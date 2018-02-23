@@ -1,8 +1,11 @@
-import React, { Component } from 'react';
-import { API_URL } from 'react-native-dotenv';
+import React, { Component } from 'react'
+import { API_URL } from 'react-native-dotenv'
 
-import SignupSignin from '../components/SignupSignin';
-import PositionRecorder from '../components/PositionRecorder';
+import SignupSignin from '../components/SignupSignin'
+import PositionRecorder from '../components/PositionRecorder'
+import RideAPI from '../services/ride_api'
+import UserAPI from '../services/user_api'
+import {BadRequestError, UnauthorizedError} from "../errors"
 
 
 export default class MainContainer extends Component {
@@ -10,61 +13,59 @@ export default class MainContainer extends Component {
     super(props)
     // @TODO: Figure out how to persist this.
     this.state = {
-      jwtToken: null
+      jwtToken: null,
+      error: null,
     }
     this.saveRide = this.saveRide.bind(this)
     this.submitLogin = this.submitLogin.bind(this)
     this.submitSignup = this.submitSignup.bind(this)
   }
 
-  submitSignup (email, password) {
-    // @TODO: Handle error when user already exists.
-    fetch(API_URL + '/users', {
-      method: "POST",
-      body: JSON.stringify({
-        email: email,
-        password: password
-      }),
-      headers: new Headers({
-        'Content-Type': 'application/json'
+  async submitSignup (email, password) {
+    const userAPI = new UserAPI()
+    try {
+      const resp = await userAPI.signup(email, password)
+      this.setState({
+        jwtToken: resp.token
       })
-    })
-    .then((response) => { return response.json() })
-    .then((response) => { this.setState({ jwtToken: response.token }) })
-    .catch((error) => { alert(error) })
+    } catch (e) {
+      console.log(e)
+      if (e instanceof BadRequestError) {
+        console.log(e)
+        this.setState({
+          error: e.message
+        })
+      }
+    }
   }
 
-  submitLogin (email, password) {
-    // @TODO: Handle error when login fails
+  async submitLogin (email, password) {
     // @TODO: Handle not connected to network
-    fetch(API_URL + '/users/login', {
-      method: "POST",
-      body: JSON.stringify({
-        email: email,
-        password: password
-      }),
-      headers: new Headers({
-        'Content-Type': 'application/json'
+    const userAPI = new UserAPI()
+    try {
+      const resp = await userAPI.login(email, password)
+      this.setState({
+        jwtToken: resp.token
       })
-    })
-    .then((response) => { return response.json() })
-    .then((response) => { this.setState({ jwtToken: response.token }) })
-    .catch((error) => { alert(error) })
+    } catch (e) {
+      if (e instanceof UnauthorizedError) {
+        this.setState({
+          error: e.message
+        })
+      }
+    }
+
   }
 
-  saveRide (positions) {
-    // @TODO: Make sure you don't lose your ride if there is no network connection
-    fetch(API_URL + '/rides', {
-      method: "POST",
-      body: JSON.stringify({
-        positions
-      }),
-      // @TODO: Move all this request crap into an API service
-      headers: new Headers({
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer: ' + this.state.jwtToken
-      })
-    })
+  async saveRide (positions) {
+    const rideAPI = new RideAPI(this.state.jwtToken)
+    try {
+      const resp = await rideAPI.saveRide({positions: positions})
+    } catch (e) {
+      console.log(e)
+      debugger
+    }
+
   }
 
   render() {
@@ -77,6 +78,7 @@ export default class MainContainer extends Component {
     } else {
       return (
         <SignupSignin
+          error={this.state.error}
           submitLogin={this.submitLogin}
           submitSignup={this.submitSignup}
         />

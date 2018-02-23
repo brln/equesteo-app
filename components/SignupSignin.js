@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {
   Button,
   StyleSheet,
+  Text,
   View
 } from 'react-native';
 import LoginForm from './LoginForm'
@@ -46,6 +47,7 @@ export default class SignupSignin extends Component {
       shown = (
         <View style={styles.container}>
           <Button onPress={this.viewSignup} title="Sign Up" />
+
           <LoginForm
             submitLogin={this.props.submitLogin}
           />
@@ -54,6 +56,7 @@ export default class SignupSignin extends Component {
     }
     return (
       <View style={styles.container}>
+        <Text>{this.props.error}</Text>
         {shown}
       </View>
     );

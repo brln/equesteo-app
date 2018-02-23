@@ -54,7 +54,6 @@ export default class SignupForm extends Component {
 
   render() {
     let dontMatchMessage = <Text>The passwords do not match</Text>
-    debugger
     return (
       <View style={styles.container}>
         { this.state.showMismatch ? dontMatchMessage : null }
