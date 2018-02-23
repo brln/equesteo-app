@@ -1,19 +1,18 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux';
 import { API_URL } from 'react-native-dotenv'
 
+import { submitLogin, submitSignup } from '../actions'
 import SignupSignin from '../components/SignupSignin'
 import PositionRecorder from '../components/PositionRecorder'
 import RideAPI from '../services/ride_api'
-import UserAPI from '../services/user_api'
-import {BadRequestError, UnauthorizedError} from "../errors"
 
 
-export default class MainContainer extends Component {
+class MainContainer extends Component {
   constructor (props) {
     super(props)
     // @TODO: Figure out how to persist this.
     this.state = {
-      jwtToken: null,
       error: null,
     }
     this.saveRide = this.saveRide.bind(this)
@@ -22,42 +21,15 @@ export default class MainContainer extends Component {
   }
 
   async submitSignup (email, password) {
-    const userAPI = new UserAPI()
-    try {
-      const resp = await userAPI.signup(email, password)
-      this.setState({
-        jwtToken: resp.token
-      })
-    } catch (e) {
-      console.log(e)
-      if (e instanceof BadRequestError) {
-        console.log(e)
-        this.setState({
-          error: e.message
-        })
-      }
-    }
+    this.props.dispatch(submitSignup(email, password))
   }
 
   async submitLogin (email, password) {
-    // @TODO: Handle not connected to network
-    const userAPI = new UserAPI()
-    try {
-      const resp = await userAPI.login(email, password)
-      this.setState({
-        jwtToken: resp.token
-      })
-    } catch (e) {
-      if (e instanceof UnauthorizedError) {
-        this.setState({
-          error: e.message
-        })
-      }
-    }
-
+    this.props.dispatch(submitLogin(email, password))
   }
 
   async saveRide (positions) {
+    //@Todo: Move this to an action/reducer
     const rideAPI = new RideAPI(this.state.jwtToken)
     try {
       const resp = await rideAPI.saveRide({positions: positions})
@@ -69,7 +41,7 @@ export default class MainContainer extends Component {
   }
 
   render() {
-    if (this.state.jwtToken) {
+    if (this.props.jwtToken) {
       return (
         <PositionRecorder
           saveRide={this.saveRide}
@@ -85,3 +57,10 @@ export default class MainContainer extends Component {
     )}
   }
 }
+
+function mapStateToProps (state) {
+  return state
+}
+
+
+export default  connect(mapStateToProps)(MainContainer)
