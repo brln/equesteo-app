@@ -2,10 +2,9 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 import { API_URL } from 'react-native-dotenv'
 
-import { submitLogin, submitSignup } from '../actions'
+import { saveRide, submitLogin, submitSignup } from '../actions'
 import SignupSignin from '../components/SignupSignin'
 import PositionRecorder from '../components/PositionRecorder'
-import RideAPI from '../services/ride_api'
 
 
 class MainContainer extends Component {
@@ -29,15 +28,15 @@ class MainContainer extends Component {
   }
 
   async saveRide (positions) {
-    //@Todo: Move this to an action/reducer
-    const rideAPI = new RideAPI(this.state.jwtToken)
-    try {
-      const resp = await rideAPI.saveRide({positions: positions})
-    } catch (e) {
-      console.log(e)
-      debugger
-    }
-
+    // @Todo: save time of ride
+    this.props.dispatch(
+      saveRide(
+        this.props.jwtToken,
+        {
+          positions: positions,
+        }
+      )
+    )
   }
 
   render() {

@@ -34,9 +34,9 @@ export default class TimeElapsed extends Component<Props> {
   }
 
   render() {
-    const timeElapsed = this.elapsedAsString()
+    // @Todo Figure out why this is sometimes delayed in showing up.
     return (
-      <Text style={styles.statFont}>Time Elapsed: {timeElapsed.toString()}</Text>
+      <Text style={styles.statFont}>Time Elapsed: {this.elapsedAsString()}</Text>
     );
   }
 }
