@@ -10,12 +10,11 @@ import AppReducer from './reducer'
 
 const store = createStore(AppReducer, undefined, applyMiddleware(thunkMiddleware))
 
-export default class App extends Component {
-  render() {
-    return (
-      <Provider store={store}>
-        <MainContainer />
-      </Provider>
-    );
-  }
-}
+registerScreens(store, Provider)
+
+Navigation.startSingleScreenApp({
+	screen: {
+		screen: 'equestio.MainContainer',
+		title: 'Main',
+	}
+});
