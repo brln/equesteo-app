@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Provider } from 'react-redux'
 import { createStore, applyMiddleware } from 'redux'
 import thunkMiddleware from 'redux-thunk'
+import { Navigation } from 'react-native-navigation';
 
 import MainContainer from './containers/Main'
 import AppReducer from './reducer'
