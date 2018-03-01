@@ -9,4 +9,8 @@ export default class RideAPI {
   async saveRide (positions) {
     return await this.apiClient.post('/rides', positions)
   }
+
+  async fetchRides () {
+    return await this.apiClient.get('/rides')
+  }
 }

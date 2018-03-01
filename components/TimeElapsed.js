@@ -9,15 +9,25 @@ import {
 export default class TimeElapsed extends Component<Props> {
   constructor (props) {
     super(props)
-    this.renderTimer = setInterval(() => {
-      this.forceUpdate()
-    }, 100)
-
     this.state = {
-      startingTime: this.props.startingTime,
+      startingTime: null,
+      elapsedTime: null,
     }
-
     this.elapsedAsString = this.elapsedAsString.bind(this)
+  }
+
+  componentDidMount() {
+    if (this.props.startingTime && !this.state.startingTime) {
+      this.setState({
+        startingTime: this.props.startingTime,
+        elapsedTime: new Date(new Date() - this.props.startingTime)
+      })
+      this.renderTimer = setInterval(() => {
+        this.setState({
+          elapsedTime: new Date(new Date() - this.state.startingTime)
+        })
+      }, 100)
+    }
   }
 
   componentWillUnmount() {
@@ -25,11 +35,16 @@ export default class TimeElapsed extends Component<Props> {
   }
 
   elapsedAsString () {
-    const elapsed = new Date(new Date() - this.state.startingTime)
-    const hours = elapsed.getUTCHours().toString().padStart(2, '0')
-    const minutes = elapsed.getUTCMinutes().toString().padStart(2, '0')
-    const seconds = elapsed.getUTCSeconds().toString().padStart(2, '0')
-    return `${hours}:${minutes}:${seconds}`
+    if (this.state.elapsedTime) {
+      const elapsed = this.state.elapsedTime
+      const hours = elapsed.getUTCHours().toString().padStart(2, '0')
+      const minutes = elapsed.getUTCMinutes().toString().padStart(2, '0')
+      const seconds = elapsed.getUTCSeconds().toString().padStart(2, '0')
+      return `${hours}:${minutes}:${seconds}`
+    } else {
+      return '00:00:00'
+    }
+
 
   }
 

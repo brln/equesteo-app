@@ -14,9 +14,12 @@ export default class Rides extends Component {
   }
 
   render() {
+    const rideComps = this.props.rides.map((ride) => {
+      return <Text key={ride.start_time}>{ride.start_time}</Text>
+    })
     return (
       <View style={styles.container}>
-        <Text>Rides</Text>
+        {rideComps}
       </View>
     );
   }
@@ -25,7 +28,7 @@ export default class Rides extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'stretch',
     backgroundColor: '#F5FCFF',
   },

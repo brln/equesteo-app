@@ -1,35 +1,34 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
-import { API_URL } from 'react-native-dotenv'
 import {
   StyleSheet,
   View
 } from 'react-native';
 
-import { submitLogin } from '../actions'
-import LoginForm from '../components/LoginForm'
+import { submitSignup } from '../actions'
+import SignupForm from '../components/SignupForm'
 
-class LoginContainer extends Component {
+class SignupContainer extends Component {
   constructor (props) {
     super(props)
+    // @TODO: Figure out how to persist this.
     this.state = {
       error: null,
     }
-    this.submitLogin = this.submitLogin.bind(this)
+    this.submitSignup = this.submitSignup.bind(this)
   }
 
-  async submitLogin (email, password) {
-    this.props.dispatch(submitLogin(email, password))
+  async submitSignup (email, password) {
+    this.props.dispatch(submitSignup(email, password))
   }
 
   render() {
     return (
       <View style={styles.container}>
-        <LoginForm
-          submitLogin={this.submitLogin}
+        <SignupForm
+          submitSignup={this.submitSignup}
         />
       </View>
-
     )
   }
 }
@@ -47,4 +46,4 @@ function mapStateToProps (state) {
   return state
 }
 
-export default  connect(mapStateToProps)(LoginContainer)
+export default connect(mapStateToProps)(SignupContainer)

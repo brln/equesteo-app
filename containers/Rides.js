@@ -9,12 +9,16 @@ class RidesContainer extends Component {
   }
 
   render() {
-    return <Rides />
+    return (
+      <Rides
+        rides={this.props.rides}
+      />
+    )
   }
 }
 
 function mapStateToProps (state) {
-  return state
+  return { rides: state.rides }
 }
 
 export default  connect(mapStateToProps)(RidesContainer)

@@ -55,9 +55,10 @@ export default class LoginForm extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'stretch',
     backgroundColor: '#F5FCFF',
+    padding: 30,
   },
   email: {
     borderColor: 'gray',

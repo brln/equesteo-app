@@ -12,14 +12,11 @@ class RecorderContainer extends Component {
     this.saveRide = this.saveRide.bind(this)
   }
 
-  async saveRide (positions) {
-    // @Todo: save time of ride
+  async saveRide (rideData) {
     this.props.dispatch(
       saveRide(
         this.props.jwtToken,
-        {
-          positions: positions,
-        }
+        rideData
       )
     )
   }

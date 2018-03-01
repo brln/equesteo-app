@@ -1,4 +1,8 @@
-import { RECEIVE_JWT, RIDE_SAVED } from './constants'
+import {
+  RECEIVE_JWT,
+  RIDE_SAVED,
+  RIDES_FETCHED
+} from './constants'
 
 const initialState = {
   app: 'login',
@@ -16,6 +20,10 @@ export default function AppReducer(state=initialState, action) {
     case RIDE_SAVED:
       return Object.assign({}, state, {
         rides: [...state.rides, action.ride]
+      })
+    case RIDES_FETCHED:
+      return Object.assign({}, state, {
+        rides: action.rides
       })
     default:
       return state
