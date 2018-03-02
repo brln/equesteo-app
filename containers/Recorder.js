@@ -3,8 +3,7 @@ import { connect } from 'react-redux';
 import { API_URL } from 'react-native-dotenv'
 
 import { saveRide } from '../actions'
-import PositionRecorder from '../components/PositionRecorder'
-
+import RideRecorder from '../components/RideRecorder/RideRecorder'
 
 class RecorderContainer extends Component {
   constructor (props) {
@@ -23,7 +22,7 @@ class RecorderContainer extends Component {
 
   render() {
     return (
-      <PositionRecorder
+      <RideRecorder
         saveRide={this.saveRide}
       />
     )

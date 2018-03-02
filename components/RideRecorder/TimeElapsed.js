@@ -1,17 +1,15 @@
 import React, { Component } from 'react';
 import {
-  Button,
   StyleSheet,
   Text,
-  View
 } from 'react-native';
 
-export default class TimeElapsed extends Component<Props> {
+export default class TimeElapsed extends Component {
   constructor (props) {
     super(props)
     this.state = {
       startingTime: null,
-      elapsedTime: null,
+      elapsedTime: undefined,
     }
     this.elapsedAsString = this.elapsedAsString.bind(this)
   }
@@ -34,22 +32,26 @@ export default class TimeElapsed extends Component<Props> {
     clearInterval(this.renderTimer)
   }
 
+  leftpad(num) {
+    const str = num.toString()
+    const pad = "00"
+    return pad.substring(0, pad.length - str.length) + str
+  }
+
   elapsedAsString () {
-    if (this.state.elapsedTime) {
-      const elapsed = this.state.elapsedTime
-      const hours = elapsed.getUTCHours().toString().padStart(2, '0')
-      const minutes = elapsed.getUTCMinutes().toString().padStart(2, '0')
-      const seconds = elapsed.getUTCSeconds().toString().padStart(2, '0')
-      return `${hours}:${minutes}:${seconds}`
-    } else {
-      return '00:00:00'
+    const elapsed = this.state.elapsedTime
+    let hours = '00'
+    let minutes = '00'
+    let seconds = '00'
+    if (!(typeof(elapsed) === 'undefined')) {
+      hours = this.leftpad(elapsed.getUTCHours())
+      minutes = this.leftpad(elapsed.getUTCMinutes())
+      seconds = this.leftpad(elapsed.getUTCSeconds())
     }
-
-
+    return `${hours}:${minutes}:${seconds}`
   }
 
   render() {
-    // @Todo Figure out why this is sometimes delayed in showing up.
     return (
       <Text style={styles.statFont}>Time Elapsed: {this.elapsedAsString()}</Text>
     );

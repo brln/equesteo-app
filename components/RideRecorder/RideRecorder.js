@@ -2,13 +2,16 @@ import React, { Component } from 'react';
 import {
   Button,
   StyleSheet,
-  Text,
   View
 } from 'react-native';
 
-import TimeElapsed from './TimeElapsed'
+
+import RideDetails from './RideDetails'
+import RideStats from './RideStats'
+import GPSStatus from './GPSStatus'
 
 const initialState = {
+  enteringDetails: false,
   hasPosition: false,
   lastLat: null,
   lastLong: null,
@@ -18,12 +21,13 @@ const initialState = {
   startingTime: null,
 }
 
-export default class PositionRecorder extends Component<Props> {
+export default class RideRecorder extends Component<Props> {
   constructor (props) {
     super(props)
     this.state = Object.assign({}, initialState)
     this.watchID = null;
     this.newPositionState = this.newPositionState.bind(this)
+    this.rideComplete = this.rideComplete.bind(this)
     this.saveRide = this.saveRide.bind(this)
     this.startRide = this.startRide.bind(this)
   }
@@ -57,9 +61,17 @@ export default class PositionRecorder extends Component<Props> {
      navigator.geolocation.clearWatch(this.watchID);
   }
 
-  saveRide () {
+  rideComplete () {
+    this.setState({
+      recording: false,
+      enteringDetails: true
+    })
+  }
+
+  saveRide (rideName) {
     this.props.saveRide({
       positions: this.state.positions,
+      name: rideName,
       startTime: this.state.startingTime,
     })
     this.setState(Object.assign({}, initialState))
@@ -80,33 +92,41 @@ export default class PositionRecorder extends Component<Props> {
   }
 
   render() {
-    let positionFound = <Text style={styles.locationNotFound}>Location Not Found</Text>
-    if (this.state.hasPosition) {
-      positionFound = <Text style={styles.locationFound}>Location Found!</Text>
-    }
-    let rideStats = null;
-    let startButton = <View><Button onPress={this.startRide} title="Start Ride"/></View>
-    if (this.state.recording && this.state.startingTime) {
+    let rideStats = null
+    let detailPage = null
+    let gpsBar = <GPSStatus hasPosition={this.state.hasPosition} />
+    let startButton = (
+      <View style={styles.startButton}>
+        <Button style={styles.startButton} onPress={this.startRide} title="Start Ride"/>
+      </View>
+    )
+    if (this.state.recording) {
       startButton = null
       rideStats = (
         <View>
-          <Text style={styles.statFont}>Latitude: {this.state.lastLat}</Text>
-          <Text style={styles.statFont}>Longitude: {this.state.lastLong}</Text>
-          <Text style={styles.statFont}>Altitude: {this.state.lastAltitude}</Text>
-          <TimeElapsed
+          <RideStats
+            lastLat={this.state.lastLat}
+            lastLong={this.state.lastLong}
+            lastAltitude={this.state.lastAltitude}
             startingTime={this.state.startingTime}
           />
-          <Button onPress={this.saveRide} title="Save Ride"/>
+          <Button onPress={this.rideComplete} title="Ride Complete"/>
         </View>
+      )
+    } else if (this.state.enteringDetails) {
+      startButton = null
+      gpsBar = null
+      detailPage = (
+        <RideDetails
+          saveRide={this.saveRide}
+        />
       )
     }
     return (
       <View style={styles.container}>
-        <View style={styles.positionFound}>{positionFound}</View>
-        <View style={styles.rideStats}>
-          {startButton}
-          {rideStats}
-        </View>
+        {startButton}
+        {rideStats}
+        {detailPage}
       </View>
     );
   }
@@ -117,22 +137,12 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'flex-start',
-    alignItems: 'center',
+    alignItems: 'stretch',
     backgroundColor: '#F5FCFF',
   },
-  locationFound: {
-    color: "green",
-  },
-  locationNotFound: {
-    color: "red",
-  },
-  rideStats: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  statFont: {
-    fontSize: 25
+  startButton: {
+    maxWidth: 100,
+    alignSelf: 'center',
+    marginTop: 50,
   }
 });

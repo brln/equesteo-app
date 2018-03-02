@@ -6,8 +6,8 @@ export default class RideAPI {
     this.apiClient = new ApiClient(token)
   }
 
-  async saveRide (positions) {
-    return await this.apiClient.post('/rides', positions)
+  async saveRide (rideData) {
+    return await this.apiClient.post('/rides', rideData)
   }
 
   async fetchRides () {

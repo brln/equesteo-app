@@ -19,7 +19,7 @@ export default function AppReducer(state=initialState, action) {
       })
     case RIDE_SAVED:
       return Object.assign({}, state, {
-        rides: [...state.rides, action.ride]
+        rides: [action.ride, ...state.rides]
       })
     case RIDES_FETCHED:
       return Object.assign({}, state, {
