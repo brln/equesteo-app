@@ -1,3 +1,5 @@
+import { AsyncStorage } from 'react-native'
+
 import RideAPI from './services/ride_api'
 import UserAPI from './services/user_api'
 import {BadRequestError, UnauthorizedError} from "./errors"
@@ -37,8 +39,19 @@ function ridesFetched(rides) {
   }
 }
 
+function findLocalToken() {
+  return async (dispatch) => {
+    const token = await AsyncStorage.getItem('@equestio:jwtToken');
+    if (token !== null) {
+      dispatch(receiveJWT(token))
+      dispatch(fetchRides(token))
+    }
+  }
+}
+
 export function appInitialized() {
   return async (dispatch, getState) => {
+    dispatch(findLocalToken())
     dispatch(changeAppRoot('login'))
   }
 }
@@ -72,6 +85,7 @@ export function submitLogin(email, password) {
     const userAPI = new UserAPI()
     try {
       const resp = await userAPI.login(email, password)
+      await AsyncStorage.setItem('@equestio:jwtToken', resp.token);
       dispatch(receiveJWT(resp.token))
       dispatch(fetchRides(resp.token))
     } catch (e) {
@@ -98,3 +112,5 @@ export function submitSignup(email, password) {
   }
 
 }
+
+// @Todo Put an accounts page in where you can log out.

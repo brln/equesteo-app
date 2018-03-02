@@ -11,7 +11,6 @@ import SignupForm from '../components/SignupForm'
 class SignupContainer extends Component {
   constructor (props) {
     super(props)
-    // @TODO: Figure out how to persist this.
     this.state = {
       error: null,
     }
