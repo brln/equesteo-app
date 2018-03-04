@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 
+import Map from './Map'
+
 import {
   StyleSheet,
   Text,
@@ -16,8 +18,13 @@ export default class Ride extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text>{this.props.ride.name}</Text>
-        <Text>{this.props.ride.start_time}</Text>
+        <Map
+          ride={this.props.ride}
+        />
+        <View>
+          <Text>{this.props.ride.name}</Text>
+          <Text>{this.props.ride.start_time}</Text>
+        </View>
       </View>
     )
   }

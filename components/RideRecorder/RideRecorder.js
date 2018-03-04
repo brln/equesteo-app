@@ -13,12 +13,12 @@ import GPSStatus from './GPSStatus'
 const initialState = {
   enteringDetails: false,
   hasPosition: false,
-  lastLat: null,
-  lastLong: null,
-  lastAltitude: null,
   positions: [],
   recording: false,
   startingTime: null,
+  lastLat: null,
+  lastLong: null,
+  totalDistance: 0.0
 }
 
 export default class RideRecorder extends Component<Props> {
@@ -26,10 +26,32 @@ export default class RideRecorder extends Component<Props> {
     super(props)
     this.state = Object.assign({}, initialState)
     this.watchID = null;
+    this.dontSaveRide = this.dontSaveRide.bind(this)
     this.newPositionState = this.newPositionState.bind(this)
     this.rideComplete = this.rideComplete.bind(this)
     this.saveRide = this.saveRide.bind(this)
     this.startRide = this.startRide.bind(this)
+  }
+
+  haversine(lat1, lon1, lat2, lon2) {
+    toRad = (deg) => {
+     return deg * Math.PI / 180;
+    }
+
+    if (!lat1 || !lon1) {
+      return 0
+    }
+
+    const R = 3959; // mi
+    const x1 = lat2 - lat1
+    const dLat = toRad(x1)
+    const x2 = lon2 - lon1
+    const dLon = toRad(x2)
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
   }
 
   newPositionState(position) {
@@ -38,12 +60,18 @@ export default class RideRecorder extends Component<Props> {
       lg: position.coords.longitude,
       ts: position.timestamp,
     }
+    const newDistance = this.haversine(
+      this.state.lastLat,
+      this.state.lastLong,
+      position.coords.latitude,
+      position.coords.longitude
+    )
     return {
-      hasPosition: true ,
-      positions: [...this.state.positions, thisPosition],
+      hasPosition: true,
       lastLat: position.coords.latitude,
       lastLong: position.coords.longitude,
-      lastAltitude: position.coords.altitude,
+      positions: [...this.state.positions, thisPosition],
+      totalDistance: this.state.totalDistance + newDistance
     }
   }
 
@@ -68,6 +96,10 @@ export default class RideRecorder extends Component<Props> {
     })
   }
 
+  dontSaveRide () {
+    this.setState(Object.assign({}, initialState))
+  }
+
   saveRide (rideName) {
     this.props.saveRide({
       positions: this.state.positions,
@@ -82,7 +114,7 @@ export default class RideRecorder extends Component<Props> {
       (position) => {
         this.setState(this.newPositionState(position))
       },
-      null,
+      (error) => alert(error.message),
       {enableHighAccuracy: true, timeout: 1000 * 60 * 10, maximumAge: 10000, distanceFilter: 20}
     )
     this.setState({
@@ -97,7 +129,7 @@ export default class RideRecorder extends Component<Props> {
     let gpsBar = <GPSStatus hasPosition={this.state.hasPosition} />
     let startButton = (
       <View style={styles.startButton}>
-        <Button style={styles.startButton} onPress={this.startRide} title="Start Ride"/>
+        <Button onPress={this.startRide} title="Start Ride"/>
       </View>
     )
     if (this.state.recording) {
@@ -105,12 +137,12 @@ export default class RideRecorder extends Component<Props> {
       rideStats = (
         <View>
           <RideStats
-            lastLat={this.state.lastLat}
-            lastLong={this.state.lastLong}
-            lastAltitude={this.state.lastAltitude}
             startingTime={this.state.startingTime}
+            totalDistance={this.state.totalDistance}
           />
-          <Button onPress={this.rideComplete} title="Ride Complete"/>
+          <View style={styles.rideComplete}>
+            <Button onPress={this.rideComplete} title="Ride Complete"/>
+          </View>
         </View>
       )
     } else if (this.state.enteringDetails) {
@@ -118,15 +150,19 @@ export default class RideRecorder extends Component<Props> {
       gpsBar = null
       detailPage = (
         <RideDetails
+          dontSaveRide={this.dontSaveRide}
           saveRide={this.saveRide}
         />
       )
     }
     return (
       <View style={styles.container}>
-        {startButton}
-        {rideStats}
-        {detailPage}
+        {gpsBar}
+        <View style={styles.content}>
+          {startButton}
+          {rideStats}
+          {detailPage}
+        </View>
       </View>
     );
   }
@@ -140,9 +176,20 @@ const styles = StyleSheet.create({
     alignItems: 'stretch',
     backgroundColor: '#F5FCFF',
   },
+  content: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'space-around',
+    alignItems: 'stretch',
+    backgroundColor: '#F5FCFF',
+  },
   startButton: {
     maxWidth: 100,
     alignSelf: 'center',
     marginTop: 50,
+  },
+  rideComplete: {
+    paddingTop: 30,
+    alignSelf: 'center',
   }
 });

@@ -1,19 +1,27 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 export default GPSStatus = (props) => {
     let positionFound = <Text style={styles.locationNotFound}>Location Not Found</Text>
     if (props.hasPosition) {
       positionFound = <Text style={styles.locationFound}>Location Found!</Text>
     }
-    return positionFound
+    return (
+      <View style={styles.container}>
+        {positionFound}
+      </View>
+    )
 }
 
 const styles = StyleSheet.create({
   locationFound: {
-    color: "green",
+    backgroundColor: 'green',
+    color: "white",
+    textAlign: 'center'
   },
   locationNotFound: {
-    color: "red",
+    backgroundColor: 'red',
+    color: "white",
+    textAlign: "center",
   },
 });

@@ -19,3 +19,14 @@ export class BadRequestError extends Error {
     this.__proto__ = BadRequestError.prototype
   }
 }
+
+export class UnknownError extends Error {
+  constructor (message, ...params) {
+    super(...params)
+    this.message = message
+
+    // Javascript hacks to be able to call instanceof
+    this.constructor = BadRequestError
+    this.__proto__ = BadRequestError.prototype
+  }
+}

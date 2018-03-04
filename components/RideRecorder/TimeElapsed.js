@@ -53,13 +53,14 @@ export default class TimeElapsed extends Component {
 
   render() {
     return (
-      <Text style={styles.statFont}>Time Elapsed: {this.elapsedAsString()}</Text>
+      <Text style={styles.statFont}>{this.elapsedAsString()}</Text>
     );
   }
 }
 
 const styles = StyleSheet.create({
   statFont: {
-    fontSize: 25
+    fontSize: 90,
+    textAlign: 'center'
   }
 });

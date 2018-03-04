@@ -113,4 +113,3 @@ export function submitSignup(email, password) {
 
 }
 
-// @Todo Put an accounts page in where you can log out.

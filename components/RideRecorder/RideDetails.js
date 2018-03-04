@@ -14,6 +14,7 @@ export default class RideDetails extends Component<Props> {
       rideName: null
     }
     this.changeRideName = this.changeRideName.bind(this)
+    this.dontSaveRide = this.dontSaveRide.bind(this)
     this.saveRide = this.saveRide.bind(this)
   }
 
@@ -27,6 +28,10 @@ export default class RideDetails extends Component<Props> {
     this.props.saveRide(this.state.rideName)
   }
 
+  dontSaveRide() {
+    this.props.dontSaveRide()
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -36,7 +41,15 @@ export default class RideDetails extends Component<Props> {
           onChangeText={this.changeRideName}
           value={this.state.rideName}
         />
-        <Button style={styles.saveButton} onPress={this.saveRide} title="Save Ride"/>
+        <View style={styles.buttons}>
+          <View style={styles.buttonPad}>
+            <Button style={styles.saveButton} onPress={this.dontSaveRide} title="Don't Save"/>
+          </View>
+
+          <View style={styles.buttonPad}>
+            <Button style={styles.saveButton} onPress={this.saveRide} title="Save Ride"/>
+          </View>
+        </View>
       </View>
     )
   }
@@ -50,9 +63,16 @@ const styles = StyleSheet.create({
     alignItems: 'stretch',
     backgroundColor: '#F5FCFF',
   },
-  textInput: {
-  },
   saveButton: {
-    width: 80
+    padding: 100
+  },
+  buttons: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'center',
+  },
+  buttonPad: {
+    margin: 20
   }
 });
