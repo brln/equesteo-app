@@ -6,3 +6,4 @@
  - Splash page
  - GPS Strength?
  - Move signup/login back into one page because the keyboard obscures the tab layout
+ - be able to log out

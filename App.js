@@ -73,6 +73,14 @@ export default class App {
               selectedIcon: require('./img/path.png'),
               title: 'Rides',
               // navigatorStyle: {}
+            },
+            {
+              label: 'Account',
+              screen: 'equestio.Account',
+              icon: require('./img/account.png'),
+              selectedIcon: require('./img/account.png'),
+              title: 'My Account',
+              // navigatorStyle: {}
             }
           ],
           // passProps: {},

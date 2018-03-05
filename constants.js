@@ -1,4 +1,5 @@
 export const CHANGE_ROOT = 'CHANGE_ROOT'
+export const CLEAR_STATE = 'CLEAR_STATE'
 export const NEW_GEO_WATCH = 'NEW_GEO_WATCH'
 export const NEW_LOCATION = 'NEW_LOCATION'
 export const RIDE_SAVED = 'RIDE_SAVED'

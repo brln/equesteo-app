@@ -6,6 +6,7 @@ import {BadRequestError, UnauthorizedError} from "./errors"
 
 import {
   CHANGE_ROOT,
+  CLEAR_STATE,
   NEW_GEO_WATCH,
   NEW_LOCATION,
   RECEIVE_JWT,
@@ -13,10 +14,18 @@ import {
   RIDES_FETCHED,
 } from './constants'
 
+TOKEN_KEY = '@equestio:jwtToken'
+
 function changeAppRoot(root) {
   return {
     type: CHANGE_ROOT,
     root
+  }
+}
+
+function clearState () {
+  return {
+    type: CLEAR_STATE
   }
 }
 
@@ -57,7 +66,7 @@ function newLocation(location) {
 
 function findLocalToken() {
   return async (dispatch) => {
-    const token = await AsyncStorage.getItem('@equestio:jwtToken');
+    const token = await AsyncStorage.getItem(TOKEN_KEY);
     if (token !== null) {
       dispatch(receiveJWT(token))
       dispatch(fetchRides(token))
@@ -123,12 +132,19 @@ export function saveRide(token, rideData) {
   }
 }
 
+export function signOut () {
+  return async(dispatch) => {
+    await AsyncStorage.removeItem(TOKEN_KEY);
+    dispatch(clearState())
+  }
+}
+
 export function submitLogin(email, password) {
   return async (dispatch) => {
     const userAPI = new UserAPI()
     try {
       const resp = await userAPI.login(email, password)
-      await AsyncStorage.setItem('@equestio:jwtToken', resp.token);
+      await AsyncStorage.setItem(TOKEN_KEY, resp.token);
       dispatch(receiveJWT(resp.token))
       dispatch(fetchRides(resp.token))
     } catch (e) {

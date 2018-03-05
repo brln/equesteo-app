@@ -1,4 +1,5 @@
 import {
+  CLEAR_STATE,
   NEW_GEO_WATCH,
   NEW_LOCATION,
   RECEIVE_JWT,
@@ -16,6 +17,8 @@ const initialState = {
 
 export default function AppReducer(state=initialState, action) {
   switch (action.type) {
+    case CLEAR_STATE:
+      return Object.assign({}, initialState)
     case NEW_GEO_WATCH:
       return Object.assign({}, state, {
         geoWatchID: action.geoWatchID
