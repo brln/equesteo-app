@@ -5,7 +5,7 @@ import {
   View
 } from 'react-native';
 
-
+import { stopLocationTracking } from '../../actions'
 import RideDetails from './RideDetails'
 import RideStats from './RideStats'
 import GPSStatus from './GPSStatus'
@@ -27,7 +27,6 @@ export default class RideRecorder extends Component<Props> {
     this.state = Object.assign({}, initialState)
     this.watchID = null;
     this.dontSaveRide = this.dontSaveRide.bind(this)
-    this.newPositionState = this.newPositionState.bind(this)
     this.rideComplete = this.rideComplete.bind(this)
     this.saveRide = this.saveRide.bind(this)
     this.startRide = this.startRide.bind(this)
@@ -54,35 +53,32 @@ export default class RideRecorder extends Component<Props> {
     return R * c;
   }
 
-  newPositionState(position) {
-    const thisPosition = {
-      lt: position.coords.latitude,
-      lg: position.coords.longitude,
-      ts: position.timestamp,
+  componentWillReceiveProps(newProps) {
+    const position = newProps.lastLocation
+    if (this.state.recording) {
+      const thisPosition = {
+        lt: position.coords.latitude,
+        lg: position.coords.longitude,
+        ts: position.timestamp,
+      }
+      const newDistance = this.haversine(
+        this.state.lastLat,
+        this.state.lastLong,
+        position.coords.latitude,
+        position.coords.longitude
+      )
+      this.setState({
+        hasPosition: true,
+        lastLat: position.coords.latitude,
+        lastLong: position.coords.longitude,
+        positions: [...this.state.positions, thisPosition],
+        totalDistance: this.state.totalDistance + newDistance
+      })
+    } else if (newProps.lastLocation) {
+      this.setState({
+        hasPosition: true
+      })
     }
-    const newDistance = this.haversine(
-      this.state.lastLat,
-      this.state.lastLong,
-      position.coords.latitude,
-      position.coords.longitude
-    )
-    return {
-      hasPosition: true,
-      lastLat: position.coords.latitude,
-      lastLong: position.coords.longitude,
-      positions: [...this.state.positions, thisPosition],
-      totalDistance: this.state.totalDistance + newDistance
-    }
-  }
-
-  componentDidMount () {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        this.setState(this.newPositionState(position));
-      },
-      (error) => alert(error.message),
-      { enableHighAccuracy: true, timeout: 1000 * 60 * 10, maximumAge: 1000 }
-    );
   }
 
   componentWillUnmount () {
@@ -110,13 +106,6 @@ export default class RideRecorder extends Component<Props> {
   }
 
   startRide () {
-    this.watchID = navigator.geolocation.watchPosition(
-      (position) => {
-        this.setState(this.newPositionState(position))
-      },
-      (error) => alert(error.message),
-      {enableHighAccuracy: true, timeout: 1000 * 60 * 10, maximumAge: 10000, distanceFilter: 20}
-    )
     this.setState({
       recording: true,
       startingTime: Math.floor(new Date().getTime()),

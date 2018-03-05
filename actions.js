@@ -6,8 +6,10 @@ import {BadRequestError, UnauthorizedError} from "./errors"
 
 import {
   CHANGE_ROOT,
+  NEW_GEO_WATCH,
+  NEW_LOCATION,
   RECEIVE_JWT,
-  RIDE_SAVED ,
+  RIDE_SAVED,
   RIDES_FETCHED,
 } from './constants'
 
@@ -39,6 +41,20 @@ function ridesFetched(rides) {
   }
 }
 
+function newGeoWatch(watchID) {
+  return {
+    type: NEW_GEO_WATCH,
+    watchID
+  }
+}
+
+function newLocation(location) {
+  return {
+    type: NEW_LOCATION,
+    location
+  }
+}
+
 function findLocalToken() {
   return async (dispatch) => {
     const token = await AsyncStorage.getItem('@equestio:jwtToken');
@@ -49,10 +65,37 @@ function findLocalToken() {
   }
 }
 
+function startLocationTracking () {
+  return async (dispatch) => {
+    navigator.geolocation.getCurrentPosition(
+      (location) => {
+        dispatch(newLocation(location))
+      },
+      null,
+      { enableHighAccuracy: true, timeout: 1000 * 60 * 10, maximumAge: 1000 }
+    );
+    const watchID = navigator.geolocation.watchPosition(
+      (location) => {
+        dispatch(newLocation(location))
+      },
+      null,
+      {enableHighAccuracy: true, timeout: 1000 * 60 * 10, maximumAge: 10000, distanceFilter: 20}
+    )
+    dispatch(newGeoWatch(watchID))
+  }
+}
+
+export function stopLocationTracking () {
+  return async (dispatch, getState) => {
+    navigator.geolocation.clearWatch(getState.geoWatchID);
+  }
+}
+
 export function appInitialized() {
   return async (dispatch, getState) => {
     dispatch(findLocalToken())
     dispatch(changeAppRoot('login'))
+    dispatch(startLocationTracking())
   }
 }
 

@@ -58,6 +58,8 @@ export default class Map extends Component {
           <MapView.Polyline
             style={styles.map}
             coordinates={coordinates}
+            strokeColor="#dc0202"
+            strokeWidth={5}
           >
           </MapView.Polyline>
         </MapView>

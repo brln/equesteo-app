@@ -16,8 +16,10 @@ export default class LoginForm extends Component {
       email: null,
       password: null
     }
+    this.inputs = {}
     this.changeEmail = this.changeEmail.bind(this);
     this.changePassword = this.changePassword.bind(this);
+    this.moveToPassword = this.moveToPassword.bind(this);
     this.submitLogin = this.submitLogin.bind(this)
   }
 
@@ -37,16 +39,29 @@ export default class LoginForm extends Component {
     this.props.submitLogin(this.state.email, this.state.password)
   }
 
+
+  moveToPassword (e) {
+    this.inputs['password'].focus()
+  }
+
   render() {
     return (
       <View style={styles.container}>
         <Text>Email:</Text>
-        <TextInput style={styles.email} onChangeText={this.changeEmail}/>
+        <TextInput
+          autoFocus={true}
+          style={styles.email}
+          onChangeText={this.changeEmail}
+          onSubmitEditing={this.moveToPassword}
+          ref={(i) => this.inputs['email'] = i}
+        />
         <Text>Password:</Text>
-        <TextInput onChangeText={this.changePassword}/>
-        <View style={styles.submitButton}>
-          <Button onPress={this.submitLogin} title="submit"/>
-        </View>
+        <TextInput
+          onChangeText={this.changePassword}
+          onSubmitEditing={this.submitLogin}
+          secureTextEntry={true}
+          ref={(i) => this.inputs['password'] = i}
+        />
       </View>
     );
   }
@@ -67,7 +82,4 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     width: 80,
   },
-  submitButton: {
-    width: 80
-  }
 });

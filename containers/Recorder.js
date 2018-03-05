@@ -23,6 +23,7 @@ class RecorderContainer extends Component {
   render() {
     return (
       <RideRecorder
+        lastLocation={this.props.lastLocation}
         saveRide={this.saveRide}
       />
     )
@@ -30,7 +31,10 @@ class RecorderContainer extends Component {
 }
 
 function mapStateToProps (state) {
-  return state
+  return {
+    jwtToken: state.jwtToken,
+    lastLocation: state.lastLocation
+  }
 }
 
 export default  connect(mapStateToProps)(RecorderContainer)

@@ -18,10 +18,13 @@ export default class SignupForm extends Component {
       password2: null,
       showMismatch: false,
     }
-    this.changeEmail = this.changeEmail.bind(this);
-    this.changePassword1 = this.changePassword1.bind(this);
-    this.changePassword2 = this.changePassword2.bind(this);
+    this.changeEmail = this.changeEmail.bind(this)
+    this.changePassword1 = this.changePassword1.bind(this)
+    this.changePassword2 = this.changePassword2.bind(this)
+    this.moveToPassword = this.moveToPassword.bind(this)
+    this.moveToPassword2 = this.moveToPassword2.bind(this)
     this.submitSignup = this.submitSignup.bind(this)
+    this.inputs = {}
   }
 
   changeEmail (text) {
@@ -42,6 +45,14 @@ export default class SignupForm extends Component {
     })
   }
 
+  moveToPassword () {
+    this.inputs['pw1'].focus()
+  }
+
+  moveToPassword2() {
+    this.inputs['pw2'].focus()
+  }
+
   submitSignup () {
     if (this.state.password1 === this.state.password2) {
       this.props.submitSignup(this.state.email, this.state.password2)
@@ -58,14 +69,29 @@ export default class SignupForm extends Component {
       <View style={styles.container}>
         { this.state.showMismatch ? dontMatchMessage : null }
         <Text>Email:</Text>
-        <TextInput style={styles.email} onChangeText={this.changeEmail}/>
+        <TextInput
+          autoFocus={true}
+          style={styles.email}
+          onSubmitEditing={this.moveToPassword}
+          onChangeText={this.changeEmail}
+          returnKeyType="next"
+          ref={(i) => this.inputs['email'] = i}
+        />
         <Text>Password:</Text>
-        <TextInput onChangeText={this.changePassword1}/>
+        <TextInput
+          onSubmitEditing={this.moveToPassword2}
+          onChangeText={this.changePassword1}
+          ref={(i) => this.inputs['pw1'] = i}
+          returnKeyType="next"
+          secureTextEntry={true}
+        />
         <Text>Password Again:</Text>
-        <TextInput onChangeText={this.changePassword2}/>
-        <View style={styles.submitButton}>
-          <Button onPress={this.submitSignup} title="submit"/>
-        </View>
+        <TextInput
+          onSubmitEditing={this.submitSignup}
+          secureTextEntry={true}
+          onChangeText={this.changePassword2}
+          ref={(i) => this.inputs['pw2'] = i}
+        />
       </View>
     );
   }
@@ -86,7 +112,4 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     width: 80,
   },
-  submitButton: {
-    width: 80
-  }
 });
