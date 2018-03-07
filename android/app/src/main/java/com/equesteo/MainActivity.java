@@ -1,4 +1,4 @@
-package com.equestio;
+package com.equesteo;
 
 import com.reactnativenavigation.controllers.SplashActivity;
 

@@ -1,4 +1,4 @@
-package com.equestio;
+package com.equesteo;
 
 import android.app.Application;
 
@@ -39,4 +39,3 @@ public class MainApplication extends NavigationApplication {
         return "index";
     }
 }
-

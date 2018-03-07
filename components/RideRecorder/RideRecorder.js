@@ -29,7 +29,8 @@ export default class RideRecorder extends Component<Props> {
   }
 
   dontSaveRide () {
-    this.setState(Object.assign({}, initialState))
+    this.setState({enteringDetails: false})
+    this.props.discardRide()
   }
 
   saveRide (rideName) {

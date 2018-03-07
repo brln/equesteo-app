@@ -1,4 +1,4 @@
-rootProject.name = 'equestio'
+rootProject.name = 'equesteo'
 
 include ':app'
 include ':react-native-navigation'

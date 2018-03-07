@@ -37,8 +37,29 @@ export default class Map extends Component {
     return [latInRads * 180 / Math.PI, longInRads * 180 / Math.PI]
   }
 
+  delta (coordinates) {
+    let lats = []
+    let longs = []
+    for (let rideCoord of coordinates) {
+      lats.push(rideCoord.latitude)
+      longs.push(rideCoord.longitude)
+    }
+    let latDelta = 0.01
+    let longDelta = 0.01
+    if (lats.length > 1 && longs.length > 1) {
+      latDelta = Math.abs(Math.max(...lats) - Math.min(...lats)) * 1.8
+      longDelta = Math.abs(Math.max(...longs) - Math.min(...longs)) * 1.8
+    }
+    return [latDelta, longDelta]
+  }
+
   render() {
-    const coordinates = this.props.ride.ride_coordinates.map((apiCoord) => {
+    const sorted = [...this.props.ride.ride_coordinates].sort((a, b) => {
+      return new Date(b.timestamp) - new Date(a.timestamp);
+    })
+
+    debugger
+    const coordinates = sorted.map((apiCoord) => {
       return {
         latitude: parseFloat(apiCoord.latitude),
         longitude: parseFloat(apiCoord.longitude),
@@ -47,13 +68,16 @@ export default class Map extends Component {
     let centerLat, centerLong
     [centerLat, centerLong] = this.center(coordinates)
 
+    let latDelta, longDelta
+    [latDelta, longDelta] = this.delta(coordinates)
+
     return (
       <View style ={styles.container}>
         <MapView style={styles.map} initialRegion={{
           latitude: centerLat,
           longitude: centerLong,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01
+          latitudeDelta: latDelta,
+          longitudeDelta: longDelta
         }}>
           <MapView.Polyline
             style={styles.map}

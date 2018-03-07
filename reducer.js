@@ -1,5 +1,6 @@
 import {
   CLEAR_STATE,
+  DISCARD_RIDE,
   NEW_GEO_WATCH,
   NEW_LOCATION,
   RECEIVE_JWT,
@@ -25,6 +26,10 @@ export default function AppReducer(state=initialState, action) {
     case NEW_GEO_WATCH:
       return Object.assign({}, state, {
         geoWatchID: action.geoWatchID
+      })
+    case DISCARD_RIDE:
+      return Object.assign({}, state, {
+        currentRide: null
       })
     case NEW_LOCATION:
       const newState = Object.assign({}, state, {

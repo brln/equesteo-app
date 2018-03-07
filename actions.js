@@ -7,6 +7,7 @@ import {BadRequestError, UnauthorizedError} from "./errors"
 import {
   CHANGE_ROOT,
   CLEAR_STATE,
+  DISCARD_RIDE,
   NEW_GEO_WATCH,
   NEW_LOCATION,
   RECEIVE_JWT,
@@ -27,6 +28,12 @@ function changeAppRoot(root) {
 function clearState () {
   return {
     type: CLEAR_STATE
+  }
+}
+
+export function discardRide ()  {
+  return {
+    type: DISCARD_RIDE
   }
 }
 
