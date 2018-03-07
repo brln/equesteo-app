@@ -5,20 +5,33 @@ import TimeElapsed from './TimeElapsed'
 
 export default RideStats = (props) => {
   return (
-    <View >
+    <View style={styles.rideStats}>
       <TimeElapsed
-        startingTime={props.startingTime}
+        startTime={props.startTime}
+        fontStyle={styles.statFont}
       />
       <View>
-        <Text style={styles.statFont}>{ props.totalDistance.toFixed(2).toString() } mi</Text>
+        <Text
+          style={styles.statFont}
+        >
+          { props.totalDistance.toFixed(2).toString() } mi
+        </Text>
       </View>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
+  rideStats: {
+    position: 'absolute',
+  },
   statFont: {
-    fontSize: 75,
-    textAlign: 'center'
+    color: 'white',
+    fontSize: 35,
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: {width: -1, height: 1},
+    textShadowRadius: 10,
+    textAlign: 'center',
+    paddingLeft: 20,
   }
 });

@@ -5,89 +5,25 @@ import {
   View
 } from 'react-native';
 
-import { stopLocationTracking } from '../../actions'
+import Map from '../Map'
 import RideDetails from './RideDetails'
 import RideStats from './RideStats'
 import GPSStatus from './GPSStatus'
 
-const initialState = {
-  enteringDetails: false,
-  hasPosition: false,
-  positions: [],
-  recording: false,
-  startingTime: null,
-  lastLat: null,
-  lastLong: null,
-  totalDistance: 0.0
-}
-
 export default class RideRecorder extends Component<Props> {
   constructor (props) {
     super(props)
-    this.state = Object.assign({}, initialState)
-    this.watchID = null;
+    this.state = {
+      enteringDetails: false,
+    }
     this.dontSaveRide = this.dontSaveRide.bind(this)
     this.rideComplete = this.rideComplete.bind(this)
     this.saveRide = this.saveRide.bind(this)
     this.startRide = this.startRide.bind(this)
   }
 
-  haversine(lat1, lon1, lat2, lon2) {
-    toRad = (deg) => {
-     return deg * Math.PI / 180;
-    }
-
-    if (!lat1 || !lon1) {
-      return 0
-    }
-
-    const R = 3959; // mi
-    const x1 = lat2 - lat1
-    const dLat = toRad(x1)
-    const x2 = lon2 - lon1
-    const dLon = toRad(x2)
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-      Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
-  }
-
-  componentWillReceiveProps(newProps) {
-    const position = newProps.lastLocation
-    if (this.state.recording) {
-      const thisPosition = {
-        lt: position.coords.latitude,
-        lg: position.coords.longitude,
-        ts: position.timestamp,
-      }
-      const newDistance = this.haversine(
-        this.state.lastLat,
-        this.state.lastLong,
-        position.coords.latitude,
-        position.coords.longitude
-      )
-      this.setState({
-        hasPosition: true,
-        lastLat: position.coords.latitude,
-        lastLong: position.coords.longitude,
-        positions: [...this.state.positions, thisPosition],
-        totalDistance: this.state.totalDistance + newDistance
-      })
-    } else if (newProps.lastLocation) {
-      this.setState({
-        hasPosition: true
-      })
-    }
-  }
-
-  componentWillUnmount () {
-     navigator.geolocation.clearWatch(this.watchID);
-  }
-
   rideComplete () {
     this.setState({
-      recording: false,
       enteringDetails: true
     })
   }
@@ -98,43 +34,45 @@ export default class RideRecorder extends Component<Props> {
 
   saveRide (rideName) {
     this.props.saveRide({
-      positions: this.state.positions,
       name: rideName,
-      startTime: this.state.startingTime,
     })
-    this.setState(Object.assign({}, initialState))
+    this.setState({
+      enteringDetails: false
+    })
   }
 
   startRide () {
-    this.setState({
-      recording: true,
-      startingTime: Math.floor(new Date().getTime()),
-    })
+    this.props.startRide()
   }
 
   render() {
     let rideStats = null
     let detailPage = null
-    let gpsBar = <GPSStatus hasPosition={this.state.hasPosition} />
+    let gpsBar = <GPSStatus lastLocation={this.props.lastLocation} />
     let startButton = (
       <View style={styles.startButton}>
         <Button onPress={this.startRide} title="Start Ride"/>
       </View>
     )
-    if (this.state.recording) {
+    if (this.props.currentRide) {
       startButton = null
       rideStats = (
         <View>
+          <Map
+            ride={this.props.currentRide}
+          />
           <RideStats
-            startingTime={this.state.startingTime}
-            totalDistance={this.state.totalDistance}
+            startTime={this.props.currentRide.startTime}
+            totalDistance={this.props.currentRide.totalDistance}
           />
           <View style={styles.rideComplete}>
             <Button onPress={this.rideComplete} title="Ride Complete"/>
           </View>
         </View>
       )
-    } else if (this.state.enteringDetails) {
+    }
+    if (this.state.enteringDetails) {
+      rideStats = null
       startButton = null
       gpsBar = null
       detailPage = (
@@ -178,7 +116,6 @@ const styles = StyleSheet.create({
     marginTop: 50,
   },
   rideComplete: {
-    paddingTop: 30,
     alignSelf: 'center',
   }
 });

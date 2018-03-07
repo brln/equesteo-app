@@ -4,11 +4,14 @@ import {
   NEW_LOCATION,
   RECEIVE_JWT,
   RIDE_SAVED,
-  RIDES_FETCHED
+  RIDES_FETCHED,
+  START_RIDE,
 } from './constants'
+import { haversine } from './helpers'
 
 const initialState = {
   app: 'login',
+  currentRide: null,
   geoWatchID: null,
   jwtToken: null,
   lastLocation: null,
@@ -24,9 +27,24 @@ export default function AppReducer(state=initialState, action) {
         geoWatchID: action.geoWatchID
       })
     case NEW_LOCATION:
-      return Object.assign({}, state, {
+      const newState = Object.assign({}, state, {
         lastLocation: action.location
       })
+      if (state.currentRide && state.lastLocation) {
+        const newDistance = haversine(
+          state.lastLocation.latitude,
+          state.lastLocation.longitude,
+          action.location.latitude,
+          action.location.longitude
+        )
+        debugger
+        newState.currentRide = {
+          ...state.currentRide,
+          ride_coordinates: [...state.currentRide.ride_coordinates, action.location],
+          totalDistance: state.currentRide.totalDistance + newDistance,
+        }
+      }
+      return newState
     case RECEIVE_JWT:
       return Object.assign({}, state, {
         app: 'after-login',
@@ -34,12 +52,20 @@ export default function AppReducer(state=initialState, action) {
       })
     case RIDE_SAVED:
       return Object.assign({}, state, {
-        rides: [action.ride, ...state.rides]
+        rides: [action.ride, ...state.rides],
+        currentRide: null,
       })
     case RIDES_FETCHED:
       return Object.assign({}, state, {
         rides: action.rides
       })
+    case START_RIDE:
+      if (state.lastLocation) {
+        action.currentRide.ride_coordinates.push(state.lastLocation)
+      }
+      return Object.assign({}, state, {
+        currentRide: action.currentRide
+    })
     default:
       return state
   }

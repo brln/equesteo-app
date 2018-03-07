@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 export default GPSStatus = (props) => {
     let positionFound = <Text style={styles.locationNotFound}>Location Not Found</Text>
-    if (props.hasPosition) {
+    if (props.lastLocation) {
       positionFound = <Text style={styles.locationFound}>Location Found!</Text>
     }
     return (

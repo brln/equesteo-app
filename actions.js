@@ -12,6 +12,7 @@ import {
   RECEIVE_JWT,
   RIDE_SAVED,
   RIDES_FETCHED,
+  START_RIDE,
 } from './constants'
 
 TOKEN_KEY = '@equestio:jwtToken'
@@ -26,6 +27,20 @@ function changeAppRoot(root) {
 function clearState () {
   return {
     type: CLEAR_STATE
+  }
+}
+
+function newGeoWatch(watchID) {
+  return {
+    type: NEW_GEO_WATCH,
+    watchID
+  }
+}
+
+function newLocation(location) {
+  return {
+    type: NEW_LOCATION,
+    location
   }
 }
 
@@ -50,17 +65,14 @@ function ridesFetched(rides) {
   }
 }
 
-function newGeoWatch(watchID) {
+export function startRide() {
   return {
-    type: NEW_GEO_WATCH,
-    watchID
-  }
-}
-
-function newLocation(location) {
-  return {
-    type: NEW_LOCATION,
-    location
+    type: START_RIDE,
+    currentRide: {
+      ride_coordinates: [],
+      totalDistance: 0,
+      startTime: Math.floor(new Date().getTime())
+    },
   }
 }
 
@@ -78,25 +90,29 @@ function startLocationTracking () {
   return async (dispatch) => {
     navigator.geolocation.getCurrentPosition(
       (location) => {
-        dispatch(newLocation(location))
+        const parsedLocation = {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          timestamp: location.timestamp,
+        }
+        dispatch(newLocation(parsedLocation))
       },
       null,
       { enableHighAccuracy: true, timeout: 1000 * 60 * 10, maximumAge: 1000 }
     );
     const watchID = navigator.geolocation.watchPosition(
       (location) => {
-        dispatch(newLocation(location))
+        const parsedLocation = {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          timestamp: location.timestamp,
+        }
+        dispatch(newLocation(parsedLocation))
       },
       null,
-      {enableHighAccuracy: true, timeout: 1000 * 60 * 10, maximumAge: 10000, distanceFilter: 20}
+      {enableHighAccuracy: true, timeout: 1000 * 60 * 10, maximumAge: 10000, distanceFilter: 10}
     )
     dispatch(newGeoWatch(watchID))
-  }
-}
-
-export function stopLocationTracking () {
-  return async (dispatch, getState) => {
-    navigator.geolocation.clearWatch(getState.geoWatchID);
   }
 }
 
@@ -120,11 +136,16 @@ export function fetchRides(token) {
   }
 }
 
-export function saveRide(token, rideData) {
-  return async (dispatch) => {
-    const rideAPI = new RideAPI(token)
+export function saveRide(rideDetails) {
+  return async (dispatch, getState) => {
+    const state = getState()
+    const rideAPI = new RideAPI(state.jwtToken)
     try {
-      const resp = await rideAPI.saveRide(rideData)
+      const withDetails = {
+        ...state.currentRide,
+        ...rideDetails,
+      }
+      const resp = await rideAPI.saveRide(withDetails)
       dispatch(rideSaved(resp))
     } catch (e) {
       console.log(e)

@@ -8,21 +8,21 @@ export default class TimeElapsed extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      startingTime: null,
+      starting: null,
       elapsedTime: undefined,
     }
     this.elapsedAsString = this.elapsedAsString.bind(this)
   }
 
   componentDidMount() {
-    if (this.props.startingTime && !this.state.startingTime) {
+    if (this.props.startTime && !this.state.startTime) {
       this.setState({
-        startingTime: this.props.startingTime,
-        elapsedTime: new Date(new Date() - this.props.startingTime)
+        startTime: this.props.startTime,
+        elapsedTime: new Date(new Date() - this.props.startTime)
       })
       this.renderTimer = setInterval(() => {
         this.setState({
-          elapsedTime: new Date(new Date() - this.state.startingTime)
+          elapsedTime: new Date(new Date() - this.state.startTime)
         })
       }, 100)
     }
@@ -53,14 +53,14 @@ export default class TimeElapsed extends Component {
 
   render() {
     return (
-      <Text style={styles.statFont}>{this.elapsedAsString()}</Text>
+      <Text style={this.props.fontStyle}>{this.elapsedAsString()}</Text>
     );
   }
 }
 
 const styles = StyleSheet.create({
   statFont: {
-    fontSize: 90,
+    fontSize: 30,
     textAlign: 'center'
   }
 });

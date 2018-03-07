@@ -2,29 +2,31 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 import { API_URL } from 'react-native-dotenv'
 
-import { saveRide } from '../actions'
+import { saveRide, startRide } from '../actions'
 import RideRecorder from '../components/RideRecorder/RideRecorder'
 
 class RecorderContainer extends Component {
   constructor (props) {
     super(props)
     this.saveRide = this.saveRide.bind(this)
+    this.startRide = this.startRide.bind(this)
   }
 
-  async saveRide (rideData) {
-    this.props.dispatch(
-      saveRide(
-        this.props.jwtToken,
-        rideData
-      )
-    )
+  saveRide (rideDetails) {
+    this.props.dispatch(saveRide(rideDetails))
+  }
+
+  startRide () {
+    this.props.dispatch(startRide())
   }
 
   render() {
     return (
       <RideRecorder
+        currentRide={this.props.currentRide}
         lastLocation={this.props.lastLocation}
         saveRide={this.saveRide}
+        startRide={this.startRide}
       />
     )
   }
@@ -32,8 +34,8 @@ class RecorderContainer extends Component {
 
 function mapStateToProps (state) {
   return {
-    jwtToken: state.jwtToken,
-    lastLocation: state.lastLocation
+    lastLocation: state.lastLocation,
+    currentRide: state.currentRide
   }
 }
 
