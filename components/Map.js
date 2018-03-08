@@ -6,6 +6,8 @@ import {
   View
 } from 'react-native';
 
+import { bearing } from '../helpers'
+
 
 export default class Map extends Component {
   constructor (props) {
@@ -18,7 +20,7 @@ export default class Map extends Component {
 
   parseCoords (rideCoords) {
     const sorted = [...rideCoords].sort((a, b) => {
-      return new Date(b.timestamp) - new Date(a.timestamp);
+      return new Date(a.timestamp) - new Date(b.timestamp);
     })
 
     return sorted.map((apiCoord) => {
@@ -34,28 +36,50 @@ export default class Map extends Component {
       this.map.fitToCoordinates(
         coordinates,
         {
-          animated: false
+          animated: false,
+          edgePadding: {
+            top: 10,
+            right: 10,
+            bottom: 10,
+            left: 10,
+          }
         }
       )
     }
   }
 
-  ridingAnimate (lastCoord) {
+  ridingAnimate (coordinates) {
+    let viewCoords
+    const showCoords = 50
+    if (coordinates.length <= showCoords) {
+      viewCoords = coordinates
+    } else {
+      viewCoords = coordinates.slice(showCoords * -1)
+    }
+
+    let newBearing = 0
+    if (coordinates.length > 1) {
+      newBearing = bearing(
+        coordinates[coordinates.length - 1].latitude,
+        coordinates[coordinates.length - 1].longitude,
+        coordinates[coordinates.length - 2].latitude,
+        coordinates[coordinates.length - 2].longitude
+      )
+    }
     return () => {
-      if (lastCoord) {
-        this.fitToElements([lastCoord])()
+      if (viewCoords) {
+        this.fitToElements(viewCoords)()
       }
-      this.map.animateToViewingAngle(45, 1)
+      this.map.animateToBearing(newBearing, 1)
     }
 
   }
 
   render() {
     const coordinates = this.parseCoords(this.props.ride.ride_coordinates)
-    const lastCoord = coordinates[coordinates.length - 1]
     let onLayout = this.fitToElements(coordinates)
     if (this.props.mode === 'duringRide') {
-      onLayout = this.ridingAnimate(lastCoord)
+      onLayout = this.ridingAnimate(coordinates)
       if (this.map) {
         onLayout()
       }

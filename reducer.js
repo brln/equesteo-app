@@ -42,7 +42,6 @@ export default function AppReducer(state=initialState, action) {
           action.location.latitude,
           action.location.longitude
         )
-        debugger
         newState.currentRide = {
           ...state.currentRide,
           ride_coordinates: [...state.currentRide.ride_coordinates, action.location],
