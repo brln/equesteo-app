@@ -17,7 +17,7 @@ export default class Rides extends Component {
 
   selectRide (ride) {
     Navigation.showModal({
-      screen: 'equestio.Ride',
+      screen: 'equesteo.Ride',
       title: ride.name,
       passProps: { ride },
       navigatorStyle: {},

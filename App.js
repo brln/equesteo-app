@@ -33,7 +33,7 @@ export default class App {
           tabs: [
             {
               label: 'Log In',
-              screen: 'equestio.Login',
+              screen: 'equesteo.Login',
               icon: require('./img/login.png'),
               selectedIcon: require('./img/login.png'),
               title: 'Log In',
@@ -41,7 +41,7 @@ export default class App {
             },
             {
               label: 'Sign Up',
-              screen: 'equestio.Signup',
+              screen: 'equesteo.Signup',
               icon: require('./img/signup.png'),
               selectedIcon: require('./img/signup.png'),
               title: 'Sign Up',
@@ -59,7 +59,7 @@ export default class App {
           tabs: [
             {
               label: 'Recorder',
-              screen: 'equestio.Recorder',
+              screen: 'equesteo.Recorder',
               icon: require('./img/target.png'),
               selectedIcon: require('./img/target.png'),
               title: 'Recorder',
@@ -68,7 +68,7 @@ export default class App {
             },
             {
               label: 'Rides',
-              screen: 'equestio.Rides',
+              screen: 'equesteo.Rides',
               icon: require('./img/path.png'),
               selectedIcon: require('./img/path.png'),
               title: 'Rides',
@@ -76,7 +76,7 @@ export default class App {
             },
             {
               label: 'Account',
-              screen: 'equestio.Account',
+              screen: 'equesteo.Account',
               icon: require('./img/account.png'),
               selectedIcon: require('./img/account.png'),
               title: 'My Account',
@@ -85,7 +85,7 @@ export default class App {
           ],
           // passProps: {},
           // animationType: 'slide-down',
-          // title: 'Equestio Title',
+          // title: 'equesteo Title',
           // drawer: {
           //   left: {
           //     screen: 'example.BottomTabsSideMenu' // unique ID registered with Navigation.registerScreen

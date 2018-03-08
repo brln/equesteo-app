@@ -16,7 +16,7 @@ import {
   START_RIDE,
 } from './constants'
 
-TOKEN_KEY = '@equestio:jwtToken'
+TOKEN_KEY = '@equesteo:jwtToken'
 
 function changeAppRoot(root) {
   return {
@@ -98,6 +98,7 @@ function startLocationTracking () {
     navigator.geolocation.getCurrentPosition(
       (location) => {
         const parsedLocation = {
+          accuracy: location.coords.accuracy,
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
           timestamp: location.timestamp,
@@ -110,6 +111,7 @@ function startLocationTracking () {
     const watchID = navigator.geolocation.watchPosition(
       (location) => {
         const parsedLocation = {
+          accuracy: location.coords.accuracy,
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
           timestamp: location.timestamp,

@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 export default GPSStatus = (props) => {
     let positionFound = <Text style={styles.locationNotFound}>Location Not Found</Text>
     if (props.lastLocation) {
-      positionFound = <Text style={styles.locationFound}>Location Found!</Text>
+      positionFound = <Text style={styles.locationFound}>Location Found! Accurate to: {Math.round(props.lastLocation.accuracy)}m</Text>
     }
     return (
       <View style={styles.container}>

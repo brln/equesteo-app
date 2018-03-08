@@ -10,10 +10,10 @@ import Ride from './components/Ride'
 
 
 export function registerScreens(store, Provider) {
-  Navigation.registerComponent('equestio.Login', () => LoginContainer, store, Provider)
-  Navigation.registerComponent('equestio.Signup', () => SignupContainer, store, Provider)
-  Navigation.registerComponent('equestio.Rides', () => RidesContainer, store, Provider)
-  Navigation.registerComponent('equestio.Recorder', () => RecorderContainer, store, Provider)
-  Navigation.registerComponent('equestio.Ride', () => Ride, store, Provider)
-  Navigation.registerComponent('equestio.Account', () => AccountContainer, store, Provider)
+  Navigation.registerComponent('equesteo.Login', () => LoginContainer, store, Provider)
+  Navigation.registerComponent('equesteo.Signup', () => SignupContainer, store, Provider)
+  Navigation.registerComponent('equesteo.Rides', () => RidesContainer, store, Provider)
+  Navigation.registerComponent('equesteo.Recorder', () => RecorderContainer, store, Provider)
+  Navigation.registerComponent('equesteo.Ride', () => Ride, store, Provider)
+  Navigation.registerComponent('equesteo.Account', () => AccountContainer, store, Provider)
 }
