@@ -1,19 +1,21 @@
-import React, { Component } from 'react';
-import { Navigation } from 'react-native-navigation';
+import React, { Component } from 'react'
+import { Navigation } from 'react-native-navigation'
+import { List, ListItem } from 'react-native-elements'
 
 import {
   StyleSheet,
-  Text,
-  View
 } from 'react-native';
 
 
 export default class Rides extends Component {
+
+
   constructor (props) {
     super(props)
     this.state = {}
     this.selectRide = this.selectRide.bind(this)
   }
+
 
   selectRide (ride) {
     Navigation.showModal({
@@ -27,32 +29,25 @@ export default class Rides extends Component {
   }
 
   render() {
-    const rideComps = this.props.rides.map((ride) => {
-      return (
-        <Text
-          style={styles.rideTitle}
-          key={ride.id}
-          onPress={() => {this.selectRide(ride)}}
-        >
-          {ride.name}
-        </Text>
-      )
-    })
     return (
-      <View style={styles.container}>
-        {rideComps}
-      </View>
-    );
+      <List containerStyle={{marginTop: 0}}>
+        {
+          this.props.rides.map((ride, i) => (
+            <ListItem
+              key={i}
+              title={ride.name}
+              subtitle={new Date(ride.start_time).toLocaleDateString("en-US")}
+              leftIcon={null}
+              onPress={() => {this.selectRide(ride)}}
+            />
+          ))
+        }
+      </List>
+    )
   }
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
   rideTitle: {
     fontSize: 24
   }

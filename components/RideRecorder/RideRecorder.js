@@ -60,6 +60,7 @@ export default class RideRecorder extends Component<Props> {
       rideStats = (
         <View>
           <Map
+            mode={"duringRide"}
             ride={this.props.currentRide}
           />
           <RideStats

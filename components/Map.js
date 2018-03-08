@@ -12,6 +12,21 @@ export default class Map extends Component {
     super(props)
     this.state = {}
     this.fitToElements = this.fitToElements.bind(this)
+    this.parseCoords = this.parseCoords.bind(this)
+    this.ridingAnimate = this.ridingAnimate.bind(this)
+  }
+
+  parseCoords (rideCoords) {
+    const sorted = [...rideCoords].sort((a, b) => {
+      return new Date(b.timestamp) - new Date(a.timestamp);
+    })
+
+    return sorted.map((apiCoord) => {
+      return {
+        latitude: parseFloat(apiCoord.latitude),
+        longitude: parseFloat(apiCoord.longitude),
+      }
+    })
   }
 
   fitToElements(coordinates) {
@@ -19,36 +34,39 @@ export default class Map extends Component {
       this.map.fitToCoordinates(
         coordinates,
         {
-          animated: false,
-          edgePadding: {
-            top: 10,
-            right: 10,
-            bottom: 10,
-            left: 10
-          }
+          animated: false
         }
       )
     }
   }
 
-  render() {
-    const sorted = [...this.props.ride.ride_coordinates].sort((a, b) => {
-      return new Date(b.timestamp) - new Date(a.timestamp);
-    })
-
-    const coordinates = sorted.map((apiCoord) => {
-      return {
-        latitude: parseFloat(apiCoord.latitude),
-        longitude: parseFloat(apiCoord.longitude),
+  ridingAnimate (lastCoord) {
+    return () => {
+      if (lastCoord) {
+        this.fitToElements([lastCoord])()
       }
-    })
+      this.map.animateToViewingAngle(45, 1)
+    }
+
+  }
+
+  render() {
+    const coordinates = this.parseCoords(this.props.ride.ride_coordinates)
+    const lastCoord = coordinates[coordinates.length - 1]
+    let onLayout = this.fitToElements(coordinates)
+    if (this.props.mode === 'duringRide') {
+      onLayout = this.ridingAnimate(lastCoord)
+      if (this.map) {
+        onLayout()
+      }
+    }
 
     return (
       <View style ={styles.container}>
         <MapView
           style={styles.map}
           ref={ref => this.map = ref}
-          onLayout={this.fitToElements(coordinates)}
+          onLayout={onLayout}
         >
           <MapView.Polyline
             style={styles.map}

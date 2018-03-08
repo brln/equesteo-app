@@ -55,50 +55,27 @@ export default class App {
         })
         return
       case 'after-login':
-        Navigation.startTabBasedApp({
-          tabs: [
-            {
-              label: 'Recorder',
-              screen: 'equesteo.Recorder',
-              icon: require('./img/target.png'),
-              selectedIcon: require('./img/target.png'),
-              title: 'Recorder',
-              // overrideBackPress: true,
-              // navigatorStyle: {}
-            },
-            {
-              label: 'Rides',
-              screen: 'equesteo.Rides',
-              icon: require('./img/path.png'),
-              selectedIcon: require('./img/path.png'),
-              title: 'Rides',
-              // navigatorStyle: {}
-            },
-            {
-              label: 'Account',
-              screen: 'equesteo.Account',
-              icon: require('./img/account.png'),
-              selectedIcon: require('./img/account.png'),
-              title: 'My Account',
-              // navigatorStyle: {}
+        Navigation.startSingleScreenApp({
+          screen: {
+            screen: 'equesteo.Rides',
+            title: 'My Rides',
+            navigatorButtons: {
+              rightButtons: [
+              ],
+              leftButtons: [
+                {
+                  id: 'sideMenu'
+                }
+
+              ]
             }
-          ],
-          // passProps: {},
-          // animationType: 'slide-down',
-          // title: 'equesteo Title',
-          // drawer: {
-          //   left: {
-          //     screen: 'example.BottomTabsSideMenu' // unique ID registered with Navigation.registerScreen
-          //   },
-          //   disableOpenGesture: false, // optional, can the drawer be opened with a swipe instead of button
-          //   passProps: {
-          //     title: 'Hello from SideMenu'
-          //   }
-          // },
-          // appStyle: {
-          //   bottomTabBadgeTextColor: '#ffffff',
-          //   bottomTabBadgeBackgroundColor: '#ff0000'
-          // }
+          },
+          drawer: {
+            left: {
+              screen: 'equesteo.Drawer',
+              fixedWidth: 500,
+            }
+          }
         })
         return
       default:
