@@ -1,5 +1,6 @@
 import { AsyncStorage } from 'react-native'
 
+import { unixTimeNow } from "./helpers"
 import RideAPI from './services/ride_api'
 import UserAPI from './services/user_api'
 import {BadRequestError, UnauthorizedError} from "./errors"
@@ -78,7 +79,7 @@ export function startRide() {
     currentRide: {
       ride_coordinates: [],
       totalDistance: 0,
-      startTime: Math.floor(new Date().getTime())
+      startTime: unixTimeNow()
     },
   }
 }

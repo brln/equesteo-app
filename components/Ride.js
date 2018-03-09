@@ -1,6 +1,5 @@
-import React, { Component } from 'react';
-
-import Map from './Map'
+import React, { Component } from 'react'
+import moment from 'moment'
 
 import {
   StyleSheet,
@@ -8,6 +7,8 @@ import {
   View
 } from 'react-native';
 
+import Map from './Map'
+import { rideCoordsToMapCoords } from "../helpers"
 
 export default class Ride extends Component {
   constructor (props) {
@@ -19,11 +20,13 @@ export default class Ride extends Component {
     return (
       <View style={styles.container}>
         <Map
-          ride={this.props.ride}
+          rideCoords={rideCoordsToMapCoords(this.props.ride.ride_coordinates)}
         />
         <View>
-          <Text>{this.props.ride.name}</Text>
-          <Text>{this.props.ride.start_time}</Text>
+          <Text>Start Time: {moment(this.props.ride.start_time).format('MMMM Do YYYY, h:mm a')}</Text>
+          <Text>Total Time Riding: { moment.utc(this.props.ride.elapsed_time_secs * 1000).format('HH:mm:ss') }</Text>
+          <Text>Distance: {this.props.ride.distance } mi</Text>
+
         </View>
       </View>
     )

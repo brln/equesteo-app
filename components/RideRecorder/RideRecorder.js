@@ -5,16 +5,19 @@ import {
   View
 } from 'react-native';
 
-import Map from '../Map'
+import { unixTimeNow } from "../../helpers"
+import RidingMap from '../RidingMap'
 import RideDetails from './RideDetails'
 import RideStats from './RideStats'
 import GPSStatus from './GPSStatus'
+import { rideCoordsToMapCoords } from "../../helpers"
 
 export default class RideRecorder extends Component<Props> {
   constructor (props) {
     super(props)
     this.state = {
       enteringDetails: false,
+      elapsedTime: 0,
     }
     this.dontSaveRide = this.dontSaveRide.bind(this)
     this.rideComplete = this.rideComplete.bind(this)
@@ -24,18 +27,24 @@ export default class RideRecorder extends Component<Props> {
 
   rideComplete () {
     this.setState({
-      enteringDetails: true
+      enteringDetails: true,
+      elapsedTime: (unixTimeNow() - this.props.currentRide.startTime) / 1000
     })
   }
 
   dontSaveRide () {
-    this.setState({enteringDetails: false})
+    this.setState({
+      enteringDetails: false,
+      elapsedTime: 0
+    })
     this.props.discardRide()
   }
 
   saveRide (rideName) {
     this.props.saveRide({
       name: rideName,
+      distance: this.props.currentRide.totalDistance,
+      elapsed_time_secs: this.state.elapsedTime,
     })
     this.setState({
       enteringDetails: false
@@ -59,9 +68,9 @@ export default class RideRecorder extends Component<Props> {
       startButton = null
       rideStats = (
         <View>
-          <Map
+          <RidingMap
             mode={"duringRide"}
-            ride={this.props.currentRide}
+            rideCoords={rideCoordsToMapCoords(this.props.currentRide.ride_coordinates)}
           />
           <RideStats
             startTime={this.props.currentRide.startTime}

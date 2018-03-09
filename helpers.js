@@ -20,10 +20,27 @@ export const haversine = (lat1, lon1, lat2, lon2) => {
   return R * c;
 }
 
-export const bearing = (lat1, lng1, lat2, lng2) => {
-  const dLon = (lng2-lng1);
-  const y = Math.sin(dLon) * Math.cos(lat2);
-  const x = Math.cos(lat1)*Math.sin(lat2) - Math.sin(lat1)*Math.cos(lat2)*Math.cos(dLon);
-  const brng = toDeg(Math.atan2(y, x));
-  return 360 - ((brng + 360) % 360);
+export const bearing = (lat1,lng1,lat2,lng2) => {
+  let dLon = toRad(lng2-lng1);
+  let y = Math.sin(dLon) * Math.cos(toRad(lat2));
+  let x = Math.cos(toRad(lat1))*Math.sin(toRad(lat2)) - Math.sin(toRad(lat1))*Math.cos(toRad(lat2))*Math.cos(dLon);
+  let brng = toDeg(Math.atan2(y, x));
+  return ((brng + 360) % 360);
+}
+
+export const rideCoordsToMapCoords = (rideCoords) => {
+  const sorted = [...rideCoords].sort((a, b) => {
+    return new Date(a.timestamp) - new Date(b.timestamp);
+  })
+
+  return sorted.map((apiCoord) => {
+    return {
+      latitude: parseFloat(apiCoord.latitude),
+      longitude: parseFloat(apiCoord.longitude),
+    }
+  })
+}
+
+export const unixTimeNow = () => {
+  return Math.floor(new Date().getTime())
 }

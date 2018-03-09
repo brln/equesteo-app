@@ -9,9 +9,11 @@ import {
   START_RIDE,
 } from './constants'
 import { haversine } from './helpers'
+import { FIRST_SCREEN } from "./App"
 
 const initialState = {
   app: 'login',
+  currentScreen: FIRST_SCREEN,
   currentRide: null,
   geoWatchID: null,
   jwtToken: null,
