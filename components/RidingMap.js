@@ -19,7 +19,6 @@ export default class RidingMap extends Component {
   }
 
   fitToElements() {
-    debugger
     const maxLat = Math.max(...this.props.rideCoords.map((c) => c.latitude))
     const minLat = Math.min(...this.props.rideCoords.map((c) => c.latitude))
     const maxLong = Math.max(...this.props.rideCoords.map((c) => c.longitude))

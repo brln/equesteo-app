@@ -8,6 +8,7 @@ export default class Drawer extends Component {
 		this.openRecorder = this.openRecorder.bind(this)
     this.toggleDrawer = this.toggleDrawer.bind(this)
 		this.openAccount = this.openAccount.bind(this)
+    this.openBarn = this.openBarn.bind(this)
   }
 
   openRecorder () {
@@ -34,6 +35,14 @@ export default class Drawer extends Component {
     })
 	}
 
+  openBarn () {
+    this.toggleDrawer()
+    this.props.navigator.push({
+      screen: 'equesteo.Barn',
+      title: 'Barn'
+    })
+  }
+
 	toggleDrawer() {
 		this.props.navigator.toggleDrawer({
 			to: 'closed',
@@ -58,6 +67,13 @@ export default class Drawer extends Component {
 							<View style={styles.drawerListItem}>
 								<Text style={styles.drawerListItemText}>
 									Rides
+								</Text>
+							</View>
+						</TouchableOpacity>
+						<TouchableOpacity onPress={this.openBarn}>
+							<View style={styles.drawerListItem}>
+								<Text style={styles.drawerListItemText}>
+									Barn
 								</Text>
 							</View>
 						</TouchableOpacity>

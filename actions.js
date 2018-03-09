@@ -1,14 +1,15 @@
 import { AsyncStorage } from 'react-native'
 
 import { unixTimeNow } from "./helpers"
-import RideAPI from './services/ride_api'
-import UserAPI from './services/user_api'
+import { HorseAPI, RideAPI, UserAPI } from './services'
 import {BadRequestError, UnauthorizedError} from "./errors"
 
 import {
   CHANGE_ROOT,
   CLEAR_STATE,
   DISCARD_RIDE,
+  HORSE_SAVED,
+  HORSES_FETCHED,
   NEW_GEO_WATCH,
   NEW_LOCATION,
   RECEIVE_JWT,
@@ -35,6 +36,20 @@ function clearState () {
 export function discardRide ()  {
   return {
     type: DISCARD_RIDE
+  }
+}
+
+export function horseSaved (horseData) {
+  return {
+    type: HORSE_SAVED,
+    horseData
+  }
+}
+
+export function horsesFetched (horses) {
+  return {
+    type: HORSES_FETCHED,
+    horses
   }
 }
 
@@ -90,6 +105,19 @@ function findLocalToken() {
     if (token !== null) {
       dispatch(receiveJWT(token))
       dispatch(fetchRides(token))
+      dispatch(fetchHorses(token))
+    }
+  }
+}
+
+export function saveNewHorse (horseData) {
+  return async (dispatch, getState) => {
+    const horseAPI = new HorseAPI(getState().jwtToken)
+    try {
+      const resp = await horseAPI.createHorse(horseData)
+      dispatch(horseSaved(resp))
+    } catch (e) {
+      console.log(e)
     }
   }
 }
@@ -127,15 +155,27 @@ function startLocationTracking () {
 }
 
 export function appInitialized() {
-  return async (dispatch, getState) => {
+  return async (dispatch) => {
     dispatch(findLocalToken())
     dispatch(changeAppRoot('login'))
     dispatch(startLocationTracking())
   }
 }
 
+export function fetchHorses(token) {
+  return async (dispatch) => {
+    const horseAPI = new HorseAPI(token)
+    try {
+      const resp = await horseAPI.fetchHorses()
+      dispatch(horsesFetched(resp))
+    } catch (e) {
+      console.log(e)
+    }
+  }
+}
+
 export function fetchRides(token) {
-  return async (dispatch, getState) => {
+  return async (dispatch) => {
     const rideAPI = new RideAPI(token)
     try {
       const resp = await rideAPI.fetchRides()
@@ -178,6 +218,7 @@ export function submitLogin(email, password) {
       await AsyncStorage.setItem(TOKEN_KEY, resp.token);
       dispatch(receiveJWT(resp.token))
       dispatch(fetchRides(resp.token))
+      dispatch(fetchHorses(resp.token))
     } catch (e) {
       if (e instanceof UnauthorizedError) {
         // @Todo: put error handling back in here

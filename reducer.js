@@ -1,6 +1,8 @@
 import {
   CLEAR_STATE,
   DISCARD_RIDE,
+  HORSES_FETCHED,
+  HORSE_SAVED,
   NEW_GEO_WATCH,
   NEW_LOCATION,
   RECEIVE_JWT,
@@ -13,9 +15,9 @@ import { FIRST_SCREEN } from "./App"
 
 const initialState = {
   app: 'login',
-  currentScreen: FIRST_SCREEN,
   currentRide: null,
   geoWatchID: null,
+  horses: [],
   jwtToken: null,
   lastLocation: null,
   rides: [],
@@ -32,6 +34,14 @@ export default function AppReducer(state=initialState, action) {
     case DISCARD_RIDE:
       return Object.assign({}, state, {
         currentRide: null
+      })
+    case HORSES_FETCHED:
+      return Object.assign({}, state, {
+        horses: action.horses
+      })
+    case HORSE_SAVED:
+      return Object.assign({}, state, {
+        horses: [action.horseData, ...state.horses]
       })
     case NEW_LOCATION:
       const newState = Object.assign({}, state, {

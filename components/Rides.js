@@ -11,7 +11,6 @@ import {
 
 export default class Rides extends Component {
 
-
   constructor (props) {
     super(props)
     this.state = {}

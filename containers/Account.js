@@ -24,7 +24,7 @@ class AccountContainer extends Component {
 }
 
 function mapStateToProps (state) {
-  return state
+  return {}
 }
 
 export default  connect(mapStateToProps)(AccountContainer)
