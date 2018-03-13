@@ -30,6 +30,7 @@ class RecorderContainer extends Component {
       <RideRecorder
         currentRide={this.props.currentRide}
         discardRide={this.discardRide}
+        horses={this.props.horses}
         lastLocation={this.props.lastLocation}
         saveRide={this.saveRide}
         startRide={this.startRide}
@@ -40,8 +41,10 @@ class RecorderContainer extends Component {
 
 function mapStateToProps (state) {
   return {
+    currentRide: state.currentRide,
+    horses: state.horses,
     lastLocation: state.lastLocation,
-    currentRide: state.currentRide
+
   }
 }
 

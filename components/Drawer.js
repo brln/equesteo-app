@@ -15,7 +15,7 @@ export default class Drawer extends Component {
     this.toggleDrawer()
     this.props.navigator.push({
       screen: 'equesteo.Recorder',
-      title: 'Ride Recorder'
+      title: 'Go Ride'
     })
 	}
 
@@ -59,7 +59,7 @@ export default class Drawer extends Component {
 						<TouchableOpacity onPress={this.openRecorder}>
 							<View style={styles.drawerListItem}>
 								<Text style={styles.drawerListItemText} onTouch>
-									Recorder
+									Go Ride
 								</Text>
 							</View>
 						</TouchableOpacity>

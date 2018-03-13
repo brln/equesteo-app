@@ -22,7 +22,10 @@ export default class Rides extends Component {
     Navigation.showModal({
       screen: 'equesteo.Ride',
       title: ride.name,
-      passProps: { ride },
+      passProps: {
+        horses: this.props.horses,
+        ride
+      },
       navigatorStyle: {},
       navigatorButtons: {},
       animationType: 'slide-up',

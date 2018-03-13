@@ -40,9 +40,10 @@ export default class RideRecorder extends Component<Props> {
     this.props.discardRide()
   }
 
-  saveRide (rideName) {
+  saveRide (rideDetails) {
     this.props.saveRide({
-      name: rideName,
+      horseID: rideDetails.horseID,
+      name: rideDetails.name,
       distance: this.props.currentRide.totalDistance,
       elapsed_time_secs: this.state.elapsedTime,
     })
@@ -89,6 +90,7 @@ export default class RideRecorder extends Component<Props> {
       detailPage = (
         <RideDetails
           dontSaveRide={this.dontSaveRide}
+          horses={this.props.horses}
           saveRide={this.saveRide}
         />
       )
