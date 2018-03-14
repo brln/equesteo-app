@@ -50,6 +50,7 @@ export default class LoginForm extends Component {
         <Text>Email:</Text>
         <TextInput
           autoFocus={true}
+          blurOnSubmit={false}
           style={styles.email}
           onChangeText={this.changeEmail}
           onSubmitEditing={this.moveToPassword}

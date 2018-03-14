@@ -71,6 +71,7 @@ export default class SignupForm extends Component {
         <Text>Email:</Text>
         <TextInput
           autoFocus={true}
+          blurOnSubmit={false}
           style={styles.email}
           onSubmitEditing={this.moveToPassword}
           onChangeText={this.changeEmail}
@@ -79,6 +80,7 @@ export default class SignupForm extends Component {
         />
         <Text>Password:</Text>
         <TextInput
+          blurOnSubmit={false}
           onSubmitEditing={this.moveToPassword2}
           onChangeText={this.changePassword1}
           ref={(i) => this.inputs['pw1'] = i}
