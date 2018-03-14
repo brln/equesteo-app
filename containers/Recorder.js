@@ -21,6 +21,7 @@ class RecorderContainer extends Component {
         currentRide={this.props.currentRide}
         horses={this.props.horses}
         lastLocation={this.props.lastLocation}
+        navigator={this.props.navigator}
         startRide={this.startRide}
       />
     )

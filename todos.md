@@ -6,7 +6,6 @@
  - make keyboard not flash on login screen between entries
  - save screenshots of ride when complete for thumbnails in ride list
  - location keeps getting recorded while entering ride details, make it not do that
- - make api fields camelcase, this conventions switching is stupid
  - when ride is complete should take you to details screen
  - database migrations
  - be able to upload profile photo
@@ -15,6 +14,7 @@
  - error handling on login/signup
  - define what props should be passed for each component
  - error happens when you start ride before location found
+ - should not be able to go for a ride until you've added a horse
 
  
  DONE!
@@ -27,3 +27,4 @@
 - Be able to assign horses to ride
 - make screen strings constants
 - switch the save button on ride details to be in the navigator
+- make api fields camelcase, this conventions switching is stupid

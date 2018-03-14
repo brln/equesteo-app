@@ -42,7 +42,7 @@ export default class Rides extends Component {
               <ListItem
                 key={i}
                 title={ride.name}
-                subtitle={moment(ride.start_time).format('MMMM Do YYYY, h:mm a')}
+                subtitle={moment(ride.startTime).format('MMMM Do YYYY, h:mm a')}
                 leftIcon={null}
                 onPress={() => {this.selectRide(ride)}}
               />

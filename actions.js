@@ -14,7 +14,8 @@ import {
   NEW_GEO_WATCH,
   NEW_LOCATION,
   RECEIVE_JWT,
-  RIDE_SAVED,
+  RIDE_SAVED_LOCALLY,
+  RIDE_SAVED_REMOTELY,
   RIDES_FETCHED,
   START_RIDE,
 } from './constants'
@@ -82,9 +83,16 @@ function receiveJWT(token) {
   }
 }
 
-function rideSaved(ride) {
+function rideSavedLocally (ride) {
   return {
-    type: RIDE_SAVED,
+    type: RIDE_SAVED_LOCALLY,
+    ride
+  }
+}
+
+function rideSavedRemotely (ride) {
+  return {
+    type: RIDE_SAVED_REMOTELY,
     ride
   }
 }
@@ -100,7 +108,7 @@ export function startRide() {
   return {
     type: START_RIDE,
     currentRide: {
-      ride_coordinates: [],
+      rideCoordinates: [],
       distance: 0,
       startTime: unixTimeNow()
     },
@@ -126,6 +134,7 @@ export function saveNewHorse (horseData) {
       dispatch(horseSaved(resp))
     } catch (e) {
       console.log(e)
+      alert('error in console')
     }
   }
 }
@@ -190,23 +199,38 @@ export function fetchRides(token) {
       dispatch(ridesFetched(resp))
     } catch (e) {
       console.log(e)
+      alert('error in console')
     }
   }
 }
 
-export function saveRide(rideDetails) {
+export function localSaveRide(recorderDetails) {
   return async (dispatch, getState) => {
-    const state = getState()
-    const rideAPI = new RideAPI(state.jwtToken)
     try {
-      const withDetails = {
-        ...state.currentRide,
-        ...rideDetails,
+      const rideDetails = {
+        ...getState().currentRide,
+        ...recorderDetails,
       }
-      const resp = await rideAPI.saveRide(withDetails)
-      dispatch(rideSaved(resp))
+      // @TODO: actually save this locally and deal with repercussions.
+      dispatch(rideSavedLocally(rideDetails))
+      dispatch(remoteSaveRide(rideDetails))
     } catch (e) {
       console.log(e)
+      alert('error in console')
+    }
+  }
+}
+
+function remoteSaveRide(rideDetails) {
+  return async (dispatch, getState) => {
+    const rideAPI = new RideAPI(getState().jwtToken)
+    try {
+      const resp = await rideAPI.saveRide(rideDetails)
+      dispatch(rideSavedRemotely(resp))
+    } catch (e) {
+      // @TODO: deal with failure
+      console.log(e)
+      alert('error in console')
     }
   }
 }

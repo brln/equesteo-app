@@ -23,6 +23,16 @@ export const DRAWER = 'equesteo.Drawer'
 export const RIDE = 'equesteo.Ride'
 export const NEW_HORSE = 'equesteo.NewHorse'
 
+export const RIDES_DETAILS = {
+  screen: RIDES,
+  title: 'My Rides',
+  navigatorButtons: {
+    leftButtons: [{
+      id: 'sideMenu'
+    }]
+  },
+}
+
 export function registerScreens(store, Provider) {
   Navigation.registerComponent(BARN, () => BarnContainer, store, Provider)
   Navigation.registerComponent(DRAWER, () => DrawerContainer, store, Provider)
@@ -36,3 +46,4 @@ export function registerScreens(store, Provider) {
   Navigation.registerComponent(RIDE, () => Ride)
   Navigation.registerComponent(NEW_HORSE, () => NewHorse)
 }
+

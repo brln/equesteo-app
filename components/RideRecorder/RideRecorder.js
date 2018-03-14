@@ -4,7 +4,6 @@ import {
   StyleSheet,
   View
 } from 'react-native';
-import { Navigation } from 'react-native-navigation'
 
 import { unixTimeNow } from "../../helpers"
 import RidingMap from '../RidingMap'
@@ -22,7 +21,7 @@ export default class RideRecorder extends Component<Props> {
 
   rideComplete () {
     const elapsedTime = (unixTimeNow() - this.props.currentRide.startTime) / 1000
-    Navigation.showModal({
+    this.props.navigator.push({
       screen: RIDE_DETAILS,
       title: 'Ride Details',
       passProps: {
@@ -53,7 +52,7 @@ export default class RideRecorder extends Component<Props> {
         <View>
           <RidingMap
             mode={"duringRide"}
-            rideCoords={rideCoordsToMapCoords(this.props.currentRide.ride_coordinates)}
+            rideCoords={rideCoordsToMapCoords(this.props.currentRide.rideCoordinates)}
           />
           <RideStats
             startTime={this.props.currentRide.startTime}

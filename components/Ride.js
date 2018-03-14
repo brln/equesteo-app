@@ -20,7 +20,7 @@ export default class Ride extends Component {
   whichHorse () {
     let found = null
     for (let horse of this.props.horses) {
-      if (horse.id === this.props.ride.horse_id) {
+      if (horse.id === this.props.ride.horseID) {
         found = horse
       }
     }
@@ -31,11 +31,11 @@ export default class Ride extends Component {
     return (
       <View style={styles.container}>
         <Map
-          rideCoords={rideCoordsToMapCoords(this.props.ride.ride_coordinates)}
+          rideCoords={rideCoordsToMapCoords(this.props.ride.rideCoordinates)}
         />
         <View>
-          <Text>Start Time: {moment(this.props.ride.start_time).format('MMMM Do YYYY, h:mm a')}</Text>
-          <Text>Total Time Riding: { moment.utc(this.props.ride.elapsed_time_secs * 1000).format('HH:mm:ss') }</Text>
+          <Text>Start Time: {moment(this.props.ride.startTime).format('MMMM Do YYYY, h:mm a')}</Text>
+          <Text>Total Time Riding: { moment.utc(this.props.ride.elapsedTimeSecs * 1000).format('HH:mm:ss') }</Text>
           <Text>Distance: {this.props.ride.distance.toFixed(2) } mi</Text>
           <Text>Horse: {this.whichHorse().name}</Text>
         </View>

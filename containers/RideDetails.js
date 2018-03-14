@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 import { API_URL } from 'react-native-dotenv'
+import moment from 'moment'
 
-import { discardRide, saveRide, startRide } from '../actions'
+import { changeScreen, discardRide, localSaveRide } from '../actions'
 import RideDetails from '../components/RideRecorder/RideDetails'
+import { RIDES } from '../screens'
 
 class RideDetailsContainer extends Component {
   static navigatorButtons = {
@@ -21,10 +23,12 @@ class RideDetailsContainer extends Component {
 
   constructor (props) {
     super(props)
+    const rideName = `${props.currentRide.distance.toFixed(2)} mi ride on ${moment(props.currentRide.startTime).format('MMMM DD YYYY')}`
     this.state = {
-      rideName: null,
+      rideName: rideName,
       horseID: null,
     }
+    this.doneOnPage = this.doneOnPage.bind(this)
     this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
     this.changeHorseID = this.changeHorseID.bind(this)
     this.changeRideName = this.changeRideName.bind(this)
@@ -45,12 +49,18 @@ class RideDetailsContainer extends Component {
     })
   }
 
+  doneOnPage () {
+    this.props.navigator.popToRoot({animated: false, animationType: 'none'})
+    this.props.dispatch(changeScreen(RIDES))
+  }
+
   onNavigatorEvent (event) {
     if (event.type === 'NavBarButtonPress') {
       if (event.id === 'save') {
         this.saveRide()
       } else if (event.id === 'discard') {
-         this.props.dispatch(discardRide())
+        this.props.dispatch(discardRide())
+        this.doneOnPage()
       }
     }
   }
@@ -60,12 +70,12 @@ class RideDetailsContainer extends Component {
     if (!horseID && this.props.horses.length > 0) {
       horseID = this.props.horses[0].id
     }
-    this.props.dispatch(saveRide({
-      elapsed_time_secs: this.props.elapsedTime,
+    this.props.dispatch(localSaveRide({
+      elapsedTimeSecs: this.props.elapsedTime,
       name: this.state.rideName,
       horseID: horseID,
     }))
-    this.props.navigator.dismissModal({animationType: 'none'})
+    this.doneOnPage()
   }
 
   render() {
@@ -84,6 +94,7 @@ class RideDetailsContainer extends Component {
 function mapStateToProps (state) {
   return {
     horses: state.horses,
+    currentRide: state.currentRide
   }
 }
 

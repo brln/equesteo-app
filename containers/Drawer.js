@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
-import { ACCOUNT, BARN, RIDES, RECORDER } from '../screens'
+import { ACCOUNT, BARN, RIDES, RIDES_DETAILS, RECORDER } from '../screens'
 import { changeScreen } from '../actions'
 
 class DrawerContainer extends Component {
@@ -32,15 +32,7 @@ class DrawerContainer extends Component {
 	openRides () {
     this.props.dispatch(changeScreen(RIDES))
     this.toggleDrawer()
-    this.props.navigator.push({
-      screen: RIDES,
-      title: 'My Rides',
-      navigatorButtons: {
-        leftButtons: [{
-          id: 'sideMenu'
-        }]
-      }
-    })
+    this.props.navigator.push(RIDES_DETAILS)
 	}
 
 	openAccount () {

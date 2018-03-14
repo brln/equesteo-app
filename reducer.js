@@ -7,7 +7,8 @@ import {
   NEW_GEO_WATCH,
   NEW_LOCATION,
   RECEIVE_JWT,
-  RIDE_SAVED,
+  RIDE_SAVED_LOCALLY,
+  RIDE_SAVED_REMOTELY,
   RIDES_FETCHED,
   START_RIDE,
 } from './constants'
@@ -63,7 +64,7 @@ export default function AppReducer(state=initialState, action) {
         )
         newState.currentRide = {
           ...state.currentRide,
-          ride_coordinates: [...state.currentRide.ride_coordinates, action.location],
+          rideCoordinates: [...state.currentRide.rideCoordinates, action.location],
           distance: state.currentRide.distance + newDistance,
         }
       }
@@ -73,18 +74,20 @@ export default function AppReducer(state=initialState, action) {
         app: 'after-login',
         jwtToken: action.token
       })
-    case RIDE_SAVED:
+    case RIDE_SAVED_LOCALLY:
       return Object.assign({}, state, {
         rides: [action.ride, ...state.rides],
         currentRide: null,
       })
+    case RIDE_SAVED_REMOTELY:
+      return state
     case RIDES_FETCHED:
       return Object.assign({}, state, {
         rides: action.rides
       })
     case START_RIDE:
       if (state.lastLocation) {
-        action.currentRide.ride_coordinates.push(state.lastLocation)
+        action.currentRide.rideCoordinates.push(state.lastLocation)
       }
       return Object.assign({}, state, {
         currentRide: action.currentRide
