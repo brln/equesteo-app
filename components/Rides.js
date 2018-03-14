@@ -2,11 +2,12 @@ import React, { Component } from 'react'
 import { Navigation } from 'react-native-navigation'
 import { List, ListItem } from 'react-native-elements'
 import moment from 'moment'
-
 import {
   ScrollView,
   StyleSheet,
 } from 'react-native';
+
+import { RIDE } from '../screens'
 
 
 export default class Rides extends Component {
@@ -20,7 +21,7 @@ export default class Rides extends Component {
 
   selectRide (ride) {
     Navigation.showModal({
-      screen: 'equesteo.Ride',
+      screen: RIDE,
       title: ride.name,
       passProps: {
         horses: this.props.horses,

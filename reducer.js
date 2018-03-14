@@ -1,4 +1,5 @@
 import {
+  CHANGE_SCREEN,
   CLEAR_STATE,
   DISCARD_RIDE,
   HORSES_FETCHED,
@@ -12,9 +13,11 @@ import {
 } from './constants'
 import { haversine } from './helpers'
 import { FIRST_SCREEN } from "./App"
+import { RIDES } from './screens'
 
 const initialState = {
   app: 'login',
+  currentScreen: RIDES,
   currentRide: null,
   geoWatchID: null,
   horses: [],
@@ -25,6 +28,10 @@ const initialState = {
 
 export default function AppReducer(state=initialState, action) {
   switch (action.type) {
+    case CHANGE_SCREEN:
+      return Object.assign({}, state, {
+        currentScreen: action.screen,
+      })
     case CLEAR_STATE:
       return Object.assign({}, initialState)
     case NEW_GEO_WATCH:
@@ -57,7 +64,7 @@ export default function AppReducer(state=initialState, action) {
         newState.currentRide = {
           ...state.currentRide,
           ride_coordinates: [...state.currentRide.ride_coordinates, action.location],
-          totalDistance: state.currentRide.totalDistance + newDistance,
+          distance: state.currentRide.distance + newDistance,
         }
       }
       return newState

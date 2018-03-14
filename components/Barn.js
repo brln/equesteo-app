@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { Navigation } from 'react-native-navigation'
 import { List, ListItem } from 'react-native-elements'
-
 import {
   StyleSheet,
   Text,
   View
 } from 'react-native';
+
+import { NEW_HORSE } from '../screens'
 
 
 export default class Barn extends Component {
@@ -19,7 +20,7 @@ export default class Barn extends Component {
 
   newHorse () {
     Navigation.showModal({
-      screen: 'equesteo.NewHorse',
+      screen: NEW_HORSE,
       title: 'New Horse',
       animationType: 'slide-up',
       passProps: {

@@ -6,6 +6,7 @@ import {BadRequestError, UnauthorizedError} from "./errors"
 
 import {
   CHANGE_ROOT,
+  CHANGE_SCREEN,
   CLEAR_STATE,
   DISCARD_RIDE,
   HORSE_SAVED,
@@ -24,6 +25,13 @@ function changeAppRoot(root) {
   return {
     type: CHANGE_ROOT,
     root
+  }
+}
+
+export function changeScreen(screen) {
+  return {
+    type: CHANGE_SCREEN,
+    screen
   }
 }
 
@@ -93,7 +101,7 @@ export function startRide() {
     type: START_RIDE,
     currentRide: {
       ride_coordinates: [],
-      totalDistance: 0,
+      distance: 0,
       startTime: unixTimeNow()
     },
   }

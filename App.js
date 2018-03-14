@@ -7,6 +7,7 @@ import {registerScreens} from './screens';
 
 import {appInitialized} from "./actions"
 import AppReducer from './reducer'
+import { DRAWER, LOGIN, SIGNUP, RIDES } from './screens'
 
 const store = createStore(AppReducer, undefined, applyMiddleware(thunkMiddleware))
 
@@ -33,7 +34,7 @@ export default class App {
           tabs: [
             {
               label: 'Log In',
-              screen: 'equesteo.Login',
+              screen: LOGIN,
               icon: require('./img/login.png'),
               selectedIcon: require('./img/login.png'),
               title: 'Log In',
@@ -41,7 +42,7 @@ export default class App {
             },
             {
               label: 'Sign Up',
-              screen: 'equesteo.Signup',
+              screen: SIGNUP,
               icon: require('./img/signup.png'),
               selectedIcon: require('./img/signup.png'),
               title: 'Sign Up',
@@ -57,22 +58,17 @@ export default class App {
       case 'after-login':
         Navigation.startSingleScreenApp({
           screen: {
-            screen: 'equesteo.Rides',
+            screen: RIDES,
             title: 'My Rides',
             navigatorButtons: {
-              rightButtons: [
-              ],
-              leftButtons: [
-                {
-                  id: 'sideMenu'
-                }
-
-              ]
+              leftButtons: [{
+                id: 'sideMenu'
+              }]
             }
           },
           drawer: {
             left: {
-              screen: 'equesteo.Drawer',
+              screen: DRAWER,
               fixedWidth: 500,
             }
           }
@@ -83,7 +79,6 @@ export default class App {
         return
 
     }
-
   }
 
 }

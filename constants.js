@@ -1,4 +1,5 @@
 export const CHANGE_ROOT = 'CHANGE_ROOT'
+export const CHANGE_SCREEN = 'CHANGE_SCREEN'
 export const CLEAR_STATE = 'CLEAR_STATE'
 export const DISCARD_RIDE = 'DISCARD_RIDE'
 export const HORSES_FETCHED = 'HORSES_FETCHED'

@@ -18,7 +18,6 @@ export default class Ride extends Component {
   }
 
   whichHorse () {
-    debugger
     let found = null
     for (let horse of this.props.horses) {
       if (horse.id === this.props.ride.horse_id) {

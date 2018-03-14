@@ -14,7 +14,7 @@ export default RideStats = (props) => {
         <Text
           style={styles.statFont}
         >
-          { props.totalDistance.toFixed(2).toString() } mi
+          { props.distance.toFixed(2).toString() } mi
         </Text>
       </View>
     </View>
