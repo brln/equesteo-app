@@ -1,20 +1,20 @@
- - When saving and network is slow, show ride but mark it unsynced somehow
- - Start and end icons on map
- - Splash page
- - GPS Strength
- - Move signup/login back into one page because the keyboard obscures the tab layout
- - make keyboard not flash on login screen between entries
- - save screenshots of ride when complete for thumbnails in ride list
- - location keeps getting recorded while entering ride details, make it not do that
- - when ride is complete should take you to details screen
- - database migrations
- - be able to upload profile photo
- - be able to upload horse photo
- - make drawer pop out on all screens instead of back buttons 
- - error handling on login/signup
- - define what props should be passed for each component
- - error happens when you start ride before location found
- - should not be able to go for a ride until you've added a horse
+ TODO!
+- When saving and network is slow, show ride but mark it unsynced somehow
+- Start and end icons on map
+- Splash page
+- GPS Strength
+- Move signup/login back into one page because the keyboard obscures the tab layout
+- make keyboard not flash on login screen between entries
+- save screenshots of ride when complete for thumbnails in ride list
+- location keeps getting recorded while entering ride details, make it not do that
+- database migrations
+- be able to upload profile photo
+- be able to upload horse photo
+- make drawer pop out on all screens instead of back buttons 
+- error handling on login/signup
+- define what props should be passed for each component
+- error happens when you start ride before location found
+- should not be able to go for a ride until you've added a horse
 
  
  DONE!
@@ -28,3 +28,4 @@
 - make screen strings constants
 - switch the save button on ride details to be in the navigator
 - make api fields camelcase, this conventions switching is stupid
+- when ride is complete should take you to details screen

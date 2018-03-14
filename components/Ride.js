@@ -36,7 +36,7 @@ export default class Ride extends Component {
         <View>
           <Text>Start Time: {moment(this.props.ride.startTime).format('MMMM Do YYYY, h:mm a')}</Text>
           <Text>Total Time Riding: { moment.utc(this.props.ride.elapsedTimeSecs * 1000).format('HH:mm:ss') }</Text>
-          <Text>Distance: {this.props.ride.distance.toFixed(2) } mi</Text>
+          <Text>Distance: { this.props.ride.distance.toFixed(2) } mi</Text>
           <Text>Horse: {this.whichHorse().name}</Text>
         </View>
       </View>

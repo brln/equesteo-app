@@ -16,10 +16,16 @@ export default class Rides extends Component {
     super(props)
     this.state = {}
     this.selectRide = this.selectRide.bind(this)
+    this.showRide = this.showRide.bind(this)
   }
 
+  componentWillReceiveProps (prevProps) {
+    if (prevProps.justFinishedRide) {
+      this.showRide(prevProps.rides[0])
+    }
+  }
 
-  selectRide (ride) {
+  showRide (ride) {
     Navigation.showModal({
       screen: RIDE,
       title: ride.name,
@@ -31,6 +37,11 @@ export default class Rides extends Component {
       navigatorButtons: {},
       animationType: 'slide-up',
     });
+  }
+
+
+  selectRide (ride) {
+    this.showRide(ride)
   }
 
   render() {

@@ -10,7 +10,7 @@ import {
   RIDE_SAVED_LOCALLY,
   RIDE_SAVED_REMOTELY,
   RIDES_FETCHED,
-  START_RIDE,
+  START_RIDE, JUST_FINISHED_RIDE_SHOWN,
 } from './constants'
 import { haversine } from './helpers'
 import { FIRST_SCREEN } from "./App"
@@ -22,6 +22,7 @@ const initialState = {
   currentRide: null,
   geoWatchID: null,
   horses: [],
+  justFinishedRide: false,
   jwtToken: null,
   lastLocation: null,
   rides: [],
@@ -51,6 +52,10 @@ export default function AppReducer(state=initialState, action) {
       return Object.assign({}, state, {
         horses: [action.horseData, ...state.horses]
       })
+    case JUST_FINISHED_RIDE_SHOWN:
+      return Object.assign({}, state, {
+        justFinishedRide: false
+      })
     case NEW_LOCATION:
       const newState = Object.assign({}, state, {
         lastLocation: action.location
@@ -77,6 +82,7 @@ export default function AppReducer(state=initialState, action) {
     case RIDE_SAVED_LOCALLY:
       return Object.assign({}, state, {
         rides: [action.ride, ...state.rides],
+        justFinishedRide: true,
         currentRide: null,
       })
     case RIDE_SAVED_REMOTELY:

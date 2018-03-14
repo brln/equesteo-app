@@ -12,6 +12,7 @@ class RidesContainer extends Component {
     return (
       <Rides
         horses={this.props.horses}
+        justFinishedRide={this.props.justFinishedRide}
         rides={this.props.rides}
       />
     )
@@ -22,6 +23,7 @@ function mapStateToProps (state) {
   return {
     rides: state.rides,
     horses: state.horses,
+    justFinishedRide: state.justFinishedRide,
   }
 }
 

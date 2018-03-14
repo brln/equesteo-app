@@ -11,6 +11,7 @@ import {
   DISCARD_RIDE,
   HORSE_SAVED,
   HORSES_FETCHED,
+  JUST_FINISHED_RIDE_SHOWN,
   NEW_GEO_WATCH,
   NEW_LOCATION,
   RECEIVE_JWT,
@@ -59,6 +60,12 @@ export function horsesFetched (horses) {
   return {
     type: HORSES_FETCHED,
     horses
+  }
+}
+
+export function justFinishedRideShown() {
+  return {
+    type: JUST_FINISHED_RIDE_SHOWN,
   }
 }
 
