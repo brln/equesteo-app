@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {
   Button,
   StyleSheet,
+  Text,
   View
 } from 'react-native';
 
@@ -11,12 +12,25 @@ import RideStats from './RideStats'
 import GPSStatus from './GPSStatus'
 import { rideCoordsToMapCoords } from "../../helpers"
 import { RIDE_DETAILS } from "../../screens"
+import { background, highlight, lowlight } from '../../colors'
+
 
 export default class RideRecorder extends Component<Props> {
   constructor (props) {
     super(props)
+    this.state = {
+      showGPS: true
+    }
     this.rideComplete = this.rideComplete.bind(this)
     this.startRide = this.startRide.bind(this)
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.lastLocation) {
+      setTimeout(() => {
+        this.setState({showGPS: false})
+      }, 2000)
+    }
   }
 
   rideComplete () {
@@ -40,26 +54,35 @@ export default class RideRecorder extends Component<Props> {
 
   render() {
     let rideStats = null
-    let gpsBar = <GPSStatus lastLocation={this.props.lastLocation} />
+    let gpsBar = null
+    if (this.state.showGPS) {
+      gpsBar = <GPSStatus style={styles.gpsBar} lastLocation={this.props.lastLocation} />
+    }
     let startButton = (
       <View style={styles.startButton}>
-        <Button onPress={this.startRide} title="Start Ride"/>
+        <Text onPress={this.startRide} style={styles.startText}>Start Ride</Text>
       </View>
     )
     if (this.props.currentRide) {
       startButton = null
       rideStats = (
-        <View>
-          <RidingMap
-            mode={"duringRide"}
-            rideCoords={rideCoordsToMapCoords(this.props.currentRide.rideCoordinates)}
-          />
-          <RideStats
-            startTime={this.props.currentRide.startTime}
-            distance={this.props.currentRide.distance}
-          />
-          <View style={styles.rideComplete}>
-            <Button onPress={this.rideComplete} title="Ride Complete"/>
+        <View style={{flex: 1}}>
+          <View style={{flex: 4}}>
+            <RidingMap
+              mode={"duringRide"}
+              rideCoords={rideCoordsToMapCoords(this.props.currentRide.rideCoordinates)}
+            />
+          </View>
+          <View style={styles.bottomSection}>
+            <RideStats
+              startTime={this.props.currentRide.startTime}
+              distance={this.props.currentRide.distance}
+            />
+            <View style={styles.rideComplete}>
+              <Text style={styles.rideCompleteText} onPress={this.rideComplete}>
+                Ride Complete
+              </Text>
+            </View>
           </View>
         </View>
       )
@@ -67,10 +90,8 @@ export default class RideRecorder extends Component<Props> {
     return (
       <View style={styles.container}>
         {gpsBar}
-        <View style={styles.content}>
-          {startButton}
-          {rideStats}
-        </View>
+        {rideStats}
+        {startButton}
       </View>
     );
   }
@@ -79,24 +100,39 @@ export default class RideRecorder extends Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
-    alignItems: 'stretch',
-    backgroundColor: '#F5FCFF',
-  },
-  content: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
-    alignItems: 'stretch',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: background,
+    alignItems: 'stretch'
   },
   startButton: {
-    maxWidth: 100,
-    alignSelf: 'center',
-    marginTop: 50,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  startText: {
+    fontSize: 30,
+    textAlign: 'center',
+    borderWidth: 3,
+    borderColor: lowlight,
+    backgroundColor: highlight,
+    padding: 20,
+  },
+  bottomSection: {
+    flex: 1,
   },
   rideComplete: {
-    alignSelf: 'center',
+    flex: 1,
+    borderWidth: 1,
+    borderColor: 'black',
+    justifyContent: 'center',
+    backgroundColor: lowlight
+  },
+  rideCompleteText: {
+    textAlign: 'center',
+    fontSize: 25,
+    color: background
+
+  },
+  gpsBar: {
+    flex: 1,
   }
 });

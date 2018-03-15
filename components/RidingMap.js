@@ -23,8 +23,9 @@ export default class RidingMap extends Component {
     const minLat = Math.min(...this.props.rideCoords.map((c) => c.latitude))
     const maxLong = Math.max(...this.props.rideCoords.map((c) => c.longitude))
     const minLong = Math.min(...this.props.rideCoords.map((c) => c.longitude))
-    const latitude = ((maxLat - minLat) / 2) + minLat
-    const longitude = ((maxLong - minLong) / 2) + minLong
+    debugger
+    const latitude = ((maxLat - minLat) / 2) + minLat || 0
+    const longitude = ((maxLong - minLong) / 2) + minLong || 0
     const latitudeDelta = Math.max((maxLat - minLat) * 1.2, 0.01)
     const longitudeDelta = Math.max((maxLong - minLong) * 1.2, 0.01)
     return {
@@ -74,10 +75,7 @@ export default class RidingMap extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    height: 400,
-    width: 400,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
+    flex: 1
   },
   map: {
     ...StyleSheet.absoluteFillObject,

@@ -6,32 +6,30 @@ import TimeElapsed from './TimeElapsed'
 export default RideStats = (props) => {
   return (
     <View style={styles.rideStats}>
+      <Text
+        style={styles.statFont}
+      >
+        { props.distance.toFixed(2).toString() } mi
+      </Text>
       <TimeElapsed
         startTime={props.startTime}
         fontStyle={styles.statFont}
       />
-      <View>
-        <Text
-          style={styles.statFont}
-        >
-          { props.distance.toFixed(2).toString() } mi
-        </Text>
-      </View>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   rideStats: {
-    position: 'absolute',
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between'
   },
   statFont: {
-    color: 'white',
+    color: 'black',
     fontSize: 35,
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
-    textShadowOffset: {width: -1, height: 1},
-    textShadowRadius: 10,
     textAlign: 'center',
-    paddingLeft: 20,
+    paddingLeft: 30,
+    paddingRight: 30,
   }
 });

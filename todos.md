@@ -3,14 +3,12 @@
 - Start and end icons on map
 - Splash page
 - GPS Strength
-- Move signup/login back into one page because the keyboard obscures the tab layout
 - save screenshots of ride when complete for thumbnails in ride list
 - location keeps getting recorded while entering ride details, make it not do that
 - database migrations
 - be able to upload profile photo
 - be able to upload horse photo
 - define what props should be passed for each component
-- error happens when you start ride before location found
 - should not be able to go for a ride until you've added a horse
 
 
@@ -32,3 +30,5 @@
 - error handling on login/signup
 - make drawer pop out on all screens instead of back buttons 
 - duplicate ride modal on first ride
+- Move signup/login back into one page because the keyboard obscures the tab layout
+- error happens when you start ride before location found
