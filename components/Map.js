@@ -52,10 +52,7 @@ export default class Map extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    height: 400,
-    width: 400,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
+    flex: 1,
   },
   map: {
     ...StyleSheet.absoluteFillObject,

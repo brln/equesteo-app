@@ -9,6 +9,7 @@ import {
 
 import Map from './Map'
 import { rideCoordsToMapCoords } from "../helpers"
+import { background } from '../colors'
 
 export default class Ride extends Component {
   constructor (props) {
@@ -30,14 +31,35 @@ export default class Ride extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Map
-          rideCoords={rideCoordsToMapCoords(this.props.ride.rideCoordinates)}
-        />
-        <View>
-          <Text>Start Time: {moment(this.props.ride.startTime).format('MMMM Do YYYY, h:mm a')}</Text>
-          <Text>Total Time Riding: { moment.utc(this.props.ride.elapsedTimeSecs * 1000).format('HH:mm:ss') }</Text>
-          <Text>Distance: { this.props.ride.distance.toFixed(2) } mi</Text>
-          <Text>Horse: {this.whichHorse()}</Text>
+        <View style={{flex: 3}}>
+          <Map
+            rideCoords={rideCoordsToMapCoords(this.props.ride.rideCoordinates)}
+          />
+        </View>
+        <View style={{flex: 1, padding: 5}}>
+          <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
+            <View style={{flex: 1}}>
+              <Text>Horse:</Text>
+              <Text style={styles.statFont}>{this.whichHorse()}</Text>
+            </View>
+            <View style={{flex: 1}}>
+              <Text>Start Time:</Text>
+              <Text style={styles.statFont}>{moment(this.props.ride.startTime).format('h:mm a')}</Text>
+            </View>
+          </View>
+
+          <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
+            <View style={{flex: 1}}>
+              <Text>Total Time Riding:</Text>
+              <Text style={styles.statFont}>{ moment.utc(this.props.ride.elapsedTimeSecs * 1000).format('HH:mm:ss') }</Text>
+            </View>
+
+            <View style={{flex: 1}}>
+              <Text>Distance:</Text>
+              <Text style={styles.statFont}>{ this.props.ride.distance.toFixed(2) } mi</Text>
+            </View>
+          </View>
+
         </View>
       </View>
     )
@@ -47,8 +69,9 @@ export default class Ride extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: background,
   },
+  statFont: {
+    fontSize: 24
+  }
 });
