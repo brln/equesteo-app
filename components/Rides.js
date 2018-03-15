@@ -10,6 +10,7 @@ import {
 import { RIDE } from '../screens'
 
 
+
 export default class Rides extends Component {
 
   constructor (props) {
@@ -22,6 +23,7 @@ export default class Rides extends Component {
   componentWillReceiveProps (prevProps) {
     if (prevProps.justFinishedRide) {
       this.showRide(prevProps.rides[0])
+      this.props.justFinishedRideShown()
     }
   }
 

@@ -78,6 +78,12 @@ export function horsesFetched (horses) {
   }
 }
 
+export function justFinishedRideShown () {
+  return {
+    type: JUST_FINISHED_RIDE_SHOWN
+  }
+}
+
 function newGeoWatch(watchID) {
   return {
     type: NEW_GEO_WATCH,

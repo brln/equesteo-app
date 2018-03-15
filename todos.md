@@ -12,7 +12,6 @@
 - define what props should be passed for each component
 - error happens when you start ride before location found
 - should not be able to go for a ride until you've added a horse
-- duplicate ride modal on first ride
 
 
  
@@ -32,3 +31,4 @@
 - location is not found when you cross the login divide
 - error handling on login/signup
 - make drawer pop out on all screens instead of back buttons 
+- duplicate ride modal on first ride
