@@ -9,11 +9,11 @@
 - database migrations
 - be able to upload profile photo
 - be able to upload horse photo
-- make drawer pop out on all screens instead of back buttons 
-- error handling on login/signup
 - define what props should be passed for each component
 - error happens when you start ride before location found
 - should not be able to go for a ride until you've added a horse
+- duplicate ride modal on first ride
+
 
  
  DONE!
@@ -29,3 +29,6 @@
 - make api fields camelcase, this conventions switching is stupid
 - when ride is complete should take you to details screen
 - make keyboard not flash on login screen between entries
+- location is not found when you cross the login divide
+- error handling on login/signup
+- make drawer pop out on all screens instead of back buttons 

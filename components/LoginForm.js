@@ -63,6 +63,9 @@ export default class LoginForm extends Component {
           secureTextEntry={true}
           ref={(i) => this.inputs['password'] = i}
         />
+        <View style={styles.switchup}>
+          <Text style={styles.switchupText} onPress={this.props.switchSignup}>Or, <Text style={styles.underlineText}>Sign Up</Text>.</Text>
+        </View>
       </View>
     );
   }
@@ -83,4 +86,14 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     width: 80,
   },
+  switchup: {
+    paddingTop: 20,
+    paddingBottom: 20,
+  },
+  switchupText: {
+    textAlign: 'center',
+  },
+  underlineText: {
+    textDecorationLine: 'underline',
+  }
 });

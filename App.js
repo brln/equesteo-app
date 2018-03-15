@@ -7,7 +7,7 @@ import {registerScreens} from './screens';
 
 import {appInitialized} from "./actions"
 import AppReducer from './reducer'
-import { DRAWER, LOGIN, SIGNUP, RIDES } from './screens'
+import { DRAWER, SIGNUP_LOGIN, RIDES } from './screens'
 
 const store = createStore(AppReducer, undefined, applyMiddleware(thunkMiddleware))
 
@@ -30,28 +30,9 @@ export default class App {
   startApp(root) {
     switch (root) {
       case 'login':
-        Navigation.startTabBasedApp({
-          tabs: [
-            {
-              label: 'Log In',
-              screen: LOGIN,
-              icon: require('./img/login.png'),
-              selectedIcon: require('./img/login.png'),
-              title: 'Log In',
-              // navigatorStyle: {}
-            },
-            {
-              label: 'Sign Up',
-              screen: SIGNUP,
-              icon: require('./img/signup.png'),
-              selectedIcon: require('./img/signup.png'),
-              title: 'Sign Up',
-              // overrideBackPress: true,
-              // navigatorStyle: {}
-            },
-          ],
-          appStyle: {
-            forceTitlesDisplay: true,
+        Navigation.startSingleScreenApp({
+          screen: {
+            screen: SIGNUP_LOGIN,
           }
         })
         return

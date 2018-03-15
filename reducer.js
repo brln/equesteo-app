@@ -2,6 +2,7 @@ import {
   CHANGE_SCREEN,
   CLEAR_STATE,
   DISCARD_RIDE,
+  DISMISS_ERROR,
   HORSES_FETCHED,
   HORSE_SAVED,
   NEW_GEO_WATCH,
@@ -10,7 +11,7 @@ import {
   RIDE_SAVED_LOCALLY,
   RIDE_SAVED_REMOTELY,
   RIDES_FETCHED,
-  START_RIDE, JUST_FINISHED_RIDE_SHOWN,
+  START_RIDE, JUST_FINISHED_RIDE_SHOWN, ERROR_OCCURRED,
 } from './constants'
 import { haversine } from './helpers'
 import { FIRST_SCREEN } from "./App"
@@ -20,6 +21,7 @@ const initialState = {
   app: 'login',
   currentScreen: RIDES,
   currentRide: null,
+  error: null,
   geoWatchID: null,
   horses: [],
   justFinishedRide: false,
@@ -35,7 +37,9 @@ export default function AppReducer(state=initialState, action) {
         currentScreen: action.screen,
       })
     case CLEAR_STATE:
-      return Object.assign({}, initialState)
+      return Object.assign({}, initialState, {
+        lastLocation: state.lastLocation
+      })
     case NEW_GEO_WATCH:
       return Object.assign({}, state, {
         geoWatchID: action.geoWatchID
@@ -43,6 +47,14 @@ export default function AppReducer(state=initialState, action) {
     case DISCARD_RIDE:
       return Object.assign({}, state, {
         currentRide: null
+      })
+    case DISMISS_ERROR:
+      return Object.assign({}, state, {
+        error: null
+      })
+    case ERROR_OCCURRED:
+      return Object.assign({}, state, {
+        error: action.message
       })
     case HORSES_FETCHED:
       return Object.assign({}, state, {

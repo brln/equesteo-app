@@ -9,6 +9,8 @@ import {
   CHANGE_SCREEN,
   CLEAR_STATE,
   DISCARD_RIDE,
+  DISMISS_ERROR,
+  ERROR_OCCURRED,
   HORSE_SAVED,
   HORSES_FETCHED,
   JUST_FINISHED_RIDE_SHOWN,
@@ -49,6 +51,19 @@ export function discardRide ()  {
   }
 }
 
+export function dismissError () {
+  return {
+    type: DISMISS_ERROR
+  }
+}
+
+export function errorOccurred (message) {
+  return {
+    type: ERROR_OCCURRED,
+    message
+  }
+}
+
 export function horseSaved (horseData) {
   return {
     type: HORSE_SAVED,
@@ -60,12 +75,6 @@ export function horsesFetched (horses) {
   return {
     type: HORSES_FETCHED,
     horses
-  }
-}
-
-export function justFinishedRideShown() {
-  return {
-    type: JUST_FINISHED_RIDE_SHOWN,
   }
 }
 
@@ -148,29 +157,27 @@ export function saveNewHorse (horseData) {
 
 function startLocationTracking () {
   return async (dispatch) => {
-    navigator.geolocation.getCurrentPosition(
-      (location) => {
-        const parsedLocation = {
-          accuracy: location.coords.accuracy,
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-          timestamp: location.timestamp,
-        }
-        dispatch(newLocation(parsedLocation))
-      },
-      null,
-      { enableHighAccuracy: true, timeout: 1000 * 60 * 10, maximumAge: 1000 }
-    );
+    const getLocation = (location) => {
+      const parsedLocation = {
+        accuracy: location.coords.accuracy,
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        timestamp: location.timestamp,
+      }
+      dispatch(newLocation(parsedLocation))
+    }
+
+    const getCurrentPosition = () => {
+      navigator.geolocation.getCurrentPosition(
+        getLocation,
+        getCurrentPosition, // recursively run on error
+        { enableHighAccuracy: true, timeout: 1000 * 60 * 10, maximumAge: 1000 }
+      );
+    }
+    getCurrentPosition()
+
     const watchID = navigator.geolocation.watchPosition(
-      (location) => {
-        const parsedLocation = {
-          accuracy: location.coords.accuracy,
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-          timestamp: location.timestamp,
-        }
-        dispatch(newLocation(parsedLocation))
-      },
+      getLocation,
       null,
       {enableHighAccuracy: true, timeout: 1000 * 60 * 10, maximumAge: 10000, distanceFilter: 10}
     )
@@ -260,8 +267,7 @@ export function submitLogin(email, password) {
       dispatch(fetchHorses(resp.token))
     } catch (e) {
       if (e instanceof UnauthorizedError) {
-        // @Todo: put error handling back in here
-        console.log(e)
+        dispatch(errorOccurred(e.message))
       }
     }
   }
@@ -275,8 +281,7 @@ export function submitSignup(email, password) {
       dispatch(receiveJWT(resp.token))
     } catch (e) {
       if (e instanceof BadRequestError) {
-        // @Todo: put error handling back in here
-        console.log(e)
+        dispatch(errorOccurred(e.message))
       }
     }
   }

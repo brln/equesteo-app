@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 
 import {
-  Button,
+  ImageBackground,
   StyleSheet,
   Text,
   TextInput,
   View
 } from 'react-native';
-
 
 export default class SignupForm extends Component {
   constructor (props) {
@@ -94,6 +93,9 @@ export default class SignupForm extends Component {
           onChangeText={this.changePassword2}
           ref={(i) => this.inputs['pw2'] = i}
         />
+        <View style={styles.switchup}>
+          <Text style={styles.switchupText} onPress={this.props.switchSignup}>Or, <Text style={styles.underlineText}>Log In</Text>.</Text>
+        </View>
       </View>
     );
   }
@@ -114,4 +116,14 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     width: 80,
   },
+  switchup: {
+    paddingTop: 20,
+    paddingBottom: 20,
+  },
+  switchupText: {
+    textAlign: 'center',
+  },
+  underlineText: {
+    textDecorationLine: 'underline',
+  }
 });
