@@ -67,7 +67,7 @@ export default class SignupForm extends Component {
     return (
       <View style={styles.container}>
         { this.state.showMismatch ? dontMatchMessage : null }
-        <Text>Email:</Text>
+        <Text style={styles.whiteText}>Email:</Text>
         <TextInput
           autoFocus={true}
           blurOnSubmit={false}
@@ -76,22 +76,26 @@ export default class SignupForm extends Component {
           onChangeText={this.changeEmail}
           returnKeyType="next"
           ref={(i) => this.inputs['email'] = i}
+          underlineColorAndroid="white"
         />
-        <Text>Password:</Text>
+        <Text style={styles.whiteText}>Password:</Text>
         <TextInput
           blurOnSubmit={false}
           onSubmitEditing={this.moveToPassword2}
           onChangeText={this.changePassword1}
           ref={(i) => this.inputs['pw1'] = i}
           returnKeyType="next"
+          underlineColorAndroid="white"
           secureTextEntry={true}
         />
-        <Text>Password Again:</Text>
+        <Text style={styles.whiteText}>Password Again:</Text>
         <TextInput
           onSubmitEditing={this.submitSignup}
           secureTextEntry={true}
+          style={styles.whiteText}
           onChangeText={this.changePassword2}
           ref={(i) => this.inputs['pw2'] = i}
+          underlineColorAndroid="white"
         />
         <View style={styles.switchup}>
           <Text style={styles.switchupText} onPress={this.props.switchSignup}>Or, <Text style={styles.underlineText}>Log In</Text>.</Text>
@@ -103,14 +107,17 @@ export default class SignupForm extends Component {
 
 const styles = StyleSheet.create({
   container: {
+    position: 'absolute',
+    top: 40,
+    width: "100%",
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'stretch',
-    backgroundColor: '#F5FCFF',
     padding: 30,
   },
   email: {
     borderColor: 'gray',
+    color: 'white',
   },
   password: {
     borderColor: 'gray',
@@ -122,8 +129,12 @@ const styles = StyleSheet.create({
   },
   switchupText: {
     textAlign: 'center',
+    color: 'white'
   },
   underlineText: {
     textDecorationLine: 'underline',
+  },
+  whiteText: {
+    color: 'white'
   }
 });

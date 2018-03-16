@@ -47,7 +47,7 @@ export default class LoginForm extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text>Email:</Text>
+        <Text style={styles.whiteText}>Email:</Text>
         <TextInput
           autoFocus={true}
           blurOnSubmit={false}
@@ -55,13 +55,16 @@ export default class LoginForm extends Component {
           onChangeText={this.changeEmail}
           onSubmitEditing={this.moveToPassword}
           ref={(i) => this.inputs['email'] = i}
+          underlineColorAndroid="white"
         />
-        <Text>Password:</Text>
+        <Text style={styles.whiteText}>Password:</Text>
         <TextInput
           onChangeText={this.changePassword}
           onSubmitEditing={this.submitLogin}
           secureTextEntry={true}
+          style={styles.whiteText}
           ref={(i) => this.inputs['password'] = i}
+          underlineColorAndroid="white"
         />
         <View style={styles.switchup}>
           <Text style={styles.switchupText} onPress={this.props.switchSignup}>Or, <Text style={styles.underlineText}>Sign Up</Text>.</Text>
@@ -73,18 +76,22 @@ export default class LoginForm extends Component {
 
 const styles = StyleSheet.create({
   container: {
+    position: 'absolute',
+    top: 80,
+    width: "100%",
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'stretch',
-    backgroundColor: '#F5FCFF',
     padding: 30,
   },
   email: {
     borderColor: 'gray',
+    color: 'white',
   },
   password: {
     borderColor: 'gray',
     width: 80,
+    color: 'white'
   },
   switchup: {
     paddingTop: 20,
@@ -92,8 +99,12 @@ const styles = StyleSheet.create({
   },
   switchupText: {
     textAlign: 'center',
+    color: 'white'
   },
   underlineText: {
     textDecorationLine: 'underline',
+  },
+  whiteText: {
+    color: 'white'
   }
 });

@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 import {
+  Image,
   StyleSheet,
   Text,
   View
@@ -57,9 +58,13 @@ class SignupLoginContainer extends Component {
     }
     const error = this.props.error ? <Text style={styles.errorBox}>{this.props.error}</Text> : null
     return (
-      <View style={styles.container}>
-        {error}
-        {form}
+        <View style={styles.container}>
+          <Image
+            source={require('../img/loginbg2.jpg')}
+            style={{width: "100%", height: "100%"}}
+          />
+          {error}
+          {form}
       </View>
     )
   }
