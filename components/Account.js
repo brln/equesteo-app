@@ -1,14 +1,13 @@
-import React, { Component } from 'react';
-import ImagePicker from 'react-native-image-crop-picker';
-
-
+import React, { Component } from 'react'
+import ImagePicker from 'react-native-image-crop-picker'
 import {
   Button,
   Image,
   StyleSheet,
   View
-} from 'react-native';
+} from 'react-native'
 
+import { profilePhotoURL } from "../helpers"
 
 export default class Account extends Component {
   constructor (props) {
@@ -35,7 +34,7 @@ export default class Account extends Component {
   render() {
     let uri = 'https://s3.amazonaws.com/equesteo-profile-photos/full_size/empty.png'
     if (this.props.userData.profilePhotoID) {
-      uri = `https://s3.amazonaws.com/equesteo-profile-photos/full_size/${this.props.userData.profilePhotoID}.jpeg`
+      uri = profilePhotoURL(this.props.userData.profilePhotoID)
     }
     return (
       <View style={styles.container}>

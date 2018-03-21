@@ -2,7 +2,14 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
-import { ACCOUNT, BARN, RIDES, RIDES_DETAILS, RECORDER } from '../screens'
+import {
+  ACCOUNT,
+  BARN,
+  FIND_FRIENDS,
+  RIDES,
+  RIDES_DETAILS,
+  RECORDER
+} from '../screens'
 import { changeScreen } from '../actions'
 
 class DrawerContainer extends Component {
@@ -13,6 +20,21 @@ class DrawerContainer extends Component {
 		this.openAccount = this.openAccount.bind(this)
     this.openBarn = this.openBarn.bind(this)
 		this.openRides = this.openRides.bind(this)
+    this.openFindFriends = this.openFindFriends.bind(this)
+  }
+
+  openFindFriends () {
+    this.props.dispatch(changeScreen(RECORDER))
+    this.toggleDrawer()
+    this.props.navigator.push({
+      screen: FIND_FRIENDS,
+      title: 'Find Friends',
+      navigatorButtons: {
+        leftButtons: [{
+          id: 'sideMenu'
+        }]
+      }
+    })
   }
 
   openRecorder () {
@@ -28,6 +50,7 @@ class DrawerContainer extends Component {
       }
 		})
 	}
+
 
 	openRides () {
     this.props.dispatch(changeScreen(RIDES))
@@ -76,6 +99,7 @@ class DrawerContainer extends Component {
     let barnScreen = null
 		let myAccountScreen = null
     let recorder = null
+    let findFriends = null
 		if (this.props.currentScreen !== RIDES) {
       myRides = (
         <TouchableOpacity onPress={this.openRides}>
@@ -118,6 +142,17 @@ class DrawerContainer extends Component {
 						</Text>
 					</View>
 				</TouchableOpacity>
+      )
+    }
+    if (this.props.currentScreen !== FIND_FRIENDS) {
+      recorder = (
+        <TouchableOpacity onPress={this.openFindFriends}>
+          <View style={styles.drawerListItem}>
+            <Text style={styles.drawerListItemText} onTouch>
+              Find Friends
+            </Text>
+          </View>
+        </TouchableOpacity>
       )
     }
 

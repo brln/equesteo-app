@@ -15,6 +15,7 @@ import {
   RIDE_SAVED_REMOTELY,
   RIDES_FETCHED,
   START_RIDE,
+  USER_SEARCH_RETURNED,
 } from './constants'
 import { haversine } from './helpers'
 import { FIRST_SCREEN } from "./App"
@@ -31,7 +32,8 @@ const initialState = {
   jwt: null,
   lastLocation: null,
   rides: [],
-  userData: {}
+  userData: {},
+  userSearchResults: []
 }
 
 export default function AppReducer(state=initialState, action) {
@@ -117,7 +119,11 @@ export default function AppReducer(state=initialState, action) {
       }
       return Object.assign({}, state, {
         currentRide: action.currentRide
-    })
+      })
+    case USER_SEARCH_RETURNED:
+      return Object.assign({}, state, {
+        userSearchResults: action.userSearchResults
+      })
     default:
       return state
   }

@@ -44,3 +44,7 @@ export const rideCoordsToMapCoords = (rideCoords) => {
 export const unixTimeNow = () => {
   return Math.floor(new Date().getTime())
 }
+
+export const profilePhotoURL = (id) => {
+  return `https://s3.amazonaws.com/equesteo-profile-photos/full_size/${id}.jpeg`
+}

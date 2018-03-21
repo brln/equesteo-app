@@ -22,6 +22,8 @@ import {
   RIDE_SAVED_REMOTELY,
   RIDES_FETCHED,
   START_RIDE,
+  USER_FETCHED,
+  USER_SEARCH_RETURNED,
 } from './constants'
 
 TOKEN_KEY = '@equesteo:jwtToken'
@@ -145,18 +147,36 @@ export function startRide() {
   }
 }
 
+export function userSearchReturned (userSearchResults) {
+  return {
+    type: USER_SEARCH_RETURNED,
+    userSearchResults,
+  }
+}
+
 function findLocalToken() {
   return async (dispatch) => {
-    const userData = await AsyncStorage.getItem(TOKEN_KEY);
-    if (userData !== null) {
-      const parsed = JSON.parse(userData)
-      dispatch(receiveUserData(parsed))
-      dispatch(fetchRides(parsed.token))
-      dispatch(fetchHorses(parsed.token))
+    const token = await AsyncStorage.getItem(TOKEN_KEY);
+    if (token !== null) {
+      dispatch(receiveJWT(token))
+      dispatch(fetchUser(token))
+      dispatch(fetchRides(token))
+      dispatch(fetchHorses(token))
     }
   }
 }
 
+export function searchForFriends (phrase) {
+  return async (dispatch, getState) => {
+    const userAPI = new UserAPI(getState().jwt)
+    try {
+      const resp = await userAPI.findUser(phrase)
+      dispatch(userSearchReturned(resp))
+    } catch (e) {
+      console.log(e)
+    }
+  }
+}
 
 function startLocationTracking () {
   return async (dispatch) => {
@@ -214,6 +234,19 @@ export function fetchRides(token) {
     try {
       const resp = await rideAPI.fetchRides()
       dispatch(ridesFetched(resp))
+    } catch (e) {
+      console.log(e)
+      alert('error in console')
+    }
+  }
+}
+
+export function fetchUser(token) {
+  return async (dispatch) => {
+    const userAPI = new UserAPI(token)
+    try {
+      const resp = await userAPI.fetchUser()
+      dispatch(receiveUserData(resp))
     } catch (e) {
       console.log(e)
       alert('error in console')

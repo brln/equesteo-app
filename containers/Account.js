@@ -37,4 +37,4 @@ function mapStateToProps (state) {
   }
 }
 
-export default  connect(mapStateToProps)(AccountContainer)
+export default connect(mapStateToProps)(AccountContainer)
