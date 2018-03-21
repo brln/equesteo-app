@@ -84,6 +84,7 @@ export default class SignupForm extends Component {
           onSubmitEditing={this.moveToPassword2}
           onChangeText={this.changePassword1}
           ref={(i) => this.inputs['pw1'] = i}
+          style={styles.whiteText}
           returnKeyType="next"
           underlineColorAndroid="white"
           secureTextEntry={true}

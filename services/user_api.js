@@ -19,4 +19,8 @@ export default class UserAPI {
       password: password,
     })
   }
+
+  async uploadProfilePhoto (imageLocation) {
+    return await this.apiClient.uploadImage('/users/profilePhoto', 'profile', imageLocation)
+  }
 }

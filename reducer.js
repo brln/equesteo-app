@@ -10,6 +10,7 @@ import {
   NEW_GEO_WATCH,
   NEW_LOCATION,
   RECEIVE_JWT,
+  RECEIVE_USER_DATA,
   RIDE_SAVED_LOCALLY,
   RIDE_SAVED_REMOTELY,
   RIDES_FETCHED,
@@ -27,9 +28,10 @@ const initialState = {
   geoWatchID: null,
   horses: [],
   justFinishedRide: false,
-  jwtToken: null,
+  jwt: null,
   lastLocation: null,
   rides: [],
+  userData: {}
 }
 
 export default function AppReducer(state=initialState, action) {
@@ -91,7 +93,11 @@ export default function AppReducer(state=initialState, action) {
     case RECEIVE_JWT:
       return Object.assign({}, state, {
         app: 'after-login',
-        jwtToken: action.token
+        jwt: action.token
+      })
+    case RECEIVE_USER_DATA:
+      return Object.assign({}, state, {
+        userData: action.userData
       })
     case RIDE_SAVED_LOCALLY:
       return Object.assign({}, state, {

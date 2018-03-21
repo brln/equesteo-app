@@ -59,11 +59,11 @@ class SignupLoginContainer extends Component {
     const error = this.props.error ? <Text style={styles.errorBox}>{this.props.error}</Text> : null
     return (
         <View style={styles.container}>
+          {error}
           <Image
             source={require('../img/loginbg2.jpg')}
             style={{width: "100%", height: "100%"}}
           />
-          {error}
           {form}
       </View>
     )

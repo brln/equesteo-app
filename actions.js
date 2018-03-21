@@ -17,6 +17,7 @@ import {
   NEW_GEO_WATCH,
   NEW_LOCATION,
   RECEIVE_JWT,
+  RECEIVE_USER_DATA,
   RIDE_SAVED_LOCALLY,
   RIDE_SAVED_REMOTELY,
   RIDES_FETCHED,
@@ -105,6 +106,13 @@ function receiveJWT(token) {
   }
 }
 
+function receiveUserData(userData) {
+  return {
+    type: RECEIVE_USER_DATA,
+    userData
+  }
+}
+
 function rideSavedLocally (ride) {
   return {
     type: RIDE_SAVED_LOCALLY,
@@ -139,27 +147,16 @@ export function startRide() {
 
 function findLocalToken() {
   return async (dispatch) => {
-    const token = await AsyncStorage.getItem(TOKEN_KEY);
-    if (token !== null) {
-      dispatch(receiveJWT(token))
-      dispatch(fetchRides(token))
-      dispatch(fetchHorses(token))
+    const userData = await AsyncStorage.getItem(TOKEN_KEY);
+    if (userData !== null) {
+      const parsed = JSON.parse(userData)
+      dispatch(receiveUserData(parsed))
+      dispatch(fetchRides(parsed.token))
+      dispatch(fetchHorses(parsed.token))
     }
   }
 }
 
-export function saveNewHorse (horseData) {
-  return async (dispatch, getState) => {
-    const horseAPI = new HorseAPI(getState().jwtToken)
-    try {
-      const resp = await horseAPI.createHorse(horseData)
-      dispatch(horseSaved(resp))
-    } catch (e) {
-      console.log(e)
-      alert('error in console')
-    }
-  }
-}
 
 function startLocationTracking () {
   return async (dispatch) => {
@@ -243,12 +240,26 @@ export function localSaveRide(recorderDetails) {
 
 function remoteSaveRide(rideDetails) {
   return async (dispatch, getState) => {
-    const rideAPI = new RideAPI(getState().jwtToken)
+    const rideAPI = new RideAPI(getState().jwt)
     try {
       const resp = await rideAPI.saveRide(rideDetails)
       dispatch(rideSavedRemotely(resp))
     } catch (e) {
       // @TODO: deal with failure
+      console.log(e)
+      alert('error in console')
+    }
+  }
+}
+
+export function saveNewHorse (horseData) {
+  return async (dispatch, getState) => {
+    debugger
+    const horseAPI = new HorseAPI(getState().jwt)
+    try {
+      const resp = await horseAPI.createHorse(horseData)
+      dispatch(horseSaved(resp))
+    } catch (e) {
       console.log(e)
       alert('error in console')
     }
@@ -271,6 +282,8 @@ export function submitLogin(email, password) {
       dispatch(receiveJWT(resp.token))
       dispatch(fetchRides(resp.token))
       dispatch(fetchHorses(resp.token))
+      delete resp.token
+      dispatch(receiveUserData(resp))
     } catch (e) {
       if (e instanceof UnauthorizedError) {
         dispatch(errorOccurred(e.message))
@@ -284,13 +297,27 @@ export function submitSignup(email, password) {
     const userAPI = new UserAPI()
     try {
       const resp = await userAPI.signup(email, password)
+      await AsyncStorage.setItem(TOKEN_KEY, resp.token);
       dispatch(receiveJWT(resp.token))
+      delete resp.token
+      dispatch(receiveUserData(resp))
     } catch (e) {
       if (e instanceof BadRequestError) {
         dispatch(errorOccurred(e.message))
       }
     }
   }
+}
 
+export function uploadProfilePhoto(photoLocation) {
+  return async (dispatch, getState) => {
+    const userAPI = new UserAPI(getState().jwt)
+    try {
+      const resp = await userAPI.uploadProfilePhoto(photoLocation)
+      dispatch(receiveUserData(resp))
+    } catch (e) {
+      debugger
+    }
+  }
 }
 

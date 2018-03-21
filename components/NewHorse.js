@@ -50,7 +50,6 @@ export default class NewHorse extends Component {
       <View style={styles.container}>
         <Text>Name:</Text>
         <TextInput
-          style={styles.textInput}
           onChangeText={this.changeName}
           value={this.state.name}
         />

@@ -10,12 +10,14 @@ export default class ApiClient {
     this.token = token
   }
 
-  headers () {
-    console.log(this.token)
-    return new Headers({
-      'Authorization': 'Bearer: ' + this.token,
-      'Content-Type': 'application/json',
-    })
+  headers (isJson) {
+    let headers = {
+     'Authorization': 'Bearer: ' + this.token,
+    }
+    if (isJson) {
+      headers['Content-Type'] = 'application/json'
+    }
+    return new Headers(headers)
   }
 
   async get (endpoint) {
@@ -30,12 +32,15 @@ export default class ApiClient {
     return this.request(this.PUT, endpoint, body)
   }
 
-  async request (method, endpoint, body) {
+  async request (method, endpoint, body, isJSON=true) {
+    if (isJSON) {
+      body = body ? JSON.stringify(body) : undefined
+    }
     const resp = await fetch(
       API_URL + endpoint,
       {
-        body: body ? JSON.stringify(body) : undefined,
-        headers: this.headers(),
+        body,
+        headers: this.headers(isJSON),
         method
       }
     )
@@ -49,5 +54,15 @@ export default class ApiClient {
     }
     return json
 
+  }
+
+  uploadImage (endpoint, name, uri) {
+    const data = new FormData()
+    data.append('file', {
+      name,
+      uri,
+      type: 'image/jpeg',
+    })
+    return this.request(this.POST, endpoint, data, false)
   }
 }
