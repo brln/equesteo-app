@@ -3,13 +3,47 @@ import { connect } from 'react-redux';
 
 import { signOut } from '../actions'
 import Account from '../components/Account'
-import { uploadProfilePhoto } from "../actions"
+import { updateProfile, uploadProfilePhoto } from "../actions"
 
 class AccountContainer extends Component {
+  static navigatorButtons = {
+    leftButtons: [],
+    rightButtons: [
+      {
+        id: 'save',
+        title: 'Save',
+      }
+    ],
+  }
+
   constructor (props) {
     super(props)
+    this.state = {
+      userMadeChanges: false,
+      userData: null,
+    }
+    this.changeAccountDetails = this.changeAccountDetails.bind(this)
     this.signOut = this.signOut.bind(this)
     this.uploadProfilePhoto = this.uploadProfilePhoto.bind(this)
+
+
+    this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
+    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
+  }
+
+  changeAccountDetails (newDetails) {
+    this.setState({
+      userMadeChanges: true,
+      userData: Object.assign({}, this.props.userData, newDetails)
+    })
+  }
+
+  onNavigatorEvent (event) {
+    if (event.type === 'NavBarButtonPress') {
+      if (event.id === 'save') {
+        this.props.dispatch(updateProfile(this.state.userData))
+      }
+    }
   }
 
   signOut () {
@@ -23,9 +57,11 @@ class AccountContainer extends Component {
   render() {
     return (
       <Account
+        userData={this.state.userMadeChanges ? this.state.userData : this.props.userData }
+        changeAccountDetails={this.changeAccountDetails}
+        navigator={this.props.navigator}
         signOut={this.signOut}
         uploadProfilePhoto={this.uploadProfilePhoto}
-        userData={this.props.userData}
       />
     )
   }

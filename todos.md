@@ -5,11 +5,10 @@
 - GPS Strength
 - save screenshots of ride when complete for thumbnails in ride list
 - location keeps getting recorded while entering ride details, make it not do that
-- database migrations
-- be able to upload profile photo
 - be able to upload horse photo
 - define what props should be passed for each component
 - should not be able to go for a ride until you've added a horse
+- some indication that profile details have been saved when hitting save button
 
 
  
@@ -32,3 +31,5 @@
 - duplicate ride modal on first ride
 - Move signup/login back into one page because the keyboard obscures the tab layout
 - error happens when you start ride before location found
+- be able to upload profile photo
+- database migrations

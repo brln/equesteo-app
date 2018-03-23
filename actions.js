@@ -354,3 +354,14 @@ export function uploadProfilePhoto(photoLocation) {
   }
 }
 
+export function updateProfile (userData) {
+  return async (dispatch, getState) => {
+    const userAPI = new UserAPI(getState().jwt)
+    try {
+      const resp = await userAPI.updateProfile(userData)
+      dispatch(receiveUserData(resp))
+    } catch (e) {
+      debugger
+    }
+  }
+}

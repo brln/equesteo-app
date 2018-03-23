@@ -31,4 +31,8 @@ export default class UserAPI {
   async findUser (searchPhrase) {
     return await this.apiClient.get('/users/search?q=' + searchPhrase)
   }
+
+  async updateProfile (userData) {
+    return await this.apiClient.put('/users', userData)
+  }
 }

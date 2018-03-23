@@ -51,7 +51,6 @@ class DrawerContainer extends Component {
 		})
 	}
 
-
 	openRides () {
     this.props.dispatch(changeScreen(RIDES))
     this.toggleDrawer()
@@ -145,7 +144,7 @@ class DrawerContainer extends Component {
       )
     }
     if (this.props.currentScreen !== FIND_FRIENDS) {
-      recorder = (
+      findFriends = (
         <TouchableOpacity onPress={this.openFindFriends}>
           <View style={styles.drawerListItem}>
             <Text style={styles.drawerListItemText} onTouch>
@@ -161,6 +160,7 @@ class DrawerContainer extends Component {
 				<View style={styles.container}>
 					<View style={styles.drawerList}>
 						{myRides}
+            {findFriends}
             {recorder}
 						{barnScreen}
 						{myAccountScreen}
