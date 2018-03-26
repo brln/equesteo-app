@@ -16,8 +16,10 @@ class FindFriendsContainer extends Component {
   render() {
     return (
       <FindFriends
-        userSearchResults={this.props.userSearchResults}
+        navigator={this.props.navigator}
         search={this.search}
+        userData={this.props.userData}
+        userSearchResults={this.props.userSearchResults}
       />
     )
   }
@@ -25,6 +27,7 @@ class FindFriendsContainer extends Component {
 
 function mapStateToProps (state) {
   return {
+    userData: state.userData,
     userSearchResults: state.userSearchResults
   }
 }

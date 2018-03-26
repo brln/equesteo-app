@@ -35,4 +35,16 @@ export default class UserAPI {
   async updateProfile (userData) {
     return await this.apiClient.put('/users', userData)
   }
+
+  async addFollow (followingID) {
+    return await this.apiClient.post('/users/follow/add', {
+      followingID
+    })
+  }
+
+  async deleteFollow (followingID ) {
+    return await this.apiClient.post('/users/follow/delete', {
+      followingID
+    })
+  }
 }

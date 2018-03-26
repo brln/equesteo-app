@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { List, ListItem } from 'react-native-elements'
-
 import {
   ScrollView,
   StyleSheet,
@@ -8,7 +7,9 @@ import {
   TextInput,
   View,
 } from 'react-native'
+
 import { profilePhotoURL } from "../helpers"
+import { PROFILE } from '../screens'
 
 
 
@@ -20,6 +21,11 @@ export default class FindFriends extends Component {
     }
     this.changeSearchPhrase = this.changeSearchPhrase.bind(this);
     this.search = this.search.bind(this)
+    this.showProfile = this.showProfile.bind(this)
+  }
+
+  componentWillReceiveProps (nextProps) {
+    debugger
   }
 
   changeSearchPhrase (phrase) {
@@ -30,6 +36,22 @@ export default class FindFriends extends Component {
 
   search () {
     this.props.search(this.state.searchPhrase)
+  }
+
+  showProfile (user) {
+    let name = 'Unknown Name'
+    if (user.firstName || user.lastName) {
+      name = `${user.firstName} ${user.lastName}`
+    }
+
+    this.props.navigator.push({
+      screen: PROFILE,
+      title: name,
+      animationType: 'slide-up',
+      passProps: {
+        user,
+      }
+    })
   }
 
   render() {
@@ -50,6 +72,7 @@ export default class FindFriends extends Component {
                   title={user.email}
                   roundAvatar
                   avatar={{uri: profilePhotoURL(user.profilePhotoID)}}
+                  onPress={() => { this.showProfile(user) }}
                 />
               ))
             }

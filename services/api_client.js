@@ -2,6 +2,7 @@ import { API_URL } from 'react-native-dotenv'
 import {BadRequestError, UnauthorizedError} from '../errors'
 
 export default class ApiClient {
+  DELETE = 'delete'
   GET = 'get'
   POST = 'post'
   PUT = 'put'
@@ -18,6 +19,10 @@ export default class ApiClient {
       headers['Content-Type'] = 'application/json'
     }
     return new Headers(headers)
+  }
+
+  async delete (endpoint) {
+    return this.request(this.DELETE, endpoint)
   }
 
   async get (endpoint) {

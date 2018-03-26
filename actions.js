@@ -154,6 +154,44 @@ export function userSearchReturned (userSearchResults) {
   }
 }
 
+//  =========================================
+// |<  FUNCTIONAL ACTIONS                |||>>
+//  =========================================
+
+export function appInitialized () {
+  return async (dispatch) => {
+    dispatch(findLocalToken())
+    dispatch(changeAppRoot('login'))
+    dispatch(startLocationTracking())
+  }
+}
+
+export function createFollow (followingID) {
+  return async (dispatch, getState) => {
+    const userAPI = new UserAPI(getState().jwt)
+    try {
+      const resp = await userAPI.addFollow(followingID)
+      dispatch(receiveUserData(resp))
+    } catch (e) {
+      console.log(e)
+      alert('error in console')
+    }
+  }
+}
+
+export function deleteFollow (followingID) {
+  return async (dispatch, getState) => {
+    const userAPI = new UserAPI(getState().jwt)
+    try {
+      const resp = await userAPI.deleteFollow(followingID)
+      dispatch(receiveUserData(resp))
+    } catch (e) {
+      console.log(e)
+      alert('error in console')
+    }
+  }
+}
+
 function findLocalToken() {
   return async (dispatch) => {
     const token = await AsyncStorage.getItem(TOKEN_KEY);
@@ -162,6 +200,89 @@ function findLocalToken() {
       dispatch(fetchUser(token))
       dispatch(fetchRides(token))
       dispatch(fetchHorses(token))
+    }
+  }
+}
+
+export function fetchHorses (token) {
+  return async (dispatch) => {
+    const horseAPI = new HorseAPI(token)
+    try {
+      const resp = await horseAPI.fetchHorses()
+      dispatch(horsesFetched(resp))
+    } catch (e) {
+      console.log(e)
+    }
+  }
+}
+
+export function fetchRides (token) {
+  return async (dispatch) => {
+    const rideAPI = new RideAPI(token)
+    try {
+      const resp = await rideAPI.fetchRides()
+      dispatch(ridesFetched(resp))
+    } catch (e) {
+      console.log(e)
+      alert('error in console')
+    }
+  }
+}
+
+export function fetchUser (token) {
+  return async (dispatch) => {
+    const userAPI = new UserAPI(token)
+    try {
+      const resp = await userAPI.fetchUser()
+      dispatch(receiveUserData(resp))
+    } catch (e) {
+      console.log(e)
+      alert('error in console')
+    }
+  }
+}
+
+export function localSaveRide (recorderDetails) {
+  return async (dispatch, getState) => {
+    try {
+      const rideDetails = {
+        ...getState().currentRide,
+        ...recorderDetails,
+      }
+      // @TODO: actually save this locally and deal with repercussions.
+      dispatch(rideSavedLocally(rideDetails))
+      dispatch(remoteSaveRide(rideDetails))
+    } catch (e) {
+      console.log(e)
+      alert('error in console')
+    }
+  }
+}
+
+function remoteSaveRide (rideDetails) {
+  return async (dispatch, getState) => {
+    const rideAPI = new RideAPI(getState().jwt)
+    try {
+      const resp = await rideAPI.saveRide(rideDetails)
+      dispatch(rideSavedRemotely(resp))
+    } catch (e) {
+      // @TODO: deal with failure
+      console.log(e)
+      alert('error in console')
+    }
+  }
+}
+
+export function saveNewHorse (horseData) {
+  return async (dispatch, getState) => {
+    debugger
+    const horseAPI = new HorseAPI(getState().jwt)
+    try {
+      const resp = await horseAPI.createHorse(horseData)
+      dispatch(horseSaved(resp))
+    } catch (e) {
+      console.log(e)
+      alert('error in console')
     }
   }
 }
@@ -175,6 +296,13 @@ export function searchForFriends (phrase) {
     } catch (e) {
       console.log(e)
     }
+  }
+}
+
+export function signOut () {
+  return async(dispatch) => {
+    await AsyncStorage.removeItem(TOKEN_KEY);
+    dispatch(clearState())
   }
 }
 
@@ -208,105 +336,7 @@ function startLocationTracking () {
   }
 }
 
-export function appInitialized() {
-  return async (dispatch) => {
-    dispatch(findLocalToken())
-    dispatch(changeAppRoot('login'))
-    dispatch(startLocationTracking())
-  }
-}
-
-export function fetchHorses(token) {
-  return async (dispatch) => {
-    const horseAPI = new HorseAPI(token)
-    try {
-      const resp = await horseAPI.fetchHorses()
-      dispatch(horsesFetched(resp))
-    } catch (e) {
-      console.log(e)
-    }
-  }
-}
-
-export function fetchRides(token) {
-  return async (dispatch) => {
-    const rideAPI = new RideAPI(token)
-    try {
-      const resp = await rideAPI.fetchRides()
-      dispatch(ridesFetched(resp))
-    } catch (e) {
-      console.log(e)
-      alert('error in console')
-    }
-  }
-}
-
-export function fetchUser(token) {
-  return async (dispatch) => {
-    const userAPI = new UserAPI(token)
-    try {
-      const resp = await userAPI.fetchUser()
-      dispatch(receiveUserData(resp))
-    } catch (e) {
-      console.log(e)
-      alert('error in console')
-    }
-  }
-}
-
-export function localSaveRide(recorderDetails) {
-  return async (dispatch, getState) => {
-    try {
-      const rideDetails = {
-        ...getState().currentRide,
-        ...recorderDetails,
-      }
-      // @TODO: actually save this locally and deal with repercussions.
-      dispatch(rideSavedLocally(rideDetails))
-      dispatch(remoteSaveRide(rideDetails))
-    } catch (e) {
-      console.log(e)
-      alert('error in console')
-    }
-  }
-}
-
-function remoteSaveRide(rideDetails) {
-  return async (dispatch, getState) => {
-    const rideAPI = new RideAPI(getState().jwt)
-    try {
-      const resp = await rideAPI.saveRide(rideDetails)
-      dispatch(rideSavedRemotely(resp))
-    } catch (e) {
-      // @TODO: deal with failure
-      console.log(e)
-      alert('error in console')
-    }
-  }
-}
-
-export function saveNewHorse (horseData) {
-  return async (dispatch, getState) => {
-    debugger
-    const horseAPI = new HorseAPI(getState().jwt)
-    try {
-      const resp = await horseAPI.createHorse(horseData)
-      dispatch(horseSaved(resp))
-    } catch (e) {
-      console.log(e)
-      alert('error in console')
-    }
-  }
-}
-
-export function signOut () {
-  return async(dispatch) => {
-    await AsyncStorage.removeItem(TOKEN_KEY);
-    dispatch(clearState())
-  }
-}
-
-export function submitLogin(email, password) {
+export function submitLogin (email, password) {
   return async (dispatch) => {
     const userAPI = new UserAPI()
     try {
@@ -325,7 +355,7 @@ export function submitLogin(email, password) {
   }
 }
 
-export function submitSignup(email, password) {
+export function submitSignup (email, password) {
   return async (dispatch) => {
     const userAPI = new UserAPI()
     try {
@@ -342,18 +372,6 @@ export function submitSignup(email, password) {
   }
 }
 
-export function uploadProfilePhoto(photoLocation) {
-  return async (dispatch, getState) => {
-    const userAPI = new UserAPI(getState().jwt)
-    try {
-      const resp = await userAPI.uploadProfilePhoto(photoLocation)
-      dispatch(receiveUserData(resp))
-    } catch (e) {
-      debugger
-    }
-  }
-}
-
 export function updateProfile (userData) {
   return async (dispatch, getState) => {
     const userAPI = new UserAPI(getState().jwt)
@@ -365,3 +383,17 @@ export function updateProfile (userData) {
     }
   }
 }
+
+export function uploadProfilePhoto (photoLocation) {
+  return async (dispatch, getState) => {
+    const userAPI = new UserAPI(getState().jwt)
+    try {
+      const resp = await userAPI.uploadProfilePhoto(photoLocation)
+      dispatch(receiveUserData(resp))
+    } catch (e) {
+      debugger
+    }
+  }
+}
+
+

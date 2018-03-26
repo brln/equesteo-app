@@ -55,7 +55,6 @@ export default class Account extends Component {
   }
 
   render() {
-    debugger
     let uri = 'https://s3.amazonaws.com/equesteo-profile-photos/full_size/empty.png'
     let buttonText = 'Upload Profile Photo'
     if (this.props.userData.profilePhotoID) {
