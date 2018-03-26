@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
 import Profile from '../components/Profile'
-import { createFollow, deleteFollow } from "../actions"
+import { clearSearch, createFollow, deleteFollow } from "../actions"
 
 class ProfileContainer extends Component {
   constructor (props) {
@@ -13,6 +13,7 @@ class ProfileContainer extends Component {
 
   createFollow (followingID) {
     this.props.dispatch(createFollow(followingID))
+    this.props.dispatch(clearSearch())
   }
 
   deleteFollow (followingID) {

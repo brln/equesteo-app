@@ -7,6 +7,7 @@ import {BadRequestError, UnauthorizedError} from "./errors"
 import {
   CHANGE_ROOT,
   CHANGE_SCREEN,
+  CLEAR_SEARCH,
   CLEAR_STATE,
   DISCARD_RIDE,
   DISMISS_ERROR,
@@ -39,6 +40,12 @@ export function changeScreen(screen) {
   return {
     type: CHANGE_SCREEN,
     screen
+  }
+}
+
+export function clearSearch () {
+  return {
+    type: CLEAR_SEARCH
   }
 }
 

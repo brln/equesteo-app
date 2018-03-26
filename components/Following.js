@@ -13,7 +13,7 @@ import { PROFILE } from '../screens'
 
 
 
-export default class FindFriends extends Component {
+export default class Following extends Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -22,10 +22,6 @@ export default class FindFriends extends Component {
     this.changeSearchPhrase = this.changeSearchPhrase.bind(this);
     this.search = this.search.bind(this)
     this.showProfile = this.showProfile.bind(this)
-  }
-
-  componentWillReceiveProps (nextProps) {
-    debugger
   }
 
   changeSearchPhrase (phrase) {
@@ -57,16 +53,32 @@ export default class FindFriends extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text>Search:</Text>
-        <TextInput
-          autoFocus={true}
-          onChangeText={this.changeSearchPhrase}
-          onSubmitEditing={this.search}
-        />
-        <ScrollView>
+        <ScrollView style={{flex: 1}}>
+          <Text>Find New People:</Text>
+          <TextInput
+            autoFocus={true}
+            onChangeText={this.changeSearchPhrase}
+            onSubmitEditing={this.search}
+          />
           <List containerStyle={{marginTop: 0}}>
             {
               this.props.userSearchResults.map((user, i) => (
+                <ListItem
+                  key={i}
+                  title={user.email}
+                  roundAvatar
+                  avatar={{uri: profilePhotoURL(user.profilePhotoID)}}
+                  onPress={() => { this.showProfile(user) }}
+                />
+              ))
+            }
+          </List>
+        </ScrollView>
+        <ScrollView style={{flex: 1}}>
+          <Text>Currently Following:</Text>
+          <List containerStyle={{marginTop: 0}}>
+            {
+              this.props.userData.following.map((user, i) => (
                 <ListItem
                   key={i}
                   title={user.email}

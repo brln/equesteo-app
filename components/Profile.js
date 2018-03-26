@@ -27,7 +27,6 @@ export default class Profile extends Component {
   }
 
   render() {
-    debugger
     let uri = 'https://s3.amazonaws.com/equesteo-profile-photos/full_size/empty.png'
     if (this.props.user.profilePhotoID) {
       uri = profilePhotoURL(this.props.user.profilePhotoID)

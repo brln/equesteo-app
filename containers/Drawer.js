@@ -5,7 +5,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import {
   ACCOUNT,
   BARN,
-  FIND_FRIENDS,
+  FOLLOWING,
   RIDES,
   RIDES_DETAILS,
   RECORDER
@@ -20,15 +20,15 @@ class DrawerContainer extends Component {
 		this.openAccount = this.openAccount.bind(this)
     this.openBarn = this.openBarn.bind(this)
 		this.openRides = this.openRides.bind(this)
-    this.openFindFriends = this.openFindFriends.bind(this)
+    this.openFollowing = this.openFollowing.bind(this)
   }
 
-  openFindFriends () {
-    this.props.dispatch(changeScreen(RECORDER))
+  openFollowing () {
+    this.props.dispatch(changeScreen(FOLLOWING))
     this.toggleDrawer()
     this.props.navigator.push({
-      screen: FIND_FRIENDS,
-      title: 'Find Friends',
+      screen: FOLLOWING,
+      title: 'Following',
       navigatorButtons: {
         leftButtons: [{
           id: 'sideMenu'
@@ -98,7 +98,7 @@ class DrawerContainer extends Component {
     let barnScreen = null
 		let myAccountScreen = null
     let recorder = null
-    let findFriends = null
+    let following = null
 		if (this.props.currentScreen !== RIDES) {
       myRides = (
         <TouchableOpacity onPress={this.openRides}>
@@ -143,12 +143,12 @@ class DrawerContainer extends Component {
 				</TouchableOpacity>
       )
     }
-    if (this.props.currentScreen !== FIND_FRIENDS) {
-      findFriends = (
-        <TouchableOpacity onPress={this.openFindFriends}>
+    if (this.props.currentScreen !== FOLLOWING) {
+      following = (
+        <TouchableOpacity onPress={this.openFollowing}>
           <View style={styles.drawerListItem}>
             <Text style={styles.drawerListItemText} onTouch>
-              Find Friends
+              Following
             </Text>
           </View>
         </TouchableOpacity>
@@ -160,7 +160,7 @@ class DrawerContainer extends Component {
 				<View style={styles.container}>
 					<View style={styles.drawerList}>
 						{myRides}
-            {findFriends}
+            {following}
             {recorder}
 						{barnScreen}
 						{myAccountScreen}

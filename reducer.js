@@ -1,5 +1,6 @@
 import {
   CHANGE_SCREEN,
+  CLEAR_SEARCH,
   CLEAR_STATE,
   DISCARD_RIDE,
   DISMISS_ERROR,
@@ -41,6 +42,10 @@ export default function AppReducer(state=initialState, action) {
     case CHANGE_SCREEN:
       return Object.assign({}, state, {
         currentScreen: action.screen,
+      })
+    case CLEAR_SEARCH:
+      return Object.assign({}, state, {
+        userSearchResults: []
       })
     case CLEAR_STATE:
       return Object.assign({}, initialState, {

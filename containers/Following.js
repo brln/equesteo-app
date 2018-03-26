@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
-import FindFriends from '../components/FindFriends'
+import Following from '../components/Following'
 import { searchForFriends } from "../actions"
 
-class FindFriendsContainer extends Component {
+class FollowingContainer extends Component {
   constructor (props) {
     super(props)
     this.search = this.search.bind(this)
@@ -15,7 +15,7 @@ class FindFriendsContainer extends Component {
 
   render() {
     return (
-      <FindFriends
+      <Following
         navigator={this.props.navigator}
         search={this.search}
         userData={this.props.userData}
@@ -32,4 +32,4 @@ function mapStateToProps (state) {
   }
 }
 
-export default connect(mapStateToProps)(FindFriendsContainer)
+export default connect(mapStateToProps)(FollowingContainer)
