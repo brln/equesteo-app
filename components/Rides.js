@@ -14,7 +14,6 @@ export default class Rides extends Component {
   constructor (props) {
     super(props)
     this.state = {}
-    this.selectRide = this.selectRide.bind(this)
     this.showRide = this.showRide.bind(this)
   }
 
@@ -26,6 +25,7 @@ export default class Rides extends Component {
   }
 
   showRide (ride) {
+    debugger
     Navigation.showModal({
       screen: RIDE,
       title: ride.name,
@@ -39,11 +39,6 @@ export default class Rides extends Component {
     });
   }
 
-
-  selectRide (ride) {
-    this.showRide(ride)
-  }
-
   render() {
     return (
       <ScrollView>
@@ -55,7 +50,7 @@ export default class Rides extends Component {
                 title={ride.name}
                 subtitle={moment(ride.startTime).format('MMMM Do YYYY, h:mm a')}
                 leftIcon={null}
-                onPress={() => {this.selectRide(ride)}}
+                onPress={() => {this.showRide(ride)}}
               />
             ))
           }

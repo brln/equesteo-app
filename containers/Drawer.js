@@ -5,6 +5,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import {
   ACCOUNT,
   BARN,
+  FEED,
   FOLLOWING,
   RIDES,
   RIDES_DETAILS,
@@ -20,7 +21,22 @@ class DrawerContainer extends Component {
 		this.openAccount = this.openAccount.bind(this)
     this.openBarn = this.openBarn.bind(this)
 		this.openRides = this.openRides.bind(this)
+    this.openFeed = this.openFeed.bind(this)
     this.openFollowing = this.openFollowing.bind(this)
+  }
+
+  openFeed () {
+    this.props.dispatch(changeScreen(FEED))
+    this.toggleDrawer()
+    this.props.navigator.push({
+      screen: FEED,
+      title: 'Feed',
+      navigatorButtons: {
+        leftButtons: [{
+          id: 'sideMenu'
+        }]
+      }
+    })
   }
 
   openFollowing () {
@@ -94,11 +110,23 @@ class DrawerContainer extends Component {
   }
 
   render() {
+    let feed = null
 		let myRides = null
     let barnScreen = null
 		let myAccountScreen = null
     let recorder = null
     let following = null
+    if (this.props.currentScreen !== FEED) {
+      feed = (
+        <TouchableOpacity onPress={this.openFeed}>
+          <View style={styles.drawerListItem}>
+            <Text style={styles.drawerListItemText}>
+              Feed
+            </Text>
+          </View>
+        </TouchableOpacity>
+      )
+    }
 		if (this.props.currentScreen !== RIDES) {
       myRides = (
         <TouchableOpacity onPress={this.openRides}>
@@ -159,6 +187,7 @@ class DrawerContainer extends Component {
       <View style={styles.linearGradient}>
 				<View style={styles.container}>
 					<View style={styles.drawerList}>
+            {feed}
 						{myRides}
             {following}
             {recorder}

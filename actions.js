@@ -282,7 +282,6 @@ function remoteSaveRide (rideDetails) {
 
 export function saveNewHorse (horseData) {
   return async (dispatch, getState) => {
-    debugger
     const horseAPI = new HorseAPI(getState().jwt)
     try {
       const resp = await horseAPI.createHorse(horseData)
