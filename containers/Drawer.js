@@ -6,6 +6,7 @@ import {
   ACCOUNT,
   BARN,
   FEED,
+  FEED_DETAILS,
   FOLLOWING,
   RIDES,
   RIDES_DETAILS,
@@ -20,7 +21,6 @@ class DrawerContainer extends Component {
     this.toggleDrawer = this.toggleDrawer.bind(this)
 		this.openAccount = this.openAccount.bind(this)
     this.openBarn = this.openBarn.bind(this)
-		this.openRides = this.openRides.bind(this)
     this.openFeed = this.openFeed.bind(this)
     this.openFollowing = this.openFollowing.bind(this)
   }
@@ -28,15 +28,7 @@ class DrawerContainer extends Component {
   openFeed () {
     this.props.dispatch(changeScreen(FEED))
     this.toggleDrawer()
-    this.props.navigator.push({
-      screen: FEED,
-      title: 'Feed',
-      navigatorButtons: {
-        leftButtons: [{
-          id: 'sideMenu'
-        }]
-      }
-    })
+    this.props.navigator.push(FEED_DETAILS)
   }
 
   openFollowing () {
@@ -65,12 +57,6 @@ class DrawerContainer extends Component {
         }]
       }
 		})
-	}
-
-	openRides () {
-    this.props.dispatch(changeScreen(RIDES))
-    this.toggleDrawer()
-    this.props.navigator.push(RIDES_DETAILS)
 	}
 
 	openAccount () {
@@ -111,7 +97,6 @@ class DrawerContainer extends Component {
 
   render() {
     let feed = null
-		let myRides = null
     let barnScreen = null
 		let myAccountScreen = null
     let recorder = null
@@ -122,17 +107,6 @@ class DrawerContainer extends Component {
           <View style={styles.drawerListItem}>
             <Text style={styles.drawerListItemText}>
               Feed
-            </Text>
-          </View>
-        </TouchableOpacity>
-      )
-    }
-		if (this.props.currentScreen !== RIDES) {
-      myRides = (
-        <TouchableOpacity onPress={this.openRides}>
-          <View style={styles.drawerListItem}>
-            <Text style={styles.drawerListItemText}>
-              My Rides
             </Text>
           </View>
         </TouchableOpacity>
@@ -188,7 +162,6 @@ class DrawerContainer extends Component {
 				<View style={styles.container}>
 					<View style={styles.drawerList}>
             {feed}
-						{myRides}
             {following}
             {recorder}
 						{barnScreen}

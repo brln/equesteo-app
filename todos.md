@@ -10,6 +10,7 @@
 - should not be able to go for a ride until you've added a horse
 - some indication that profile details have been saved when hitting save button
 - some semblence of search engine using postgres
+- when you start following someone their rides need to appear in your feed
 
 
  

@@ -10,7 +10,6 @@ import FeedContainer from './containers/Feed'
 import FollowingContainer from './containers/Following'
 import ProfileContainer from './containers/Profile'
 import RecorderContainer from './containers/Recorder'
-import RidesContainer from './containers/Rides'
 import RideDetailsContainer from './containers/RideDetails'
 import SignupLoginContainer from './containers/SignupLogin'
 
@@ -23,18 +22,17 @@ export const NEW_HORSE = 'equesteo.NewHorse'
 export const PROFILE = 'equesteo.Profile'
 export const RECORDER = 'equesteo.Recorder'
 export const RIDE = 'equesteo.Ride'
-export const RIDES = 'equesteo.Rides'
 export const RIDE_DETAILS = 'equesteo.RideDetails'
 export const SIGNUP_LOGIN = 'equesteo.SignupLogin'
 
-export const RIDES_DETAILS = {
-  screen: RIDES,
-  title: 'My Rides',
+export const FEED_DETAILS = {
+  screen: FEED,
+  title: 'Feed',
   navigatorButtons: {
     leftButtons: [{
       id: 'sideMenu'
     }]
-  },
+  }
 }
 
 export function registerScreens(store, Provider) {
@@ -43,7 +41,6 @@ export function registerScreens(store, Provider) {
   Navigation.registerComponent(FEED, () => FeedContainer, store, Provider)
   Navigation.registerComponent(FOLLOWING, () => FollowingContainer, store, Provider)
   Navigation.registerComponent(SIGNUP_LOGIN, () => SignupLoginContainer, store, Provider)
-  Navigation.registerComponent(RIDES, () => RidesContainer, store, Provider)
   Navigation.registerComponent(RIDE_DETAILS, () => RideDetailsContainer, store, Provider)
   Navigation.registerComponent(RECORDER, () => RecorderContainer, store, Provider)
   Navigation.registerComponent(ACCOUNT, () => AccountContainer, store, Provider)

@@ -19,12 +19,11 @@ import {
   USER_SEARCH_RETURNED,
 } from './constants'
 import { haversine } from './helpers'
-import { FIRST_SCREEN } from "./App"
-import { RIDES } from './screens'
+import { FEED } from './screens'
 
 const initialState = {
   app: 'login',
-  currentScreen: RIDES,
+  currentScreen: FEED,
   currentRide: null,
   error: null,
   geoWatchID: null,

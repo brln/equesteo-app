@@ -7,7 +7,7 @@ import {registerScreens} from './screens';
 
 import {appInitialized} from "./actions"
 import AppReducer from './reducer'
-import { DRAWER, SIGNUP_LOGIN, RIDES } from './screens'
+import { DRAWER, FEED_DETAILS, SIGNUP_LOGIN } from './screens'
 
 const store = createStore(AppReducer, undefined, applyMiddleware(thunkMiddleware))
 
@@ -38,15 +38,7 @@ export default class App {
         return
       case 'after-login':
         Navigation.startSingleScreenApp({
-          screen: {
-            screen: RIDES,
-            title: 'My Rides',
-            navigatorButtons: {
-              leftButtons: [{
-                id: 'sideMenu'
-              }]
-            }
-          },
+          screen: FEED_DETAILS,
           drawer: {
             left: {
               screen: DRAWER,

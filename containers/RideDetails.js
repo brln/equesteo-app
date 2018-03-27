@@ -5,7 +5,7 @@ import moment from 'moment'
 
 import { changeScreen, discardRide, localSaveRide } from '../actions'
 import RideDetails from '../components/RideRecorder/RideDetails'
-import { RIDES } from '../screens'
+import { FEED } from '../screens'
 
 class RideDetailsContainer extends Component {
   static navigatorButtons = {
@@ -51,7 +51,7 @@ class RideDetailsContainer extends Component {
 
   doneOnPage () {
     this.props.navigator.popToRoot({animated: false, animationType: 'none'})
-    this.props.dispatch(changeScreen(RIDES))
+    this.props.dispatch(changeScreen(FEED))
   }
 
   onNavigatorEvent (event) {
@@ -93,7 +93,7 @@ class RideDetailsContainer extends Component {
 
 function mapStateToProps (state) {
   return {
-    horses: state.horses,
+    horses: state.horses.filter((h) => h.userID === state.userData.id),
     currentRide: state.currentRide
   }
 }

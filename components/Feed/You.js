@@ -7,9 +7,9 @@ import {
   StyleSheet,
 } from 'react-native';
 
-import { RIDE } from '../screens'
+import { RIDE } from '../../screens'
 
-export default class Rides extends Component {
+export default class You extends Component {
 
   constructor (props) {
     super(props)
@@ -25,7 +25,6 @@ export default class Rides extends Component {
   }
 
   showRide (ride) {
-    debugger
     Navigation.showModal({
       screen: RIDE,
       title: ride.name,

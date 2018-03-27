@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
-import Feed from '../components/Feed'
+import Feed from '../components/Feed/Feed'
 
 class FeedContainer extends Component {
   constructor (props) {
@@ -12,7 +12,9 @@ class FeedContainer extends Component {
   render() {
     return (
       <Feed
-        rides={this.props.rides}
+        followingRides={this.props.followingRides}
+        horses={this.props.horses}
+        yourRides={this.props.yourRides}
       />
     )
   }
@@ -20,7 +22,9 @@ class FeedContainer extends Component {
 
 function mapStateToProps (state) {
   return {
-    rides: state.rides
+    followingRides: state.rides.filter((r) => r.userID !== state.userData.id),
+    horses: state.horses,
+    yourRides: state.rides.filter((r) => r.userID === state.userData.id),
   }
 }
 
