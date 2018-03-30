@@ -1,17 +1,40 @@
 import React, { Component } from 'react';
 import { Container, Tab, Tabs } from 'native-base';
+import { Navigation } from 'react-native-navigation'
 import {
   StyleSheet,
 } from 'react-native';
 import Following from './Following'
 import You from './You'
+import { RIDE } from '../../screens'
 
 export default class Feed extends Component {
   constructor (props) {
     super(props)
     this.state = {}
+    this.showRide = this.showRide.bind(this)
   }
 
+  componentWillReceiveProps (prevProps) {
+    if (prevProps.justFinishedRide) {
+      this.showRide(prevProps.yourRides[0])
+      this.props.justFinishedRideShown()
+    }
+  }
+
+  showRide (ride) {
+    Navigation.showModal({
+      screen: RIDE,
+      title: ride.name,
+      passProps: {
+        horses: this.props.horses,
+        ride
+      },
+      navigatorStyle: {},
+      navigatorButtons: {},
+      animationType: 'slide-up',
+    });
+  }
 
   render() {
     return (
@@ -21,12 +44,14 @@ export default class Feed extends Component {
             <Following
               horses={this.props.horses}
               rides={this.props.followingRides}
+              showRide={this.showRide}
             />
           </Tab>
           <Tab heading="You">
             <You
               horses={this.props.horses}
               rides={this.props.yourRides}
+              showRide={this.showRide}
             />
           </Tab>
         </Tabs>

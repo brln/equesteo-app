@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { Navigation } from 'react-native-navigation'
 import { List, ListItem } from 'react-native-elements'
 import moment from 'moment'
 import {
@@ -7,14 +6,12 @@ import {
   StyleSheet,
 } from 'react-native';
 
-import { RIDE } from '../../screens'
 
 export default class Following extends Component {
 
   constructor (props) {
     super(props)
     this.state = {}
-    this.showRide = this.showRide.bind(this)
   }
 
   componentWillReceiveProps (prevProps) {
@@ -22,20 +19,6 @@ export default class Following extends Component {
       this.showRide(prevProps.rides[0])
       this.props.justFinishedRideShown()
     }
-  }
-
-  showRide (ride) {
-    Navigation.showModal({
-      screen: RIDE,
-      title: ride.name,
-      passProps: {
-        horses: this.props.horses,
-        ride
-      },
-      navigatorStyle: {},
-      navigatorButtons: {},
-      animationType: 'slide-up',
-    });
   }
 
   render() {
@@ -49,7 +32,7 @@ export default class Following extends Component {
                 title={ride.name}
                 subtitle={moment(ride.startTime).format('MMMM Do YYYY, h:mm a')}
                 leftIcon={null}
-                onPress={() => {this.showRide(ride)}}
+                onPress={() => {this.props.showRide(ride)}}
               />
             ))
           }
