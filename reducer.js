@@ -112,6 +112,18 @@ export default function AppReducer(state=initialState, action) {
         currentRide: null,
       })
     case RIDE_SAVED_REMOTELY:
+      const newRides = []
+      for (let ride of state.rides) {
+        // This is a hack and assumes there will only be one ride without an ID at a time!
+        if (!ride.id) {
+          newRides.push(action.ride)
+        } else {
+          newRides.push(ride)
+        }
+      }
+      return Object.assign({}, state, {
+        rides: newRides
+      })
       return state
     case RIDES_FETCHED:
       return Object.assign({}, state, {
