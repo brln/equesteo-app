@@ -255,6 +255,7 @@ export function localSaveRide (recorderDetails) {
       const rideDetails = {
         ...getState().currentRide,
         ...recorderDetails,
+        userID: getState().userData.id,
       }
       // @TODO: actually save this locally and deal with repercussions.
       dispatch(rideSavedLocally(rideDetails))

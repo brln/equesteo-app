@@ -5,6 +5,7 @@ import {
   ScrollView,
   StyleSheet,
 } from 'react-native';
+import RideCard from './RideCard'
 
 
 export default class Following extends Component {
@@ -14,25 +15,16 @@ export default class Following extends Component {
     this.state = {}
   }
 
-  componentWillReceiveProps (prevProps) {
-    if (prevProps.justFinishedRide) {
-      this.showRide(prevProps.rides[0])
-      this.props.justFinishedRideShown()
-    }
-  }
-
   render() {
     return (
       <ScrollView>
         <List containerStyle={{marginTop: 0}}>
           {
             this.props.rides.map((ride, i) => (
-              <ListItem
+              <RideCard
                 key={i}
-                title={ride.name}
-                subtitle={moment(ride.startTime).format('MMMM Do YYYY, h:mm a')}
-                leftIcon={null}
-                onPress={() => {this.props.showRide(ride)}}
+                ride={ride}
+                showRide={this.props.showRide}
               />
             ))
           }
