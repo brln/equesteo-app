@@ -27,10 +27,14 @@ export default class RideRecorder extends Component<Props> {
 
   componentWillReceiveProps (nextProps) {
     if (nextProps.lastLocation) {
-      setTimeout(() => {
+      this.gpsTimeout = setTimeout(() => {
         this.setState({showGPS: false})
       }, 2000)
     }
+  }
+
+  componentWillUnmount () {
+    clearInterval(this.gpsTimeout)
   }
 
   rideComplete () {

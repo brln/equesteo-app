@@ -1,7 +1,5 @@
-import { AsyncStorage } from 'react-native'
-
 import { unixTimeNow } from "./helpers"
-import { HorseAPI, RideAPI, UserAPI } from './services'
+import { HorseAPI, LocalStorage, RideAPI, UserAPI } from './services'
 import {BadRequestError, UnauthorizedError} from "./errors"
 
 import {
@@ -26,8 +24,6 @@ import {
   USER_FETCHED,
   USER_SEARCH_RETURNED,
 } from './constants'
-
-TOKEN_KEY = '@equesteo:jwtToken'
 
 function changeAppRoot(root) {
   return {
@@ -201,7 +197,7 @@ export function deleteFollow (followingID) {
 
 function findLocalToken() {
   return async (dispatch) => {
-    const token = await AsyncStorage.getItem(TOKEN_KEY);
+    const token = await LocalStorage.loadToken()
     if (token !== null) {
       dispatch(receiveJWT(token))
       dispatch(fetchUser(token))
@@ -256,8 +252,10 @@ export function localSaveRide (recorderDetails) {
         ...getState().currentRide,
         ...recorderDetails,
         userID: getState().userData.id,
+        savedRemotely: false,
+        localID: LocalStorage.randomID(),
       }
-      // @TODO: actually save this locally and deal with repercussions.
+      await LocalStorage.saveRideLocally(rideDetails)
       dispatch(rideSavedLocally(rideDetails))
       dispatch(remoteSaveRide(rideDetails))
     } catch (e) {
@@ -273,6 +271,7 @@ function remoteSaveRide (rideDetails) {
     try {
       const resp = await rideAPI.saveRide(rideDetails)
       dispatch(rideSavedRemotely(resp))
+      await LocalStorage.removeLocalRide(rideDetails)
     } catch (e) {
       // @TODO: deal with failure
       console.log(e)
@@ -308,7 +307,7 @@ export function searchForFriends (phrase) {
 
 export function signOut () {
   return async(dispatch) => {
-    await AsyncStorage.removeItem(TOKEN_KEY);
+    await LocalStorage.deleteToken()
     dispatch(clearState())
   }
 }
@@ -348,7 +347,7 @@ export function submitLogin (email, password) {
     const userAPI = new UserAPI()
     try {
       const resp = await userAPI.login(email, password)
-      await AsyncStorage.setItem(TOKEN_KEY, resp.token);
+      await LocalStorage.saveToken(resp.token);
       dispatch(receiveJWT(resp.token))
       dispatch(fetchRides(resp.token))
       dispatch(fetchHorses(resp.token))
@@ -367,7 +366,7 @@ export function submitSignup (email, password) {
     const userAPI = new UserAPI()
     try {
       const resp = await userAPI.signup(email, password)
-      await AsyncStorage.setItem(TOKEN_KEY, resp.token);
+      await LocalStorage.saveToken(resp.token);
       dispatch(receiveJWT(resp.token))
       delete resp.token
       dispatch(receiveUserData(resp))
