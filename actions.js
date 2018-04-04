@@ -1,3 +1,5 @@
+import PouchDB from 'pouchdb-react-native'
+
 import { unixTimeNow } from "./helpers"
 import { HorseAPI, LocalStorage, RideAPI, UserAPI } from './services'
 import {BadRequestError, UnauthorizedError} from "./errors"
@@ -225,6 +227,7 @@ export function fetchRides (token) {
     try {
       const resp = await rideAPI.fetchRides()
       dispatch(ridesFetched(resp))
+      dispatch(persistToDB())
     } catch (e) {
       console.log(e)
       alert('error in console')
@@ -262,6 +265,13 @@ export function localSaveRide (recorderDetails) {
       console.log(e)
       alert('error in console')
     }
+  }
+}
+
+function persistToDB () {
+  return async (dispatch, getState) => {
+    const localDB = new PouchDB(getState().userData.id.toString())
+    localDB.put(getState())
   }
 }
 

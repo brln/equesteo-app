@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import { API_URL } from 'react-native-dotenv';
 import {
-  Button,
   StyleSheet,
   Text,
   TextInput,

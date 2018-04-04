@@ -22,6 +22,7 @@ import { haversine } from './helpers'
 import { FEED } from './screens'
 
 const initialState = {
+  _id: 'state', // for PouchDB
   app: 'login',
   currentScreen: FEED,
   currentRide: null,

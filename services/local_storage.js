@@ -17,7 +17,7 @@ export default class LocalStorage {
   }
 
   static async deleteToken () {
-    return await AsyncStorage.removeItem(TOKEN_KEY);
+    return await AsyncStorage.removeItem(LocalStorage.TOKEN_KEY);
   }
 
   static async saveRideLocally (ride) {

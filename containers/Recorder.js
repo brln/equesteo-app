@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
-import { API_URL } from 'react-native-dotenv'
 
 import { startRide } from '../actions'
 import RideRecorder from '../components/RideRecorder/RideRecorder'

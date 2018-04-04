@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
-import { List, ListItem } from 'react-native-elements'
-import moment from 'moment'
+import { List } from 'native-base'
 import {
   ScrollView,
   StyleSheet,
