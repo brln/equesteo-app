@@ -5,16 +5,14 @@ import {
   DISCARD_RIDE,
   DISMISS_ERROR,
   ERROR_OCCURRED,
-  HORSES_FETCHED,
-  HORSE_SAVED,
   JUST_FINISHED_RIDE_SHOWN,
+  LOCAL_DATA_LOADED,
   NEW_GEO_WATCH,
   NEW_LOCATION,
   RECEIVE_JWT,
   RECEIVE_USER_DATA,
-  RIDE_SAVED_LOCALLY,
-  RIDE_SAVED_REMOTELY,
-  RIDES_FETCHED,
+  SAVE_HORSE,
+  SAVE_RIDE,
   START_RIDE,
   USER_SEARCH_RETURNED,
 } from './constants'
@@ -22,18 +20,17 @@ import { haversine } from './helpers'
 import { FEED } from './screens'
 
 const initialState = {
-  _id: 'state', // for PouchDB
   app: 'login',
   currentScreen: FEED,
   currentRide: null,
   error: null,
-  geoWatchID: null,
   horses: [],
   justFinishedRide: false,
   jwt: null,
   lastLocation: null,
   rides: [],
   userData: {},
+  userLoaded: false,
   userSearchResults: []
 }
 
@@ -67,17 +64,14 @@ export default function AppReducer(state=initialState, action) {
       return Object.assign({}, state, {
         error: action.message
       })
-    case HORSES_FETCHED:
-      return Object.assign({}, state, {
-        horses: action.horses
-      })
-    case HORSE_SAVED:
-      return Object.assign({}, state, {
-        horses: [action.horseData, ...state.horses]
-      })
     case JUST_FINISHED_RIDE_SHOWN:
       return Object.assign({}, state, {
         justFinishedRide: false
+      })
+    case LOCAL_DATA_LOADED:
+      return Object.assign({}, state, {
+        ...action.localData,
+        currentScreen: FEED
       })
     case NEW_LOCATION:
       const newState = Object.assign({}, state, {
@@ -104,31 +98,23 @@ export default function AppReducer(state=initialState, action) {
       })
     case RECEIVE_USER_DATA:
       return Object.assign({}, state, {
-        userData: action.userData
+        userData: action.userData,
+        userLoaded: true
       })
-    case RIDE_SAVED_LOCALLY:
+    case SAVE_HORSE:
       return Object.assign({}, state, {
-        rides: [action.ride, ...state.rides],
-        justFinishedRide: true,
-        currentRide: null,
+        horses: [action.horse, ...state.horses]
       })
-    case RIDE_SAVED_REMOTELY:
-      const newRides = []
-      for (let ride of state.rides) {
-        // This is a hack and assumes there will only be one ride without an ID at a time!
-        if (!ride.id) {
-          newRides.push(action.ride)
-        } else {
-          newRides.push(ride)
-        }
+    case SAVE_RIDE:
+      const newRide = {
+        ...state.currentRide,
+        ...action.ride,
+        userID: state.userData.id
       }
       return Object.assign({}, state, {
-        rides: newRides
-      })
-      return state
-    case RIDES_FETCHED:
-      return Object.assign({}, state, {
-        rides: action.rides
+        rides: [newRide, ...state.rides],
+        justFinishedRide: true,
+        currentRide: null,
       })
     case START_RIDE:
       if (state.lastLocation) {

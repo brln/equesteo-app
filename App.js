@@ -5,11 +5,16 @@ import thunkMiddleware from 'redux-thunk'
 import {Navigation} from 'react-native-navigation';
 import {registerScreens} from './screens';
 
-import {appInitialized} from "./actions"
+import { appInitialized } from "./actions"
+import { storeToPouch } from "./middleware"
 import AppReducer from './reducer'
 import { DRAWER, FEED_DETAILS, SIGNUP_LOGIN } from './screens'
 
-const store = createStore(AppReducer, undefined, applyMiddleware(thunkMiddleware))
+const store = createStore(
+  AppReducer,
+  undefined,
+  applyMiddleware(thunkMiddleware, storeToPouch)
+)
 
 registerScreens(store, Provider)
 
@@ -50,8 +55,6 @@ export default class App {
       default:
         console.log('unknown app root!')
         return
-
     }
   }
-
 }

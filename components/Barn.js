@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Navigation } from 'react-native-navigation'
-import { List, ListItem } from 'react-native-elements'
+import { ListItem } from 'react-native-elements'
 import {
   StyleSheet,
   Text,
@@ -40,7 +40,7 @@ export default class Barn extends Component {
     return (
       <View>
         <Text style={styles.header}>Horses:</Text>
-        <List containerStyle={{marginTop: 0}}>
+        <View containerStyle={{marginTop: 0}}>
           {
             [...this.props.horses.map((horse, i) => (
               <ListItem
@@ -55,7 +55,7 @@ export default class Barn extends Component {
               />
             ]
           }
-        </List>
+        </View>
       </View>
     )
   }

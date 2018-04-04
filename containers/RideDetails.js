@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 import moment from 'moment'
 
-import { changeScreen, discardRide, localSaveRide } from '../actions'
+import { changeScreen, discardRide, saveRide } from '../actions'
 import RideDetails from '../components/RideRecorder/RideDetails'
 import { FEED } from '../screens'
 
@@ -69,7 +69,7 @@ class RideDetailsContainer extends Component {
     if (!horseID && this.props.horses.length > 0) {
       horseID = this.props.horses[0].id
     }
-    this.props.dispatch(localSaveRide({
+    this.props.dispatch(saveRide({
       elapsedTimeSecs: this.props.elapsedTime,
       name: this.state.rideName,
       horseID: horseID,

@@ -1,7 +1,7 @@
 import PouchDB from 'pouchdb-react-native'
 
 import { unixTimeNow } from "./helpers"
-import { HorseAPI, LocalStorage, RideAPI, UserAPI } from './services'
+import { LocalStorage, UserAPI } from './services'
 import {BadRequestError, UnauthorizedError} from "./errors"
 
 import {
@@ -12,18 +12,14 @@ import {
   DISCARD_RIDE,
   DISMISS_ERROR,
   ERROR_OCCURRED,
-  HORSE_SAVED,
-  HORSES_FETCHED,
   JUST_FINISHED_RIDE_SHOWN,
-  NEW_GEO_WATCH,
+  LOCAL_DATA_LOADED,
   NEW_LOCATION,
   RECEIVE_JWT,
   RECEIVE_USER_DATA,
-  RIDE_SAVED_LOCALLY,
-  RIDE_SAVED_REMOTELY,
-  RIDES_FETCHED,
+  SAVE_HORSE,
+  SAVE_RIDE,
   START_RIDE,
-  USER_FETCHED,
   USER_SEARCH_RETURNED,
 } from './constants'
 
@@ -72,30 +68,16 @@ export function errorOccurred (message) {
   }
 }
 
-export function horseSaved (horseData) {
-  return {
-    type: HORSE_SAVED,
-    horseData
-  }
-}
-
-export function horsesFetched (horses) {
-  return {
-    type: HORSES_FETCHED,
-    horses
-  }
-}
-
 export function justFinishedRideShown () {
   return {
     type: JUST_FINISHED_RIDE_SHOWN
   }
 }
 
-function newGeoWatch(watchID) {
+export function localDataLoaded (localData) {
   return {
-    type: NEW_GEO_WATCH,
-    watchID
+    type: LOCAL_DATA_LOADED,
+    localData
   }
 }
 
@@ -120,24 +102,17 @@ function receiveUserData(userData) {
   }
 }
 
-function rideSavedLocally (ride) {
+export function saveHorse (horse) {
   return {
-    type: RIDE_SAVED_LOCALLY,
-    ride
+    type: SAVE_HORSE,
+    horse
   }
 }
 
-function rideSavedRemotely (ride) {
+export function saveRide (ride) {
   return {
-    type: RIDE_SAVED_REMOTELY,
+    type: SAVE_RIDE,
     ride
-  }
-}
-
-function ridesFetched(rides) {
-  return {
-    type: RIDES_FETCHED,
-    rides
   }
 }
 
@@ -197,41 +172,21 @@ export function deleteFollow (followingID) {
   }
 }
 
-function findLocalToken() {
+function findLocalToken () {
   return async (dispatch) => {
-    const token = await LocalStorage.loadToken()
-    if (token !== null) {
-      dispatch(receiveJWT(token))
-      dispatch(fetchUser(token))
-      dispatch(fetchRides(token))
-      dispatch(fetchHorses(token))
+    const storedToken = await LocalStorage.loadToken()
+    if (storedToken !== null) {
+      dispatch(receiveJWT(storedToken.token))
+      dispatch(loadLocalData(storedToken.userID.toString()))
     }
   }
 }
 
-export function fetchHorses (token) {
+function loadLocalData (databaseName) {
   return async (dispatch) => {
-    const horseAPI = new HorseAPI(token)
-    try {
-      const resp = await horseAPI.fetchHorses()
-      dispatch(horsesFetched(resp))
-    } catch (e) {
-      console.log(e)
-    }
-  }
-}
-
-export function fetchRides (token) {
-  return async (dispatch) => {
-    const rideAPI = new RideAPI(token)
-    try {
-      const resp = await rideAPI.fetchRides()
-      dispatch(ridesFetched(resp))
-      dispatch(persistToDB())
-    } catch (e) {
-      console.log(e)
-      alert('error in console')
-    }
+    const localDB = new PouchDB(databaseName)
+    const localData = await localDB.get('state')
+    dispatch(localDataLoaded(localData))
   }
 }
 
@@ -241,61 +196,6 @@ export function fetchUser (token) {
     try {
       const resp = await userAPI.fetchUser()
       dispatch(receiveUserData(resp))
-    } catch (e) {
-      console.log(e)
-      alert('error in console')
-    }
-  }
-}
-
-export function localSaveRide (recorderDetails) {
-  return async (dispatch, getState) => {
-    try {
-      const rideDetails = {
-        ...getState().currentRide,
-        ...recorderDetails,
-        userID: getState().userData.id,
-        savedRemotely: false,
-        localID: LocalStorage.randomID(),
-      }
-      await LocalStorage.saveRideLocally(rideDetails)
-      dispatch(rideSavedLocally(rideDetails))
-      dispatch(remoteSaveRide(rideDetails))
-    } catch (e) {
-      console.log(e)
-      alert('error in console')
-    }
-  }
-}
-
-function persistToDB () {
-  return async (dispatch, getState) => {
-    const localDB = new PouchDB(getState().userData.id.toString())
-    localDB.put(getState())
-  }
-}
-
-function remoteSaveRide (rideDetails) {
-  return async (dispatch, getState) => {
-    const rideAPI = new RideAPI(getState().jwt)
-    try {
-      const resp = await rideAPI.saveRide(rideDetails)
-      dispatch(rideSavedRemotely(resp))
-      await LocalStorage.removeLocalRide(rideDetails)
-    } catch (e) {
-      // @TODO: deal with failure
-      console.log(e)
-      alert('error in console')
-    }
-  }
-}
-
-export function saveNewHorse (horseData) {
-  return async (dispatch, getState) => {
-    const horseAPI = new HorseAPI(getState().jwt)
-    try {
-      const resp = await horseAPI.createHorse(horseData)
-      dispatch(horseSaved(resp))
     } catch (e) {
       console.log(e)
       alert('error in console')
@@ -343,12 +243,11 @@ function startLocationTracking () {
     }
     getCurrentPosition()
 
-    const watchID = navigator.geolocation.watchPosition(
+    navigator.geolocation.watchPosition(
       getLocation,
       null,
       {enableHighAccuracy: true, timeout: 1000 * 60 * 10, maximumAge: 10000, distanceFilter: 10}
     )
-    dispatch(newGeoWatch(watchID))
   }
 }
 
@@ -357,10 +256,8 @@ export function submitLogin (email, password) {
     const userAPI = new UserAPI()
     try {
       const resp = await userAPI.login(email, password)
-      await LocalStorage.saveToken(resp.token);
+      await LocalStorage.saveToken(resp.token, resp.id);
       dispatch(receiveJWT(resp.token))
-      dispatch(fetchRides(resp.token))
-      dispatch(fetchHorses(resp.token))
       delete resp.token
       dispatch(receiveUserData(resp))
     } catch (e) {
@@ -376,7 +273,7 @@ export function submitSignup (email, password) {
     const userAPI = new UserAPI()
     try {
       const resp = await userAPI.signup(email, password)
-      await LocalStorage.saveToken(resp.token);
+      await LocalStorage.saveToken(resp.token, resp.id);
       dispatch(receiveJWT(resp.token))
       delete resp.token
       dispatch(receiveUserData(resp))

@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
 import Barn from '../components/Barn'
-import { saveNewHorse } from '../actions'
+import { saveHorse } from '../actions'
 
 class BarnContainer extends Component {
   constructor (props) {
@@ -11,7 +11,7 @@ class BarnContainer extends Component {
   }
 
   saveNewHorse (horseData) {
-    this.props.dispatch(saveNewHorse(horseData))
+    this.props.dispatch(saveHorse(horseData))
   }
 
   render() {
