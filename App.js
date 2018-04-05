@@ -55,6 +55,8 @@ export default class App {
       default:
         console.log('unknown app root!')
         return
+
     }
   }
+
 }

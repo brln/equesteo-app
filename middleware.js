@@ -14,9 +14,10 @@ export const storeToPouch = store => next => action => {
       localDB.put(newLocalState)
     }).catch((e) => {
       if (e.status === 404) {
+        debugger
         localDB.put({
           ...store.getState(),
-          _id: 'state'
+          _id: 'state',
         })
       } else {
         throw e

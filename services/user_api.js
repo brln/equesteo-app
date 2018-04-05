@@ -43,4 +43,12 @@ export default class UserAPI {
       followingID
     })
   }
+
+  async saveState (state) {
+    return await this.apiClient.post('/users/state', state)
+  }
+
+  async getState () {
+    return await this.apiClient.get('/users/state')
+  }
 }

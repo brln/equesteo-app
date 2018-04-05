@@ -1,6 +1,7 @@
 import PouchDB from 'pouchdb-react-native'
 
 import { unixTimeNow } from "./helpers"
+import { FEED } from './screens'
 import { LocalStorage, UserAPI } from './services'
 import {BadRequestError, UnauthorizedError} from "./errors"
 
@@ -17,6 +18,7 @@ import {
   NEW_LOCATION,
   RECEIVE_JWT,
   RECEIVE_USER_DATA,
+  REHYDRATE_STATE,
   SAVE_HORSE,
   SAVE_RIDE,
   START_RIDE,
@@ -99,6 +101,13 @@ function receiveUserData(userData) {
   return {
     type: RECEIVE_USER_DATA,
     userData
+  }
+}
+
+function rehydrateState(dehydratedState) {
+  return {
+    type: REHYDRATE_STATE,
+    dehydratedState
   }
 }
 
@@ -204,6 +213,7 @@ export function searchForFriends (phrase) {
 
 export function signOut () {
   return async(dispatch) => {
+    await dispatch(syncToServer())
     await LocalStorage.deleteToken()
     dispatch(clearState())
   }
@@ -243,15 +253,32 @@ export function submitLogin (email, password) {
     const userAPI = new UserAPI()
     try {
       const resp = await userAPI.login(email, password)
+      const tokenedUserAPI = new UserAPI(resp.token)
+      const dehydratedState = await tokenedUserAPI.getState()
+      await dispatch(rehydrateState(dehydratedState))
+      dispatch(changeScreen(FEED))
       await LocalStorage.saveToken(resp.token, resp.id);
       dispatch(receiveJWT(resp.token))
-      delete resp.token
-      dispatch(receiveUserData(resp))
     } catch (e) {
       if (e instanceof UnauthorizedError) {
         dispatch(errorOccurred(e.message))
       }
     }
+  }
+}
+
+export function syncToServer () {
+  return async (dispatch, getState) => {
+    const dbName = getState().userData.id.toString()
+    const localDB = new PouchDB(dbName)
+
+    const state = await localDB.get('state')
+    delete state.jwt
+    delete state._id
+    delete state._rev
+
+    const userAPI = new UserAPI(getState().jwt)
+    await userAPI.saveState(state)
   }
 }
 

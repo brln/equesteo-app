@@ -11,6 +11,7 @@ import {
   NEW_LOCATION,
   RECEIVE_JWT,
   RECEIVE_USER_DATA,
+  REHYDRATE_STATE,
   SAVE_HORSE,
   SAVE_RIDE,
   START_RIDE,
@@ -45,6 +46,7 @@ export default function AppReducer(state=initialState, action) {
         userSearchResults: []
       })
     case CLEAR_STATE:
+      debugger
       return Object.assign({}, initialState, {
         lastLocation: state.lastLocation
       })
@@ -101,6 +103,8 @@ export default function AppReducer(state=initialState, action) {
         userData: action.userData,
         userLoaded: true
       })
+    case REHYDRATE_STATE:
+      return Object.assign({}, action.dehydratedState)
     case SAVE_HORSE:
       return Object.assign({}, state, {
         horses: [action.horse, ...state.horses]
