@@ -92,7 +92,7 @@ class RideDetailsContainer extends Component {
 
 function mapStateToProps (state) {
   return {
-    horses: state.horses.filter((h) => h.userID === state.userData.id),
+    horses: state.horses,
     currentRide: state.currentRide
   }
 }

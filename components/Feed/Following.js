@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
-import { List } from 'native-base'
 import {
   ScrollView,
   StyleSheet,
+  View,
 } from 'react-native';
 import RideCard from './RideCard'
 
@@ -17,7 +17,7 @@ export default class Following extends Component {
   render() {
     return (
       <ScrollView>
-        <List containerStyle={{marginTop: 0}}>
+        <View containerStyle={{marginTop: 0}}>
           {
             this.props.rides.map((ride, i) => (
               <RideCard
@@ -27,7 +27,7 @@ export default class Following extends Component {
               />
             ))
           }
-        </List>
+        </View>
       </ScrollView>
     )
   }

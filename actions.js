@@ -190,19 +190,6 @@ function loadLocalData (databaseName) {
   }
 }
 
-export function fetchUser (token) {
-  return async (dispatch) => {
-    const userAPI = new UserAPI(token)
-    try {
-      const resp = await userAPI.fetchUser()
-      dispatch(receiveUserData(resp))
-    } catch (e) {
-      console.log(e)
-      alert('error in console')
-    }
-  }
-}
-
 export function searchForFriends (phrase) {
   return async (dispatch, getState) => {
     const userAPI = new UserAPI(getState().jwt)

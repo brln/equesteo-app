@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { List, ListItem } from 'react-native-elements'
+import { ListItem } from 'react-native-elements'
 import {
   ScrollView,
   StyleSheet,
@@ -10,8 +10,6 @@ import {
 
 import { profilePhotoURL } from "../helpers"
 import { PROFILE } from '../screens'
-
-
 
 export default class Following extends Component {
   constructor (props) {
@@ -60,7 +58,7 @@ export default class Following extends Component {
             onChangeText={this.changeSearchPhrase}
             onSubmitEditing={this.search}
           />
-          <List containerStyle={{marginTop: 0}}>
+          <View containerStyle={{marginTop: 0}}>
             {
               this.props.userSearchResults.map((user, i) => (
                 <ListItem
@@ -72,11 +70,11 @@ export default class Following extends Component {
                 />
               ))
             }
-          </List>
+          </View>
         </ScrollView>
         <ScrollView style={{flex: 1}}>
           <Text>Currently Following:</Text>
-          <List containerStyle={{marginTop: 0}}>
+          <View containerStyle={{marginTop: 0}}>
             {
               this.props.userData.following.map((user, i) => (
                 <ListItem
@@ -88,7 +86,7 @@ export default class Following extends Component {
                 />
               ))
             }
-          </List>
+          </View>
         </ScrollView>
       </View>
     )

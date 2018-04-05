@@ -6,10 +6,6 @@ export default class UserAPI {
     this.apiClient = new ApiClient(token)
   }
 
-  async fetchUser () {
-    return await this.apiClient.get('/users')
-  }
-
   async login (email, password) {
     return await this.apiClient.post('/users/login', {
       email: email,

@@ -19,7 +19,6 @@ export const storeToPouch = store => next => action => {
           _id: 'state'
         })
       } else {
-        debugger
         throw e
       }
     })
