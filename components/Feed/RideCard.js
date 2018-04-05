@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 import { Button, Content, Card, CardItem, Icon, Left, ListItem, Right, Text } from 'native-base';
-import moment from 'moment'
 import {
   Image,
   StyleSheet,
 } from 'react-native';
+
+import { staticMap } from '../../helpers'
 
 export default class RideCard extends Component {
   render() {
@@ -19,7 +20,7 @@ export default class RideCard extends Component {
             </CardItem>
             <CardItem cardBody>
               <Image
-                source={{uri: `https://s3.amazonaws.com/equesteo-ride-map-images/${this.props.ride.mapImageID}.jpeg`}}
+                source={{uri: staticMap(this.props.ride)}}
                 style={{height: 200, width: null, flex: 1}}
               />
             </CardItem>

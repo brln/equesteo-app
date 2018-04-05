@@ -34,6 +34,7 @@ export default class Ride extends Component {
         <View style={{flex: 3}}>
           <Map
             rideCoords={rideCoordsToMapCoords(this.props.ride.rideCoordinates)}
+            fill={true}
           />
         </View>
         <View style={{flex: 1, padding: 5}}>

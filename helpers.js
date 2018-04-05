@@ -61,3 +61,27 @@ export function generateUUID () { // Public Domain/MIT
         return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
     });
 }
+
+function urlParams (params) {
+  return Object.keys(params).map(k => k + '=' + encodeURIComponent(params[k])).join('&')
+}
+
+export function staticMap (ride) {
+  const STATIC_MAPS_API_KEY = ' AIzaSyBhUmpq-7uQ2JaqtrHO3hpfeFHynVpo8xQ'
+  const ROOT_URL = 'https://maps.googleapis.com/maps/api/staticmap?'
+  const queryStringParams = {
+      size: '400x400',
+      format: 'png',
+      maptype: 'terrain',
+  }
+  const pathStyle = 'color:0xff0000ff|weight:5'
+  let pathCoords = ''
+  for (let coordinate of ride.rideCoordinates) {
+    pathCoords += `|${coordinate.latitude},${coordinate.longitude}`
+  }
+
+  queryStringParams['path'] = pathStyle + pathCoords
+  queryStringParams['key'] = STATIC_MAPS_API_KEY
+  const queryString = urlParams(queryStringParams)
+  return ROOT_URL + queryString
+}

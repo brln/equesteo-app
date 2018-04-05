@@ -31,7 +31,7 @@ export default class Map extends Component {
 
   render() {
     return (
-      <View style ={styles.container}>
+      <View style={styles.container}>
         <MapView
           style={styles.map}
           ref={ref => this.map = ref}

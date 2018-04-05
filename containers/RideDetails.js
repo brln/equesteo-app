@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import moment from 'moment'
 
 import { changeScreen, discardRide, saveRide } from '../actions'
-import { generateUUID } from '../helpers'
+import { generateUUID, staticMap } from '../helpers'
 import RideDetails from '../components/RideRecorder/RideDetails'
 import { FEED } from '../screens'
 
