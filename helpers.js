@@ -85,3 +85,20 @@ export function staticMap (ride) {
   const queryString = urlParams(queryStringParams)
   return ROOT_URL + queryString
 }
+
+export const connectionType = {
+  none: 'none',
+  wifi: 'wifi',
+  cellular: 'cellular',
+  unknown: 'unknown',
+  bluetooth: 'bluetooth',
+  ethernet: 'ethernet',
+  wimax: 'wimax',
+}
+
+export const effectiveConnectionType = {
+  twoG: '2g',
+  threeG: '3g',
+  fourG: '4g',
+  unknown: 'unknown'
+}

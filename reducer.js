@@ -7,8 +7,8 @@ import {
   ERROR_OCCURRED,
   JUST_FINISHED_RIDE_SHOWN,
   LOCAL_DATA_LOADED,
-  NEW_GEO_WATCH,
   NEW_LOCATION,
+  NEW_NETWORK_STATE,
   RECEIVE_JWT,
   RECEIVE_USER_DATA,
   REHYDRATE_STATE,
@@ -17,13 +17,19 @@ import {
   START_RIDE,
   USER_SEARCH_RETURNED,
 } from './constants'
-import { haversine } from './helpers'
+import {
+  connectionType,
+  effectiveConnectionType,
+  haversine
+} from './helpers'
 import { FEED } from './screens'
 
 const initialState = {
   app: 'login',
+  connectionType: connectionType.none,
   currentScreen: FEED,
   currentRide: null,
+  effectiveConnectionType: effectiveConnectionType.none,
   error: null,
   horses: [],
   justFinishedRide: false,
@@ -49,10 +55,6 @@ export default function AppReducer(state=initialState, action) {
       debugger
       return Object.assign({}, initialState, {
         lastLocation: state.lastLocation
-      })
-    case NEW_GEO_WATCH:
-      return Object.assign({}, state, {
-        geoWatchID: action.geoWatchID
       })
     case DISCARD_RIDE:
       return Object.assign({}, state, {
@@ -93,6 +95,11 @@ export default function AppReducer(state=initialState, action) {
         }
       }
       return newState
+    case NEW_NETWORK_STATE:
+      return Object.assign({}, state, {
+        connectionType: action.connectionType,
+        effectiveConnectionType: action.effectiveConnectionType
+      })
     case RECEIVE_JWT:
       return Object.assign({}, state, {
         app: 'after-login',

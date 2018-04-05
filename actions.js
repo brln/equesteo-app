@@ -1,3 +1,4 @@
+import { NetInfo } from 'react-native'
 import PouchDB from 'pouchdb-react-native'
 
 import { unixTimeNow } from "./helpers"
@@ -16,6 +17,7 @@ import {
   JUST_FINISHED_RIDE_SHOWN,
   LOCAL_DATA_LOADED,
   NEW_LOCATION,
+  NEW_NETWORK_STATE,
   RECEIVE_JWT,
   RECEIVE_USER_DATA,
   REHYDRATE_STATE,
@@ -90,6 +92,15 @@ function newLocation(location) {
   }
 }
 
+function newNetworkState(connectionType, effectiveConnectionType) {
+  alert(connectionType + effectiveConnectionType)
+  return {
+    type: NEW_NETWORK_STATE,
+    connectionType,
+    effectiveConnectionType,
+  }
+}
+
 function receiveJWT(token) {
   return {
     type: RECEIVE_JWT,
@@ -151,6 +162,7 @@ export function appInitialized () {
   return async (dispatch) => {
     dispatch(findLocalToken())
     dispatch(changeAppRoot('login'))
+    dispatch(startNetworkTracking())
     dispatch(startLocationTracking())
   }
 }
@@ -245,6 +257,20 @@ function startLocationTracking () {
       null,
       {enableHighAccuracy: true, timeout: 1000 * 60 * 10, maximumAge: 10000, distanceFilter: 10}
     )
+  }
+}
+
+function startNetworkTracking () {
+  return async (dispatch) => {
+    NetInfo.getConnectionInfo().then((connectionInfo) => {
+      dispatch(newNetworkState(connectionInfo.type, connectionInfo.effectiveType))
+    });
+    NetInfo.addEventListener(
+      'connectionChange',
+      (connectionInfo) => {
+        dispatch(newNetworkState(connectionInfo.type, connectionInfo.effectiveType))
+      }
+    );
   }
 }
 
