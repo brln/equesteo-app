@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
-
 import {
   StyleSheet,
   Text,
   TextInput,
   View
 } from 'react-native';
-
 
 export default class NewHorse extends Component {
   static navigatorButtons = {

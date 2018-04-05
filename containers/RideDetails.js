@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import moment from 'moment'
 
 import { changeScreen, discardRide, saveRide } from '../actions'
+import { generateUUID } from '../helpers'
 import RideDetails from '../components/RideRecorder/RideDetails'
 import { FEED } from '../screens'
 
@@ -70,6 +71,7 @@ class RideDetailsContainer extends Component {
       horseID = this.props.horses[0].id
     }
     this.props.dispatch(saveRide({
+      id: generateUUID(),
       elapsedTimeSecs: this.props.elapsedTime,
       name: this.state.rideName,
       horseID: horseID,

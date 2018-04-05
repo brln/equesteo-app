@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 
 import Barn from '../components/Barn'
 import { saveHorse } from '../actions'
+import { generateUUID } from '../helpers'
 
 class BarnContainer extends Component {
   constructor (props) {
@@ -11,7 +12,10 @@ class BarnContainer extends Component {
   }
 
   saveNewHorse (horseData) {
-    this.props.dispatch(saveHorse(horseData))
+    this.props.dispatch(saveHorse({
+      ...horseData,
+      id: generateUUID()
+    }))
   }
 
   render() {
