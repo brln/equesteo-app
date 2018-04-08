@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Keyboard, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import {
   ACCOUNT,

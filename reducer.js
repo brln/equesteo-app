@@ -7,34 +7,43 @@ import {
   ERROR_OCCURRED,
   JUST_FINISHED_RIDE_SHOWN,
   LOCAL_DATA_LOADED,
+  LOCAL_PERSIST_STARTED,
+  LOCALLY_PERSISTED,
+  NEEDS_TO_PERSIST,
   NEW_LOCATION,
   NEW_NETWORK_STATE,
+  NEW_REV,
+  PERSIST_STARTED,
+  PERSISTED,
   RECEIVE_JWT,
-  RECEIVE_USER_DATA,
   REHYDRATE_STATE,
   SAVE_HORSE,
   SAVE_RIDE,
+  SAVE_USER_DATA,
   START_RIDE,
   USER_SEARCH_RETURNED,
 } from './constants'
 import {
-  connectionType,
-  effectiveConnectionType,
+  goodConnection,
   haversine
 } from './helpers'
 import { FEED } from './screens'
 
 const initialState = {
+  _id: 'state',
+  _rev: null,
   app: 'login',
-  connectionType: connectionType.none,
   currentScreen: FEED,
   currentRide: null,
-  effectiveConnectionType: effectiveConnectionType.none,
   error: null,
+  goodConnection: false,
   horses: [],
   justFinishedRide: false,
   jwt: null,
   lastLocation: null,
+  locallyPersisting: false,
+  needsToPersist: false,
+  persistStarted: true,
   rides: [],
   userData: {},
   userLoaded: false,
@@ -52,7 +61,6 @@ export default function AppReducer(state=initialState, action) {
         userSearchResults: []
       })
     case CLEAR_STATE:
-      debugger
       return Object.assign({}, initialState, {
         lastLocation: state.lastLocation
       })
@@ -77,6 +85,19 @@ export default function AppReducer(state=initialState, action) {
         ...action.localData,
         currentScreen: FEED
       })
+    case LOCAL_PERSIST_STARTED:
+      return Object.assign({}, state, {
+        locallyPersisting: true
+      })
+    case LOCALLY_PERSISTED:
+      return Object.assign({}, state, {
+        locallyPersisting: false,
+        _rev: action.rev
+      })
+    case NEEDS_TO_PERSIST:
+      return Object.assign({}, state, {
+        needsToPersist: true
+      })
     case NEW_LOCATION:
       const newState = Object.assign({}, state, {
         lastLocation: action.location
@@ -97,15 +118,31 @@ export default function AppReducer(state=initialState, action) {
       return newState
     case NEW_NETWORK_STATE:
       return Object.assign({}, state, {
-        connectionType: action.connectionType,
-        effectiveConnectionType: action.effectiveConnectionType
+        goodConnection: goodConnection(
+          action.connectionType,
+          action.effectiveConnectionType
+        )
+      })
+    case NEW_REV:
+      return Object.assign({}, state, {
+        _rev: action.rev
+      })
+    case PERSIST_STARTED:
+      return Object.assign({}, state, {
+        persistStarted: true,
+      })
+    case PERSISTED:
+      return Object.assign({}, state, {
+        needsToPersist: false,
+        persistStarted: false,
+        locallyPersisting: false,
       })
     case RECEIVE_JWT:
       return Object.assign({}, state, {
         app: 'after-login',
         jwt: action.token
       })
-    case RECEIVE_USER_DATA:
+    case SAVE_USER_DATA:
       return Object.assign({}, state, {
         userData: action.userData,
         userLoaded: true

@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
 import Barn from '../components/Barn'
-import { saveHorse } from '../actions'
+import { needsToPersist, saveHorse } from '../actions'
 import { generateUUID } from '../helpers'
 
 class BarnContainer extends Component {
@@ -16,6 +16,7 @@ class BarnContainer extends Component {
       ...horseData,
       id: generateUUID()
     }))
+    this.props.dispatch(needsToPersist())
   }
 
   render() {

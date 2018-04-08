@@ -2,8 +2,8 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 import moment from 'moment'
 
-import { changeScreen, discardRide, saveRide } from '../actions'
-import { generateUUID, staticMap } from '../helpers'
+import { changeScreen, discardRide, needsToPersist, saveRide } from '../actions'
+import { generateUUID } from '../helpers'
 import RideDetails from '../components/RideRecorder/RideDetails'
 import { FEED } from '../screens'
 
@@ -76,6 +76,7 @@ class RideDetailsContainer extends Component {
       name: this.state.rideName,
       horseID: horseID,
     }))
+    this.props.dispatch(needsToPersist())
     this.doneOnPage()
   }
 
@@ -95,6 +96,7 @@ class RideDetailsContainer extends Component {
 function mapStateToProps (state) {
   return {
     horses: state.horses,
+    goodConnection: state.goodConnection,
     currentRide: state.currentRide
   }
 }

@@ -16,13 +16,17 @@ import {
   ERROR_OCCURRED,
   JUST_FINISHED_RIDE_SHOWN,
   LOCAL_DATA_LOADED,
+  NEEDS_TO_PERSIST,
   NEW_LOCATION,
   NEW_NETWORK_STATE,
+  NEW_REV,
+  PERSIST_STARTED,
+  PERSISTED,
   RECEIVE_JWT,
-  RECEIVE_USER_DATA,
   REHYDRATE_STATE,
   SAVE_HORSE,
   SAVE_RIDE,
+  SAVE_USER_DATA,
   START_RIDE,
   USER_SEARCH_RETURNED,
 } from './constants'
@@ -85,15 +89,27 @@ export function localDataLoaded (localData) {
   }
 }
 
-function newLocation(location) {
+export function needsToPersist () {
+  return {
+    type: NEEDS_TO_PERSIST,
+  }
+}
+
+function newLocation (location) {
   return {
     type: NEW_LOCATION,
     location
   }
 }
 
-function newNetworkState(connectionType, effectiveConnectionType) {
-  alert(connectionType + effectiveConnectionType)
+export function newRev (rev) {
+  return {
+    type: NEW_REV,
+    rev
+  }
+}
+
+function newNetworkState (connectionType, effectiveConnectionType) {
   return {
     type: NEW_NETWORK_STATE,
     connectionType,
@@ -101,16 +117,28 @@ function newNetworkState(connectionType, effectiveConnectionType) {
   }
 }
 
-function receiveJWT(token) {
+export function persisted () {
+  return {
+    type: PERSISTED,
+  }
+}
+
+export function persistStarted () {
+  return {
+    type: PERSIST_STARTED
+  }
+}
+
+function receiveJWT (token) {
   return {
     type: RECEIVE_JWT,
     token
   }
 }
 
-function receiveUserData(userData) {
+export function saveUserData(userData) {
   return {
-    type: RECEIVE_USER_DATA,
+    type: SAVE_USER_DATA,
     userData
   }
 }
@@ -164,6 +192,9 @@ export function appInitialized () {
     dispatch(changeAppRoot('login'))
     dispatch(startNetworkTracking())
     dispatch(startLocationTracking())
+
+    // In case app died during a persist.
+    dispatch(persisted())
   }
 }
 
@@ -172,7 +203,7 @@ export function createFollow (followingID) {
     const userAPI = new UserAPI(getState().jwt)
     try {
       const resp = await userAPI.addFollow(followingID)
-      dispatch(receiveUserData(resp))
+      // dispatch(receiveUserData(resp))
     } catch (e) {
       console.log(e)
       alert('error in console')
@@ -185,7 +216,7 @@ export function deleteFollow (followingID) {
     const userAPI = new UserAPI(getState().jwt)
     try {
       const resp = await userAPI.deleteFollow(followingID)
-      dispatch(receiveUserData(resp))
+      // dispatch(receiveUserData(resp))
     } catch (e) {
       console.log(e)
       alert('error in console')
@@ -225,7 +256,6 @@ export function searchForFriends (phrase) {
 
 export function signOut () {
   return async(dispatch) => {
-    await dispatch(syncToServer())
     await LocalStorage.deleteToken()
     dispatch(clearState())
   }
@@ -293,46 +323,18 @@ export function submitLogin (email, password) {
   }
 }
 
-export function syncToServer () {
-  return async (dispatch, getState) => {
-    const dbName = getState().userData.id.toString()
-    const localDB = new PouchDB(dbName)
-
-    const state = await localDB.get('state')
-    delete state.jwt
-    delete state._id
-    delete state._rev
-
-    const userAPI = new UserAPI(getState().jwt)
-    await userAPI.saveState(state)
-  }
-}
-
 export function submitSignup (email, password) {
   return async (dispatch) => {
     const userAPI = new UserAPI()
     try {
       const resp = await userAPI.signup(email, password)
       await LocalStorage.saveToken(resp.token, resp.id);
+      dispatch(saveUserData({id: resp.id}))
       dispatch(receiveJWT(resp.token))
-      delete resp.token
-      dispatch(receiveUserData(resp))
     } catch (e) {
       if (e instanceof BadRequestError) {
         dispatch(errorOccurred(e.message))
       }
-    }
-  }
-}
-
-export function updateProfile (userData) {
-  return async (dispatch, getState) => {
-    const userAPI = new UserAPI(getState().jwt)
-    try {
-      const resp = await userAPI.updateProfile(userData)
-      dispatch(receiveUserData(resp))
-    } catch (e) {
-      debugger
     }
   }
 }
@@ -342,7 +344,7 @@ export function uploadProfilePhoto (photoLocation) {
     const userAPI = new UserAPI(getState().jwt)
     try {
       const resp = await userAPI.uploadProfilePhoto(photoLocation)
-      dispatch(receiveUserData(resp))
+      // dispatch(receiveUserData(resp))
     } catch (e) {
       debugger
     }

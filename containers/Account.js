@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import { signOut } from '../actions'
 import Account from '../components/Account'
-import { updateProfile, uploadProfilePhoto } from "../actions"
+import { needsToPersist, saveUserData, uploadProfilePhoto } from "../actions"
 
 class AccountContainer extends Component {
   static navigatorButtons = {
@@ -34,19 +34,20 @@ class AccountContainer extends Component {
   changeAccountDetails (newDetails) {
     this.setState({
       userMadeChanges: true,
-      userData: Object.assign({}, this.props.userData, newDetails)
+      userData: Object.assign({}, this.state.userData, newDetails)
     })
   }
 
   onNavigatorEvent (event) {
     if (event.type === 'NavBarButtonPress') {
       if (event.id === 'save') {
-        this.props.dispatch(updateProfile(this.state.userData))
+        this.props.dispatch(saveUserData(this.state.userData))
       }
     }
   }
 
   signOut () {
+    this.props.dispatch(needsToPersist())
     this.props.dispatch(signOut())
   }
 

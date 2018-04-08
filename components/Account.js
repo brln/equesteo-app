@@ -24,18 +24,21 @@ export default class Account extends Component {
 
   changeFirstName (newText) {
     this.props.changeAccountDetails({
+      ...this.props.userData,
       firstName: newText
     })
   }
 
   changeLastName (newText) {
     this.props.changeAccountDetails({
+      ...this.props.userData,
       lastName: newText
     })
   }
 
   changeAboutMe (newText) {
     this.props.changeAccountDetails({
+      ...this.props.userData,
       aboutMe: newText
     })
   }

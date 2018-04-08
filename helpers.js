@@ -102,3 +102,11 @@ export const effectiveConnectionType = {
   fourG: '4g',
   unknown: 'unknown'
 }
+
+export function goodConnection(type, effectiveType) {
+  return (type === connectionType.wifi || (
+    type === connectionType.cellular && (
+      effectiveType === effectiveConnectionType.threeG || effectiveConnectionType.fourG
+    )
+  ))
+}
