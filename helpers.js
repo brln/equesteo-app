@@ -75,9 +75,16 @@ export function staticMap (ride) {
       maptype: 'terrain',
   }
   const pathStyle = 'color:0xff0000ff|weight:5'
+
+  const MAX_NUM_COORDS = 300 // Google static maps API limit of 8096 chars in URL
+  let nth = ride.rideCoordinates.length / MAX_NUM_COORDS
+  nth = (nth < 1) ? 1 : Math.ceil(nth)
   let pathCoords = ''
-  for (let coordinate of ride.rideCoordinates) {
-    pathCoords += `|${coordinate.latitude},${coordinate.longitude}`
+  for (let i = 0; i < Math.min(ride.rideCoordinates.length, MAX_NUM_COORDS); i++) {
+    const coordinate = ride.rideCoordinates[i]
+    if (i % nth === 0) {
+      pathCoords += `|${coordinate.latitude},${coordinate.longitude}`
+    }
   }
 
   queryStringParams['path'] = pathStyle + pathCoords

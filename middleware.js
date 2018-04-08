@@ -28,7 +28,9 @@ function localPersist (store, state) {
       throw e
     }
   })
+}
 
+function remotePersist (store, state) {
   if (state.needsToPersist && !state.persistStarted && state.goodConnection) {
     const persistState = {...state}
     delete persistState.jwt
@@ -52,6 +54,7 @@ function recursiveEmptyQueue (store, state) {
 
 export const storeToPouch = store => dispatch => action => {
   dispatch(action)
+  console.log(action)
   let currentState = store.getState()
   if (currentState.userLoaded) {
     if (action.type !== NEW_REV) {
@@ -61,5 +64,6 @@ export const storeToPouch = store => dispatch => action => {
         recursiveEmptyQueue(store ,{...currentState})
       }
     }
+    remotePersist(store, currentState)
   }
 }
