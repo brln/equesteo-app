@@ -7,12 +7,12 @@ import {
   ERROR_OCCURRED,
   JUST_FINISHED_RIDE_SHOWN,
   LOCAL_DATA_LOADED,
-  LOCAL_PERSIST_STARTED,
-  LOCALLY_PERSISTED,
   NEEDS_TO_PERSIST,
+  NEW_APP_STATE,
   NEW_LOCATION,
   NEW_NETWORK_STATE,
   NEW_REV,
+  ONGOING_NOTIFICATION_SHOWN,
   PERSIST_STARTED,
   PERSISTED,
   RECEIVE_JWT,
@@ -24,6 +24,7 @@ import {
   USER_SEARCH_RETURNED,
 } from './constants'
 import {
+  appStates,
   goodConnection,
   haversine
 } from './helpers'
@@ -33,6 +34,7 @@ const initialState = {
   _id: 'state',
   _rev: null,
   app: 'login',
+  appState: appStates.active,
   currentScreen: FEED,
   currentRide: null,
   error: null,
@@ -43,6 +45,7 @@ const initialState = {
   lastLocation: null,
   locallyPersisting: false,
   needsToPersist: false,
+  ongoingNotificationShown: false,
   persistStarted: true,
   rides: [],
   userData: {},
@@ -85,18 +88,13 @@ export default function AppReducer(state=initialState, action) {
         ...action.localData,
         currentScreen: FEED
       })
-    case LOCAL_PERSIST_STARTED:
-      return Object.assign({}, state, {
-        locallyPersisting: true
-      })
-    case LOCALLY_PERSISTED:
-      return Object.assign({}, state, {
-        locallyPersisting: false,
-        _rev: action.rev
-      })
     case NEEDS_TO_PERSIST:
       return Object.assign({}, state, {
         needsToPersist: true
+      })
+    case NEW_APP_STATE:
+      return Object.assign({}, state, {
+        appState: action.newState
       })
     case NEW_LOCATION:
       const newState = Object.assign({}, state, {
@@ -127,6 +125,10 @@ export default function AppReducer(state=initialState, action) {
       return Object.assign({}, state, {
         _rev: action.rev
       })
+    case ONGOING_NOTIFICATION_SHOWN:
+      return Object.assign({}, state, {
+        ongoingNotificationShown: action.isShowing
+      })
     case PERSIST_STARTED:
       return Object.assign({}, state, {
         persistStarted: true,
@@ -148,7 +150,10 @@ export default function AppReducer(state=initialState, action) {
         userLoaded: true
       })
     case REHYDRATE_STATE:
-      return Object.assign({}, action.dehydratedState)
+      return Object.assign({}, {
+        ...action.dehydratedState,
+        _id: 'state',
+      })
     case SAVE_HORSE:
       return Object.assign({}, state, {
         horses: [action.horse, ...state.horses]

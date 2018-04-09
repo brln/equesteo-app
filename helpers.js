@@ -110,6 +110,12 @@ export const effectiveConnectionType = {
   unknown: 'unknown'
 }
 
+export const appStates = {
+  active: 'active',
+  background: 'background',
+  inactive: 'inactive'
+}
+
 export function goodConnection(type, effectiveType) {
   return (type === connectionType.wifi || (
     type === connectionType.cellular && (

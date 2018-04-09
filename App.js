@@ -1,14 +1,15 @@
 import React, {Component} from 'react';
-import {Provider} from 'react-redux'
-import {createStore, applyMiddleware} from 'redux'
+import { Provider } from 'react-redux'
+import { createStore, applyMiddleware } from 'redux'
 import thunkMiddleware from 'redux-thunk'
-import {Navigation} from 'react-native-navigation';
-import {registerScreens} from './screens';
+import { Navigation } from 'react-native-navigation';
+
+
 
 import { appInitialized } from "./actions"
 import { storeToPouch } from "./middleware"
 import AppReducer from './reducer'
-import { DRAWER, FEED_DETAILS, SIGNUP_LOGIN } from './screens'
+import { DRAWER, FEED_DETAILS, SIGNUP_LOGIN, registerScreens } from './screens'
 
 const store = createStore(
   AppReducer,

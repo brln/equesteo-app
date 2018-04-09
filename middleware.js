@@ -9,7 +9,7 @@ let awaitingResponse = false
 
 function localPersist (store, state) {
   const dbName = state.userData.id.toString()
-  const localDB = new PouchDB(dbName)
+  const localDB = new PouchDB(dbName, {auto_compaction: true})
   localDB.put(state).then((doc) => {
     store.dispatch(newRev(doc.rev))
     const newState = store.getState()
@@ -25,6 +25,7 @@ function localPersist (store, state) {
         debugger
       })
     } else {
+      debugger
       throw e
     }
   })

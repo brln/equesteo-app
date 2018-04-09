@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { connect } from 'react-redux';
+import { connect } from 'react-redux'
+
 
 import { startRide } from '../actions'
 import RideRecorder from '../components/RideRecorder/RideRecorder'

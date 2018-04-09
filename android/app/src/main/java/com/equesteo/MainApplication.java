@@ -3,6 +3,7 @@ package com.equesteo;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.facebook.react.ReactNativeHost;
@@ -27,7 +28,8 @@ public class MainApplication extends NavigationApplication {
         // No need to add RnnPackage and MainReactPackage
         return Arrays.<ReactPackage>asList(
             new MapsPackage(),
-            new PickerPackage()
+            new PickerPackage(),
+            new ReactNativePushNotificationPackage()
             // eg. new VectorIconsPackage()
         );
     }

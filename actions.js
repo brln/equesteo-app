@@ -1,7 +1,8 @@
-import { NetInfo } from 'react-native'
+import { AppState, NetInfo } from 'react-native'
 import PouchDB from 'pouchdb-react-native'
+import Notifications  from 'react-native-push-notification'
 
-import { unixTimeNow } from "./helpers"
+import { unixTimeNow, appStates } from "./helpers"
 import { FEED } from './screens'
 import { LocalStorage, UserAPI } from './services'
 import {BadRequestError, UnauthorizedError} from "./errors"
@@ -18,8 +19,10 @@ import {
   LOCAL_DATA_LOADED,
   NEEDS_TO_PERSIST,
   NEW_LOCATION,
+  NEW_APP_STATE,
   NEW_NETWORK_STATE,
   NEW_REV,
+  ONGOING_NOTIFICATION_SHOWN,
   PERSIST_STARTED,
   PERSISTED,
   RECEIVE_JWT,
@@ -95,6 +98,13 @@ export function needsToPersist () {
   }
 }
 
+function newAppState (newState) {
+  return {
+    type: NEW_APP_STATE,
+    newState
+  }
+}
+
 function newLocation (location) {
   return {
     type: NEW_LOCATION,
@@ -114,6 +124,13 @@ function newNetworkState (connectionType, effectiveConnectionType) {
     type: NEW_NETWORK_STATE,
     connectionType,
     effectiveConnectionType,
+  }
+}
+
+export function ongoingNotificationShown (isShowing) {
+  return {
+    type: ONGOING_NOTIFICATION_SHOWN,
+    isShowing
   }
 }
 
@@ -192,6 +209,7 @@ export function appInitialized () {
     dispatch(changeAppRoot('login'))
     dispatch(startNetworkTracking())
     dispatch(startLocationTracking())
+    dispatch(startAppStateTracking())
 
     // In case app died during a persist.
     dispatch(persisted())
@@ -254,6 +272,25 @@ export function searchForFriends (phrase) {
   }
 }
 
+export function showOngoingNotification () {
+  return async (dispatch) => {
+    Notifications.localNotification({
+      id: '123',
+      ongoing: true,
+      title: "You are tracking a ride.",
+      message: "Tap here to return to your ride.",
+    });
+    dispatch(ongoingNotificationShown(true))
+  }
+}
+
+export function dismissOngoingNotification () {
+  return async (dispatch) => {
+    Notifications.cancelAllLocalNotifications()
+    dispatch(ongoingNotificationShown(false))
+  }
+}
+
 export function signOut () {
   return async(dispatch) => {
     await LocalStorage.deleteToken()
@@ -301,6 +338,19 @@ function startNetworkTracking () {
         dispatch(newNetworkState(connectionInfo.type, connectionInfo.effectiveType))
       }
     );
+  }
+}
+
+function startAppStateTracking () {
+  return async (dispatch, getState) => {
+    AppState.addEventListener('change', (nextAppState) => {
+      dispatch(newAppState(nextAppState))
+      if (nextAppState === appStates.background && getState().currentRide && !getState().ongoingNotificationShown) {
+        dispatch(showOngoingNotification())
+      } else if (nextAppState === appStates.active) {
+        dispatch(dismissOngoingNotification())
+      }
+    })
   }
 }
 
