@@ -162,7 +162,7 @@ class DrawerContainer extends Component {
 				<View style={styles.container}>
 					<View style={styles.drawerList}>
             {feed}
-            {following}
+            {/*{following}*/}
             {recorder}
 						{barnScreen}
 						{myAccountScreen}

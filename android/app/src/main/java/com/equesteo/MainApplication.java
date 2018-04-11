@@ -3,6 +3,7 @@ package com.equesteo;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.marianhello.bgloc.react.BackgroundGeolocationPackage;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
@@ -29,8 +30,8 @@ public class MainApplication extends NavigationApplication {
         return Arrays.<ReactPackage>asList(
             new MapsPackage(),
             new PickerPackage(),
-            new ReactNativePushNotificationPackage()
-            // eg. new VectorIconsPackage()
+            new ReactNativePushNotificationPackage(),
+            new BackgroundGeolocationPackage()
         );
     }
 

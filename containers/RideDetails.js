@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 import moment from 'moment'
 
-import { changeScreen, discardRide, needsToPersist, saveRide } from '../actions'
+import { changeScreen, discardRide, needsToPersist, saveRide, stopLocationTracking } from '../actions'
 import { generateUUID } from '../helpers'
 import RideDetails from '../components/RideRecorder/RideDetails'
 import { FEED } from '../screens'
@@ -66,6 +66,7 @@ class RideDetailsContainer extends Component {
   }
 
   saveRide () {
+    this.props.dispatch(stopLocationTracking())
     let horseID = this.state.horseID
     if (!horseID && this.props.horses.length > 0) {
       horseID = this.props.horses[0].id

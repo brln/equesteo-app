@@ -69,8 +69,10 @@ export default class SignupForm extends Component {
         { this.state.showMismatch ? dontMatchMessage : null }
         <Text style={styles.whiteText}>Email:</Text>
         <TextInput
+          autoCapitalize={'none'}
           autoFocus={true}
           blurOnSubmit={false}
+          keyboardType={'email-address'}
           style={styles.email}
           onSubmitEditing={this.moveToPassword}
           onChangeText={this.changeEmail}
@@ -80,6 +82,7 @@ export default class SignupForm extends Component {
         />
         <Text style={styles.whiteText}>Password:</Text>
         <TextInput
+          autoCapitalize={'none'}
           blurOnSubmit={false}
           onSubmitEditing={this.moveToPassword2}
           onChangeText={this.changePassword1}
@@ -91,6 +94,7 @@ export default class SignupForm extends Component {
         />
         <Text style={styles.whiteText}>Password Again:</Text>
         <TextInput
+          autoCapitalize={'none'}
           onSubmitEditing={this.submitSignup}
           secureTextEntry={true}
           style={styles.whiteText}

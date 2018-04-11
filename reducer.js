@@ -1,5 +1,5 @@
 import {
-  CHANGE_SCREEN,
+  CHANGE_SCREEN, CLEAR_LAST_LOCATION,
   CLEAR_SEARCH,
   CLEAR_STATE,
   DISCARD_RIDE,
@@ -46,7 +46,7 @@ const initialState = {
   locallyPersisting: false,
   needsToPersist: false,
   ongoingNotificationShown: false,
-  persistStarted: true,
+  persistStarted: false,
   rides: [],
   userData: {},
   userLoaded: false,
@@ -58,6 +58,10 @@ export default function AppReducer(state=initialState, action) {
     case CHANGE_SCREEN:
       return Object.assign({}, state, {
         currentScreen: action.screen,
+      })
+    case CLEAR_LAST_LOCATION:
+      return Object.assign({}, state, {
+        lastLocation: null
       })
     case CLEAR_SEARCH:
       return Object.assign({}, state, {
@@ -153,6 +157,7 @@ export default function AppReducer(state=initialState, action) {
       return Object.assign({}, {
         ...action.dehydratedState,
         _id: 'state',
+        needsToPersist: false,
       })
     case SAVE_HORSE:
       return Object.assign({}, state, {
@@ -170,9 +175,6 @@ export default function AppReducer(state=initialState, action) {
         currentRide: null,
       })
     case START_RIDE:
-      if (state.lastLocation) {
-        action.currentRide.rideCoordinates.push(state.lastLocation)
-      }
       return Object.assign({}, state, {
         currentRide: action.currentRide
       })

@@ -12,6 +12,7 @@ export default RideStats = (props) => {
         { props.distance.toFixed(2).toString() } mi
       </Text>
       <TimeElapsed
+        appState={props.appState}
         startTime={props.startTime}
         fontStyle={styles.statFont}
       />

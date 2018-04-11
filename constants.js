@@ -1,5 +1,6 @@
 export const CHANGE_ROOT = 'CHANGE_ROOT'
 export const CHANGE_SCREEN = 'CHANGE_SCREEN'
+export const CLEAR_LAST_LOCATION = 'CLEAR_LAST_LOCATION'
 export const CLEAR_SEARCH = 'CLEAR_SEARCH'
 export const CLEAR_STATE = 'CLEAR_STATE'
 export const DISCARD_RIDE = 'DISCARD_RIDE'

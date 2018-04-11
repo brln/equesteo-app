@@ -1,6 +1,6 @@
 import { AppState, NetInfo } from 'react-native'
 import PouchDB from 'pouchdb-react-native'
-import Notifications  from 'react-native-push-notification'
+import BackgroundGeolocation from 'react-native-mauron85-background-geolocation'
 
 import { unixTimeNow, appStates } from "./helpers"
 import { FEED } from './screens'
@@ -10,6 +10,7 @@ import {BadRequestError, UnauthorizedError} from "./errors"
 import {
   CHANGE_ROOT,
   CHANGE_SCREEN,
+  CLEAR_LAST_LOCATION,
   CLEAR_SEARCH,
   CLEAR_STATE,
   DISCARD_RIDE,
@@ -22,7 +23,6 @@ import {
   NEW_APP_STATE,
   NEW_NETWORK_STATE,
   NEW_REV,
-  ONGOING_NOTIFICATION_SHOWN,
   PERSIST_STARTED,
   PERSISTED,
   RECEIVE_JWT,
@@ -45,6 +45,12 @@ export function changeScreen(screen) {
   return {
     type: CHANGE_SCREEN,
     screen
+  }
+}
+
+export function clearLastLocation () {
+  return {
+    type: CLEAR_LAST_LOCATION,
   }
 }
 
@@ -127,13 +133,6 @@ function newNetworkState (connectionType, effectiveConnectionType) {
   }
 }
 
-export function ongoingNotificationShown (isShowing) {
-  return {
-    type: ONGOING_NOTIFICATION_SHOWN,
-    isShowing
-  }
-}
-
 export function persisted () {
   return {
     type: PERSISTED,
@@ -208,11 +207,7 @@ export function appInitialized () {
     dispatch(findLocalToken())
     dispatch(changeAppRoot('login'))
     dispatch(startNetworkTracking())
-    dispatch(startLocationTracking())
     dispatch(startAppStateTracking())
-
-    // In case app died during a persist.
-    dispatch(persisted())
   }
 }
 
@@ -272,25 +267,6 @@ export function searchForFriends (phrase) {
   }
 }
 
-export function showOngoingNotification () {
-  return async (dispatch) => {
-    Notifications.localNotification({
-      id: '123',
-      ongoing: true,
-      title: "You are tracking a ride.",
-      message: "Tap here to return to your ride.",
-    });
-    dispatch(ongoingNotificationShown(true))
-  }
-}
-
-export function dismissOngoingNotification () {
-  return async (dispatch) => {
-    Notifications.cancelAllLocalNotifications()
-    dispatch(ongoingNotificationShown(false))
-  }
-}
-
 export function signOut () {
   return async(dispatch) => {
     await LocalStorage.deleteToken()
@@ -298,32 +274,38 @@ export function signOut () {
   }
 }
 
-function startLocationTracking () {
+export function startLocationTracking () {
   return async (dispatch) => {
-    const getLocation = (location) => {
+    BackgroundGeolocation.configure({
+      desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
+      stationaryRadius: 10,
+      distanceFilter: 10,
+      maxLocations: 10,
+      notificationTitle: 'You\'re out on a ride a ride.',
+      notificationText: 'Tap here to see your progress.',
+      // debug: true,
+      locationProvider: BackgroundGeolocation.RAW_PROVIDER,
+      interval: 10000,
+      fastestInterval: 5000,
+      activitiesInterval: 10000,
+    });
+
+    BackgroundGeolocation.on('location', (location) => {
       const parsedLocation = {
-        accuracy: location.coords.accuracy,
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        timestamp: location.timestamp,
+        accuracy: location.accuracy,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        timestamp: location.time,
       }
-      dispatch(newLocation(parsedLocation))
-    }
+      if (location.accuracy < 50) {
+        dispatch(newLocation(parsedLocation))
+      } else {
+        console.log('discarding low accuracy: ' + location.accuracy)
+      }
 
-    const getCurrentPosition = () => {
-      navigator.geolocation.getCurrentPosition(
-        getLocation,
-        getCurrentPosition, // recursively run on error
-        { enableHighAccuracy: true, timeout: 1000 * 60 * 10, maximumAge: 1000 }
-      );
-    }
-    getCurrentPosition()
+    })
 
-    navigator.geolocation.watchPosition(
-      getLocation,
-      null,
-      {enableHighAccuracy: true, timeout: 1000 * 60 * 10, maximumAge: 10000, distanceFilter: 10}
-    )
+    BackgroundGeolocation.start()
   }
 }
 
@@ -341,15 +323,17 @@ function startNetworkTracking () {
   }
 }
 
+export function stopLocationTracking () {
+  return async (dispatch) => {
+    BackgroundGeolocation.stop()
+    dispatch(clearLastLocation())
+  }
+}
+
 function startAppStateTracking () {
   return async (dispatch, getState) => {
     AppState.addEventListener('change', (nextAppState) => {
       dispatch(newAppState(nextAppState))
-      if (nextAppState === appStates.background && getState().currentRide && !getState().ongoingNotificationShown) {
-        dispatch(showOngoingNotification())
-      } else if (nextAppState === appStates.active) {
-        dispatch(dismissOngoingNotification())
-      }
     })
   }
 }

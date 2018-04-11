@@ -4,13 +4,15 @@ import {
   Text,
 } from 'react-native';
 
+const initialState = {
+  starting: null,
+  elapsedTime: undefined
+}
+
 export default class TimeElapsed extends Component {
   constructor (props) {
     super(props)
-    this.state = {
-      starting: null,
-      elapsedTime: undefined,
-    }
+    this.state = { ...initialState }
     this.elapsedAsString = this.elapsedAsString.bind(this)
   }
 
@@ -29,6 +31,7 @@ export default class TimeElapsed extends Component {
   }
 
   componentWillUnmount() {
+    this.setState({ ...initialState })
     clearInterval(this.renderTimer)
   }
 

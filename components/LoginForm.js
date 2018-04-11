@@ -47,8 +47,10 @@ export default class LoginForm extends Component {
       <View style={styles.container}>
         <Text style={styles.whiteText}>Email:</Text>
         <TextInput
+          autoCapitalize={'none'}
           autoFocus={true}
           blurOnSubmit={false}
+          keyboardType={'email-address'}
           style={styles.email}
           onChangeText={this.changeEmail}
           onSubmitEditing={this.moveToPassword}
@@ -57,6 +59,7 @@ export default class LoginForm extends Component {
         />
         <Text style={styles.whiteText}>Password:</Text>
         <TextInput
+          autoCapitalize={'none'}
           onChangeText={this.changePassword}
           onSubmitEditing={this.submitLogin}
           secureTextEntry={true}

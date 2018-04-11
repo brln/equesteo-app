@@ -55,10 +55,10 @@ function recursiveEmptyQueue (store, state) {
 
 export const storeToPouch = store => dispatch => action => {
   dispatch(action)
-  console.log(action)
   let currentState = store.getState()
   if (currentState.userLoaded) {
     if (action.type !== NEW_REV) {
+      console.log(action)
       if (awaitingResponse) {
         queue.push(store)
       } else {

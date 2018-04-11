@@ -78,6 +78,7 @@ export default class RideRecorder extends Component<Props> {
           </View>
           <View style={styles.bottomSection}>
             <RideStats
+              appState={this.props.appState}
               startTime={this.props.currentRide.startTime}
               distance={this.props.currentRide.distance}
             />
