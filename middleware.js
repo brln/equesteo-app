@@ -1,11 +1,11 @@
 import PouchDB from 'pouchdb-react-native'
 
-import { persisted, persistStarted, newRev } from './actions'
-import { NEW_REV } from './constants'
+import { clearState, persisted, persistStarted, newRev } from './actions'
 import { UserAPI } from './services'
 
 let queue = []
-let awaitingResponse = false
+let savingLocally = false
+let savingRemotely = false
 
 function localPersist (state, rev, store) {
   const dbName = state.userData.id.toString()
@@ -17,7 +17,7 @@ function localPersist (state, rev, store) {
       const state = queue.shift()
       recursiveEmptyQueue(state, doc.rev, store)
     } else {
-      awaitingResponse = false
+      savingLocally = false
       store.dispatch(newRev(doc.rev))
     }
   }).catch((e) => {
@@ -27,7 +27,11 @@ function localPersist (state, rev, store) {
 }
 
 function remotePersist (store, state) {
-  if (state.needsToPersist && !state.persistStarted && state.goodConnection && state.jwt) {
+  console.log('needs to persist: ' + state.needsToPersist)
+  console.log('goodConnection: ' + state.goodConnection)
+  console.log('jwt: ' + state.jwt)
+  if (state.needsToPersist && state.goodConnection && state.jwt) {
+    savingRemotely = true
     console.log('remote persisting')
     const persistState = {...state}
     delete persistState.jwt
@@ -35,9 +39,13 @@ function remotePersist (store, state) {
     delete persistState._rev
 
     const userAPI = new UserAPI(state.jwt)
-    store.dispatch(persistStarted())
     userAPI.saveState(persistState).then(() => {
       store.dispatch(persisted())
+      if (state.clearStateAfterPersist) {
+        store.dispatch(clearState())
+      }
+      savingRemotely = false
+      console.log('done saving remotely')
     }).catch((e) => {
       alert('could not save to server')
     })
@@ -45,7 +53,7 @@ function remotePersist (store, state) {
 }
 
 function recursiveEmptyQueue (state, rev, store) {
-  awaitingResponse = true
+  savingLocally = true
   localPersist(state, rev, store)
 }
 
@@ -55,7 +63,7 @@ export const storeToPouch = store => dispatch => action => {
   let currentState = store.getState()
   if (currentState.userLoaded) {
     if (action.persist !== false) {
-      if (awaitingResponse) {
+      if (savingLocally) {
         console.log('enqueueing action: ' + action.type)
         queue.push({...currentState})
       } else {
@@ -63,6 +71,11 @@ export const storeToPouch = store => dispatch => action => {
         recursiveEmptyQueue({...currentState}, currentState._rev, store)
       }
     }
-    remotePersist(store, currentState)
+
+    if (!savingRemotely) {
+      // this will need to be a queue at some point
+      remotePersist(store, currentState)
+    }
+
   }
 }

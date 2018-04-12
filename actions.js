@@ -13,6 +13,7 @@ import {
   CLEAR_LAST_LOCATION,
   CLEAR_SEARCH,
   CLEAR_STATE,
+  CLEAR_STATE_AFTER_PERSIST,
   DISCARD_RIDE,
   DISMISS_ERROR,
   ERROR_OCCURRED,
@@ -60,9 +61,17 @@ export function clearSearch () {
   }
 }
 
-function clearState () {
+export function clearState () {
   return {
-    type: CLEAR_STATE
+    type: CLEAR_STATE,
+    persist: false
+  }
+}
+
+function clearStateAfterPersist () {
+  return {
+    type: CLEAR_STATE_AFTER_PERSIST,
+    persist: false
   }
 }
 
@@ -101,6 +110,7 @@ export function localDataLoaded (localData) {
 export function needsToPersist () {
   return {
     type: NEEDS_TO_PERSIST,
+    persist: false,
   }
 }
 
@@ -138,12 +148,7 @@ function newNetworkState (connectionType, effectiveConnectionType) {
 export function persisted () {
   return {
     type: PERSISTED,
-  }
-}
-
-export function persistStarted () {
-  return {
-    type: PERSIST_STARTED
+    persist: false,
   }
 }
 
@@ -272,7 +277,8 @@ export function searchForFriends (phrase) {
 export function signOut () {
   return async(dispatch) => {
     await LocalStorage.deleteToken()
-    dispatch(clearState())
+    dispatch(clearStateAfterPersist())
+    dispatch(needsToPersist())
   }
 }
 

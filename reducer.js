@@ -2,6 +2,7 @@ import {
   CHANGE_SCREEN, CLEAR_LAST_LOCATION,
   CLEAR_SEARCH,
   CLEAR_STATE,
+  CLEAR_STATE_AFTER_PERSIST,
   DISCARD_RIDE,
   DISMISS_ERROR,
   ERROR_OCCURRED,
@@ -36,6 +37,7 @@ const initialState = {
   _rev: null,
   app: 'login',
   appState: appStates.active,
+  clearStateAfterPersist: false,
   currentScreen: FEED,
   currentRide: null,
   error: null,
@@ -47,7 +49,6 @@ const initialState = {
   locallyPersisting: false,
   needsToPersist: false,
   ongoingNotificationShown: false,
-  persistStarted: false,
   rides: [],
   userData: {
     id: null,
@@ -74,7 +75,11 @@ export default function AppReducer(state=initialState, action) {
       })
     case CLEAR_STATE:
       return Object.assign({}, initialState, {
-        lastLocation: state.lastLocation
+        goodConnection: state.goodConnection,
+      })
+    case CLEAR_STATE_AFTER_PERSIST:
+      return Object.assign({}, state, {
+        clearStateAfterPersist: true
       })
     case DISCARD_RIDE:
       return Object.assign({}, state, {
@@ -138,15 +143,9 @@ export default function AppReducer(state=initialState, action) {
       return Object.assign({}, state, {
         ongoingNotificationShown: action.isShowing
       })
-    case PERSIST_STARTED:
-      return Object.assign({}, state, {
-        persistStarted: true,
-      })
     case PERSISTED:
       return Object.assign({}, state, {
         needsToPersist: false,
-        persistStarted: false,
-        locallyPersisting: false,
       })
     case RECEIVE_JWT:
       return Object.assign({}, state, {
@@ -163,6 +162,7 @@ export default function AppReducer(state=initialState, action) {
       const needsToPersist = migrator.migrated
       return Object.assign({}, state, {
         ...migrator.newState,
+        clearStateAfterPersist: false,
         _id: 'state',
         needsToPersist,
       })

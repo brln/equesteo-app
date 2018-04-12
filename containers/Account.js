@@ -47,7 +47,6 @@ class AccountContainer extends Component {
   }
 
   signOut () {
-    this.props.dispatch(needsToPersist())
     this.props.dispatch(signOut())
   }
 
