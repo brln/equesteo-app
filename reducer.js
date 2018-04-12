@@ -50,6 +50,7 @@ const initialState = {
   persistStarted: false,
   rides: [],
   userData: {
+    id: null,
     following: [],
   },
   userLoaded: false,
@@ -160,7 +161,7 @@ export default function AppReducer(state=initialState, action) {
     case REHYDRATE_STATE:
       const migrator = runMigrations(action.dehydratedState)
       const needsToPersist = migrator.migrated
-      return Object.assign({}, {
+      return Object.assign({}, state, {
         ...migrator.newState,
         _id: 'state',
         needsToPersist,

@@ -7,17 +7,18 @@ import { UserAPI } from './services'
 let queue = []
 let awaitingResponse = false
 
-function localPersist (store, state) {
+function localPersist (state, rev, store) {
   const dbName = state.userData.id.toString()
   const localDB = new PouchDB(dbName, {auto_compaction: true})
-  localDB.put(state).then((doc) => {
-    store.dispatch(newRev(doc.rev))
-    const newState = store.getState()
+  console.log('state rev: ' + state._rev)
+  console.log('putting with rev: ' + rev)
+  localDB.put({...state, _rev: rev}).then((doc) => {
     if (queue.length) {
-      const store = queue.shift()
-      recursiveEmptyQueue(store, {...newState})
+      const state = queue.shift()
+      recursiveEmptyQueue(state, doc.rev, store)
     } else {
       awaitingResponse = false
+      store.dispatch(newRev(doc.rev))
     }
   }).catch((e) => {
     if (e.status === 404) {
@@ -34,9 +35,11 @@ function localPersist (store, state) {
 
 function remotePersist (store, state) {
   if (state.needsToPersist && !state.persistStarted && state.goodConnection && state.jwt) {
+    console.log('remote persisting')
     const persistState = {...state}
     delete persistState.jwt
     delete persistState._id
+    delete persistState._rev
 
     const userAPI = new UserAPI(state.jwt)
     store.dispatch(persistStarted())
@@ -48,21 +51,23 @@ function remotePersist (store, state) {
   }
 }
 
-function recursiveEmptyQueue (store, state) {
+function recursiveEmptyQueue (state, rev, store) {
   awaitingResponse = true
-  localPersist(store, state)
+  localPersist(state, rev, store)
 }
 
 export const storeToPouch = store => dispatch => action => {
+  console.log('starting action: ' + action.type)
   dispatch(action)
   let currentState = store.getState()
   if (currentState.userLoaded) {
-    if (action.type !== NEW_REV) {
-      console.log(action)
+    if (action.persist !== false) {
       if (awaitingResponse) {
-        queue.push(store)
+        console.log('enqueueing action: ' + action.type)
+        queue.push({...currentState})
       } else {
-        recursiveEmptyQueue(store ,{...currentState})
+        console.log('running action: ' + action.type)
+        recursiveEmptyQueue({...currentState}, currentState._rev, store)
       }
     }
     remotePersist(store, currentState)

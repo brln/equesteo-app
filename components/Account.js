@@ -77,6 +77,7 @@ export default class Account extends Component {
             <View style={{flex: 1, padding: 5, left: -15}}>
               <Text>First Name:</Text>
               <TextInput
+                blurOnSubmit={false}
                 onChangeText={this.changeFirstName}
                 value={this.props.userData.firstName}
               />

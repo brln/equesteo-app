@@ -28,10 +28,6 @@ export default class UserAPI {
     return await this.apiClient.get('/users/search?q=' + searchPhrase)
   }
 
-  async updateProfile (userData) {
-    return await this.apiClient.put('/users', userData)
-  }
-
   async addFollow (followingID) {
     return await this.apiClient.post('/users/follow/add', {
       followingID

@@ -121,6 +121,7 @@ function newLocation (location) {
 export function newRev (rev) {
   return {
     type: NEW_REV,
+    persist: false,
     rev
   }
 }
@@ -331,7 +332,7 @@ export function stopLocationTracking () {
 }
 
 function startAppStateTracking () {
-  return async (dispatch, getState) => {
+  return async (dispatch) => {
     AppState.addEventListener('change', (nextAppState) => {
       dispatch(newAppState(nextAppState))
     })
@@ -358,12 +359,12 @@ export function submitLogin (email, password) {
 }
 
 export function submitSignup (email, password) {
-  return async (dispatch) => {
+  return async (dispatch, getState) => {
     const userAPI = new UserAPI()
     try {
       const resp = await userAPI.signup(email, password)
       await LocalStorage.saveToken(resp.token, resp.id);
-      dispatch(saveUserData({id: resp.id}))
+      dispatch(saveUserData({...getState().userData, id: resp.id}))
       dispatch(receiveJWT(resp.token))
     } catch (e) {
       if (e instanceof BadRequestError) {
