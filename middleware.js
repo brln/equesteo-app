@@ -22,21 +22,21 @@ function localPersist (store, state) {
   }).catch((e) => {
     if (e.status === 404) {
       localDB.put(state).catch((e) => {
-        debugger
+        console.log(e)
       })
     } else {
-      debugger
+      console.log(e)
+      console.log(state)
       throw e
     }
   })
 }
 
 function remotePersist (store, state) {
-  if (state.needsToPersist && !state.persistStarted && state.goodConnection) {
+  if (state.needsToPersist && !state.persistStarted && state.goodConnection && state.jwt) {
     const persistState = {...state}
     delete persistState.jwt
     delete persistState._id
-    delete persistState._rev
 
     const userAPI = new UserAPI(state.jwt)
     store.dispatch(persistStarted())

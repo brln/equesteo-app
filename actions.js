@@ -345,10 +345,10 @@ export function submitLogin (email, password) {
       const resp = await userAPI.login(email, password)
       const tokenedUserAPI = new UserAPI(resp.token)
       const dehydratedState = await tokenedUserAPI.getState()
-      await dispatch(rehydrateState(dehydratedState))
-      dispatch(changeScreen(FEED))
+      dispatch(rehydrateState(dehydratedState))
       await LocalStorage.saveToken(resp.token, resp.id);
       dispatch(receiveJWT(resp.token))
+      dispatch(changeScreen(FEED))
     } catch (e) {
       if (e instanceof UnauthorizedError) {
         dispatch(errorOccurred(e.message))

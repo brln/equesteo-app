@@ -29,6 +29,7 @@ import {
   haversine
 } from './helpers'
 import { FEED } from './screens'
+import { runMigrations } from './migrations/migrator'
 
 const initialState = {
   _id: 'state',
@@ -48,9 +49,12 @@ const initialState = {
   ongoingNotificationShown: false,
   persistStarted: false,
   rides: [],
-  userData: {},
+  userData: {
+    following: [],
+  },
   userLoaded: false,
-  userSearchResults: []
+  userSearchResults: [],
+  version: 1
 }
 
 export default function AppReducer(state=initialState, action) {
@@ -154,10 +158,12 @@ export default function AppReducer(state=initialState, action) {
         userLoaded: true
       })
     case REHYDRATE_STATE:
+      const migrator = runMigrations(action.dehydratedState)
+      const needsToPersist = migrator.migrated
       return Object.assign({}, {
-        ...action.dehydratedState,
+        ...migrator.newState,
         _id: 'state',
-        needsToPersist: false,
+        needsToPersist,
       })
     case SAVE_HORSE:
       return Object.assign({}, state, {
