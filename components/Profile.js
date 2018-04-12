@@ -31,9 +31,10 @@ export default class Profile extends Component {
     if (this.props.user.profilePhotoID) {
       uri = profilePhotoURL(this.props.user.profilePhotoID)
     }
+    debugger
     let followButton = <Button color="green" onPress={this.follow} title="Follow" />
     for (let following of this.props.userData.following) {
-      if (following.id === this.props.user.id) {
+      if (following === this.props.user.id) {
         followButton = <Button color="red" onPress={this.unfollow} title="Unfollow" />
         break
       }

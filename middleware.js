@@ -27,9 +27,6 @@ function localPersist (state, rev, store) {
 }
 
 function remotePersist (store, state) {
-  console.log('needs to persist: ' + state.needsToPersist)
-  console.log('goodConnection: ' + state.goodConnection)
-  console.log('jwt: ' + state.jwt)
   if (state.needsToPersist && state.goodConnection && state.jwt) {
     savingRemotely = true
     console.log('remote persisting')

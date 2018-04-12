@@ -226,11 +226,10 @@ export function createFollow (followingID) {
   return async (dispatch, getState) => {
     const userAPI = new UserAPI(getState().jwt)
     try {
-      const resp = await userAPI.addFollow(followingID)
-      // dispatch(receiveUserData(resp))
+      const following = await userAPI.addFollow(followingID)
+      dispatch(saveUserData({...getState().userData, following}))
     } catch (e) {
       console.log(e)
-      alert('error in console')
     }
   }
 }
@@ -239,8 +238,8 @@ export function deleteFollow (followingID) {
   return async (dispatch, getState) => {
     const userAPI = new UserAPI(getState().jwt)
     try {
-      const resp = await userAPI.deleteFollow(followingID)
-      // dispatch(receiveUserData(resp))
+      const following = await userAPI.deleteFollow(followingID)
+      dispatch(saveUserData({...getState().userData, following}))
     } catch (e) {
       console.log(e)
       alert('error in console')
