@@ -187,11 +187,15 @@ export function saveRide (ride) {
   }
 }
 
-export function startRide() {
+export function startRide(firstCoord) {
+  const coords = []
+  if (firstCoord) {
+    coords.push(firstCoord)
+  }
   return {
     type: START_RIDE,
     currentRide: {
-      rideCoordinates: [],
+      rideCoordinates: coords,
       distance: 0,
       startTime: unixTimeNow()
     },

@@ -30,7 +30,7 @@ class RecorderContainer extends Component {
   }
 
   startRide () {
-    this.props.dispatch(startRide())
+    this.props.dispatch(startRide(this.props.lastLocation))
   }
 
   discardRide () {
