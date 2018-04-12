@@ -2,12 +2,20 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 
-import { stopLocationTracking, startRide, startLocationTracking } from '../actions'
+import {
+  changeScreen,
+  discardRide,
+  stopLocationTracking,
+  startRide,
+  startLocationTracking
+} from '../actions'
 import RideRecorder from '../components/RideRecorder/RideRecorder'
+import { FEED } from '../screens'
 
 class RecorderContainer extends Component {
   constructor (props) {
     super(props)
+    this.discardRide = this.discardRide.bind(this)
     this.startRide = this.startRide.bind(this)
   }
 
@@ -25,11 +33,18 @@ class RecorderContainer extends Component {
     this.props.dispatch(startRide())
   }
 
+  discardRide () {
+    this.props.dispatch(discardRide())
+    this.props.navigator.popToRoot({animated: false, animationType: 'none'})
+    this.props.dispatch(changeScreen(FEED))
+  }
+
   render() {
     return (
       <RideRecorder
         appState={this.props.appState}
         currentRide={this.props.currentRide}
+        discardRide={this.discardRide}
         horses={this.props.horses}
         lastLocation={this.props.lastLocation}
         navigator={this.props.navigator}

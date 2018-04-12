@@ -37,18 +37,24 @@ export default class RideRecorder extends Component<Props> {
   }
 
   rideComplete () {
-    const elapsedTime = (unixTimeNow() - this.props.currentRide.startTime) / 1000
-    this.props.navigator.push({
-      screen: RIDE_DETAILS,
-      title: 'Ride Details',
-      passProps: {
-        horses: this.props.horses,
-        elapsedTime,
-      },
-      navigatorStyle: {},
-      navigatorButtons: {},
-      animationType: 'slide-up',
-    });
+    if (this.props.currentRide.rideCoordinates.length > 0) {
+      const elapsedTime = (unixTimeNow() - this.props.currentRide.startTime) / 1000
+      this.props.navigator.push({
+        screen: RIDE_DETAILS,
+        title: 'Ride Details',
+        passProps: {
+          horses: this.props.horses,
+          elapsedTime,
+        },
+        navigatorStyle: {},
+        navigatorButtons: {},
+        animationType: 'slide-up',
+      });
+    } else {
+      alert('Discarding empty ride.')
+      this.props.discardRide()
+    }
+
   }
 
   startRide () {

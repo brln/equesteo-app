@@ -21,15 +21,8 @@ function localPersist (state, rev, store) {
       store.dispatch(newRev(doc.rev))
     }
   }).catch((e) => {
-    if (e.status === 404) {
-      localDB.put(state).catch((e) => {
-        console.log(e)
-      })
-    } else {
-      console.log(e)
-      console.log(state)
-      throw e
-    }
+    console.log(e)
+    console.log(state)
   })
 }
 

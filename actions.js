@@ -107,7 +107,8 @@ export function needsToPersist () {
 function newAppState (newState) {
   return {
     type: NEW_APP_STATE,
-    newState
+    newState,
+    persist: false
   }
 }
 
