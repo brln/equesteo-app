@@ -24,7 +24,6 @@ import {
   NEW_APP_STATE,
   NEW_NETWORK_STATE,
   NEW_REV,
-  PERSIST_STARTED,
   PERSISTED,
   RECEIVE_JWT,
   REHYDRATE_STATE,
@@ -110,7 +109,6 @@ export function localDataLoaded (localData) {
 export function needsToPersist () {
   return {
     type: NEEDS_TO_PERSIST,
-    persist: false,
   }
 }
 
@@ -308,12 +306,7 @@ export function startLocationTracking () {
         longitude: location.longitude,
         timestamp: location.time,
       }
-      if (location.accuracy < 50) {
-        dispatch(newLocation(parsedLocation))
-      } else {
-        console.log('discarding low accuracy: ' + location.accuracy)
-      }
-
+      dispatch(newLocation(parsedLocation))
     })
 
     BackgroundGeolocation.start()

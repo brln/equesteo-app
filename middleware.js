@@ -20,6 +20,10 @@ function localPersist (state, rev, store) {
       savingLocally = false
       store.dispatch(newRev(doc.rev))
     }
+    if (!savingRemotely) {
+      // this will need to be a queue at some point
+      remotePersist(store, state)
+    }
   }).catch((e) => {
     console.log(e)
     console.log(state)
@@ -69,10 +73,7 @@ export const storeToPouch = store => dispatch => action => {
       }
     }
 
-    if (!savingRemotely) {
-      // this will need to be a queue at some point
-      remotePersist(store, currentState)
-    }
+
 
   }
 }
