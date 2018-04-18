@@ -35,13 +35,11 @@ function remotePersist (store, state, localDB) {
   if (state.needsToPersist && state.goodConnection && state.jwt) {
     savingRemotely = true
     console.log('remote persisting')
-    const persistState = {...state}
-    delete persistState.jwt
-
     const url = API_URL + '/couchproxy/' + localDB.name
-    const remoteDB = new PouchDB(url)
-    console.log(url)
-    const rep = PouchDB.replicate(localDB, remoteDB).on('complete', (info) => {
+    const remoteDB = new PouchDB(url, {ajax: {
+      headers: {'Authorization': 'Bearer: ' + state.jwt}
+    }})
+    PouchDB.replicate(localDB, remoteDB).on('complete', (info) => {
       store.dispatch(persisted())
       if (state.clearStateAfterPersist) {
         store.dispatch(clearState())
@@ -49,7 +47,6 @@ function remotePersist (store, state, localDB) {
       savingRemotely = false
       console.log('done saving remotely')
     }).on('error', (e) => {
-      debugger
       alert('could not save to server')
       console.log(e)
     })
