@@ -1,14 +1,15 @@
 import PouchDB from 'pouchdb-react-native'
 
+
 import { clearState, persisted, persistStarted, newRev } from './actions'
-import { UserAPI } from './services'
+import { API_URL } from 'react-native-dotenv'
 
 let queue = []
 let savingLocally = false
 let savingRemotely = false
 
 function localPersist (state, rev, store) {
-  const dbName = state.userData.id.toString()
+  const dbName = 'db' + state.userData.id.toString()
   const localDB = new PouchDB(dbName, {auto_compaction: true})
   console.log('state rev: ' + state._rev)
   console.log('putting with rev: ' + rev)
@@ -22,7 +23,7 @@ function localPersist (state, rev, store) {
     }
     if (!savingRemotely) {
       // this will need to be a queue at some point
-      remotePersist(store, state)
+      remotePersist(store, state, localDB)
     }
   }).catch((e) => {
     console.log(e)
@@ -30,25 +31,27 @@ function localPersist (state, rev, store) {
   })
 }
 
-function remotePersist (store, state) {
+function remotePersist (store, state, localDB) {
   if (state.needsToPersist && state.goodConnection && state.jwt) {
     savingRemotely = true
     console.log('remote persisting')
     const persistState = {...state}
     delete persistState.jwt
-    delete persistState._id
-    delete persistState._rev
 
-    const userAPI = new UserAPI(state.jwt)
-    userAPI.saveState(persistState).then(() => {
+    const url = API_URL + '/couchproxy/' + localDB.name
+    const remoteDB = new PouchDB(url)
+    console.log(url)
+    const rep = PouchDB.replicate(localDB, remoteDB).on('complete', (info) => {
       store.dispatch(persisted())
       if (state.clearStateAfterPersist) {
         store.dispatch(clearState())
       }
       savingRemotely = false
       console.log('done saving remotely')
-    }).catch((e) => {
+    }).on('error', (e) => {
+      debugger
       alert('could not save to server')
+      console.log(e)
     })
   }
 }

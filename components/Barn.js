@@ -4,7 +4,8 @@ import { ListItem } from 'react-native-elements'
 import {
   StyleSheet,
   Text,
-  View
+  ScrollView,
+  View,
 } from 'react-native';
 
 import { NEW_HORSE } from '../screens'
@@ -38,7 +39,7 @@ export default class Barn extends Component {
 
   render() {
     return (
-      <View>
+      <ScrollView>
         <Text style={styles.header}>Horses:</Text>
         <View containerStyle={{marginTop: 0}}>
           {
@@ -56,7 +57,7 @@ export default class Barn extends Component {
             ]
           }
         </View>
-      </View>
+      </ScrollView>
     )
   }
 }
