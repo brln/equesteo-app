@@ -39,8 +39,4 @@ export default class UserAPI {
       followingID
     })
   }
-
-  async getState () {
-    return await this.apiClient.get('/users/state')
-  }
 }

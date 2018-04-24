@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
 
 function mapStateToProps (state) {
   return {
-    error: state.error
+    error: state.localState.error
   }
 }
 

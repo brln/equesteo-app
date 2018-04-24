@@ -2,9 +2,9 @@ import { AppState, NetInfo } from 'react-native'
 import PouchDB from 'pouchdb-react-native'
 import BackgroundGeolocation from 'react-native-mauron85-background-geolocation'
 
-import { unixTimeNow, appStates } from "./helpers"
+import { unixTimeNow } from "./helpers"
 import { FEED } from './screens'
-import { LocalStorage, UserAPI } from './services'
+import { LocalStorage, PouchCouch, UserAPI } from './services'
 import {BadRequestError, UnauthorizedError} from "./errors"
 
 import {
@@ -17,20 +17,19 @@ import {
   DISCARD_RIDE,
   DISMISS_ERROR,
   ERROR_OCCURRED,
+  HORSE_SAVED,
   JUST_FINISHED_RIDE_SHOWN,
   LOCAL_DATA_LOADED,
-  NEEDS_TO_PERSIST,
+  NEEDS_REMOTE_PERSIST,
   NEW_LOCATION,
   NEW_APP_STATE,
   NEW_NETWORK_STATE,
-  NEW_REV,
-  PERSISTED,
   RECEIVE_JWT,
-  REHYDRATE_STATE,
-  SAVE_HORSE,
-  SAVE_RIDE,
-  SAVE_USER_DATA,
+  REMOTE_PERSIST_COMPLETE,
+  RIDE_SAVED,
+  SAVE_USER_ID,
   START_RIDE,
+  USER_SAVED,
   USER_SEARCH_RETURNED,
 } from './constants'
 
@@ -63,14 +62,12 @@ export function clearSearch () {
 export function clearState () {
   return {
     type: CLEAR_STATE,
-    persist: false
   }
 }
 
 function clearStateAfterPersist () {
   return {
     type: CLEAR_STATE_AFTER_PERSIST,
-    persist: false
   }
 }
 
@@ -106,9 +103,10 @@ export function localDataLoaded (localData) {
   }
 }
 
-export function needsToPersist () {
+export function needsRemotePersist (database) {
   return {
-    type: NEEDS_TO_PERSIST,
+    type: NEEDS_REMOTE_PERSIST,
+    database
   }
 }
 
@@ -116,7 +114,6 @@ function newAppState (newState) {
   return {
     type: NEW_APP_STATE,
     newState,
-    persist: false
   }
 }
 
@@ -124,14 +121,6 @@ function newLocation (location) {
   return {
     type: NEW_LOCATION,
     location
-  }
-}
-
-export function newRev (rev) {
-  return {
-    type: NEW_REV,
-    persist: false,
-    rev
   }
 }
 
@@ -143,13 +132,6 @@ function newNetworkState (connectionType, effectiveConnectionType) {
   }
 }
 
-export function persisted () {
-  return {
-    type: PERSISTED,
-    persist: false,
-  }
-}
-
 function receiveJWT (token) {
   return {
     type: RECEIVE_JWT,
@@ -157,31 +139,31 @@ function receiveJWT (token) {
   }
 }
 
-export function saveUserData(userData) {
+export function saveUserID(userID) {
   return {
-    type: SAVE_USER_DATA,
-    userData
+    type: SAVE_USER_ID,
+    userID
   }
 }
 
-function rehydrateState(dehydratedState) {
+function horseSaved (horse) {
   return {
-    type: REHYDRATE_STATE,
-    dehydratedState
+    type: HORSE_SAVED,
+    horse,
   }
 }
 
-export function saveHorse (horse) {
+export function remotePersistComplete (database) {
   return {
-    type: SAVE_HORSE,
-    horse
+    type: REMOTE_PERSIST_COMPLETE,
+    database
   }
 }
 
-export function saveRide (ride) {
+function rideSaved (ride) {
   return {
-    type: SAVE_RIDE,
-    ride
+    type: RIDE_SAVED,
+    ride,
   }
 }
 
@@ -207,6 +189,13 @@ export function userSearchReturned (userSearchResults) {
   }
 }
 
+export function userSaved (userData) {
+  return {
+    type: USER_SAVED,
+    userData,
+  }
+}
+
 //  =========================================
 // |<  FUNCTIONAL ACTIONS                |||>>
 //  =========================================
@@ -222,26 +211,33 @@ export function appInitialized () {
 
 export function createFollow (followingID) {
   return async (dispatch, getState) => {
-    const userAPI = new UserAPI(getState().jwt)
-    try {
-      const following = await userAPI.addFollow(followingID)
-      dispatch(saveUserData({...getState().userData, following}))
-    } catch (e) {
-      console.log(e)
+    let currentUser = null
+    for (let user of getState().users) {
+      if (user._id === getState().localState.userID) {
+        currentUser = user
+        break
+      }
     }
+    const newUserData = {...currentUser}
+    newUserData.following.push(followingID)
+    const pouchCouch = new PouchCouch(getState().localState.jwt)
+    await pouchCouch.saveUser(newUserData)
+    dispatch(userSaved(newUserData))
+    dispatch(needsRemotePersist('users'))
   }
 }
 
 export function deleteFollow (followingID) {
   return async (dispatch, getState) => {
-    const userAPI = new UserAPI(getState().jwt)
-    try {
-      const following = await userAPI.deleteFollow(followingID)
-      dispatch(saveUserData({...getState().userData, following}))
-    } catch (e) {
-      console.log(e)
-      alert('error in console')
-    }
+    // const userAPI = new UserAPI(getState().jwt)
+    // try {
+    //   const following = await userAPI.deleteFollow(followingID)
+    //   dispatch(saveUserData({...getState().userData, following}))
+    // } catch (e) {
+    //   console.log(e)
+    //   alert('error in console')
+    // }
+    // @TODO: fix this
   }
 }
 
@@ -250,16 +246,19 @@ function findLocalToken () {
     const storedToken = await LocalStorage.loadToken()
     if (storedToken !== null) {
       dispatch(receiveJWT(storedToken.token))
-      dispatch(loadLocalData(storedToken.userID.toString()))
+      dispatch(loadLocalData(storedToken.userID, storedToken.token))
     }
   }
 }
 
-function loadLocalData (databaseName) {
+function loadLocalData (userID, jwt) {
   return async (dispatch) => {
-    const localDB = new PouchDB(databaseName)
-    const localData = await localDB.get('state')
-    dispatch(localDataLoaded(localData))
+    const pouchCouch = new PouchCouch(jwt)
+    const localData = await pouchCouch.localLoad()
+    dispatch(localDataLoaded({
+      ...localData,
+      userID
+    }))
   }
 }
 
@@ -275,11 +274,34 @@ export function searchForFriends (phrase) {
   }
 }
 
+export function saveHorse (horseData) {
+  return async (dispatch, getState) => {
+    const pouchCouch = new PouchCouch(getState().localState.jwt)
+    const doc = await pouchCouch.saveHorse(horseData)
+    dispatch(horseSaved({...horseData, _id: doc.id, _rev: doc.rev}))
+    dispatch(needsRemotePersist('horses'))
+  }
+}
+
+export function saveRide (rideData) {
+  return async (dispatch, getState) => {
+    const pouchCouch = new PouchCouch()
+    const theRide = {
+      ...getState().localState.currentRide,
+      ...rideData
+    }
+    const doc = await pouchCouch.saveRide(theRide)
+    dispatch(rideSaved({...theRide, _id: doc.id, _rev: doc.rev}))
+    dispatch(needsRemotePersist('rides'))
+  }
+}
+
 export function signOut () {
   return async(dispatch) => {
     await LocalStorage.deleteToken()
+    const pouchCouch = new PouchCouch()
+    await pouchCouch.deleteLocalDBs()
     dispatch(clearStateAfterPersist())
-    dispatch(needsToPersist())
   }
 }
 
@@ -347,9 +369,12 @@ export function submitLogin (email, password) {
     const userAPI = new UserAPI()
     try {
       const resp = await userAPI.login(email, password)
-      const tokenedUserAPI = new UserAPI(resp.token)
-      const dehydratedState = await tokenedUserAPI.getState()
-      dispatch(rehydrateState(dehydratedState))
+      const token = resp.token
+      const userID = resp.id
+      const following = resp.following
+      const pouchCouch = new PouchCouch(token)
+      await pouchCouch.localReplicate([...following, userID])
+      dispatch(loadLocalData(userID, token))
       await LocalStorage.saveToken(resp.token, resp.id);
       dispatch(receiveJWT(resp.token))
       dispatch(changeScreen(FEED))
@@ -367,7 +392,10 @@ export function submitSignup (email, password) {
     try {
       const resp = await userAPI.signup(email, password)
       await LocalStorage.saveToken(resp.token, resp.id);
-      dispatch(saveUserData({...getState().userData, id: resp.id}))
+      const pouchCouch = new PouchCouch(resp.token)
+      await pouchCouch.replicateOwnUser(resp.id)
+      dispatch(loadLocalData(resp.id, resp.token))
+      dispatch(saveUserID(resp.id))
       dispatch(receiveJWT(resp.token))
     } catch (e) {
       if (e instanceof BadRequestError) {

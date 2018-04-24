@@ -19,11 +19,11 @@ export default class Profile extends Component {
   }
 
   follow () {
-    this.props.createFollow(this.props.user.id)
+    this.props.createFollow(this.props.user._id)
   }
 
   unfollow () {
-    this.props.deleteFollow(this.props.user.id)
+    this.props.deleteFollow(this.props.user._id)
   }
 
   render() {
@@ -31,10 +31,9 @@ export default class Profile extends Component {
     if (this.props.user.profilePhotoID) {
       uri = profilePhotoURL(this.props.user.profilePhotoID)
     }
-    debugger
     let followButton = <Button color="green" onPress={this.follow} title="Follow" />
     for (let following of this.props.userData.following) {
-      if (following === this.props.user.id) {
+      if (following === this.props.user._id) {
         followButton = <Button color="red" onPress={this.unfollow} title="Unfollow" />
         break
       }

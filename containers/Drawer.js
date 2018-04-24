@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
 
 function mapStateToProps (state) {
   return {
-  	currentScreen: state.currentScreen
+  	currentScreen: state.localState.currentScreen
 	}
 }
 

@@ -29,10 +29,10 @@ class FeedContainer extends Component {
 
 function mapStateToProps (state) {
   return {
-    followingRides: state.rides.filter((r) => r.userID !== state.userData.id),
+    followingRides: state.rides.filter((r) => r.userID !== state.localState.userID).sort((a, b) => b.startTime - a.startTime),
     horses: state.horses,
-    justFinishedRide: state.justFinishedRide,
-    yourRides: state.rides.filter((r) => r.userID === state.userData.id),
+    justFinishedRide: state.localState.justFinishedRide,
+    yourRides: state.rides.filter((r) => r.userID === state.localState.userID).sort((a, b) => b.startTime - a.startTime),
   }
 }
 
