@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import { signOut } from '../actions'
 import Account from '../components/Account'
-import { needsToPersist, saveUserData, uploadProfilePhoto } from "../actions"
+import { uploadProfilePhoto } from "../actions"
 
 class AccountContainer extends Component {
   static navigatorButtons = {
@@ -14,6 +14,10 @@ class AccountContainer extends Component {
         title: 'Save',
       }
     ],
+  }
+
+  shouldComponentUpdate (nextProps) {
+    return !!nextProps.userData
   }
 
   constructor (props) {
@@ -41,7 +45,7 @@ class AccountContainer extends Component {
   onNavigatorEvent (event) {
     if (event.type === 'NavBarButtonPress') {
       if (event.id === 'save') {
-        this.props.dispatch(saveUserData(this.state.userData))
+        alert('broken')
       }
     }
   }
@@ -69,7 +73,7 @@ class AccountContainer extends Component {
 
 function mapStateToProps (state) {
   return {
-    userData: state.userData
+    userData: state.users.filter((u) => u._id === state.localState.userID)[0]
   }
 }
 

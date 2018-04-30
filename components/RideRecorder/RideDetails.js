@@ -18,9 +18,9 @@ export default class RideDetails extends Component<Props> {
     for (let horse of this.props.horses) {
       horseComps.push(
         <Picker.Item
-          key={horse.id}
+          key={horse._id}
           label={horse.name}
-          value={horse.id}
+          value={horse._id}
         />
       )
     }

@@ -1,59 +1,59 @@
-import { clearState, persisted, persistStarted, newRev } from './actions'
-import PouchCouch from './services/pouch_couch'
+import { clearState, remotePersistComplete } from './actions'
+import { PouchCouch } from './services'
+
+export const logger = store => dispatch => action => {
+  console.log(action.type)
+  dispatch(action)
+}
 
 let queue = []
-let savingLocally = false
 let savingRemotely = false
 
-function localPersist (state, rev, store, pouchCouch) {
-  pouchCouch.localPut({...state, _rev: rev}).then((doc) => {
-    if (queue.length) {
-      const state = queue.shift()
-      recursiveEmptyQueue(state, doc.rev, store, pouchCouch)
-    } else {
-      savingLocally = false
-      store.dispatch(newRev(doc.rev))
-    }
-    if (!savingRemotely) {
-      if (state.needsToPersist && state.goodConnection && state.jwt) {
-        remotePersist(store, state, pouchCouch)
-      }
-    }
-  }).catch((e) => {
-    console.log(e)
-    console.log(state)
-  })
-}
-
-function remotePersist (store, state, pouchCouch) {
-  savingRemotely = true
-  pouchCouch.remoteReplicate().on('complete', (info) => {
-    store.dispatch(persisted())
-    if (state.clearStateAfterPersist) {
-      store.dispatch(clearState())
-    }
-    savingRemotely = false
-  }).on('error', (e) => {
-    alert('could not save to server')
-  })
-}
-
-function recursiveEmptyQueue (state, rev, store, pouchCouch) {
-  savingLocally = true
-  localPersist(state, rev, store, pouchCouch)
-}
-
-export const storeToPouch = store => dispatch => action => {
+export const storeToCouch = store => dispatch => action => {
   dispatch(action)
   let currentState = store.getState()
-  if (currentState.userLoaded) {
-    if (action.persist !== false) {
-      const pouchCouch = new PouchCouch(currentState.userData.id, currentState.jwt)
-      if (savingLocally) {
-        queue.push({...currentState})
-      } else {
-        recursiveEmptyQueue({...currentState}, currentState._rev, store, pouchCouch)
+  const needsPersist = Object.values(currentState.localState.needsRemotePersist).filter((x) => x).length > 0
+  if (needsPersist && currentState.localState.jwt && currentState.localState.goodConnection) {
+    const pouchCouch = new PouchCouch(currentState.localState.jwt)
+    for (let db of Object.keys(currentState.localState.needsRemotePersist)) {
+      if (currentState.localState.needsRemotePersist[db]) {
+        if (savingRemotely) {
+          queue.push(db)
+        } else {
+          recursiveEmptyQueue(db, store, pouchCouch)
+        }
       }
     }
+  } else if (!needsPersist && currentState.localState.clearStateAfterPersist) {
+    store.dispatch(clearState())
   }
 }
+
+function recursiveEmptyQueue (db, store, pouchCouch) {
+  savingRemotely = true
+  remotePersist(db, store, pouchCouch)
+}
+
+function remotePersist (db, store, pouchCouch) {
+  pouchCouch.remoteReplicateDB(db).on('complete', () => {
+    if (queue.length) {
+      const db = queue.shift()
+      recursiveEmptyQueue(db, store, pouchCouch)
+    } else {
+      store.dispatch(remotePersistComplete(db))
+      savingRemotely = false
+      if (store.getState().localState.clearStateAfterPersist) {
+        store.dispatch(clearState())
+      }
+    }
+  }).on('error', (e) => {
+    queue = []
+    savingRemotely = false
+    console.log('remote replication error')
+    console.log(e)
+  })
+}
+
+
+
+

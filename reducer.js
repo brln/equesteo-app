@@ -6,23 +6,22 @@ import {
   DISCARD_RIDE,
   DISMISS_ERROR,
   ERROR_OCCURRED,
+  HORSE_SAVED,
   JUST_FINISHED_RIDE_SHOWN,
   LOCAL_DATA_LOADED,
-  NEEDS_TO_PERSIST,
+  NEEDS_REMOTE_PERSIST,
   NEW_APP_STATE,
   NEW_LOCATION,
   NEW_NETWORK_STATE,
   NEW_REV,
   ONGOING_NOTIFICATION_SHOWN,
-  PERSIST_STARTED,
-  PERSISTED,
   RECEIVE_JWT,
-  REHYDRATE_STATE,
-  SAVE_HORSE,
-  SAVE_RIDE,
-  SAVE_USER_DATA,
+  REMOTE_PERSIST_COMPLETE,
+  RIDE_SAVED,
+  SAVE_USER_ID,
   START_RIDE,
   USER_SEARCH_RETURNED,
+  USER_SAVED,
 } from './constants'
 import {
   appStates,
@@ -33,162 +32,257 @@ import { FEED } from './screens'
 import { runMigrations } from './migrations/migrator'
 
 const initialState = {
-  _id: 'state',
-  _rev: null,
-  app: 'login',
-  appState: appStates.active,
-  clearStateAfterPersist: false,
-  currentScreen: FEED,
-  currentRide: null,
-  error: null,
-  goodConnection: false,
-  horses: [],
-  justFinishedRide: false,
-  jwt: null,
-  lastLocation: null,
-  locallyPersisting: false,
-  needsToPersist: false,
-  ongoingNotificationShown: false,
-  rides: [],
-  userData: {
-    id: null,
-    following: [],
+  localState: {
+    app: 'login',
+    appState: appStates.active,
+    clearStateAfterPersist: false,
+    currentScreen: FEED,
+    currentRide: null,
+    error: null,
+    goodConnection: false,
+    justFinishedRide: false,
+    jwt: null,
+    lastLocation: null,
+    locallyPersisting: false,
+    needsRemotePersist: {
+      horses: false,
+      rides: false,
+      users: false,
+    },
+    ongoingNotificationShown: false,
+    userID: null,
+    userLoaded: false,
+    userSearchResults: [],
   },
-  userLoaded: false,
-  userSearchResults: [],
+  horses: [],
+  rides: [],
+  users: [],
   version: 1
 }
 
 export default function AppReducer(state=initialState, action) {
   switch (action.type) {
     case CHANGE_SCREEN:
-      return Object.assign({}, state, {
-        currentScreen: action.screen,
-      })
+      return {
+        ...state,
+        localState: {
+          ...state.localState,
+          currentScreen: action.screen,
+        }
+      }
     case CLEAR_LAST_LOCATION:
-      return Object.assign({}, state, {
-        lastLocation: null
-      })
+      return {
+        ...state,
+        localState: {
+          ...state.localState,
+          lastLocation: null,
+        }
+      }
     case CLEAR_SEARCH:
-      return Object.assign({}, state, {
-        userSearchResults: []
-      })
+      return {
+        ...state,
+        localState: {
+          ...state.localState,
+          userSearchResults: []
+        }
+      }
     case CLEAR_STATE:
-      return Object.assign({}, initialState, {
-        goodConnection: state.goodConnection,
-      })
+      return {
+        ...initialState,
+        localState: {
+          ...initialState.localState,
+          goodConnection: state.localState.goodConnection,
+        }
+      }
     case CLEAR_STATE_AFTER_PERSIST:
-      return Object.assign({}, state, {
-        clearStateAfterPersist: true
-      })
+      return {
+        ...state,
+        localState: {
+          ...state.localState,
+          clearStateAfterPersist: true
+        }
+      }
     case DISCARD_RIDE:
-      return Object.assign({}, state, {
-        currentRide: null
-      })
+      return {
+        ...state,
+        localState: {
+          ...state.localState,
+          currentRide: null
+        }
+      }
     case DISMISS_ERROR:
-      return Object.assign({}, state, {
-        error: null
-      })
+      return {
+        ...state,
+        localState: {
+          ...state.localState,
+          error: null
+        }
+      }
     case ERROR_OCCURRED:
-      return Object.assign({}, state, {
-        error: action.message
-      })
+      return {
+        ...state,
+        localState: {
+          ...state.localState,
+          error: action.message
+        }
+      }
+    case HORSE_SAVED:
+      return {
+        ...state,
+        horses: [action.horse, ...state.horses]
+      }
     case JUST_FINISHED_RIDE_SHOWN:
-      return Object.assign({}, state, {
-        justFinishedRide: false
-      })
+      return {
+        ...state,
+        localState: {
+          ...state.localState,
+          justFinishedRide: false
+        }
+      }
     case LOCAL_DATA_LOADED:
-      return Object.assign({}, state, {
-        ...action.localData,
-        currentScreen: FEED
-      })
-    case NEEDS_TO_PERSIST:
-      return Object.assign({}, state, {
-        needsToPersist: true
-      })
+      return {
+        ...state,
+        rides: action.localData.rides,
+        horses: action.localData.horses,
+        users: action.localData.users,
+        localState: {
+          ...state.localState,
+          currentScreen: FEED,
+          clearStateAfterPersist: false,
+          userID: action.localData.userID
+        }
+      }
+    case NEEDS_REMOTE_PERSIST:
+      let newNeeds = {...state.localState.needsRemotePersist}
+      newNeeds[action.database] = true
+      return {
+        ...state,
+        localState: {
+          ...state.localState,
+          needsRemotePersist: newNeeds
+        }
+      }
     case NEW_APP_STATE:
-      return Object.assign({}, state, {
-        appState: action.newState
-      })
+      return {
+        ...state,
+        localState: {
+          ...state.localState,
+          appState: action.newState
+        }
+      }
     case NEW_LOCATION:
-      const newState = Object.assign({}, state, {
-        lastLocation: action.location
-      })
-      if (state.currentRide && state.lastLocation) {
+      const newState = {
+        ...state,
+        localState: {
+          ...state.localState,
+          lastLocation: action.location
+        }
+      }
+      if (state.localState.currentRide && state.localState.lastLocation) {
         const newDistance = haversine(
-          state.lastLocation.latitude,
-          state.lastLocation.longitude,
+          state.localState.lastLocation.latitude,
+          state.localState.lastLocation.longitude,
           action.location.latitude,
           action.location.longitude
         )
-        newState.currentRide = {
-          ...state.currentRide,
-          rideCoordinates: [...state.currentRide.rideCoordinates, action.location],
-          distance: state.currentRide.distance + newDistance,
+        newState.localState.currentRide = {
+          ...state.localState.currentRide,
+          rideCoordinates: [...state.localState.currentRide.rideCoordinates, action.location],
+          distance: state.localState.currentRide.distance + newDistance,
         }
       }
       return newState
     case NEW_NETWORK_STATE:
-      return Object.assign({}, state, {
-        goodConnection: goodConnection(
-          action.connectionType,
-          action.effectiveConnectionType
-        )
-      })
-    case NEW_REV:
-      return Object.assign({}, state, {
-        _rev: action.rev
-      })
-    case ONGOING_NOTIFICATION_SHOWN:
-      return Object.assign({}, state, {
-        ongoingNotificationShown: action.isShowing
-      })
-    case PERSISTED:
-      return Object.assign({}, state, {
-        needsToPersist: false,
-      })
-    case RECEIVE_JWT:
-      return Object.assign({}, state, {
-        app: 'after-login',
-        jwt: action.token
-      })
-    case SAVE_USER_DATA:
-      return Object.assign({}, state, {
-        userData: action.userData,
-        userLoaded: true
-      })
-    case REHYDRATE_STATE:
-      const migrator = runMigrations(action.dehydratedState)
-      const needsToPersist = migrator.migrated
-      return Object.assign({}, state, {
-        ...migrator.newState,
-        clearStateAfterPersist: false,
-        _id: 'state',
-        needsToPersist,
-      })
-    case SAVE_HORSE:
-      return Object.assign({}, state, {
-        horses: [action.horse, ...state.horses]
-      })
-    case SAVE_RIDE:
-      const newRide = {
-        ...state.currentRide,
-        ...action.ride,
-        userID: state.userData.id
+      return {
+        ...state,
+        localState: {
+          ...state.localState,
+          goodConnection: goodConnection(
+            action.connectionType,
+            action.effectiveConnectionType
+          )
+        }
       }
-      return Object.assign({}, state, {
+    case NEW_REV:
+      return {
+        ...state,
+        localState: {
+          ...state.localState,
+          _rev: action.rev
+        }
+      }
+    case ONGOING_NOTIFICATION_SHOWN:
+      return {
+        ...state,
+        localState: {
+          ...state.localState,
+          ongoingNotificationShown: action.isShowing
+        }
+      }
+    case RECEIVE_JWT:
+      return {
+        ...state,
+        localState: {
+          ...state.localState,
+          app: 'after-login',
+          jwt: action.token
+        }
+      }
+    case REMOTE_PERSIST_COMPLETE:
+      let newNeedsFalse = {...state.localState.needsRemotePersist}
+      newNeedsFalse[action.database] = false
+      return {
+        ...state,
+        localState: {
+          ...state.localState,
+          needsRemotePersist: newNeedsFalse
+        }
+      }
+    case RIDE_SAVED:
+      const newRide = {
+        ...state.localState.currentRide,
+        ...action.ride,
+        userID: state.localState.userID
+      }
+      return {
+        ...state,
         rides: [newRide, ...state.rides],
-        justFinishedRide: true,
-        currentRide: null,
-      })
+        localState: {
+          ...state.localState,
+          justFinishedRide: true,
+          currentRide: null,
+        }
+      }
+    case SAVE_USER_ID:
+      return {
+        ...state,
+        localState: {
+          ...state.localState,
+          userLoaded: true,
+          userID: action.userID
+        },
+      }
     case START_RIDE:
-      return Object.assign({}, state, {
-        currentRide: action.currentRide
-      })
+      return {
+        ...state,
+        localState: {
+          ...state.localState,
+          currentRide: action.currentRide
+        }
+      }
+    case USER_SAVED:
+      return {
+        ...state,
+        users: [action.userData, ...state.users]
+      }
     case USER_SEARCH_RETURNED:
-      return Object.assign({}, state, {
-        userSearchResults: action.userSearchResults
-      })
+      return {
+        ...state,
+        localState: {
+          ...state.localState,
+          userSearchResults: action.userSearchResults
+        }
+      }
     default:
       return state
   }

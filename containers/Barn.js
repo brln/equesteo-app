@@ -2,8 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
 import Barn from '../components/Barn'
-import { needsToPersist, saveHorse } from '../actions'
-import { generateUUID } from '../helpers'
+import { saveHorse } from '../actions'
 
 class BarnContainer extends Component {
   constructor (props) {
@@ -14,9 +13,9 @@ class BarnContainer extends Component {
   saveNewHorse (horseData) {
     this.props.dispatch(saveHorse({
       ...horseData,
-      id: generateUUID()
+      _id:  `${this.props.userID.toString()}_${(new Date).getTime().toString()}`,
+      userID: this.props.userID
     }))
-    this.props.dispatch(needsToPersist())
   }
 
   render() {
@@ -31,7 +30,8 @@ class BarnContainer extends Component {
 
 function mapStateToProps (state) {
   return {
-    horses: state.horses
+    horses: state.horses.filter((h) => h.userID === state.localState.userID),
+    userID: state.localState.userID
   }
 }
 

@@ -7,14 +7,14 @@ import { Navigation } from 'react-native-navigation';
 
 
 import { appInitialized } from "./actions"
-import { storeToPouch } from "./middleware"
+import { logger, storeToCouch } from "./middleware"
 import AppReducer from './reducer'
 import { DRAWER, FEED_DETAILS, SIGNUP_LOGIN, registerScreens } from './screens'
 
 const store = createStore(
   AppReducer,
   undefined,
-  applyMiddleware(thunkMiddleware, storeToPouch)
+  applyMiddleware(thunkMiddleware, logger, storeToCouch)
 )
 
 registerScreens(store, Provider)
@@ -26,7 +26,7 @@ export default class App {
   }
 
   onStoreUpdate() {
-    const root = store.getState().app
+    const root = store.getState().localState.app
     if (this.currentRoot !== root) {
       this.currentRoot = root;
       this.startApp(root);

@@ -56,10 +56,10 @@ class RecorderContainer extends Component {
 
 function mapStateToProps (state) {
   return {
-    appState: state.appState,
-    currentRide: state.currentRide,
+    appState: state.localState.appState,
+    currentRide: state.localState.currentRide,
     horses: state.horses,
-    lastLocation: state.lastLocation,
+    lastLocation: state.localState.lastLocation,
   }
 }
 

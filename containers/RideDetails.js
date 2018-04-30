@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 import moment from 'moment'
 
-import { changeScreen, discardRide, needsToPersist, saveRide, stopLocationTracking } from '../actions'
+import { changeScreen, discardRide, saveRide, stopLocationTracking } from '../actions'
 import { generateUUID } from '../helpers'
 import RideDetails from '../components/RideRecorder/RideDetails'
 import { FEED } from '../screens'
@@ -69,15 +69,15 @@ class RideDetailsContainer extends Component {
     this.props.dispatch(stopLocationTracking())
     let horseID = this.state.horseID
     if (!horseID && this.props.horses.length > 0) {
-      horseID = this.props.horses[0].id
+      horseID = this.props.horses[0]._id
     }
     this.props.dispatch(saveRide({
-      id: generateUUID(),
+      _id:  `${this.props.userID.toString()}_${(new Date).getTime().toString()}`,
       elapsedTimeSecs: this.props.elapsedTime,
       name: this.state.rideName,
       horseID: horseID,
+      userID: this.props.userID,
     }))
-    this.props.dispatch(needsToPersist())
     this.doneOnPage()
   }
 
@@ -96,9 +96,10 @@ class RideDetailsContainer extends Component {
 
 function mapStateToProps (state) {
   return {
-    horses: state.horses,
-    goodConnection: state.goodConnection,
-    currentRide: state.currentRide
+    horses: state.horses.filter((h) => h.userID === state.localState.userID),
+    goodConnection: state.localState.goodConnection,
+    currentRide: state.localState.currentRide,
+    userID: state.localState.userID,
   }
 }
 

@@ -21,7 +21,7 @@ export default class Ride extends Component {
   whichHorse () {
     let found = null
     for (let horse of this.props.horses) {
-      if (horse.id === this.props.ride.horseID) {
+      if (horse._id === this.props.ride.horseID) {
         found = horse
       }
     }
