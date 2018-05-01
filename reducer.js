@@ -13,8 +13,8 @@ import {
   NEW_APP_STATE,
   NEW_LOCATION,
   NEW_NETWORK_STATE,
-  NEW_REV,
   ONGOING_NOTIFICATION_SHOWN,
+  PUSHER_LISTENING,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
   RIDE_SAVED,
@@ -50,6 +50,7 @@ const initialState = {
       users: false,
     },
     ongoingNotificationShown: false,
+    pusherSocket: null,
     userID: null,
     userLoaded: false,
     userSearchResults: [],
@@ -203,20 +204,21 @@ export default function AppReducer(state=initialState, action) {
           )
         }
       }
-    case NEW_REV:
-      return {
-        ...state,
-        localState: {
-          ...state.localState,
-          _rev: action.rev
-        }
-      }
     case ONGOING_NOTIFICATION_SHOWN:
       return {
         ...state,
         localState: {
           ...state.localState,
           ongoingNotificationShown: action.isShowing
+        }
+      }
+    case PUSHER_LISTENING:
+      debugger
+      return {
+        ...state,
+        localState: {
+          ...state.localState,
+          pusherSocket: action.socketInstance
         }
       }
     case RECEIVE_JWT:

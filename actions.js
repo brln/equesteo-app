@@ -1,8 +1,8 @@
 import { AppState, NetInfo } from 'react-native'
-import PouchDB from 'pouchdb-react-native'
 import BackgroundGeolocation from 'react-native-mauron85-background-geolocation'
+import Pusher from 'pusher-js/react-native';
 
-import { unixTimeNow } from "./helpers"
+import { unixTimeNow, appStates } from "./helpers"
 import { FEED } from './screens'
 import { LocalStorage, PouchCouch, UserAPI } from './services'
 import {BadRequestError, UnauthorizedError} from "./errors"
@@ -24,6 +24,7 @@ import {
   NEW_LOCATION,
   NEW_APP_STATE,
   NEW_NETWORK_STATE,
+  PUSHER_LISTENING,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
   RIDE_SAVED,
@@ -132,6 +133,13 @@ function newNetworkState (connectionType, effectiveConnectionType) {
   }
 }
 
+function pusherListening (socketInstance) {
+  return {
+    type: PUSHER_LISTENING,
+    socketInstance
+  }
+}
+
 function receiveJWT (token) {
   return {
     type: RECEIVE_JWT,
@@ -206,6 +214,7 @@ export function appInitialized () {
     dispatch(changeAppRoot('login'))
     dispatch(startNetworkTracking())
     dispatch(startAppStateTracking())
+    dispatch(startPusherListening())
   }
 }
 
@@ -349,6 +358,28 @@ function startNetworkTracking () {
   }
 }
 
+function startPusherListening () {
+  return async (dispatch) => {
+    const pusher = new Pusher('6f49bf77389d2688ed5f', {
+      cluster: 'us2',
+      encrypted: true
+    });
+    dispatch(pusherListening(pusher))
+    const channel = pusher.subscribe('my-channel');
+    channel.bind('my-event', function(data) {
+      alert(data.message);
+    });
+  }
+}
+
+function stopPusherListening () {
+  return async (dispatch, getState) => {
+    const pusherSocket = getState().localState.pusherSocket
+    pusherSocket.disconnect()
+    dispatch(pusherListening(null))
+  }
+}
+
 export function stopLocationTracking () {
   return async (dispatch) => {
     BackgroundGeolocation.stop()
@@ -357,9 +388,17 @@ export function stopLocationTracking () {
 }
 
 function startAppStateTracking () {
-  return async (dispatch) => {
+  return async (dispatch, getState) => {
     AppState.addEventListener('change', (nextAppState) => {
       dispatch(newAppState(nextAppState))
+      const pusherListening = getState().localState.pusherSocket
+      if (nextAppState === appStates.background && pusherListening) {
+        dispatch(stopPusherListening())
+      } else if (nextAppState === appStates.inactive && pusherListening) {
+        dispatch(stopPusherListening)
+      } else if (nextAppState === appStates.active && !pusherListening) {
+        dispatch(startPusherListening())
+      }
     })
   }
 }
