@@ -214,7 +214,7 @@ export function appInitialized () {
     dispatch(changeAppRoot('login'))
     dispatch(startNetworkTracking())
     dispatch(startAppStateTracking())
-    dispatch(startPusherListening())
+
   }
 }
 
@@ -254,15 +254,16 @@ function findLocalToken () {
   return async (dispatch) => {
     const storedToken = await LocalStorage.loadToken()
     if (storedToken !== null) {
+      dispatch(startPusherListening(storedToken.userID))
       dispatch(receiveJWT(storedToken.token))
-      dispatch(loadLocalData(storedToken.userID, storedToken.token))
+      dispatch(loadLocalData(storedToken.userID))
     }
   }
 }
 
-function loadLocalData (userID, jwt) {
-  return async (dispatch) => {
-    const pouchCouch = new PouchCouch(jwt)
+function loadLocalData (userID) {
+  return async (dispatch, getState) => {
+    const pouchCouch = new PouchCouch(getState().jwt)
     const localData = await pouchCouch.localLoad()
     dispatch(localDataLoaded({
       ...localData,
@@ -308,6 +309,7 @@ export function saveRide (rideData) {
 export function signOut () {
   return async(dispatch) => {
     await LocalStorage.deleteToken()
+    dispatch(stopPusherListening())
     const pouchCouch = new PouchCouch()
     await pouchCouch.deleteLocalDBs()
     dispatch(clearStateAfterPersist())
@@ -358,16 +360,19 @@ function startNetworkTracking () {
   }
 }
 
-function startPusherListening () {
+function startPusherListening (userID) {
   return async (dispatch) => {
     const pusher = new Pusher('6f49bf77389d2688ed5f', {
       cluster: 'us2',
-      encrypted: true
+      encrypted: true,
+      activityTimeout: 60000,
+      disableStats: true
     });
     dispatch(pusherListening(pusher))
-    const channel = pusher.subscribe('my-channel');
-    channel.bind('my-event', function(data) {
-      alert(data.message);
+    const channel = pusher.subscribe(userID);
+    channel.bind('pull-db', function(data) {
+      const db = data.message;
+      dispatch(syncDBPull(db))
     });
   }
 }
@@ -388,17 +393,9 @@ export function stopLocationTracking () {
 }
 
 function startAppStateTracking () {
-  return async (dispatch, getState) => {
+  return async (dispatch) => {
     AppState.addEventListener('change', (nextAppState) => {
       dispatch(newAppState(nextAppState))
-      const pusherListening = getState().localState.pusherSocket
-      if (nextAppState === appStates.background && pusherListening) {
-        dispatch(stopPusherListening())
-      } else if (nextAppState === appStates.inactive && pusherListening) {
-        dispatch(stopPusherListening)
-      } else if (nextAppState === appStates.active && !pusherListening) {
-        dispatch(startPusherListening())
-      }
     })
   }
 }
@@ -413,9 +410,11 @@ export function submitLogin (email, password) {
       const following = resp.following
       const pouchCouch = new PouchCouch(token)
       await pouchCouch.localReplicate([...following, userID])
-      dispatch(loadLocalData(userID, token))
-      await LocalStorage.saveToken(resp.token, resp.id);
+      dispatch(startPusherListening(userID))
       dispatch(receiveJWT(resp.token))
+      dispatch(loadLocalData(userID))
+      await LocalStorage.saveToken(resp.token, resp.id);
+
       dispatch(changeScreen(FEED))
     } catch (e) {
       if (e instanceof UnauthorizedError) {
@@ -433,14 +432,30 @@ export function submitSignup (email, password) {
       await LocalStorage.saveToken(resp.token, resp.id);
       const pouchCouch = new PouchCouch(resp.token)
       await pouchCouch.replicateOwnUser(resp.id)
-      dispatch(loadLocalData(resp.id, resp.token))
-      dispatch(saveUserID(resp.id))
+      dispatch(startPusherListening(resp.id))
       dispatch(receiveJWT(resp.token))
+      dispatch(loadLocalData(resp.id))
+      dispatch(saveUserID(resp.id))
+
     } catch (e) {
       if (e instanceof BadRequestError) {
         dispatch(errorOccurred(e.message))
       }
     }
+  }
+}
+
+export function syncDBPull (db) {
+  return async (dispatch, getState) => {
+    const pouchCouch = new PouchCouch(getState().localState.jwt)
+    const userID = getState().localState.userID
+    debugger
+    const following = getState().users.filter((u) => {
+      return u._id === userID
+    })[0].following
+    debugger
+    await pouchCouch.localReplicateDB(db, [...following, userID])
+    dispatch(loadLocalData(userID))
   }
 }
 

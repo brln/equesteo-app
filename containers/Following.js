@@ -27,7 +27,7 @@ class FollowingContainer extends Component {
 
 function mapStateToProps (state) {
   return {
-    userData: state.users.filter((u) => u._id === state.localState.userID)[0],
+    userData: state.users.filter((u) => u._id === state.localState.userID)[0] || {},
     userSearchResults: state.localState.userSearchResults
   }
 }

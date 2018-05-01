@@ -1,6 +1,8 @@
 import PouchDB from 'pouchdb-react-native'
 import { API_URL } from 'react-native-dotenv'
 
+import UserAPI from './user_api'
+
 export default class PouchCouch {
   constructor (jwt) {
     const horsesDBName = 'horses'
@@ -18,6 +20,8 @@ export default class PouchCouch {
     this.remoteHorsesDB = new PouchDB(`${API_URL}/couchproxy/${horsesDBName}`, remoteHeaders)
     this.remoteRidesDB = new PouchDB(`${API_URL}/couchproxy/${ridesDBName}`, remoteHeaders)
     this.remoteUsersDB = new PouchDB(`${API_URL}/couchproxy/${usersDBName}`, remoteHeaders)
+
+    this.userAPI = new UserAPI(jwt)
   }
 
   catchError (e) {
@@ -55,15 +59,34 @@ export default class PouchCouch {
   }
 
   remoteReplicateHorses () {
-    return PouchDB.replicate(this.localHorsesDB, this.remoteHorsesDB)
+    return PouchDB.replicate(this.localHorsesDB, this.remoteHorsesDB).on('complete', () => {
+      this.userAPI.notifyDBUpdated('horses')
+    })
   }
 
   remoteReplicateRides () {
-    return PouchDB.replicate(this.localRidesDB, this.remoteRidesDB)
+    return PouchDB.replicate(this.localRidesDB, this.remoteRidesDB).on('complete', () => {
+      this.userAPI.notifyDBUpdated('rides')
+    })
   }
 
   remoteReplicateUsers () {
-    return PouchDB.replicate(this.localUsersDB, this.remoteUsersDB)
+    return PouchDB.replicate(this.localUsersDB, this.remoteUsersDB).on('complete', () => {
+      this.userAPI.notifyDBUpdated('users')
+    })
+  }
+
+  localReplicateDB(db, userIDs) {
+    switch(db) {
+      case 'horses':
+        return this.localReplicateHorses(userIDs)
+      case 'rides':
+        return this.localReplicateRides(userIDs)
+      case 'users':
+        return this.localReplicateUsers(userIDs)
+      default:
+        throw('DB not found')
+    }
   }
 
   localReplicateRides (userIDs) {

@@ -28,15 +28,7 @@ export default class UserAPI {
     return await this.apiClient.get('/users/search?q=' + searchPhrase)
   }
 
-  async addFollow (followingID) {
-    return await this.apiClient.post('/users/follow/add', {
-      followingID
-    })
-  }
-
-  async deleteFollow (followingID ) {
-    return await this.apiClient.post('/users/follow/delete', {
-      followingID
-    })
+  async notifyDBUpdated (db) {
+    return await this.apiClient.post('/users/updateDBNotification', {db})
   }
 }

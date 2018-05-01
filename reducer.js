@@ -148,8 +148,6 @@ export default function AppReducer(state=initialState, action) {
         users: action.localData.users,
         localState: {
           ...state.localState,
-          currentScreen: FEED,
-          clearStateAfterPersist: false,
           userID: action.localData.userID
         }
       }
@@ -213,7 +211,6 @@ export default function AppReducer(state=initialState, action) {
         }
       }
     case PUSHER_LISTENING:
-      debugger
       return {
         ...state,
         localState: {
