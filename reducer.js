@@ -14,7 +14,6 @@ import {
   NEW_LOCATION,
   NEW_NETWORK_STATE,
   ONGOING_NOTIFICATION_SHOWN,
-  PUSHER_LISTENING,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
   RIDE_SAVED,
@@ -50,7 +49,6 @@ const initialState = {
       users: false,
     },
     ongoingNotificationShown: false,
-    pusherSocket: null,
     userID: null,
     userLoaded: false,
     userSearchResults: [],
@@ -146,10 +144,6 @@ export default function AppReducer(state=initialState, action) {
         rides: action.localData.rides,
         horses: action.localData.horses,
         users: action.localData.users,
-        localState: {
-          ...state.localState,
-          userID: action.localData.userID
-        }
       }
     case NEEDS_REMOTE_PERSIST:
       let newNeeds = {...state.localState.needsRemotePersist}
@@ -208,14 +202,6 @@ export default function AppReducer(state=initialState, action) {
         localState: {
           ...state.localState,
           ongoingNotificationShown: action.isShowing
-        }
-      }
-    case PUSHER_LISTENING:
-      return {
-        ...state,
-        localState: {
-          ...state.localState,
-          pusherSocket: action.socketInstance
         }
       }
     case RECEIVE_JWT:

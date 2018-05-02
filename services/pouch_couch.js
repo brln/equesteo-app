@@ -84,6 +84,8 @@ export default class PouchCouch {
         return this.localReplicateRides(userIDs)
       case 'users':
         return this.localReplicateUsers(userIDs)
+      case 'all':
+        return this.localReplicate(userIDs)
       default:
         throw('DB not found')
     }

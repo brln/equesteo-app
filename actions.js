@@ -1,6 +1,5 @@
 import { AppState, NetInfo } from 'react-native'
 import BackgroundGeolocation from 'react-native-mauron85-background-geolocation'
-import Pusher from 'pusher-js/react-native';
 
 import { unixTimeNow, appStates } from "./helpers"
 import { FEED } from './screens'
@@ -24,7 +23,6 @@ import {
   NEW_LOCATION,
   NEW_APP_STATE,
   NEW_NETWORK_STATE,
-  PUSHER_LISTENING,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
   RIDE_SAVED,
@@ -130,13 +128,6 @@ function newNetworkState (connectionType, effectiveConnectionType) {
     type: NEW_NETWORK_STATE,
     connectionType,
     effectiveConnectionType,
-  }
-}
-
-function pusherListening (socketInstance) {
-  return {
-    type: PUSHER_LISTENING,
-    socketInstance
   }
 }
 
@@ -254,21 +245,19 @@ function findLocalToken () {
   return async (dispatch) => {
     const storedToken = await LocalStorage.loadToken()
     if (storedToken !== null) {
-      dispatch(startPusherListening(storedToken.userID))
       dispatch(receiveJWT(storedToken.token))
-      dispatch(loadLocalData(storedToken.userID))
+      dispatch(saveUserID(storedToken.userID))
+      await dispatch(loadLocalData())
+      dispatch(syncDBPull('all'))
     }
   }
 }
 
-function loadLocalData (userID) {
+function loadLocalData () {
   return async (dispatch, getState) => {
     const pouchCouch = new PouchCouch(getState().jwt)
     const localData = await pouchCouch.localLoad()
-    dispatch(localDataLoaded({
-      ...localData,
-      userID
-    }))
+    dispatch(localDataLoaded(localData))
   }
 }
 
@@ -309,7 +298,6 @@ export function saveRide (rideData) {
 export function signOut () {
   return async(dispatch) => {
     await LocalStorage.deleteToken()
-    dispatch(stopPusherListening())
     const pouchCouch = new PouchCouch()
     await pouchCouch.deleteLocalDBs()
     dispatch(clearStateAfterPersist())
@@ -360,31 +348,6 @@ function startNetworkTracking () {
   }
 }
 
-function startPusherListening (userID) {
-  return async (dispatch) => {
-    const pusher = new Pusher('6f49bf77389d2688ed5f', {
-      cluster: 'us2',
-      encrypted: true,
-      activityTimeout: 60000,
-      disableStats: true
-    });
-    dispatch(pusherListening(pusher))
-    const channel = pusher.subscribe(userID);
-    channel.bind('pull-db', function(data) {
-      const db = data.message;
-      dispatch(syncDBPull(db))
-    });
-  }
-}
-
-function stopPusherListening () {
-  return async (dispatch, getState) => {
-    const pusherSocket = getState().localState.pusherSocket
-    pusherSocket.disconnect()
-    dispatch(pusherListening(null))
-  }
-}
-
 export function stopLocationTracking () {
   return async (dispatch) => {
     BackgroundGeolocation.stop()
@@ -410,9 +373,9 @@ export function submitLogin (email, password) {
       const following = resp.following
       const pouchCouch = new PouchCouch(token)
       await pouchCouch.localReplicate([...following, userID])
-      dispatch(startPusherListening(userID))
       dispatch(receiveJWT(resp.token))
-      dispatch(loadLocalData(userID))
+      dispatch(saveUserID(resp.id))
+      dispatch(loadLocalData())
       await LocalStorage.saveToken(resp.token, resp.id);
 
       dispatch(changeScreen(FEED))
@@ -432,10 +395,10 @@ export function submitSignup (email, password) {
       await LocalStorage.saveToken(resp.token, resp.id);
       const pouchCouch = new PouchCouch(resp.token)
       await pouchCouch.replicateOwnUser(resp.id)
-      dispatch(startPusherListening(resp.id))
       dispatch(receiveJWT(resp.token))
-      dispatch(loadLocalData(resp.id))
       dispatch(saveUserID(resp.id))
+      dispatch(loadLocalData())
+
 
     } catch (e) {
       if (e instanceof BadRequestError) {
@@ -453,9 +416,8 @@ export function syncDBPull (db) {
     const following = getState().users.filter((u) => {
       return u._id === userID
     })[0].following
-    debugger
     await pouchCouch.localReplicateDB(db, [...following, userID])
-    dispatch(loadLocalData(userID))
+    dispatch(loadLocalData())
   }
 }
 
