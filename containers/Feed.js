@@ -2,12 +2,22 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
 import Feed from '../components/Feed/Feed'
-import {justFinishedRideShown} from "../actions";
+import {justFinishedRideShown, syncDBPull} from "../actions";
 
 class FeedContainer extends Component {
   constructor (props) {
     super(props)
     this.justFinishedRideShown = this.justFinishedRideShown.bind(this)
+    this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
+    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
+  }
+
+  onNavigatorEvent (event) {
+    if (event.type === 'NavBarButtonPress') {
+      if (event.id === 'refresh') {
+        this.props.dispatch(syncDBPull('all'))
+      }
+    }
   }
 
   justFinishedRideShown () {

@@ -412,7 +412,6 @@ export function syncDBPull (db) {
   return async (dispatch, getState) => {
     const pouchCouch = new PouchCouch(getState().localState.jwt)
     const userID = getState().localState.userID
-    debugger
     const following = getState().users.filter((u) => {
       return u._id === userID
     })[0].following

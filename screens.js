@@ -31,7 +31,15 @@ export const FEED_DETAILS = {
   navigatorButtons: {
     leftButtons: [{
       id: 'sideMenu'
-    }]
+    }],
+    rightButtons: [
+      {
+        //@TODO: figure out how to animate and deactivate this
+        //@TODO: icon while refreshing and when no network
+        icon: require('./img/refresh.png'),
+        id: 'refresh',
+      }
+    ],
   }
 }
 
