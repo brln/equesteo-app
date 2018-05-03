@@ -34,6 +34,7 @@ export default class RideDetails extends Component<Props> {
         <TextInput
           style={styles.textInput}
           onChangeText={this.props.changeRideName}
+          selectTextOnFocus={true}
           value={this.props.rideName}
         />
         <Text>Horse:</Text>

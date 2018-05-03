@@ -398,8 +398,6 @@ export function submitSignup (email, password) {
       dispatch(receiveJWT(resp.token))
       dispatch(saveUserID(resp.id))
       dispatch(loadLocalData())
-
-
     } catch (e) {
       if (e instanceof BadRequestError) {
         dispatch(errorOccurred(e.message))
@@ -417,6 +415,20 @@ export function syncDBPull (db) {
     })[0].following
     await pouchCouch.localReplicateDB(db, [...following, userID])
     dispatch(loadLocalData())
+  }
+}
+
+export function updateUser (userDetails) {
+  return async (dispatch, getState) => {
+    const pouchCouch = new PouchCouch(getState().localState.jwt)
+    const userID = getState().localState.userID
+    const userDoc = getState().users.filter((u) => {
+      return u._id === userID
+    })[0]
+    const newUserData = {...userDoc, ...userDetails}
+    const doc = await pouchCouch.saveUser(newUserData)
+    dispatch(userSaved({...newUserData, _rev: doc.rev}))
+    dispatch(needsRemotePersist('users'))
   }
 }
 

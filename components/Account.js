@@ -65,7 +65,7 @@ export default class Account extends Component {
       buttonText = 'Change Profile Photo'
     }
     return (
-      <ScrollView>
+      <ScrollView keyboardShouldPersistTaps={'always'}>
         <View style={styles.container}>
           <View style={styles.topSection}>
             <View style={{flex: 1, padding: 20}}>
@@ -77,7 +77,6 @@ export default class Account extends Component {
             <View style={{flex: 1, padding: 5, left: -15}}>
               <Text>First Name:</Text>
               <TextInput
-                blurOnSubmit={false}
                 onChangeText={this.changeFirstName}
                 value={this.props.userData.firstName}
               />

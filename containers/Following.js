@@ -9,6 +9,10 @@ class FollowingContainer extends Component {
     this.search = this.search.bind(this)
   }
 
+  shouldComponentUpdate (nextProps) {
+    return !!nextProps.userData
+  }
+
   search (phrase) {
     this.props.dispatch(searchForFriends(phrase))
   }
@@ -27,7 +31,7 @@ class FollowingContainer extends Component {
 
 function mapStateToProps (state) {
   return {
-    userData: state.users.filter((u) => u._id === state.localState.userID)[0] || {},
+    userData: state.users.filter((u) => u._id === state.localState.userID)[0],
     userSearchResults: state.localState.userSearchResults
   }
 }
