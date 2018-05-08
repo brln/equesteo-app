@@ -59,21 +59,15 @@ export default class PouchCouch {
   }
 
   remoteReplicateHorses () {
-    return PouchDB.replicate(this.localHorsesDB, this.remoteHorsesDB).on('complete', () => {
-      this.userAPI.notifyDBUpdated('horses')
-    })
+    return PouchDB.replicate(this.localHorsesDB, this.remoteHorsesDB)
   }
 
   remoteReplicateRides () {
-    return PouchDB.replicate(this.localRidesDB, this.remoteRidesDB).on('complete', () => {
-      this.userAPI.notifyDBUpdated('rides')
-    })
+    return PouchDB.replicate(this.localRidesDB, this.remoteRidesDB)
   }
 
   remoteReplicateUsers () {
-    return PouchDB.replicate(this.localUsersDB, this.remoteUsersDB).on('complete', () => {
-      this.userAPI.notifyDBUpdated('users')
-    })
+    return PouchDB.replicate(this.localUsersDB, this.remoteUsersDB)
   }
 
   localReplicateDB(db, userIDs) {

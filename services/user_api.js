@@ -20,15 +20,11 @@ export default class UserAPI {
     })
   }
 
-  async uploadProfilePhoto (imageLocation) {
-    return await this.apiClient.uploadImage('/users/profilePhoto', 'profile', imageLocation)
+  async uploadProfilePhoto (imageLocation, imageName) {
+    return await this.apiClient.uploadImage('/users/profilePhoto', imageName, imageLocation)
   }
 
   async findUser (searchPhrase) {
     return await this.apiClient.get('/users/search?q=' + searchPhrase)
-  }
-
-  async notifyDBUpdated (db) {
-    return await this.apiClient.post('/users/updateDBNotification', {db})
   }
 }

@@ -1,7 +1,7 @@
 import { AppState, NetInfo } from 'react-native'
 import BackgroundGeolocation from 'react-native-mauron85-background-geolocation'
 
-import { unixTimeNow, appStates } from "./helpers"
+import { unixTimeNow, generateUUID } from "./helpers"
 import { FEED } from './screens'
 import { LocalStorage, PouchCouch, UserAPI } from './services'
 import {BadRequestError, UnauthorizedError} from "./errors"
@@ -434,10 +434,12 @@ export function updateUser (userDetails) {
 
 export function uploadProfilePhoto (photoLocation) {
   return async (dispatch, getState) => {
-    const userAPI = new UserAPI(getState().jwt)
+    const userAPI = new UserAPI(getState().localState.jwt)
     try {
-      const resp = await userAPI.uploadProfilePhoto(photoLocation)
-      // dispatch(receiveUserData(resp))
+      const profilePhotoID = generateUUID()
+      const filename = profilePhotoID + '.jpg'
+      await userAPI.uploadProfilePhoto(photoLocation, filename)
+      dispatch(updateUser({profilePhotoID}))
     } catch (e) {
       debugger
     }

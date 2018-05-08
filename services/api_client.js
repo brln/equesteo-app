@@ -68,6 +68,7 @@ export default class ApiClient {
       uri,
       type: 'image/jpeg',
     })
+    debugger
     return this.request(this.POST, endpoint, data, false)
   }
 }
