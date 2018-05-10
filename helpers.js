@@ -49,6 +49,10 @@ export const profilePhotoURL = (id) => {
   return `https://s3.amazonaws.com/equesteo-profile-photos/${id}.jpg`
 }
 
+export const horsePhotoURL = (id) => {
+  return `https://s3.amazonaws.com/equesteo-horse-photos-2/${id}.jpg`
+}
+
 // from https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
 export function generateUUID () { // Public Domain/MIT
     let d = new Date().getTime();

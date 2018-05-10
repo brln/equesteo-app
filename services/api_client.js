@@ -61,14 +61,14 @@ export default class ApiClient {
 
   }
 
-  uploadImage (endpoint, name, uri) {
+  uploadImage (endpoint, photoID, imageLocation) {
     const data = new FormData()
+    const name = `${photoID}.jpg`
     data.append('file', {
       name,
-      uri,
+      uri: imageLocation,
       type: 'image/jpeg',
     })
-    debugger
     return this.request(this.POST, endpoint, data, false)
   }
 }

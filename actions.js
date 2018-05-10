@@ -1,10 +1,12 @@
 import { AppState, NetInfo } from 'react-native'
 import BackgroundGeolocation from 'react-native-mauron85-background-geolocation'
+import ImagePicker from 'react-native-image-crop-picker'
 
 import { unixTimeNow, generateUUID } from "./helpers"
 import { FEED } from './screens'
 import { LocalStorage, PouchCouch, UserAPI } from './services'
 import {BadRequestError, UnauthorizedError} from "./errors"
+import { enqueueHorsePhoto } from './photoQueue'
 
 import {
   CHANGE_ROOT,
@@ -19,10 +21,12 @@ import {
   HORSE_SAVED,
   JUST_FINISHED_RIDE_SHOWN,
   LOCAL_DATA_LOADED,
+  NEEDS_PHOTO_UPLOAD,
   NEEDS_REMOTE_PERSIST,
   NEW_LOCATION,
   NEW_APP_STATE,
   NEW_NETWORK_STATE,
+  PHOTO_PERSIST_COMPLETE,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
   RIDE_SAVED,
@@ -79,6 +83,13 @@ export function discardRide ()  {
 export function dismissError () {
   return {
     type: DISMISS_ERROR
+  }
+}
+
+export function needsPhotoUpload (photoType) {
+  return {
+    type: NEEDS_PHOTO_UPLOAD,
+    photoType
   }
 }
 
@@ -152,6 +163,12 @@ function horseSaved (horse) {
   }
 }
 
+export function photoPersistComplete () {
+  return {
+    type: PHOTO_PERSIST_COMPLETE
+  }
+}
+
 export function remotePersistComplete (database) {
   return {
     type: REMOTE_PERSIST_COMPLETE,
@@ -206,6 +223,33 @@ export function appInitialized () {
     dispatch(startNetworkTracking())
     dispatch(startAppStateTracking())
 
+  }
+}
+
+export function changeHorsePhotoData(horseID, photoID, uri) {
+  return async (dispatch, getState) => {
+    debugger
+    let horseData = null
+    for (let horse of getState().horses) {
+      if (horse._id === horseID) {
+        horseData = {...horse}
+        break;
+      }
+    }
+
+    let timestamp = unixTimeNow()
+    if (horseData.photosByID[photoID]) {
+      timestamp = horseData.photosByID[photoID].timestamp
+    } else {
+      horseData.profilePhotoID = photoID
+    }
+
+    horseData.photosByID[photoID] = {
+      uri,
+      timestamp
+    }
+
+    dispatch(saveHorse(horseData))
   }
 }
 
@@ -432,17 +476,23 @@ export function updateUser (userDetails) {
   }
 }
 
+export function uploadHorsePhoto (photoLocation, horseID) {
+  return async (dispatch) => {
+    const photoID = generateUUID()
+    dispatch(changeHorsePhotoData(horseID, photoID, photoLocation))
+    enqueueHorsePhoto(photoLocation, photoID, horseID)
+    dispatch(needsPhotoUpload('horse'))
+  }
+}
+
 export function uploadProfilePhoto (photoLocation) {
   return async (dispatch, getState) => {
     const userAPI = new UserAPI(getState().localState.jwt)
-    try {
-      const profilePhotoID = generateUUID()
-      const filename = profilePhotoID + '.jpg'
-      await userAPI.uploadProfilePhoto(photoLocation, filename)
-      dispatch(updateUser({profilePhotoID}))
-    } catch (e) {
-      debugger
-    }
+    const profilePhotoID = generateUUID()
+    const filename = profilePhotoID + '.jpg'
+    await userAPI.uploadProfilePhoto(photoLocation, filename)
+    dispatch(updateUser({profilePhotoID}))
+    ImagePicker.cleanSingle(photoLocation)
   }
 }
 

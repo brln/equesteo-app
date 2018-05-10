@@ -1,15 +1,10 @@
-import { clearState, remotePersistComplete } from './actions'
-import { PouchCouch } from './services'
-
-export const logger = store => dispatch => action => {
-  console.log(action.type)
-  dispatch(action)
-}
+import { clearState, remotePersistComplete } from '../actions'
+import { PouchCouch } from '../services/index'
 
 let queue = []
 let savingRemotely = false
 
-export const storeToCouch = store => dispatch => action => {
+export default storeToCouch = store => dispatch => action => {
   dispatch(action)
   let currentState = store.getState()
   const needsPersist = Object.values(currentState.localState.needsRemotePersist).filter((x) => x).length > 0
@@ -53,7 +48,4 @@ function remotePersist (db, store, pouchCouch) {
     console.log(e)
   })
 }
-
-
-
 

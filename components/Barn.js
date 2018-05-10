@@ -47,6 +47,7 @@ export default class Barn extends Component {
               <ListItem
                 key={i}
                 title={horse.name}
+                onPress={() => {this.props.horseProfile(horse)}}
               />
             )),
               <ListItem

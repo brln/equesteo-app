@@ -20,8 +20,23 @@ export default class UserAPI {
     })
   }
 
-  async uploadProfilePhoto (imageLocation, imageName) {
-    return await this.apiClient.uploadImage('/users/profilePhoto', imageName, imageLocation)
+  _uploadProfilePhoto (imageLocation, photoID) {
+    return this.apiClient.uploadImage('/users/profilePhoto', photoID, imageLocation)
+  }
+
+  _uploadHorsePhoto (imageLocation, photoID) {
+    return this.apiClient.uploadImage('/users/horsePhoto', photoID, imageLocation)
+  }
+
+  uploadPhoto (type, imageLocation, photoID) {
+    switch (type) {
+      case 'horse':
+        return this._uploadHorsePhoto(imageLocation, photoID)
+      case 'profile':
+        return this._uploadProfilePhoto(imageLocation, photoID)
+      default:
+        throw "lolwut wrong type"
+    }
   }
 
   async findUser (searchPhrase) {

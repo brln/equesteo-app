@@ -2,12 +2,28 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
 import Barn from '../components/Barn'
-import { saveHorse } from '../actions'
+import { changeScreen, saveHorse } from '../actions'
+import { HORSE } from '../screens'
 
 class BarnContainer extends Component {
   constructor (props) {
     super(props)
     this.saveNewHorse = this.saveNewHorse.bind(this)
+    this.horseProfile = this.horseProfile.bind(this)
+  }
+
+  horseProfile (horse) {
+    this.props.dispatch(changeScreen(HORSE))
+    this.props.navigator.push({
+      screen: HORSE,
+      title: horse.name,
+      navigatorButtons: {
+        leftButtons: [{
+          id: 'sideMenu'
+        }]
+      },
+      passProps: {horseID: horse._id},
+    })
   }
 
   saveNewHorse (horseData) {
@@ -22,6 +38,7 @@ class BarnContainer extends Component {
     return (
       <Barn
         horses={this.props.horses}
+        horseProfile={this.horseProfile}
         saveNewHorse={this.saveNewHorse}
       />
     )

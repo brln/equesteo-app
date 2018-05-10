@@ -9,11 +9,13 @@ import {
   HORSE_SAVED,
   JUST_FINISHED_RIDE_SHOWN,
   LOCAL_DATA_LOADED,
+  NEEDS_PHOTO_UPLOAD,
   NEEDS_REMOTE_PERSIST,
   NEW_APP_STATE,
   NEW_LOCATION,
   NEW_NETWORK_STATE,
   ONGOING_NOTIFICATION_SHOWN,
+  PHOTO_PERSIST_COMPLETE,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
   RIDE_SAVED,
@@ -43,6 +45,10 @@ const initialState = {
     jwt: null,
     lastLocation: null,
     locallyPersisting: false,
+    needsPhotoUploads: {
+      profile: false,
+      horse: false
+    },
     needsRemotePersist: {
       horses: false,
       rides: false,
@@ -125,6 +131,18 @@ export default function AppReducer(state=initialState, action) {
           error: action.message
         }
       }
+    case NEEDS_PHOTO_UPLOAD:
+      const needsPhotoUploads = {
+        ...state.localState.needsPhotoUploads
+      }
+      needsPhotoUploads[action.photoType] = true
+      return {
+        ...state,
+        localState: {
+          ...state.localState,
+          needsPhotoUploads
+        }
+      }
     case HORSE_SAVED:
       return {
         ...state,
@@ -202,6 +220,18 @@ export default function AppReducer(state=initialState, action) {
         localState: {
           ...state.localState,
           ongoingNotificationShown: action.isShowing
+        }
+      }
+    case PHOTO_PERSIST_COMPLETE:
+      const newPhotoFalse = {...state.localState.needsPhotoUploads}
+      for (let type of Object.keys(newPhotoFalse)) {
+        newPhotoFalse[type] = false
+      }
+      return {
+        ...state,
+        localState: {
+          ...state.localState,
+          needsPhotoUploads: newPhotoFalse
         }
       }
     case RECEIVE_JWT:

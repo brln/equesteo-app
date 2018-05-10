@@ -31,7 +31,9 @@ export default class NewHorse extends Component {
     if (event.type === 'NavBarButtonPress') {
       if (event.id === 'save') {
         this.props.saveNewHorse({
-          name: this.state.name
+          name: this.state.name,
+          profilePhotoID: null,
+          photosByID: {},
         })
       }
     }
