@@ -28,12 +28,18 @@ export default class UserAPI {
     return this.apiClient.uploadImage('/users/horsePhoto', photoID, imageLocation)
   }
 
+  _uploadRidePhoto (imageLocation, photoID) {
+    return this.apiClient.uploadImage('/users/ridePhoto', photoID, imageLocation)
+  }
+
   uploadPhoto (type, imageLocation, photoID) {
     switch (type) {
       case 'horse':
         return this._uploadHorsePhoto(imageLocation, photoID)
       case 'profile':
         return this._uploadProfilePhoto(imageLocation, photoID)
+      case 'ride':
+        return this._uploadRidePhoto(imageLocation, photoID)
       default:
         throw "lolwut wrong type"
     }

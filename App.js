@@ -19,8 +19,8 @@ const store = createStore(
   applyMiddleware(
     thunkMiddleware,
     logger,
+    uploadPhotos,
     storeToCouch,
-    uploadPhotos
   )
 )
 

@@ -1,12 +1,11 @@
 import { AppState, NetInfo } from 'react-native'
 import BackgroundGeolocation from 'react-native-mauron85-background-geolocation'
-import ImagePicker from 'react-native-image-crop-picker'
 
 import { unixTimeNow, generateUUID } from "./helpers"
 import { FEED } from './screens'
 import { LocalStorage, PouchCouch, UserAPI } from './services'
 import {BadRequestError, UnauthorizedError} from "./errors"
-import { enqueueHorsePhoto } from './photoQueue'
+import { enqueueHorsePhoto, enqueueRidePhoto } from './photoQueue'
 
 import {
   CHANGE_ROOT,
@@ -29,6 +28,7 @@ import {
   PHOTO_PERSIST_COMPLETE,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
+  RIDE_CREATED,
   RIDE_SAVED,
   SAVE_USER_ID,
   START_RIDE,
@@ -176,10 +176,17 @@ export function remotePersistComplete (database) {
   }
 }
 
+function rideCreated (ride) {
+  return {
+    type: RIDE_CREATED,
+    ride,
+  }
+}
+
 function rideSaved (ride) {
   return {
     type: RIDE_SAVED,
-    ride,
+    ride
   }
 }
 
@@ -226,9 +233,8 @@ export function appInitialized () {
   }
 }
 
-export function changeHorsePhotoData(horseID, photoID, uri) {
+export function changeHorsePhotoData(horseID, photoID, uri, remotePersist=true) {
   return async (dispatch, getState) => {
-    debugger
     let horseData = null
     for (let horse of getState().horses) {
       if (horse._id === horseID) {
@@ -249,7 +255,25 @@ export function changeHorsePhotoData(horseID, photoID, uri) {
       timestamp
     }
 
-    dispatch(saveHorse(horseData))
+    dispatch(saveHorse(horseData, remotePersist))
+  }
+}
+
+export function changeRidePhotoData(rideID, photoID, uri) {
+  return async (dispatch, getState) => {
+    let rideData = null
+    for (let ride of getState().rides) {
+      if (ride._id === rideID) {
+        rideData = {...ride}
+        break
+      }
+    }
+    const photosClone = rideData.photosByID = {...rideData.photosByID}
+    photosClone[photoID] = {
+      ...photosClone[photoID],
+      uri,
+    }
+    dispatch(saveRide(rideData))
   }
 }
 
@@ -317,16 +341,18 @@ export function searchForFriends (phrase) {
   }
 }
 
-export function saveHorse (horseData) {
+export function saveHorse (horseData, remotePersist=true) {
   return async (dispatch, getState) => {
     const pouchCouch = new PouchCouch(getState().localState.jwt)
     const doc = await pouchCouch.saveHorse(horseData)
     dispatch(horseSaved({...horseData, _id: doc.id, _rev: doc.rev}))
-    dispatch(needsRemotePersist('horses'))
+    if (remotePersist) {
+      dispatch(needsRemotePersist('horses'))
+    }
   }
 }
 
-export function saveRide (rideData) {
+export function createRide (rideData) {
   return async (dispatch, getState) => {
     const pouchCouch = new PouchCouch()
     const theRide = {
@@ -334,7 +360,17 @@ export function saveRide (rideData) {
       ...rideData
     }
     const doc = await pouchCouch.saveRide(theRide)
-    dispatch(rideSaved({...theRide, _id: doc.id, _rev: doc.rev}))
+    dispatch(rideCreated({...theRide, _id: doc.id, _rev: doc.rev}))
+    dispatch(needsRemotePersist('rides'))
+
+  }
+}
+
+export function saveRide (rideData) {
+  return async (dispatch) => {
+    const pouchCouch = new PouchCouch()
+    const doc = await pouchCouch.saveRide(rideData)
+    dispatch(rideSaved({...rideData, _rev: doc.rev}))
     dispatch(needsRemotePersist('rides'))
   }
 }
@@ -479,7 +515,7 @@ export function updateUser (userDetails) {
 export function uploadHorsePhoto (photoLocation, horseID) {
   return async (dispatch) => {
     const photoID = generateUUID()
-    dispatch(changeHorsePhotoData(horseID, photoID, photoLocation))
+    dispatch(changeHorsePhotoData(horseID, photoID, photoLocation, false))
     enqueueHorsePhoto(photoLocation, photoID, horseID)
     dispatch(needsPhotoUpload('horse'))
   }
@@ -492,7 +528,13 @@ export function uploadProfilePhoto (photoLocation) {
     const filename = profilePhotoID + '.jpg'
     await userAPI.uploadProfilePhoto(photoLocation, filename)
     dispatch(updateUser({profilePhotoID}))
-    ImagePicker.cleanSingle(photoLocation)
+  }
+}
+
+export function uploadRidePhoto (photoID, photoLocation, rideID) {
+  return async (dispatch) => {
+    enqueueRidePhoto(photoLocation, photoID, rideID)
+    dispatch(needsPhotoUpload('ride'))
   }
 }
 

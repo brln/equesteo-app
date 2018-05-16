@@ -1,17 +1,34 @@
 import React, { Component } from 'react';
 import {
+  Button,
   Picker,
   StyleSheet,
   Text,
   TextInput,
   View
 } from 'react-native';
+import { Container, Content } from 'native-base';
+import ImagePicker from 'react-native-image-crop-picker'
+
+import PhotosByTimestamp from '../PhotosByTimestamp'
 
 export default class RideDetails extends Component<Props> {
   constructor (props) {
     super(props)
     this.renderHorses = this.renderHorses.bind(this)
+    this.uploadPhoto = this.uploadPhoto.bind(this)
   }
+
+  uploadPhoto() {
+    ImagePicker.openPicker({
+      width: 800,
+      height: 800,
+      cropping: true
+    }).then(image => {
+      this.props.uploadPhoto(image.path)
+    }).catch(() => {})
+  }
+
 
   renderHorses () {
     const horseComps = []
@@ -44,6 +61,19 @@ export default class RideDetails extends Component<Props> {
         >
           {this.renderHorses()}
         </Picker>
+        <View style={styles.profileButton}>
+          <Button onPress={this.uploadPhoto} title='Add Photo' />
+        </View>
+        <Container>
+          <Content>
+            <Text>Photos</Text>
+            <PhotosByTimestamp
+              photosByID={this.props.photosByID}
+              profilePhotoID={this.props.profilePhotoID}
+            />
+          </Content>
+        </Container>
+
       </View>
     )
   }
@@ -68,5 +98,10 @@ const styles = StyleSheet.create({
   },
   buttonPad: {
     margin: 20
-  }
+  },
+  profileButton: {
+    width: 130,
+    paddingTop: 2,
+  },
+
 });

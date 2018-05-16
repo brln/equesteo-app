@@ -18,6 +18,7 @@ import {
   PHOTO_PERSIST_COMPLETE,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
+  RIDE_CREATED,
   RIDE_SAVED,
   SAVE_USER_ID,
   START_RIDE,
@@ -253,7 +254,7 @@ export default function AppReducer(state=initialState, action) {
           needsRemotePersist: newNeedsFalse
         }
       }
-    case RIDE_SAVED:
+    case RIDE_CREATED:
       const newRide = {
         ...state.localState.currentRide,
         ...action.ride,
@@ -267,6 +268,24 @@ export default function AppReducer(state=initialState, action) {
           justFinishedRide: true,
           currentRide: null,
         }
+      }
+    case RIDE_SAVED:
+      // @TODO: ugh, these need to be in a map by ID
+      let found = null
+      let i = 0
+      for (i; i < state.rides.length; i++) {
+        const ride = state.rides[i]
+        if (ride._id === action.ride._id) {
+          found = {...ride, ...action.ride}
+          break
+        }
+      }
+      const ridesClone = [...state.rides]
+      debugger
+      ridesClone[i] = found
+      return {
+        ...state,
+        rides: ridesClone
       }
     case SAVE_USER_ID:
       return {

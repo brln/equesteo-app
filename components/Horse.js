@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ImagePicker from 'react-native-image-crop-picker'
-import { Container, Content, Thumbnail } from 'native-base';
+import { Container, Content } from 'native-base';
 import {
   Button,
   Image,
@@ -8,6 +8,8 @@ import {
   Text,
   View,
 } from 'react-native';
+
+import PhotosByTimestamp from './PhotosByTimestamp'
 
 export default class Horse extends Component {
   constructor (props) {
@@ -22,7 +24,7 @@ export default class Horse extends Component {
       cropping: true
     }).then(image => {
       this.props.uploadPhoto(image.path)
-    });
+    }).catch(() => {});
   }
 
   render() {
@@ -33,41 +35,21 @@ export default class Horse extends Component {
       buttonText = 'Change Profile Photo'
     }
 
-    const byTimestamp = {}
-    for (let photoID of Object.keys(this.props.horse.photosByID)) {
-      if (photoID !== this.props.horse.profilePhotoID) {
-        const photoData = this.props.horse.photosByID[photoID]
-        const source = {uri: photoData.uri}
-        byTimestamp[photoData.timestamp] = (
-          <View key={photoID} style={styles.photoThumbnail}>
-            <Thumbnail
-              style={styles.thumbnail}
-              square
-              source={source}
-            />
-          </View>
-        )
-      }
-    }
-    const sortedKeys = Object.keys(byTimestamp).sort((a, b) => b - a)
-    const sortedVals = []
-    for (let key of sortedKeys) {
-      sortedVals.push(byTimestamp[key])
-    }
     return (
       <View style={{flex: 1, padding: 20}}>
         <Image style={styles.image} source={source} />
         <View style={styles.profileButton}>
           <Button onPress={this.uploadPhoto} title={buttonText} />
         </View>
-          <Container>
-            <Content>
-              <Text>Other Photos</Text>
-              <Container style={styles.photoContainer}>
-                {sortedVals}
-              </Container>
-            </Content>
-          </Container>
+        <Container>
+          <Content>
+            <Text>Other Photos</Text>
+            <PhotosByTimestamp
+              photosByID={this.props.horse.photosByID}
+              profilePhotoID={this.props.horse.profilePhotoID}
+            />
+          </Content>
+        </Container>
       </View>
     )
   }
@@ -82,16 +64,4 @@ const styles = StyleSheet.create({
     width: 130,
     paddingTop: 2,
   },
-  photoContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  photoThumbnail: {
-    padding: 5
-  },
-  thumbnail: {
-    width: 80,
-    height: 80,
-  }
 });

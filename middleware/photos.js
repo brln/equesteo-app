@@ -1,5 +1,7 @@
-import { changeHorsePhotoData, photoPersistComplete } from '../actions'
-import { horsePhotoURL } from '../helpers'
+import ImagePicker from 'react-native-image-crop-picker'
+
+import { changeHorsePhotoData, changeRidePhotoData, photoPersistComplete } from '../actions'
+import { horsePhotoURL, ridePhotoURL } from '../helpers'
 import UserAPI from '../services/user_api'
 import { dequeuePhoto } from '../photoQueue'
 
@@ -35,9 +37,18 @@ function recursiveEmptyQueue (item, store, userAPI) {
 }
 
 function remotePersist (item, store, userAPI) {
-  userAPI.uploadPhoto('horse', item.filepath, item.photoID).then(() => {
-    const uploadedURI = horsePhotoURL(item.photoID)
-    store.dispatch(changeHorsePhotoData(item.horseID, item.photoID, uploadedURI))
+  userAPI.uploadPhoto(item.type, item.filepath, item.photoID).then(() => {
+    switch (item.type) {
+      case 'horse':
+        const uploadedHorseURI = horsePhotoURL(item.photoID)
+        store.dispatch(changeHorsePhotoData(item.horseID, item.photoID, uploadedHorseURI))
+        return
+      case 'ride':
+        const uploadedRideURI = ridePhotoURL(item.photoID)
+        store.dispatch(changeRidePhotoData(item.rideID, item.photoID, uploadedRideURI))
+    }
+    ImagePicker.cleanSingle(item.filepath)
+
     if (queue.length) {
       const item = queue.shift()
       recursiveEmptyQueue(item, store, userAPI)

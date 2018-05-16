@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
 import Horse from '../components/Horse'
-import { saveHorse, uploadHorsePhoto } from '../actions'
+import { uploadHorsePhoto } from '../actions'
 
 class HorseContainer extends Component {
   constructor (props) {

@@ -27,6 +27,7 @@ export default class PouchCouch {
   catchError (e) {
     console.log(e)
     debugger
+    throw e
   }
 
   replicateOwnUser (id) {
