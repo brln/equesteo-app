@@ -5,7 +5,7 @@ import { unixTimeNow, generateUUID } from "./helpers"
 import { FEED } from './screens'
 import { LocalStorage, PouchCouch, UserAPI } from './services'
 import {BadRequestError, UnauthorizedError} from "./errors"
-import { enqueueHorsePhoto, enqueueRidePhoto } from './photoQueue'
+import { enqueueHorsePhoto, enqueueProfilePhoto, enqueueRidePhoto } from './photoQueue'
 
 import {
   CHANGE_ROOT,
@@ -17,6 +17,7 @@ import {
   DISCARD_RIDE,
   DISMISS_ERROR,
   ERROR_OCCURRED,
+  HORSE_CREATED,
   HORSE_SAVED,
   JUST_FINISHED_RIDE_SHOWN,
   LOCAL_DATA_LOADED,
@@ -83,6 +84,13 @@ export function discardRide ()  {
 export function dismissError () {
   return {
     type: DISMISS_ERROR
+  }
+}
+
+export function horseSaved (horse) {
+  return {
+    type: HORSE_SAVED,
+    horse
   }
 }
 
@@ -156,9 +164,9 @@ export function saveUserID(userID) {
   }
 }
 
-function horseSaved (horse) {
+function horseCreated (horse) {
   return {
-    type: HORSE_SAVED,
+    type: HORSE_CREATED,
     horse,
   }
 }
@@ -233,7 +241,7 @@ export function appInitialized () {
   }
 }
 
-export function changeHorsePhotoData(horseID, photoID, uri, remotePersist=true) {
+export function changeHorsePhotoData(horseID, photoID, uri) {
   return async (dispatch, getState) => {
     let horseData = null
     for (let horse of getState().horses) {
@@ -255,7 +263,7 @@ export function changeHorsePhotoData(horseID, photoID, uri, remotePersist=true) 
       timestamp
     }
 
-    dispatch(saveHorse(horseData, remotePersist))
+    dispatch(saveHorse(horseData))
   }
 }
 
@@ -268,12 +276,38 @@ export function changeRidePhotoData(rideID, photoID, uri) {
         break
       }
     }
-    const photosClone = rideData.photosByID = {...rideData.photosByID}
+    const photosClone = {...rideData.photosByID}
     photosClone[photoID] = {
       ...photosClone[photoID],
       uri,
     }
+    rideData.photosByID = photosClone
     dispatch(saveRide(rideData))
+  }
+}
+
+export function changeUserPhotoData (photoID, uri) {
+  return async (dispatch, getState) => {
+    const userID = getState().localState.userID
+    const userDoc = getState().users.filter((u) => {
+      return u._id === userID
+    })[0]
+    const userClone = {...userDoc}
+
+    let timestamp = unixTimeNow()
+    if (userClone.photosByID[photoID]) {
+      timestamp = userClone.photosByID[photoID].timestamp
+    } else {
+      userClone.profilePhotoID = photoID
+    }
+
+    const photosClone = {...userDoc.photosByID}
+    photosClone[photoID] = {
+      timestamp,
+      uri,
+    }
+    userClone.photosByID = photosClone
+    dispatch(updateUser(userClone))
   }
 }
 
@@ -341,11 +375,11 @@ export function searchForFriends (phrase) {
   }
 }
 
-export function saveHorse (horseData, remotePersist=true) {
+export function createHorse (horseData, remotePersist=true) {
   return async (dispatch, getState) => {
     const pouchCouch = new PouchCouch(getState().localState.jwt)
     const doc = await pouchCouch.saveHorse(horseData)
-    dispatch(horseSaved({...horseData, _id: doc.id, _rev: doc.rev}))
+    dispatch(horseCreated({...horseData, _id: doc.id, _rev: doc.rev}))
     if (remotePersist) {
       dispatch(needsRemotePersist('horses'))
     }
@@ -372,6 +406,15 @@ export function saveRide (rideData) {
     const doc = await pouchCouch.saveRide(rideData)
     dispatch(rideSaved({...rideData, _rev: doc.rev}))
     dispatch(needsRemotePersist('rides'))
+  }
+}
+
+export function saveHorse (horseData) {
+  return async (dispatch) => {
+    const pouchCouch = new PouchCouch()
+    const doc = await pouchCouch.saveHorse(horseData)
+    dispatch(horseSaved({...horseData, _rev: doc.rev}))
+    dispatch(needsRemotePersist('horses'))
   }
 }
 
@@ -522,12 +565,11 @@ export function uploadHorsePhoto (photoLocation, horseID) {
 }
 
 export function uploadProfilePhoto (photoLocation) {
-  return async (dispatch, getState) => {
-    const userAPI = new UserAPI(getState().localState.jwt)
+  return async (dispatch) => {
     const profilePhotoID = generateUUID()
-    const filename = profilePhotoID + '.jpg'
-    await userAPI.uploadProfilePhoto(photoLocation, filename)
-    dispatch(updateUser({profilePhotoID}))
+    dispatch(changeUserPhotoData(profilePhotoID, photoLocation))
+    enqueueProfilePhoto(photoLocation, profilePhotoID)
+    dispatch(needsPhotoUpload('profile'))
   }
 }
 

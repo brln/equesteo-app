@@ -61,7 +61,7 @@ export default class Account extends Component {
     let source = require('../img/empty.png')
     let buttonText = 'Upload Profile Photo'
     if (this.props.userData.profilePhotoID) {
-      source = {uri: profilePhotoURL(this.props.userData.profilePhotoID)}
+      source = {uri: this.props.userData.photosByID[this.props.userData.profilePhotoID].uri}
       buttonText = 'Change Profile Photo'
     }
     return (

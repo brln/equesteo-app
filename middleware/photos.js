@@ -1,7 +1,7 @@
 import ImagePicker from 'react-native-image-crop-picker'
 
-import { changeHorsePhotoData, changeRidePhotoData, photoPersistComplete } from '../actions'
-import { horsePhotoURL, ridePhotoURL } from '../helpers'
+import { changeHorsePhotoData, changeRidePhotoData, changeUserPhotoData, photoPersistComplete } from '../actions'
+import { horsePhotoURL, profilePhotoURL, ridePhotoURL } from '../helpers'
 import UserAPI from '../services/user_api'
 import { dequeuePhoto } from '../photoQueue'
 
@@ -42,10 +42,17 @@ function remotePersist (item, store, userAPI) {
       case 'horse':
         const uploadedHorseURI = horsePhotoURL(item.photoID)
         store.dispatch(changeHorsePhotoData(item.horseID, item.photoID, uploadedHorseURI))
-        return
+        break
       case 'ride':
         const uploadedRideURI = ridePhotoURL(item.photoID)
         store.dispatch(changeRidePhotoData(item.rideID, item.photoID, uploadedRideURI))
+        break
+      case 'profile':
+        const uploadedProfilePhotoURI = profilePhotoURL(item.photoID)
+        store.dispatch(changeUserPhotoData(item.photoID, uploadedProfilePhotoURI))
+        break
+      default:
+        throw Error('cant persist type i dont know about')
     }
     ImagePicker.cleanSingle(item.filepath)
 

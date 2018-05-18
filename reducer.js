@@ -6,6 +6,7 @@ import {
   DISCARD_RIDE,
   DISMISS_ERROR,
   ERROR_OCCURRED,
+  HORSE_CREATED,
   HORSE_SAVED,
   JUST_FINISHED_RIDE_SHOWN,
   LOCAL_DATA_LOADED,
@@ -144,10 +145,27 @@ export default function AppReducer(state=initialState, action) {
           needsPhotoUploads
         }
       }
-    case HORSE_SAVED:
+    case HORSE_CREATED:
       return {
         ...state,
         horses: [action.horse, ...state.horses]
+      }
+    case HORSE_SAVED:
+      // @TODO: ugh, these need to be in a map by ID
+      let j = 0
+      let foundHorse = null
+      for (j; j < state.horses.length; j++) {
+        const horse = state.horses[j]
+        if (horse._id === action.horse._id) {
+          foundHorse = {...horse, ...action.horse}
+          break
+        }
+      }
+      const horsesClone = [...state.horses]
+      horsesClone[j] = foundHorse
+      return {
+        ...state,
+        horses: horsesClone
       }
     case JUST_FINISHED_RIDE_SHOWN:
       return {
@@ -281,7 +299,6 @@ export default function AppReducer(state=initialState, action) {
         }
       }
       const ridesClone = [...state.rides]
-      debugger
       ridesClone[i] = found
       return {
         ...state,

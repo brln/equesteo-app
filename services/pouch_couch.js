@@ -55,7 +55,8 @@ export default class PouchCouch {
       case 'users':
         return this.remoteReplicateUsers()
       default:
-        throw('DB not found')
+        debugger
+        throw('Remote DB not found')
     }
   }
 
@@ -82,7 +83,7 @@ export default class PouchCouch {
       case 'all':
         return this.localReplicate(userIDs)
       default:
-        throw('DB not found')
+        throw('Local DB not found')
     }
   }
 

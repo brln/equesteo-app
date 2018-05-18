@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
 import Barn from '../components/Barn'
-import { changeScreen, saveHorse } from '../actions'
+import { changeScreen, createHorse } from '../actions'
 import { HORSE } from '../screens'
 
 class BarnContainer extends Component {
@@ -27,7 +27,7 @@ class BarnContainer extends Component {
   }
 
   saveNewHorse (horseData) {
-    this.props.dispatch(saveHorse({
+    this.props.dispatch(createHorse({
       ...horseData,
       _id:  `${this.props.userID.toString()}_${(new Date).getTime().toString()}`,
       userID: this.props.userID

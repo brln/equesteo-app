@@ -27,9 +27,9 @@ export default class Profile extends Component {
   }
 
   render() {
-    let uri = 'https://s3.amazonaws.com/equesteo-profile-photos/full_size/empty.png'
+    let source = require('../img/empty.png')
     if (this.props.user.profilePhotoID) {
-      uri = profilePhotoURL(this.props.user.profilePhotoID)
+      source = {uri: profilePhotoURL(this.props.user.profilePhotoID)}
     }
     let followButton = <Button color="green" onPress={this.follow} title="Follow" />
     for (let following of this.props.userData.following) {
@@ -43,7 +43,7 @@ export default class Profile extends Component {
         <View style={styles.container}>
           <View style={styles.topSection}>
             <View style={{flex: 1, padding: 20}}>
-              <Image style={styles.image} source={{uri: uri}} />
+              <Image style={styles.image} source={source} />
             </View>
             <View style={{flex: 1, padding: 5, left: -15}}>
               {followButton}
