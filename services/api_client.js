@@ -1,6 +1,7 @@
 import { API_URL } from 'react-native-dotenv'
 import {BadRequestError, UnauthorizedError} from '../errors'
 
+
 export default class ApiClient {
   DELETE = 'delete'
   GET = 'get'
@@ -61,11 +62,12 @@ export default class ApiClient {
 
   }
 
-  uploadImage (endpoint, name, uri) {
+  uploadImage (endpoint, photoID, imageLocation) {
     const data = new FormData()
+    const name = `${photoID}.jpg`
     data.append('file', {
       name,
-      uri,
+      uri: imageLocation,
       type: 'image/jpeg',
     })
     return this.request(this.POST, endpoint, data, false)

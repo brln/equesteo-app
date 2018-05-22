@@ -23,7 +23,9 @@ export default class Following extends Component {
               <RideCard
                 key={i}
                 ride={ride}
+                rideCarrots={this.props.rideCarrots.filter((rc) => rc.rideID === ride._id && rc.deleted === false)}
                 showRide={this.props.showRide}
+                toggleCarrot={this.props.toggleCarrot}
               />
             ))
           }

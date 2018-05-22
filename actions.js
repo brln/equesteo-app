@@ -1,11 +1,11 @@
 import { AppState, NetInfo } from 'react-native'
-import PouchDB from 'pouchdb-react-native'
 import BackgroundGeolocation from 'react-native-mauron85-background-geolocation'
 
-import { unixTimeNow } from "./helpers"
+import { unixTimeNow, generateUUID } from "./helpers"
 import { FEED } from './screens'
 import { LocalStorage, PouchCouch, UserAPI } from './services'
 import {BadRequestError, UnauthorizedError} from "./errors"
+import { enqueueHorsePhoto, enqueueProfilePhoto, enqueueRidePhoto } from './photoQueue'
 
 import {
   CHANGE_ROOT,
@@ -17,15 +17,21 @@ import {
   DISCARD_RIDE,
   DISMISS_ERROR,
   ERROR_OCCURRED,
+  HORSE_CREATED,
   HORSE_SAVED,
   JUST_FINISHED_RIDE_SHOWN,
   LOCAL_DATA_LOADED,
+  NEEDS_PHOTO_UPLOAD,
   NEEDS_REMOTE_PERSIST,
   NEW_LOCATION,
   NEW_APP_STATE,
   NEW_NETWORK_STATE,
+  PHOTO_PERSIST_COMPLETE,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
+  RIDE_CARROT_CREATED,
+  RIDE_CARROT_SAVED,
+  RIDE_CREATED,
   RIDE_SAVED,
   SAVE_USER_ID,
   START_RIDE,
@@ -80,6 +86,20 @@ export function discardRide ()  {
 export function dismissError () {
   return {
     type: DISMISS_ERROR
+  }
+}
+
+export function horseSaved (horse) {
+  return {
+    type: HORSE_SAVED,
+    horse
+  }
+}
+
+export function needsPhotoUpload (photoType) {
+  return {
+    type: NEEDS_PHOTO_UPLOAD,
+    photoType
   }
 }
 
@@ -146,10 +166,16 @@ export function saveUserID(userID) {
   }
 }
 
-function horseSaved (horse) {
+function horseCreated (horse) {
   return {
-    type: HORSE_SAVED,
+    type: HORSE_CREATED,
     horse,
+  }
+}
+
+export function photoPersistComplete () {
+  return {
+    type: PHOTO_PERSIST_COMPLETE
   }
 }
 
@@ -160,10 +186,31 @@ export function remotePersistComplete (database) {
   }
 }
 
+export function rideCarrotCreated (carrotData) {
+  return {
+    type: RIDE_CARROT_CREATED,
+    carrotData
+  }
+}
+
+export function rideCarrotSaved (carrotData) {
+  return {
+    type: RIDE_CARROT_SAVED,
+    carrotData
+  }
+}
+
+function rideCreated (ride) {
+  return {
+    type: RIDE_CREATED,
+    ride,
+  }
+}
+
 function rideSaved (ride) {
   return {
     type: RIDE_SAVED,
-    ride,
+    ride
   }
 }
 
@@ -206,6 +253,103 @@ export function appInitialized () {
     dispatch(changeAppRoot('login'))
     dispatch(startNetworkTracking())
     dispatch(startAppStateTracking())
+
+  }
+}
+
+export function changeHorsePhotoData(horseID, photoID, uri) {
+  return async (dispatch, getState) => {
+    let horseData = null
+    for (let horse of getState().horses) {
+      if (horse._id === horseID) {
+        horseData = {...horse}
+        break;
+      }
+    }
+
+    let timestamp = unixTimeNow()
+    if (horseData.photosByID[photoID]) {
+      timestamp = horseData.photosByID[photoID].timestamp
+    } else {
+      horseData.profilePhotoID = photoID
+    }
+
+    horseData.photosByID[photoID] = {
+      uri,
+      timestamp
+    }
+
+    dispatch(saveHorse(horseData))
+  }
+}
+
+export function changeRidePhotoData(rideID, photoID, uri) {
+  return async (dispatch, getState) => {
+    let rideData = null
+    for (let ride of getState().rides) {
+      if (ride._id === rideID) {
+        rideData = {...ride}
+        break
+      }
+    }
+    const photosClone = {...rideData.photosByID}
+    photosClone[photoID] = {
+      ...photosClone[photoID],
+      uri,
+    }
+    rideData.photosByID = photosClone
+    dispatch(saveRide(rideData))
+  }
+}
+
+export function changeUserPhotoData (photoID, uri) {
+  return async (dispatch, getState) => {
+    const userID = getState().localState.userID
+    const userDoc = getState().users.filter((u) => {
+      return u._id === userID
+    })[0]
+    const userClone = {...userDoc}
+
+    let timestamp = unixTimeNow()
+    if (userClone.photosByID[photoID]) {
+      timestamp = userClone.photosByID[photoID].timestamp
+    } else {
+      userClone.profilePhotoID = photoID
+    }
+
+    const photosClone = {...userDoc.photosByID}
+    photosClone[photoID] = {
+      timestamp,
+      uri,
+    }
+    userClone.photosByID = photosClone
+    dispatch(updateUser(userClone))
+  }
+}
+
+export function createHorse (horseData, remotePersist=true) {
+  return async (dispatch, getState) => {
+    const pouchCouch = new PouchCouch(getState().localState.jwt)
+    const doc = await pouchCouch.saveHorse(horseData)
+    dispatch(horseCreated({...horseData, _id: doc.id, _rev: doc.rev}))
+    if (remotePersist) {
+      dispatch(needsRemotePersist('horses'))
+    }
+  }
+}
+
+export function createRide (rideData) {
+  return async (dispatch, getState) => {
+    const pouchCouch = new PouchCouch()
+    const theRide = {
+      ...getState().localState.currentRide,
+      ...rideData,
+      type: 'ride'
+    }
+    const doc = await pouchCouch.saveRide(theRide)
+    dispatch(rideCreated({...theRide, _id: doc.id, _rev: doc.rev}))
+    dispatch(needsRemotePersist('rides'))
+
   }
 }
 
@@ -246,19 +390,18 @@ function findLocalToken () {
     const storedToken = await LocalStorage.loadToken()
     if (storedToken !== null) {
       dispatch(receiveJWT(storedToken.token))
-      dispatch(loadLocalData(storedToken.userID, storedToken.token))
+      dispatch(saveUserID(storedToken.userID))
+      await dispatch(loadLocalData())
+      dispatch(syncDBPull('all'))
     }
   }
 }
 
-function loadLocalData (userID, jwt) {
-  return async (dispatch) => {
-    const pouchCouch = new PouchCouch(jwt)
+function loadLocalData () {
+  return async (dispatch, getState) => {
+    const pouchCouch = new PouchCouch(getState().jwt)
     const localData = await pouchCouch.localLoad()
-    dispatch(localDataLoaded({
-      ...localData,
-      userID
-    }))
+    dispatch(localDataLoaded(localData))
   }
 }
 
@@ -274,25 +417,21 @@ export function searchForFriends (phrase) {
   }
 }
 
-export function saveHorse (horseData) {
-  return async (dispatch, getState) => {
-    const pouchCouch = new PouchCouch(getState().localState.jwt)
-    const doc = await pouchCouch.saveHorse(horseData)
-    dispatch(horseSaved({...horseData, _id: doc.id, _rev: doc.rev}))
-    dispatch(needsRemotePersist('horses'))
+export function saveRide (rideData) {
+  return async (dispatch) => {
+    const pouchCouch = new PouchCouch()
+    const doc = await pouchCouch.saveRide(rideData)
+    dispatch(rideSaved({...rideData, _rev: doc.rev}))
+    dispatch(needsRemotePersist('rides'))
   }
 }
 
-export function saveRide (rideData) {
-  return async (dispatch, getState) => {
+export function saveHorse (horseData) {
+  return async (dispatch) => {
     const pouchCouch = new PouchCouch()
-    const theRide = {
-      ...getState().localState.currentRide,
-      ...rideData
-    }
-    const doc = await pouchCouch.saveRide(theRide)
-    dispatch(rideSaved({...theRide, _id: doc.id, _rev: doc.rev}))
-    dispatch(needsRemotePersist('rides'))
+    const doc = await pouchCouch.saveHorse(horseData)
+    dispatch(horseSaved({...horseData, _rev: doc.rev}))
+    dispatch(needsRemotePersist('horses'))
   }
 }
 
@@ -374,9 +513,11 @@ export function submitLogin (email, password) {
       const following = resp.following
       const pouchCouch = new PouchCouch(token)
       await pouchCouch.localReplicate([...following, userID])
-      dispatch(loadLocalData(userID, token))
-      await LocalStorage.saveToken(resp.token, resp.id);
       dispatch(receiveJWT(resp.token))
+      dispatch(saveUserID(resp.id))
+      dispatch(loadLocalData())
+      await LocalStorage.saveToken(resp.token, resp.id);
+
       dispatch(changeScreen(FEED))
     } catch (e) {
       if (e instanceof UnauthorizedError) {
@@ -394,9 +535,9 @@ export function submitSignup (email, password) {
       await LocalStorage.saveToken(resp.token, resp.id);
       const pouchCouch = new PouchCouch(resp.token)
       await pouchCouch.replicateOwnUser(resp.id)
-      dispatch(loadLocalData(resp.id, resp.token))
-      dispatch(saveUserID(resp.id))
       dispatch(receiveJWT(resp.token))
+      dispatch(saveUserID(resp.id))
+      dispatch(loadLocalData())
     } catch (e) {
       if (e instanceof BadRequestError) {
         dispatch(errorOccurred(e.message))
@@ -405,15 +546,83 @@ export function submitSignup (email, password) {
   }
 }
 
-export function uploadProfilePhoto (photoLocation) {
+export function syncDBPull (db) {
   return async (dispatch, getState) => {
-    const userAPI = new UserAPI(getState().jwt)
-    try {
-      const resp = await userAPI.uploadProfilePhoto(photoLocation)
-      // dispatch(receiveUserData(resp))
-    } catch (e) {
-      debugger
+    const pouchCouch = new PouchCouch(getState().localState.jwt)
+    const userID = getState().localState.userID
+    const following = getState().users.filter((u) => {
+      return u._id === userID
+    })[0].following
+    await pouchCouch.localReplicateDB(db, [...following, userID])
+    dispatch(loadLocalData())
+  }
+}
+
+export function toggleRideCarrot (rideID) {
+  return async (dispatch, getState) => {
+    const pouchCouch = new PouchCouch(getState().localState.jwt)
+    const currentUserID = getState().localState.userID
+    let existing = getState().rideCarrots.filter((c) => {
+      return c.rideID === rideID && c.userID === currentUserID
+    })
+    existing = existing.length > 0 ? existing[0] : null
+    if (existing) {
+      let toggled = {...existing, deleted: !existing.deleted}
+      const doc = await pouchCouch.saveRide(toggled)
+      dispatch(rideCarrotSaved({...toggled, _rev: doc.rev}))
+    } else {
+      const carrotID = `${currentUserID}_${(new Date).getTime().toString()}`
+      const newCarrot = {
+        _id: carrotID,
+        rideID,
+        userID: currentUserID,
+        deleted: false,
+        type: 'carrot'
+      }
+
+      const doc = await pouchCouch.saveRide(newCarrot)
+      dispatch(rideCarrotCreated({...newCarrot, _rev: doc.rev}))
     }
+    dispatch(needsRemotePersist('rides'))
+  }
+}
+
+export function updateUser (userDetails) {
+  return async (dispatch, getState) => {
+    const pouchCouch = new PouchCouch(getState().localState.jwt)
+    const userID = getState().localState.userID
+    const userDoc = getState().users.filter((u) => {
+      return u._id === userID
+    })[0]
+    const newUserData = {...userDoc, ...userDetails}
+    const doc = await pouchCouch.saveUser(newUserData)
+    dispatch(userSaved({...newUserData, _rev: doc.rev}))
+    dispatch(needsRemotePersist('users'))
+  }
+}
+
+export function uploadHorsePhoto (photoLocation, horseID) {
+  return async (dispatch) => {
+    const photoID = generateUUID()
+    dispatch(changeHorsePhotoData(horseID, photoID, photoLocation, false))
+    enqueueHorsePhoto(photoLocation, photoID, horseID)
+    dispatch(needsPhotoUpload('horse'))
+  }
+}
+
+export function uploadProfilePhoto (photoLocation) {
+  return async (dispatch) => {
+    const profilePhotoID = generateUUID()
+    dispatch(changeUserPhotoData(profilePhotoID, photoLocation))
+    enqueueProfilePhoto(photoLocation, profilePhotoID)
+    dispatch(needsPhotoUpload('profile'))
+  }
+}
+
+export function uploadRidePhoto (photoID, photoLocation, rideID) {
+  return async (dispatch) => {
+    enqueueRidePhoto(photoLocation, photoID, rideID)
+    dispatch(needsPhotoUpload('ride'))
   }
 }
 

@@ -20,23 +20,32 @@ export default class UserAPI {
     })
   }
 
-  async uploadProfilePhoto (imageLocation) {
-    return await this.apiClient.uploadImage('/users/profilePhoto', 'profile', imageLocation)
+  _uploadProfilePhoto (imageLocation, photoID) {
+    return this.apiClient.uploadImage('/users/profilePhoto', photoID, imageLocation)
+  }
+
+  _uploadHorsePhoto (imageLocation, photoID) {
+    return this.apiClient.uploadImage('/users/horsePhoto', photoID, imageLocation)
+  }
+
+  _uploadRidePhoto (imageLocation, photoID) {
+    return this.apiClient.uploadImage('/users/ridePhoto', photoID, imageLocation)
+  }
+
+  uploadPhoto (type, imageLocation, photoID) {
+    switch (type) {
+      case 'horse':
+        return this._uploadHorsePhoto(imageLocation, photoID)
+      case 'profile':
+        return this._uploadProfilePhoto(imageLocation, photoID)
+      case 'ride':
+        return this._uploadRidePhoto(imageLocation, photoID)
+      default:
+        throw "lolwut wrong type"
+    }
   }
 
   async findUser (searchPhrase) {
     return await this.apiClient.get('/users/search?q=' + searchPhrase)
-  }
-
-  async addFollow (followingID) {
-    return await this.apiClient.post('/users/follow/add', {
-      followingID
-    })
-  }
-
-  async deleteFollow (followingID ) {
-    return await this.apiClient.post('/users/follow/delete', {
-      followingID
-    })
   }
 }

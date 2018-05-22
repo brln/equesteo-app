@@ -1,6 +1,7 @@
 import PouchDB from 'pouchdb-react-native'
 import { API_URL } from 'react-native-dotenv'
 
+
 export default class PouchCouch {
   constructor (jwt) {
     const horsesDBName = 'horses'
@@ -23,6 +24,7 @@ export default class PouchCouch {
   catchError (e) {
     console.log(e)
     debugger
+    throw e
   }
 
   replicateOwnUser (id) {
@@ -50,7 +52,8 @@ export default class PouchCouch {
       case 'users':
         return this.remoteReplicateUsers()
       default:
-        throw('DB not found')
+        debugger
+        throw('Remote DB not found')
     }
   }
 
@@ -64,6 +67,21 @@ export default class PouchCouch {
 
   remoteReplicateUsers () {
     return PouchDB.replicate(this.localUsersDB, this.remoteUsersDB)
+  }
+
+  localReplicateDB(db, userIDs) {
+    switch(db) {
+      case 'horses':
+        return this.localReplicateHorses(userIDs)
+      case 'rides':
+        return this.localReplicateRides(userIDs)
+      case 'users':
+        return this.localReplicateUsers(userIDs)
+      case 'all':
+        return this.localReplicate(userIDs)
+      default:
+        throw('Local DB not found')
+    }
   }
 
   localReplicateRides (userIDs) {
@@ -141,7 +159,8 @@ export default class PouchCouch {
     const usersResp = await this.localUsersDB.allDocs()
     return {
       horses: horsesResp.rows.map((r) => r.doc),
-      rides: ridesResp.rows.map((r) => r.doc),
+      rideCarrots: ridesResp.rows.map((r) => r.doc).filter((r) => r.type === 'carrot'),
+      rides: ridesResp.rows.map((r) => r.doc).filter((r) => r.type === 'ride'),
       users: usersResp.rows.map((r) => r.doc),
     }
   }

@@ -9,6 +9,10 @@ class FollowingContainer extends Component {
     this.search = this.search.bind(this)
   }
 
+  shouldComponentUpdate (nextProps) {
+    return !!nextProps.userData
+  }
+
   search (phrase) {
     this.props.dispatch(searchForFriends(phrase))
   }

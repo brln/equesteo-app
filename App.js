@@ -7,14 +7,21 @@ import { Navigation } from 'react-native-navigation';
 
 
 import { appInitialized } from "./actions"
-import { logger, storeToCouch } from "./middleware"
+import logger from './middleware/logger'
+import storeToCouch from './middleware/couch'
+import uploadPhotos from './middleware/photos'
 import AppReducer from './reducer'
 import { DRAWER, FEED_DETAILS, SIGNUP_LOGIN, registerScreens } from './screens'
 
 const store = createStore(
   AppReducer,
   undefined,
-  applyMiddleware(thunkMiddleware, logger, storeToCouch)
+  applyMiddleware(
+    thunkMiddleware,
+    logger,
+    uploadPhotos,
+    storeToCouch,
+  )
 )
 
 registerScreens(store, Provider)

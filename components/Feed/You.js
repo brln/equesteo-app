@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { List } from 'native-base';
-import moment from 'moment'
 import {
   ScrollView,
   StyleSheet,
@@ -23,7 +22,9 @@ export default class You extends Component {
               <RideCard
                 key={i}
                 ride={ride}
+                rideCarrots={this.props.rideCarrots.filter((rc) => rc.rideID === ride._id && rc.deleted === false)}
                 showRide={this.props.showRide}
+                toggleCarrot={this.props.toggleCarrot}
               />
             ))
           }

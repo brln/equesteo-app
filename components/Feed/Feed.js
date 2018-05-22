@@ -44,14 +44,18 @@ export default class Feed extends Component {
             <Following
               horses={this.props.horses}
               rides={this.props.followingRides}
+              rideCarrots={this.props.rideCarrots}
               showRide={this.showRide}
+              toggleCarrot={this.props.toggleCarrot}
             />
           </Tab>
           <Tab heading="You">
             <You
               horses={this.props.horses}
               rides={this.props.yourRides}
+              rideCarrots={this.props.rideCarrots}
               showRide={this.showRide}
+              toggleCarrot={this.props.toggleCarrot}
             />
           </Tab>
         </Tabs>

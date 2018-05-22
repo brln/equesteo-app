@@ -2,8 +2,14 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 import moment from 'moment'
 
-import { changeScreen, discardRide, saveRide, stopLocationTracking } from '../actions'
-import { generateUUID } from '../helpers'
+import {
+  changeScreen,
+  discardRide,
+  createRide,
+  stopLocationTracking,
+  uploadRidePhoto
+} from '../actions'
+import { generateUUID, unixTimeNow } from '../helpers'
 import RideDetails from '../components/RideRecorder/RideDetails'
 import { FEED } from '../screens'
 
@@ -27,12 +33,15 @@ class RideDetailsContainer extends Component {
     this.state = {
       rideName: rideName,
       horseID: null,
+      photosByID: {},
+      coverPhotoID: null,
     }
     this.doneOnPage = this.doneOnPage.bind(this)
     this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
     this.changeHorseID = this.changeHorseID.bind(this)
     this.changeRideName = this.changeRideName.bind(this)
-    this.saveRide = this.saveRide.bind(this)
+    this.createRide = this.createRide.bind(this)
+    this.uploadPhoto = this.uploadPhoto.bind(this)
 
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
   }
@@ -57,7 +66,7 @@ class RideDetailsContainer extends Component {
   onNavigatorEvent (event) {
     if (event.type === 'NavBarButtonPress') {
       if (event.id === 'save') {
-        this.saveRide()
+        this.createRide()
       } else if (event.id === 'discard') {
         this.props.dispatch(discardRide())
         this.doneOnPage()
@@ -65,30 +74,49 @@ class RideDetailsContainer extends Component {
     }
   }
 
-  saveRide () {
+  createRide () {
     this.props.dispatch(stopLocationTracking())
     let horseID = this.state.horseID
     if (!horseID && this.props.horses.length > 0) {
       horseID = this.props.horses[0]._id
     }
-    this.props.dispatch(saveRide({
-      _id:  `${this.props.userID.toString()}_${(new Date).getTime().toString()}`,
+    const rideID = `${this.props.userID.toString()}_${(new Date).getTime().toString()}`
+    for (let photoID of Object.keys(this.state.photosByID)) {
+      this.props.dispatch(uploadRidePhoto(photoID, this.state.photosByID[photoID].uri, rideID))
+    }
+    this.props.dispatch(createRide({
+      _id: rideID,
       elapsedTimeSecs: this.props.elapsedTime,
       name: this.state.rideName,
       horseID: horseID,
       userID: this.props.userID,
+      photosByID: this.state.photosByID,
+      coverPhotoID: this.state.coverPhotoID,
     }))
     this.doneOnPage()
+  }
+
+  uploadPhoto (photoURI) {
+    const photoID = generateUUID()
+    const newPhotosByID = {...this.state.photosByID}
+    newPhotosByID[photoID] = {uri: photoURI, timestamp: unixTimeNow()}
+    this.setState({
+      coverPhotoID: photoID,
+      photosByID: newPhotosByID
+    })
   }
 
   render() {
     return (
       <RideDetails
+        coverPhotoID={this.state.coverPhotoID}
+        photosByID={this.state.photosByID}
         horses={this.props.horses}
         horseID={this.state.horseID}
         changeRideName={this.changeRideName}
         changeHorseID={this.changeHorseID}
         rideName={this.state.rideName}
+        uploadPhoto={this.uploadPhoto}
       />
     )
   }

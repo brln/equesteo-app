@@ -6,17 +6,22 @@ import {
   DISCARD_RIDE,
   DISMISS_ERROR,
   ERROR_OCCURRED,
+  HORSE_CREATED,
   HORSE_SAVED,
   JUST_FINISHED_RIDE_SHOWN,
   LOCAL_DATA_LOADED,
+  NEEDS_PHOTO_UPLOAD,
   NEEDS_REMOTE_PERSIST,
   NEW_APP_STATE,
   NEW_LOCATION,
   NEW_NETWORK_STATE,
-  NEW_REV,
   ONGOING_NOTIFICATION_SHOWN,
+  PHOTO_PERSIST_COMPLETE,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
+  RIDE_CARROT_CREATED,
+  RIDE_CARROT_SAVED,
+  RIDE_CREATED,
   RIDE_SAVED,
   SAVE_USER_ID,
   START_RIDE,
@@ -44,6 +49,10 @@ const initialState = {
     jwt: null,
     lastLocation: null,
     locallyPersisting: false,
+    needsPhotoUploads: {
+      profile: false,
+      horse: false
+    },
     needsRemotePersist: {
       horses: false,
       rides: false,
@@ -56,6 +65,7 @@ const initialState = {
   },
   horses: [],
   rides: [],
+  rideCarrots: [],
   users: [],
   version: 1
 }
@@ -126,10 +136,39 @@ export default function AppReducer(state=initialState, action) {
           error: action.message
         }
       }
-    case HORSE_SAVED:
+    case NEEDS_PHOTO_UPLOAD:
+      const needsPhotoUploads = {
+        ...state.localState.needsPhotoUploads
+      }
+      needsPhotoUploads[action.photoType] = true
+      return {
+        ...state,
+        localState: {
+          ...state.localState,
+          needsPhotoUploads
+        }
+      }
+    case HORSE_CREATED:
       return {
         ...state,
         horses: [action.horse, ...state.horses]
+      }
+    case HORSE_SAVED:
+      // @TODO: ugh, these need to be in a map by ID
+      let j = 0
+      let foundHorse = null
+      for (j; j < state.horses.length; j++) {
+        const horse = state.horses[j]
+        if (horse._id === action.horse._id) {
+          foundHorse = {...horse, ...action.horse}
+          break
+        }
+      }
+      const horsesClone = [...state.horses]
+      horsesClone[j] = foundHorse
+      return {
+        ...state,
+        horses: horsesClone
       }
     case JUST_FINISHED_RIDE_SHOWN:
       return {
@@ -143,14 +182,9 @@ export default function AppReducer(state=initialState, action) {
       return {
         ...state,
         rides: action.localData.rides,
+        rideCarrots: action.localData.rideCarrots,
         horses: action.localData.horses,
         users: action.localData.users,
-        localState: {
-          ...state.localState,
-          currentScreen: FEED,
-          clearStateAfterPersist: false,
-          userID: action.localData.userID
-        }
       }
     case NEEDS_REMOTE_PERSIST:
       let newNeeds = {...state.localState.needsRemotePersist}
@@ -203,20 +237,24 @@ export default function AppReducer(state=initialState, action) {
           )
         }
       }
-    case NEW_REV:
-      return {
-        ...state,
-        localState: {
-          ...state.localState,
-          _rev: action.rev
-        }
-      }
     case ONGOING_NOTIFICATION_SHOWN:
       return {
         ...state,
         localState: {
           ...state.localState,
           ongoingNotificationShown: action.isShowing
+        }
+      }
+    case PHOTO_PERSIST_COMPLETE:
+      const newPhotoFalse = {...state.localState.needsPhotoUploads}
+      for (let type of Object.keys(newPhotoFalse)) {
+        newPhotoFalse[type] = false
+      }
+      return {
+        ...state,
+        localState: {
+          ...state.localState,
+          needsPhotoUploads: newPhotoFalse
         }
       }
     case RECEIVE_JWT:
@@ -238,7 +276,30 @@ export default function AppReducer(state=initialState, action) {
           needsRemotePersist: newNeedsFalse
         }
       }
-    case RIDE_SAVED:
+    case RIDE_CARROT_CREATED:
+      return {
+        ...state,
+        rideCarrots: [action.carrotData, ...state.rideCarrots]
+      }
+    case RIDE_CARROT_SAVED:
+      // @TODO: ugh, these need to be in a map by ID, and this function needs to be de-duped
+      let rideCarrotFound = null
+      let k = 0
+      for (k; k < state.rideCarrots.length; k++) {
+        const currentRideCarrot = state.rideCarrots[k]
+        if (currentRideCarrot._id === action.carrotData._id) {
+          rideCarrotFound = {...currentRideCarrot, ...action.carrotData}
+          break
+        }
+      }
+      debugger
+      const rideCarrotClone = [...state.rideCarrots]
+      rideCarrotClone[k] = rideCarrotFound
+      return {
+        ...state,
+        rideCarrots: rideCarrotClone
+      }
+    case RIDE_CREATED:
       const newRide = {
         ...state.localState.currentRide,
         ...action.ride,
@@ -252,6 +313,23 @@ export default function AppReducer(state=initialState, action) {
           justFinishedRide: true,
           currentRide: null,
         }
+      }
+    case RIDE_SAVED:
+      // @TODO: ugh, these need to be in a map by ID
+      let found = null
+      let i = 0
+      for (i; i < state.rides.length; i++) {
+        const ride = state.rides[i]
+        if (ride._id === action.ride._id) {
+          found = {...ride, ...action.ride}
+          break
+        }
+      }
+      const ridesClone = [...state.rides]
+      ridesClone[i] = found
+      return {
+        ...state,
+        rides: ridesClone
       }
     case SAVE_USER_ID:
       return {

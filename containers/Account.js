@@ -3,7 +3,8 @@ import { connect } from 'react-redux';
 
 import { signOut } from '../actions'
 import Account from '../components/Account'
-import { uploadProfilePhoto } from "../actions"
+import { changeScreen, updateUser, uploadProfilePhoto } from "../actions"
+import { FEED } from '../screens'
 
 class AccountContainer extends Component {
   static navigatorButtons = {
@@ -18,6 +19,15 @@ class AccountContainer extends Component {
 
   shouldComponentUpdate (nextProps) {
     return !!nextProps.userData
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (!this.state.userData || nextProps.userData._rev !== this.state.userData._rev) {
+      this.setState({
+        userData: nextProps.userData,
+        userMadeChanges: false
+      })
+    }
   }
 
   constructor (props) {
@@ -45,7 +55,9 @@ class AccountContainer extends Component {
   onNavigatorEvent (event) {
     if (event.type === 'NavBarButtonPress') {
       if (event.id === 'save') {
-        alert('broken')
+        this.props.dispatch(updateUser(this.state.userData))
+        this.props.navigator.popToRoot({animated: false, animationType: 'none'})
+        this.props.dispatch(changeScreen(FEED))
       }
     }
   }
