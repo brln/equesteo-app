@@ -19,6 +19,8 @@ import {
   PHOTO_PERSIST_COMPLETE,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
+  RIDE_CARROT_CREATED,
+  RIDE_CARROT_SAVED,
   RIDE_CREATED,
   RIDE_SAVED,
   SAVE_USER_ID,
@@ -63,6 +65,7 @@ const initialState = {
   },
   horses: [],
   rides: [],
+  rideCarrots: [],
   users: [],
   version: 1
 }
@@ -179,6 +182,7 @@ export default function AppReducer(state=initialState, action) {
       return {
         ...state,
         rides: action.localData.rides,
+        rideCarrots: action.localData.rideCarrots,
         horses: action.localData.horses,
         users: action.localData.users,
       }
@@ -271,6 +275,29 @@ export default function AppReducer(state=initialState, action) {
           ...state.localState,
           needsRemotePersist: newNeedsFalse
         }
+      }
+    case RIDE_CARROT_CREATED:
+      return {
+        ...state,
+        rideCarrots: [action.carrotData, ...state.rideCarrots]
+      }
+    case RIDE_CARROT_SAVED:
+      // @TODO: ugh, these need to be in a map by ID, and this function needs to be de-duped
+      let rideCarrotFound = null
+      let k = 0
+      for (k; k < state.rideCarrots.length; k++) {
+        const currentRideCarrot = state.rideCarrots[k]
+        if (currentRideCarrot._id === action.carrotData._id) {
+          rideCarrotFound = {...currentRideCarrot, ...action.carrotData}
+          break
+        }
+      }
+      debugger
+      const rideCarrotClone = [...state.rideCarrots]
+      rideCarrotClone[k] = rideCarrotFound
+      return {
+        ...state,
+        rideCarrots: rideCarrotClone
       }
     case RIDE_CREATED:
       const newRide = {

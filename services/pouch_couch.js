@@ -1,7 +1,6 @@
 import PouchDB from 'pouchdb-react-native'
 import { API_URL } from 'react-native-dotenv'
 
-import UserAPI from './user_api'
 
 export default class PouchCouch {
   constructor (jwt) {
@@ -20,8 +19,6 @@ export default class PouchCouch {
     this.remoteHorsesDB = new PouchDB(`${API_URL}/couchproxy/${horsesDBName}`, remoteHeaders)
     this.remoteRidesDB = new PouchDB(`${API_URL}/couchproxy/${ridesDBName}`, remoteHeaders)
     this.remoteUsersDB = new PouchDB(`${API_URL}/couchproxy/${usersDBName}`, remoteHeaders)
-
-    this.userAPI = new UserAPI(jwt)
   }
 
   catchError (e) {
@@ -162,7 +159,8 @@ export default class PouchCouch {
     const usersResp = await this.localUsersDB.allDocs()
     return {
       horses: horsesResp.rows.map((r) => r.doc),
-      rides: ridesResp.rows.map((r) => r.doc),
+      rideCarrots: ridesResp.rows.map((r) => r.doc).filter((r) => r.type === 'carrot'),
+      rides: ridesResp.rows.map((r) => r.doc).filter((r) => r.type === 'ride'),
       users: usersResp.rows.map((r) => r.doc),
     }
   }

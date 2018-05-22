@@ -1,5 +1,15 @@
 import React, { Component } from 'react'
-import { Button, Content, Card, CardItem, Icon, Left, ListItem, Right, Text } from 'native-base';
+import {
+  Button,
+  Content,
+  Card,
+  CardItem,
+  Icon,
+  Left,
+  ListItem,
+  Right,
+  Text
+} from 'native-base';
 import {
   Image,
   StyleSheet,
@@ -8,6 +18,15 @@ import {
 import { staticMap } from '../../helpers'
 
 export default class RideCard extends Component {
+  constructor (props) {
+    super(props)
+    this.toggleCarrot = this.toggleCarrot.bind(this)
+  }
+
+  toggleCarrot () {
+    this.props.toggleCarrot(this.props.ride._id)
+  }
+
   render() {
     return (
       <ListItem
@@ -26,9 +45,9 @@ export default class RideCard extends Component {
             </CardItem>
             <CardItem footer>
               <Left>
-                <Button transparent>
+                <Button transparent onPress={this.toggleCarrot}>
                   <Icon active name="thumbs-up" />
-                  <Text>45 Likes</Text>
+                  <Text>{this.props.rideCarrots.length} Carrots</Text>
                 </Button>
               </Left>
               <Right>
