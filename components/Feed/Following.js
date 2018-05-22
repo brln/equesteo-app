@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
 import {
-  ScrollView,
+  FlatList,
   StyleSheet,
-  View,
 } from 'react-native';
 import RideCard from './RideCard'
 
@@ -14,23 +13,30 @@ export default class Following extends Component {
     this.state = {}
   }
 
+  startRefresh () {
+    this.setState({
+      refreshing: true
+    })
+  }
+
   render() {
     return (
-      <ScrollView>
-        <View containerStyle={{marginTop: 0}}>
-          {
-            this.props.rides.map((ride, i) => (
-              <RideCard
-                key={i}
-                ride={ride}
-                rideCarrots={this.props.rideCarrots.filter((rc) => rc.rideID === ride._id && rc.deleted === false)}
-                showRide={this.props.showRide}
-                toggleCarrot={this.props.toggleCarrot}
-              />
-            ))
-          }
-        </View>
-      </ScrollView>
+      <FlatList
+        containerStyle={{marginTop: 0}}
+        data={this.props.rides}
+        keyExtractor={(item) => item._id}
+        onRefresh={this.props.startRefresh}
+        refreshing={this.props.refreshing}
+        renderItem={({item}) => {
+          const ride = item
+          return (<RideCard
+            ride={ride}
+            rideCarrots={this.props.rideCarrots.filter((rc) => rc.rideID === ride._id && rc.deleted === false)}
+            showRide={this.props.showRide}
+            toggleCarrot={this.props.toggleCarrot}
+          />)
+        }}
+      />
     )
   }
 }

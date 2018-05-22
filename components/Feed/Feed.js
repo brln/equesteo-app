@@ -4,6 +4,7 @@ import { Navigation } from 'react-native-navigation'
 import {
   StyleSheet,
 } from 'react-native';
+
 import Following from './Following'
 import You from './You'
 import { RIDE } from '../../screens'
@@ -11,8 +12,11 @@ import { RIDE } from '../../screens'
 export default class Feed extends Component {
   constructor (props) {
     super(props)
-    this.state = {}
+    this.state = {
+      refreshing: false
+    }
     this.showRide = this.showRide.bind(this)
+    this.startRefresh = this.startRefresh.bind(this)
   }
 
   componentWillReceiveProps (prevProps) {
@@ -20,6 +24,13 @@ export default class Feed extends Component {
       this.showRide(prevProps.yourRides[0])
       this.props.justFinishedRideShown()
     }
+  }
+
+  startRefresh () {
+    this.setState({
+      refreshing: true
+    })
+    this.props.syncDBPull()
   }
 
   showRide (ride) {
@@ -39,22 +50,26 @@ export default class Feed extends Component {
   render() {
     return (
       <Container>
-        <Tabs initialPage={0}>
+        <Tabs initialPage={0} locked={true}>
           <Tab heading="Following">
             <Following
               horses={this.props.horses}
+              refreshing={this.state.refreshing}
               rides={this.props.followingRides}
               rideCarrots={this.props.rideCarrots}
               showRide={this.showRide}
+              startRefresh={this.startRefresh}
               toggleCarrot={this.props.toggleCarrot}
             />
           </Tab>
           <Tab heading="You">
             <You
               horses={this.props.horses}
+              refreshing={this.state.refreshing}
               rides={this.props.yourRides}
               rideCarrots={this.props.rideCarrots}
               showRide={this.showRide}
+              startRefresh={this.startRefresh}
               toggleCarrot={this.props.toggleCarrot}
             />
           </Tab>

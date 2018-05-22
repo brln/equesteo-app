@@ -9,16 +9,12 @@ class FeedContainer extends Component {
     super(props)
     this.justFinishedRideShown = this.justFinishedRideShown.bind(this)
     this.toggleCarrot = this.toggleCarrot.bind(this)
-    this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
-    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
+    this.syncDBPull = this.syncDBPull.bind(this)
   }
 
-  onNavigatorEvent (event) {
-    if (event.type === 'NavBarButtonPress') {
-      if (event.id === 'refresh') {
-        this.props.dispatch(syncDBPull('all'))
-      }
-    }
+  syncDBPull () {
+    this.props.dispatch(syncDBPull('all'))
+    // @TODO: make the refresher go away when it's done refreshing!
   }
 
   justFinishedRideShown () {
@@ -37,6 +33,7 @@ class FeedContainer extends Component {
         justFinishedRide={this.props.justFinishedRide}
         justFinishedRideShown={this.justFinishedRideShown}
         rideCarrots={this.props.rideCarrots}
+        syncDBPull={this.syncDBPull}
         toggleCarrot={this.toggleCarrot}
         yourRides={this.props.yourRides}
       />
