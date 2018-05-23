@@ -35,6 +35,7 @@ import {
   RIDE_SAVED,
   SAVE_USER_ID,
   START_RIDE,
+  SYNC_COMPLETE,
   USER_SAVED,
   USER_SEARCH_RETURNED,
 } from './constants'
@@ -226,6 +227,12 @@ export function startRide(firstCoord) {
       distance: 0,
       startTime: unixTimeNow()
     },
+  }
+}
+
+export function syncComplete () {
+  return {
+    type: SYNC_COMPLETE,
   }
 }
 
@@ -554,7 +561,9 @@ export function syncDBPull (db) {
       return u._id === userID
     })[0].following
     await pouchCouch.localReplicateDB(db, [...following, userID])
-    dispatch(loadLocalData())
+    await dispatch(loadLocalData())
+    debugger
+    dispatch(syncComplete())
   }
 }
 

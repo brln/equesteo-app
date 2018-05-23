@@ -12,9 +12,6 @@ import { RIDE } from '../../screens'
 export default class Feed extends Component {
   constructor (props) {
     super(props)
-    this.state = {
-      refreshing: false
-    }
     this.showRide = this.showRide.bind(this)
     this.startRefresh = this.startRefresh.bind(this)
   }
@@ -27,9 +24,6 @@ export default class Feed extends Component {
   }
 
   startRefresh () {
-    this.setState({
-      refreshing: true
-    })
     this.props.syncDBPull()
   }
 
@@ -54,7 +48,7 @@ export default class Feed extends Component {
           <Tab heading="Following">
             <Following
               horses={this.props.horses}
-              refreshing={this.state.refreshing}
+              refreshing={this.props.refreshing}
               rides={this.props.followingRides}
               rideCarrots={this.props.rideCarrots}
               showRide={this.showRide}
@@ -65,7 +59,7 @@ export default class Feed extends Component {
           <Tab heading="You">
             <You
               horses={this.props.horses}
-              refreshing={this.state.refreshing}
+              refreshing={this.props.refreshing}
               rides={this.props.yourRides}
               rideCarrots={this.props.rideCarrots}
               showRide={this.showRide}

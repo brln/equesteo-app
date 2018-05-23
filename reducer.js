@@ -25,6 +25,7 @@ import {
   RIDE_SAVED,
   SAVE_USER_ID,
   START_RIDE,
+  SYNC_COMPLETE,
   USER_SEARCH_RETURNED,
   USER_SAVED,
 } from './constants'
@@ -47,6 +48,7 @@ const initialState = {
     goodConnection: false,
     justFinishedRide: false,
     jwt: null,
+    lastFullSync: null,
     lastLocation: null,
     locallyPersisting: false,
     needsPhotoUploads: {
@@ -346,6 +348,14 @@ export default function AppReducer(state=initialState, action) {
         localState: {
           ...state.localState,
           currentRide: action.currentRide
+        }
+      }
+    case SYNC_COMPLETE:
+      return {
+        ...state,
+        localState: {
+          ...state.localState,
+          lastFullSync: new Date()
         }
       }
     case USER_SAVED:
