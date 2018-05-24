@@ -35,7 +35,7 @@ export default class Following extends Component {
   showProfile (user) {
     let name = 'Unknown Name'
     if (user.firstName || user.lastName) {
-      name = `${user.firstName} ${user.lastName}`
+      name = `${user.firstName || ''} ${user.lastName || ''}`
     }
 
     this.props.navigator.push({
@@ -61,22 +61,6 @@ export default class Following extends Component {
           <View containerStyle={{marginTop: 0}}>
             {
               this.props.userSearchResults.map((user, i) => (
-                <ListItem
-                  key={i}
-                  title={user.email}
-                  roundAvatar
-                  avatar={{uri: profilePhotoURL(user.profilePhotoID)}}
-                  onPress={() => { this.showProfile(user) }}
-                />
-              ))
-            }
-          </View>
-        </ScrollView>
-        <ScrollView style={{flex: 1}}>
-          <Text>Currently Following:</Text>
-          <View containerStyle={{marginTop: 0}}>
-            {
-              this.props.userData.following.map((user, i) => (
                 <ListItem
                   key={i}
                   title={user.email}

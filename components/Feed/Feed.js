@@ -5,8 +5,7 @@ import {
   StyleSheet,
 } from 'react-native';
 
-import Following from './Following'
-import You from './You'
+import RideList from './RideList'
 import { RIDE } from '../../screens'
 
 export default class Feed extends Component {
@@ -46,25 +45,29 @@ export default class Feed extends Component {
       <Container>
         <Tabs initialPage={0} locked={true}>
           <Tab heading="Following">
-            <Following
+            <RideList
               horses={this.props.horses}
+              navigator={this.props.navigator}
               refreshing={this.props.refreshing}
               rides={this.props.followingRides}
               rideCarrots={this.props.rideCarrots}
               showRide={this.showRide}
               startRefresh={this.startRefresh}
               toggleCarrot={this.props.toggleCarrot}
+              users={this.props.users}
             />
           </Tab>
           <Tab heading="You">
-            <You
+            <RideList
               horses={this.props.horses}
+              navigator={this.props.navigator}
               refreshing={this.props.refreshing}
               rides={this.props.yourRides}
               rideCarrots={this.props.rideCarrots}
               showRide={this.showRide}
               startRefresh={this.startRefresh}
               toggleCarrot={this.props.toggleCarrot}
+              users={this.props.users}
             />
           </Tab>
         </Tabs>

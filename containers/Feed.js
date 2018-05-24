@@ -47,10 +47,12 @@ class FeedContainer extends Component {
         horses={this.props.horses}
         justFinishedRide={this.props.justFinishedRide}
         justFinishedRideShown={this.justFinishedRideShown}
+        navigator={this.props.navigator}
         refreshing={this.state.refreshing}
         rideCarrots={this.props.rideCarrots}
         syncDBPull={this.syncDBPull}
         toggleCarrot={this.toggleCarrot}
+        users={this.props.users}
         yourRides={this.props.yourRides}
       />
     )
@@ -64,6 +66,7 @@ function mapStateToProps (state) {
     justFinishedRide: state.localState.justFinishedRide,
     lastFullSync: state.localState.lastFullSync,
     rideCarrots: state.rideCarrots,
+    users: state.users,
     yourRides: state.rides.filter((r) => r.userID === state.localState.userID).sort((a, b) => b.startTime - a.startTime),
   }
 }

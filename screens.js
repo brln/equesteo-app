@@ -1,5 +1,6 @@
 import { Navigation } from 'react-native-navigation';
 
+import Map from './components/Map'
 import NewHorse from './components/NewHorse'
 import Ride from './components/Ride'
 
@@ -20,6 +21,7 @@ export const DRAWER = 'equesteo.Drawer'
 export const FEED = 'equesteo.Feed'
 export const HORSE = 'equesteo.Horse'
 export const FOLLOWING = 'equesteo.Following'
+export const MAP = 'equesteo.Map'
 export const NEW_HORSE = 'equesteo.NewHorse'
 export const PROFILE = 'equesteo.Profile'
 export const RECORDER = 'equesteo.Recorder'
@@ -49,6 +51,7 @@ export function registerScreens(store, Provider) {
   Navigation.registerComponent(ACCOUNT, () => AccountContainer, store, Provider)
   Navigation.registerComponent(PROFILE, () => ProfileContainer, store, Provider)
 
+  Navigation.registerComponent(MAP, () => Map)
   Navigation.registerComponent(RIDE, () => Ride)
   Navigation.registerComponent(NEW_HORSE, () => NewHorse)
 }

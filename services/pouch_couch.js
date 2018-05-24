@@ -1,6 +1,7 @@
 import PouchDB from 'pouchdb-react-native'
 import { API_URL } from 'react-native-dotenv'
 
+
 export default class PouchCouch {
   constructor (jwt) {
     const horsesDBName = 'horses'
