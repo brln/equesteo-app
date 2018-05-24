@@ -23,6 +23,7 @@ import { PROFILE } from '../../screens'
 export default class RideCard extends Component {
   constructor (props) {
     super(props)
+    this.showComments = this.showComments.bind(this)
     this.showProfile = this.showProfile.bind(this)
     this.toggleCarrot = this.toggleCarrot.bind(this)
   }
@@ -31,9 +32,12 @@ export default class RideCard extends Component {
     this.props.toggleCarrot(this.props.ride._id)
   }
 
+  showComments () {
+    this.props.showComments(this.props.ride)
+  }
+
   showProfile () {
     const user = this.props.user
-    console.log(user)
     let name = 'Unknown Name'
     if (user.firstName || user.lastName) {
       name = `${user.firstName || ''} ${user.lastName || ''}`
@@ -45,6 +49,7 @@ export default class RideCard extends Component {
       animationType: 'slide-up',
       passProps: {
         user,
+        userProfilePhotoURL: this.props.userProfilePhotoURL
       }
     })
   }
@@ -93,9 +98,9 @@ export default class RideCard extends Component {
                 </Button>
               </Left>
               <Right>
-                <Button transparent>
+                <Button transparent onPress={this.showComments}>
                   <Icon active name="chatbubbles" />
-                  <Text>77 comments</Text>
+                  <Text>{this.props.rideComments.length} comments</Text>
                 </Button>
               </Right>
             </CardItem>

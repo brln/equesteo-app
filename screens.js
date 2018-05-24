@@ -12,6 +12,7 @@ import FollowingContainer from './containers/Following'
 import HorseContainer from './containers/Horse'
 import ProfileContainer from './containers/Profile'
 import RecorderContainer from './containers/Recorder'
+import RideCommentsContainer from './containers/RideComments'
 import RideDetailsContainer from './containers/RideDetails'
 import SignupLoginContainer from './containers/SignupLogin'
 
@@ -26,6 +27,7 @@ export const NEW_HORSE = 'equesteo.NewHorse'
 export const PROFILE = 'equesteo.Profile'
 export const RECORDER = 'equesteo.Recorder'
 export const RIDE = 'equesteo.Ride'
+export const RIDE_COMMENTS = 'equesteo.RideComments'
 export const RIDE_DETAILS = 'equesteo.RideDetails'
 export const SIGNUP_LOGIN = 'equesteo.SignupLogin'
 
@@ -40,16 +42,17 @@ export const FEED_DETAILS = {
 }
 
 export function registerScreens(store, Provider) {
+  Navigation.registerComponent(ACCOUNT, () => AccountContainer, store, Provider)
   Navigation.registerComponent(BARN, () => BarnContainer, store, Provider)
   Navigation.registerComponent(DRAWER, () => DrawerContainer, store, Provider)
   Navigation.registerComponent(FEED, () => FeedContainer, store, Provider)
   Navigation.registerComponent(FOLLOWING, () => FollowingContainer, store, Provider)
   Navigation.registerComponent(HORSE, () => HorseContainer, store, Provider)
-  Navigation.registerComponent(SIGNUP_LOGIN, () => SignupLoginContainer, store, Provider)
-  Navigation.registerComponent(RIDE_DETAILS, () => RideDetailsContainer, store, Provider)
-  Navigation.registerComponent(RECORDER, () => RecorderContainer, store, Provider)
-  Navigation.registerComponent(ACCOUNT, () => AccountContainer, store, Provider)
   Navigation.registerComponent(PROFILE, () => ProfileContainer, store, Provider)
+  Navigation.registerComponent(RECORDER, () => RecorderContainer, store, Provider)
+  Navigation.registerComponent(RIDE_COMMENTS, () => RideCommentsContainer, store, Provider)
+  Navigation.registerComponent(RIDE_DETAILS, () => RideDetailsContainer, store, Provider)
+  Navigation.registerComponent(SIGNUP_LOGIN, () => SignupLoginContainer, store, Provider)
 
   Navigation.registerComponent(MAP, () => Map)
   Navigation.registerComponent(RIDE, () => Ride)

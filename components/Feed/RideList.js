@@ -57,6 +57,8 @@ export default class RideList extends Component {
               navigator={this.props.navigator}
               ride={ride}
               rideCarrots={this.props.rideCarrots.filter((rc) => rc.rideID === ride._id && rc.deleted === false)}
+              rideComments={this.props.rideComments.filter((rc) => rc.rideID === ride._id && rc.deleted === false)}
+              showComments={this.props.showComments}
               showRide={this.props.showRide}
               toggleCarrot={this.props.toggleCarrot}
               user={this.getUser(ride)}

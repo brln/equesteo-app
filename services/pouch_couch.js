@@ -157,10 +157,13 @@ export default class PouchCouch {
     const horsesResp = await this.localHorsesDB.allDocs()
     const ridesResp = await this.localRidesDB.allDocs()
     const usersResp = await this.localUsersDB.allDocs()
+
+    const rideDocs = ridesResp.rows.map((r) => r.doc)
     return {
       horses: horsesResp.rows.map((r) => r.doc),
-      rideCarrots: ridesResp.rows.map((r) => r.doc).filter((r) => r.type === 'carrot'),
-      rides: ridesResp.rows.map((r) => r.doc).filter((r) => r.type === 'ride'),
+      rideCarrots: rideDocs.filter((r) => r.type === 'carrot'),
+      rideComments: rideDocs.filter((r) => r.type === 'comment'),
+      rides: rideDocs.filter((r) => r.type === 'ride'),
       users: usersResp.rows.map((r) => r.doc),
     }
   }

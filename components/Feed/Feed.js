@@ -51,6 +51,8 @@ export default class Feed extends Component {
               refreshing={this.props.refreshing}
               rides={this.props.followingRides}
               rideCarrots={this.props.rideCarrots}
+              rideComments={this.props.rideComments}
+              showComments={this.props.showComments}
               showRide={this.showRide}
               startRefresh={this.startRefresh}
               toggleCarrot={this.props.toggleCarrot}
@@ -64,6 +66,8 @@ export default class Feed extends Component {
               refreshing={this.props.refreshing}
               rides={this.props.yourRides}
               rideCarrots={this.props.rideCarrots}
+              rideComments={this.props.rideComments}
+              showComments={this.props.showComments}
               showRide={this.showRide}
               startRefresh={this.startRefresh}
               toggleCarrot={this.props.toggleCarrot}

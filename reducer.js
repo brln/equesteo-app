@@ -19,6 +19,7 @@ import {
   PHOTO_PERSIST_COMPLETE,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
+  RIDE_COMMENT_CREATED,
   RIDE_CARROT_CREATED,
   RIDE_CARROT_SAVED,
   RIDE_CREATED,
@@ -68,6 +69,7 @@ const initialState = {
   horses: [],
   rides: [],
   rideCarrots: [],
+  rideComments: [],
   users: [],
   version: 1
 }
@@ -185,6 +187,7 @@ export default function AppReducer(state=initialState, action) {
         ...state,
         rides: action.localData.rides,
         rideCarrots: action.localData.rideCarrots,
+        rideComments: action.localData.rideComments,
         horses: action.localData.horses,
         users: action.localData.users,
       }
@@ -294,12 +297,16 @@ export default function AppReducer(state=initialState, action) {
           break
         }
       }
-      debugger
       const rideCarrotClone = [...state.rideCarrots]
       rideCarrotClone[k] = rideCarrotFound
       return {
         ...state,
         rideCarrots: rideCarrotClone
+      }
+    case RIDE_COMMENT_CREATED:
+      return {
+        ...state,
+        rideComments: [action.rideComment, ...state.rideComments]
       }
     case RIDE_CREATED:
       const newRide = {

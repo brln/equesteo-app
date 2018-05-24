@@ -31,6 +31,7 @@ import {
   REMOTE_PERSIST_COMPLETE,
   RIDE_CARROT_CREATED,
   RIDE_CARROT_SAVED,
+  RIDE_COMMENT_CREATED,
   RIDE_CREATED,
   RIDE_SAVED,
   SAVE_USER_ID,
@@ -201,6 +202,13 @@ export function rideCarrotSaved (carrotData) {
   }
 }
 
+function rideCommentCreated (rideComment) {
+  return {
+    type: RIDE_COMMENT_CREATED,
+    rideComment
+  }
+}
+
 function rideCreated (ride) {
   return {
     type: RIDE_CREATED,
@@ -356,7 +364,26 @@ export function createRide (rideData) {
     const doc = await pouchCouch.saveRide(theRide)
     dispatch(rideCreated({...theRide, _id: doc.id, _rev: doc.rev}))
     dispatch(needsRemotePersist('rides'))
+  }
+}
 
+export function createRideComment(commentData) {
+  return async (dispatch, getState) => {
+    const pouchCouch = new PouchCouch(getState().localState.jwt)
+    const currentUserID = getState().localState.userID
+    const commentID = `${currentUserID}_${(new Date).getTime().toString()}`
+    const newComment = {
+      _id: commentID,
+      rideID: commentData.rideID,
+      userID: currentUserID,
+      deleted: false,
+      type: 'comment',
+      comment: commentData.comment,
+      timestamp: commentData.timestamp
+    }
+    const doc = await pouchCouch.saveRide(newComment)
+    dispatch(rideCommentCreated({...newComment, _rev: doc.rev}))
+    dispatch(needsRemotePersist('rides'))
   }
 }
 
@@ -562,7 +589,6 @@ export function syncDBPull (db) {
     })[0].following
     await pouchCouch.localReplicateDB(db, [...following, userID])
     await dispatch(loadLocalData())
-    debugger
     dispatch(syncComplete())
   }
 }
