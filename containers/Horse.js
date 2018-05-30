@@ -2,12 +2,59 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
 import Horse from '../components/Horse'
-import { uploadHorsePhoto } from '../actions'
+import { changeScreen, updateHorse, uploadHorsePhoto } from '../actions'
+import { FEED } from '../screens'
 
 class HorseContainer extends Component {
+  static navigatorButtons = {
+    leftButtons: [],
+    rightButtons: [
+      {
+        id: 'save',
+        title: 'Save',
+      }
+    ],
+  }
+
   constructor (props) {
     super(props)
+    this.state = {
+      userMadeChanges: false,
+      horseData: null,
+    }
+    this.changeHorseDetails = this.changeHorseDetails.bind(this)
     this.uploadPhoto = this.uploadPhoto.bind(this)
+    this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
+    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
+  }
+
+  static getDerivedStateFromProps (props, state) {
+    let nextState = null
+    if (!state.horseData || props.horseData._rev !== state.horseData._rev) {
+      nextState = {
+        horseData: props.horseData,
+        userMadeChanges: false
+      }
+    }
+    return nextState
+  }
+
+  onNavigatorEvent (event) {
+    if (event.type === 'NavBarButtonPress') {
+      if (event.id === 'save') {
+        this.props.dispatch(updateHorse(this.state.horseData))
+        this.props.navigator.popToRoot({animated: false, animationType: 'none'})
+        this.props.dispatch(changeScreen(FEED))
+      }
+    }
+  }
+
+  changeHorseDetails (newDetails) {
+    const newData = { ...this.state.horseData, ...newDetails }
+    this.setState({
+      userMadeChanges: true,
+      horseData: newData
+    })
   }
 
   uploadPhoto (location) {
@@ -17,7 +64,9 @@ class HorseContainer extends Component {
   render() {
     return (
       <Horse
-        horse={this.props.horse}
+        changeHorseDetails={this.changeHorseDetails}
+        horse={this.state.horseData}
+        navigator={this.props.navigator}
         uploadPhoto={this.uploadPhoto}
         userID={this.props.userID}
       />
@@ -26,15 +75,15 @@ class HorseContainer extends Component {
 }
 
 function mapStateToProps (state, passedProps) {
-  let horse = null
+  let horseData = null
   for (let eachHorse of state.horses) {
     if (eachHorse._id === passedProps.horseID) {
-      horse = eachHorse
+      horseData = eachHorse
       break;
     }
   }
   return {
-    horse,
+    horseData,
     userID: state.localState.userID,
   }
 }

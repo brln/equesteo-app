@@ -126,5 +126,4 @@ const styles = StyleSheet.create({
     width: 130,
     paddingTop: 2,
   }
-
 });

@@ -32,8 +32,6 @@ export default class NewHorse extends Component {
       if (event.id === 'save') {
         this.props.saveNewHorse({
           name: this.state.name,
-          profilePhotoID: null,
-          photosByID: {},
         })
       }
     }

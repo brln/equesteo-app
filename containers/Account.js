@@ -21,13 +21,15 @@ class AccountContainer extends Component {
     return !!nextProps.userData
   }
 
-  componentWillReceiveProps (nextProps) {
-    if (!this.state.userData || nextProps.userData._rev !== this.state.userData._rev) {
-      this.setState({
-        userData: nextProps.userData,
+  static getDerivedStateFromProps (props, state) {
+    let nextState = null
+    if (!state.userData || props.userData._rev !== state.userData._rev) {
+      nextState = {
+        userData: props.userData,
         userMadeChanges: false
-      })
+      }
     }
+    return nextState
   }
 
   constructor (props) {
@@ -48,7 +50,7 @@ class AccountContainer extends Component {
   changeAccountDetails (newDetails) {
     this.setState({
       userMadeChanges: true,
-      userData: Object.assign({}, this.state.userData, newDetails)
+      userData: { ...this.state.userData, ...newDetails }
     })
   }
 
