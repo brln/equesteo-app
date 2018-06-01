@@ -342,14 +342,25 @@ export function changeUserPhotoData (photoID, uri) {
   }
 }
 
-export function createHorse (horseData, remotePersist=true) {
+export function createHorse (horseData) {
   return async (dispatch, getState) => {
     const pouchCouch = new PouchCouch(getState().localState.jwt)
-    const doc = await pouchCouch.saveHorse(horseData)
-    dispatch(horseCreated({...horseData, _id: doc.id, _rev: doc.rev}))
-    if (remotePersist) {
-      dispatch(needsRemotePersist('horses'))
+    const newHorse = {
+      _id: horseData._id,
+      birthDay: null,
+      birthMonth: null,
+      birthYear: null,
+      description: null,
+      heightHands: null,
+      heightInches: null,
+      name: horseData.name,
+      profilePhotoID: null,
+      photosByID: {},
+      userID: horseData.userID
     }
+    const doc = await pouchCouch.saveHorse(newHorse)
+    dispatch(horseCreated({...newHorse, _rev: doc.rev}))
+    dispatch(needsRemotePersist('horses'))
   }
 }
 
@@ -433,7 +444,7 @@ function findLocalToken () {
 
 function loadLocalData () {
   return async (dispatch, getState) => {
-    const pouchCouch = new PouchCouch(getState().jwt)
+    const pouchCouch = new PouchCouch(getState().localState.jwt)
     const localData = await pouchCouch.localLoad()
     dispatch(localDataLoaded(localData))
   }
@@ -441,7 +452,7 @@ function loadLocalData () {
 
 export function searchForFriends (phrase) {
   return async (dispatch, getState) => {
-    const userAPI = new UserAPI(getState().jwt)
+    const userAPI = new UserAPI(getState().localState.jwt)
     try {
       const resp = await userAPI.findUser(phrase)
       dispatch(userSearchReturned(resp))
@@ -622,16 +633,20 @@ export function toggleRideCarrot (rideID) {
   }
 }
 
+export function updateHorse (horseDetails) {
+  return async (dispatch, getState) => {
+    const pouchCouch = new PouchCouch(getState().localState.jwt)
+    const doc = await pouchCouch.saveHorse(horseDetails)
+    dispatch(horseSaved({...horseDetails, _rev: doc.rev}))
+    dispatch(needsRemotePersist('horses'))
+  }
+}
+
 export function updateUser (userDetails) {
   return async (dispatch, getState) => {
     const pouchCouch = new PouchCouch(getState().localState.jwt)
-    const userID = getState().localState.userID
-    const userDoc = getState().users.filter((u) => {
-      return u._id === userID
-    })[0]
-    const newUserData = {...userDoc, ...userDetails}
-    const doc = await pouchCouch.saveUser(newUserData)
-    dispatch(userSaved({...newUserData, _rev: doc.rev}))
+    const doc = await pouchCouch.saveUser(userDetails)
+    dispatch(userSaved({...userDetails, _rev: doc.rev}))
     dispatch(needsRemotePersist('users'))
   }
 }

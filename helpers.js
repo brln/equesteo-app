@@ -78,7 +78,7 @@ export function staticMap (ride) {
   const STATIC_MAPS_API_KEY = 'AIzaSyBhUmpq-7uQ2JaqtrHO3hpfeFHynVpo8xQ'
   const ROOT_URL = 'https://maps.googleapis.com/maps/api/staticmap?'
   const queryStringParams = {
-      size: '400x400',
+      size: '580x350',
       format: 'png',
       maptype: 'terrain',
   }
@@ -88,7 +88,7 @@ export function staticMap (ride) {
   let nth = ride.rideCoordinates.length / MAX_NUM_COORDS
   nth = (nth < 1) ? 1 : Math.ceil(nth)
   let pathCoords = ''
-  for (let i = 0; i < Math.min(ride.rideCoordinates.length, MAX_NUM_COORDS); i++) {
+  for (let i = 0; i < ride.rideCoordinates.length; i++) {
     const coordinate = ride.rideCoordinates[i]
     if (i % nth === 0) {
       pathCoords += `|${coordinate.latitude},${coordinate.longitude}`

@@ -1,16 +1,32 @@
  TODO!
-- When saving and network is slow, show ride but mark it unsynced somehow
 - Start and end icons on map
 - Splash page
 - GPS Strength
 - save screenshots of ride when complete for thumbnails in ride list
-- location keeps getting recorded while entering ride details, make it not do that
-- be able to upload horse photo
 - define what props should be passed for each component
 - should not be able to go for a ride until you've added a horse
-- some indication that profile details have been saved when hitting save button
-- some semblence of search engine using postgres
-- when you start following someone their rides need to appear in your feed
+- save current state to PouchDB localdata
+- photoviewer component
+- comments on photos
+- photoswiper on rides in feed
+- training page with historical data
+- gpx uploader
+- profile photo picker
+- Make drawer less ugly more solid
+- Push notifications when friends do shit
+- Solve following/follower comments problem
+- New horses and follow in feed.
+- be able to delete horses
+- be able to delete rides
+- make unfollow work again
+- be able to view people's horse profiles from their user profiles
+- make NewHorse screen match the horse profile screen
+- preload images after they're uploaded so they don't flash
+- put weekly dividers in feed
+- show rides for a particular horse on the horse profile page
+- chart showing speed and altitude for a ride
+- be able to add photos to a ride after it happens
+- be able to change some details (horse) about a ride after it happens
 
 
  
@@ -35,3 +51,9 @@
 - error happens when you start ride before location found
 - be able to upload profile photo
 - database migrations
+- when you start following someone their rides need to appear in your feed
+- some semblence of search engine using postgres
+- some indication that profile details have been saved when hitting save button
+- be able to upload horse photo
+- location keeps getting recorded while entering ride details, make it not do that
+- When saving and network is slow, show ride but mark it unsynced somehow
