@@ -15,7 +15,7 @@ import {
 
 import { MAP } from '../screens'
 import { background } from '../colors'
-import PhotosBytimestamp from './PhotosByTimestamp'
+import PhotosByTimestamp from './PhotosByTimestamp'
 
 export default class Ride extends Component {
   constructor (props) {
@@ -36,7 +36,6 @@ export default class Ride extends Component {
   }
 
   fullscreenMap () {
-    console.log(MAP)
     Navigation.showModal({
       screen: MAP,
       title: 'Map',
@@ -86,7 +85,7 @@ export default class Ride extends Component {
             </View>
           </View>
           <View style={{height: 800}}>
-            <PhotosBytimestamp
+            <PhotosByTimestamp
               photosByID={this.props.ride.photosByID}
               profilePhotoID={this.props.ride.profilePhotoID}
             />

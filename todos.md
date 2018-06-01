@@ -23,7 +23,10 @@
 - make NewHorse screen match the horse profile screen
 - preload images after they're uploaded so they don't flash
 - put weekly dividers in feed
-
+- show rides for a particular horse on the horse profile page
+- chart showing speed and altitude for a ride
+- be able to add photos to a ride after it happens
+- be able to change some details (horse) about a ride after it happens
 
 
  

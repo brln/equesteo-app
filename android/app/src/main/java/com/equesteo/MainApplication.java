@@ -12,11 +12,24 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.reactnativenavigation.NavigationApplication;
 import com.airbnb.android.react.maps.MapsPackage;
+import com.facebook.react.bridge.ReadableNativeArray;
+import com.facebook.react.bridge.ReadableNativeMap;
+import com.facebook.soloader.SoLoader;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class MainApplication extends NavigationApplication {
+
+    @Override
+    public void onCreate() {
+        // workaround for bug where array cant have more than 512 elements
+        // https://github.com/facebook/react-native/issues/18292
+        super.onCreate();
+        SoLoader.init(this, /* native exopackage */ false);
+        ReadableNativeArray.setUseNativeAccessor(true);
+        ReadableNativeMap.setUseNativeAccessor(true);
+    }
 
     @Override
     public boolean isDebug() {

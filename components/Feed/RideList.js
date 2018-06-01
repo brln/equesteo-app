@@ -31,7 +31,7 @@ export default class RideList extends Component {
   getHorseProfilePhotoURL (ride) {
     const foundHorseRes = this.props.horses.filter((h) => h._id === ride.horseID)
     let profilePhotoURL = null
-    if (foundHorseRes) {
+    if (foundHorseRes.length > 0) {
       const foundHorse = foundHorseRes[0]
       const profilePhotoID = foundHorse.profilePhotoID
       if (profilePhotoID) {
