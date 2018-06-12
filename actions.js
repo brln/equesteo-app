@@ -642,6 +642,16 @@ export function updateHorse (horseDetails) {
   }
 }
 
+export function updateRide (rideDetails) {
+  return async (dispatch, getState) => {
+    console.log(rideDetails)
+    const pouchCouch = new PouchCouch(getState().localState.jwt)
+    const doc = await pouchCouch.saveRide(rideDetails)
+    dispatch(rideSaved({...rideDetails, _rev: doc.rev}))
+    dispatch(needsRemotePersist('rides'))
+  }
+}
+
 export function updateUser (userDetails) {
   return async (dispatch, getState) => {
     const pouchCouch = new PouchCouch(getState().localState.jwt)

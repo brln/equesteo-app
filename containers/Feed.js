@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
 import Feed from '../components/Feed/Feed'
-import { justFinishedRideShown, syncDBPull, toggleRideCarrot } from "../actions";
+import { justFinishedRideShown, syncDBPull, toggleRideCarrot, updateRide } from "../actions";
 import { RIDE_COMMENTS } from '../screens'
 
 class FeedContainer extends Component {
@@ -12,6 +12,7 @@ class FeedContainer extends Component {
       refreshing: false,
       lastFullSync: null
     }
+    this.deleteRide = this.deleteRide.bind(this)
     this.justFinishedRideShown = this.justFinishedRideShown.bind(this)
     this.toggleCarrot = this.toggleCarrot.bind(this)
     this.showComments = this.showComments.bind(this)
@@ -25,6 +26,13 @@ class FeedContainer extends Component {
       nextState.refreshing = false
     }
     return nextState
+  }
+
+  deleteRide (ride) {
+    this.props.dispatch(updateRide({
+      ...ride,
+      deleted: true,
+    }))
   }
 
   syncDBPull () {
@@ -55,6 +63,7 @@ class FeedContainer extends Component {
   render() {
     return (
       <Feed
+        deleteRide={this.deleteRide}
         followingRides={this.props.followingRides}
         horses={this.props.horses}
         justFinishedRide={this.props.justFinishedRide}
@@ -66,6 +75,7 @@ class FeedContainer extends Component {
         showComments={this.showComments}
         syncDBPull={this.syncDBPull}
         toggleCarrot={this.toggleCarrot}
+        userID={this.props.userID}
         users={this.props.users}
         yourRides={this.props.yourRides}
       />
@@ -75,14 +85,15 @@ class FeedContainer extends Component {
 
 function mapStateToProps (state) {
   return {
-    followingRides: state.rides.filter((r) => r.userID !== state.localState.userID).sort((a, b) => b.startTime - a.startTime),
+    followingRides: state.rides.filter((r) => r.userID !== state.localState.userID && r.deleted !== true).sort((a, b) => b.startTime - a.startTime),
     horses: state.horses,
     justFinishedRide: state.localState.justFinishedRide,
     lastFullSync: state.localState.lastFullSync,
     rideCarrots: state.rideCarrots,
     rideComments: state.rideComments,
     users: state.users,
-    yourRides: state.rides.filter((r) => r.userID === state.localState.userID).sort((a, b) => b.startTime - a.startTime),
+    userID: state.localState.userID,
+    yourRides: state.rides.filter((r) => r.userID === state.localState.userID && r.deleted !== true).sort((a, b) => b.startTime - a.startTime),
   }
 }
 

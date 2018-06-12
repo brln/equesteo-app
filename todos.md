@@ -1,8 +1,8 @@
  TODO!
+- save screenshots of ride when complete for thumbnails in ride list (making slow!)
 - Start and end icons on map
 - Splash page
 - GPS Strength
-- save screenshots of ride when complete for thumbnails in ride list
 - define what props should be passed for each component
 - should not be able to go for a ride until you've added a horse
 - save current state to PouchDB localdata
@@ -27,6 +27,9 @@
 - chart showing speed and altitude for a ride
 - be able to add photos to a ride after it happens
 - be able to change some details (horse) about a ride after it happens
+- facebook integration
+- privacy controls per account and ride
+- fix wrong username/password banner
 
 
  

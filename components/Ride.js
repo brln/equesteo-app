@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import Modal from 'react-native-modalbox';
 import { Navigation } from 'react-native-navigation'
 import moment from 'moment'
 
@@ -6,9 +7,9 @@ import { staticMap } from '../helpers'
 
 import {
   Image,
+  ScrollView,
   StyleSheet,
   Text,
-  ScrollView,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -20,9 +21,41 @@ import PhotosByTimestamp from './PhotosByTimestamp'
 export default class Ride extends Component {
   constructor (props) {
     super(props)
-    this.state = {}
+    this.state = {
+      modalOpen: false
+    }
     this.fullscreenMap = this.fullscreenMap.bind(this)
     this.whichHorse = this.whichHorse.bind(this)
+
+    this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
+    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
+  }
+
+  onNavigatorEvent(event) {
+    if (event.type == 'NavBarButtonPress') {
+      if (event.id == 'dropdown') {
+       this.props.navigator.showContextualMenu(
+          {
+            rightButtons: [
+              {
+                title: 'Edit',
+              },
+              {
+                title: 'Delete',
+              }
+            ],
+            onButtonPressed: (index) => {
+              if (index === 0) {
+                alert('edit')
+              } else if (index === 1) {
+                this.setState({modalOpen: true})
+                // this.props.deleteRide(this.props.ride)
+              }
+            }
+          }
+        );
+      }
+    }
   }
 
   whichHorse () {
@@ -49,6 +82,9 @@ export default class Ride extends Component {
   render() {
     return (
       <ScrollView>
+        <Modal style={[styles.modal, styles.modal3]} position={"top"} ref={"modal3"} isDisabled={false} isOpen={this.state.modalOpen}>
+          <Text style={styles.text}>Modal centered</Text>
+        </Modal>
         <View style={styles.container}>
           <View style={{flex: 3}}>
             <TouchableOpacity
@@ -84,7 +120,7 @@ export default class Ride extends Component {
               </View>
             </View>
           </View>
-          <View style={{height: 800}}>
+          <View>
             <PhotosByTimestamp
               photosByID={this.props.ride.photosByID}
               profilePhotoID={this.props.ride.profilePhotoID}
@@ -103,5 +139,14 @@ const styles = StyleSheet.create({
   },
   statFont: {
     fontSize: 24
-  }
+  },
+  modal: {
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  modal3: {
+    marginTop: 30,
+    height: 300,
+    width: 300
+  },
 });

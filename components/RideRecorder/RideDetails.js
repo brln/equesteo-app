@@ -41,7 +41,14 @@ export default class RideDetails extends Component<Props> {
         />
       )
     }
-    return horseComps
+    return (
+      <Picker
+        selectedValue={this.props.horseID}
+        onValueChange={this.props.changeHorseID}
+      >
+        {horseComps}
+      </Picker>
+    )
   }
 
   render() {
@@ -55,12 +62,7 @@ export default class RideDetails extends Component<Props> {
           value={this.props.rideName}
         />
         <Text>Horse:</Text>
-        <Picker
-          selectedValue={this.props.horseID}
-          onValueChange={this.props.changeHorseID}
-        >
-          {this.renderHorses()}
-        </Picker>
+        {this.renderHorses()}
         <View style={styles.profileButton}>
           <Button onPress={this.uploadPhoto} title='Add Photo' />
         </View>
