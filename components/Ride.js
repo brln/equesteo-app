@@ -6,6 +6,7 @@ import moment from 'moment'
 import { staticMap } from '../helpers'
 
 import {
+  Button,
   Image,
   ScrollView,
   StyleSheet,
@@ -24,6 +25,8 @@ export default class Ride extends Component {
     this.state = {
       modalOpen: false
     }
+    this.closeDeleteModal = this.closeDeleteModal.bind(this)
+    this.deleteRide = this.deleteRide.bind(this)
     this.fullscreenMap = this.fullscreenMap.bind(this)
     this.whichHorse = this.whichHorse.bind(this)
 
@@ -49,7 +52,6 @@ export default class Ride extends Component {
                 alert('edit')
               } else if (index === 1) {
                 this.setState({modalOpen: true})
-                // this.props.deleteRide(this.props.ride)
               }
             }
           }
@@ -79,11 +81,40 @@ export default class Ride extends Component {
     })
   }
 
+  closeDeleteModal () {
+    this.setState({
+      modalOpen: false
+    })
+  }
+
+  deleteRide () {
+    this.props.deleteRide(this.props.ride)
+    this.props.navigator.dismissAllModals()
+  }
+
+
   render() {
     return (
       <ScrollView>
-        <Modal style={[styles.modal, styles.modal3]} position={"top"} ref={"modal3"} isDisabled={false} isOpen={this.state.modalOpen}>
-          <Text style={styles.text}>Modal centered</Text>
+        <Modal
+          style={[styles.modal, styles.modal3]}
+          position={"top"}
+          isOpen={this.state.modalOpen}
+          onClosed={this.closeDeleteModal}
+        >
+          <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+            <Text>Are you sure you want to delete this ride?</Text>
+          </View>
+          <View style={{flex: 1, flexDirection: 'row', height: 20, alignItems: 'center'}}>
+            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+              <View style={{margin: 20}} >
+                <Button title={"Yes"} color={"red"} onPress={this.deleteRide}/>
+              </View>
+              <View style={{margin: 20}} >
+                <Button title={"No"} onPress={this.closeDeleteModal}/>
+              </View>
+            </View>
+          </View>
         </Modal>
         <View style={styles.container}>
           <View style={{flex: 3}}>
@@ -147,6 +178,6 @@ const styles = StyleSheet.create({
   modal3: {
     marginTop: 30,
     height: 300,
-    width: 300
+    width: 300,
   },
 });
