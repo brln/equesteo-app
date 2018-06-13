@@ -31,7 +31,13 @@ export default class UpdateRide extends Component<Props> {
 
 
   renderHorses () {
-    const horseComps = []
+    const horseComps = [
+       <Picker.Item
+        key={null}
+        label={''}
+        value={null}
+      />
+    ]
     for (let horse of this.props.horses) {
       horseComps.push(
         <Picker.Item

@@ -28,10 +28,11 @@
 - check to see if location services are turned on and prompt if not
 - save screenshots of ride when complete for thumbnails in ride list (making slow!)
 - update to gradle 3
-
+- make placeholder avatars prettier
 
  
  DONE!
+- changing horses in edit mode doesn't work if theres only one horse
 - be able to change some details (horse) about a ride after it happens
 - be able to add photos to a ride after it happens
 - be able to log out

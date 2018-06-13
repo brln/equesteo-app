@@ -23,7 +23,7 @@ class AccountContainer extends Component {
 
   static getDerivedStateFromProps (props, state) {
     let nextState = null
-    if (!state.userData || props.userData._rev !== state.userData._rev) {
+    if (!state.userData || (props.userData && props.userData._rev !== state.userData._rev)) {
       nextState = {
         userData: props.userData,
         userMadeChanges: false

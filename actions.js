@@ -326,6 +326,8 @@ export function changeUserPhotoData (photoID, uri) {
     const userClone = {...userDoc}
 
     let timestamp = unixTimeNow()
+    console.log('userclone')
+    console.log(userClone)
     if (userClone.photosByID[photoID]) {
       timestamp = userClone.photosByID[photoID].timestamp
     } else {
