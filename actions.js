@@ -1,7 +1,7 @@
 import { AppState, NetInfo } from 'react-native'
 import BackgroundGeolocation from 'react-native-mauron85-background-geolocation'
 
-import { unixTimeNow, generateUUID } from "./helpers"
+import { unixTimeNow, generateUUID, staticMap } from "./helpers"
 import { FEED } from './screens'
 import { LocalStorage, PouchCouch, UserAPI } from './services'
 import {BadRequestError, UnauthorizedError} from "./errors"
@@ -370,8 +370,9 @@ export function createRide (rideData) {
     const theRide = {
       ...getState().localState.currentRide,
       ...rideData,
-      type: 'ride'
+      type: 'ride',
     }
+    theRide.mapURL = staticMap(theRide)
     const doc = await pouchCouch.saveRide(theRide)
     dispatch(rideCreated({...theRide, _id: doc.id, _rev: doc.rev}))
     dispatch(needsRemotePersist('rides'))

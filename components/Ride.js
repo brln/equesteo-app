@@ -15,7 +15,7 @@ import {
   View,
 } from 'react-native';
 
-import { MAP } from '../screens'
+import { MAP, UPDATE_RIDE } from '../screens'
 import { background } from '../colors'
 import PhotosByTimestamp from './PhotosByTimestamp'
 
@@ -49,7 +49,18 @@ export default class Ride extends Component {
             ],
             onButtonPressed: (index) => {
               if (index === 0) {
-                alert('edit')
+                this.props.navigator.dismissAllModals()
+                this.props.navigator.push({
+                  screen: UPDATE_RIDE,
+                  title: 'Update Ride',
+                  passProps: {
+                    horses: this.props.horses,
+                    ride: this.props.ride
+                  },
+                  navigatorStyle: {},
+                  navigatorButtons: {},
+                  animationType: 'slide-up',
+                });
               } else if (index === 1) {
                 this.setState({modalOpen: true})
               }
@@ -122,7 +133,7 @@ export default class Ride extends Component {
               onPress={this.fullscreenMap}
             >
               <Image
-                source={{uri: staticMap(this.props.ride)}}
+                source={{uri: this.props.ride.mapURL }}
                 style={{height: 250, width: null, flex: 1}}
               />
             </TouchableOpacity>
