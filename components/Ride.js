@@ -3,8 +3,6 @@ import Modal from 'react-native-modalbox';
 import { Navigation } from 'react-native-navigation'
 import moment from 'moment'
 
-import { staticMap } from '../helpers'
-
 import {
   Button,
   Image,
@@ -105,6 +103,7 @@ export default class Ride extends Component {
 
 
   render() {
+    console.log('rendering')
     return (
       <ScrollView>
         <Modal
@@ -127,6 +126,7 @@ export default class Ride extends Component {
             </View>
           </View>
         </Modal>
+
         <View style={styles.container}>
           <View style={{flex: 3}}>
             <TouchableOpacity

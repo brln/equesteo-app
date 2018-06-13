@@ -12,20 +12,30 @@ import {
   Text
 } from 'native-base';
 import {
-  Image,
   StyleSheet,
   View,
 } from 'react-native';
 
-import { staticMap } from '../../helpers'
 import { PROFILE } from '../../screens'
+import RideImage from './RideImage'
 
 export default class RideCard extends Component {
   constructor (props) {
     super(props)
     this.showComments = this.showComments.bind(this)
+    this.showRide = this.showRide.bind(this)
     this.showProfile = this.showProfile.bind(this)
     this.toggleCarrot = this.toggleCarrot.bind(this)
+  }
+
+  shouldComponentUpdate (nextProps) {
+    if (this.props.rideComments.length !== nextProps.rideComments.length) {
+      return true
+    }
+    if (this.props.rideCarrots.length !== nextProps.rideCarrots.length) {
+      return true
+    }
+    return false
   }
 
   toggleCarrot () {
@@ -34,6 +44,10 @@ export default class RideCard extends Component {
 
   showComments () {
     this.props.showComments(this.props.ride)
+  }
+
+  showRide () {
+    this.props.showRide(this.props.ride)
   }
 
   showProfile () {
@@ -55,9 +69,10 @@ export default class RideCard extends Component {
   }
 
   render() {
+    console.log('rendering card')
     return (
       <ListItem
-        onPress={() => {this.props.showRide(this.props.ride)}}
+        onPress={this.showRide}
       >
         <Content>
           <Card>
@@ -85,10 +100,7 @@ export default class RideCard extends Component {
               </View>
             </CardItem>
             <CardItem cardBody>
-              <Image
-                source={{uri: this.props.ride.mapURL}}
-                style={{height: 200, width: null, flex: 1}}
-              />
+              <RideImage uri={this.props.ride.mapURL} />
             </CardItem>
             <CardItem footer>
               <Left>
