@@ -122,7 +122,7 @@ class RideDetailsContainer extends Component {
   }
 }
 
-function mapStateToProps (state) {
+function mapStateToProps (state, ownProps) {
   return {
     horses: state.horses.filter((h) => h.userID === state.localState.userID),
     goodConnection: state.localState.goodConnection,

@@ -1,28 +1,74 @@
 import React, { Component } from 'react'
+import Modal from 'react-native-modalbox';
 import { Navigation } from 'react-native-navigation'
 import moment from 'moment'
 
 import { staticMap } from '../helpers'
 
 import {
+  Button,
   Image,
+  ScrollView,
   StyleSheet,
   Text,
-  ScrollView,
   TouchableOpacity,
   View,
 } from 'react-native';
 
-import { MAP } from '../screens'
+import { MAP, UPDATE_RIDE } from '../screens'
 import { background } from '../colors'
 import PhotosByTimestamp from './PhotosByTimestamp'
 
 export default class Ride extends Component {
   constructor (props) {
     super(props)
-    this.state = {}
+    this.state = {
+      modalOpen: false
+    }
+    this.closeDeleteModal = this.closeDeleteModal.bind(this)
+    this.deleteRide = this.deleteRide.bind(this)
     this.fullscreenMap = this.fullscreenMap.bind(this)
     this.whichHorse = this.whichHorse.bind(this)
+
+    this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
+    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
+  }
+
+  onNavigatorEvent(event) {
+    if (event.type == 'NavBarButtonPress') {
+      if (event.id == 'dropdown') {
+       this.props.navigator.showContextualMenu(
+          {
+            rightButtons: [
+              {
+                title: 'Edit',
+              },
+              {
+                title: 'Delete',
+              }
+            ],
+            onButtonPressed: (index) => {
+              if (index === 0) {
+                this.props.navigator.dismissAllModals()
+                this.props.navigator.push({
+                  screen: UPDATE_RIDE,
+                  title: 'Update Ride',
+                  passProps: {
+                    horses: this.props.horses,
+                    ride: this.props.ride
+                  },
+                  navigatorStyle: {},
+                  navigatorButtons: {},
+                  animationType: 'slide-up',
+                });
+              } else if (index === 1) {
+                this.setState({modalOpen: true})
+              }
+            }
+          }
+        );
+      }
+    }
   }
 
   whichHorse () {
@@ -46,16 +92,48 @@ export default class Ride extends Component {
     })
   }
 
+  closeDeleteModal () {
+    this.setState({
+      modalOpen: false
+    })
+  }
+
+  deleteRide () {
+    this.props.deleteRide(this.props.ride)
+    this.props.navigator.dismissAllModals()
+  }
+
+
   render() {
     return (
       <ScrollView>
+        <Modal
+          style={[styles.modal, styles.modal3]}
+          position={"top"}
+          isOpen={this.state.modalOpen}
+          onClosed={this.closeDeleteModal}
+        >
+          <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+            <Text>Are you sure you want to delete this ride?</Text>
+          </View>
+          <View style={{flex: 1, flexDirection: 'row', height: 20, alignItems: 'center'}}>
+            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+              <View style={{margin: 20}} >
+                <Button title={"Yes"} color={"red"} onPress={this.deleteRide}/>
+              </View>
+              <View style={{margin: 20}} >
+                <Button title={"No"} onPress={this.closeDeleteModal}/>
+              </View>
+            </View>
+          </View>
+        </Modal>
         <View style={styles.container}>
           <View style={{flex: 3}}>
             <TouchableOpacity
               onPress={this.fullscreenMap}
             >
               <Image
-                source={{uri: staticMap(this.props.ride)}}
+                source={{uri: this.props.ride.mapURL }}
                 style={{height: 250, width: null, flex: 1}}
               />
             </TouchableOpacity>
@@ -84,7 +162,7 @@ export default class Ride extends Component {
               </View>
             </View>
           </View>
-          <View style={{height: 800}}>
+          <View>
             <PhotosByTimestamp
               photosByID={this.props.ride.photosByID}
               profilePhotoID={this.props.ride.profilePhotoID}
@@ -103,5 +181,14 @@ const styles = StyleSheet.create({
   },
   statFont: {
     fontSize: 24
-  }
+  },
+  modal: {
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  modal3: {
+    marginTop: 30,
+    height: 300,
+    width: 300,
+  },
 });

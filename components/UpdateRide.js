@@ -10,9 +10,9 @@ import {
 import { Container, Content } from 'native-base';
 import ImagePicker from 'react-native-image-crop-picker'
 
-import PhotosByTimestamp from '../PhotosByTimestamp'
+import PhotosByTimestamp from './PhotosByTimestamp'
 
-export default class RideDetails extends Component<Props> {
+export default class UpdateRide extends Component<Props> {
   constructor (props) {
     super(props)
     this.renderHorses = this.renderHorses.bind(this)
@@ -43,7 +43,7 @@ export default class RideDetails extends Component<Props> {
     }
     return (
       <Picker
-        selectedValue={this.props.horseID}
+        selectedValue={this.props.ride.horseID}
         onValueChange={this.props.changeHorseID}
       >
         {horseComps}
@@ -59,7 +59,7 @@ export default class RideDetails extends Component<Props> {
           style={styles.textInput}
           onChangeText={this.props.changeRideName}
           selectTextOnFocus={true}
-          value={this.props.rideName}
+          value={this.props.ride.name}
         />
         <Text>Horse:</Text>
         {this.renderHorses()}
@@ -70,8 +70,8 @@ export default class RideDetails extends Component<Props> {
           <Content>
             <Text>Photos</Text>
             <PhotosByTimestamp
-              photosByID={this.props.photosByID}
-              profilePhotoID={this.props.profilePhotoID}
+              photosByID={this.props.ride.photosByID}
+              profilePhotoID={this.props.ride.profilePhotoID}
             />
           </Content>
         </Container>

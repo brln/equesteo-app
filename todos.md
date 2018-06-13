@@ -1,23 +1,20 @@
  TODO!
+- photoswiper on rides in feed
 - Start and end icons on map
 - Splash page
 - GPS Strength
-- save screenshots of ride when complete for thumbnails in ride list
 - define what props should be passed for each component
 - should not be able to go for a ride until you've added a horse
 - save current state to PouchDB localdata
 - photoviewer component
 - comments on photos
-- photoswiper on rides in feed
 - training page with historical data
-- gpx uploader
 - profile photo picker
 - Make drawer less ugly more solid
 - Push notifications when friends do shit
 - Solve following/follower comments problem
 - New horses and follow in feed.
 - be able to delete horses
-- be able to delete rides
 - make unfollow work again
 - be able to view people's horse profiles from their user profiles
 - make NewHorse screen match the horse profile screen
@@ -25,13 +22,20 @@
 - put weekly dividers in feed
 - show rides for a particular horse on the horse profile page
 - chart showing speed and altitude for a ride
-- be able to add photos to a ride after it happens
-- be able to change some details (horse) about a ride after it happens
+- facebook integration
+- privacy controls per account and ride
+- fix wrong username/password banner
+- check to see if location services are turned on and prompt if not
+- save screenshots of ride when complete for thumbnails in ride list (making slow!)
+- update to gradle 3
 
 
  
  DONE!
+- be able to change some details (horse) about a ride after it happens
+- be able to add photos to a ride after it happens
 - be able to log out
+- gpx uploader
 - Put map on current ride page
 - Properly zoom map on ride show-page
 - make sure location is turned on when you start the app
@@ -57,3 +61,4 @@
 - be able to upload horse photo
 - location keeps getting recorded while entering ride details, make it not do that
 - When saving and network is slow, show ride but mark it unsynced somehow
+- be able to delete rides

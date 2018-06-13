@@ -27,15 +27,28 @@ export default class Feed extends Component {
   }
 
   showRide (ride) {
+    let rightButtons = []
+    if (this.props.userID === ride.userID) {
+      rightButtons = [
+        {
+          icon: require('../../img/threedot.png'),
+          id: 'dropdown',
+        }
+      ]
+    }
     Navigation.showModal({
       screen: RIDE,
       title: ride.name,
       passProps: {
+        deleteRide: this.props.deleteRide,
         horses: this.props.horses,
-        ride
+        ride,
       },
       navigatorStyle: {},
-      navigatorButtons: {},
+      navigatorButtons: {
+        leftButtons: [],
+        rightButtons
+      },
       animationType: 'slide-up',
     });
   }

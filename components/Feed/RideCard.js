@@ -86,7 +86,7 @@ export default class RideCard extends Component {
             </CardItem>
             <CardItem cardBody>
               <Image
-                source={{uri: staticMap(this.props.ride)}}
+                source={{uri: this.props.ride.mapURL}}
                 style={{height: 200, width: null, flex: 1}}
               />
             </CardItem>

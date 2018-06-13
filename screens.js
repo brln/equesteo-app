@@ -15,6 +15,7 @@ import RecorderContainer from './containers/Recorder'
 import RideCommentsContainer from './containers/RideComments'
 import RideDetailsContainer from './containers/RideDetails'
 import SignupLoginContainer from './containers/SignupLogin'
+import UpdateRideContainer from './containers/UpdateRide'
 
 export const ACCOUNT = 'equesteo.Account'
 export const BARN = 'equesteo.Barn'
@@ -30,6 +31,7 @@ export const RIDE = 'equesteo.Ride'
 export const RIDE_COMMENTS = 'equesteo.RideComments'
 export const RIDE_DETAILS = 'equesteo.RideDetails'
 export const SIGNUP_LOGIN = 'equesteo.SignupLogin'
+export const UPDATE_RIDE = 'equesteo.UpdateRide'
 
 export const FEED_DETAILS = {
   screen: FEED,
@@ -53,6 +55,7 @@ export function registerScreens(store, Provider) {
   Navigation.registerComponent(RIDE_COMMENTS, () => RideCommentsContainer, store, Provider)
   Navigation.registerComponent(RIDE_DETAILS, () => RideDetailsContainer, store, Provider)
   Navigation.registerComponent(SIGNUP_LOGIN, () => SignupLoginContainer, store, Provider)
+  Navigation.registerComponent(UPDATE_RIDE, () => UpdateRideContainer, store, Provider)
 
   Navigation.registerComponent(MAP, () => Map)
   Navigation.registerComponent(RIDE, () => Ride)

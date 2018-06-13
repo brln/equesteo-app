@@ -8,6 +8,7 @@ const toDeg = (rad) => {
 
 
 export const haversine = (lat1, lon1, lat2, lon2) => {
+  console.log('running haversine')
   const R = 3959; // mi
   const x1 = lat2 - lat1
   const dLat = toRad(x1)
@@ -29,6 +30,7 @@ export const bearing = (lat1,lng1,lat2,lng2) => {
 }
 
 export const rideCoordsToMapCoords = (rideCoords) => {
+  console.log('ride coords to map coords')
   const sorted = [...rideCoords].sort((a, b) => {
     return new Date(a.timestamp) - new Date(b.timestamp);
   })
@@ -75,6 +77,7 @@ function urlParams (params) {
 }
 
 export function staticMap (ride) {
+  console.log('static map')
   const STATIC_MAPS_API_KEY = 'AIzaSyBhUmpq-7uQ2JaqtrHO3hpfeFHynVpo8xQ'
   const ROOT_URL = 'https://maps.googleapis.com/maps/api/staticmap?'
   const queryStringParams = {
