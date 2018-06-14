@@ -3,8 +3,7 @@ import { Provider } from 'react-redux'
 import { createStore, applyMiddleware } from 'redux'
 import thunkMiddleware from 'redux-thunk'
 import { Navigation } from 'react-native-navigation';
-
-
+import { Sentry } from 'react-native-sentry';
 
 import { appInitialized } from "./actions"
 import logger from './middleware/logger'
@@ -25,6 +24,8 @@ const store = createStore(
 )
 
 registerScreens(store, Provider)
+
+Sentry.config('https://a392ba52ce124829a8afc43dc4dc44de:5dfdf9a68b84429dbbc693a96de52795@sentry.io/1226675').install();
 
 export default class App {
   constructor() {

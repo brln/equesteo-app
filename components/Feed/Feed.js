@@ -37,7 +37,7 @@ export default class Feed extends Component {
       ]
     }
     console.log('start show ride')
-    this.props.navigator.push({
+    Navigation.showModal({
       screen: RIDE,
       title: ride.name,
       passProps: {

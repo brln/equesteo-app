@@ -29,13 +29,10 @@ export default class RideCard extends Component {
   }
 
   shouldComponentUpdate (nextProps) {
-    if (this.props.rideComments.length !== nextProps.rideComments.length) {
-      return true
-    }
-    if (this.props.rideCarrots.length !== nextProps.rideCarrots.length) {
-      return true
-    }
-    return false
+    return (this.props.rideComments.length !== nextProps.rideComments.length
+      || this.props.rideCarrots.length !== nextProps.rideCarrots.length
+      || this.props.horseProfilePhotoURL !== nextProps.horseProfilePhotoURL
+    )
   }
 
   toggleCarrot () {
