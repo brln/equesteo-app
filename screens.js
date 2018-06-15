@@ -13,6 +13,7 @@ import HorseContainer from './containers/Horse'
 import ProfileContainer from './containers/Profile'
 import RecorderContainer from './containers/Recorder'
 import RideCommentsContainer from './containers/RideComments'
+import RideContainer from './containers/Ride'
 import RideDetailsContainer from './containers/RideDetails'
 import SignupLoginContainer from './containers/SignupLogin'
 import UpdateRideContainer from './containers/UpdateRide'
@@ -52,13 +53,13 @@ export function registerScreens(store, Provider) {
   Navigation.registerComponent(HORSE, () => HorseContainer, store, Provider)
   Navigation.registerComponent(PROFILE, () => ProfileContainer, store, Provider)
   Navigation.registerComponent(RECORDER, () => RecorderContainer, store, Provider)
+  Navigation.registerComponent(RIDE, () => RideContainer, store, Provider)
   Navigation.registerComponent(RIDE_COMMENTS, () => RideCommentsContainer, store, Provider)
   Navigation.registerComponent(RIDE_DETAILS, () => RideDetailsContainer, store, Provider)
   Navigation.registerComponent(SIGNUP_LOGIN, () => SignupLoginContainer, store, Provider)
   Navigation.registerComponent(UPDATE_RIDE, () => UpdateRideContainer, store, Provider)
 
   Navigation.registerComponent(MAP, () => Map)
-  Navigation.registerComponent(RIDE, () => Ride)
   Navigation.registerComponent(NEW_HORSE, () => NewHorse)
 }
 

@@ -112,10 +112,10 @@ class UpdateRideContainer extends Component {
   }
 }
 
-function mapStateToProps (state, ownProps) {
+function mapStateToProps (state, passedProps) {
   return {
     horses: state.horses.filter((h) => h.userID === state.localState.userID),
-    ride: ownProps.ride,
+    ride: state.rides.filter((r) => r._id === passedProps.rideID)[0],
     userID: state.localState.userID,
   }
 }

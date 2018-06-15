@@ -32,6 +32,7 @@ export default class RideCard extends Component {
     return (this.props.rideComments.length !== nextProps.rideComments.length
       || this.props.rideCarrots.length !== nextProps.rideCarrots.length
       || this.props.horseProfilePhotoURL !== nextProps.horseProfilePhotoURL
+      || this.props.ride.name !== nextProps.ride.name
     )
   }
 

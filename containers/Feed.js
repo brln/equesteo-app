@@ -12,7 +12,6 @@ class FeedContainer extends Component {
       refreshing: false,
       lastFullSync: null
     }
-    this.deleteRide = this.deleteRide.bind(this)
     this.justFinishedRideShown = this.justFinishedRideShown.bind(this)
     this.toggleCarrot = this.toggleCarrot.bind(this)
     this.showComments = this.showComments.bind(this)
@@ -26,13 +25,6 @@ class FeedContainer extends Component {
       nextState.refreshing = false
     }
     return nextState
-  }
-
-  deleteRide (ride) {
-    this.props.dispatch(updateRide({
-      ...ride,
-      deleted: true,
-    }))
   }
 
   syncDBPull () {
@@ -55,7 +47,7 @@ class FeedContainer extends Component {
       screen: RIDE_COMMENTS,
       title: 'Comments',
       passProps: {
-        ride
+        rideID: ride._id
       }
     })
   }

@@ -52,8 +52,7 @@ export default class Ride extends Component {
                   screen: UPDATE_RIDE,
                   title: 'Update Ride',
                   passProps: {
-                    horses: this.props.horses,
-                    ride: this.props.ride
+                    rideID: this.props.ride._id
                   },
                   navigatorStyle: {},
                   navigatorButtons: {},
@@ -97,7 +96,7 @@ export default class Ride extends Component {
   }
 
   deleteRide () {
-    this.props.deleteRide(this.props.ride)
+    this.props.deleteRide()
     this.props.navigator.dismissAllModals()
   }
 

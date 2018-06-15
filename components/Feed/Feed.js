@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Container, Tab, Tabs } from 'native-base';
-import { Navigation } from 'react-native-navigation'
 import {
   StyleSheet,
 } from 'react-native';
@@ -36,16 +35,12 @@ export default class Feed extends Component {
         }
       ]
     }
-    console.log('start show ride')
-    Navigation.showModal({
+    this.props.navigator.push({
       screen: RIDE,
       title: ride.name,
       passProps: {
-        deleteRide: this.props.deleteRide,
-        horses: this.props.horses,
-        ride,
+        rideID: ride._id,
       },
-      navigatorStyle: {},
       navigatorButtons: {
         leftButtons: [],
         rightButtons

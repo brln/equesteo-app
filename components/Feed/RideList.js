@@ -64,7 +64,9 @@ export default class RideList extends PureComponent {
       <FlatList
         containerStyle={{marginTop: 0}}
         data={this.props.rides}
+        initialNumToRender={3}
         keyExtractor={(item) => item._id}
+        maxToRenderPerBatch={2}
         onRefresh={this.props.startRefresh}
         refreshing={this.props.refreshing}
         renderItem={this._renderCard}

@@ -59,7 +59,8 @@ class RideCommentsContainer extends Component {
 
 function mapStateToProps (state, passedProps) {
   return {
-    rideComments: state.rideComments.filter((rc) => rc.rideID === passedProps.ride._id),
+    ride: state.rides.filter((r) => r._id === passedProps.rideID)[0],
+    rideComments: state.rideComments.filter((rc) => rc.rideID === passedProps.rideID),
     users: state.users
   }
 }
