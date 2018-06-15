@@ -51,7 +51,8 @@ function changeAppRoot(root) {
 export function changeScreen(screen) {
   return {
     type: CHANGE_SCREEN,
-    screen
+    logData: ['screen'],
+    screen,
   }
 }
 
@@ -134,6 +135,7 @@ export function needsRemotePersist (database) {
 
 function newAppState (newState) {
   return {
+    logData: ['newState'],
     type: NEW_APP_STATE,
     newState,
   }

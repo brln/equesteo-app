@@ -21,6 +21,7 @@ export default class PouchCouch {
   }
 
   catchError (e) {
+    console.log("ERROR TO FOLLOW: ")
     console.log(e)
     debugger
     throw e
@@ -56,17 +57,22 @@ export default class PouchCouch {
     }
   }
 
+  // --START MESSAGE
+  // Do not put error handlers on these, the errors are handled in
+  // middleware/couch.js::remotePersist and if you catch them here
+  // it fucks the queue up
   remoteReplicateHorses () {
-    return PouchDB.replicate(this.localHorsesDB, this.remoteHorsesDB).on('error', (e) => this.catchError(e))
+    return PouchDB.replicate(this.localHorsesDB, this.remoteHorsesDB)
   }
 
   remoteReplicateRides () {
-    return PouchDB.replicate(this.localRidesDB, this.remoteRidesDB).on('error', (e) => this.catchError(e))
+    return PouchDB.replicate(this.localRidesDB, this.remoteRidesDB)
   }
 
   remoteReplicateUsers () {
-    return PouchDB.replicate(this.localUsersDB, this.remoteUsersDB).on('error', (e) => this.catchError(e))
+    return PouchDB.replicate(this.localUsersDB, this.remoteUsersDB)
   }
+  // ---END MESSAGE
 
   localReplicateDB(db, userIDs) {
     switch(db) {

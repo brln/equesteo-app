@@ -44,7 +44,7 @@ function remotePersist (db, store, pouchCouch) {
   }).on('error', (e) => {
     queue = []
     savingRemotely = false
-    console.log('remote replication error')
+    console.log('Remote replication error follows: ')
     console.log(e)
   })
 }
