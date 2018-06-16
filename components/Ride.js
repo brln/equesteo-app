@@ -102,7 +102,6 @@ export default class Ride extends Component {
 
 
   render() {
-    console.log('rendering')
     return (
       <ScrollView>
         <Modal

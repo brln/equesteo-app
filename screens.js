@@ -2,7 +2,6 @@ import { Navigation } from 'react-native-navigation';
 
 import Map from './components/Map'
 import NewHorse from './components/NewHorse'
-import Ride from './components/Ride'
 
 import AccountContainer from './containers/Account'
 import BarnContainer from './containers/Barn'
@@ -16,6 +15,7 @@ import RideCommentsContainer from './containers/RideComments'
 import RideContainer from './containers/Ride'
 import RideDetailsContainer from './containers/RideDetails'
 import SignupLoginContainer from './containers/SignupLogin'
+import TrainingContainer from './containers/Training'
 import UpdateRideContainer from './containers/UpdateRide'
 
 export const ACCOUNT = 'equesteo.Account'
@@ -32,6 +32,7 @@ export const RIDE = 'equesteo.Ride'
 export const RIDE_COMMENTS = 'equesteo.RideComments'
 export const RIDE_DETAILS = 'equesteo.RideDetails'
 export const SIGNUP_LOGIN = 'equesteo.SignupLogin'
+export const TRAINING = 'equesteo.Training'
 export const UPDATE_RIDE = 'equesteo.UpdateRide'
 
 export const FEED_DETAILS = {
@@ -57,6 +58,7 @@ export function registerScreens(store, Provider) {
   Navigation.registerComponent(RIDE_COMMENTS, () => RideCommentsContainer, store, Provider)
   Navigation.registerComponent(RIDE_DETAILS, () => RideDetailsContainer, store, Provider)
   Navigation.registerComponent(SIGNUP_LOGIN, () => SignupLoginContainer, store, Provider)
+  Navigation.registerComponent(TRAINING, () => TrainingContainer, store, Provider)
   Navigation.registerComponent(UPDATE_RIDE, () => UpdateRideContainer, store, Provider)
 
   Navigation.registerComponent(MAP, () => Map)

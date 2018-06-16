@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
-import { Keyboard, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import {
   ACCOUNT,
@@ -10,19 +10,21 @@ import {
   FOLLOWING,
   RIDES,
   RIDES_DETAILS,
-  RECORDER
+  RECORDER,
+  TRAINING,
 } from '../screens'
 import { changeScreen } from '../actions'
 
 class DrawerContainer extends Component {
   constructor (props) {
     super(props)
-		this.openRecorder = this.openRecorder.bind(this)
     this.toggleDrawer = this.toggleDrawer.bind(this)
 		this.openAccount = this.openAccount.bind(this)
     this.openBarn = this.openBarn.bind(this)
     this.openFeed = this.openFeed.bind(this)
     this.openFollowing = this.openFollowing.bind(this)
+		this.openRecorder = this.openRecorder.bind(this)
+    this.openTraining = this.openTraining.bind(this)
   }
 
   openFeed () {
@@ -79,6 +81,20 @@ class DrawerContainer extends Component {
     this.props.navigator.push({
       screen: BARN,
       title: 'Barn',
+      navigatorButtons: {
+        leftButtons: [{
+          id: 'sideMenu'
+        }]
+      }
+    })
+  }
+
+  openTraining () {
+    this.props.dispatch(changeScreen(TRAINING))
+    this.toggleDrawer()
+    this.props.navigator.push({
+      screen: TRAINING,
+      title: 'Training',
       navigatorButtons: {
         leftButtons: [{
           id: 'sideMenu'
@@ -151,6 +167,17 @@ class DrawerContainer extends Component {
           <View style={styles.drawerListItem}>
             <Text style={styles.drawerListItemText} onTouch>
               Following
+            </Text>
+          </View>
+        </TouchableOpacity>
+      )
+    }
+    if (this.props.currentScreen !== TRAINING) {
+      following = (
+        <TouchableOpacity onPress={this.openTraining}>
+          <View style={styles.drawerListItem}>
+            <Text style={styles.drawerListItemText} onTouch>
+              Training
             </Text>
           </View>
         </TouchableOpacity>

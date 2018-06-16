@@ -309,11 +309,7 @@ export default function AppReducer(state=initialState, action) {
         rideComments: [action.rideComment, ...state.rideComments]
       }
     case RIDE_CREATED:
-      const newRide = {
-        ...state.localState.currentRide,
-        ...action.ride,
-        userID: state.localState.userID
-      }
+      const newRide = { ...action.ride }
       return {
         ...state,
         rides: [newRide, ...state.rides],

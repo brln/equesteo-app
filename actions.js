@@ -371,9 +371,19 @@ export function createHorse (horseData) {
 export function createRide (rideData) {
   return async (dispatch, getState) => {
     const pouchCouch = new PouchCouch()
+    const currentRide = getState().localState.currentRide
     const theRide = {
       ...getState().localState.currentRide,
-      ...rideData,
+      rideCoordinates: currentRide.rideCoordinates,
+      distance: currentRide.distance,
+      startTime: currentRide.startTime,
+      _id: rideData._id,
+      elapsedTimeSecs: rideData.elapsedtimeSecs,
+      name: rideData.name,
+      horseID: rideData.horseID,
+      userID: rideData.userID,
+      photosByID: rideData.photosByID,
+      coverPhotoID: rideData.coverPhotoID,
       type: 'ride',
     }
     theRide.mapURL = staticMap(theRide)
