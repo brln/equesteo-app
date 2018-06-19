@@ -217,16 +217,22 @@ export default function AppReducer(state=initialState, action) {
           lastLocation: action.location
         }
       }
-      if (state.localState.currentRide && state.localState.lastLocation) {
-        const newDistance = haversine(
-          state.localState.lastLocation.latitude,
-          state.localState.lastLocation.longitude,
-          action.location.latitude,
-          action.location.longitude
-        )
+      if (state.localState.currentRide) {
+        let newDistance = 0
+        if (state.localState.lastLocation) {
+          newDistance = haversine(
+            state.localState.lastLocation.latitude,
+            state.localState.lastLocation.longitude,
+            action.location.latitude,
+            action.location.longitude
+          )
+        }
+        const rideCoordinates = [...state.localState.currentRide.rideCoordinates, action.location].sort((a, b) => {
+          return new Date(a.timestamp) - new Date(b.timestamp);
+        })
         newState.localState.currentRide = {
           ...state.localState.currentRide,
-          rideCoordinates: [...state.localState.currentRide.rideCoordinates, action.location],
+          rideCoordinates,
           distance: state.localState.currentRide.distance + newDistance,
         }
       }
@@ -350,7 +356,7 @@ export default function AppReducer(state=initialState, action) {
         ...state,
         localState: {
           ...state.localState,
-          currentRide: action.currentRide
+          currentRide: action.currentRide,
         }
       }
     case SYNC_COMPLETE:

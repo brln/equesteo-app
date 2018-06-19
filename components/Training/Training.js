@@ -2,10 +2,31 @@ import React, { Component } from 'react'
 import {
   FlatList,
   ScrollView,
-  StyleSheet
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native'
 
 import Week from './Week'
+
+function DaysOfWeek () {
+  const asNums = {0: 'M', 1: 'T', 2: 'W', 3: 'R', 4: 'F', 5: 'Sa', 6: 'Su'}
+  const days = []
+  for (let i = 0; i < 7; i++) {
+    days.push(
+      <View key={i} style={{flex: 1, justifyContent: 'center'}}>
+        <Text style={{textAlign: 'center', fontSize: 15, color: "#C2C2C2"}}>{asNums[i]}</Text>
+      </View>
+    )
+  }
+  return (
+    <View style={{paddingTop: 20, borderBottomWidth: 1, borderBottomColor: '#C2C2C2'}}>
+      <View style={{flex: 1, flexDirection: 'row', marginBottom: 15}}>
+        {days}
+      </View>
+    </View>
+  )
+}
 
 export default class Training extends Component {
   constructor (props) {
@@ -59,13 +80,16 @@ export default class Training extends Component {
     const mondayDates = Object.keys(rideWeeks)
     mondayDates.sort((a, b) => new Date(b) - new Date(a))
     return (
-      <ScrollView>
-        <FlatList
-          data={mondayDates}
-          keyExtractor={(i) => i}
-          renderItem={this._renderItem(rideWeeks)}
-        />
-      </ScrollView>
+      <View>
+        <DaysOfWeek />
+        <ScrollView>
+          <FlatList
+            data={mondayDates}
+            keyExtractor={(i) => i}
+            renderItem={this._renderItem(rideWeeks)}
+          />
+        </ScrollView>
+      </View>
     )
   }
 }

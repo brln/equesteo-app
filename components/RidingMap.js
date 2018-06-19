@@ -6,8 +6,7 @@ import {
   View
 } from 'react-native';
 
-import { bearing } from '../helpers'
-
+import { bearing, rideCoordsToMapCoords } from '../helpers'
 
 export default class RidingMap extends Component {
   constructor (props) {
@@ -18,11 +17,21 @@ export default class RidingMap extends Component {
     this.fitToElements = this.fitToElements.bind(this)
   }
 
+  shouldComponentUpdate(nextProps) {
+    let should = false
+    if (nextProps.rideCoords.length !== this.props.rideCoords.length) {
+      should = true
+    }
+    return should
+  }
+
   fitToElements() {
-    const maxLat = Math.max(...this.props.rideCoords.map((c) => c.latitude))
-    const minLat = Math.min(...this.props.rideCoords.map((c) => c.latitude))
-    const maxLong = Math.max(...this.props.rideCoords.map((c) => c.longitude))
-    const minLong = Math.min(...this.props.rideCoords.map((c) => c.longitude))
+    const lats = this.props.rideCoords.map(c => c.latitude)
+    const longs = this.props.rideCoords.map(c => c.longitude)
+    const maxLat = Math.max(...lats)
+    const minLat = Math.min(...lats)
+    const maxLong = Math.max(...longs)
+    const minLong = Math.min(...longs)
     const latitude = ((maxLat - minLat) / 2) + minLat || 0
     const longitude = ((maxLong - minLong) / 2) + minLong || 0
     const latitudeDelta = Math.max((maxLat - minLat) * 1.2, 0.01)

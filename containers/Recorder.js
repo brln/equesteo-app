@@ -17,16 +17,15 @@ class RecorderContainer extends Component {
     super(props)
     this.discardRide = this.discardRide.bind(this)
     this.startRide = this.startRide.bind(this)
+    this.stopLocationTracking = this.stopLocationTracking.bind(this)
   }
 
   componentDidMount () {
     this.props.dispatch(startLocationTracking())
   }
 
-  componentWillUnmount () {
-    if (!this.props.currentRide) {
-      this.props.dispatch(stopLocationTracking())
-    }
+  stopLocationTracking () {
+    this.props.dispatch(stopLocationTracking())
   }
 
   startRide () {
@@ -49,6 +48,7 @@ class RecorderContainer extends Component {
         lastLocation={this.props.lastLocation}
         navigator={this.props.navigator}
         startRide={this.startRide}
+        stopLocationTracking={this.stopLocationTracking}
       />
     )
   }

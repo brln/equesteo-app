@@ -48,15 +48,17 @@ export default class Week extends Component {
       endString = end.format('MMMM D YYYY')
     }
     return (
-      <View style={{flex: 1, flexDirection: 'column'}}>
+      <View style={{flex: 1, flexDirection: 'column', paddingBottom: 30}}>
         <View style={{flex: 1}}>
           <Text style={{textAlign: 'center'}}>
             {startString} - {endString}
           </Text>
         </View>
         <View style={{flex: 1, flexDirection: 'row', marginBottom: 15}}>
-          {/*{this.props.rides.map((r) => <Text key={r._id}>{r.distance.toFixed(1)}|</Text>)}*/}
           {this.days(this.props.mondayString)}
+        </View>
+        <View>
+          <Text style={{textAlign: 'center'}}>Total: 23.1</Text>
         </View>
       </View>
     )

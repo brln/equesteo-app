@@ -78,6 +78,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5FCFF',
   },
   errorBox: {
+    marginTop: 40,
     textAlign: 'center',
     paddingTop: 20,
     paddingBottom: 20,

@@ -551,6 +551,7 @@ function startNetworkTracking () {
 export function stopLocationTracking () {
   return async (dispatch) => {
     BackgroundGeolocation.stop()
+    BackgroundGeolocation.removeAllListeners('location')
     dispatch(clearLastLocation())
   }
 }

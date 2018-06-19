@@ -29,20 +29,6 @@ export const bearing = (lat1,lng1,lat2,lng2) => {
   return ((brng + 360) % 360);
 }
 
-export const rideCoordsToMapCoords = (rideCoords) => {
-  console.log('ride coords to map coords')
-  const sorted = [...rideCoords].sort((a, b) => {
-    return new Date(a.timestamp) - new Date(b.timestamp);
-  })
-
-  return sorted.map((apiCoord) => {
-    return {
-      latitude: parseFloat(apiCoord.latitude),
-      longitude: parseFloat(apiCoord.longitude),
-    }
-  })
-}
-
 export const unixTimeNow = () => {
   return Math.floor(new Date().getTime())
 }

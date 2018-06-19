@@ -9,7 +9,8 @@ import { unixTimeNow } from "../../helpers"
 import RidingMap from '../RidingMap'
 import RideStats from './RideStats'
 import GPSStatus from './GPSStatus'
-import { rideCoordsToMapCoords } from "../../helpers"
+
+import { stopLocationTracking } from "../../actions"
 import { RIDE_DETAILS } from "../../screens"
 import { background, highlight, lowlight } from '../../colors'
 
@@ -54,7 +55,7 @@ export default class RideRecorder extends Component<Props> {
       alert('Discarding empty ride.')
       this.props.discardRide()
     }
-
+    this.props.stopLocationTracking()
   }
 
   startRide () {
@@ -79,7 +80,7 @@ export default class RideRecorder extends Component<Props> {
           <View style={{flex: 4}}>
             <RidingMap
               mode={"duringRide"}
-              rideCoords={rideCoordsToMapCoords(this.props.currentRide.rideCoordinates)}
+              rideCoords={this.props.currentRide.rideCoordinates}
             />
           </View>
           <View style={styles.bottomSection}>

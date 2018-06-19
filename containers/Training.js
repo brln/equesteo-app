@@ -23,7 +23,7 @@ class TrainingContainer extends Component {
 function mapStateToProps (state, passedProps) {
   return {
     horses: state.horses,
-    rides: state.rides.filter((r) => r.userID === state.localState.userID),
+    rides: state.rides.filter((r) => r.userID === state.localState.userID && r.deleted !== true),
   }
 }
 

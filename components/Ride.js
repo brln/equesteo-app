@@ -97,7 +97,7 @@ export default class Ride extends Component {
 
   deleteRide () {
     this.props.deleteRide()
-    this.props.navigator.dismissAllModals()
+    this.props.navigator.popToRoot()
   }
 
 
