@@ -67,7 +67,6 @@ export default class RideCard extends Component {
   }
 
   render() {
-    console.log('rendering card')
     return (
       <ListItem
         onPress={this.showRide}

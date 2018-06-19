@@ -1,4 +1,5 @@
  TODO!
+- training page with historical data
 - photoswiper on rides in feed
 - Start and end icons on map
 - Splash page
@@ -8,7 +9,6 @@
 - save current state to PouchDB localdata
 - photoviewer component
 - comments on photos
-- training page with historical data
 - profile photo picker
 - Make drawer less ugly more solid
 - Push notifications when friends do shit
@@ -27,8 +27,10 @@
 - fix wrong username/password banner
 - check to see if location services are turned on and prompt if not
 - save screenshots of ride when complete for thumbnails in ride list (making slow!)
-- update to gradle 3
+- update to gradle 3 (4? rumors that 3 might not work on android?)
 - make placeholder avatars prettier
+- progress while logging in/downloading data
+- make taskbar notification go away when not riding always
 
  
  DONE!

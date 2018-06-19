@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
 import Ride from '../components/Ride'
+import { updateRide } from '../actions'
 
 
 class RideContainer extends Component {
