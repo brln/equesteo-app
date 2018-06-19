@@ -378,7 +378,7 @@ export function createRide (rideData) {
       distance: currentRide.distance,
       startTime: currentRide.startTime,
       _id: rideData._id,
-      elapsedTimeSecs: rideData.elapsedtimeSecs,
+      elapsedTimeSecs: rideData.elapsedTimeSecs,
       name: rideData.name,
       horseID: rideData.horseID,
       userID: rideData.userID,

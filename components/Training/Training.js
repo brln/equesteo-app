@@ -65,10 +65,12 @@ export default class Training extends Component {
   }
 
   _renderItem (rideWeeks) {
-    return ({item}) => {
+    return ({item, index}) => {
        return (
          <Week
+           index={index}
            mondayString={item}
+           navigator={this.props.navigator}
            rides={rideWeeks[item]}
          />
       )
