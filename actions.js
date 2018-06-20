@@ -29,6 +29,7 @@ import {
   PHOTO_PERSIST_COMPLETE,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
+  REMOVE_RIDE_FROM_STATE,
   RIDE_CARROT_CREATED,
   RIDE_CARROT_SAVED,
   RIDE_COMMENT_CREATED,
@@ -190,6 +191,13 @@ export function remotePersistComplete (database) {
   }
 }
 
+function removeRideFromState (rideID) {
+  return {
+    type: REMOVE_RIDE_FROM_STATE,
+    rideID
+  }
+}
+
 export function rideCarrotCreated (carrotData) {
   return {
     type: RIDE_CARROT_CREATED,
@@ -253,7 +261,7 @@ export function userSearchReturned (userSearchResults) {
   }
 }
 
-export function userSaved (userData) {
+export function userUpdated (userData) {
   return {
     type: USER_SAVED,
     userData,
@@ -415,6 +423,7 @@ export function createRideComment(commentData) {
 
 export function createFollow (followingID) {
   return async (dispatch, getState) => {
+    debugger
     let currentUser = null
     for (let user of getState().users) {
       if (user._id === getState().localState.userID) {
@@ -425,23 +434,39 @@ export function createFollow (followingID) {
     const newUserData = {...currentUser}
     newUserData.following.push(followingID)
     const pouchCouch = new PouchCouch(getState().localState.jwt)
-    await pouchCouch.saveUser(newUserData)
-    dispatch(userSaved(newUserData))
+    const doc = await pouchCouch.saveUser(newUserData)
+    await dispatch(userUpdated({...newUserData, _rev: doc.rev}))
+    debugger
     dispatch(needsRemotePersist('users'))
+    dispatch(syncDBPull('all'))
   }
 }
 
 export function deleteFollow (followingID) {
   return async (dispatch, getState) => {
-    // const userAPI = new UserAPI(getState().jwt)
-    // try {
-    //   const following = await userAPI.deleteFollow(followingID)
-    //   dispatch(saveUserData({...getState().userData, following}))
-    // } catch (e) {
-    //   console.log(e)
-    //   alert('error in console')
-    // }
-    // @TODO: fix this
+    let currentUser = null
+    for (let user of getState().users) {
+      if (user._id === getState().localState.userID) {
+        currentUser = user
+        break
+      }
+    }
+    const newUserData = {...currentUser}
+    const index = newUserData.following.indexOf(followingID);
+    if (index > -1) {
+      newUserData.following.splice(index, 1);
+    }
+    const pouchCouch = new PouchCouch(getState().localState.jwt)
+    const doc = await pouchCouch.saveUser(newUserData)
+    dispatch(userUpdated({...newUserData, _rev: doc.rev}))
+    dispatch(needsRemotePersist('users'))
+
+    for (let ride of getState().rides) {
+      if (ride.userID === followingID) {
+        pouchCouch.deleteRide(ride._id, ride._rev)
+        dispatch(removeRideFromState(ride._id))
+      }
+    }
   }
 }
 
@@ -511,7 +536,7 @@ export function startLocationTracking () {
       stationaryRadius: 10,
       distanceFilter: 10,
       maxLocations: 10,
-      notificationTitle: 'You\'re out on a ride a ride.',
+      notificationTitle: 'You\'re out on a ride.',
       notificationText: 'Tap here to see your progress.',
       // debug: true,
       locationProvider: BackgroundGeolocation.RAW_PROVIDER,
@@ -671,7 +696,7 @@ export function updateUser (userDetails) {
   return async (dispatch, getState) => {
     const pouchCouch = new PouchCouch(getState().localState.jwt)
     const doc = await pouchCouch.saveUser(userDetails)
-    dispatch(userSaved({...userDetails, _rev: doc.rev}))
+    dispatch(userUpdated({...userDetails, _rev: doc.rev}))
     dispatch(needsRemotePersist('users'))
   }
 }

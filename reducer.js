@@ -19,6 +19,7 @@ import {
   PHOTO_PERSIST_COMPLETE,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
+  REMOVE_RIDE_FROM_STATE,
   RIDE_COMMENT_CREATED,
   RIDE_CARROT_CREATED,
   RIDE_CARROT_SAVED,
@@ -28,7 +29,7 @@ import {
   START_RIDE,
   SYNC_COMPLETE,
   USER_SEARCH_RETURNED,
-  USER_SAVED,
+  USER_UPDATED,
 } from './constants'
 import {
   appStates,
@@ -70,7 +71,7 @@ const initialState = {
   rides: [],
   rideCarrots: [],
   rideComments: [],
-  users: [],
+  users: {},
   version: 1
 }
 
@@ -287,6 +288,25 @@ export default function AppReducer(state=initialState, action) {
           needsRemotePersist: newNeedsFalse
         }
       }
+    case REMOVE_RIDE_FROM_STATE:
+      let rideFound = null
+      let l = 0
+      for (l; l < state.rides.length; l++) {
+        const ride = state.rides[l]
+        if (ride._id === action.rideID) {
+          rideFound = ride
+          break
+        }
+      }
+      if (rideFound) {
+        const removeRidesClone = [...state.rides]
+        removeRidesClone.splice(l, 1)
+        return {
+          ...state,
+          rides: removeRidesClone
+        }
+      }
+      return
     case RIDE_CARROT_CREATED:
       return {
         ...state,

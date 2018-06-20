@@ -67,6 +67,20 @@ export default class RideCard extends Component {
   }
 
   render() {
+    let horseAvatar = null
+    if (this.props.horseProfilePhotoURL) {
+      horseAvatar = (
+        <View style={{flex: 1}}>
+          <Avatar
+            small
+            rounded
+            source={{uri: this.props.horseProfilePhotoURL}}
+            onPress={() => console.log("Works!")}
+            activeOpacity={0.7}
+          />
+        </View>
+      )
+    }
     return (
       <ListItem
         onPress={this.showRide}
@@ -85,15 +99,7 @@ export default class RideCard extends Component {
                 <View style={{flex: 5}}>
                   <Text>{this.props.ride.name}</Text>
                 </View>
-                <View style={{flex: 1}}>
-                  <Avatar
-                    small
-                    rounded
-                    source={{uri: this.props.horseProfilePhotoURL}}
-                    onPress={() => console.log("Works!")}
-                    activeOpacity={0.7}
-                  />
-                </View>
+                { horseAvatar }
               </View>
             </CardItem>
             <CardItem cardBody>
