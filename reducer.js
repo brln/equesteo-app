@@ -184,13 +184,17 @@ export default function AppReducer(state=initialState, action) {
         }
       }
     case LOCAL_DATA_LOADED:
+      const allUsers = {}
+      for (let user of action.localData.users) {
+        allUsers[user._id] = user
+      }
       return {
         ...state,
         rides: action.localData.rides,
         rideCarrots: action.localData.rideCarrots,
         rideComments: action.localData.rideComments,
         horses: action.localData.horses,
-        users: action.localData.users,
+        users: allUsers,
       }
     case NEEDS_REMOTE_PERSIST:
       let newNeeds = {...state.localState.needsRemotePersist}
@@ -387,10 +391,12 @@ export default function AppReducer(state=initialState, action) {
           lastFullSync: new Date()
         }
       }
-    case USER_SAVED:
+    case USER_UPDATED:
+      const usersClone = {...state.users}
+      usersClone[action.userData._id] = action.userData
       return {
         ...state,
-        users: [action.userData, ...state.users]
+        users: usersClone
       }
     case USER_SEARCH_RETURNED:
       return {

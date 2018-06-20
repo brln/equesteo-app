@@ -32,7 +32,7 @@ export default class RideComments extends Component {
   }
 
   singleComment(rideComment) {
-    const commentUser = this.props.users.filter((u) => u._id === rideComment.userID)[0]
+    const commentUser = this.props.users[rideComment.userID]
     return (
       <ListItem avatar key={rideComment._id}>
         <Left>

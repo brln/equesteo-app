@@ -38,7 +38,7 @@ import {
   SAVE_USER_ID,
   START_RIDE,
   SYNC_COMPLETE,
-  USER_SAVED,
+  USER_UPDATED,
   USER_SEARCH_RETURNED,
 } from './constants'
 
@@ -263,7 +263,7 @@ export function userSearchReturned (userSearchResults) {
 
 export function userUpdated (userData) {
   return {
-    type: USER_SAVED,
+    type: USER_UPDATED,
     userData,
   }
 }
@@ -330,9 +330,7 @@ export function changeRidePhotoData(rideID, photoID, uri) {
 export function changeUserPhotoData (photoID, uri) {
   return async (dispatch, getState) => {
     const userID = getState().localState.userID
-    const userDoc = getState().users.filter((u) => {
-      return u._id === userID
-    })[0]
+    const userDoc = getState().users[userID]
     const userClone = {...userDoc}
 
     let timestamp = unixTimeNow()
@@ -423,20 +421,13 @@ export function createRideComment(commentData) {
 
 export function createFollow (followingID) {
   return async (dispatch, getState) => {
-    debugger
-    let currentUser = null
-    for (let user of getState().users) {
-      if (user._id === getState().localState.userID) {
-        currentUser = user
-        break
-      }
-    }
+    const userID = getState().localState.userID
+    const currentUser = getState().users[userID]
     const newUserData = {...currentUser}
     newUserData.following.push(followingID)
     const pouchCouch = new PouchCouch(getState().localState.jwt)
     const doc = await pouchCouch.saveUser(newUserData)
     await dispatch(userUpdated({...newUserData, _rev: doc.rev}))
-    debugger
     dispatch(needsRemotePersist('users'))
     dispatch(syncDBPull('all'))
   }
@@ -444,13 +435,8 @@ export function createFollow (followingID) {
 
 export function deleteFollow (followingID) {
   return async (dispatch, getState) => {
-    let currentUser = null
-    for (let user of getState().users) {
-      if (user._id === getState().localState.userID) {
-        currentUser = user
-        break
-      }
-    }
+    const userID = getState().localState.userID
+    const currentUser = getState().users[userID]
     const newUserData = {...currentUser}
     const index = newUserData.following.indexOf(followingID);
     if (index > -1) {
@@ -460,13 +446,6 @@ export function deleteFollow (followingID) {
     const doc = await pouchCouch.saveUser(newUserData)
     dispatch(userUpdated({...newUserData, _rev: doc.rev}))
     dispatch(needsRemotePersist('users'))
-
-    for (let ride of getState().rides) {
-      if (ride.userID === followingID) {
-        pouchCouch.deleteRide(ride._id, ride._rev)
-        dispatch(removeRideFromState(ride._id))
-      }
-    }
   }
 }
 
@@ -636,9 +615,7 @@ export function syncDBPull (db) {
   return async (dispatch, getState) => {
     const pouchCouch = new PouchCouch(getState().localState.jwt)
     const userID = getState().localState.userID
-    const following = getState().users.filter((u) => {
-      return u._id === userID
-    })[0].following
+    const following = getState().users[userID].following
     await pouchCouch.localReplicateDB(db, [...following, userID])
     await dispatch(loadLocalData())
     dispatch(syncComplete())
