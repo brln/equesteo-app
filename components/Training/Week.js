@@ -12,7 +12,6 @@ import {
 } from 'react-native';
 
 function RideDay (props) {
-  console.log(props.i)
   return (
     <View style={{flex: 1, justifyContent: 'center'}}>
       <TouchableHighlight onPress={() => { props.showRide(props.ride)} }>

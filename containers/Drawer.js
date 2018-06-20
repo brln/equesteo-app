@@ -117,6 +117,7 @@ class DrawerContainer extends Component {
 		let myAccountScreen = null
     let recorder = null
     let following = null
+    let training = null
     if (this.props.currentScreen !== FEED) {
       feed = (
         <TouchableOpacity onPress={this.openFeed}>
@@ -173,7 +174,7 @@ class DrawerContainer extends Component {
       )
     }
     if (this.props.currentScreen !== TRAINING) {
-      following = (
+      training = (
         <TouchableOpacity onPress={this.openTraining}>
           <View style={styles.drawerListItem}>
             <Text style={styles.drawerListItemText} onTouch>
@@ -190,13 +191,11 @@ class DrawerContainer extends Component {
 					<View style={styles.drawerList}>
             {feed}
             {following}
+            {training}
             {recorder}
 						{barnScreen}
 						{myAccountScreen}
 					</View>
-					<Text style={styles._version}>
-						{/* 'v1.0.0' */}
-					</Text>
 				</View>
 			</View>
     )

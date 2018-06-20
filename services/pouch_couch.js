@@ -43,6 +43,10 @@ export default class PouchCouch {
     return this.localUsersDB.put(userData).catch(this.catchError)
   }
 
+  deleteRide (id, rev) {
+    return this.localRidesDB.remove(id, rev).catch(this.catchError)
+  }
+
   remoteReplicateDB(db) {
     switch(db) {
       case 'horses':

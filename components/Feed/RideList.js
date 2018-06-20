@@ -16,7 +16,7 @@ export default class RideList extends PureComponent {
   }
 
   getUser (ride) {
-    return this.props.users.filter((u) => u._id === ride.userID)[0]
+    return this.props.users[ride.userID]
   }
 
   getUserProfilePhotoURL (ride) {

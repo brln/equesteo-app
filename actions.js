@@ -29,6 +29,7 @@ import {
   PHOTO_PERSIST_COMPLETE,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
+  REMOVE_RIDE_FROM_STATE,
   RIDE_CARROT_CREATED,
   RIDE_CARROT_SAVED,
   RIDE_COMMENT_CREATED,
@@ -37,7 +38,7 @@ import {
   SAVE_USER_ID,
   START_RIDE,
   SYNC_COMPLETE,
-  USER_SAVED,
+  USER_UPDATED,
   USER_SEARCH_RETURNED,
 } from './constants'
 
@@ -190,6 +191,13 @@ export function remotePersistComplete (database) {
   }
 }
 
+function removeRideFromState (rideID) {
+  return {
+    type: REMOVE_RIDE_FROM_STATE,
+    rideID
+  }
+}
+
 export function rideCarrotCreated (carrotData) {
   return {
     type: RIDE_CARROT_CREATED,
@@ -253,9 +261,9 @@ export function userSearchReturned (userSearchResults) {
   }
 }
 
-export function userSaved (userData) {
+export function userUpdated (userData) {
   return {
-    type: USER_SAVED,
+    type: USER_UPDATED,
     userData,
   }
 }
@@ -322,9 +330,7 @@ export function changeRidePhotoData(rideID, photoID, uri) {
 export function changeUserPhotoData (photoID, uri) {
   return async (dispatch, getState) => {
     const userID = getState().localState.userID
-    const userDoc = getState().users.filter((u) => {
-      return u._id === userID
-    })[0]
+    const userDoc = getState().users[userID]
     const userClone = {...userDoc}
 
     let timestamp = unixTimeNow()
@@ -415,33 +421,31 @@ export function createRideComment(commentData) {
 
 export function createFollow (followingID) {
   return async (dispatch, getState) => {
-    let currentUser = null
-    for (let user of getState().users) {
-      if (user._id === getState().localState.userID) {
-        currentUser = user
-        break
-      }
-    }
+    const userID = getState().localState.userID
+    const currentUser = getState().users[userID]
     const newUserData = {...currentUser}
     newUserData.following.push(followingID)
     const pouchCouch = new PouchCouch(getState().localState.jwt)
-    await pouchCouch.saveUser(newUserData)
-    dispatch(userSaved(newUserData))
+    const doc = await pouchCouch.saveUser(newUserData)
+    await dispatch(userUpdated({...newUserData, _rev: doc.rev}))
     dispatch(needsRemotePersist('users'))
+    dispatch(syncDBPull('all'))
   }
 }
 
 export function deleteFollow (followingID) {
   return async (dispatch, getState) => {
-    // const userAPI = new UserAPI(getState().jwt)
-    // try {
-    //   const following = await userAPI.deleteFollow(followingID)
-    //   dispatch(saveUserData({...getState().userData, following}))
-    // } catch (e) {
-    //   console.log(e)
-    //   alert('error in console')
-    // }
-    // @TODO: fix this
+    const userID = getState().localState.userID
+    const currentUser = getState().users[userID]
+    const newUserData = {...currentUser}
+    const index = newUserData.following.indexOf(followingID);
+    if (index > -1) {
+      newUserData.following.splice(index, 1);
+    }
+    const pouchCouch = new PouchCouch(getState().localState.jwt)
+    const doc = await pouchCouch.saveUser(newUserData)
+    dispatch(userUpdated({...newUserData, _rev: doc.rev}))
+    dispatch(needsRemotePersist('users'))
   }
 }
 
@@ -511,7 +515,7 @@ export function startLocationTracking () {
       stationaryRadius: 10,
       distanceFilter: 10,
       maxLocations: 10,
-      notificationTitle: 'You\'re out on a ride a ride.',
+      notificationTitle: 'You\'re out on a ride.',
       notificationText: 'Tap here to see your progress.',
       // debug: true,
       locationProvider: BackgroundGeolocation.RAW_PROVIDER,
@@ -611,9 +615,7 @@ export function syncDBPull (db) {
   return async (dispatch, getState) => {
     const pouchCouch = new PouchCouch(getState().localState.jwt)
     const userID = getState().localState.userID
-    const following = getState().users.filter((u) => {
-      return u._id === userID
-    })[0].following
+    const following = getState().users[userID].following
     await pouchCouch.localReplicateDB(db, [...following, userID])
     await dispatch(loadLocalData())
     dispatch(syncComplete())
@@ -671,7 +673,7 @@ export function updateUser (userDetails) {
   return async (dispatch, getState) => {
     const pouchCouch = new PouchCouch(getState().localState.jwt)
     const doc = await pouchCouch.saveUser(userDetails)
-    dispatch(userSaved({...userDetails, _rev: doc.rev}))
+    dispatch(userUpdated({...userDetails, _rev: doc.rev}))
     dispatch(needsRemotePersist('users'))
   }
 }

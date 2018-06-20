@@ -75,9 +75,20 @@ class FeedContainer extends Component {
   }
 }
 
+function followingRideFilter (state) {
+  return state.rides.filter(
+    r => r.userID !== state.localState.userID // not the users rides
+      && r.deleted !== true // hasn't been deleted
+      && state.users[state.localState.userID].following.indexOf(r.userID) >= 0 // user hasn't removed follow
+  ).sort(
+    (a, b) => b.startTime - a.startTime
+  )
+
+}
+
 function mapStateToProps (state) {
   return {
-    followingRides: state.rides.filter((r) => r.userID !== state.localState.userID && r.deleted !== true).sort((a, b) => b.startTime - a.startTime),
+    followingRides: followingRideFilter(state),
     horses: state.horses,
     justFinishedRide: state.localState.justFinishedRide,
     lastFullSync: state.localState.lastFullSync,

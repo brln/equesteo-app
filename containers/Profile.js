@@ -35,7 +35,7 @@ class ProfileContainer extends Component {
 function mapStateToProps (state, passedProps) {
   return {
     user: passedProps.user,
-    userData: state.users.filter((u) => u._id === state.localState.userID)[0]
+    userData: state.users[state.localState.userID]
   }
 }
 

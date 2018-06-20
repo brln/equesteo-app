@@ -19,6 +19,7 @@ import {
   PHOTO_PERSIST_COMPLETE,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
+  REMOVE_RIDE_FROM_STATE,
   RIDE_COMMENT_CREATED,
   RIDE_CARROT_CREATED,
   RIDE_CARROT_SAVED,
@@ -28,7 +29,7 @@ import {
   START_RIDE,
   SYNC_COMPLETE,
   USER_SEARCH_RETURNED,
-  USER_SAVED,
+  USER_UPDATED,
 } from './constants'
 import {
   appStates,
@@ -70,7 +71,7 @@ const initialState = {
   rides: [],
   rideCarrots: [],
   rideComments: [],
-  users: [],
+  users: {},
   version: 1
 }
 
@@ -183,13 +184,17 @@ export default function AppReducer(state=initialState, action) {
         }
       }
     case LOCAL_DATA_LOADED:
+      const allUsers = {}
+      for (let user of action.localData.users) {
+        allUsers[user._id] = user
+      }
       return {
         ...state,
         rides: action.localData.rides,
         rideCarrots: action.localData.rideCarrots,
         rideComments: action.localData.rideComments,
         horses: action.localData.horses,
-        users: action.localData.users,
+        users: allUsers,
       }
     case NEEDS_REMOTE_PERSIST:
       let newNeeds = {...state.localState.needsRemotePersist}
@@ -287,6 +292,25 @@ export default function AppReducer(state=initialState, action) {
           needsRemotePersist: newNeedsFalse
         }
       }
+    case REMOVE_RIDE_FROM_STATE:
+      let rideFound = null
+      let l = 0
+      for (l; l < state.rides.length; l++) {
+        const ride = state.rides[l]
+        if (ride._id === action.rideID) {
+          rideFound = ride
+          break
+        }
+      }
+      if (rideFound) {
+        const removeRidesClone = [...state.rides]
+        removeRidesClone.splice(l, 1)
+        return {
+          ...state,
+          rides: removeRidesClone
+        }
+      }
+      return
     case RIDE_CARROT_CREATED:
       return {
         ...state,
@@ -367,10 +391,12 @@ export default function AppReducer(state=initialState, action) {
           lastFullSync: new Date()
         }
       }
-    case USER_SAVED:
+    case USER_UPDATED:
+      const usersClone = {...state.users}
+      usersClone[action.userData._id] = action.userData
       return {
         ...state,
-        users: [action.userData, ...state.users]
+        users: usersClone
       }
     case USER_SEARCH_RETURNED:
       return {
