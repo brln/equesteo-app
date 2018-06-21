@@ -30,6 +30,9 @@ export default class Map extends Component {
   }
 
   render() {
+    const lastIndex = this.props.rideCoords.length - 1
+    const firstCoord = this.props.rideCoords[0]
+    const lastCoord = this.props.rideCoords[lastIndex]
     return (
       <View style={styles.container}>
         <MapView
@@ -42,8 +45,21 @@ export default class Map extends Component {
             coordinates={this.props.rideCoords}
             strokeColor="#dc0202"
             strokeWidth={5}
-          >
-          </MapView.Polyline>
+          />
+          <MapView.Marker
+            coordinate={{
+              latitude: firstCoord.latitude,
+              longitude: firstCoord.longitude
+            }}
+            pinColor={"#0bc464"}
+          />
+          <MapView.Marker
+            coordinate={{
+              latitude: lastCoord.latitude,
+              longitude: lastCoord.longitude
+            }}
+            pincolor={"#ea4a3f"}
+          />
         </MapView>
       </View>
     )
