@@ -20,6 +20,7 @@ import {
   TRAINING,
 } from '../screens'
 import { changeScreen } from '../actions'
+import { brand } from '../colors'
 
 class DrawerContainer extends Component {
   constructor (props) {
@@ -195,7 +196,7 @@ class DrawerContainer extends Component {
       <View style={styles.linearGradient}>
         <View style={{
           flex: 1,
-          backgroundColor: 'white',
+          backgroundColor: '#e8eae8',
           alignItems: 'center',
           flexDirection: 'row',
           paddingLeft: 25
@@ -203,12 +204,19 @@ class DrawerContainer extends Component {
           <Image
             source={require('../img/logo.png')}
             style={{
-              width: 100,
-              height: 100,
-              alignItems: 'center'
+              width: 80,
+              height: 80,
+              alignItems: 'center',
+              paddingRight: 15,
             }}
           />
-          <Text>Equesteo</Text>
+          <Text style={{
+            fontFamily: 'RockSalt',
+            fontSize: 30,
+            color: 'black',
+          }}>
+            Equesteo
+          </Text>
         </View>
 				<View style={styles.container}>
 					<View style={styles.drawerList}>
@@ -229,9 +237,9 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 2,
     paddingTop: 30,
-		paddingLeft: 25,
+		paddingLeft: 20,
 		justifyContent: 'flex-start',
-    backgroundColor: 'red',
+    backgroundColor: brand,
 	},
 	drawerList: {
 
