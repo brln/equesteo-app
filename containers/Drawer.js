@@ -1,6 +1,12 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native'
 
 import {
   ACCOUNT,
@@ -187,6 +193,23 @@ class DrawerContainer extends Component {
 
     return (
       <View style={styles.linearGradient}>
+        <View style={{
+          flex: 1,
+          backgroundColor: 'white',
+          alignItems: 'center',
+          flexDirection: 'row',
+          paddingLeft: 25
+        }}>
+          <Image
+            source={require('../img/logo.png')}
+            style={{
+              width: 100,
+              height: 100,
+              alignItems: 'center'
+            }}
+          />
+          <Text>Equesteo</Text>
+        </View>
 				<View style={styles.container}>
 					<View style={styles.drawerList}>
             {feed}
@@ -204,9 +227,11 @@ class DrawerContainer extends Component {
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,
+		flex: 2,
+    paddingTop: 30,
 		paddingLeft: 25,
-		justifyContent: 'center'
+		justifyContent: 'flex-start',
+    backgroundColor: 'red',
 	},
 	drawerList: {
 
@@ -227,14 +252,8 @@ const styles = StyleSheet.create({
 		flex: 1
 	},
 	linearGradient: {
-		flex: 1
+		flex: 1,
 	},
-	_version: {
-		color: '#3c3c3c',
-		position: 'absolute',
-		bottom: 25,
-		marginLeft: 53
-	}
 });
 
 function mapStateToProps (state) {

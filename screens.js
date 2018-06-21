@@ -1,6 +1,5 @@
 import { Navigation } from 'react-native-navigation';
 
-import Map from './components/Ride/Map'
 import NewHorse from './components/NewHorse'
 
 import AccountContainer from './containers/Account'
