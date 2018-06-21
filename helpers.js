@@ -8,7 +8,6 @@ const toDeg = (rad) => {
 
 
 export const haversine = (lat1, lon1, lat2, lon2) => {
-  console.log('running haversine')
   const R = 3959; // mi
   const x1 = lat2 - lat1
   const dLat = toRad(x1)

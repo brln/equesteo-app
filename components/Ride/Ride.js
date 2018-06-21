@@ -1,21 +1,27 @@
-import React, { Component } from 'react'
+import moment from 'moment'
 import Modal from 'react-native-modalbox';
 import { Navigation } from 'react-native-navigation'
-import moment from 'moment'
+import React, { Component } from 'react'
+import Swiper from 'react-native-swiper';
 
 import {
   Button,
+  Dimensions,
   Image,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 
-import { MAP, UPDATE_RIDE } from '../screens'
-import { background } from '../colors'
-import PhotosByTimestamp from './PhotosByTimestamp'
+import { MAP, UPDATE_RIDE } from '../../screens'
+import PhotosByTimestamp from '../PhotosByTimestamp'
+import SpeedChart from './SpeedChart'
+import Stats from './Stats'
+import DeleteModal from './DeleteModal'
+
+const { width } = Dimensions.get('window')
 
 export default class Ride extends Component {
   constructor (props) {
@@ -26,7 +32,6 @@ export default class Ride extends Component {
     this.closeDeleteModal = this.closeDeleteModal.bind(this)
     this.deleteRide = this.deleteRide.bind(this)
     this.fullscreenMap = this.fullscreenMap.bind(this)
-    this.whichHorse = this.whichHorse.bind(this)
 
     this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
@@ -68,23 +73,15 @@ export default class Ride extends Component {
     }
   }
 
-  whichHorse () {
-    let found = null
-    for (let horse of this.props.horses) {
-      if (horse._id === this.props.ride.horseID) {
-        found = horse
-      }
-    }
-    return found ? found.name : 'none'
-  }
+
 
   fullscreenMap () {
-    Navigation.showModal({
+    this.props.navigator.push({
       screen: MAP,
       title: 'Map',
       animationType: 'slide-up',
       passProps: {
-        rideCoords: this.props.ride.rideCoordinates
+        rideID: this.props.ride._id
       }
     })
   }
@@ -100,8 +97,59 @@ export default class Ride extends Component {
     this.props.navigator.popToRoot()
   }
 
+  render () {
+    let speedChart = <Text>Not enough points for Speed Chart</Text>
+    if (this.props.ride.rideCoordinates.length > 2) {
+      speedChart = (
+        <View style={styles.slide}>
+          <SpeedChart
+            rideCoordinates={this.props.ride.rideCoordinates}
+          />
+        </View>
+      )
+    }
+    return (
+      <View style={{flex: 1}}>
+        <DeleteModal
+          modalOpen={this.state.modalOpen}
+          closeDeleteModal={this.closeDeleteModal}
+          deleteRide={this.deleteRide}
+        />
+        <View style={{flex: 1}}>
 
-  render() {
+          <View style={{flex: 1}}>
+            <Swiper
+              loop={false}
+            >
+              <TouchableWithoutFeedback style={styles.slide}
+                onPress={this.fullscreenMap}
+              >
+                <Image style={styles.image} source={{uri: this.props.ride.mapURL }} />
+              </TouchableWithoutFeedback>
+              { speedChart }
+            </Swiper>
+          </View>
+          <View style={{flex: 1}}>
+            <View style={{flex: 1}}>
+              <Stats
+                ride={this.props.ride}
+                horses={this.props.horses}
+              />
+            </View>
+            <ScrollView style={{flex: 1}}>
+              <PhotosByTimestamp
+                photosByID={this.props.ride.photosByID}
+                profilePhotoID={this.props.ride.profilePhotoID}
+              />
+            </ScrollView>
+          </View>
+        </View>
+      </View>
+    )
+  }
+
+
+  renderp() {
     return (
       <ScrollView>
         <Modal
@@ -127,14 +175,22 @@ export default class Ride extends Component {
 
         <View style={styles.container}>
           <View style={{flex: 3}}>
-            <TouchableOpacity
-              onPress={this.fullscreenMap}
-            >
-              <Image
-                source={{uri: this.props.ride.mapURL }}
-                style={{height: 250, width: null, flex: 1}}
-              />
-            </TouchableOpacity>
+            <Swiper>
+              <View style={styles.slide1}>
+                <Text>Hello swiper</Text>
+                {/*<TouchableOpacity*/}
+                  {/*onPress={this.fullscreenMap}*/}
+                {/*>*/}
+                  {/*<Image*/}
+                    {/*source={{uri: this.props.ride.mapURL }}*/}
+                    {/*style={{height: 250, width: null, flex: 1}}*/}
+                  {/*/>*/}
+                {/*</TouchableOpacity>*/}
+              </View>
+              <View style={styles.slide1}>
+                <Text>Hello swiper</Text>
+              </View>
+            </Swiper>
           </View>
           <View style={{flex: 1, padding: 5}}>
             <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -161,6 +217,9 @@ export default class Ride extends Component {
             </View>
           </View>
           <View>
+            <SpeedChart
+              rideCoordinates={this.props.ride.rideCoordinates}
+            />
             <PhotosByTimestamp
               photosByID={this.props.ride.photosByID}
               profilePhotoID={this.props.ride.profilePhotoID}
@@ -172,21 +231,26 @@ export default class Ride extends Component {
   }
 }
 
+
+
+
 const styles = StyleSheet.create({
-  container: {
+  wrapper: {
+    width,
+    flex: 1
+  },
+  slide: {
     flex: 1,
-    backgroundColor: background,
-  },
-  statFont: {
-    fontSize: 24
-  },
-  modal: {
     justifyContent: 'center',
-    alignItems: 'center'
+    backgroundColor: 'transparent'
   },
-  modal3: {
-    marginTop: 30,
-    height: 300,
-    width: 300,
+  text: {
+    color: '#fff',
+    fontSize: 30,
+    fontWeight: 'bold'
   },
+  image: {
+    width,
+    flex: 1
+},
 });

@@ -3,6 +3,7 @@ package com.equesteo;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.horcrux.svg.SvgPackage;
 import io.sentry.RNSentryPackage;
 import com.marianhello.bgloc.react.BackgroundGeolocationPackage;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
@@ -45,7 +46,8 @@ public class MainApplication extends NavigationApplication {
             new MapsPackage(),
             new PickerPackage(),
             new ReactNativePushNotificationPackage(),
-            new BackgroundGeolocationPackage()
+            new BackgroundGeolocationPackage(),
+            new SvgPackage()
         );
     }
 
