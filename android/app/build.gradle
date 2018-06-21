@@ -149,6 +149,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-svg')
     compile project(':react-native-sentry')
     compile project(':react-native-mauron85-background-geolocation')
     compile project(':react-native-push-notification')

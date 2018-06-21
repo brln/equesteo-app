@@ -1,6 +1,6 @@
 import { Navigation } from 'react-native-navigation';
 
-import Map from './components/Map'
+import Map from './components/Ride/Map'
 import NewHorse from './components/NewHorse'
 
 import AccountContainer from './containers/Account'
@@ -9,6 +9,7 @@ import DrawerContainer from './containers/Drawer'
 import FeedContainer from './containers/Feed'
 import FollowingContainer from './containers/Following'
 import HorseContainer from './containers/Horse'
+import MapContainer from './containers/Map'
 import ProfileContainer from './containers/Profile'
 import RecorderContainer from './containers/Recorder'
 import RideCommentsContainer from './containers/RideComments'
@@ -52,6 +53,7 @@ export function registerScreens(store, Provider) {
   Navigation.registerComponent(FEED, () => FeedContainer, store, Provider)
   Navigation.registerComponent(FOLLOWING, () => FollowingContainer, store, Provider)
   Navigation.registerComponent(HORSE, () => HorseContainer, store, Provider)
+  Navigation.registerComponent(MAP, () => MapContainer, store, Provider)
   Navigation.registerComponent(PROFILE, () => ProfileContainer, store, Provider)
   Navigation.registerComponent(RECORDER, () => RecorderContainer, store, Provider)
   Navigation.registerComponent(RIDE, () => RideContainer, store, Provider)
@@ -61,7 +63,7 @@ export function registerScreens(store, Provider) {
   Navigation.registerComponent(TRAINING, () => TrainingContainer, store, Provider)
   Navigation.registerComponent(UPDATE_RIDE, () => UpdateRideContainer, store, Provider)
 
-  Navigation.registerComponent(MAP, () => Map)
+
   Navigation.registerComponent(NEW_HORSE, () => NewHorse)
 }
 

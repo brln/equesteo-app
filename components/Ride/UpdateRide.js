@@ -10,7 +10,7 @@ import {
 import { Container, Content } from 'native-base';
 import ImagePicker from 'react-native-image-crop-picker'
 
-import PhotosByTimestamp from './PhotosByTimestamp'
+import PhotosByTimestamp from '../PhotosByTimestamp'
 
 export default class UpdateRide extends Component<Props> {
   constructor (props) {
@@ -81,7 +81,6 @@ export default class UpdateRide extends Component<Props> {
             />
           </Content>
         </Container>
-
       </View>
     )
   }

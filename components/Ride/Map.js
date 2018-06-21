@@ -18,7 +18,7 @@ export default class Map extends Component {
     this.map.fitToCoordinates(
       this.props.rideCoords,
       {
-        animated: false,
+        animated: true,
         edgePadding: {
           top: 50,
           right: 50,

@@ -7,7 +7,7 @@ import {
   updateRide,
 } from '../actions'
 import { generateUUID, unixTimeNow } from '../helpers'
-import UpdateRide from '../components/UpdateRide'
+import UpdateRide from '../components/Ride/UpdateRide'
 import { FEED } from '../screens'
 
 class UpdateRideContainer extends Component {
@@ -66,7 +66,7 @@ class UpdateRideContainer extends Component {
   }
 
   doneOnPage () {
-    this.props.navigator.popToRoot({animated: false, animationType: 'none'})
+    this.props.navigator.pop({animated: false, animationType: 'none'})
     this.props.dispatch(changeScreen(FEED))
   }
 
