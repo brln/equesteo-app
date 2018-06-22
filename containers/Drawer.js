@@ -20,7 +20,7 @@ import {
   TRAINING,
 } from '../screens'
 import { changeScreen } from '../actions'
-import { brand } from '../colors'
+import { brand, lightGrey } from '../colors'
 
 class DrawerContainer extends Component {
   constructor (props) {
@@ -196,7 +196,7 @@ class DrawerContainer extends Component {
       <View style={styles.linearGradient}>
         <View style={{
           flex: 1,
-          backgroundColor: '#e8eae8',
+          backgroundColor: lightGrey,
           alignItems: 'center',
           flexDirection: 'row',
           paddingLeft: 25

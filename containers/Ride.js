@@ -3,9 +3,9 @@ import { connect } from 'react-redux';
 
 import Ride from '../components/Ride/Ride'
 import { updateRide } from '../actions'
+import NavigatorComponent from './NavigatorComponent'
 
-
-class RideContainer extends Component {
+class RideContainer extends NavigatorComponent {
   constructor (props) {
     super(props)
     this.deleteRide = this.deleteRide.bind(this)

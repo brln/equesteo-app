@@ -12,8 +12,9 @@ import {
 import { generateUUID, unixTimeNow } from '../helpers'
 import RideDetails from '../components/RideRecorder/RideDetails'
 import { FEED } from '../screens'
+import NavigatorComponent from './NavigatorComponent'
 
-class RideDetailsContainer extends Component {
+class RideDetailsContainer extends NavigatorComponent {
   static navigatorButtons = {
     rightButtons: [
       {

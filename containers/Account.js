@@ -4,9 +4,10 @@ import { connect } from 'react-redux';
 import { signOut } from '../actions'
 import Account from '../components/Account'
 import { changeScreen, updateUser, uploadProfilePhoto } from "../actions"
+import NavigatorComponent from './NavigatorComponent'
 import { FEED } from '../screens'
 
-class AccountContainer extends Component {
+class AccountContainer extends NavigatorComponent {
   static navigatorButtons = {
     leftButtons: [],
     rightButtons: [

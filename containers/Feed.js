@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
+import { justFinishedRideShown, syncDBPull, toggleRideCarrot } from "../actions";
 import Feed from '../components/Feed/Feed'
-import { justFinishedRideShown, syncDBPull, toggleRideCarrot, updateRide } from "../actions";
+import NavigatorComponent from './NavigatorComponent'
 import { RIDE_COMMENTS } from '../screens'
 
-class FeedContainer extends Component {
+class FeedContainer extends NavigatorComponent {
   constructor (props) {
     super(props)
     this.state = {

@@ -9,8 +9,9 @@ import {
 import { generateUUID, unixTimeNow } from '../helpers'
 import UpdateRide from '../components/Ride/UpdateRide'
 import { FEED } from '../screens'
+import NavigatorComponent from './NavigatorComponent'
 
-class UpdateRideContainer extends Component {
+class UpdateRideContainer extends NavigatorComponent {
   static navigatorButtons = {
     rightButtons: [
       {

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { goodGreen, badRed } from '../../colors'
+import { green, danger } from '../../colors'
 
 export default GPSStatus = (props) => {
     let positionFound = <Text style={styles.locationNotFound}>Location Not Found</Text>
@@ -17,12 +17,12 @@ export default GPSStatus = (props) => {
 
 const styles = StyleSheet.create({
   locationFound: {
-    backgroundColor: goodGreen,
+    backgroundColor: green,
     color: "black",
     textAlign: 'center'
   },
   locationNotFound: {
-    backgroundColor: badRed,
+    backgroundColor: danger,
     color: "white",
     textAlign: "center",
   },
