@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
 import { Navigation } from 'react-native-navigation'
-import { ListItem } from 'react-native-elements'
 import {
+  Image,
   StyleSheet,
   Text,
+  TouchableOpacity,
   ScrollView,
   View,
 } from 'react-native';
+import { Icon, Fab } from 'native-base';
 
+import { black, brand, green } from '../colors'
 import { NEW_HORSE } from '../screens'
 
 
@@ -39,26 +42,67 @@ export default class Barn extends Component {
 
   render() {
     return (
-      <ScrollView>
-        <Text style={styles.header}>Horses:</Text>
-        <View containerStyle={{marginTop: 0}}>
-          {
-            [...this.props.horses.map((horse, i) => (
-              <ListItem
-                key={i}
-                title={horse.name}
-                onPress={() => {this.props.horseProfile(horse)}}
-              />
-            )),
-              <ListItem
-                key="add-horse"
-                title={'Add New Horse'}
-                onPress={this.newHorse}
-              />
-            ]
-          }
-        </View>
-      </ScrollView>
+      <View style={{flex: 1}}>
+        <ScrollView>
+          <View style={{
+            flex: 1,
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            margin: 30
+          }}>
+            {
+              [...this.props.horses.map((horse, i) => {
+                let source = require('../img/empty.png')
+                if (horse.profilePhotoID) {
+                  source = {uri: horse.photosByID[horse.profilePhotoID].uri}
+                }
+                return (
+                  <View key={i} elevation={5} style={{
+                    marginBottom: 20,
+                    backgroundColor: brand,
+                    shadowColor: black,
+                    shadowOffset: {
+                      width: 0,
+                      height: 3
+                    },
+                    shadowRadius: 5,
+                    shadowOpacity: 1.0
+                  }}>
+                    <TouchableOpacity
+                      onPress={() => {this.props.horseProfile(horse)}}
+                    >
+                      <View
+                        key={i}
+                        title={horse.name}
+                        style={{flex: 1}}
+                      >
+                        <View style={{flex: 1, alignItems: 'center', paddingBottom: 5}}>
+                          <Image
+                            source={source}
+                            style={{height: 120, width: 120, margin: 10}}
+                          />
+                          <Text>{horse.name}</Text>
+                        </View>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                )
+              })]
+            }
+          </View>
+        </ScrollView>
+        <Fab
+          active={this.state.active}
+          direction="up"
+          containerStyle={{ }}
+          style={{ backgroundColor: brand }}
+          position="bottomRight"
+          onPress={this.newHorse}>
+          <Icon name="ios-add" />
+        </Fab>
+      </View>
     )
   }
 }

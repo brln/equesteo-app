@@ -18,11 +18,6 @@ class BarnContainer extends NavigatorComponent {
     this.props.navigator.push({
       screen: HORSE,
       title: horse.name,
-      navigatorButtons: {
-        leftButtons: [{
-          id: 'sideMenu'
-        }]
-      },
       passProps: {horseID: horse._id},
     })
   }
