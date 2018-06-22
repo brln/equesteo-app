@@ -2,9 +2,9 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
 import Training from '../components/Training/Training'
+import NavigatorComponent from './NavigatorComponent'
 
-
-class TrainingContainer extends Component {
+class TrainingContainer extends NavigatorComponent {
   constructor (props) {
     super(props)
   }

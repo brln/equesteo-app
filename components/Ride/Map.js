@@ -39,6 +39,7 @@ export default class Map extends Component {
           style={styles.map}
           ref={ref => this.map = ref}
           onLayout={this.fitToElements}
+          mapType="terrain"
         >
           <MapView.Polyline
             style={styles.map}

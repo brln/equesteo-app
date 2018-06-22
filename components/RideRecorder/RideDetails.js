@@ -12,7 +12,7 @@ import ImagePicker from 'react-native-image-crop-picker'
 
 import PhotosByTimestamp from '../PhotosByTimestamp'
 
-export default class RideDetails extends Component<Props> {
+export default class RideDetails extends Component {
   constructor (props) {
     super(props)
     this.renderHorses = this.renderHorses.bind(this)

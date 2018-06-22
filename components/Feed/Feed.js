@@ -6,6 +6,7 @@ import {
 
 import RideList from './RideList'
 import { RIDE } from '../../screens'
+import { brand } from '../../colors'
 
 export default class Feed extends Component {
   constructor (props) {
@@ -53,7 +54,7 @@ export default class Feed extends Component {
     return (
       <Container>
         <Tabs initialPage={0} locked={true}>
-          <Tab heading="Following">
+          <Tab tabStyle={{backgroundColor: brand}} activeTabStyle={{backgroundColor: brand}} heading="Following">
             <RideList
               horses={this.props.horses}
               navigator={this.props.navigator}
@@ -68,7 +69,7 @@ export default class Feed extends Component {
               users={this.props.users}
             />
           </Tab>
-          <Tab heading="You">
+          <Tab tabStyle={{backgroundColor: brand}} activeTabStyle={{backgroundColor: brand}} heading="You">
             <RideList
               horses={this.props.horses}
               navigator={this.props.navigator}

@@ -1,5 +1,10 @@
-export const highlight = "#ECFFB0"
-export const lowlight = "#26408B"
-export const goodGreen = "#1B9AAA"
-export const background = "#F5F0F6"
-export const badRed = "#931621"
+export const lightBrand = '#78cbee'
+export const brand = '#5bc0eb'
+export const darkBrand = '#4b9ec1'
+export const black = '#000000'
+export const danger = '#e55934'
+export const green = '#9bc53d'
+export const warning = '#fde74c'
+export const orange = '#fa7921'
+export const white = '#FFFFFF'
+export const lightGrey = '#e8eae8'

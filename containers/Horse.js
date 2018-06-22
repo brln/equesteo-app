@@ -4,8 +4,9 @@ import { connect } from 'react-redux';
 import Horse from '../components/Horse'
 import { changeScreen, updateHorse, uploadHorsePhoto } from '../actions'
 import { FEED } from '../screens'
+import NavigatorComponent from './NavigatorComponent'
 
-class HorseContainer extends Component {
+class HorseContainer extends NavigatorComponent {
   static navigatorButtons = {
     leftButtons: [],
     rightButtons: [

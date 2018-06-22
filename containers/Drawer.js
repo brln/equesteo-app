@@ -1,6 +1,12 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native'
 
 import {
   ACCOUNT,
@@ -14,6 +20,7 @@ import {
   TRAINING,
 } from '../screens'
 import { changeScreen } from '../actions'
+import { brand, lightGrey } from '../colors'
 
 class DrawerContainer extends Component {
   constructor (props) {
@@ -187,6 +194,30 @@ class DrawerContainer extends Component {
 
     return (
       <View style={styles.linearGradient}>
+        <View style={{
+          flex: 1,
+          backgroundColor: lightGrey,
+          alignItems: 'center',
+          flexDirection: 'row',
+          paddingLeft: 25
+        }}>
+          <Image
+            source={require('../img/logo.png')}
+            style={{
+              width: 80,
+              height: 80,
+              alignItems: 'center',
+              paddingRight: 15,
+            }}
+          />
+          <Text style={{
+            fontFamily: 'RockSalt',
+            fontSize: 30,
+            color: 'black',
+          }}>
+            Equesteo
+          </Text>
+        </View>
 				<View style={styles.container}>
 					<View style={styles.drawerList}>
             {feed}
@@ -204,9 +235,11 @@ class DrawerContainer extends Component {
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,
-		paddingLeft: 25,
-		justifyContent: 'center'
+		flex: 2,
+    paddingTop: 30,
+		paddingLeft: 20,
+		justifyContent: 'flex-start',
+    backgroundColor: brand,
 	},
 	drawerList: {
 
@@ -227,14 +260,8 @@ const styles = StyleSheet.create({
 		flex: 1
 	},
 	linearGradient: {
-		flex: 1
+		flex: 1,
 	},
-	_version: {
-		color: '#3c3c3c',
-		position: 'absolute',
-		bottom: 25,
-		marginLeft: 53
-	}
 });
 
 function mapStateToProps (state) {

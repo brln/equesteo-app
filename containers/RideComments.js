@@ -4,9 +4,9 @@ import { connect } from 'react-redux';
 import { createRideComment } from '../actions'
 import { unixTimeNow } from '../helpers'
 import RideComments from '../components/RideComments'
+import NavigatorComponent from './NavigatorComponent'
 
-
-class RideCommentsContainer extends Component {
+class RideCommentsContainer extends NavigatorComponent {
   static navigatorButtons = {
     leftButtons: [],
     rightButtons: [

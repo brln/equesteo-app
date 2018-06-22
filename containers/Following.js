@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
-import Following from '../components/Following'
-import { searchForFriends } from "../actions"
 
-class FollowingContainer extends Component {
+import { searchForFriends } from "../actions"
+import Following from '../components/Following'
+import NavigatorComponent from './NavigatorComponent'
+
+class FollowingContainer extends NavigatorComponent {
   constructor (props) {
     super(props)
     this.search = this.search.bind(this)

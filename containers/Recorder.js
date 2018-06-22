@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-
+import { brand, white } from '../colors'
 import {
   changeScreen,
   discardRide,
@@ -11,8 +11,9 @@ import {
 } from '../actions'
 import RideRecorder from '../components/RideRecorder/RideRecorder'
 import { FEED } from '../screens'
+import NavigatorComponent from './NavigatorComponent'
 
-class RecorderContainer extends Component {
+class RecorderContainer extends NavigatorComponent {
   constructor (props) {
     super(props)
     this.discardRide = this.discardRide.bind(this)

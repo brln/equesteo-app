@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
-import Barn from '../components/Barn'
 import { changeScreen, createHorse } from '../actions'
+import Barn from '../components/Barn'
+import NavigatorComponent from './NavigatorComponent'
 import { HORSE } from '../screens'
 
-class BarnContainer extends Component {
+class BarnContainer extends NavigatorComponent {
   constructor (props) {
     super(props)
     this.saveNewHorse = this.saveNewHorse.bind(this)

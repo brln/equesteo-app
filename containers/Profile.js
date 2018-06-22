@@ -3,8 +3,9 @@ import { connect } from 'react-redux';
 
 import Profile from '../components/Profile'
 import { clearSearch, createFollow, deleteFollow } from "../actions"
+import NavigatorComponent from './NavigatorComponent'
 
-class ProfileContainer extends Component {
+class ProfileContainer extends NavigatorComponent {
   constructor (props) {
     super(props)
     this.createFollow = this.createFollow.bind(this)

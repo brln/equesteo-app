@@ -2,9 +2,9 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
 import Map from '../components/Ride/Map'
+import NavigatorComponent from './NavigatorComponent'
 
-
-class MapContainer extends Component {
+class MapContainer extends NavigatorComponent {
   constructor (props) {
     super(props)
   }

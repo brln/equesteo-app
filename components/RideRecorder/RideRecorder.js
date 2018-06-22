@@ -5,17 +5,14 @@ import {
   View
 } from 'react-native';
 
+import { black, brand, green, white } from '../../colors'
+import GPSStatus from './GPSStatus'
 import { unixTimeNow } from "../../helpers"
 import RidingMap from '../RidingMap'
 import RideStats from './RideStats'
-import GPSStatus from './GPSStatus'
-
-import { stopLocationTracking } from "../../actions"
 import { RIDE_DETAILS } from "../../screens"
-import { background, highlight, lowlight } from '../../colors'
 
-
-export default class RideRecorder extends Component<Props> {
+export default class RideRecorder extends Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -47,7 +44,12 @@ export default class RideRecorder extends Component<Props> {
           horses: this.props.horses,
           elapsedTime,
         },
-        navigatorStyle: {},
+        navigatorStyle: {
+          navBarBackgroundColor: brand,
+          topBarElevationShadowEnabled: false,
+          navBarTextColor: white,
+          navBarButtonColor: white,
+        },
         navigatorButtons: {},
         animationType: 'slide-up',
       });
@@ -111,7 +113,6 @@ export default class RideRecorder extends Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: background,
     alignItems: 'stretch'
   },
   startButton: {
@@ -120,28 +121,29 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   startText: {
+    borderRadius: 30,
+    color: white,
     fontSize: 30,
     textAlign: 'center',
-    borderWidth: 3,
-    borderColor: lowlight,
-    backgroundColor: highlight,
+    borderWidth: 1,
+    borderColor: black,
+    backgroundColor: green,
     padding: 20,
   },
   bottomSection: {
     flex: 1,
   },
   rideComplete: {
+    backgroundColor: brand,
     flex: 1,
     borderWidth: 1,
     borderColor: 'black',
     justifyContent: 'center',
-    backgroundColor: lowlight
   },
   rideCompleteText: {
     textAlign: 'center',
     fontSize: 25,
-    color: background
-
+    color: white,
   },
   gpsBar: {
     flex: 1,
