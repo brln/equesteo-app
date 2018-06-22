@@ -1,3 +1,5 @@
+import moment from 'moment'
+
 const toRad = (deg) => {
   return deg * Math.PI / 180;
 }
@@ -118,4 +120,23 @@ export function goodConnection(type, effectiveType) {
       effectiveType === effectiveConnectionType.threeG || effectiveConnectionType.fourG
     )
   ))
+}
+
+export function getMonday (d) {
+  d = new Date(d);
+  d.setHours(0, 0, 0, 0)
+  let day = d.getDay()
+  let diff = d.getDate() - day + (day === 0 ? -6 : 1) // adjust when day is sunday
+  return new Date(d.setDate(diff))
+}
+
+export function formattedWeekString(monday) {
+  const start = moment(new Date(monday))
+  const startString = start.format('MMMM D')
+  let end = moment(start).add(6, 'days')
+  let endString = end.format('D YYYY')
+  if (start.month() !== end.month()) {
+    endString = end.format('MMMM D YYYY')
+  }
+  return `${startString} - ${endString}`
 }

@@ -2,17 +2,16 @@ import React, { Component } from 'react'
 import { Avatar } from 'react-native-elements'
 import {
   Button,
-  Content,
   Card,
   CardItem,
   Icon,
   Left,
-  ListItem,
   Right,
   Text
 } from 'native-base';
 import {
   StyleSheet,
+  TouchableOpacity,
   View,
 } from 'react-native';
 
@@ -70,10 +69,10 @@ export default class RideCard extends Component {
     let horseAvatar = null
     if (this.props.horseProfilePhotoURL) {
       horseAvatar = (
-        <View style={{flex: 1}}>
+        <View>
           <Avatar
-            small
             rounded
+            size="medium"
             source={{uri: this.props.horseProfilePhotoURL}}
             onPress={() => console.log("Works!")}
             activeOpacity={0.7}
@@ -82,46 +81,44 @@ export default class RideCard extends Component {
       )
     }
     return (
-      <ListItem
-        onPress={this.showRide}
-      >
-        <Content>
-          <Card>
-            <CardItem header>
-              <View style={{flex: 1, flexDirection: 'row'}}>
-                <View style={{flex: 1}}>
-                  <Avatar
-                    source={{uri: this.props.userProfilePhotoURL}}
-                    onPress={this.showProfile}
-                    activeOpacity={0.7}
-                  />
-                </View>
-                <View style={{flex: 5}}>
+      <TouchableOpacity onPress={this.showRide}>
+        <Card>
+          <CardItem header style={{paddingLeft: 3, paddingTop: 3, paddingBottom: 5, paddingRight: 3}}>
+            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
+              <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
+                <Avatar
+                  rounded
+                  size="medium"
+                  source={{uri: this.props.userProfilePhotoURL}}
+                  onPress={this.showProfile}
+                  activeOpacity={0.7}
+                />
+                <View style={{paddingLeft: 10}}>
                   <Text>{this.props.ride.name}</Text>
                 </View>
-                { horseAvatar }
               </View>
-            </CardItem>
-            <CardItem cardBody>
-              <RideImage uri={this.props.ride.mapURL} />
-            </CardItem>
-            <CardItem footer>
-              <Left>
-                <Button transparent onPress={this.toggleCarrot}>
-                  <Icon active name="thumbs-up" />
-                  <Text>{this.props.rideCarrots.length} Carrots</Text>
-                </Button>
-              </Left>
-              <Right>
-                <Button transparent onPress={this.showComments}>
-                  <Icon active name="chatbubbles" />
-                  <Text>{this.props.rideComments.length} comments</Text>
-                </Button>
-              </Right>
-            </CardItem>
-          </Card>
-        </Content>
-      </ListItem>
+              { horseAvatar }
+            </View>
+          </CardItem>
+          <CardItem cardBody>
+            <RideImage uri={this.props.ride.mapURL} />
+          </CardItem>
+          <CardItem footer>
+            <Left>
+              <Button transparent onPress={this.toggleCarrot}>
+                <Icon active name="thumbs-up" />
+                <Text>{this.props.rideCarrots.length} Carrots</Text>
+              </Button>
+            </Left>
+            <Right>
+              <Button transparent onPress={this.showComments}>
+                <Icon active name="chatbubbles" />
+                <Text>{this.props.rideComments.length} comments</Text>
+              </Button>
+            </Right>
+          </CardItem>
+        </Card>
+      </TouchableOpacity>
     )
   }
 }

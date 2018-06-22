@@ -1,9 +1,12 @@
 import React, { PureComponent } from 'react'
 import {
-  FlatList,
+  SectionList,
   StyleSheet,
 } from 'react-native';
 import RideCard from './RideCard'
+
+import { getMonday } from '../../helpers'
+import SectionHeader from './SectionHeader'
 
 
 export default class RideList extends PureComponent {
@@ -59,17 +62,41 @@ export default class RideList extends PureComponent {
     )
   }
 
+  _makeSections () {
+    const rideWeeks = {}
+    for (let ride of this.props.rides) {
+      let monday = getMonday(ride.startTime)
+      if (!rideWeeks[monday]) {
+        rideWeeks[monday] = []
+      }
+      rideWeeks[monday].push(ride)
+    }
+    const weeks = Object.keys(rideWeeks).sort((a, b) => b - a)
+    const mapped = weeks.map((w) => {
+      return {
+        title: w,
+        data: rideWeeks[w]
+      }
+    })
+    return mapped
+  }
+
+  _renderSectionHeader ({section: {title}}) {
+    return <SectionHeader title={title} />
+  }
+
   render() {
     return (
-      <FlatList
+      <SectionList
         containerStyle={{marginTop: 0}}
-        data={this.props.rides}
         initialNumToRender={3}
         keyExtractor={(item) => item._id}
         maxToRenderPerBatch={2}
         onRefresh={this.props.startRefresh}
         refreshing={this.props.refreshing}
         renderItem={this._renderCard}
+        renderSectionHeader={this._renderSectionHeader}
+        sections={this._makeSections()}
       />
     )
   }

@@ -2,6 +2,7 @@ import moment from 'moment'
 import React, { Component } from 'react'
 
 import { RIDE } from '../../screens'
+import { formattedWeekString } from "../../helpers"
 
 
 import {
@@ -98,19 +99,12 @@ export default class Week extends Component {
   }
 
   render () {
-    const start = moment(new Date(this.props.mondayString))
-    const startString = start.format('MMMM D')
-    let end = moment(start).add(6, 'days')
-    let endString = end.format('D YYYY')
-    if (start.month() !== end.month()) {
-      endString = end.format('MMMM D YYYY')
-    }
     const weekData = this.days(this.props.mondayString)
     return (
       <View style={{flex: 1, flexDirection: 'column', paddingTop: 10, paddingBottom: 10, marginBottom: 10, backgroundColor: "#AAAAAA"}}>
         <View style={{flex: 1}}>
           <Text style={{textAlign: 'center'}}>
-            {startString} - {endString}
+            {formattedWeekString(this.props.mondayString)}
           </Text>
         </View>
         <View style={{flex: 1, flexDirection: 'row', marginBottom: 15}}>

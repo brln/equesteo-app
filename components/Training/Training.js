@@ -9,6 +9,8 @@ import {
 
 import Week from './Week'
 
+import { getMonday } from '../../helpers'
+
 function DaysOfWeek () {
   const asNums = {0: 'M', 1: 'T', 2: 'W', 3: 'R', 4: 'F', 5: 'Sa', 6: 'Su'}
   const days = []
@@ -44,18 +46,10 @@ export default class Training extends Component {
     return found ? found.name : 'none'
   }
 
-  getMonday (d) {
-    d = new Date(d);
-    d.setHours(0, 0, 0, 0)
-    let day = d.getDay()
-    let diff = d.getDate() - day + (day === 0 ? -6 : 1) // adjust when day is sunday
-    return new Date(d.setDate(diff))
-  }
-
   ridesToWeeks (rides) {
     const rideWeeks = {}
     for (let ride of rides) {
-      let monday = this.getMonday(ride.startTime)
+      let monday = getMonday(ride.startTime)
       if (!rideWeeks[monday]) {
         rideWeeks[monday] = []
       }
