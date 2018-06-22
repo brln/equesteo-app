@@ -63,7 +63,7 @@ function urlParams (params) {
 
 export function staticMap (ride) {
   console.log('static map')
-  const STATIC_MAPS_API_KEY = 'AIzaSyBhUmpq-7uQ2JaqtrHO3hpfeFHynVpo8xQ'
+  const STATIC_MAPS_API_KEY = 'AIzaSyC337uByuGAIHPei2Wp4EF_GNrDF0Ltc2o'
   const ROOT_URL = 'https://maps.googleapis.com/maps/api/staticmap?'
   const queryStringParams = {
       size: '580x350',

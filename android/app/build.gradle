@@ -95,13 +95,13 @@ def enableSeparateBuildPerCPUArchitecture = false
 def enableProguardInReleaseBuilds = false
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.1"
+    compileSdkVersion 26
+    buildToolsVersion "27.0.3"
 
     defaultConfig {
         applicationId "com.equesteo"
-        minSdkVersion 16
-        targetSdkVersion 22
+        minSdkVersion 21
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         ndk {
@@ -149,25 +149,27 @@ android {
 }
 
 dependencies {
-    compile project(':react-native-svg')
-    compile project(':react-native-sentry')
-    compile project(':react-native-mauron85-background-geolocation')
-    compile project(':react-native-push-notification')
-    compile project(':react-native-image-crop-picker')
-    compile project(':react-native-image-crop-picker')
-    compile project(':react-native-image-crop-picker')
-    compile project(':react-native-vector-icons')
-     compile fileTree(dir: "libs", include: ["*.jar"])
-     compile "com.android.support:appcompat-v7:23.0.1"
-     compile "com.facebook.react:react-native:+"
-     compile project(':react-native-navigation')
-     compile(project(':react-native-maps')){
-        exclude group: 'com.google.android.gms', module: 'play-services-base'
-        exclude group: 'com.google.android.gms', module: 'play-services-maps'
-     }
-     compile 'com.google.android.gms:play-services-base:+'
-     compile 'com.google.android.gms:play-services-maps:+'
-     compile 'com.google.android.gms:play-services-location:+'
+    implementation 'com.android.support:design:27.1.0'
+    implementation project(':react-native-svg')
+    implementation project(':react-native-sentry')
+    implementation project(':react-native-mauron85-background-geolocation')
+    implementation project(':react-native-push-notification')
+    implementation project(':react-native-image-crop-picker')
+    implementation project(':react-native-image-crop-picker')
+    implementation project(':react-native-image-crop-picker')
+    implementation project(':react-native-vector-icons')
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation "com.android.support:appcompat-v7:23.0.1"
+    implementation "com.facebook.react:react-native:+"
+    implementation project(':react-native-navigation')
+    implementation 'com.google.android.gms:play-services-base:+'
+    implementation 'com.google.android.gms:play-services-maps:+'
+    implementation 'com.google.android.gms:play-services-location:+'
+    implementation(project(':react-native-maps')){
+       exclude group: 'com.google.android.gms', module: 'play-services-base'
+       exclude group: 'com.google.android.gms', module: 'play-services-maps'
+    }
+
 
 }
 
