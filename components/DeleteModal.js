@@ -21,12 +21,12 @@ export default class DeleteModal extends PureComponent {
         onClosed={this.props.closeDeleteModal}
       >
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-          <Text>Are you sure you want to delete this ride?</Text>
+          <Text>{this.props.text}</Text>
         </View>
         <View style={{flex: 1, flexDirection: 'row', height: 20, alignItems: 'center'}}>
           <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
             <View style={{margin: 20}} >
-              <Button title={"Yes"} color={"red"} onPress={this.props.deleteRide}/>
+              <Button title={"Yes"} color={"red"} onPress={this.props.deleteFunc}/>
             </View>
             <View style={{margin: 20}} >
               <Button title={"No"} onPress={this.props.closeDeleteModal}/>

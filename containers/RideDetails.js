@@ -34,6 +34,7 @@ class RideDetailsContainer extends NavigatorComponent {
     this.state = {
       rideName: rideName,
       horseID: null,
+      horseSelected: false,
       photosByID: {},
       coverPhotoID: null,
     }
@@ -55,6 +56,7 @@ class RideDetailsContainer extends NavigatorComponent {
 
   changeHorseID (horseID) {
     this.setState({
+      horseSelected: true,
       horseID: horseID
     })
   }
@@ -78,7 +80,7 @@ class RideDetailsContainer extends NavigatorComponent {
   createRide () {
     this.props.dispatch(stopLocationTracking())
     let horseID = this.state.horseID
-    if (!horseID && this.props.horses.length > 0) {
+    if (!this.props.horseSelected && this.props.horses.length > 0) {
       horseID = this.props.horses[0]._id
     }
     const rideID = `${this.props.userID.toString()}_${(new Date).getTime().toString()}`
@@ -114,6 +116,7 @@ class RideDetailsContainer extends NavigatorComponent {
         photosByID={this.state.photosByID}
         horses={this.props.horses}
         horseID={this.state.horseID}
+        horseSelected={this.state.horseSelected}
         changeRideName={this.changeRideName}
         changeHorseID={this.changeHorseID}
         rideName={this.state.rideName}
@@ -125,7 +128,7 @@ class RideDetailsContainer extends NavigatorComponent {
 
 function mapStateToProps (state, ownProps) {
   return {
-    horses: state.horses.filter((h) => h.userID === state.localState.userID),
+    horses: state.horses.filter((h) => h.userID === state.localState.userID && h.deleted !== true),
     goodConnection: state.localState.goodConnection,
     currentRide: state.localState.currentRide,
     userID: state.localState.userID,

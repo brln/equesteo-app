@@ -34,7 +34,7 @@ export default class UpdateRide extends Component<Props> {
     const horseComps = [
        <Picker.Item
         key={null}
-        label={''}
+        label={'None'}
         value={null}
       />
     ]

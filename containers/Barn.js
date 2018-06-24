@@ -43,7 +43,7 @@ class BarnContainer extends NavigatorComponent {
 
 function mapStateToProps (state) {
   return {
-    horses: state.horses.filter((h) => h.userID === state.localState.userID),
+    horses: state.horses.filter((h) => h.userID === state.localState.userID && h.deleted !== true),
     userID: state.localState.userID
   }
 }

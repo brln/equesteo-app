@@ -41,9 +41,16 @@ export default class RideDetails extends Component {
         />
       )
     }
+    horseComps.push(
+      <Picker.Item
+        key={null}
+        label={'None'}
+        value={null}
+      />
+    )
     return (
       <Picker
-        selectedValue={this.props.horseID}
+        selectedValue={this.props.horseSelected ? this.props.horseID : this.props.horses[0]._id}
         onValueChange={this.props.changeHorseID}
       >
         {horseComps}
