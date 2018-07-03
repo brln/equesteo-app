@@ -36,16 +36,6 @@ export default class Training extends Component {
     this._renderItem = this._renderItem.bind(this)
   }
 
-  whichHorse () {
-    let found = null
-    for (let horse of this.props.horses) {
-      if (horse._id === this.props.ride.horseID) {
-        found = horse
-      }
-    }
-    return found ? found.name : 'none'
-  }
-
   ridesToWeeks (rides) {
     const rideWeeks = {}
     for (let ride of rides) {
