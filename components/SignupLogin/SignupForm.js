@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 
 import {
-  ImageBackground,
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View
 } from 'react-native';
 
@@ -67,7 +67,7 @@ export default class SignupForm extends Component {
     return (
       <View style={styles.container}>
         { this.state.showMismatch ? dontMatchMessage : null }
-        <Text style={styles.whiteText}>Email:</Text>
+        <Text>Email:</Text>
         <TextInput
           autoCapitalize={'none'}
           autoFocus={true}
@@ -78,9 +78,9 @@ export default class SignupForm extends Component {
           onChangeText={this.changeEmail}
           returnKeyType="next"
           ref={(i) => this.inputs['email'] = i}
-          underlineColorAndroid="white"
+          underlineColorAndroid="black"
         />
-        <Text style={styles.whiteText}>Password:</Text>
+        <Text>Password:</Text>
         <TextInput
           autoCapitalize={'none'}
           blurOnSubmit={false}
@@ -89,10 +89,10 @@ export default class SignupForm extends Component {
           ref={(i) => this.inputs['pw1'] = i}
           style={styles.whiteText}
           returnKeyType="next"
-          underlineColorAndroid="white"
+          underlineColorAndroid="black"
           secureTextEntry={true}
         />
-        <Text style={styles.whiteText}>Password Again:</Text>
+        <Text>Password Again:</Text>
         <TextInput
           autoCapitalize={'none'}
           onSubmitEditing={this.submitSignup}
@@ -100,10 +100,12 @@ export default class SignupForm extends Component {
           style={styles.whiteText}
           onChangeText={this.changePassword2}
           ref={(i) => this.inputs['pw2'] = i}
-          underlineColorAndroid="white"
+          underlineColorAndroid="black"
         />
         <View style={styles.switchup}>
-          <Text style={styles.switchupText} onPress={this.props.switchSignup}>Or, <Text style={styles.underlineText}>Log In</Text>.</Text>
+          <TouchableOpacity onPress={this.props.showLogin}>
+            <Text style={styles.switchupText}>Or, <Text style={styles.underlineText}>Log In</Text>.</Text>
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -113,7 +115,7 @@ export default class SignupForm extends Component {
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    top: 40,
+    top: 20,
     width: "100%",
     flex: 1,
     justifyContent: 'flex-start',
@@ -134,12 +136,8 @@ const styles = StyleSheet.create({
   },
   switchupText: {
     textAlign: 'center',
-    color: 'white'
   },
   underlineText: {
     textDecorationLine: 'underline',
   },
-  whiteText: {
-    color: 'white'
-  }
 });

@@ -26,7 +26,9 @@ import {
   RIDE_CREATED,
   RIDE_SAVED,
   SAVE_USER_ID,
+  SET_APP_ROOT,
   START_RIDE,
+  TOGGLE_AWAITING_PW_CHANGE,
   SYNC_COMPLETE,
   USER_SEARCH_RETURNED,
   USER_UPDATED,
@@ -41,8 +43,8 @@ import { runMigrations } from './migrations/migrator'
 
 const initialState = {
   localState: {
-    app: 'login',
     appState: appStates.active,
+    awaitingPWChange: false,
     clearStateAfterPersist: false,
     currentScreen: FEED,
     currentRide: null,
@@ -63,6 +65,7 @@ const initialState = {
       users: false,
     },
     ongoingNotificationShown: false,
+    root: 'login',
     userID: null,
     userLoaded: false,
     userSearchResults: [],
@@ -278,7 +281,6 @@ export default function AppReducer(state=initialState, action) {
         ...state,
         localState: {
           ...state.localState,
-          app: 'after-login',
           jwt: action.token
         }
       }
@@ -375,6 +377,14 @@ export default function AppReducer(state=initialState, action) {
           userID: action.userID
         },
       }
+    case SET_APP_ROOT:
+      return {
+        ...state,
+        localState: {
+          ...state.localState,
+          root: action.root
+        }
+      }
     case START_RIDE:
       return {
         ...state,
@@ -389,6 +399,14 @@ export default function AppReducer(state=initialState, action) {
         localState: {
           ...state.localState,
           lastFullSync: new Date()
+        }
+      }
+    case TOGGLE_AWAITING_PW_CHANGE:
+      return {
+        ...state,
+        localState: {
+          ...state.localState,
+          awaitingPWChange: !state.localState.awaitingPWChange
         }
       }
     case USER_UPDATED:

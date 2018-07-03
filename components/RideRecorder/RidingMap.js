@@ -6,14 +6,14 @@ import {
   View
 } from 'react-native';
 
-import { bearing, rideCoordsToMapCoords } from '../helpers'
+import { bearing, rideCoordsToMapCoords } from '../../helpers'
 
 export default class RidingMap extends Component {
   constructor (props) {
     super(props)
     this.state = {}
     this.fitToElements = this.fitToElements.bind(this)
-    // this.changeBearing = this.changeBearing.bind(this)
+    this.changeBearing = this.changeBearing.bind(this)
     this.fitToElements = this.fitToElements.bind(this)
   }
 
@@ -23,6 +23,13 @@ export default class RidingMap extends Component {
       should = true
     }
     return should
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.rideCoords.length === 0 && this.props.rideCoords.length === 1) {
+      this.map.animateToRegion(this.fitToElements())
+    }
+    this.changeBearing()
   }
 
   fitToElements() {
@@ -48,14 +55,15 @@ export default class RidingMap extends Component {
   changeBearing () {
     let newBearing = 0
     let coordinates = this.props.rideCoords
+    const lastCoord = coordinates[coordinates.length -1]
     if (coordinates.length > 1) {
       newBearing = bearing(
         coordinates[coordinates.length - 2].latitude,
         coordinates[coordinates.length - 2].longitude,
-        coordinates[coordinates.length - 1].latitude,
-        coordinates[coordinates.length - 1].longitude
+        lastCoord.latitude,
+        lastCoord.longitude
       )
-      this.map.animateToBearing(newBearing, 500)
+      this.map.animateToNavigation(lastCoord, newBearing, 45)
     }
   }
 
@@ -65,7 +73,7 @@ export default class RidingMap extends Component {
         <MapView
           style={styles.map}
           ref={ref => this.map = ref}
-          region={this.fitToElements()}
+          initialRegion={this.fitToElements()}
           // onRegionChangeComplete={this.changeBearing}
         >
           <MapView.Polyline

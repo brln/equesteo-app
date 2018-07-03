@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {
   Button,
+  Dimensions,
   Image,
   ScrollView,
   StyleSheet,
@@ -9,6 +10,8 @@ import {
 } from 'react-native';
 
 import { profilePhotoURL } from '../helpers'
+
+const { width } = Dimensions.get('window')
 
 
 export default class Profile extends Component {
@@ -41,11 +44,11 @@ export default class Profile extends Component {
     return (
       <ScrollView>
         <View style={styles.container}>
-          <View style={styles.topSection}>
-            <View style={{flex: 1, padding: 20}}>
-              <Image style={styles.image} source={source} />
-            </View>
-            <View style={{flex: 1, padding: 5, left: -15}}>
+          <View style={{flex: 2, width}}>
+            <Image style={{width}} source={source} />
+          </View>
+          <View style={{flex: 3}}>
+            <View>
               {followButton}
               <Text> Email: </Text>
               <Text>
@@ -62,14 +65,10 @@ export default class Profile extends Component {
                 {this.props.user.lastName || 'unknown'}
               </Text>
             </View>
-          </View>
-          <View style={{flex: 3, padding: 20}}>
             <Text> About Me: </Text>
             <Text>
               {this.props.user.aboutMe || 'Nothing'}
             </Text>
-
-
           </View>
         </View>
       </ScrollView>
@@ -83,16 +82,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'stretch',
     backgroundColor: '#F5FCFF',
-  },
-  topSection: {
-    flex: 2.5,
-    flexDirection: 'row',
-    alignItems: 'stretch',
-    justifyContent: 'space-between',
-  },
-  image: {
-    width: 130,
-    height: 130,
   },
   profileButton: {
     width: 130,

@@ -6,6 +6,12 @@ export default class UserAPI {
     this.apiClient = new ApiClient(token)
   }
 
+  async getPWCode (email) {
+    return await this.apiClient.post('/users/getPWCode', {
+      email: email
+    })
+  }
+
   async login (email, password) {
     return await this.apiClient.post('/users/login', {
       email: email,
@@ -18,6 +24,16 @@ export default class UserAPI {
       email: email,
       password: password,
     })
+  }
+
+  async changePassword (newPassword) {
+    return await this.apiClient.post('/users/changePW', {
+      password: newPassword
+    })
+  }
+
+  async exchangePWCodeForToken (email, code) {
+    return await this.apiClient.post('/users/exchangePWCode', { email, code })
   }
 
   _uploadProfilePhoto (imageLocation, photoID) {
