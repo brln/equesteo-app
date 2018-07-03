@@ -40,10 +40,14 @@ export default class Profile extends Component {
   }
 
   renderHorse ({item}) {
+    let uri = 'https://s3.us-west-1.amazonaws.com/equesteo-horse-photos/empty.png'
+    if (item.profilePhotoID && item.photosByID[item.profilePhotoID]) {
+      uri = item.photosByID[item.profilePhotoID].uri
+    }
     return (
       <ListItem avatar noBorder={true} style={{height: 80}} onPress={() => alert(item.name)}>
         <Left>
-          <Thumbnail size={30} source={{uri: item.photosByID[item.profilePhotoID].uri}} />
+          <Thumbnail size={30} source={{ uri }} />
         </Left>
         <Body>
           <Text>{item.name}</Text>
@@ -53,14 +57,17 @@ export default class Profile extends Component {
   }
 
   renderHorses (horses) {
-    return (
-      <FlatList
-        data={horses}
-        renderItem={this.renderHorse}
-        keyExtractor={(i) => i._id}
-        ItemSeparatorComponent={null}
-      />
-    )
+    if (horses.length > 0) {
+      return (
+        <FlatList
+          data={horses}
+          renderItem={this.renderHorse}
+          keyExtractor={(i) => i._id}
+          ItemSeparatorComponent={null}
+        />
+      )
+    }
+
   }
 
   render() {

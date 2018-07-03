@@ -69,7 +69,7 @@ export default class LoginForm extends Component {
             underlineColorAndroid="black"
           />
 
-          <View style={styles.switchup}>
+          <View>
             <TouchableOpacity onPress={this.props.showSignup}>
               <View style={styles.switchup} >
                 <Text style={styles.switchupText} >Or, <Text style={styles.underlineText}>Sign Up</Text>.</Text>
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     width: 80,
   },
   switchup: {
-    paddingTop: 20,
+    paddingTop: 10,
     paddingBottom: 20,
   },
   switchupText: {

@@ -36,7 +36,7 @@ class ProfileContainer extends NavigatorComponent {
 
 function mapStateToProps (state, passedProps) {
   return {
-    horses: state.horses.filter((h) => h.userID === state.localState.userID && h.deleted !== true),
+    horses: state.horses.filter((h) => h.userID === passedProps.user._id && h.deleted !== true),
     user: passedProps.user,
     userData: state.users[state.localState.userID]
   }
