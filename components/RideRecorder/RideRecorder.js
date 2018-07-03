@@ -8,7 +8,7 @@ import {
 import { black, brand, green, white } from '../../colors'
 import GPSStatus from './GPSStatus'
 import { unixTimeNow } from "../../helpers"
-import RidingMap from '../RidingMap'
+import RidingMap from './RidingMap'
 import RideStats from './RideStats'
 import { RIDE_DETAILS } from "../../screens"
 

@@ -25,6 +25,7 @@ class ProfileContainer extends NavigatorComponent {
     return (
       <Profile
         createFollow={this.createFollow}
+        horses={this.props.horses}
         deleteFollow={this.deleteFollow}
         user={this.props.user}
         userData={this.props.userData}
@@ -35,6 +36,7 @@ class ProfileContainer extends NavigatorComponent {
 
 function mapStateToProps (state, passedProps) {
   return {
+    horses: state.horses.filter((h) => h.userID === state.localState.userID && h.deleted !== true),
     user: passedProps.user,
     userData: state.users[state.localState.userID]
   }

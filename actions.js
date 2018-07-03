@@ -1,5 +1,6 @@
 import { AppState, NetInfo } from 'react-native'
 import BackgroundGeolocation from 'react-native-mauron85-background-geolocation'
+import { ENV } from 'react-native-dotenv'
 
 import { unixTimeNow, generateUUID, staticMap } from "./helpers"
 import { FEED } from './screens'
@@ -29,25 +30,19 @@ import {
   PHOTO_PERSIST_COMPLETE,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
-  REMOVE_RIDE_FROM_STATE,
   RIDE_CARROT_CREATED,
   RIDE_CARROT_SAVED,
   RIDE_COMMENT_CREATED,
   RIDE_CREATED,
   RIDE_SAVED,
   SAVE_USER_ID,
+  SET_APP_ROOT,
   START_RIDE,
   SYNC_COMPLETE,
+  TOGGLE_AWAITING_PW_CHANGE,
   USER_UPDATED,
   USER_SEARCH_RETURNED,
 } from './constants'
-
-function changeAppRoot(root) {
-  return {
-    type: CHANGE_ROOT,
-    root
-  }
-}
 
 export function changeScreen(screen) {
   return {
@@ -191,13 +186,6 @@ export function remotePersistComplete (database) {
   }
 }
 
-function removeRideFromState (rideID) {
-  return {
-    type: REMOVE_RIDE_FROM_STATE,
-    rideID
-  }
-}
-
 export function rideCarrotCreated (carrotData) {
   return {
     type: RIDE_CARROT_CREATED,
@@ -233,6 +221,13 @@ function rideSaved (ride) {
   }
 }
 
+function setAppRoot (root) {
+  return {
+    type: SET_APP_ROOT,
+    root
+  }
+}
+
 export function startRide(firstCoord) {
   const coords = []
   if (firstCoord) {
@@ -251,6 +246,12 @@ export function startRide(firstCoord) {
 export function syncComplete () {
   return {
     type: SYNC_COMPLETE,
+  }
+}
+
+function toggleAwaitingPasswordChange () {
+  return {
+    type: TOGGLE_AWAITING_PW_CHANGE
   }
 }
 
@@ -275,10 +276,8 @@ export function userUpdated (userData) {
 export function appInitialized () {
   return async (dispatch) => {
     dispatch(findLocalToken())
-    dispatch(changeAppRoot('login'))
     dispatch(startNetworkTracking())
     dispatch(startAppStateTracking())
-
   }
 }
 
@@ -308,6 +307,36 @@ export function changeHorsePhotoData(horseID, photoID, uri) {
   }
 }
 
+export function getPWCode (email) {
+  return async () => {
+    let userAPI = new UserAPI()
+    await userAPI.getPWCode(email)
+  }
+}
+
+export function exchangePWCode (email, code) {
+  return async (dispatch) => {
+    let userAPI = new UserAPI()
+    try {
+      const resp = await userAPI.exchangePWCodeForToken(email, code)
+      const token = resp.token
+      const userID = resp.id
+      const following = resp.following
+      const pouchCouch = new PouchCouch(token)
+      dispatch(toggleAwaitingPasswordChange())
+      await pouchCouch.localReplicate([...following, userID])
+      dispatch(receiveJWT(resp.token))
+      dispatch(saveUserID(resp.id))
+      dispatch(loadLocalData())
+      await LocalStorage.saveToken(resp.token, resp.id);
+    } catch (e) {
+      if (e instanceof UnauthorizedError) {
+        dispatch(errorOccurred(e.message))
+      }
+    }
+  }
+}
+
 export function changeRidePhotoData(rideID, photoID, uri) {
   return async (dispatch, getState) => {
     let rideData = null
@@ -334,8 +363,6 @@ export function changeUserPhotoData (photoID, uri) {
     const userClone = {...userDoc}
 
     let timestamp = unixTimeNow()
-    console.log('userclone')
-    console.log(userClone)
     if (userClone.photosByID[photoID]) {
       timestamp = userClone.photosByID[photoID].timestamp
     } else {
@@ -455,6 +482,7 @@ function findLocalToken () {
     if (storedToken !== null) {
       dispatch(receiveJWT(storedToken.token))
       dispatch(saveUserID(storedToken.userID))
+      dispatch(setAppRoot('after-login'))
       await dispatch(loadLocalData())
       dispatch(syncDBPull('all'))
     }
@@ -466,6 +494,18 @@ function loadLocalData () {
     const pouchCouch = new PouchCouch(getState().localState.jwt)
     const localData = await pouchCouch.localLoad()
     dispatch(localDataLoaded(localData))
+  }
+}
+
+export function newPassword (password) {
+  return async (dispatch, getState) => {
+    const userAPI = new UserAPI(getState().localState.jwt)
+    try {
+      await userAPI.changePassword(password)
+      dispatch((setAppRoot('after-login')))
+    } catch (e) {
+      console.log(e)
+    }
   }
 }
 
@@ -579,10 +619,10 @@ export function submitLogin (email, password) {
       const pouchCouch = new PouchCouch(token)
       await pouchCouch.localReplicate([...following, userID])
       dispatch(receiveJWT(resp.token))
+      dispatch(setAppRoot('after-login'))
       dispatch(saveUserID(resp.id))
       dispatch(loadLocalData())
       await LocalStorage.saveToken(resp.token, resp.id);
-
       dispatch(changeScreen(FEED))
     } catch (e) {
       if (e instanceof UnauthorizedError) {
@@ -593,7 +633,7 @@ export function submitLogin (email, password) {
 }
 
 export function submitSignup (email, password) {
-  return async (dispatch, getState) => {
+  return async (dispatch) => {
     const userAPI = new UserAPI()
     try {
       const resp = await userAPI.signup(email, password)
@@ -601,6 +641,7 @@ export function submitSignup (email, password) {
       const pouchCouch = new PouchCouch(resp.token)
       await pouchCouch.replicateOwnUser(resp.id)
       dispatch(receiveJWT(resp.token))
+      dispatch(setAppRoot('after-login'))
       dispatch(saveUserID(resp.id))
       dispatch(loadLocalData())
     } catch (e) {
