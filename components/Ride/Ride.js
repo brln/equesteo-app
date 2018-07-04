@@ -69,8 +69,6 @@ export default class Ride extends Component {
     }
   }
 
-
-
   fullscreenMap () {
     this.props.navigator.push({
       screen: MAP,
@@ -113,7 +111,6 @@ export default class Ride extends Component {
           text={"Are you sure you want to delete this ride?"}
         />
         <View style={{flex: 1}}>
-
           <View style={{flex: 1}}>
             <Swiper
               loop={false}

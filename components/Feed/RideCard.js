@@ -83,7 +83,6 @@ export default class RideCard extends Component {
       animationType: 'slide-up',
       passProps: {
         user,
-        userProfilePhotoURL: this.props.userProfilePhotoURL
       }
     })
   }

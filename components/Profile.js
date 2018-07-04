@@ -20,6 +20,7 @@ import {
 
 import { profilePhotoURL } from '../helpers'
 import { danger, darkBrand, green } from '../colors'
+import { HORSE_PROFILE } from '../screens'
 
 const { width, height } = Dimensions.get('window')
 
@@ -29,14 +30,31 @@ export default class Profile extends Component {
     super(props)
     this.follow = this.follow.bind(this)
     this.unfollow = this.unfollow.bind(this)
+    this.horseProfile = this.horseProfile.bind(this)
+    this.renderHorse = this.renderHorse.bind(this)
   }
 
   follow () {
-    this.props.createFollow(this.props.user._id)
+    this.props.createFollow(this.props.profileUser._id)
   }
 
   unfollow () {
-    this.props.deleteFollow(this.props.user._id)
+    this.props.deleteFollow(this.props.profileUser._id)
+  }
+
+  horseProfile (horse) {
+    return () => {
+      this.props.navigator.push({
+        screen: HORSE_PROFILE,
+        title: horse.name,
+        passProps: {
+          horse: horse,
+          horseUser: this.props.profileUser,
+          user: this.props.user,
+        },
+      })
+    }
+
   }
 
   renderHorse ({item}) {
@@ -45,7 +63,7 @@ export default class Profile extends Component {
       uri = item.photosByID[item.profilePhotoID].uri
     }
     return (
-      <ListItem avatar noBorder={true} style={{height: 80}} onPress={() => alert(item.name)}>
+      <ListItem avatar noBorder={true} style={{height: 80}} onPress={this.horseProfile(item)}>
         <Left>
           <Thumbnail size={30} source={{ uri }} />
         </Left>
@@ -72,12 +90,12 @@ export default class Profile extends Component {
 
   render() {
     let source = require('../img/empty.png')
-    if (this.props.user.profilePhotoID) {
-      source = {uri: profilePhotoURL(this.props.user.profilePhotoID)}
+    if (this.props.profileUser.profilePhotoID) {
+      source = {uri: profilePhotoURL(this.props.profileUser.profilePhotoID)}
     }
     let followButton = <Button style={styles.followButton} color={green} onPress={this.follow} title="Follow" />
-    for (let following of this.props.userData.following) {
-      if (following === this.props.user._id) {
+    for (let following of this.props.profileUser.following) {
+      if (following === this.props.profileUser._id) {
         followButton = <Button style={styles.followButton} color={danger} onPress={this.unfollow} title="Unfollow" />
         break
       }
@@ -100,7 +118,7 @@ export default class Profile extends Component {
                 </View>
               </CardItem>
               <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20}}>
-                <Text>{this.props.user.aboutMe || 'nothing'}</Text>
+                <Text>{this.props.profileUser.aboutMe || 'nothing'}</Text>
               </CardItem>
             </Card>
 
