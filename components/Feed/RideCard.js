@@ -10,11 +10,13 @@ import {
   Text
 } from 'native-base';
 import {
+  Image,
   StyleSheet,
   TouchableOpacity,
   View,
 } from 'react-native';
 
+import { brand } from '../../colors'
 import { PROFILE } from '../../screens'
 import RideImage from './RideImage'
 
@@ -106,14 +108,14 @@ export default class RideCard extends Component {
           <CardItem footer>
             <Left>
               <Button transparent onPress={this.toggleCarrot}>
-                <Icon active name="thumbs-up" />
-                <Text>{this.props.rideCarrots.length} Carrots</Text>
+                <Image source={require('../../img/carrot.png')} style={{height: 20, width: 20}} />
+                <Text style={{color: brand}}>{this.props.rideCarrots.length} Carrots</Text>
               </Button>
             </Left>
             <Right>
               <Button transparent onPress={this.showComments}>
-                <Icon active name="chatbubbles" />
-                <Text>{this.props.rideComments.length} comments</Text>
+                <Image source={require('../../img/comment.png')} style={{height: 20, width: 20}} />
+                <Text style={{color: brand}}>{this.props.rideComments.length} comments</Text>
               </Button>
             </Right>
           </CardItem>

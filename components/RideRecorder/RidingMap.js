@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import MapView from 'react-native-maps';
 
 import {
+  Image,
   StyleSheet,
+  Text,
   View
 } from 'react-native';
 
@@ -15,6 +17,7 @@ export default class RidingMap extends Component {
     this.fitToElements = this.fitToElements.bind(this)
     this.changeBearing = this.changeBearing.bind(this)
     this.fitToElements = this.fitToElements.bind(this)
+    this.gpsStatusImage = this.gpsStatusImage.bind(this)
   }
 
   shouldComponentUpdate(nextProps) {
@@ -67,23 +70,46 @@ export default class RidingMap extends Component {
     }
   }
 
+  gpsStatusImage () {
+    if (this.props.lastLocation) {
+      switch (true) {
+        case this.props.lastLocation.accuracy < 10:
+          return require('../../img/gps/gps5.png')
+        case this.props.lastLocation.accuracy < 15:
+          return require('../../img/gps/gps4.png')
+        case this.props.lastLocation.accuracy < 20:
+          return require('../../img/gps/gps3.png')
+        case this.props.lastLocation.accuracy < 25:
+          return require('../../img/gps/gps2.png')
+        default:
+          return require('../../img/gps/gps1.png')
+      }
+    } else {
+      return null
+    }
+  }
+
   render() {
     return (
       <View style ={styles.container}>
-        <MapView
-          style={styles.map}
-          ref={ref => this.map = ref}
-          initialRegion={this.fitToElements()}
-          // onRegionChangeComplete={this.changeBearing}
-        >
-          <MapView.Polyline
+        <View style={{flex: 1}}>
+          <MapView
             style={styles.map}
-            coordinates={this.props.rideCoords}
-            strokeColor="#dc0202"
-            strokeWidth={5}
+            ref={ref => this.map = ref}
+            initialRegion={this.fitToElements()}
           >
-          </MapView.Polyline>
-        </MapView>
+            <MapView.Polyline
+              style={styles.map}
+              coordinates={this.props.rideCoords}
+              strokeColor="#dc0202"
+              strokeWidth={5}
+            >
+            </MapView.Polyline>
+          </MapView>
+        </View>
+        <View style={{position: 'absolute', right: 0, top: 0}} >
+          <Image source={this.gpsStatusImage()} style={{width: 50, height: 50}}/>
+        </View>
       </View>
     )
   }

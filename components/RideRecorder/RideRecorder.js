@@ -83,6 +83,7 @@ export default class RideRecorder extends Component {
             <RidingMap
               mode={"duringRide"}
               rideCoords={this.props.currentRide.rideCoordinates}
+              lastLocation={this.props.lastLocation}
             />
           </View>
           <View style={styles.bottomSection}>
