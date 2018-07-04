@@ -35,9 +35,7 @@ export default class App {
 
   onStoreUpdate() {
     const root = store.getState().localState.root
-    console.log('root: ' + root)
     if (this.currentRoot !== root) {
-      console.log('changing root!: ' + root)
       this.currentRoot = root;
       this.startApp(root);
     }

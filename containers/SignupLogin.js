@@ -114,6 +114,7 @@ class SignupLoginContainer extends Component {
   render() {
     let form = (
       <LoginForm
+        doingInitialLoad={this.props.doingInitialLoad}
         submitLogin={this.submitLogin}
         showSignup={this.showSignup}
         showForgot={this.showForgot}
@@ -175,6 +176,7 @@ const styles = StyleSheet.create({
 function mapStateToProps (state) {
   return {
     awaitingPWChange: state.localState.awaitingPWChange,
+    doingInitialLoad: state.localState.doingInitialLoad,
     error: state.localState.error,
     resetCodeAccepted: state.localState.resetCodeAccepted
   }

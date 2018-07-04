@@ -5,11 +5,10 @@ import { ENV } from 'react-native-dotenv'
 import { unixTimeNow, generateUUID, staticMap } from "./helpers"
 import { FEED } from './screens'
 import { LocalStorage, PouchCouch, UserAPI } from './services'
-import {BadRequestError, UnauthorizedError} from "./errors"
+import {BadRequestError, NotConnectedError, UnauthorizedError} from "./errors"
 import { enqueueHorsePhoto, enqueueProfilePhoto, enqueueRidePhoto } from './photoQueue'
 
 import {
-  CHANGE_ROOT,
   CHANGE_SCREEN,
   CLEAR_LAST_LOCATION,
   CLEAR_SEARCH,
@@ -40,6 +39,7 @@ import {
   START_RIDE,
   SYNC_COMPLETE,
   TOGGLE_AWAITING_PW_CHANGE,
+  TOGGLE_DOING_INITIAL_LOAD,
   USER_UPDATED,
   USER_SEARCH_RETURNED,
 } from './constants'
@@ -109,6 +109,13 @@ export function errorOccurred (message) {
   }
 }
 
+function horseCreated (horse) {
+  return {
+    type: HORSE_CREATED,
+    horse,
+  }
+}
+
 export function justFinishedRideShown () {
   return {
     type: JUST_FINISHED_RIDE_SHOWN
@@ -163,13 +170,6 @@ export function saveUserID(userID) {
   return {
     type: SAVE_USER_ID,
     userID
-  }
-}
-
-function horseCreated (horse) {
-  return {
-    type: HORSE_CREATED,
-    horse,
   }
 }
 
@@ -252,6 +252,12 @@ export function syncComplete () {
 function toggleAwaitingPasswordChange () {
   return {
     type: TOGGLE_AWAITING_PW_CHANGE
+  }
+}
+
+function toggleDoingInitialLoad () {
+  return {
+    type: TOGGLE_DOING_INITIAL_LOAD
   }
 }
 
@@ -613,6 +619,8 @@ export function submitLogin (email, password) {
     const userAPI = new UserAPI()
     try {
       const resp = await userAPI.login(email, password)
+      dispatch(dismissError())
+      dispatch(toggleDoingInitialLoad())
       const token = resp.token
       const userID = resp.id
       const following = resp.following
@@ -626,6 +634,8 @@ export function submitLogin (email, password) {
       dispatch(changeScreen(FEED))
     } catch (e) {
       if (e instanceof UnauthorizedError) {
+        dispatch(errorOccurred(e.message))
+      } else if (e instanceof NotConnectedError) {
         dispatch(errorOccurred(e.message))
       }
     }

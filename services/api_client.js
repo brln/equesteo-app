@@ -1,5 +1,5 @@
 import { API_URL } from 'react-native-dotenv'
-import {BadRequestError, UnauthorizedError} from '../errors'
+import {BadRequestError, UnauthorizedError, NotConnectedError} from '../errors'
 
 
 export default class ApiClient {
@@ -49,7 +49,13 @@ export default class ApiClient {
         headers: this.headers(isJSON),
         method
       }
-    )
+    ).catch(e => {
+      if (e instanceof TypeError) {
+        if (e.toString() === 'TypeError: Network request failed') {
+          throw new NotConnectedError('Cannot find the internet.')
+        }
+      }
+    })
 
     const json = await resp.json()
     switch (resp.status) {

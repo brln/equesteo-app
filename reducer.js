@@ -29,6 +29,7 @@ import {
   SET_APP_ROOT,
   START_RIDE,
   TOGGLE_AWAITING_PW_CHANGE,
+  TOGGLE_DOING_INITIAL_LOAD,
   SYNC_COMPLETE,
   USER_SEARCH_RETURNED,
   USER_UPDATED,
@@ -48,6 +49,7 @@ const initialState = {
     clearStateAfterPersist: false,
     currentScreen: FEED,
     currentRide: null,
+    doingInitialLoad: false,
     error: null,
     goodConnection: false,
     justFinishedRide: false,
@@ -407,6 +409,14 @@ export default function AppReducer(state=initialState, action) {
         localState: {
           ...state.localState,
           awaitingPWChange: !state.localState.awaitingPWChange
+        }
+      }
+    case TOGGLE_DOING_INITIAL_LOAD:
+      return {
+        ...state,
+        localState: {
+          ...state.localState,
+          doingInitialLoad: !state.localState.doingInitialLoad
         }
       }
     case USER_UPDATED:

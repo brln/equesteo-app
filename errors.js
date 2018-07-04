@@ -26,7 +26,18 @@ export class UnknownError extends Error {
     this.message = message
 
     // Javascript hacks to be able to call instanceof
-    this.constructor = BadRequestError
-    this.__proto__ = BadRequestError.prototype
+    this.constructor = UnknownError
+    this.__proto__ = UnknownError.prototype
+  }
+}
+
+export class NotConnectedError extends Error {
+  constructor (message, ...params) {
+    super(...params)
+    this.message = message
+
+    // Javascript hacks to be able to call instanceof
+    this.constructor = NotConnectedError
+    this.__proto__ = NotConnectedError.prototype
   }
 }
