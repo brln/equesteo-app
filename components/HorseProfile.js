@@ -45,6 +45,16 @@ function FabImage (props) {
   )
 }
 
+function SwipablePhoto (props) {
+  return (
+    <TouchableWithoutFeedback style={styles.slide}>
+      <Image
+        style={{width: '100%', height: '100%' }}
+        source={props.source}
+      />
+    </TouchableWithoutFeedback>
+  )
+}
 
 export default class HorseProfile extends Component {
   constructor (props) {
@@ -66,34 +76,50 @@ export default class HorseProfile extends Component {
 
   makeBirthday () {
     const horse = this.props.horse
-    return `${horse.birthMonth}-${horse.birthDay}-${horse.birthYear}`
+    if (horse.birthMonth && horse.birthDay && horse.birthYear) {
+      return `${horse.birthMonth}-${horse.birthDay}-${horse.birthYear}`
+    } else if (horse.birthMonth && horse.birthYear) {
+      return `${horse.birthMonth}-${horse.birthYear}`
+    }
+    else return 'unknown'
+
+
   }
 
   makeHeight () {
     const horse = this.props.horse
-    return `${horse.heightHands}.${horse.heightInches} hh`
+    if (horse.heightHands && horse.heightInches) {
+       return `${horse.heightHands}.${horse.heightInches} hh`
+    } else if (horse.heightHands) {
+      return `${horse.heightHands} hh`
+    } else return 'unknown'
+
   }
 
   renderImages () {
-    const images = [
-      <TouchableWithoutFeedback style={styles.slide} key='profile'>
-        <Image
-          style={{width: '100%', height: '100%' }}
+    const images = []
+    if (Object.keys(this.props.horse.photosByID).length > 0) {
+      images.push(
+        <SwipablePhoto
+          key="profile"
           source={{uri: this.props.horse.photosByID[this.props.horse.profilePhotoID].uri}}
         />
-      </TouchableWithoutFeedback>
-    ]
-    for (let imageID of Object.keys(this.props.horse.photosByID)) {
-      if (imageID !== this.props.horse.profilePhotoID) {
-        images.push(
-          <TouchableWithoutFeedback style={styles.slide} key={imageID}>
-            <Image
-              style={{width: '100%', height: '100%' }}
+      )
+      for (let imageID of Object.keys(this.props.horse.photosByID)) {
+        if (imageID !== this.props.horse.profilePhotoID) {
+          images.push(
+            <SwipablePhoto
+              key={imageID}
               source={{uri: this.props.horse.photosByID[imageID].uri}}
             />
-          </TouchableWithoutFeedback>
-        )
+          )
+        }
       }
+
+    } else {
+      images.push(
+        <SwipablePhoto key="empty" source={require('../img/emptyHorse.png')} />
+      )
     }
     return images
   }

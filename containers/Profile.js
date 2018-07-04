@@ -29,7 +29,7 @@ class ProfileContainer extends NavigatorComponent {
         horses={this.props.horses}
         navigator={this.props.navigator}
         profileUser={this.props.profileUser}
-        userData={this.props.userData}
+        user={this.props.user}
       />
     )
   }

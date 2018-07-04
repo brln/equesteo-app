@@ -94,7 +94,7 @@ export default class Profile extends Component {
       source = {uri: profilePhotoURL(this.props.profileUser.profilePhotoID)}
     }
     let followButton = <Button style={styles.followButton} color={green} onPress={this.follow} title="Follow" />
-    for (let following of this.props.profileUser.following) {
+    for (let following of this.props.user.following) {
       if (following === this.props.profileUser._id) {
         followButton = <Button style={styles.followButton} color={danger} onPress={this.unfollow} title="Unfollow" />
         break
