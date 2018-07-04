@@ -304,11 +304,12 @@ export function changeHorsePhotoData(horseID, photoID, uri) {
       horseData.profilePhotoID = photoID
     }
 
-    horseData.photosByID[photoID] = {
-      uri,
-      timestamp
+    const photosClone = {...horseData.photosByID}
+    photosClone[photoID] = {
+      timestamp,
+      uri
     }
-
+    horseData.photosByID = photosClone
     dispatch(saveHorse(horseData))
   }
 }

@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
-import { changeScreen, createHorse } from '../actions'
+import { createHorse } from '../actions'
 import Barn from '../components/Barn'
 import NavigatorComponent from './NavigatorComponent'
-import { HORSE } from '../screens'
+import { HORSE_PROFILE } from '../screens'
 
 class BarnContainer extends NavigatorComponent {
   constructor (props) {
@@ -14,11 +14,19 @@ class BarnContainer extends NavigatorComponent {
   }
 
   horseProfile (horse) {
-    this.props.dispatch(changeScreen(HORSE))
     this.props.navigator.push({
-      screen: HORSE,
+      screen: HORSE_PROFILE,
       title: horse.name,
-      passProps: {horseID: horse._id},
+      passProps: {horse: horse, user: this.props.user},
+      navigatorButtons: {
+        leftButtons: [],
+        rightButtons: [
+          {
+            icon: require('../img/threedot.png'),
+            id: 'dropdown',
+          }
+        ]
+      },
     })
   }
 
@@ -44,7 +52,8 @@ class BarnContainer extends NavigatorComponent {
 function mapStateToProps (state) {
   return {
     horses: state.horses.filter((h) => h.userID === state.localState.userID && h.deleted !== true),
-    userID: state.localState.userID
+    userID: state.localState.userID,
+    user: state.users[state.localState.userID]
   }
 }
 

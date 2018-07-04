@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
-import ImagePicker from 'react-native-image-crop-picker'
-import { Container, Content } from 'native-base';
+
 import {
-  Button,
-  Image,
   Picker,
   ScrollView,
   StyleSheet,
@@ -12,8 +9,6 @@ import {
   View,
 } from 'react-native';
 
-import PhotosByTimestamp from './PhotosByTimestamp'
-import DeleteModal from './DeleteModal'
 
 export default class Horse extends Component {
   constructor (props) {
@@ -25,17 +20,6 @@ export default class Horse extends Component {
     this.changeHorseHeightInches = this.changeHorseHeightInches.bind(this)
     this.changeHorseHeightHands = this.changeHorseHeightHands.bind(this)
     this.changeHorseName = this.changeHorseName.bind(this)
-    this.uploadPhoto = this.uploadPhoto.bind(this)
-  }
-
-  uploadPhoto () {
-    ImagePicker.openPicker({
-      width: 800,
-      height: 800,
-      cropping: true
-    }).then(image => {
-      this.props.uploadPhoto(image.path)
-    }).catch(() => {});
   }
 
   changeHorseBirthDay (newDay) {
@@ -82,33 +66,34 @@ export default class Horse extends Component {
 
   monthPicker (onValueChange) {
     return (<Picker
-      selectedValue={this.props.horse.birthMonth || "1"}
+      selectedValue={this.props.horse.birthMonth}
       style={{ height: 50, width: 120 }}
       onValueChange={onValueChange}
     >
-      <Picker.Item label="Jan" value="1" />
-      <Picker.Item label="Feb" value="2" />
-      <Picker.Item label="Mar" value="3" />
-      <Picker.Item label="Apr" value="4" />
-      <Picker.Item label="May" value="5" />
-      <Picker.Item label="Jun" value="6" />
-      <Picker.Item label="Jul" value="7" />
-      <Picker.Item label="Aug" value="8" />
-      <Picker.Item label="Sep" value="9" />
-      <Picker.Item label="Oct" value="10" />
-      <Picker.Item label="Nov" value="11" />
-      <Picker.Item label="Dec" value="12" />
+      <Picker.Item label="" value={null} key="null"/>
+      <Picker.Item label="Jan" value="1" key="1"/>
+      <Picker.Item label="Feb" value="2" key="2"/>
+      <Picker.Item label="Mar" value="3" key="3"/>
+      <Picker.Item label="Apr" value="4" key="4"/>
+      <Picker.Item label="May" value="5" key="5"/>
+      <Picker.Item label="Jun" value="6" key="6"/>
+      <Picker.Item label="Jul" value="7" key="7"/>
+      <Picker.Item label="Aug" value="8" key="8"/>
+      <Picker.Item label="Sep" value="9" key="9"/>
+      <Picker.Item label="Oct" value="10" key="10"/>
+      <Picker.Item label="Nov" value="11" key="11"/>
+      <Picker.Item label="Dec" value="12" key="12"/>
     </Picker>)
   }
 
   dayPicker (onValueChange) {
-    const allDays = []
+    const allDays = [<Picker.Item label="" value={null} key={null}/>]
     for (let i = 1; i <= 31; i++) {
       allDays.push(<Picker.Item label={i.toString()} value={i.toString()} key={i} />)
     }
     return (
       <Picker
-        selectedValue={this.props.horse.birthDay || "1"}
+        selectedValue={this.props.horse.birthDay}
         style={{ height: 50, width: 80 }}
         onValueChange={onValueChange}
       >
@@ -118,14 +103,14 @@ export default class Horse extends Component {
   }
 
   yearPicker (onValueChange) {
-    const startYear = 1970
-    const allDays = []
+    const startYear = 1980
+    const allDays = [<Picker.Item label="" value={null} key={null} />]
     for (let i = startYear; i <= 2018; i++) {
       allDays.push(<Picker.Item label={i.toString()} value={i.toString()} key={i} />)
     }
     return (
       <Picker
-        selectedValue={this.props.horse.birthYear || startYear.toString()}
+        selectedValue={this.props.horse.birthYear}
         style={{ height: 50, width: 120 }}
         onValueChange={onValueChange}
       >
@@ -135,66 +120,47 @@ export default class Horse extends Component {
   }
 
   render() {
-    let source = require('../img/empty.png')
-    let buttonText = 'Upload Photo'
-    if (this.props.horse.profilePhotoID) {
-      source = {uri: this.props.horse.photosByID[this.props.horse.profilePhotoID].uri}
-      buttonText = 'Change Profile Photo'
-    }
-
     return (
       <View>
-        <DeleteModal
-          modalOpen={this.props.modalOpen}
-          closeDeleteModal={this.props.closeDeleteModal}
-          deleteFunc={this.props.deleteHorse}
-          text={"Are you sure you want to delete this horse?"}
-        />
         <ScrollView keyboardShouldPersistTaps={'always'}>
           <View style={styles.container}>
-            <View style={styles.topSection}>
-              <View style={{flex: 1, padding: 20}}>
-                <Image style={styles.image} source={source} />
-                <View style={styles.profileButton}>
-                  <Button onPress={this.uploadPhoto} title={buttonText} />
-                </View>
-              </View>
-              <View style={{flex: 1, padding: 5, left: -15}}>
-                <Text>Name:</Text>
-                <TextInput
-                  value={this.props.horse.name}
-                  onChangeText={this.changeHorseName}
-                />
+            <View style={{flex: 1, padding: 5}}>
+              <Text>Name:</Text>
+              <TextInput
+                value={this.props.horse.name}
+                onChangeText={this.changeHorseName}
+              />
 
-                <Text>Height:</Text>
-                <View style={{flex: 1, flexDirection: 'row'}}>
-                  <Picker
-                    selectedValue={this.props.horse.heightHands || "14"}
-                    style={{ height: 50, width: 80 }}
-                    onValueChange={this.changeHorseHeightHands}
-                  >
-                    <Picker.Item label="11" value="11" />
-                    <Picker.Item label="12" value="12" />
-                    <Picker.Item label="13" value="13" />
-                    <Picker.Item label="14" value="14" />
-                    <Picker.Item label="15" value="15" />
-                    <Picker.Item label="16" value="16" />
-                    <Picker.Item label="17" value="17" />
-                  </Picker>
-                  <Picker
-                    selectedValue={this.props.horse.heightInches || "0"}
-                    style={{ height: 50, width: 80 }}
-                    onValueChange={this.changeHorseHeightInches}
-                  >
-                    <Picker.Item label="0" value="0" />
-                    <Picker.Item label="1" value="1" />
-                    <Picker.Item label="2" value="2" />
-                    <Picker.Item label="3" value="3" />
-                  </Picker>
-                </View>
+              <Text>Height:</Text>
+              <View style={{flex: 1, flexDirection: 'row'}}>
+                <Picker
+                  selectedValue={this.props.horse.heightHands || "14"}
+                  style={{ height: 50, width: 80 }}
+                  onValueChange={this.changeHorseHeightHands}
+                >
+                  <Picker.Item label="" value={null} />
+                  <Picker.Item label="11" value="11" />
+                  <Picker.Item label="12" value="12" />
+                  <Picker.Item label="13" value="13" />
+                  <Picker.Item label="14" value="14" />
+                  <Picker.Item label="15" value="15" />
+                  <Picker.Item label="16" value="16" />
+                  <Picker.Item label="17" value="17" />
+                </Picker>
+                <Picker
+                  selectedValue={this.props.horse.heightInches || "0"}
+                  style={{ height: 50, width: 80 }}
+                  onValueChange={this.changeHorseHeightInches}
+                >
+                  <Picker.Item label="" value={null} />
+                  <Picker.Item label="0" value="0" />
+                  <Picker.Item label="1" value="1" />
+                  <Picker.Item label="2" value="2" />
+                  <Picker.Item label="3" value="3" />
+                </Picker>
               </View>
             </View>
-            <View style={{flex: 3, padding: 20}}>
+            <View style={{flex: 3}}>
               <Text>Birthday</Text>
               <View style={{flex: 1, flexDirection: 'row'}}>
                 {this.monthPicker(this.changeHorseBirthMonth)}
@@ -208,15 +174,6 @@ export default class Horse extends Component {
                 onChangeText={this.changeHorseDescription}
               />
             </View>
-            <Container>
-              <Content>
-                <Text>Other Photos</Text>
-                <PhotosByTimestamp
-                  photosByID={this.props.horse.photosByID}
-                  profilePhotoID={this.props.horse.profilePhotoID}
-                />
-              </Content>
-            </Container>
           </View>
         </ScrollView>
       </View>

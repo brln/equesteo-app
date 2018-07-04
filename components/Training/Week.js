@@ -58,11 +58,11 @@ export default class Week extends Component {
       navigatorButtons: {
         leftButtons: [],
         rightButtons: [
-        {
-          icon: require('../../img/threedot.png'),
-          id: 'dropdown',
-        }
-      ]
+          {
+            icon: require('../../img/threedot.png'),
+            id: 'dropdown',
+          }
+        ]
       },
       animationType: 'slide-up',
     });

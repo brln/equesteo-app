@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
 import Horse from '../components/Horse'
-import { updateHorse, uploadHorsePhoto } from '../actions'
+import { updateHorse } from '../actions'
 import NavigatorComponent from './NavigatorComponent'
 
 class HorseContainer extends NavigatorComponent {
@@ -13,10 +13,6 @@ class HorseContainer extends NavigatorComponent {
         id: 'save',
         title: 'Save',
       },
-      {
-        id: 'delete',
-        title: 'Delete',
-      }
     ],
   }
 
@@ -25,12 +21,8 @@ class HorseContainer extends NavigatorComponent {
     this.state = {
       userMadeChanges: false,
       horseData: null,
-      modalOpen: false
     }
     this.changeHorseDetails = this.changeHorseDetails.bind(this)
-    this.closeDeleteModal = this.closeDeleteModal.bind(this)
-    this.deleteHorse = this.deleteHorse.bind(this)
-    this.uploadPhoto = this.uploadPhoto.bind(this)
     this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
   }
@@ -51,21 +43,8 @@ class HorseContainer extends NavigatorComponent {
       if (event.id === 'save') {
         this.props.dispatch(updateHorse(this.state.horseData))
         this.props.navigator.pop()
-      } else if (event.id === 'delete') {
-        this.setState({modalOpen: true})
       }
     }
-  }
-
-  closeDeleteModal () {
-    this.setState({
-      modalOpen: false
-    })
-  }
-
-  deleteHorse () {
-    this.props.dispatch(updateHorse({...this.state.horseData, deleted: true}))
-    this.props.navigator.pop()
   }
 
   changeHorseDetails (newDetails) {
@@ -74,10 +53,6 @@ class HorseContainer extends NavigatorComponent {
       userMadeChanges: true,
       horseData: newData
     })
-  }
-
-  uploadPhoto (location) {
-    this.props.dispatch(uploadHorsePhoto(location, this.props.horseID))
   }
 
   render() {
