@@ -8,6 +8,7 @@ import DrawerContainer from './containers/Drawer'
 import FeedContainer from './containers/Feed'
 import FollowingContainer from './containers/Following'
 import HorseContainer from './containers/Horse'
+import HorseProfileContainer from './containers/HorseProfile'
 import MapContainer from './containers/Map'
 import ProfileContainer from './containers/Profile'
 import RecorderContainer from './containers/Recorder'
@@ -23,6 +24,7 @@ export const BARN = 'equesteo.Barn'
 export const DRAWER = 'equesteo.Drawer'
 export const FEED = 'equesteo.Feed'
 export const HORSE = 'equesteo.Horse'
+export const HORSE_PROFILE = 'equesteo.HorseProfile'
 export const FOLLOWING = 'equesteo.Following'
 export const MAP = 'equesteo.Map'
 export const NEW_HORSE = 'equesteo.NewHorse'
@@ -52,6 +54,7 @@ export function registerScreens(store, Provider) {
   Navigation.registerComponent(FEED, () => FeedContainer, store, Provider)
   Navigation.registerComponent(FOLLOWING, () => FollowingContainer, store, Provider)
   Navigation.registerComponent(HORSE, () => HorseContainer, store, Provider)
+  Navigation.registerComponent(HORSE_PROFILE, () => HorseProfileContainer, store, Provider)
   Navigation.registerComponent(MAP, () => MapContainer, store, Provider)
   Navigation.registerComponent(PROFILE, () => ProfileContainer, store, Provider)
   Navigation.registerComponent(RECORDER, () => RecorderContainer, store, Provider)

@@ -12,7 +12,7 @@ import SectionHeader from './SectionHeader'
 export default class RideList extends PureComponent {
   constructor (props) {
     super(props)
-    this.getHorseProfilePhotoURL = this.getHorseProfilePhotoURL.bind(this)
+    this.getHorse = this.getHorse.bind(this)
     this.getUserProfilePhotoURL = this.getUserProfilePhotoURL.bind(this)
     this.getUser = this.getUser.bind(this)
     this._renderCard = this._renderCard.bind(this)
@@ -32,23 +32,14 @@ export default class RideList extends PureComponent {
     return profilePhotoURL
   }
 
-  getHorseProfilePhotoURL (ride) {
-    const foundHorseRes = this.props.horses.filter((h) => h._id === ride.horseID)
-    let profilePhotoURL = null
-    if (foundHorseRes.length > 0) {
-      const foundHorse = foundHorseRes[0]
-      const profilePhotoID = foundHorse.profilePhotoID
-      if (profilePhotoID) {
-        profilePhotoURL = foundHorse.photosByID[profilePhotoID].uri
-      }
-    }
-    return profilePhotoURL
+  getHorse (ride) {
+    return this.props.horses.filter((h) => h._id === ride.horseID)[0]
   }
 
   _renderCard ({item}) {
     return (
       <RideCard
-        horseProfilePhotoURL={this.getHorseProfilePhotoURL(item)}
+        horse={this.getHorse(item)}
         navigator={this.props.navigator}
         ride={item}
         rideCarrots={this.props.rideCarrots.filter((rc) => rc.rideID === item._id && rc.deleted === false)}

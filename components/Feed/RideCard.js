@@ -4,7 +4,6 @@ import {
   Button,
   Card,
   CardItem,
-  Icon,
   Left,
   Right,
   Text
@@ -17,14 +16,16 @@ import {
 } from 'react-native';
 
 import { brand } from '../../colors'
-import { PROFILE } from '../../screens'
+import { HORSE_PROFILE, PROFILE } from '../../screens'
 import RideImage from './RideImage'
 
 export default class RideCard extends Component {
   constructor (props) {
     super(props)
+    this.horseProfileURL = this.horseProfileURL.bind(this)
     this.showComments = this.showComments.bind(this)
     this.showRide = this.showRide.bind(this)
+    this.showHorseProfile = this.showHorseProfile.bind(this)
     this.showProfile = this.showProfile.bind(this)
     this.toggleCarrot = this.toggleCarrot.bind(this)
   }
@@ -49,6 +50,26 @@ export default class RideCard extends Component {
     this.props.showRide(this.props.ride)
   }
 
+  showHorseProfile () {
+    this.props.navigator.push({
+      screen: HORSE_PROFILE,
+      title: this.props.horse.name,
+      animationType: 'slide-up',
+      passProps: {
+        horse: this.props.horse,
+        user: this.props.user,
+      }
+    })
+  }
+
+  horseProfileURL () {
+    if (this.props.horse &&
+      this.props.horse.profilePhotoID &&
+      this.props.horse.photosByID[this.props.horse.profilePhotoID]) {
+      return this.props.horse.photosByID[this.props.horse.profilePhotoID].uri
+    }
+  }
+
   showProfile () {
     const user = this.props.user
     let name = 'Unknown Name'
@@ -69,14 +90,15 @@ export default class RideCard extends Component {
 
   render() {
     let horseAvatar = null
-    if (this.props.horseProfilePhotoURL) {
+    const horseProfileURL = this.horseProfileURL()
+    if (horseProfileURL) {
       horseAvatar = (
         <View>
           <Avatar
             rounded
             size="medium"
-            source={{uri: this.props.horseProfilePhotoURL}}
-            onPress={() => console.log("Works!")}
+            source={{uri: horseProfileURL}}
+            onPress={this.showHorseProfile}
             activeOpacity={0.7}
           />
         </View>
