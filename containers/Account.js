@@ -42,8 +42,6 @@ class AccountContainer extends NavigatorComponent {
     this.changeAccountDetails = this.changeAccountDetails.bind(this)
     this.signOut = this.signOut.bind(this)
     this.uploadProfilePhoto = this.uploadProfilePhoto.bind(this)
-
-
     this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
   }

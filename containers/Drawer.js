@@ -48,7 +48,7 @@ class DrawerContainer extends Component {
       title: 'Following',
       navigatorButtons: {
         leftButtons: [{
-          id: 'sideMenu'
+          id: 'back'
         }]
       }
     })
@@ -62,7 +62,7 @@ class DrawerContainer extends Component {
       title: 'Go Ride',
       navigatorButtons: {
         leftButtons: [{
-          id: 'sideMenu'
+          id: 'back'
         }]
       }
 		})
@@ -76,7 +76,7 @@ class DrawerContainer extends Component {
       title: 'My Account',
       navigatorButtons: {
         leftButtons: [{
-          id: 'sideMenu'
+          id: 'back'
         }],
         rightButtons: [
           {
@@ -99,7 +99,7 @@ class DrawerContainer extends Component {
       title: 'Barn',
       navigatorButtons: {
         leftButtons: [{
-          id: 'sideMenu'
+          id: 'back'
         }]
       }
     })
@@ -113,7 +113,7 @@ class DrawerContainer extends Component {
       title: 'Training',
       navigatorButtons: {
         leftButtons: [{
-          id: 'sideMenu'
+          id: 'back'
         }]
       }
     })
