@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
-import { justFinishedRideShown, syncDBPull, toggleRideCarrot } from "../actions";
+import { changeScreen, justFinishedRideShown, syncDBPull, toggleRideCarrot } from "../actions";
 import Feed from '../components/Feed/Feed'
 import NavigatorComponent from './NavigatorComponent'
-import { RIDE_COMMENTS } from '../screens'
+import { FEED, RIDE_COMMENTS } from '../screens'
 
 class FeedContainer extends NavigatorComponent {
   constructor (props) {
@@ -17,6 +17,15 @@ class FeedContainer extends NavigatorComponent {
     this.toggleCarrot = this.toggleCarrot.bind(this)
     this.showComments = this.showComments.bind(this)
     this.syncDBPull = this.syncDBPull.bind(this)
+  }
+
+  componentDidMount () {
+    console.log('mounting feed')
+    this.props.dispatch(changeScreen(FEED))
+  }
+
+  componentWillUnmount () {
+    console.log('unmounting feed')
   }
 
   static getDerivedStateFromProps (nextProps, prevState) {

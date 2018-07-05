@@ -3,13 +3,14 @@ import { connect } from 'react-redux';
 
 import Profile from '../components/Profile'
 import {
+  changeScreen,
   clearSearch,
   createFollow,
   deleteFollow ,
   signOut,
   uploadProfilePhoto,
 } from "../actions"
-import { ACCOUNT } from '../screens'
+import { ACCOUNT, FEED } from '../screens'
 import NavigatorComponent from './NavigatorComponent'
 
 class ProfileContainer extends NavigatorComponent {
@@ -56,6 +57,9 @@ class ProfileContainer extends NavigatorComponent {
           }
         );
       }
+    }
+    if (event.id === 'willDisappear' && event.type === 'ScreenChangedEvent') {
+      this.props.dispatch(changeScreen(FEED))
     }
   }
 

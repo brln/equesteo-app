@@ -149,6 +149,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-android-location-services-dialog-box')
     implementation 'com.android.support:design:27.1.0'
     implementation project(':react-native-svg')
     implementation project(':react-native-sentry')

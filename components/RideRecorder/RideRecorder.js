@@ -5,6 +5,7 @@ import {
   View
 } from 'react-native';
 
+
 import { black, brand, green, white } from '../../colors'
 import GPSStatus from './GPSStatus'
 import { unixTimeNow } from "../../helpers"

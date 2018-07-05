@@ -1,16 +1,24 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
-import { createHorse } from '../actions'
+import { changeScreen, createHorse } from '../actions'
 import Barn from '../components/Barn'
 import NavigatorComponent from './NavigatorComponent'
-import { HORSE_PROFILE } from '../screens'
+import { FEED, HORSE_PROFILE } from '../screens'
 
 class BarnContainer extends NavigatorComponent {
   constructor (props) {
     super(props)
     this.saveNewHorse = this.saveNewHorse.bind(this)
     this.horseProfile = this.horseProfile.bind(this)
+    this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
+    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
+  }
+
+  onNavigatorEvent (event) {
+    if (event.id === 'willDisappear' && event.type === 'ScreenChangedEvent') {
+      this.props.dispatch(changeScreen(FEED))
+    }
   }
 
   horseProfile (horse) {

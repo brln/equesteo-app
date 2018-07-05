@@ -1,12 +1,22 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
+import { changeScreen } from '../actions'
 import Training from '../components/Training/Training'
 import NavigatorComponent from './NavigatorComponent'
+import { FEED } from '../screens'
 
 class TrainingContainer extends NavigatorComponent {
   constructor (props) {
     super(props)
+    this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
+    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
+  }
+
+  onNavigatorEvent (event) {
+    if (event.id === 'willDisappear' && event.type === 'ScreenChangedEvent') {
+      this.props.dispatch(changeScreen(FEED))
+    }
   }
 
   render() {
