@@ -75,6 +75,7 @@ class HorseProfileContainer extends NavigatorComponent {
         deleteHorse={this.deleteHorse}
         horse={this.props.horse}
         modalOpen={this.state.modalOpen}
+        navigator={this.props.navigator}
         uploadPhoto={this.uploadPhoto}
         user={this.props.user}
       />

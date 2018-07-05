@@ -66,8 +66,6 @@ export default class HorseProfile extends Component {
       return `${horse.birthMonth}-${horse.birthYear}`
     }
     else return 'unknown'
-
-
   }
 
   makeHeight () {
@@ -87,6 +85,7 @@ export default class HorseProfile extends Component {
         <SwipablePhoto
           key="profile"
           source={{uri: this.props.horse.photosByID[this.props.horse.profilePhotoID].uri}}
+          navigator={this.props.navigator}
         />
       )
       for (let imageID of Object.keys(this.props.horse.photosByID)) {
@@ -95,11 +94,11 @@ export default class HorseProfile extends Component {
             <SwipablePhoto
               key={imageID}
               source={{uri: this.props.horse.photosByID[imageID].uri}}
+              navigator={this.props.navigator}
             />
           )
         }
       }
-
     } else {
       images.push(
         <SwipablePhoto key="empty" source={require('../img/emptyHorse.png')} />

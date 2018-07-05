@@ -1,19 +1,53 @@
-import React from 'react';
+import React, { Component } from 'react';
 import {
   Image,
   TouchableWithoutFeedback,
   StyleSheet,
 } from 'react-native'
 
-export default function SwipablePhoto (props) {
-  return (
-    <TouchableWithoutFeedback style={styles.slide}>
-      <Image
-        style={{width: '100%', height: '100%' }}
-        source={props.source}
-      />
-    </TouchableWithoutFeedback>
-  )
+import { brand } from '../colors'
+import { PHOTO_LIGHTBOX } from '../screens'
+
+export default class SwipablePhoto extends Component {
+  constructor (props) {
+    super(props)
+    this.closeLightbox = this.closeLightbox.bind(this)
+    this.showLightbox = this.showLightbox.bind(this)
+  }
+
+  closeLightbox () {
+    console.log('close dammit')
+    this.props.navigator.dismissLightBox()
+  }
+
+  showLightbox () {
+    if (this.props.navigator) {
+      this.props.navigator.showLightBox({
+        screen: PHOTO_LIGHTBOX,
+        passProps: {
+          source: this.props.source,
+          close: this.closeLightbox
+        },
+        style: {
+          backgroundBlur: 'dark', // 'dark' / 'light' / 'xlight' / 'none' - the type of blur on the background
+          backgroundColor: brand + 'AA',
+          tapBackgroundToDismiss: true // dismisses LightBox on background taps (optional)
+        }
+      })
+    }
+
+  }
+
+  render () {
+    return (
+      <TouchableWithoutFeedback style={styles.slide} onPress={this.showLightbox}>
+        <Image
+          style={{width: '100%', height: '100%'}}
+          source={this.props.source}
+        />
+      </TouchableWithoutFeedback>
+    )
+  }
 }
 
 const styles = StyleSheet.create({

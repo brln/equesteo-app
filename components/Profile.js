@@ -111,6 +111,7 @@ export default class Profile extends Component {
         <SwipablePhoto
           key="profile"
           source={{uri: user.photosByID[user.profilePhotoID].uri}}
+          navigator={this.props.navigator}
         />
       )
       for (let imageID of Object.keys(user.photosByID)) {
@@ -119,6 +120,7 @@ export default class Profile extends Component {
             <SwipablePhoto
               key={imageID}
               source={{uri: user.photosByID[imageID].uri}}
+              navigator={this.props.navigator}
             />
           )
         }
