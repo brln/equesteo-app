@@ -23,17 +23,19 @@ export default class RideCard extends Component {
   constructor (props) {
     super(props)
     this.horseProfileURL = this.horseProfileURL.bind(this)
+    this.horseAvatar = this.horseAvatar.bind(this)
     this.showComments = this.showComments.bind(this)
     this.showRide = this.showRide.bind(this)
     this.showHorseProfile = this.showHorseProfile.bind(this)
     this.showProfile = this.showProfile.bind(this)
     this.toggleCarrot = this.toggleCarrot.bind(this)
+    this.userAvatar = this.userAvatar.bind(this)
   }
 
   shouldComponentUpdate (nextProps) {
     return (this.props.rideComments.length !== nextProps.rideComments.length
       || this.props.rideCarrots.length !== nextProps.rideCarrots.length
-      || this.props.horseProfilePhotoURL !== nextProps.horseProfilePhotoURL
+      || (this.props.horse && (this.props.horse.profilePhotoID !== nextProps.horse.profilePhotoID))
       || this.props.ride.name !== nextProps.ride.name
     )
   }
@@ -51,14 +53,25 @@ export default class RideCard extends Component {
   }
 
   showHorseProfile () {
+    let rightButtons = []
+    if (this.props.userID === this.props.rideUser._id) {
+      rightButtons = [
+        {
+          icon: require('../../img/threedot.png'),
+          id: 'dropdown',
+        }
+      ]
+    }
+
     this.props.navigator.push({
       screen: HORSE_PROFILE,
       title: this.props.horse.name,
       animationType: 'slide-up',
       passProps: {
         horse: this.props.horse,
-        user: this.props.user,
-      }
+        user: this.props.rideUser,
+      },
+      rightButtons
     })
   }
 
@@ -71,10 +84,10 @@ export default class RideCard extends Component {
   }
 
   showProfile () {
-    const user = this.props.user
+    const rideUser = this.props.rideUser
     let name = 'Unknown Name'
-    if (user.firstName || user.lastName) {
-      name = `${user.firstName || ''} ${user.lastName || ''}`
+    if (rideUser.firstName || rideUser.lastName) {
+      name = `${rideUser.firstName || ''} ${rideUser.lastName || ''}`
     }
 
     this.props.navigator.push({
@@ -82,12 +95,12 @@ export default class RideCard extends Component {
       title: name,
       animationType: 'slide-up',
       passProps: {
-        user,
+        profileUser: rideUser,
       }
     })
   }
 
-  render() {
+  horseAvatar () {
     let horseAvatar = null
     const horseProfileURL = this.horseProfileURL()
     if (horseProfileURL) {
@@ -103,24 +116,39 @@ export default class RideCard extends Component {
         </View>
       )
     }
+    return horseAvatar
+  }
+
+  userAvatar () {
+    let avatar
+    if (this.props.userID !== this.props.rideUser._id) {
+      avatar = (
+        <Avatar
+          rounded
+          size="medium"
+          source={{uri: this.props.userProfilePhotoURL}}
+          onPress={this.showProfile}
+          activeOpacity={0.7}
+        />
+      )
+    }
+    return avatar
+  }
+
+  render() {
+
     return (
       <TouchableOpacity onPress={this.showRide}>
         <Card>
           <CardItem header style={{paddingLeft: 3, paddingTop: 3, paddingBottom: 5, paddingRight: 3}}>
             <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
               <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
-                <Avatar
-                  rounded
-                  size="medium"
-                  source={{uri: this.props.userProfilePhotoURL}}
-                  onPress={this.showProfile}
-                  activeOpacity={0.7}
-                />
+                { this.userAvatar() }
                 <View style={{paddingLeft: 10}}>
                   <Text>{this.props.ride.name}</Text>
                 </View>
               </View>
-              { horseAvatar }
+              { this.horseAvatar() }
             </View>
           </CardItem>
           <CardItem cardBody>

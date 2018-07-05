@@ -12,7 +12,7 @@ class FollowingContainer extends NavigatorComponent {
   }
 
   shouldComponentUpdate (nextProps) {
-    return !!nextProps.userData
+    return !!nextProps.user
   }
 
   search (phrase) {
@@ -24,7 +24,7 @@ class FollowingContainer extends NavigatorComponent {
       <Following
         navigator={this.props.navigator}
         search={this.search}
-        userData={this.props.userData}
+        user={this.props.user}
         userSearchResults={this.props.userSearchResults}
       />
     )
@@ -33,7 +33,7 @@ class FollowingContainer extends NavigatorComponent {
 
 function mapStateToProps (state) {
   return {
-    userData: state.users[state.localState.userID],
+    user: state.users[state.localState.userID],
     userSearchResults: state.localState.userSearchResults
   }
 }

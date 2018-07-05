@@ -32,10 +32,10 @@ export default class Following extends Component {
     this.props.search(this.state.searchPhrase)
   }
 
-  showProfile (user) {
+  showProfile (profileUser) {
     let name = 'Unknown Name'
-    if (user.firstName || user.lastName) {
-      name = `${user.firstName || ''} ${user.lastName || ''}`
+    if (profileUser.firstName || profileUser.lastName) {
+      name = `${profileUser.firstName || ''} ${profileUser.lastName || ''}`
     }
 
     this.props.navigator.push({
@@ -43,7 +43,7 @@ export default class Following extends Component {
       title: name,
       animationType: 'slide-up',
       passProps: {
-        user,
+        profileUser,
       }
     })
   }
@@ -60,7 +60,7 @@ export default class Following extends Component {
           />
           <View containerStyle={{marginTop: 0}}>
             {
-              this.props.userSearchResults.map((user, i) => (
+              this.props.userSearchResults.filter(u => u._id !== this.props.user._id).map((user, i) => (
                 <ListItem
                   key={i}
                   title={user.email}

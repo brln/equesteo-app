@@ -11,15 +11,16 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TouchableWithoutFeedback,
   View
 } from 'react-native';
 import Swiper from 'react-native-swiper';
 
 import { brand } from '../colors'
 import DeleteModal from './DeleteModal'
+import SwipablePhoto from './SwipablePhoto'
+import FabImage from './FabImage'
 
-const { width, height } = Dimensions.get('window')
+const { height } = Dimensions.get('window')
 
 function Stat (props) {
   return (
@@ -39,23 +40,6 @@ function Stat (props) {
   )
 }
 
-function FabImage (props) {
-  return (
-    <Image source={props.source} style={{width: props.width, height: props.height}}/>
-  )
-}
-
-function SwipablePhoto (props) {
-  return (
-    <TouchableWithoutFeedback style={styles.slide}>
-      <Image
-        style={{width: '100%', height: '100%' }}
-        source={props.source}
-      />
-    </TouchableWithoutFeedback>
-  )
-}
-
 export default class HorseProfile extends Component {
   constructor (props) {
     super(props)
@@ -66,8 +50,8 @@ export default class HorseProfile extends Component {
 
   uploadPhoto () {
     ImagePicker.openPicker({
-      width: 800,
-      height: 800,
+      width: 1080,
+      height: 1080,
       cropping: true
     }).then(image => {
       this.props.uploadPhoto(image.path)
@@ -192,10 +176,4 @@ export default class HorseProfile extends Component {
   }
 }
 
-const styles = StyleSheet.create({
-  slide: {
-    flex: 1,
-    justifyContent: 'center',
-    backgroundColor: 'transparent'
-  },
-});
+const styles = StyleSheet.create({});

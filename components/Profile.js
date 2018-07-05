@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
+import Swiper from 'react-native-swiper';
+import ImagePicker from 'react-native-image-crop-picker'
 import {
   Body,
   Card,
   CardItem,
+  Fab,
   ListItem,
   Left,
   Thumbnail,
@@ -11,18 +14,20 @@ import {
   Button,
   Dimensions,
   FlatList,
-  Image,
   ScrollView,
   StyleSheet,
   Text,
   View
 } from 'react-native';
 
-import { profilePhotoURL } from '../helpers'
 import { danger, darkBrand, green } from '../colors'
 import { HORSE_PROFILE } from '../screens'
 
-const { width, height } = Dimensions.get('window')
+const { height } = Dimensions.get('window')
+
+import { brand } from '../colors'
+import SwipablePhoto from './SwipablePhoto'
+import FabImage from './FabImage'
 
 
 export default class Profile extends Component {
@@ -32,6 +37,17 @@ export default class Profile extends Component {
     this.unfollow = this.unfollow.bind(this)
     this.horseProfile = this.horseProfile.bind(this)
     this.renderHorse = this.renderHorse.bind(this)
+    this.uploadProfile = this.uploadProfile.bind(this)
+  }
+
+  uploadProfile () {
+    ImagePicker.openPicker({
+      width: 1080,
+      height: 1080,
+      cropping: true
+    }).then(image => {
+      this.props.uploadProfilePhoto(image.path)
+    });
   }
 
   follow () {
@@ -85,57 +101,101 @@ export default class Profile extends Component {
         />
       )
     }
+  }
 
+  renderImages () {
+    const images = []
+    const user = this.props.profileUser
+    if (Object.keys(user.photosByID).length > 0) {
+      images.push(
+        <SwipablePhoto
+          key="profile"
+          source={{uri: user.photosByID[user.profilePhotoID].uri}}
+        />
+      )
+      for (let imageID of Object.keys(user.photosByID)) {
+        if (imageID !== user.profilePhotoID) {
+          images.push(
+            <SwipablePhoto
+              key={imageID}
+              source={{uri: user.photosByID[imageID].uri}}
+            />
+          )
+        }
+      }
+
+    } else {
+      images.push(
+        <SwipablePhoto key="empty" source={require('../img/emptyProfile.png')} />
+      )
+    }
+    return images
+  }
+
+  renderImageSwiper () {
+    let fab
+    let followButton
+    if (this.props.profileUser._id === this.props.user._id) {
+      fab = (
+        <Fab
+          direction="up"
+          style={{ backgroundColor: brand }}
+          position="bottomRight"
+          onPress={this.uploadProfile}>
+          <FabImage source={require('../img/addphoto.png')} height={30} width={30} />
+        </Fab>
+      )
+    } else {
+      followButton = <Button style={styles.followButton} color={green} onPress={this.follow} title="Follow" />
+      for (let following of this.props.user.following) {
+        if (following === this.props.profileUser._id) {
+          followButton = <Button style={styles.followButton} color={danger} onPress={this.unfollow} title="Unfollow" />
+          break
+        }
+      }
+    }
+
+    return (
+      <View style={{height: ((height / 2) - 20)}}>
+        <Swiper loop={false} showsPagination={false}>
+          {this.renderImages()}
+        </Swiper>
+        { fab }
+        <View style={{position: 'absolute', width: 150, bottom: 10, right: 10}}>
+          { followButton }
+        </View>
+      </View>
+    )
   }
 
   render() {
-    let source = require('../img/empty.png')
-    if (this.props.profileUser.profilePhotoID) {
-      source = {uri: profilePhotoURL(this.props.profileUser.profilePhotoID)}
-    }
-    let followButton = <Button style={styles.followButton} color={green} onPress={this.follow} title="Follow" />
-    for (let following of this.props.user.following) {
-      if (following === this.props.profileUser._id) {
-        followButton = <Button style={styles.followButton} color={danger} onPress={this.unfollow} title="Unfollow" />
-        break
-      }
-    }
-    const imageHeight = Math.round(height * 2 / 5)
     return (
       <ScrollView>
+        {this.renderImageSwiper()}
         <View style={{flex: 1}}>
-          <View style={{flex: 2, width}}>
-            <Image style={{width, height: imageHeight }} source={source} />
-            <View style={{position: 'absolute', width: 150, bottom: 10, right: 10}}>
-              {followButton}
-            </View>
-          </View>
-          <View style={{flex: 3}}>
-            <Card>
-              <CardItem header style={{padding: 5}}>
-                <View style={{paddingLeft: 5}}>
-                  <Text style={{color: darkBrand}}>About Me</Text>
-                </View>
-              </CardItem>
-              <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20}}>
-                <Text>{this.props.profileUser.aboutMe || 'nothing'}</Text>
-              </CardItem>
-            </Card>
+          <Card>
+            <CardItem header style={{padding: 5}}>
+              <View style={{paddingLeft: 5}}>
+                <Text style={{color: darkBrand}}>About Me</Text>
+              </View>
+            </CardItem>
+            <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20}}>
+              <Text>{this.props.profileUser.aboutMe || 'nothing'}</Text>
+            </CardItem>
+          </Card>
 
-
-            <Card>
-              <CardItem header style={{padding: 5}}>
-                <View style={{paddingLeft: 5}}>
-                  <Text style={{color: darkBrand}}>Horses</Text>
-                </View>
-              </CardItem>
-              <CardItem cardBody>
-                {this.renderHorses(this.props.horses)}
-              </CardItem>
-            </Card>
-          </View>
+          <Card>
+            <CardItem header style={{padding: 5}}>
+              <View style={{paddingLeft: 5}}>
+                <Text style={{color: darkBrand}}>Horses</Text>
+              </View>
+            </CardItem>
+            <CardItem cardBody>
+              {this.renderHorses(this.props.horses)}
+            </CardItem>
+          </Card>
         </View>
-      </ScrollView>
+        </ScrollView>
     )
   }
 }

@@ -47,8 +47,10 @@ export default class RideList extends PureComponent {
         showComments={this.props.showComments}
         showRide={this.props.showRide}
         toggleCarrot={this.props.toggleCarrot}
-        user={this.getUser(item)}
+        rideUser={this.getUser(item)}
         userProfilePhotoURL={this.getUserProfilePhotoURL(item)}
+        userID={this.props.userID}
+        users={this.props.users}
       />
     )
   }

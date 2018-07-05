@@ -21,8 +21,8 @@ export default class UpdateRide extends Component<Props> {
 
   uploadPhoto() {
     ImagePicker.openPicker({
-      width: 800,
-      height: 800,
+      width: 1080,
+      height: 1080,
       cropping: true
     }).then(image => {
       this.props.uploadPhoto(image.path)

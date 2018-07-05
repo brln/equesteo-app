@@ -9,11 +9,11 @@ import {
 } from 'react-native'
 
 import {
-  ACCOUNT,
   BARN,
   FEED,
   FEED_DETAILS,
   FOLLOWING,
+  PROFILE,
   RIDES,
   RIDES_DETAILS,
   RECORDER,
@@ -69,15 +69,24 @@ class DrawerContainer extends Component {
 	}
 
 	openAccount () {
-    this.props.dispatch(changeScreen(ACCOUNT))
+    this.props.dispatch(changeScreen(PROFILE))
     this.toggleDrawer()
     this.props.navigator.push({
-      screen: ACCOUNT,
+      screen: PROFILE,
       title: 'My Account',
       navigatorButtons: {
         leftButtons: [{
           id: 'sideMenu'
-        }]
+        }],
+        rightButtons: [
+          {
+            icon: require('../img/threedot.png'),
+            id: 'dropdown',
+          }
+        ]
+      },
+      passProps: {
+        profileUser: this.props.user,
       }
     })
 	}
@@ -147,7 +156,7 @@ class DrawerContainer extends Component {
         </TouchableOpacity>
 			)
     }
-    if (this.props.currentScreen !== ACCOUNT) {
+    if (this.props.currentScreen !== PROFILE) {
 			myAccountScreen = (
         <TouchableOpacity onPress={this.openAccount}>
           <View style={styles.drawerListItem}>
@@ -266,7 +275,8 @@ const styles = StyleSheet.create({
 
 function mapStateToProps (state) {
   return {
-  	currentScreen: state.localState.currentScreen
+  	currentScreen: state.localState.currentScreen,
+    user: state.users[state.localState.userID],
 	}
 }
 

@@ -66,6 +66,7 @@ export default class Feed extends Component {
               showRide={this.showRide}
               startRefresh={this.startRefresh}
               toggleCarrot={this.props.toggleCarrot}
+              userID={this.props.userID}
               users={this.props.users}
             />
           </Tab>
@@ -81,6 +82,7 @@ export default class Feed extends Component {
               showRide={this.showRide}
               startRefresh={this.startRefresh}
               toggleCarrot={this.props.toggleCarrot}
+              userID={this.props.userID}
               users={this.props.users}
             />
           </Tab>

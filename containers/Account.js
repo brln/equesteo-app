@@ -59,8 +59,7 @@ class AccountContainer extends NavigatorComponent {
     if (event.type === 'NavBarButtonPress') {
       if (event.id === 'save') {
         this.props.dispatch(updateUser(this.state.userData))
-        this.props.navigator.popToRoot({animated: false, animationType: 'none'})
-        this.props.dispatch(changeScreen(FEED))
+        this.props.navigator.pop()
       }
     }
   }
@@ -79,8 +78,6 @@ class AccountContainer extends NavigatorComponent {
         userData={this.state.userMadeChanges ? this.state.userData : this.props.userData }
         changeAccountDetails={this.changeAccountDetails}
         navigator={this.props.navigator}
-        signOut={this.signOut}
-        uploadProfilePhoto={this.uploadProfilePhoto}
       />
     )
   }
