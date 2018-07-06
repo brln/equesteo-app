@@ -154,7 +154,6 @@ dependencies {
     implementation project(':react-native-svg')
     implementation project(':react-native-sentry')
     implementation project(':react-native-mauron85-background-geolocation')
-    implementation project(':react-native-push-notification')
     implementation project(':react-native-image-crop-picker')
     implementation project(':react-native-image-crop-picker')
     implementation project(':react-native-image-crop-picker')

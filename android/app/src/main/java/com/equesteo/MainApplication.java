@@ -7,7 +7,6 @@ import com.showlocationservicesdialogbox.LocationServicesDialogBoxPackage;
 import com.horcrux.svg.SvgPackage;
 import io.sentry.RNSentryPackage;
 import com.marianhello.bgloc.react.BackgroundGeolocationPackage;
-import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.facebook.react.ReactNativeHost;
@@ -46,7 +45,6 @@ public class MainApplication extends NavigationApplication {
         return Arrays.<ReactPackage>asList(
             new MapsPackage(),
             new PickerPackage(),
-            new ReactNativePushNotificationPackage(),
             new BackgroundGeolocationPackage(),
             new SvgPackage(),
             new LocationServicesDialogBoxPackage()
