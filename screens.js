@@ -2,12 +2,10 @@ import { Navigation } from 'react-native-navigation';
 
 import NewHorse from './components/NewHorse'
 
-import AccountContainer from './containers/Account'
 import BarnContainer from './containers/Barn'
 import DrawerContainer from './containers/Drawer'
 import FeedContainer from './containers/Feed'
 import FollowingContainer from './containers/Following'
-import UpdateHorseContainer from './containers/UpdateHorse'
 import HorseProfileContainer from './containers/HorseProfile'
 import MapContainer from './containers/Map'
 import PhotoLightboxContainer from './containers/PhotoLightbox'
@@ -18,9 +16,10 @@ import RideContainer from './containers/Ride'
 import RideDetailsContainer from './containers/RideDetails'
 import SignupLoginContainer from './containers/SignupLogin'
 import TrainingContainer from './containers/Training'
+import UpdateHorseContainer from './containers/UpdateHorse'
+import UpdateProfileContainer from './containers/UpdateProfile'
 import UpdateRideContainer from './containers/UpdateRide'
 
-export const ACCOUNT = 'equesteo.Account'
 export const BARN = 'equesteo.Barn'
 export const DRAWER = 'equesteo.Drawer'
 export const FEED = 'equesteo.Feed'
@@ -37,6 +36,7 @@ export const RIDE_DETAILS = 'equesteo.RideDetails'
 export const SIGNUP_LOGIN = 'equesteo.SignupLogin'
 export const TRAINING = 'equesteo.Training'
 export const UPDATE_HORSE = 'equesteo.Horse'
+export const UPDATE_PROFILE = 'equesteo.UpdateProfile'
 export const UPDATE_RIDE = 'equesteo.UpdateRide'
 
 export const FEED_DETAILS = {
@@ -50,7 +50,6 @@ export const FEED_DETAILS = {
 }
 
 export function registerScreens(store, Provider) {
-  Navigation.registerComponent(ACCOUNT, () => AccountContainer, store, Provider)
   Navigation.registerComponent(BARN, () => BarnContainer, store, Provider)
   Navigation.registerComponent(DRAWER, () => DrawerContainer, store, Provider)
   Navigation.registerComponent(FEED, () => FeedContainer, store, Provider)
@@ -66,8 +65,8 @@ export function registerScreens(store, Provider) {
   Navigation.registerComponent(SIGNUP_LOGIN, () => SignupLoginContainer, store, Provider)
   Navigation.registerComponent(TRAINING, () => TrainingContainer, store, Provider)
   Navigation.registerComponent(UPDATE_HORSE, () => UpdateHorseContainer, store, Provider)
+  Navigation.registerComponent(UPDATE_PROFILE, () => UpdateProfileContainer, store, Provider)
   Navigation.registerComponent(UPDATE_RIDE, () => UpdateRideContainer, store, Provider)
-
 
   Navigation.registerComponent(NEW_HORSE, () => NewHorse)
 }

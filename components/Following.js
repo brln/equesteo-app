@@ -33,14 +33,8 @@ export default class Following extends Component {
   }
 
   showProfile (profileUser) {
-    let name = 'Unknown Name'
-    if (profileUser.firstName || profileUser.lastName) {
-      name = `${profileUser.firstName || ''} ${profileUser.lastName || ''}`
-    }
-
     this.props.navigator.push({
       screen: PROFILE,
-      title: name,
       animationType: 'slide-up',
       passProps: {
         profileUser,

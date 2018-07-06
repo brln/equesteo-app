@@ -57,6 +57,15 @@ export default class Profile extends Component {
   }
 
   horseProfile (horse) {
+    let rightButtons = []
+    if (this.props.profileUser._id === this.props.user._id) {
+      rightButtons.push(
+        {
+          icon: require('../img/threedot.png'),
+          id: 'dropdown',
+        }
+      )
+    }
     return () => {
       this.props.navigator.push({
         screen: HORSE_PROFILE,
@@ -66,6 +75,7 @@ export default class Profile extends Component {
           horseUser: this.props.profileUser,
           user: this.props.user,
         },
+        rightButtons
       })
     }
 
@@ -176,10 +186,19 @@ export default class Profile extends Component {
           <Card>
             <CardItem header style={{padding: 5}}>
               <View style={{paddingLeft: 5}}>
+                <Text style={{color: darkBrand}}>Name</Text>
+              </View>
+            </CardItem>
+            <CardItem cardBody style={{marginLeft: 20, marginRight: 20}}>
+              <Text>{this.props.profileUser.firstName || ''} {this.props.profileUser.lastName || ''}</Text>
+            </CardItem>
+
+            <CardItem header style={{padding: 5}}>
+              <View style={{paddingLeft: 5}}>
                 <Text style={{color: darkBrand}}>About Me</Text>
               </View>
             </CardItem>
-            <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20}}>
+            <CardItem cardBody style={{marginLeft: 20, marginBottom: 20, marginRight: 20}}>
               <Text>{this.props.profileUser.aboutMe || 'nothing'}</Text>
             </CardItem>
           </Card>

@@ -84,18 +84,11 @@ export default class RideCard extends Component {
   }
 
   showProfile () {
-    const rideUser = this.props.rideUser
-    let name = 'Unknown Name'
-    if (rideUser.firstName || rideUser.lastName) {
-      name = `${rideUser.firstName || ''} ${rideUser.lastName || ''}`
-    }
-
     this.props.navigator.push({
       screen: PROFILE,
-      title: name,
       animationType: 'slide-up',
       passProps: {
-        profileUser: rideUser,
+        profileUser: this.props.rideUser,
       }
     })
   }

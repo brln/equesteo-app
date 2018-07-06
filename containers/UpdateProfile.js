@@ -2,12 +2,11 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
 import { signOut } from '../actions'
-import Account from '../components/Account'
-import { changeScreen, updateUser, uploadProfilePhoto } from "../actions"
+import UpdateProfile from '../components/UpdateProfile'
+import { updateUser, uploadProfilePhoto } from "../actions"
 import NavigatorComponent from './NavigatorComponent'
-import { FEED } from '../screens'
 
-class AccountContainer extends NavigatorComponent {
+class UpdateProfileContainer extends NavigatorComponent {
   static navigatorButtons = {
     leftButtons: [],
     rightButtons: [
@@ -19,14 +18,14 @@ class AccountContainer extends NavigatorComponent {
   }
 
   shouldComponentUpdate (nextProps) {
-    return !!nextProps.userData
+    return !!nextProps.user
   }
 
   static getDerivedStateFromProps (props, state) {
     let nextState = null
-    if (!state.userData || (props.userData && props.userData._rev !== state.userData._rev)) {
+    if (!state.user || (props.user && props.user._rev !== state.user._rev)) {
       nextState = {
-        userData: props.userData,
+        user: props.user,
         userMadeChanges: false
       }
     }
@@ -37,7 +36,7 @@ class AccountContainer extends NavigatorComponent {
     super(props)
     this.state = {
       userMadeChanges: false,
-      userData: null,
+      user: null,
     }
     this.changeAccountDetails = this.changeAccountDetails.bind(this)
     this.signOut = this.signOut.bind(this)
@@ -49,14 +48,14 @@ class AccountContainer extends NavigatorComponent {
   changeAccountDetails (newDetails) {
     this.setState({
       userMadeChanges: true,
-      userData: { ...this.state.userData, ...newDetails }
+      user: { ...this.state.user, ...newDetails }
     })
   }
 
   onNavigatorEvent (event) {
     if (event.type === 'NavBarButtonPress') {
       if (event.id === 'save') {
-        this.props.dispatch(updateUser(this.state.userData))
+        this.props.dispatch(updateUser(this.state.user))
         this.props.navigator.pop()
       }
     }
@@ -72,8 +71,8 @@ class AccountContainer extends NavigatorComponent {
 
   render() {
     return (
-      <Account
-        userData={this.state.userMadeChanges ? this.state.userData : this.props.userData }
+      <UpdateProfile
+        user={this.state.userMadeChanges ? this.state.user : this.props.user }
         changeAccountDetails={this.changeAccountDetails}
         navigator={this.props.navigator}
       />
@@ -83,8 +82,8 @@ class AccountContainer extends NavigatorComponent {
 
 function mapStateToProps (state) {
   return {
-    userData: state.users[state.localState.userID]
+    user: state.users[state.localState.userID]
   }
 }
 
-export default connect(mapStateToProps)(AccountContainer)
+export default connect(mapStateToProps)(UpdateProfileContainer)

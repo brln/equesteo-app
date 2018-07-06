@@ -141,6 +141,7 @@ export default class HorseProfile extends Component {
         />
         {this.renderImageSwiper()}
         <View style={{flex: 1}}>
+
           <Card>
             <CardItem header style={{padding: 5}}>
               <View style={{paddingLeft: 5}}>
@@ -151,6 +152,7 @@ export default class HorseProfile extends Component {
               <Text>{this.props.horse.description || 'nothing'}</Text>
             </CardItem>
           </Card>
+
           <Card style={{flex: 1}}>
             <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20, flex: 1}}>
               <View style={{flex: 1, paddingTop: 20}}>

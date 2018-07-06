@@ -10,7 +10,7 @@ import {
   signOut,
   uploadProfilePhoto,
 } from "../actions"
-import { ACCOUNT, FEED } from '../screens'
+import { FEED, UPDATE_PROFILE } from '../screens'
 import NavigatorComponent from './NavigatorComponent'
 
 class ProfileContainer extends NavigatorComponent {
@@ -46,8 +46,8 @@ class ProfileContainer extends NavigatorComponent {
               if (index === 0) {
                 this.props.navigator.dismissAllModals()
                 this.props.navigator.push({
-                  screen: ACCOUNT,
-                  title: 'Update Account',
+                  screen: UPDATE_PROFILE,
+                  title: 'Update Profile',
                   animationType: 'slide-up',
                 });
               } else if (index === 1) {
