@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import Swiper from 'react-native-swiper';
 
-import { brand } from '../colors'
+import { brand, darkBrand } from '../colors'
 import DeleteModal from './DeleteModal'
 import SwipablePhoto from './SwipablePhoto'
 import FabImage from './FabImage'
@@ -140,7 +140,17 @@ export default class HorseProfile extends Component {
           text={"Are you sure you want to delete this horse?"}
         />
         {this.renderImageSwiper()}
-        <View style={{height: height / 3}}>
+        <View style={{flex: 1}}>
+          <Card>
+            <CardItem header style={{padding: 5}}>
+              <View style={{paddingLeft: 5}}>
+                <Text style={{color: darkBrand}}>Description</Text>
+              </View>
+            </CardItem>
+            <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20}}>
+              <Text>{this.props.horse.description || 'nothing'}</Text>
+            </CardItem>
+          </Card>
           <Card style={{flex: 1}}>
             <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20, flex: 1}}>
               <View style={{flex: 1, paddingTop: 20}}>
@@ -153,6 +163,7 @@ export default class HorseProfile extends Component {
                   <Stat
                     imgSrc={require('../img/breed.png')}
                     text={'Breed'}
+                    value={this.props.horse.breed || 'none'}
                   />
                 </View>
                 <View style={{flex: 1, flexDirection: 'row'}}>
@@ -163,12 +174,14 @@ export default class HorseProfile extends Component {
                   />
                   <Stat
                     imgSrc={require('../img/type.png')}
-                    text={'Type'}
+                    text={'Sex'}
+                    value={this.props.horse.sex || 'none'}
                   />
                 </View>
               </View>
             </CardItem>
           </Card>
+
         </View>
       </ScrollView>
     )

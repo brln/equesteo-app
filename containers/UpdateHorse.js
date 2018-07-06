@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
-import Horse from '../components/Horse'
+import UpdateHorse from '../components/UpdateHorse'
 import { updateHorse } from '../actions'
 import NavigatorComponent from './NavigatorComponent'
 
-class HorseContainer extends NavigatorComponent {
+class UpdateHorseContainer extends NavigatorComponent {
   static navigatorButtons = {
     leftButtons: [],
     rightButtons: [
@@ -57,7 +57,7 @@ class HorseContainer extends NavigatorComponent {
 
   render() {
     return (
-      <Horse
+      <UpdateHorse
         changeHorseDetails={this.changeHorseDetails}
         closeDeleteModal={this.closeDeleteModal}
         deleteHorse={this.deleteHorse}
@@ -85,4 +85,4 @@ function mapStateToProps (state, passedProps) {
   }
 }
 
-export default  connect(mapStateToProps)(HorseContainer)
+export default  connect(mapStateToProps)(UpdateHorseContainer)

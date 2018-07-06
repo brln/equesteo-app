@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
 import { updateHorse, uploadHorsePhoto } from '../actions'
-import { HORSE } from '../screens'
+import { UPDATE_HORSE } from '../screens'
 import HorseProfile from '../components/HorseProfile'
 import NavigatorComponent from './NavigatorComponent'
 
@@ -42,7 +42,7 @@ class HorseProfileContainer extends NavigatorComponent {
               if (index === 0) {
                 this.props.navigator.dismissAllModals()
                 this.props.navigator.push({
-                  screen: HORSE,
+                  screen: UPDATE_HORSE,
                   title: 'Update Horse',
                   passProps: {
                     horseID: this.props.horse._id

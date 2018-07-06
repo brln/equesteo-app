@@ -54,7 +54,7 @@ export default class Barn extends Component {
           }}>
             {
               [...this.props.horses.map((horse, i) => {
-                let source = require('../img/empty.png')
+                let source = require('../img/emptyHorseBlack.png')
                 if (horse.profilePhotoID) {
                   source = {uri: horse.photosByID[horse.profilePhotoID].uri}
                 }

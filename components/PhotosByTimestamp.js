@@ -1,26 +1,51 @@
 import React, { Component } from 'react'
 import {
+  Dimensions,
   StyleSheet,
+  TouchableOpacity,
   View
 } from 'react-native';
-import { Container, Thumbnail } from 'native-base';
+import { Thumbnail } from 'native-base'
 
-export default PhotosByTimestamp = (props) => {
+import { orange } from '../colors'
+
+const { width } = Dimensions.get('window')
+
+export default class PhotosByTimestamp extends Component {
+  constructor (props) {
+    super(props)
+    this.changeProfilePhoto = this.changeProfilePhoto.bind(this)
+  }
+
+  changeProfilePhoto (photoID) {
+    return () => {
+      this.props.changeProfilePhoto(photoID)
+    }
+  }
+
+  render () {
     const byTimestamp = {}
-    for (let photoID of Object.keys(props.photosByID)) {
-      if (photoID !== props.profilePhotoID) {
-        const photoData = props.photosByID[photoID]
-        const source = {uri: photoData.uri}
-        byTimestamp[photoData.timestamp] = (
-          <View key={photoID} style={styles.photoThumbnail}>
-            <Thumbnail
-              style={styles.thumbnail}
-              square
-              source={source}
-            />
-          </View>
-        )
+    for (let photoID of Object.keys(this.props.photosByID)) {
+      const photoData = this.props.photosByID[photoID]
+      const source = {uri: photoData.uri}
+      let style = styles.thumbnail
+      if (photoID === this.props.profilePhotoID) {
+        style = styles.profilePhoto
       }
+      byTimestamp[photoData.timestamp] = (
+        <TouchableOpacity
+          key={photoID}
+          style={styles.photoThumbnail}
+          onPress={this.changeProfilePhoto(photoID)}
+        >
+          <Thumbnail
+            style={style}
+            square
+            source={source}
+
+          />
+        </TouchableOpacity>
+      )
     }
     const sortedKeys = Object.keys(byTimestamp).sort((a, b) => b - a)
     const sortedVals = []
@@ -28,10 +53,11 @@ export default PhotosByTimestamp = (props) => {
       sortedVals.push(byTimestamp[key])
     }
     return (
-      <Container style={styles.photoContainer}>
+      <View style={styles.photoContainer}>
         {sortedVals}
-      </Container>
+      </View>
     )
+  }
 }
 
 const styles = StyleSheet.create({
@@ -44,7 +70,13 @@ const styles = StyleSheet.create({
     padding: 5
   },
   thumbnail: {
-    width: 80,
-    height: 80,
+    width: width / 4,
+    height: width / 4,
+  },
+  profilePhoto: {
+    width: width / 4,
+    height: width / 4,
+    borderWidth: 5,
+    borderColor: orange
   }
 })

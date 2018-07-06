@@ -22,13 +22,11 @@ import {
 
 import { danger, darkBrand, green } from '../colors'
 import { HORSE_PROFILE } from '../screens'
-
-const { height } = Dimensions.get('window')
-
 import { brand } from '../colors'
 import SwipablePhoto from './SwipablePhoto'
 import FabImage from './FabImage'
 
+const { height } = Dimensions.get('window')
 
 export default class Profile extends Component {
   constructor (props) {
