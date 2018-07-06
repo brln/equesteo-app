@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {
   StyleSheet,
   Text,
+  TouchableOpacity,
   View
 } from 'react-native';
 
@@ -93,11 +94,11 @@ export default class RideRecorder extends Component {
               startTime={this.props.currentRide.startTime}
               distance={this.props.currentRide.distance}
             />
-            <View style={styles.rideComplete}>
-              <Text style={styles.rideCompleteText} onPress={this.rideComplete}>
+            <TouchableOpacity style={styles.rideComplete} onPress={this.rideComplete}>
+              <Text style={styles.rideCompleteText}>
                 Ride Complete
               </Text>
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
       )
@@ -138,8 +139,6 @@ const styles = StyleSheet.create({
   rideComplete: {
     backgroundColor: brand,
     flex: 1,
-    borderWidth: 1,
-    borderColor: 'black',
     justifyContent: 'center',
   },
   rideCompleteText: {

@@ -12,15 +12,37 @@ import { orange } from '../colors'
 const { width } = Dimensions.get('window')
 
 export default class PhotosByTimestamp extends Component {
+  // @TODO a class very similar to this should be used to
+  // display horses on the RideDetails page, but it needs
+  // to deal with the situation where there are horses with
+  // no profile photos
   constructor (props) {
     super(props)
     this.changeProfilePhoto = this.changeProfilePhoto.bind(this)
+    this.thumbnail = this.thumbnail.bind(this)
   }
 
   changeProfilePhoto (photoID) {
     return () => {
       this.props.changeProfilePhoto(photoID)
     }
+  }
+
+  thumbnail (photoID, style, source) {
+    return (
+      <TouchableOpacity
+        key={photoID}
+        style={styles.photoThumbnail}
+        onPress={this.changeProfilePhoto(photoID)}
+      >
+        <Thumbnail
+          style={style}
+          square
+          source={source}
+
+        />
+      </TouchableOpacity>
+    )
   }
 
   render () {
@@ -32,20 +54,7 @@ export default class PhotosByTimestamp extends Component {
       if (photoID === this.props.profilePhotoID) {
         style = styles.profilePhoto
       }
-      byTimestamp[photoData.timestamp] = (
-        <TouchableOpacity
-          key={photoID}
-          style={styles.photoThumbnail}
-          onPress={this.changeProfilePhoto(photoID)}
-        >
-          <Thumbnail
-            style={style}
-            square
-            source={source}
-
-          />
-        </TouchableOpacity>
-      )
+      byTimestamp[photoData.timestamp] = this.thumbnail(photoID, style, source)
     }
     const sortedKeys = Object.keys(byTimestamp).sort((a, b) => b - a)
     const sortedVals = []

@@ -138,3 +138,23 @@ export function formattedWeekString(monday) {
   }
   return `${startString} - ${endString}`
 }
+
+export function newRideName (currentRide) {
+  let name
+  const hour = (new Date(currentRide.startTime)).getHours()
+  console.log('hour: ' + hour)
+  if (hour < 5) {
+    name = 'Early Morning Ride'
+  } else if (hour < 10) {
+    name = 'Morning Ride'
+  } else if (hour < 14) {
+    name = 'Lunch Ride'
+  } else if (hour < 17) {
+    name = 'Afternoon Ride'
+  } else if (hour < 20) {
+    name = 'Evening Ride'
+  } else if (hour < 25 ) {
+    name = 'Night Ride'
+  }
+  return name
+}

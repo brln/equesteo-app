@@ -1,15 +1,21 @@
 import React, { Component } from 'react';
 import {
   Button,
-  Picker,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View
 } from 'react-native';
-import { Container, Content } from 'native-base';
+import {
+  Card,
+  CardItem,
+  Fab,
+} from 'native-base'
 import ImagePicker from 'react-native-image-crop-picker'
 
+import { brand, darkBrand } from '../../colors'
+import FabImage from '../FabImage'
 import PhotosByTimestamp from '../PhotosByTimestamp'
 
 export default class RideDetails extends Component {
@@ -17,6 +23,17 @@ export default class RideDetails extends Component {
     super(props)
     this.renderHorses = this.renderHorses.bind(this)
     this.uploadPhoto = this.uploadPhoto.bind(this)
+    this.changeHorseID = this.changeHorseID.bind(this)
+  }
+
+  changeHorseID (photoID) {
+    let horseID = null
+    for (let horse of this.props.horses) {
+      if (horse.profilePhotoID === photoID) {
+        horseID = horse._id
+      }
+    }
+    this.props.changeHorseID(horseID)
   }
 
   uploadPhoto() {
@@ -31,59 +48,84 @@ export default class RideDetails extends Component {
 
 
   renderHorses () {
-    const horseComps = []
+    const horseProfilePhotos = {}
+    let selected = this.props.horses.length > 0 ? this.props.horses[0].profilePhotoID : null
     for (let horse of this.props.horses) {
-      horseComps.push(
-        <Picker.Item
-          key={horse._id}
-          label={horse.name}
-          value={horse._id}
-        />
-      )
+      // @TODO deal with horses with no profile photos
+      if (horse.profilePhotoID) {
+        horseProfilePhotos[horse.profilePhotoID] = horse.photosByID[horse.profilePhotoID]
+        if (horse._id === this.props.horseID) {
+          selected = horse.profilePhotoID
+        }
+      }
     }
-    horseComps.push(
-      <Picker.Item
-        key={null}
-        label={'None'}
-        value={null}
-      />
-    )
     return (
-      <Picker
-        selectedValue={this.props.horseSelected ? this.props.horseID : this.props.horses[0]._id}
-        onValueChange={this.props.changeHorseID}
-      >
-        {horseComps}
-      </Picker>
+      <PhotosByTimestamp
+        changeProfilePhoto={this.changeHorseID}
+        photosByID={horseProfilePhotos}
+        profilePhotoID={selected}
+      />
     )
   }
 
   render() {
     return (
-      <View style={styles.container}>
-        <Text>Ride Name:</Text>
-        <TextInput
-          style={styles.textInput}
-          onChangeText={this.props.changeRideName}
-          selectTextOnFocus={true}
-          value={this.props.rideName}
-        />
-        <Text>Horse:</Text>
-        {this.renderHorses()}
-        <View style={styles.profileButton}>
-          <Button onPress={this.uploadPhoto} title='Add Photo' />
-        </View>
-        <Container>
-          <Content>
-            <Text>Photos</Text>
-            <PhotosByTimestamp
-              photosByID={this.props.photosByID}
-              profilePhotoID={this.props.profilePhotoID}
-            />
-          </Content>
-        </Container>
+      <ScrollView>
+        <View style={styles.container}>
+          <Card>
+            <CardItem header style={{padding: 5}}>
+              <View style={{paddingLeft: 5}}>
+                <Text style={{color: darkBrand}}>Ride Name</Text>
+              </View>
+            </CardItem>
+            <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20}}>
+              <TextInput
+                style={{width: '100%'}}
+                value={this.props.rideName}
+                onChangeText={this.changeRideName}
+                underlineColorAndroid={darkBrand}
+              />
+            </CardItem>
+          </Card>
 
-      </View>
+          <Card>
+            <CardItem header style={{padding: 5}}>
+              <View style={{paddingLeft: 5}}>
+                <Text style={{color: darkBrand}}>Horse</Text>
+              </View>
+            </CardItem>
+            <View style={{marginLeft: 20, marginBottom: 30}}>
+              {this.renderHorses()}
+            </View>
+          </Card>
+
+          <Card>
+            <CardItem header style={{padding: 5}}>
+              <View style={{paddingLeft: 5}}>
+                <Text style={{color: darkBrand}}>Ride Photos</Text>
+              </View>
+            </CardItem>
+
+            <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20}}>
+              <PhotosByTimestamp
+                photosByID={this.props.photosByID}
+                profilePhotoID={this.props.profilePhotoID}
+                changeProfilePhoto={() => {}}
+              />
+            </CardItem>
+
+            <View style={{paddingTop: 15}}>
+              <Fab
+                direction="up"
+                style={{ backgroundColor: brand }}
+                position="bottomRight"
+                onPress={this.uploadPhoto}>
+                <FabImage source={require('../../img/addphoto.png')} height={30} width={30} />
+              </Fab>
+            </View>
+          </Card>
+        </View>
+      </ScrollView>
     )
   }
 }
@@ -108,9 +150,4 @@ const styles = StyleSheet.create({
   buttonPad: {
     margin: 20
   },
-  profileButton: {
-    width: 130,
-    paddingTop: 2,
-  },
-
 });

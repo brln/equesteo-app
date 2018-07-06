@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
-import moment from 'moment'
+
 
 import {
   changeScreen,
@@ -9,7 +9,7 @@ import {
   stopLocationTracking,
   uploadRidePhoto
 } from '../actions'
-import { generateUUID, unixTimeNow } from '../helpers'
+import { generateUUID, newRideName, unixTimeNow } from '../helpers'
 import RideDetails from '../components/RideRecorder/RideDetails'
 import { FEED } from '../screens'
 import NavigatorComponent from './NavigatorComponent'
@@ -30,7 +30,7 @@ class RideDetailsContainer extends NavigatorComponent {
 
   constructor (props) {
     super(props)
-    const rideName = `${props.currentRide.distance.toFixed(2)} mi ride on ${moment(props.currentRide.startTime).format('MMMM DD YYYY')}`
+    const rideName = newRideName(props.currentRide)
     this.state = {
       rideName: rideName,
       horseID: null,
@@ -80,7 +80,7 @@ class RideDetailsContainer extends NavigatorComponent {
   createRide () {
     this.props.dispatch(stopLocationTracking())
     let horseID = this.state.horseID
-    if (!this.props.horseSelected && this.props.horses.length > 0) {
+    if (!this.state.horseSelected && this.props.horses.length > 0) {
       horseID = this.props.horses[0]._id
     }
     const rideID = `${this.props.userID.toString()}_${(new Date).getTime().toString()}`

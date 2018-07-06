@@ -124,7 +124,6 @@ const styles = StyleSheet.create({
   },
   email: {
     borderColor: 'gray',
-    color: 'white',
   },
   password: {
     borderColor: 'gray',
