@@ -551,6 +551,7 @@ export function signOut () {
     await LocalStorage.deleteToken()
     const pouchCouch = new PouchCouch()
     await pouchCouch.deleteLocalDBs()
+    dispatch(stopLocationTracking())
     dispatch(clearStateAfterPersist())
   }
 }
