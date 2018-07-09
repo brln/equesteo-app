@@ -16,29 +16,18 @@ import ImagePicker from 'react-native-image-crop-picker'
 
 import { brand, darkBrand } from '../../colors'
 import FabImage from '../FabImage'
+import HorseSelector from './HorseSelector'
 import PhotosByTimestamp from '../PhotosByTimestamp'
 
 export default class RideDetails extends Component {
   constructor (props) {
     super(props)
-    this.renderHorses = this.renderHorses.bind(this)
     this.uploadPhoto = this.uploadPhoto.bind(this)
     this.changeRideName = this.changeRideName.bind(this)
-    this.changeHorseID = this.changeHorseID.bind(this)
   }
 
   changeRideName (name) {
     this.props.changeRideName(name)
-  }
-
-  changeHorseID (photoID) {
-    let horseID = null
-    for (let horse of this.props.horses) {
-      if (horse.profilePhotoID === photoID) {
-        horseID = horse._id
-      }
-    }
-    this.props.changeHorseID(horseID)
   }
 
   uploadPhoto() {
@@ -49,28 +38,6 @@ export default class RideDetails extends Component {
     }).then(image => {
       this.props.uploadPhoto(image.path)
     }).catch((e) => {})
-  }
-
-
-  renderHorses () {
-    const horseProfilePhotos = {}
-    let selected = this.props.horses.length > 0 ? this.props.horses[0].profilePhotoID : null
-    for (let horse of this.props.horses) {
-      // @TODO deal with horses with no profile photos
-      if (horse.profilePhotoID) {
-        horseProfilePhotos[horse.profilePhotoID] = horse.photosByID[horse.profilePhotoID]
-        if (horse._id === this.props.horseID) {
-          selected = horse.profilePhotoID
-        }
-      }
-    }
-    return (
-      <PhotosByTimestamp
-        changeProfilePhoto={this.changeHorseID}
-        photosByID={horseProfilePhotos}
-        profilePhotoID={selected}
-      />
-    )
   }
 
   render() {
@@ -100,7 +67,11 @@ export default class RideDetails extends Component {
               </View>
             </CardItem>
             <View style={{marginLeft: 20, marginBottom: 30}}>
-              {this.renderHorses()}
+              <HorseSelector
+                changeHorseID={this.props.changeHorseID}
+                horseID={this.props.horseID}
+                horses={this.props.horses}
+              />
             </View>
           </Card>
 

@@ -26,7 +26,7 @@ const store = createStore(
 
 registerScreens(store, Provider)
 
-if (!ENV === 'local') {
+if (ENV !== 'local') {
   Sentry.config(SENTRY_DSN).install();
 }
 

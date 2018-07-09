@@ -35,15 +35,15 @@ export const unixTimeNow = () => {
 }
 
 export const profilePhotoURL = (id) => {
-  return `https://s3.amazonaws.com/equesteo-profile-photos/${id}.jpg`
+  return `https://equesteo-profile-photos-2.s3.amazonaws.com/${id}.jpg`
 }
 
 export const horsePhotoURL = (id) => {
-  return `https://s3.amazonaws.com/equesteo-horse-photos-2/${id}.jpg`
+  return `https://equesteo-horse-photos.s3.amazonaws.com/${id}.jpg`
 }
 
 export const ridePhotoURL = (id) => {
-  return `https://s3.amazonaws.com/equesteo-ride-photos/${id}.jpg`
+  return `https://equesteo-ride-photos-2.s3.amazonaws.com/${id}.jpg`
 }
 
 // from https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
