@@ -43,7 +43,7 @@ class UpdateRideContainer extends NavigatorComponent {
 
   static getDerivedStateFromProps (props, state) {
     let nextState = null
-    if (!state.ride) {
+    if (!state.ride || state.ride._rev !== props.ride._rev) {
       nextState = {
         ride: props.ride,
         userMadeChanges: false
@@ -68,7 +68,6 @@ class UpdateRideContainer extends NavigatorComponent {
 
   doneOnPage () {
     this.props.navigator.pop({animated: false, animationType: 'none'})
-    this.props.dispatch(changeScreen(FEED))
   }
 
   onNavigatorEvent (event) {

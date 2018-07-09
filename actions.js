@@ -1,5 +1,5 @@
 import { AppState, NetInfo } from 'react-native'
-import BackgroundGeolocation from 'react-native-mauron85-background-geolocation'
+import BackgroundGeolocation from 'react-native-mauron85-background-geolocation-brln'
 import { ENV } from 'react-native-dotenv'
 
 import { unixTimeNow, generateUUID, staticMap } from "./helpers"

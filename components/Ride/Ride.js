@@ -134,6 +134,7 @@ export default class Ride extends Component {
               <PhotosByTimestamp
                 photosByID={this.props.ride.photosByID}
                 profilePhotoID={this.props.ride.profilePhotoID}
+                changeProfilePhoto={() => {}}
               />
             </ScrollView>
           </View>

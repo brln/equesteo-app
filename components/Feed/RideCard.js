@@ -35,7 +35,7 @@ export default class RideCard extends Component {
   shouldComponentUpdate (nextProps) {
     return (this.props.rideComments.length !== nextProps.rideComments.length
       || this.props.rideCarrots.length !== nextProps.rideCarrots.length
-      || (this.props.horse && (this.props.horse.profilePhotoID !== nextProps.horse.profilePhotoID))
+      || ((nextProps.horse && this.props.horse) && (this.props.horse.profilePhotoID !== nextProps.horse.profilePhotoID))
       || this.props.ride.name !== nextProps.ride.name
     )
   }
@@ -129,7 +129,6 @@ export default class RideCard extends Component {
   }
 
   render() {
-
     return (
       <TouchableOpacity onPress={this.showRide}>
         <Card>

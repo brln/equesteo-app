@@ -11,6 +11,12 @@ class RideContainer extends NavigatorComponent {
     this.deleteRide = this.deleteRide.bind(this)
   }
 
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.ride.name !== this.props.ride.name) {
+      this.props.navigator.setTitle({title: nextProps.ride.name})
+    }
+  }
+
   deleteRide () {
     this.props.dispatch(updateRide({
       ...this.props.ride,

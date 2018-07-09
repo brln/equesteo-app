@@ -23,7 +23,12 @@ export default class RideDetails extends Component {
     super(props)
     this.renderHorses = this.renderHorses.bind(this)
     this.uploadPhoto = this.uploadPhoto.bind(this)
+    this.changeRideName = this.changeRideName.bind(this)
     this.changeHorseID = this.changeHorseID.bind(this)
+  }
+
+  changeRideName (name) {
+    this.props.changeRideName(name)
   }
 
   changeHorseID (photoID) {
