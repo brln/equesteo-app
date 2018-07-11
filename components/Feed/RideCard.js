@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
-import { Avatar } from 'react-native-elements'
 import {
   Button,
   Card,
   CardItem,
   Left,
   Right,
-  Text
+  Text,
+  Thumbnail,
 } from 'native-base';
 import {
   Image,
@@ -14,22 +14,27 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import moment from 'moment'
 
-import { brand } from '../../colors'
+import { brand, darkGrey } from '../../colors'
 import { HORSE_PROFILE, PROFILE } from '../../screens'
 import RideImage from './RideImage'
 
 export default class RideCard extends Component {
   constructor (props) {
     super(props)
+    this.avgSpeed = this.avgSpeed.bind(this)
     this.horseProfileURL = this.horseProfileURL.bind(this)
     this.horseAvatar = this.horseAvatar.bind(this)
+    this.horseSection = this.horseSection.bind(this)
+    this.rideTime = this.rideTime.bind(this)
     this.showComments = this.showComments.bind(this)
     this.showRide = this.showRide.bind(this)
     this.showHorseProfile = this.showHorseProfile.bind(this)
     this.showProfile = this.showProfile.bind(this)
     this.toggleCarrot = this.toggleCarrot.bind(this)
     this.userAvatar = this.userAvatar.bind(this)
+    this.userName = this.userName.bind(this)
   }
 
   shouldComponentUpdate (nextProps) {
@@ -94,74 +99,156 @@ export default class RideCard extends Component {
   }
 
   horseAvatar () {
-    let horseAvatar = null
     const horseProfileURL = this.horseProfileURL()
+    let source
     if (horseProfileURL) {
-      horseAvatar = (
-        <View>
-          <Avatar
-            rounded
-            size="medium"
-            source={{uri: horseProfileURL}}
-            onPress={this.showHorseProfile}
-            activeOpacity={0.7}
-          />
-        </View>
-      )
+        source = {uri: horseProfileURL}
+    } else {
+      source = require('../../img/breed.png')
     }
-    return horseAvatar
+    return (
+      <TouchableOpacity
+        onPress={this.showHorseProfile}
+      >
+        <Thumbnail
+          small
+          source={source}
+        />
+      </TouchableOpacity>
+    )
   }
 
   userAvatar () {
     let avatar
     if (this.props.userID !== this.props.rideUser._id) {
+      let source
+      if (this.props.userProfilePhotoURL) {
+        source = {uri: this.props.userProfilePhotoURL}
+      } else {
+        source = require('../../img/empty.png')
+      }
       avatar = (
-        <Avatar
-          rounded
-          size="medium"
-          source={{uri: this.props.userProfilePhotoURL}}
+        <TouchableOpacity
+          style={{paddingRight: 10}}
           onPress={this.showProfile}
-          activeOpacity={0.7}
-        />
+        >
+          <Thumbnail
+            small
+            source={source}
+          />
+        </TouchableOpacity>
       )
     }
     return avatar
   }
 
+  userName () {
+    if (this.props.rideUser._id !== this.props.userID) {
+      if (this.props.rideUser.firstName && this.props.rideUser.lastName) {
+        return `${this.props.rideUser.firstName} ${this.props.rideUser.lastName}`
+      } else if (this.props.rideUser.firstName || this.props.rideUser.lastName) {
+        return this.props.rideUser.firstName || this.props.rideUser.lastName
+      } else {
+        return 'No Name'
+      }
+    }
+  }
+
+  rideTime () {
+    const t = this.props.ride.startTime
+    return `${moment(t).format('MMMM Do YYYY')} at ${moment(t).format('h:mm a')}`
+  }
+
+  horseSection () {
+    if (this.props.horse) {
+      let section = null
+      if (this.props.ride.horseID) {
+        section = (
+          <View style={{flex: 1}}>
+            <Text style={{color: darkGrey, fontSize: 12}}>Horse</Text>
+            { this.horseAvatar() }
+          </View>
+        )
+      }
+      return section
+    }
+  }
+
+  avgSpeed () {
+    if (this.props.ride.distance && this.props.ride.elapsedTimeSecs) {
+      return `${(
+        this.props.ride.distance / (this.props.ride.elapsedTimeSecs / 3600)
+      ).toFixed(1)} mph`
+    } else {
+      return '0 mph'
+    }
+  }
+
   render() {
     return (
-      <TouchableOpacity onPress={this.showRide}>
-        <Card>
-          <CardItem header style={{paddingLeft: 3, paddingTop: 3, paddingBottom: 5, paddingRight: 3}}>
+      <Card>
+        <CardItem header>
+          <View style={{flex: 1}}>
             <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
-              <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
+
+              <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', paddingRight: 10}}>
                 { this.userAvatar() }
-                <View style={{paddingLeft: 10}}>
-                  <Text>{this.props.ride.name}</Text>
+                <View>
+                  <Text style={{fontSize: 14}}>{this.userName()}</Text>
+                  <Text style={{fontSize: 12, fontWeight: 'normal', color: darkGrey}}>{this.rideTime()}</Text>
                 </View>
               </View>
-              { this.horseAvatar() }
             </View>
-          </CardItem>
-          <CardItem cardBody>
+            <TouchableOpacity onPress={this.showRide}>
+              <View style={{flex: 1, paddingTop: 15, paddingBottom: 15}}>
+                <Text style={{fontSize: 20}}>{this.props.ride.name}</Text>
+              </View>
+            </TouchableOpacity>
+            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
+              <View style={{flex: 3, flexDirection: 'row'}}>
+                <View style={{paddingRight: 10, borderRightWidth: 1, borderRightColor: darkGrey}}>
+                  <Text style={{color: darkGrey, fontSize: 12, fontWeight: 'normal'}}>
+                    Distance
+                  </Text>
+                  <Text style={{fontSize: 20, fontWeight: 'normal', color: darkGrey}}>
+                    {`${this.props.ride.distance.toFixed(1)} mi`}
+                  </Text>
+                </View>
+                <View style={{paddingLeft: 10}}>
+                  <Text style={{color: darkGrey, fontSize: 12, fontWeight: 'normal'}}>
+                    Avg. Speed
+                  </Text>
+                  <Text style={{fontSize: 20, fontWeight: 'normal', color: darkGrey}}>
+                    {this.avgSpeed()}
+                  </Text>
+                </View>
+              </View>
+              <View style={{flex: 1}}>
+                { this.horseSection() }
+              </View>
+            </View>
+          </View>
+        </CardItem>
+        <CardItem cardBody>
+          <TouchableOpacity onPress={this.showRide} style={{flex: 1}}>
             <RideImage uri={this.props.ride.mapURL} />
-          </CardItem>
-          <CardItem footer>
-            <Left>
-              <Button transparent onPress={this.toggleCarrot}>
-                <Image source={require('../../img/carrot.png')} style={{height: 20, width: 20}} />
-                <Text style={{color: brand}}>{this.props.rideCarrots.length} Carrots</Text>
-              </Button>
-            </Left>
-            <Right>
-              <Button transparent onPress={this.showComments}>
-                <Image source={require('../../img/comment.png')} style={{height: 20, width: 20}} />
-                <Text style={{color: brand}}>{this.props.rideComments.length} comments</Text>
-              </Button>
-            </Right>
-          </CardItem>
-        </Card>
-      </TouchableOpacity>
+          </TouchableOpacity>
+        </CardItem>
+        <CardItem footer>
+          <Left>
+            <Button transparent onPress={this.toggleCarrot}>
+              <Image source={require('../../img/carrot.png')} style={{height: 20, width: 20}} />
+              <Text style={{color: brand}}>{this.props.rideCarrots.length} Carrots</Text>
+            </Button>
+          </Left>
+          <Right>
+            <Button transparent onPress={this.showComments}>
+              <Image source={require('../../img/comment.png')} style={{height: 20, width: 20}} />
+              <Text style={{color: brand}}>{this.props.rideComments.length} comments</Text>
+            </Button>
+          </Right>
+        </CardItem>
+      </Card>
     )
   }
 }

@@ -13,7 +13,6 @@
     "react": "16.2.0",
     "react-native": "^0.55.4",
     "react-native-android-location-services-dialog-box": "^2.5.1",
-    "react-native-elements": "^1.0.0-beta2",
     "react-native-image-crop-picker": "^0.20.0",
     "react-native-image-zoom-viewer": "^2.2.13",
     "react-native-maps": "GuilhermeEd/react-native-maps",

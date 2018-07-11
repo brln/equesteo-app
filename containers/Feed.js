@@ -20,12 +20,7 @@ class FeedContainer extends NavigatorComponent {
   }
 
   componentDidMount () {
-    console.log('mounting feed')
     this.props.dispatch(changeScreen(FEED))
-  }
-
-  componentWillUnmount () {
-    console.log('unmounting feed')
   }
 
   static getDerivedStateFromProps (nextProps, prevState) {

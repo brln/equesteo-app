@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Navigation } from 'react-native-navigation'
 import {
+  Dimensions,
   Image,
   StyleSheet,
   Text,
@@ -12,6 +13,8 @@ import { Icon, Fab } from 'native-base';
 
 import { black, brand, green } from '../colors'
 import { NEW_HORSE } from '../screens'
+
+const { width } = Dimensions.get('window')
 
 
 export default class Barn extends Component {
@@ -41,6 +44,7 @@ export default class Barn extends Component {
   }
 
   render() {
+    const calcWidth = (width / 2) - 41
     return (
       <View style={{flex: 1}}>
         <ScrollView>
@@ -50,7 +54,10 @@ export default class Barn extends Component {
             flexWrap: 'wrap',
             alignItems: 'flex-start',
             justifyContent: 'space-between',
-            margin: 30
+            marginTop: 30,
+            marginBottom: 30,
+            marginLeft: 10,
+            marginRight: 10,
           }}>
             {
               [...this.props.horses.map((horse, i) => {
@@ -81,9 +88,29 @@ export default class Barn extends Component {
                         <View style={{flex: 1, alignItems: 'center', paddingBottom: 5}}>
                           <Image
                             source={source}
-                            style={{height: 120, width: 120, margin: 10}}
+                            style={{height: calcWidth, width: calcWidth, margin: 10}}
                           />
-                          <Text>{horse.name}</Text>
+                          <View style={{
+                            position: 'absolute',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            left: 5,
+                            right: 5,
+                            top: 5,
+                            bottom: 5,
+                            padding: 5
+                          }}>
+                            <Text style={{
+                              textAlign: 'center',
+                              fontSize: 20,
+                              color: 'white',
+                              textShadowColor: 'black',
+                              textShadowRadius: 5,
+                              textShadowOffset: {
+                                width: -1,
+                                height: 1
+                              }}}>{horse.name}</Text>
+                          </View>
                         </View>
                       </View>
                     </TouchableOpacity>

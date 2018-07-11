@@ -19,6 +19,12 @@ class HorseProfileContainer extends NavigatorComponent {
     this.uploadPhoto = this.uploadPhoto.bind(this)
   }
 
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.horse.name !== this.props.horse.name) {
+      this.props.navigator.setTitle({title: nextProps.horse.name})
+    }
+  }
+
   closeDeleteModal () {
     this.setState({
       modalOpen: false

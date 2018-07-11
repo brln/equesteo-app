@@ -29,6 +29,10 @@ export default class HorseSelector extends Component {
   }
 
   thumbnail (horse, style) {
+    let source = require('../../img/emptyHorseBlack.png')
+    if (horse.profilePhotoID) {
+      source = {uri: horse.photosByID[horse.profilePhotoID].uri}
+    }
     return (
       <TouchableOpacity
         key={horse._id}
@@ -38,7 +42,7 @@ export default class HorseSelector extends Component {
         <Image
           style={style}
           square
-          source={{uri: horse.photosByID[horse.profilePhotoID].uri}}
+          source={source}
         />
         <View style={{
           position: 'absolute',

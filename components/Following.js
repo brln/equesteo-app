@@ -1,14 +1,19 @@
 import React, { Component } from 'react';
-import { ListItem } from 'react-native-elements'
 import {
+  FlatList,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native'
+import {
+  Body,
+  Left,
+  ListItem,
+  Thumbnail,
+} from 'native-base'
 
-import { profilePhotoURL } from "../helpers"
 import { PROFILE } from '../screens'
 
 export default class Following extends Component {
@@ -20,6 +25,7 @@ export default class Following extends Component {
     this.changeSearchPhrase = this.changeSearchPhrase.bind(this);
     this.search = this.search.bind(this)
     this.showProfile = this.showProfile.bind(this)
+    this.renderResult = this.renderResult.bind(this)
   }
 
   changeSearchPhrase (phrase) {
@@ -33,13 +39,28 @@ export default class Following extends Component {
   }
 
   showProfile (profileUser) {
-    this.props.navigator.push({
-      screen: PROFILE,
-      animationType: 'slide-up',
-      passProps: {
-        profileUser,
-      }
-    })
+    return () => {
+      this.props.navigator.push({
+        screen: PROFILE,
+        animationType: 'slide-up',
+        passProps: {
+          profileUser,
+        }
+      })
+    }
+  }
+
+  renderResult ({item}) {
+    return (
+      <ListItem onPress={this.showProfile(item)}>
+          <Left>
+            <Thumbnail size={30} source={{uri: item.photosByID[item.profilePhotoID]}.uri} />
+          </Left>
+          <Body>
+            <Text>{`${item.firstName} ${item.lastName}`}</Text>
+          </Body>
+      </ListItem>
+    )
   }
 
   render() {
@@ -52,19 +73,12 @@ export default class Following extends Component {
             onChangeText={this.changeSearchPhrase}
             onSubmitEditing={this.search}
           />
-          <View containerStyle={{marginTop: 0}}>
-            {
-              this.props.userSearchResults.filter(u => u._id !== this.props.user._id).map((user, i) => (
-                <ListItem
-                  key={i}
-                  title={user.email}
-                  roundAvatar
-                  avatar={{uri: profilePhotoURL(user.profilePhotoID)}}
-                  onPress={() => { this.showProfile(user) }}
-                />
-              ))
-            }
-          </View>
+          <FlatList
+            keyExtractor={(u) => u._id}
+            containerStyle={{marginTop: 0}}
+            data={this.props.userSearchResults.filter(u => u._id !== this.props.user._id)}
+            renderItem={this.renderResult}
+          />
         </ScrollView>
       </View>
     )

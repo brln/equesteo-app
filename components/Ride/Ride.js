@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Swiper from 'react-native-swiper';
-
+import memoizeOne from 'memoize-one';
 import {
   Dimensions,
   Image,
@@ -11,13 +11,14 @@ import {
   View,
 } from 'react-native';
 
+import { haversine } from '../../helpers'
 import { MAP, UPDATE_RIDE } from '../../screens'
 import PhotosByTimestamp from '../PhotosByTimestamp'
 import SpeedChart from './SpeedChart'
 import Stats from './Stats'
 import DeleteModal from '../DeleteModal'
 
-const { width } = Dimensions.get('window')
+const { height, width } = Dimensions.get('window')
 
 export default class Ride extends Component {
   constructor (props) {
@@ -28,6 +29,7 @@ export default class Ride extends Component {
     this.closeDeleteModal = this.closeDeleteModal.bind(this)
     this.deleteRide = this.deleteRide.bind(this)
     this.fullscreenMap = this.fullscreenMap.bind(this)
+    this.memoizedParse = memoizeOne(this.parseSpeedData)
 
     this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
@@ -69,6 +71,52 @@ export default class Ride extends Component {
     }
   }
 
+  parseSpeedData (rideCoordinates) {
+    const parsedData = []
+    let parsedBucket = []
+    let lastPoint = null
+    let fullDistance = 0
+    let maxSpeed = 0
+
+    const desiredNumCoords = 85
+    const actualNumCoords = rideCoordinates.length
+    const bucketSize = Math.ceil(actualNumCoords / desiredNumCoords)
+
+    for (let rideCoord of rideCoordinates) {
+      if (!lastPoint) {
+        parsedBucket.push({distance: 0, pace: 0})
+      } else {
+        const distance = haversine(
+          lastPoint.latitude,
+          lastPoint.longitude,
+          rideCoord.latitude,
+          rideCoord.longitude
+        )
+        fullDistance += distance
+
+        const timeDiff = (rideCoord.timestamp / 1000) - (lastPoint.timestamp / 1000)
+        const mpSecond = distance / timeDiff
+        const mph = mpSecond * 60 * 60
+        parsedBucket.push({ pace: mph })
+
+        if (mph > maxSpeed) {
+          maxSpeed = mph
+        }
+      }
+      lastPoint = rideCoord
+
+      if (parsedBucket.length === bucketSize) {
+        const pace = parsedBucket.reduce((acc, val) => acc + val.pace, 0) / bucketSize
+        parsedData.push({ distance: fullDistance, pace })
+        parsedBucket = []
+      }
+    }
+    return {
+      avgSpeed: parsedData,
+      maxSpeed: maxSpeed
+    }
+  }
+
   fullscreenMap () {
     this.props.navigator.push({
       screen: MAP,
@@ -93,17 +141,18 @@ export default class Ride extends Component {
 
   render () {
     let speedChart = <Text>Not enough points for Speed Chart</Text>
+    let speedData = this.memoizedParse(this.props.ride.rideCoordinates)
     if (this.props.ride.rideCoordinates.length > 2) {
       speedChart = (
         <View style={styles.slide}>
           <SpeedChart
-            rideCoordinates={this.props.ride.rideCoordinates}
+            speedData={speedData.avgSpeed}
           />
         </View>
       )
     }
     return (
-      <View style={{flex: 1}}>
+      <ScrollView style={{flex: 1}}>
         <DeleteModal
           modalOpen={this.state.modalOpen}
           closeDeleteModal={this.closeDeleteModal}
@@ -111,7 +160,7 @@ export default class Ride extends Component {
           text={"Are you sure you want to delete this ride?"}
         />
         <View style={{flex: 1}}>
-          <View style={{flex: 1}}>
+          <View style={{height: ((height / 2) - 20)}}>
             <Swiper
               loop={false}
             >
@@ -124,22 +173,19 @@ export default class Ride extends Component {
             </Swiper>
           </View>
           <View style={{flex: 1}}>
-            <View style={{flex: 1}}>
-              <Stats
-                ride={this.props.ride}
-                horses={this.props.horses}
-              />
-            </View>
-            <ScrollView style={{flex: 1}}>
-              <PhotosByTimestamp
-                photosByID={this.props.ride.photosByID}
-                profilePhotoID={this.props.ride.profilePhotoID}
-                changeProfilePhoto={() => {}}
-              />
-            </ScrollView>
+            <Stats
+              ride={this.props.ride}
+              horses={this.props.horses}
+              maxSpeed={speedData.maxSpeed}
+            />
+            <PhotosByTimestamp
+              photosByID={this.props.ride.photosByID}
+              profilePhotoID={this.props.ride.profilePhotoID}
+              changeProfilePhoto={() => {}}
+            />
           </View>
         </View>
-      </View>
+      </ScrollView>
     )
   }
 }

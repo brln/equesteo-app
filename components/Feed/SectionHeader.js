@@ -12,10 +12,10 @@ import { darkBrand } from '../../colors'
 
 export default function SectionHeader (props) {
   return (
-    <Card style={{backgroundColor: darkBrand}}>
+    <View>
       <View style={{paddingTop: 10, paddingBottom: 10, paddingLeft: 20}}>
         <Text style={{fontWeight: 'bold'}}>Week of {formattedWeekString(props.title)}</Text>
       </View>
-    </Card>
+    </View>
   )
 }
