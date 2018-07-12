@@ -25,6 +25,7 @@ class TrainingContainer extends NavigatorComponent {
         horses={this.props.horses}
         navigator={this.props.navigator}
         rides={this.props.rides}
+        user={this.props.user}
       />
     )
   }
@@ -34,6 +35,7 @@ function mapStateToProps (state, passedProps) {
   return {
     horses: state.horses,
     rides: state.rides.filter((r) => r.userID === state.localState.userID && r.deleted !== true),
+    user: state.users[state.localState.userID]
   }
 }
 

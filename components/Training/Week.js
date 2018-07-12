@@ -1,9 +1,9 @@
 import moment from 'moment'
 import React, { Component } from 'react'
 
+import { lightGrey } from '../../colors'
 import { RIDE } from '../../screens'
 import { formattedWeekString } from "../../helpers"
-
 
 import {
   StyleSheet,
@@ -24,6 +24,28 @@ function RideDay (props) {
           { props.ride.distance.toFixed(1) }
         </Text>
       </TouchableHighlight>
+    </View>
+  )
+}
+
+function MultiRideDay (props) {
+  return (
+    <View style={{flex: 1, justifyContent: 'center'}}>
+      {
+        props.rides.map((r) => {
+          return (
+            <TouchableHighlight key={r._id} onPress={() => { props.showRide(r)} }>
+              <Text style={{
+                textAlign: 'center',
+                fontSize: 25,
+                fontWeight: 'bold'}}
+              >
+                { r.distance.toFixed(1) }
+              </Text>
+            </TouchableHighlight>
+          )
+        })
+      }
     </View>
   )
 }
@@ -76,7 +98,8 @@ export default class Week extends Component {
       const eachDay = moment(start).add(i, 'days')
       const daysRides = []
       for (let ride of this.props.rides) {
-        if (moment(ride.startTime).date() === eachDay.date()) {
+        console.log(ride.horseID)
+        if (moment(ride.startTime).date() === eachDay.date() && (ride.horseID === this.props.chosenHorseID || this.props.chosenHorseID === 1)) {
           daysRides.push(ride)
           const distance = ride.distance.toFixed(1)
           total += parseFloat(distance)
@@ -85,11 +108,19 @@ export default class Week extends Component {
 
       if (daysRides.length === 0) {
         days.push(<ZeroDay key={i}/>)
-      } else {
+      } else if (daysRides.length === 1) {
         days.push(
           <RideDay
             key={i}
             ride={daysRides[0]}
+            showRide={this.showRide}
+          />
+        )
+      } else if (daysRides.length > 1) {
+        days.push(
+          <MultiRideDay
+            key={i}
+            rides={daysRides}
             showRide={this.showRide}
           />
         )
@@ -101,7 +132,7 @@ export default class Week extends Component {
   render () {
     const weekData = this.days(this.props.mondayString)
     return (
-      <View style={{flex: 1, flexDirection: 'column', paddingTop: 10, paddingBottom: 10, marginBottom: 10, backgroundColor: "#AAAAAA"}}>
+      <View style={{flex: 1, flexDirection: 'column', paddingTop: 10, paddingBottom: 10, marginBottom: 10, backgroundColor: lightGrey}}>
         <View style={{flex: 1}}>
           <Text style={{textAlign: 'center'}}>
             {formattedWeekString(this.props.mondayString)}

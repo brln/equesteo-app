@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import {
   FlatList,
+  Picker,
   ScrollView,
   StyleSheet,
   Text,
@@ -33,7 +34,12 @@ function DaysOfWeek () {
 export default class Training extends Component {
   constructor (props) {
     super(props)
+    this.state = {
+      chosenHorseID: 1
+    }
     this._renderItem = this._renderItem.bind(this)
+    this.horsePicker = this.horsePicker.bind(this)
+    this.pickHorse = this.pickHorse.bind(this)
   }
 
   ridesToWeeks (rides) {
@@ -52,6 +58,7 @@ export default class Training extends Component {
     return ({item, index}) => {
        return (
          <Week
+           chosenHorseID={this.state.chosenHorseID}
            index={index}
            mondayString={item}
            navigator={this.props.navigator}
@@ -61,12 +68,35 @@ export default class Training extends Component {
     }
   }
 
+  pickHorse (value) {
+    this.setState({
+      chosenHorseID: value
+    })
+  }
+
+  horsePicker () {
+    return (
+      <View style={{borderWidth: 1, borderColor: 'black'}}>
+        <Picker selectedValue={this.state.chosenHorseID} onValueChange={this.pickHorse}>
+          <Picker.Item key="everyone" label="Everyone" value={1} />
+          {
+            this.props.horses.filter(h => h.userID === this.props.user._id).map(h => {
+              return <Picker.Item key={h._id} label={h.name} value={h._id} />
+            })
+          }
+          <Picker.Item key="none" label="No Horse" value={undefined} />
+        </Picker>
+      </View>
+    )
+  }
+
   render() {
     const rideWeeks = this.ridesToWeeks(this.props.rides)
     const mondayDates = Object.keys(rideWeeks)
     mondayDates.sort((a, b) => new Date(b) - new Date(a))
     return (
-      <View>
+      <View style={{flex: 1}}>
+        { this.horsePicker() }
         <DaysOfWeek />
         <ScrollView>
           <FlatList
