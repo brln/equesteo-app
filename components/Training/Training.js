@@ -9,7 +9,7 @@ import {
 } from 'react-native'
 
 import Week from './Week'
-
+import { lightGrey } from '../../colors'
 import { getMonday } from '../../helpers'
 
 function DaysOfWeek () {
@@ -34,12 +34,22 @@ function DaysOfWeek () {
 export default class Training extends Component {
   constructor (props) {
     super(props)
-    this.state = {
-      chosenHorseID: 1
+    this.TYPES = {
+      DISTANCE: 'typeDistance',
+      TYPE_TIME: 'typeTime'
     }
+
+    this.SHOW_EVERYONE = 'showEveryone'
+
+    this.state = {
+      chosenHorseID: this.SHOW_EVERYONE,
+      chosenType: this.TYPES.DISTANCE
+    }
+
     this._renderItem = this._renderItem.bind(this)
     this.horsePicker = this.horsePicker.bind(this)
     this.pickHorse = this.pickHorse.bind(this)
+    this.pickType = this.pickType.bind(this)
   }
 
   ridesToWeeks (rides) {
@@ -59,10 +69,13 @@ export default class Training extends Component {
        return (
          <Week
            chosenHorseID={this.state.chosenHorseID}
+           chosenType={this.state.chosenType}
            index={index}
            mondayString={item}
            navigator={this.props.navigator}
            rides={rideWeeks[item]}
+           showEveryone={this.SHOW_EVERYONE}
+           types={this.TYPES}
          />
       )
     }
@@ -74,17 +87,34 @@ export default class Training extends Component {
     })
   }
 
+  pickType (value) {
+    this.setState({
+      chosenType: value
+    })
+  }
+
   horsePicker () {
     return (
-      <View style={{borderWidth: 1, borderColor: 'black'}}>
+      <View style={{flex: 1, borderWidth: 1, borderColor: lightGrey}}>
         <Picker selectedValue={this.state.chosenHorseID} onValueChange={this.pickHorse}>
-          <Picker.Item key="everyone" label="Everyone" value={1} />
+          <Picker.Item key="everyone" label="All Horses" value={1} />
           {
             this.props.horses.filter(h => h.userID === this.props.user._id).map(h => {
               return <Picker.Item key={h._id} label={h.name} value={h._id} />
             })
           }
-          <Picker.Item key="none" label="No Horse" value={undefined} />
+          <Picker.Item key="none" label="No Horse" value={null} />
+        </Picker>
+      </View>
+    )
+  }
+
+  typePicker () {
+    return (
+      <View style={{flex: 1, borderWidth: 1, borderColor: lightGrey}}>
+        <Picker selectedValue={this.state.chosenType} onValueChange={this.pickType}>
+          <Picker.Item key="distance" label="Distance" value={this.TYPES.DISTANCE} />
+          <Picker.Item key="time" label="Time" value={this.TYPES.TIME} />
         </Picker>
       </View>
     )
@@ -96,15 +126,20 @@ export default class Training extends Component {
     mondayDates.sort((a, b) => new Date(b) - new Date(a))
     return (
       <View style={{flex: 1}}>
-        { this.horsePicker() }
-        <DaysOfWeek />
-        <ScrollView>
-          <FlatList
-            data={mondayDates}
-            keyExtractor={(i) => i}
-            renderItem={this._renderItem(rideWeeks)}
-          />
-        </ScrollView>
+        <View style={{flex: 1, flexDirection: 'row'}}>
+          { this.horsePicker() }
+          { this.typePicker() }
+        </View>
+        <View style={{flex: 9}}>
+          <DaysOfWeek />
+          <ScrollView>
+            <FlatList
+              data={mondayDates}
+              keyExtractor={(i) => i}
+              renderItem={this._renderItem(rideWeeks)}
+            />
+          </ScrollView>
+        </View>
       </View>
     )
   }

@@ -8,22 +8,34 @@ import { formattedWeekString } from "../../helpers"
 import {
   StyleSheet,
   Text,
-  TouchableHighlight,
+  TouchableOpacity,
   View,
 } from 'react-native';
 
 function RideDay (props) {
+  let showString
+  if (props.chosenType === props.types.DISTANCE) {
+    showString = (
+      <Text style={{
+        textAlign: 'center',
+        fontSize: 25,
+        fontWeight: 'bold'}}
+      >
+        {props.ride.distance.toFixed(1)}
+      </Text>
+    )
+  } else if (props.chosenType === props.types.TIME) {
+    showString = props.timeString(
+      props.ride.elapsedTimeSecs,
+      {textAlign: 'center', fontSize: 15, fontWeight: 'bold'},
+      false
+    )
+  }
   return (
     <View style={{flex: 1, justifyContent: 'center'}}>
-      <TouchableHighlight onPress={() => { props.showRide(props.ride)} }>
-        <Text style={{
-          textAlign: 'center',
-          fontSize: 25,
-          fontWeight: 'bold'}}
-        >
-          { props.ride.distance.toFixed(1) }
-        </Text>
-      </TouchableHighlight>
+      <TouchableOpacity onPress={() => { props.showRide(props.ride)} }>
+        { showString }
+      </TouchableOpacity>
     </View>
   )
 }
@@ -33,16 +45,28 @@ function MultiRideDay (props) {
     <View style={{flex: 1, justifyContent: 'center'}}>
       {
         props.rides.map((r) => {
-          return (
-            <TouchableHighlight key={r._id} onPress={() => { props.showRide(r)} }>
+          let showString
+          if (props.chosenType === props.types.DISTANCE) {
+            showString = (
               <Text style={{
                 textAlign: 'center',
                 fontSize: 25,
                 fontWeight: 'bold'}}
               >
-                { r.distance.toFixed(1) }
+                {r.distance.toFixed(1)}
               </Text>
-            </TouchableHighlight>
+            )
+          } else if (props.chosenType === props.types.TIME) {
+            showString = props.timeString(
+              r.elapsedTimeSecs,
+              {textAlign: 'center', fontSize: 15, fontWeight: 'bold'},
+              false
+            )
+          }
+          return (
+            <TouchableOpacity key={r._id} onPress={() => { props.showRide(r)} }>
+              { showString }
+            </TouchableOpacity>
           )
         })
       }
@@ -93,16 +117,18 @@ export default class Week extends Component {
   days (mondayString) {
     const days = []
     const start = moment(new Date(mondayString))
-    let total = 0.0
+    let totalDistance = 0.0
+    let totalTime = 0
     for (let i = 0; i < 7; i++) {
       const eachDay = moment(start).add(i, 'days')
       const daysRides = []
       for (let ride of this.props.rides) {
-        console.log(ride.horseID)
-        if (moment(ride.startTime).date() === eachDay.date() && (ride.horseID === this.props.chosenHorseID || this.props.chosenHorseID === 1)) {
+        const showingID = ride.horseID ? ride.horseID : null
+        if (moment(ride.startTime).date() === eachDay.date()
+          && (showingID === this.props.chosenHorseID || this.props.chosenHorseID === this.props.showEveryone)) {
           daysRides.push(ride)
-          const distance = ride.distance.toFixed(1)
-          total += parseFloat(distance)
+          totalDistance += ride.distance
+          totalTime += ride.elapsedTimeSecs
         }
       }
 
@@ -114,6 +140,9 @@ export default class Week extends Component {
             key={i}
             ride={daysRides[0]}
             showRide={this.showRide}
+            types={this.props.types}
+            chosenType={this.props.chosenType}
+            timeString={this.timeString}
           />
         )
       } else if (daysRides.length > 1) {
@@ -122,11 +151,27 @@ export default class Week extends Component {
             key={i}
             rides={daysRides}
             showRide={this.showRide}
+            types={this.props.types}
+            chosenType={this.props.chosenType}
+            timeString={this.timeString}
           />
         )
       }
     }
-    return { days, total }
+    return { days, totalDistance, totalTime }
+  }
+
+  timeString(seconds, style, showSpace=true) {
+    const space = showSpace ? ' ' : ''
+    const hours = seconds / 3600
+    const justHours = Math.floor(hours)
+    const minutes = Math.round((hours - justHours) * 60)
+    if (justHours > 0) {
+      return <Text style={style}>{`${justHours}h${space}${minutes}m`}</Text>
+    } else {
+      return <Text style={style}>{`${minutes}m`}</Text>
+    }
+
   }
 
   render () {
@@ -141,8 +186,15 @@ export default class Week extends Component {
         <View style={{flex: 1, flexDirection: 'row', marginBottom: 15}}>
           {weekData.days}
         </View>
-        <View>
-          <Text style={{textAlign: 'center'}}>Total: { weekData.total.toFixed(1) }</Text>
+        <View style={{flex: 1, flexDirection: 'row'}}>
+          <View style={{flex: 1}}>
+            <Text style={{textAlign: 'center', fontSize: 20}}>{ weekData.totalDistance.toFixed(1) } mi</Text>
+            <Text style={{textAlign: 'center', fontSize: 10}}>DISTANCE</Text>
+          </View>
+          <View style={{flex: 1}}>
+            {this.timeString(weekData.totalTime, {textAlign: 'center', fontSize: 20})}
+            <Text style={{textAlign: 'center', fontSize: 10}}>TIME</Text>
+          </View>
         </View>
       </View>
     )
