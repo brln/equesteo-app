@@ -34,6 +34,7 @@ export default class Profile extends Component {
     this.follow = this.follow.bind(this)
     this.unfollow = this.unfollow.bind(this)
     this.horseProfile = this.horseProfile.bind(this)
+    this.horsesCard = this.horsesCard.bind(this)
     this.renderHorse = this.renderHorse.bind(this)
     this.uploadProfile = this.uploadProfile.bind(this)
   }
@@ -164,9 +165,8 @@ export default class Profile extends Component {
           title="Follow"
         />
       )
-      console.log(this.props.follows)
-      for (let follow of Object.values(this.props.follows)) {
-        if (!follow.deleted && follow.followingID === this.props.profileUser._id) {
+      for (let follow of this.props.follows) {
+        if (follow.followingID === this.props.profileUser._id) {
           followButton = (
             <Button
               style={styles.followButton}
@@ -191,6 +191,23 @@ export default class Profile extends Component {
         </View>
       </View>
     )
+  }
+
+  horsesCard () {
+    if (this.props.horses.length > 0) {
+      return (
+        <Card>
+          <CardItem header style={{padding: 5}}>
+            <View style={{paddingLeft: 5}}>
+              <Text style={{color: darkBrand}}>Horses</Text>
+            </View>
+          </CardItem>
+          <CardItem cardBody>
+            {this.renderHorses(this.props.horses)}
+          </CardItem>
+        </Card>
+      )
+    }
   }
 
   render() {
@@ -218,16 +235,8 @@ export default class Profile extends Component {
             </CardItem>
           </Card>
 
-          <Card>
-            <CardItem header style={{padding: 5}}>
-              <View style={{paddingLeft: 5}}>
-                <Text style={{color: darkBrand}}>Horses</Text>
-              </View>
-            </CardItem>
-            <CardItem cardBody>
-              {this.renderHorses(this.props.horses)}
-            </CardItem>
-          </Card>
+          { this.horsesCard() }
+
         </View>
         </ScrollView>
     )

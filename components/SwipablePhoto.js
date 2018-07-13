@@ -16,7 +16,6 @@ export default class SwipablePhoto extends Component {
   }
 
   closeLightbox () {
-    console.log('close dammit')
     this.props.navigator.dismissLightBox()
   }
 

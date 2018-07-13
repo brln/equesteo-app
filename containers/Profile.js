@@ -76,7 +76,6 @@ class ProfileContainer extends NavigatorComponent {
   }
 
   uploadProfilePhoto (location) {
-    console.log(location)
     this.props.dispatch(uploadProfilePhoto(location))
   }
 
@@ -101,7 +100,7 @@ function mapStateToProps (state, passedProps) {
     horses: state.horses.filter((h) => h.userID === passedProps.profileUser._id && h.deleted !== true),
     profileUser: state.users[passedProps.profileUser._id] || passedProps.profileUser,
     user: state.users[state.localState.userID],
-    follows: state.follows
+    follows: Object.values(state.follows).filter(f => !f.deleted && f.followerID === state.localState.userID)
   }
 }
 

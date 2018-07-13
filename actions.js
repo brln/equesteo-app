@@ -654,7 +654,6 @@ export function submitLogin (email, password) {
       const userID = resp.id
       const following = resp.following
       const followers = resp.followers
-      console.log('login followers: ' + followers)
       const pouchCouch = new PouchCouch(token)
       await pouchCouch.localReplicateDB('all', [...following, userID], followers)
       dispatch(receiveJWT(resp.token))
@@ -695,7 +694,6 @@ export function submitSignup (email, password) {
 
 export function syncDBPull (db) {
   return async (dispatch, getState) => {
-    console.log('syncDBPull')
     const pouchCouch = new PouchCouch(getState().localState.jwt)
     const userID = getState().localState.userID
     const following = Object.values(getState().follows).filter(

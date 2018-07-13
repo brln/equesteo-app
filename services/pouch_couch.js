@@ -86,10 +86,10 @@ export default class PouchCouch {
       case 'rides':
         return this.localReplicateRides(userIDs, followerUserIDs)
       case 'users':
-        return this.localReplicateUsers(userIDs)
+        return this.localReplicateUsers([...userIDs, ...followerUserIDs])
       case 'all':
         const rideReplicate = this.localReplicateRides(userIDs, followerUserIDs)
-        const userReplicate = this.localReplicateUsers(userIDs)
+        const userReplicate = this.localReplicateUsers([...userIDs, ...followerUserIDs])
         const horsesReplicate = this.localReplicateHorses(userIDs)
         return Promise.all([rideReplicate, horsesReplicate, userReplicate])
       default:
@@ -97,12 +97,7 @@ export default class PouchCouch {
     }
   }
 
-  localReplicate (userIDs, followerUserIDs) {
-
-  }
-
   localReplicateRides (userIDs, followerUserIDs) {
-    console.log('piggy: ' + followerUserIDs)
     return new Promise((resolve, reject) => {
       PouchDB.replicate(
         this.remoteRidesDB,

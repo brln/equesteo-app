@@ -58,7 +58,6 @@ class SignupLoginContainer extends Component {
     Linking.addEventListener('url', ({ url }) => {
       const parsedURL = URI(url)
       const token = parsedURL.search(true).token
-      console.log(token)
     });
   }
 

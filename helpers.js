@@ -64,7 +64,6 @@ function urlParams (params) {
 }
 
 export function staticMap (ride) {
-  console.log('static map')
   const ROOT_URL = 'https://maps.googleapis.com/maps/api/staticmap?'
   const queryStringParams = {
       size: '580x350',
@@ -142,7 +141,6 @@ export function formattedWeekString(monday) {
 export function newRideName (currentRide) {
   let name
   const hour = (new Date(currentRide.startTime)).getHours()
-  console.log('hour: ' + hour)
   if (hour < 5) {
     name = 'Early Morning Ride'
   } else if (hour < 10) {

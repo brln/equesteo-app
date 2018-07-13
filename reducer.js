@@ -148,7 +148,7 @@ export default function AppReducer(state=initialState, action) {
         }
       }
     case FOLLOW_UPDATED:
-      const followsClone = {...state.users}
+      const followsClone = {...state.follows}
       followsClone[action.follow._id] = action.follow
       return {
         ...state,
@@ -191,7 +191,6 @@ export default function AppReducer(state=initialState, action) {
       }
 
       const allFollows = {}
-      console.log(action.localData.follows)
       for (let follow of action.localData.follows) {
         allFollows[follow._id] = follow
       }
