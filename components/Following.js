@@ -52,13 +52,13 @@ export default class Following extends Component {
 
   renderResult ({item}) {
     return (
-      <ListItem onPress={this.showProfile(item)}>
-          <Left>
-            <Thumbnail size={30} source={{uri: item.photosByID[item.profilePhotoID]}.uri} />
-          </Left>
-          <Body>
-            <Text>{`${item.firstName} ${item.lastName}`}</Text>
-          </Body>
+      <ListItem avatar noBorder={true} style={{height: 80}} onPress={this.showProfile(item)}>
+        <Left>
+          <Thumbnail size={30} source={{uri: item.photosByID[item.profilePhotoID]}.uri} />
+        </Left>
+        <Body>
+          <Text>{`${item.firstName} ${item.lastName}`}</Text>
+        </Body>
       </ListItem>
     )
   }

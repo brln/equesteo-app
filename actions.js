@@ -17,6 +17,7 @@ import {
   DISCARD_RIDE,
   DISMISS_ERROR,
   ERROR_OCCURRED,
+  FOLLOW_UPDATED,
   HORSE_CREATED,
   HORSE_SAVED,
   JUST_FINISHED_RIDE_SHOWN,
@@ -106,6 +107,13 @@ export function errorOccurred (message) {
   return {
     type: ERROR_OCCURRED,
     message
+  }
+}
+
+export function followUpdated (follow) {
+  return {
+    type: FOLLOW_UPDATED,
+    follow
   }
 }
 
@@ -331,7 +339,7 @@ export function exchangePWCode (email, code) {
       const following = resp.following
       const pouchCouch = new PouchCouch(token)
       dispatch(toggleAwaitingPasswordChange())
-      await pouchCouch.localReplicate([...following, userID])
+      await pouchCouch.localReplicateDB('all', [...following, userID])
       dispatch(receiveJWT(resp.token))
       dispatch(saveUserID(resp.id))
       dispatch(loadLocalData())
@@ -456,12 +464,25 @@ export function createRideComment(commentData) {
 export function createFollow (followingID) {
   return async (dispatch, getState) => {
     const userID = getState().localState.userID
-    const currentUser = getState().users[userID]
-    const newUserData = {...currentUser}
-    newUserData.following.push(followingID)
+    const followRecordID = `${userID}_${followingID}`
+
+    let followingDoc = {
+      _id: followRecordID,
+      followingID,
+      followerID: userID,
+      deleted: false,
+      type: "follow"
+    }
+    for (let followID of Object.keys(getState().follows)) {
+      const followRecord = getState().follows[followID]
+      if (followID === followRecordID) {
+        followingDoc = {...followRecord, deleted: false}
+      }
+    }
+
     const pouchCouch = new PouchCouch(getState().localState.jwt)
-    const doc = await pouchCouch.saveUser(newUserData)
-    await dispatch(userUpdated({...newUserData, _rev: doc.rev}))
+    const doc = await pouchCouch.saveUser(followingDoc)
+    await dispatch(followUpdated({...followingDoc, _rev: doc.rev}))
     dispatch(needsRemotePersist('users'))
     dispatch(syncDBPull('all'))
   }
@@ -470,15 +491,21 @@ export function createFollow (followingID) {
 export function deleteFollow (followingID) {
   return async (dispatch, getState) => {
     const userID = getState().localState.userID
-    const currentUser = getState().users[userID]
-    const newUserData = {...currentUser}
-    const index = newUserData.following.indexOf(followingID);
-    if (index > -1) {
-      newUserData.following.splice(index, 1);
+    const followRecordID = `${userID}_${followingID}`
+    let followingDoc
+    for (let followID of Object.keys(getState().follows)) {
+      const followRecord = getState().follows[followID]
+      if (followID === followRecordID) {
+        followingDoc = {...followRecord, deleted: true}
+      }
     }
+    if (!followingDoc) {
+      throw Error('should have found a following doc')
+    }
+
     const pouchCouch = new PouchCouch(getState().localState.jwt)
-    const doc = await pouchCouch.saveUser(newUserData)
-    dispatch(userUpdated({...newUserData, _rev: doc.rev}))
+    const doc = await pouchCouch.saveUser(followingDoc)
+    dispatch(followUpdated({...followingDoc, _rev: doc.rev}))
     dispatch(needsRemotePersist('users'))
   }
 }
@@ -626,8 +653,10 @@ export function submitLogin (email, password) {
       const token = resp.token
       const userID = resp.id
       const following = resp.following
+      const followers = resp.followers
+      console.log('login followers: ' + followers)
       const pouchCouch = new PouchCouch(token)
-      await pouchCouch.localReplicate([...following, userID])
+      await pouchCouch.localReplicateDB('all', [...following, userID], followers)
       dispatch(receiveJWT(resp.token))
       dispatch(setAppRoot('after-login'))
       dispatch(saveUserID(resp.id))
@@ -666,10 +695,22 @@ export function submitSignup (email, password) {
 
 export function syncDBPull (db) {
   return async (dispatch, getState) => {
+    console.log('syncDBPull')
     const pouchCouch = new PouchCouch(getState().localState.jwt)
     const userID = getState().localState.userID
-    const following = getState().users[userID].following
-    await pouchCouch.localReplicateDB(db, [...following, userID])
+    const following = Object.values(getState().follows).filter(
+      f => !f.deleted && f.followerID === userID
+    ).map(
+      f => f.followingID
+    )
+
+    const followers = Object.values(getState().follows).filter(
+      f => !f.deleted && f.followingID === userID
+    ).map(
+      f => f.followerID
+    )
+    console.log('followers: ' + followers)
+    await pouchCouch.localReplicateDB(db, [...following, userID], followers)
     await dispatch(loadLocalData())
     dispatch(syncComplete())
   }

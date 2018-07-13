@@ -6,6 +6,7 @@ import {
   DISCARD_RIDE,
   DISMISS_ERROR,
   ERROR_OCCURRED,
+  FOLLOW_UPDATED,
   HORSE_CREATED,
   HORSE_SAVED,
   JUST_FINISHED_RIDE_SHOWN,
@@ -40,7 +41,6 @@ import {
   haversine
 } from './helpers'
 import { FEED } from './screens'
-import { runMigrations } from './migrations/migrator'
 
 const initialState = {
   localState: {
@@ -73,6 +73,7 @@ const initialState = {
     userSearchResults: [],
   },
   horses: [],
+  follows: {},
   rides: [],
   rideCarrots: [],
   rideComments: [],
@@ -146,17 +147,12 @@ export default function AppReducer(state=initialState, action) {
           error: action.message
         }
       }
-    case NEEDS_PHOTO_UPLOAD:
-      const needsPhotoUploads = {
-        ...state.localState.needsPhotoUploads
-      }
-      needsPhotoUploads[action.photoType] = true
+    case FOLLOW_UPDATED:
+      const followsClone = {...state.users}
+      followsClone[action.follow._id] = action.follow
       return {
         ...state,
-        localState: {
-          ...state.localState,
-          needsPhotoUploads
-        }
+        follows: followsClone
       }
     case HORSE_CREATED:
       return {
@@ -193,13 +189,32 @@ export default function AppReducer(state=initialState, action) {
       for (let user of action.localData.users) {
         allUsers[user._id] = user
       }
+
+      const allFollows = {}
+      console.log(action.localData.follows)
+      for (let follow of action.localData.follows) {
+        allFollows[follow._id] = follow
+      }
       return {
         ...state,
+        follows: allFollows,
         rides: action.localData.rides,
         rideCarrots: action.localData.rideCarrots,
         rideComments: action.localData.rideComments,
         horses: action.localData.horses,
         users: allUsers,
+      }
+    case NEEDS_PHOTO_UPLOAD:
+      const needsPhotoUploads = {
+        ...state.localState.needsPhotoUploads
+      }
+      needsPhotoUploads[action.photoType] = true
+      return {
+        ...state,
+        localState: {
+          ...state.localState,
+          needsPhotoUploads
+        }
       }
     case NEEDS_REMOTE_PERSIST:
       let newNeeds = {...state.localState.needsRemotePersist}

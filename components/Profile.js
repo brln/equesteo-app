@@ -156,10 +156,25 @@ export default class Profile extends Component {
         </Fab>
       )
     } else {
-      followButton = <Button style={styles.followButton} color={green} onPress={this.follow} title="Follow" />
-      for (let following of this.props.user.following) {
-        if (following === this.props.profileUser._id) {
-          followButton = <Button style={styles.followButton} color={danger} onPress={this.unfollow} title="Unfollow" />
+      followButton = (
+        <Button
+          style={styles.followButton}
+          color={green}
+          onPress={this.follow}
+          title="Follow"
+        />
+      )
+      console.log(this.props.follows)
+      for (let follow of Object.values(this.props.follows)) {
+        if (!follow.deleted && follow.followingID === this.props.profileUser._id) {
+          followButton = (
+            <Button
+              style={styles.followButton}
+              color={danger}
+              onPress={this.unfollow}
+              title="Unfollow"
+            />
+          )
           break
         }
       }

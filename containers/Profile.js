@@ -26,12 +26,10 @@ class ProfileContainer extends NavigatorComponent {
   shouldComponentUpdate (nextProps) {
     // When you log out there is no profileUser but it tries to render
     // and blows up.
-    if (!!nextProps.profileUser) {
+    if (!nextProps.profileUser || !nextProps.user ) {
       return false
     }
-    if (!!nextProps.user) {
-      return false
-    }
+    return true
   }
 
   onNavigatorEvent(event) {
@@ -87,6 +85,7 @@ class ProfileContainer extends NavigatorComponent {
       <Profile
         createFollow={this.createFollow}
         deleteFollow={this.deleteFollow}
+        follows={this.props.follows}
         horses={this.props.horses}
         navigator={this.props.navigator}
         profileUser={this.props.profileUser}
@@ -102,6 +101,7 @@ function mapStateToProps (state, passedProps) {
     horses: state.horses.filter((h) => h.userID === passedProps.profileUser._id && h.deleted !== true),
     profileUser: state.users[passedProps.profileUser._id] || passedProps.profileUser,
     user: state.users[state.localState.userID],
+    follows: state.follows
   }
 }
 

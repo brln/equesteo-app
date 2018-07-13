@@ -27,9 +27,8 @@ const store = createStore(
 registerScreens(store, Provider)
 
 if (ENV !== 'local') {
-  Sentry.config(SENTRY_DSN).install();
+  Sentry.config(SENTRY_DSN).install()
 }
-
 
 export default class App {
   constructor() {

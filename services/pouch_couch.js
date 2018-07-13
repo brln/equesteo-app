@@ -79,22 +79,30 @@ export default class PouchCouch {
   }
   // ---END MESSAGE
 
-  localReplicateDB(db, userIDs) {
+  localReplicateDB(db, userIDs, followerUserIDs) {
     switch(db) {
       case 'horses':
         return this.localReplicateHorses(userIDs)
       case 'rides':
-        return this.localReplicateRides(userIDs)
+        return this.localReplicateRides(userIDs, followerUserIDs)
       case 'users':
         return this.localReplicateUsers(userIDs)
       case 'all':
-        return this.localReplicate(userIDs)
+        const rideReplicate = this.localReplicateRides(userIDs, followerUserIDs)
+        const userReplicate = this.localReplicateUsers(userIDs)
+        const horsesReplicate = this.localReplicateHorses(userIDs)
+        return Promise.all([rideReplicate, horsesReplicate, userReplicate])
       default:
         throw('Local DB not found')
     }
   }
 
-  localReplicateRides (userIDs) {
+  localReplicate (userIDs, followerUserIDs) {
+
+  }
+
+  localReplicateRides (userIDs, followerUserIDs) {
+    console.log('piggy: ' + followerUserIDs)
     return new Promise((resolve, reject) => {
       PouchDB.replicate(
         this.remoteRidesDB,
@@ -102,7 +110,10 @@ export default class PouchCouch {
         {
           live: false,
           filter: 'rides/byUserIDs',
-          query_params: {userIDs: userIDs.join(',')}
+          query_params: {
+            userIDs: userIDs.join(','),
+            followerUserIDs: followerUserIDs.join(',')
+          }
         }
       ).on('complete', () => {
         resolve()
@@ -119,7 +130,9 @@ export default class PouchCouch {
         this.remoteUsersDB,
         this.localUsersDB,
         {
-          doc_ids: userIDs
+          live: false,
+          filter: 'users/byUserIDs',
+          query_params: {userIDs: userIDs.join(',')}
         }
       ).on('complete', () => {
           resolve()
@@ -149,12 +162,7 @@ export default class PouchCouch {
     })
   }
 
-  localReplicate (userIDs) {
-    const rideReplicate = this.localReplicateRides(userIDs)
-    const userReplicate = this.localReplicateUsers(userIDs)
-    const horsesReplicate = this.localReplicateHorses(userIDs)
-    return Promise.all([rideReplicate, horsesReplicate, userReplicate])
-  }
+
 
   async deleteLocalDBs () {
     await this.localHorsesDB.destroy()
@@ -168,13 +176,15 @@ export default class PouchCouch {
     const ridesResp = await this.localRidesDB.allDocs()
     const usersResp = await this.localUsersDB.allDocs()
 
-    const rideDocs = ridesResp.rows.map((r) => r.doc)
+    const rideDocs = ridesResp.rows.map(r => r.doc)
+    const userDocs = usersResp.rows.map(u => u.doc)
     return {
-      horses: horsesResp.rows.map((r) => r.doc),
-      rideCarrots: rideDocs.filter((r) => r.type === 'carrot'),
-      rideComments: rideDocs.filter((r) => r.type === 'comment'),
-      rides: rideDocs.filter((r) => r.type === 'ride'),
-      users: usersResp.rows.map((r) => r.doc),
+      horses: horsesResp.rows.map(r => r.doc),
+      follows: userDocs.filter(u => u.type === 'follow'),
+      rideCarrots: rideDocs.filter(r => r.type === 'carrot'),
+      rideComments: rideDocs.filter(r => r.type === 'comment'),
+      rides: rideDocs.filter(r => r.type === 'ride'),
+      users: userDocs.filter(u => u.type === 'user')
     }
   }
 }

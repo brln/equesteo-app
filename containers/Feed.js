@@ -81,10 +81,15 @@ class FeedContainer extends NavigatorComponent {
 }
 
 function followingRideFilter (state) {
+  const following = Object.values(state.follows).filter(
+    f => !f.deleted && f.followerID === state.localState.userID
+  ).map(
+    f => f.followingID
+  )
   return state.rides.filter(
     r => r.userID !== state.localState.userID // not the users rides
       && r.deleted !== true // hasn't been deleted
-      && state.users[state.localState.userID].following.indexOf(r.userID) >= 0 // user hasn't removed follow
+      && following.indexOf(r.userID) >= 0 // user hasn't removed follow
   ).sort(
     (a, b) => b.startTime - a.startTime
   )
@@ -101,7 +106,9 @@ function mapStateToProps (state) {
     rideComments: state.rideComments,
     users: state.users,
     userID: state.localState.userID,
-    yourRides: state.rides.filter((r) => r.userID === state.localState.userID && r.deleted !== true).sort((a, b) => b.startTime - a.startTime),
+    yourRides: state.rides.filter(
+      (r) => r.userID === state.localState.userID && r.deleted !== true
+    ).sort((a, b) => b.startTime - a.startTime),
   }
 }
 
