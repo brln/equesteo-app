@@ -15,9 +15,9 @@ export default class Feed extends Component {
     this.startRefresh = this.startRefresh.bind(this)
   }
 
-  componentWillReceiveProps (prevProps) {
-    if (prevProps.justFinishedRide) {
-      this.showRide(prevProps.yourRides[0])
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.justFinishedRide) {
+      this.showRide(nextProps.yourRides[0])
       this.props.justFinishedRideShown()
     }
   }

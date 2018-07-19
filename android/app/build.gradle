@@ -149,7 +149,10 @@ android {
 }
 
 dependencies {
-    compile project(':react-native-android-location-services-dialog-box')
+    compile project(':react-native-push-notification')
+    implementation project(':react-native-firebase')
+    implementation "com.google.firebase:firebase-messaging:17.1.0"
+    implementation project(':react-native-android-location-services-dialog-box')
     implementation 'com.android.support:design:27.1.0'
     implementation project(':react-native-svg')
     implementation project(':react-native-sentry')
@@ -169,7 +172,7 @@ dependencies {
        exclude group: 'com.google.android.gms', module: 'play-services-base'
        exclude group: 'com.google.android.gms', module: 'play-services-maps'
     }
-
+    implementation 'com.google.firebase:firebase-core:16.0.1'
 
 }
 
@@ -179,3 +182,5 @@ task copyDownloadableDepsToLibs(type: Copy) {
     from configurations.compile
     into 'libs'
 }
+
+apply plugin: 'com.google.gms.google-services'

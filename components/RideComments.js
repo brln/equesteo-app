@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import {
-  List,
   ListItem,
   Left,
   Body,
@@ -9,6 +8,7 @@ import {
   Text
 } from 'native-base';
 import {
+  FlatList,
   ScrollView,
   StyleSheet,
   TextInput,
@@ -60,9 +60,11 @@ export default class RideComments extends Component {
           value={this.props.newComment}
         />
         <ScrollView>
-          <List>
-            {this.props.rideComments.sort((a, b) => b.timestamp - a.timestamp).map((rc) => this.singleComment(rc))}
-          </List>
+          <FlatList>
+            data={this.props.rideComments}
+            keyExtractor={(i) => i._id}
+            renderItem={({item}) => item.sort((a, b) => b.timestamp - a.timestamp).map((rc) => this.singleComment(rc))}}
+          </FlatList>
         </ScrollView>
       </View>
     )

@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "373350399276",
+    "firebase_url": "https://stately-minutia-208016.firebaseio.com",
+    "project_id": "stately-minutia-208016",
+    "storage_bucket": "stately-minutia-208016.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:373350399276:android:0baf1aebad7834e6",
+        "android_client_info": {
+          "package_name": "com.equesteo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "373350399276-r9pfn0dut4mkpg417cai01vm7dluhs28.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAp5Kb1O8mNM-4xom4WERg1DC8UpVAnxbk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

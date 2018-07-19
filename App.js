@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import { Provider } from 'react-redux'
 import { createStore, applyMiddleware } from 'redux'
 import thunkMiddleware from 'redux-thunk'
-import { Navigation } from 'react-native-navigation'
+import { Navigation, NativeEventsReceiver } from 'react-native-navigation'
 import { Sentry } from 'react-native-sentry'
 import { ENV, SENTRY_DSN } from 'react-native-dotenv'
 
@@ -31,7 +31,7 @@ if (ENV !== 'local') {
 }
 
 export default class App {
-  constructor() {
+  constructor(context) {
     store.subscribe(this.onStoreUpdate.bind(this));
     store.dispatch(appInitialized());
   }
@@ -39,8 +39,16 @@ export default class App {
   onStoreUpdate() {
     const root = store.getState().localState.root
     if (this.currentRoot !== root) {
-      this.currentRoot = root;
-      this.startApp(root);
+      this.currentRoot = root
+
+      Promise.resolve(Navigation.isAppLaunched())
+        .then(appLaunched => {
+          if (appLaunched) {
+            this.startApp(root);
+          } else {
+            new NativeEventsReceiver().appLaunched(() => this.startApp(root));
+          }
+        })
     }
   }
 

@@ -3,6 +3,10 @@ package com.equesteo;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
+import io.invertase.firebase.RNFirebasePackage;
+import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
+import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
 import com.showlocationservicesdialogbox.LocationServicesDialogBoxPackage;
 import com.horcrux.svg.SvgPackage;
 import io.sentry.RNSentryPackage;
@@ -47,7 +51,11 @@ public class MainApplication extends NavigationApplication {
             new PickerPackage(),
             new BackgroundGeolocationPackage(),
             new SvgPackage(),
-            new LocationServicesDialogBoxPackage()
+            new LocationServicesDialogBoxPackage(),
+            new RNFirebasePackage(),
+            new RNFirebaseMessagingPackage(),
+            new RNFirebaseNotificationsPackage(),
+            new ReactNativePushNotificationPackage()
         );
     }
 

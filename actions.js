@@ -1,6 +1,8 @@
 import { AppState, NetInfo } from 'react-native'
 import BackgroundGeolocation from 'react-native-mauron85-background-geolocation-brln'
 import { ENV } from 'react-native-dotenv'
+import firebase from 'react-native-firebase'
+import PushNotification from 'react-native-push-notification'
 
 import { unixTimeNow, generateUUID, staticMap } from "./helpers"
 import { FEED } from './screens'
@@ -167,6 +169,12 @@ function newNetworkState (connectionType, effectiveConnectionType) {
   }
 }
 
+export function photoPersistComplete () {
+  return {
+    type: PHOTO_PERSIST_COMPLETE
+  }
+}
+
 function receiveJWT (token) {
   return {
     type: RECEIVE_JWT,
@@ -178,12 +186,6 @@ export function saveUserID(userID) {
   return {
     type: SAVE_USER_ID,
     userID
-  }
-}
-
-export function photoPersistComplete () {
-  return {
-    type: PHOTO_PERSIST_COMPLETE
   }
 }
 
@@ -290,6 +292,7 @@ export function userUpdated (userData) {
 export function appInitialized () {
   return async (dispatch) => {
     dispatch(findLocalToken())
+    dispatch(checkFCMPermission())
     dispatch(startNetworkTracking())
     dispatch(startAppStateTracking())
   }
@@ -329,6 +332,45 @@ export function getPWCode (email) {
   }
 }
 
+export function getFCMToken () {
+  return async (dispatch, getState) => {
+    let fcmToken
+    try {
+      fcmToken = await firebase.messaging().getToken();
+    } catch (e) {
+      console.log(e)
+    }
+    const localUser = getState().users[getState().localState.userID]
+    if (fcmToken && localUser) {
+      if (fcmToken !== localUser.fcmToken) {
+        const user = {...localUser, fcmToken}
+        dispatch(updateUser(user))
+      } else {
+        console.log('token is the samesies')
+      }
+    } else {
+      console.log(localUser)
+      console.log(fcmToken)
+      throw Error('cant get token or user for some reason')
+    }
+  }
+}
+
+export function checkFCMPermission () {
+  return async () => {
+    const enabled = await firebase.messaging().hasPermission();
+    if (!enabled) {
+      try {
+        await firebase.messaging().requestPermission();
+      } catch (error) {
+        alert('YOU HAVE TO.')
+        throw error
+      }
+    }
+
+  }
+}
+
 export function exchangePWCode (email, code) {
   return async (dispatch) => {
     let userAPI = new UserAPI()
@@ -342,7 +384,8 @@ export function exchangePWCode (email, code) {
       await pouchCouch.localReplicateDB('all', [...following, userID])
       dispatch(receiveJWT(resp.token))
       dispatch(saveUserID(resp.id))
-      dispatch(loadLocalData())
+      await dispatch(loadLocalData())
+      dispatch(getFCMToken())
       await LocalStorage.saveToken(resp.token, resp.id);
     } catch (e) {
       if (e instanceof UnauthorizedError) {
@@ -518,6 +561,7 @@ function findLocalToken () {
       dispatch(saveUserID(storedToken.userID))
       dispatch(setAppRoot('after-login'))
       await dispatch(loadLocalData())
+      dispatch(startListeningFCM())
       dispatch(syncDBPull('all'))
     }
   }
@@ -627,6 +671,39 @@ function startNetworkTracking () {
   }
 }
 
+function startListeningFCM () {
+  return async (dispatch, getState) => {
+    console.log('starting listening')
+    console.log(getState().users[getState().localState.userID].fcmToken)
+    PushNotification.configure({
+      onNotification: (notification) => {
+        alert('clicked')
+      }
+    })
+    firebase.messaging().onTokenRefresh((m) => {
+      console.log('token refresh handler')
+      console.log(m)
+    })
+    firebase.messaging().onMessage(async (m) => {
+      const userID = m._data.userID
+      const rideID = m._data.rideID
+      const distance = m._data.distance
+      const user = getState().users[userID]
+      const message = `${user.firstName} went for a ${distance} mile ride!`
+      await dispatch(syncDBPull('rides'))
+      PushNotification.localNotification({
+        message: message,
+      })
+    })
+    firebase.notifications().onNotificationOpened((m) => {
+      console.log('notification opened')
+      console.log(m)
+    })
+
+
+  }
+}
+
 export function stopLocationTracking () {
   return async (dispatch) => {
     BackgroundGeolocation.stop()
@@ -659,9 +736,10 @@ export function submitLogin (email, password) {
       dispatch(receiveJWT(resp.token))
       dispatch(setAppRoot('after-login'))
       dispatch(saveUserID(resp.id))
-      dispatch(loadLocalData())
-      await LocalStorage.saveToken(resp.token, resp.id);
       dispatch(changeScreen(FEED))
+      await dispatch(loadLocalData())
+      dispatch(getFCMToken())
+      await LocalStorage.saveToken(resp.token, resp.id);
     } catch (e) {
       if (e instanceof UnauthorizedError) {
         dispatch(errorOccurred(e.message))
@@ -683,7 +761,8 @@ export function submitSignup (email, password) {
       dispatch(receiveJWT(resp.token))
       dispatch(setAppRoot('after-login'))
       dispatch(saveUserID(resp.id))
-      dispatch(loadLocalData())
+      await dispatch(loadLocalData())
+      dispatch(getFCMToken())
     } catch (e) {
       if (e instanceof BadRequestError) {
         dispatch(errorOccurred(e.message))
@@ -707,7 +786,6 @@ export function syncDBPull (db) {
     ).map(
       f => f.followerID
     )
-    console.log('followers: ' + followers)
     await pouchCouch.localReplicateDB(db, [...following, userID], followers)
     await dispatch(loadLocalData())
     dispatch(syncComplete())
