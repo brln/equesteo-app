@@ -85,8 +85,8 @@ export default class RideDetails extends Component {
             <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20}}>
               <PhotosByTimestamp
                 photosByID={this.props.photosByID}
-                profilePhotoID={this.props.profilePhotoID}
-                changeProfilePhoto={() => {}}
+                profilePhotoID={this.props.coverPhotoID}
+                changeProfilePhoto={this.props.changeCoverPhoto}
               />
             </CardItem>
 

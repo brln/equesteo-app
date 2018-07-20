@@ -190,14 +190,24 @@ export default class RideCard extends Component {
       </TouchableOpacity>
     )
     if (Object.values(this.props.ride.photosByID).length > 0) {
-      const images = Object.values(this.props.ride.photosByID).map((p) => {
-        return (
+      const images = []
+      let coverImage = null
+      Object.keys(this.props.ride.photosByID).reduce((accum, id) => {
+        const photo = this.props.ride.photosByID[id]
+        const thisImage = (
           <TouchableOpacity onPress={this.showRide} style={{flex: 1}} key="map">
-            <Image style={{height: 200}} key={p.uri} source={{uri: p.uri}} />
+            <Image style={{height: 200}} key={photo.uri} source={{uri: photo.uri}} />
           </TouchableOpacity>
         )
-      })
+        if (id !== this.props.ride.coverPhotoID) {
+          accum.push(thisImage)
+        } else {
+          coverImage = thisImage
+        }
+        return accum
+      }, images)
       images.push(mapImage)
+      images.unshift(coverImage)
       return (
         <Swiper
           loop={false}

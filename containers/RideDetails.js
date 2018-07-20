@@ -36,13 +36,14 @@ class RideDetailsContainer extends NavigatorComponent {
       horseSelected: false,
       userMadeChanges: false
     }
-    this.doneOnPage = this.doneOnPage.bind(this)
-    this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
+    this.changeCoverPhoto = this.changeCoverPhoto.bind(this)
     this.changeHorseID = this.changeHorseID.bind(this)
     this.changeRideName = this.changeRideName.bind(this)
     this.createRide = this.createRide.bind(this)
+    this.doneOnPage = this.doneOnPage.bind(this)
     this.uploadPhoto = this.uploadPhoto.bind(this)
 
+    this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
   }
 
@@ -125,6 +126,17 @@ class RideDetailsContainer extends NavigatorComponent {
     this.doneOnPage()
   }
 
+  changeCoverPhoto (coverPhotoID) {
+    console.log('changing: ' + coverPhotoID)
+    this.setState({
+      ...this.state,
+      ride: {
+        ...this.state.ride,
+        coverPhotoID
+      }
+    })
+  }
+
   uploadPhoto (photoURI) {
     const photoID = generateUUID()
     const newPhotosByID = {...this.state.ride.photosByID}
@@ -143,6 +155,7 @@ class RideDetailsContainer extends NavigatorComponent {
   render() {
     return (
       <RideDetails
+        changeCoverPhoto={this.changeCoverPhoto}
         coverPhotoID={this.state.ride.coverPhotoID}
         photosByID={this.state.ride.photosByID}
         horses={this.props.horses}
