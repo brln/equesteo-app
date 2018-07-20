@@ -18,7 +18,6 @@ import SignupLoginContainer from './containers/SignupLogin'
 import TrainingContainer from './containers/Training'
 import UpdateHorseContainer from './containers/UpdateHorse'
 import UpdateProfileContainer from './containers/UpdateProfile'
-import UpdateRideContainer from './containers/UpdateRide'
 
 export const BARN = 'equesteo.Barn'
 export const DRAWER = 'equesteo.Drawer'
@@ -37,7 +36,6 @@ export const SIGNUP_LOGIN = 'equesteo.SignupLogin'
 export const TRAINING = 'equesteo.Training'
 export const UPDATE_HORSE = 'equesteo.Horse'
 export const UPDATE_PROFILE = 'equesteo.UpdateProfile'
-export const UPDATE_RIDE = 'equesteo.UpdateRide'
 
 export const FEED_DETAILS = {
   screen: FEED,
@@ -66,7 +64,6 @@ export function registerScreens(store, Provider) {
   Navigation.registerComponent(TRAINING, () => TrainingContainer, store, Provider)
   Navigation.registerComponent(UPDATE_HORSE, () => UpdateHorseContainer, store, Provider)
   Navigation.registerComponent(UPDATE_PROFILE, () => UpdateProfileContainer, store, Provider)
-  Navigation.registerComponent(UPDATE_RIDE, () => UpdateRideContainer, store, Provider)
 
   Navigation.registerComponent(NEW_HORSE, () => NewHorse)
 }

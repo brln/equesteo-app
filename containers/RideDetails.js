@@ -7,6 +7,7 @@ import {
   discardRide,
   createRide,
   stopLocationTracking,
+  updateRide,
   uploadRidePhoto
 } from '../actions'
 import { generateUUID, newRideName, unixTimeNow } from '../helpers'
@@ -30,13 +31,10 @@ class RideDetailsContainer extends NavigatorComponent {
 
   constructor (props) {
     super(props)
-    const rideName = newRideName(props.currentRide)
     this.state = {
-      rideName: rideName,
-      horseID: null,
+      ride: null,
       horseSelected: false,
-      photosByID: {},
-      coverPhotoID: null,
+      userMadeChanges: false
     }
     this.doneOnPage = this.doneOnPage.bind(this)
     this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
@@ -48,16 +46,49 @@ class RideDetailsContainer extends NavigatorComponent {
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
   }
 
+  static getDerivedStateFromProps (props, state) {
+    let nextState = null
+    if (!state.ride && props.newRide) {
+      const name = newRideName(props.currentRide)
+      const _id = `${props.userID.toString()}_${(new Date).getTime().toString()}`
+      nextState = {
+        ride: {
+          _id,
+          elapsedTimeSecs: null,
+          horseID: null,
+          name,
+          userID: props.userID,
+          photosByID: {},
+          coverPhotoID: null,
+        },
+        userMadeChanges: true
+      }
+    } else if (!state.ride) {
+      nextState = {
+        ride: props.currentRide
+      }
+    }
+    return nextState
+  }
+
   changeRideName (text) {
     this.setState({
-      rideName: text
+      ...this.state,
+      ride: {
+        ...this.state.ride,
+        name: text
+      }
     })
   }
 
   changeHorseID (horseID) {
     this.setState({
+      ...this.state,
       horseSelected: true,
-      horseID: horseID
+      ride: {
+        ...this.state.ride,
+        horseID
+      }
     })
   }
 
@@ -68,58 +99,58 @@ class RideDetailsContainer extends NavigatorComponent {
 
   onNavigatorEvent (event) {
     if (event.type === 'NavBarButtonPress') {
-      if (event.id === 'save') {
-        this.createRide()
-      } else if (event.id === 'discard') {
-        this.props.dispatch(discardRide())
-        this.doneOnPage()
+      if (this.props.newRide) {
+        if (event.id === 'save') {
+          this.createRide(this.state.ride)
+        } else if (event.id === 'discard') {
+          this.props.dispatch(discardRide())
+          this.doneOnPage()
+        }
+      } else {
+        if (event.id === 'save') {
+          this.props.dispatch(updateRide(this.state.ride))
+        }
+        this.props.navigator.pop()
       }
+
     }
   }
 
   createRide () {
     this.props.dispatch(stopLocationTracking())
-    let horseID = this.state.horseID
-    if (!this.state.horseSelected && this.props.horses.length > 0) {
-      horseID = this.props.horses[0]._id
+    for (let photoID of Object.keys(this.state.ride.photosByID)) {
+      this.props.dispatch(uploadRidePhoto(photoID, this.state.ride.photosByID[photoID].uri, this.state.ride._id))
     }
-    const rideID = `${this.props.userID.toString()}_${(new Date).getTime().toString()}`
-    for (let photoID of Object.keys(this.state.photosByID)) {
-      this.props.dispatch(uploadRidePhoto(photoID, this.state.photosByID[photoID].uri, rideID))
-    }
-    this.props.dispatch(createRide({
-      _id: rideID,
-      elapsedTimeSecs: this.props.elapsedTime,
-      name: this.state.rideName,
-      horseID: horseID,
-      userID: this.props.userID,
-      photosByID: this.state.photosByID,
-      coverPhotoID: this.state.coverPhotoID,
-    }))
+    this.props.dispatch(createRide(this.state.ride))
     this.doneOnPage()
   }
 
   uploadPhoto (photoURI) {
     const photoID = generateUUID()
-    const newPhotosByID = {...this.state.photosByID}
+    const newPhotosByID = {...this.state.ride.photosByID}
     newPhotosByID[photoID] = {uri: photoURI, timestamp: unixTimeNow()}
     this.setState({
-      coverPhotoID: photoID,
-      photosByID: newPhotosByID
+      ...this.state,
+      horseSelected: true,
+      ride: {
+        ...this.state.ride,
+        coverPhotoID: photoID,
+        photosByID: newPhotosByID
+      }
     })
   }
 
   render() {
     return (
       <RideDetails
-        coverPhotoID={this.state.coverPhotoID}
-        photosByID={this.state.photosByID}
+        coverPhotoID={this.state.ride.coverPhotoID}
+        photosByID={this.state.ride.photosByID}
         horses={this.props.horses}
-        horseID={this.state.horseID}
+        horseID={this.state.ride.horseID}
         horseSelected={this.state.horseSelected}
         changeRideName={this.changeRideName}
         changeHorseID={this.changeHorseID}
-        rideName={this.state.rideName}
+        rideName={this.state.ride.name}
         uploadPhoto={this.uploadPhoto}
       />
     )
@@ -127,10 +158,15 @@ class RideDetailsContainer extends NavigatorComponent {
 }
 
 function mapStateToProps (state, ownProps) {
+  const newRide = !ownProps.rideID
+  let currentRide = state.localState.currentRide
+  if (!newRide) {
+    currentRide = state.rides.filter(r => r._id === ownProps.rideID)[0]
+  }
   return {
+    currentRide,
     horses: state.horses.filter((h) => h.userID === state.localState.userID && h.deleted !== true),
-    goodConnection: state.localState.goodConnection,
-    currentRide: state.localState.currentRide,
+    newRide,
     userID: state.localState.userID,
   }
 }

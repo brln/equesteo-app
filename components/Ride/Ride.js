@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 
 import { haversine } from '../../helpers'
-import { MAP, UPDATE_RIDE } from '../../screens'
+import { MAP, RIDE_DETAILS } from '../../screens'
 import PhotosByTimestamp from '../PhotosByTimestamp'
 import SpeedChart from './SpeedChart'
 import Stats from './Stats'
@@ -52,7 +52,7 @@ export default class Ride extends Component {
               if (index === 0) {
                 this.props.navigator.dismissAllModals()
                 this.props.navigator.push({
-                  screen: UPDATE_RIDE,
+                  screen: RIDE_DETAILS,
                   title: 'Update Ride',
                   passProps: {
                     rideID: this.props.ride._id

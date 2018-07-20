@@ -26,10 +26,7 @@ class ProfileContainer extends NavigatorComponent {
   shouldComponentUpdate (nextProps) {
     // When you log out there is no profileUser but it tries to render
     // and blows up.
-    if (!nextProps.profileUser || !nextProps.user ) {
-      return false
-    }
-    return true
+    return !(!nextProps.profileUser || !nextProps.user )
   }
 
   onNavigatorEvent(event) {
