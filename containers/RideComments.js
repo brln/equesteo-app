@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import { createRideComment } from '../actions'
 import { unixTimeNow } from '../helpers'
-import RideComments from '../components/RideComments'
+import RideComments from '../components/RideComments/RideComments'
 import NavigatorComponent from './NavigatorComponent'
 
 class RideCommentsContainer extends NavigatorComponent {
@@ -33,7 +33,7 @@ class RideCommentsContainer extends NavigatorComponent {
 
   onNavigatorEvent (event) {
     if (event.type === 'NavBarButtonPress') {
-      if (event.id === 'submit') {
+      if (event.id === 'submit' && !!this.state.newComment !== false) {
         this.props.dispatch(createRideComment({
           comment: this.state.newComment,
           rideID: this.props.ride._id,
@@ -58,9 +58,15 @@ class RideCommentsContainer extends NavigatorComponent {
 }
 
 function mapStateToProps (state, passedProps) {
+  const rideComments = state.rideComments.filter(
+    (rc) => rc.rideID === passedProps.rideID
+  ).sort(
+    (a, b) => b.timestamp - a.timestamp
+  )
+  console.log(rideComments.map(r => r.timestamp))
   return {
     ride: state.rides.filter((r) => r._id === passedProps.rideID)[0],
-    rideComments: state.rideComments.filter((rc) => rc.rideID === passedProps.rideID),
+    rideComments,
     users: state.users
   }
 }

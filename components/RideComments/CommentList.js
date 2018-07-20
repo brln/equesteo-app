@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import {
-  ListItem,
-  Left,
   Body,
+  Left,
+  ListItem,
   Right,
   Thumbnail,
   Text
@@ -11,15 +11,17 @@ import {
   FlatList,
   ScrollView,
   StyleSheet,
-  TextInput,
-  View
 } from 'react-native';
 import moment from 'moment'
 
-export default class RideComments extends Component {
+export default class CommentList extends Component {
   constructor (props) {
     super(props)
     this.singleComment = this.singleComment.bind(this)
+  }
+
+  shouldComponentUpdate (nextProps) {
+    return this.props.rideComments.length !== nextProps.rideComments.length
   }
 
   commentProfilePhotoURL (user) {
@@ -31,7 +33,8 @@ export default class RideComments extends Component {
     return profilePhotoURL
   }
 
-  singleComment(rideComment) {
+  singleComment({item}) {
+    const rideComment = item
     const commentUser = this.props.users[rideComment.userID]
     return (
       <ListItem avatar key={rideComment._id}>
@@ -39,8 +42,8 @@ export default class RideComments extends Component {
           <Thumbnail source={{ uri: this.commentProfilePhotoURL(commentUser) }} />
         </Left>
         <Body>
-          <Text>{commentUser.firstName || ''} {commentUser.lastName || ''}</Text>
-          <Text note>{rideComment.comment}</Text>
+        <Text>{commentUser.firstName || ''} {commentUser.lastName || ''}</Text>
+        <Text note>{rideComment.comment}</Text>
         </Body>
         <Right>
           <Text note>{moment(rideComment.timestamp).format('MM/DD hh:mm a')}</Text>
@@ -50,32 +53,17 @@ export default class RideComments extends Component {
   }
 
   render() {
+    console.log('rendering CommentList')
     return (
-      <View style={styles.container}>
-        <Text>
-          New Comment:
-        </Text>
-        <TextInput
-          onChangeText={this.props.updateNewComment}
-          value={this.props.newComment}
+      <ScrollView>
+        <FlatList
+          data={this.props.rideComments}
+          keyExtractor={(i) => i._id}
+          renderItem={this.singleComment}
         />
-        <ScrollView>
-          <FlatList>
-            data={this.props.rideComments}
-            keyExtractor={(i) => i._id}
-            renderItem={({item}) => item.sort((a, b) => b.timestamp - a.timestamp).map((rc) => this.singleComment(rc))}}
-          </FlatList>
-        </ScrollView>
-      </View>
+      </ScrollView>
     )
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'stretch',
-    backgroundColor: '#F5FCFF',
-  },
-});
+const styles = StyleSheet.create({});
