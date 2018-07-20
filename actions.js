@@ -346,11 +346,9 @@ export function getFCMToken () {
         const user = {...localUser, fcmToken}
         dispatch(updateUser(user))
       } else {
-        console.log('token is the samesies')
+        console.log('Token unchanged')
       }
     } else {
-      console.log(localUser)
-      console.log(fcmToken)
       throw Error('cant get token or user for some reason')
     }
   }
@@ -673,8 +671,6 @@ function startNetworkTracking () {
 
 function startListeningFCM () {
   return async (dispatch, getState) => {
-    console.log('starting listening')
-    console.log(getState().users[getState().localState.userID].fcmToken)
     PushNotification.configure({
       onNotification: (notification) => {
         alert('clicked')

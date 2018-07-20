@@ -14,7 +14,9 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import isEqual from 'lodash.isequal'
 import moment from 'moment'
+import Swiper from 'react-native-swiper';
 
 import { brand, darkGrey } from '../../colors'
 import { HORSE_PROFILE, PROFILE } from '../../screens'
@@ -27,6 +29,7 @@ export default class RideCard extends Component {
     this.horseProfileURL = this.horseProfileURL.bind(this)
     this.horseAvatar = this.horseAvatar.bind(this)
     this.horseSection = this.horseSection.bind(this)
+    this.renderSwiper = this.renderSwiper.bind(this)
     this.rideTime = this.rideTime.bind(this)
     this.showComments = this.showComments.bind(this)
     this.showRide = this.showRide.bind(this)
@@ -38,11 +41,7 @@ export default class RideCard extends Component {
   }
 
   shouldComponentUpdate (nextProps) {
-    return (this.props.rideComments.length !== nextProps.rideComments.length
-      || this.props.rideCarrots.length !== nextProps.rideCarrots.length
-      || ((nextProps.horse && this.props.horse) && (this.props.horse.profilePhotoID !== nextProps.horse.profilePhotoID))
-      || this.props.ride.name !== nextProps.ride.name
-    )
+    return !isEqual(this.props, nextProps)
   }
 
   toggleCarrot () {
@@ -184,6 +183,36 @@ export default class RideCard extends Component {
     }
   }
 
+  renderSwiper () {
+    const mapImage = (
+      <TouchableOpacity onPress={this.showRide} style={{flex: 1}} key="map">
+        <RideImage uri={this.props.ride.mapURL} />
+      </TouchableOpacity>
+    )
+    if (Object.values(this.props.ride.photosByID).length > 0) {
+      const images = Object.values(this.props.ride.photosByID).map((p) => {
+        return (
+          <TouchableOpacity onPress={this.showRide} style={{flex: 1}} key="map">
+            <Image style={{height: 200}} key={p.uri} source={{uri: p.uri}} />
+          </TouchableOpacity>
+        )
+      })
+      images.push(mapImage)
+      return (
+        <Swiper
+          loop={false}
+          showsPagination={false}
+          showsButtons={true}
+          style={{height: 200}}
+        >
+          { images }
+        </Swiper>
+      )
+    } else {
+      return mapImage
+    }
+  }
+
   render() {
     return (
       <Card>
@@ -230,9 +259,7 @@ export default class RideCard extends Component {
           </View>
         </CardItem>
         <CardItem cardBody>
-          <TouchableOpacity onPress={this.showRide} style={{flex: 1}}>
-            <RideImage uri={this.props.ride.mapURL} />
-          </TouchableOpacity>
+          {this.renderSwiper()}
         </CardItem>
         <CardItem footer>
           <Left>

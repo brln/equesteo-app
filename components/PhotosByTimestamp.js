@@ -12,10 +12,6 @@ import { orange } from '../colors'
 const { width } = Dimensions.get('window')
 
 export default class PhotosByTimestamp extends Component {
-  // @TODO a class very similar to this should be used to
-  // display horses on the RideDetails page, but it needs
-  // to deal with the situation where there are horses with
-  // no profile photos
   constructor (props) {
     super(props)
     this.changeProfilePhoto = this.changeProfilePhoto.bind(this)
