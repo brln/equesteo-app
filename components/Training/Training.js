@@ -97,7 +97,7 @@ export default class Training extends Component {
     return (
       <View style={{flex: 1, borderWidth: 1, borderColor: lightGrey}}>
         <Picker selectedValue={this.state.chosenHorseID} onValueChange={this.pickHorse}>
-          <Picker.Item key="everyone" label="All Horses" value={1} />
+          <Picker.Item key="everyone" label="All Horses" value={this.SHOW_EVERYONE} />
           {
             this.props.horses.filter(h => h.userID === this.props.user._id).map(h => {
               return <Picker.Item key={h._id} label={h.name} value={h._id} />

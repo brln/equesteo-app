@@ -119,6 +119,7 @@ export default class Week extends Component {
     const start = moment(new Date(mondayString))
     let totalDistance = 0.0
     let totalTime = 0
+    let weekHasRides = false
     for (let i = 0; i < 7; i++) {
       const eachDay = moment(start).add(i, 'days')
       const daysRides = []
@@ -135,6 +136,7 @@ export default class Week extends Component {
       if (daysRides.length === 0) {
         days.push(<ZeroDay key={i}/>)
       } else if (daysRides.length === 1) {
+        weekHasRides = true
         days.push(
           <RideDay
             key={i}
@@ -146,6 +148,7 @@ export default class Week extends Component {
           />
         )
       } else if (daysRides.length > 1) {
+        weekHasRides = true
         days.push(
           <MultiRideDay
             key={i}
@@ -158,10 +161,10 @@ export default class Week extends Component {
         )
       }
     }
-    return { days, totalDistance, totalTime }
+    return { days, totalDistance, totalTime, weekHasRides }
   }
 
-  timeString(seconds, style, showSpace=true) {
+  timeString (seconds, style, showSpace=true) {
     const space = showSpace ? ' ' : ''
     const hours = seconds / 3600
     const justHours = Math.floor(hours)
@@ -176,28 +179,32 @@ export default class Week extends Component {
 
   render () {
     const weekData = this.days(this.props.mondayString)
-    return (
-      <View style={{flex: 1, flexDirection: 'column', paddingTop: 10, paddingBottom: 10, marginBottom: 10, backgroundColor: lightGrey}}>
-        <View style={{flex: 1}}>
-          <Text style={{textAlign: 'center'}}>
-            {formattedWeekString(this.props.mondayString)}
-          </Text>
-        </View>
-        <View style={{flex: 1, flexDirection: 'row', marginBottom: 15}}>
-          {weekData.days}
-        </View>
-        <View style={{flex: 1, flexDirection: 'row'}}>
+    if (weekData.weekHasRides) {
+      return (
+        <View style={{flex: 1, flexDirection: 'column', paddingTop: 10, paddingBottom: 10, marginBottom: 10, backgroundColor: lightGrey}}>
           <View style={{flex: 1}}>
-            <Text style={{textAlign: 'center', fontSize: 20}}>{ weekData.totalDistance.toFixed(1) } mi</Text>
-            <Text style={{textAlign: 'center', fontSize: 10}}>DISTANCE</Text>
+            <Text style={{textAlign: 'center'}}>
+              {formattedWeekString(this.props.mondayString)}
+            </Text>
           </View>
-          <View style={{flex: 1}}>
-            {this.timeString(weekData.totalTime, {textAlign: 'center', fontSize: 20})}
-            <Text style={{textAlign: 'center', fontSize: 10}}>TIME</Text>
+          <View style={{flex: 1, flexDirection: 'row', marginBottom: 15}}>
+            {weekData.days}
+          </View>
+          <View style={{flex: 1, flexDirection: 'row'}}>
+            <View style={{flex: 1}}>
+              <Text style={{textAlign: 'center', fontSize: 20}}>{ weekData.totalDistance.toFixed(1) } mi</Text>
+              <Text style={{textAlign: 'center', fontSize: 10}}>DISTANCE</Text>
+            </View>
+            <View style={{flex: 1}}>
+              {this.timeString(weekData.totalTime, {textAlign: 'center', fontSize: 20})}
+              <Text style={{textAlign: 'center', fontSize: 10}}>TIME</Text>
+            </View>
           </View>
         </View>
-      </View>
-    )
+      )
+    } else {
+      return null
+    }
   }
 }
 

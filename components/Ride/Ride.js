@@ -35,6 +35,10 @@ export default class Ride extends Component {
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
   }
 
+  componentWillUnmount() {
+    this.memoizedParse = memoizeOne(this.parseSpeedData)
+  }
+
   onNavigatorEvent(event) {
     if (event.type == 'NavBarButtonPress') {
       if (event.id == 'dropdown') {

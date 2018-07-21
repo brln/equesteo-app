@@ -55,7 +55,7 @@ class RideDetailsContainer extends NavigatorComponent {
       nextState = {
         ride: {
           _id,
-          elapsedTimeSecs: null,
+          elapsedTimeSecs: props.elapsedTime,
           horseID: null,
           name,
           userID: props.userID,

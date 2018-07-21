@@ -685,7 +685,7 @@ function startListeningFCM () {
       const rideID = m._data.rideID
       const distance = m._data.distance
       const user = getState().users[userID]
-      const message = `${user.firstName} went for a ${distance} mile ride!`
+      const message = `${user.firstName} went for a ${distance.toFixed(1)} mile ride!`
       await dispatch(syncDBPull('rides'))
       PushNotification.localNotification({
         message: message,

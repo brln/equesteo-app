@@ -99,20 +99,20 @@ export default class RideCard extends Component {
 
   horseAvatar () {
     const horseProfileURL = this.horseProfileURL()
-    let source
+    let el
     if (horseProfileURL) {
-        source = {uri: horseProfileURL}
+      el = (<Thumbnail
+        small
+        source={{uri: horseProfileURL}}
+      />)
     } else {
-      source = require('../../img/breed.png')
+      el = <Text>{this.props.horse.name || 'None'}</Text>
     }
     return (
       <TouchableOpacity
         onPress={this.showHorseProfile}
       >
-        <Thumbnail
-          small
-          source={source}
-        />
+        {el}
       </TouchableOpacity>
     )
   }
