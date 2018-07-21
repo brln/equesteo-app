@@ -51,7 +51,8 @@ class HorseProfileContainer extends NavigatorComponent {
                   screen: UPDATE_HORSE,
                   title: 'Update Horse',
                   passProps: {
-                    horseID: this.props.horse._id
+                    horseID: this.props.horse._id,
+                    newHorse: false
                   },
                   animationType: 'slide-up',
                 });

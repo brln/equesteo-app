@@ -440,15 +440,17 @@ export function createHorse (horseData) {
     const pouchCouch = new PouchCouch(getState().localState.jwt)
     const newHorse = {
       _id: horseData._id,
-      birthDay: null,
-      birthMonth: null,
-      birthYear: null,
-      description: null,
-      heightHands: null,
-      heightInches: null,
+      breed: horseData.breed,
+      birthDay: horseData.birthDay,
+      birthMonth: horseData.birthMonth,
+      birthYear: horseData.birthYear,
+      description: horseData.description,
+      heightHands: horseData.heightHands,
+      heightInches: horseData.heightInches,
       name: horseData.name,
-      profilePhotoID: null,
-      photosByID: {},
+      profilePhotoID: horseData.profilePhotoID,
+      photosByID: horseData.photosByID,
+      sex: horseData.sex,
       userID: horseData.userID
     }
     const doc = await pouchCouch.saveHorse(newHorse)

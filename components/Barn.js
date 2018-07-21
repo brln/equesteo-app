@@ -11,8 +11,8 @@ import {
 } from 'react-native';
 import { Icon, Fab } from 'native-base';
 
-import { black, brand, green } from '../colors'
-import { NEW_HORSE } from '../screens'
+import { black, brand } from '../colors'
+import { UPDATE_HORSE } from '../screens'
 
 const { width } = Dimensions.get('window')
 
@@ -22,25 +22,17 @@ export default class Barn extends Component {
     super(props)
     this.state = {}
     this.newHorse = this.newHorse.bind(this)
-    this.saveNewHorse = this.saveNewHorse.bind(this)
   }
 
   newHorse () {
-    Navigation.showModal({
-      screen: NEW_HORSE,
+    this.props.navigator.push({
+      screen: UPDATE_HORSE,
       title: 'New Horse',
       animationType: 'slide-up',
       passProps: {
-        saveNewHorse: this.saveNewHorse
+        newHorse: true
       }
     })
-  }
-
-  saveNewHorse (horseData) {
-    Navigation.dismissModal({
-      animationType: 'slide-down'
-    })
-    this.props.saveNewHorse(horseData)
   }
 
   render() {

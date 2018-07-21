@@ -1,7 +1,5 @@
 import { Navigation } from 'react-native-navigation';
 
-import NewHorse from './components/NewHorse'
-
 import BarnContainer from './containers/Barn'
 import DrawerContainer from './containers/Drawer'
 import FeedContainer from './containers/Feed'
@@ -25,7 +23,6 @@ export const FEED = 'equesteo.Feed'
 export const HORSE_PROFILE = 'equesteo.HorseProfile'
 export const FOLLOWING = 'equesteo.Following'
 export const MAP = 'equesteo.Map'
-export const NEW_HORSE = 'equesteo.NewHorse'
 export const PHOTO_LIGHTBOX = 'equesteo.PhotoLightbox'
 export const PROFILE = 'equesteo.Profile'
 export const RECORDER = 'equesteo.Recorder'
@@ -64,7 +61,5 @@ export function registerScreens(store, Provider) {
   Navigation.registerComponent(TRAINING, () => TrainingContainer, store, Provider)
   Navigation.registerComponent(UPDATE_HORSE, () => UpdateHorseContainer, store, Provider)
   Navigation.registerComponent(UPDATE_PROFILE, () => UpdateProfileContainer, store, Provider)
-
-  Navigation.registerComponent(NEW_HORSE, () => NewHorse)
 }
 

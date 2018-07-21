@@ -9,7 +9,6 @@ import { FEED, HORSE_PROFILE } from '../screens'
 class BarnContainer extends NavigatorComponent {
   constructor (props) {
     super(props)
-    this.saveNewHorse = this.saveNewHorse.bind(this)
     this.horseProfile = this.horseProfile.bind(this)
     this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
@@ -38,20 +37,12 @@ class BarnContainer extends NavigatorComponent {
     })
   }
 
-  saveNewHorse (horseData) {
-    this.props.dispatch(createHorse({
-      ...horseData,
-      _id:  `${this.props.userID.toString()}_${(new Date).getTime().toString()}`,
-      userID: this.props.userID
-    }))
-  }
-
   render() {
     return (
       <Barn
         horses={this.props.horses}
         horseProfile={this.horseProfile}
-        saveNewHorse={this.saveNewHorse}
+        navigator={this.props.navigator}
       />
     )
   }

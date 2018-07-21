@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
 import UpdateHorse from '../components/UpdateHorse'
-import { updateHorse } from '../actions'
+import { createHorse, updateHorse } from '../actions'
 import NavigatorComponent from './NavigatorComponent'
 
 class UpdateHorseContainer extends NavigatorComponent {
@@ -24,7 +24,7 @@ class UpdateHorseContainer extends NavigatorComponent {
     }
     this.changeHorseDetails = this.changeHorseDetails.bind(this)
     this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
-    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
+    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent)
   }
 
   static getDerivedStateFromProps (props, state) {
@@ -41,7 +41,15 @@ class UpdateHorseContainer extends NavigatorComponent {
   onNavigatorEvent (event) {
     if (event.type === 'NavBarButtonPress') {
       if (event.id === 'save') {
-        this.props.dispatch(updateHorse(this.state.horseData))
+        if (this.props.newHorse) {
+          this.props.dispatch(createHorse({
+            ...this.state.horseData,
+            _id:  `${this.props.userID.toString()}_${(new Date).getTime().toString()}`,
+            userID: this.props.userID
+          }))
+        } else {
+          this.props.dispatch(updateHorse(this.state.horseData))
+        }
         this.props.navigator.pop()
       }
     }
@@ -72,16 +80,22 @@ class UpdateHorseContainer extends NavigatorComponent {
 }
 
 function mapStateToProps (state, passedProps) {
-  let horseData = null
-  for (let eachHorse of state.horses) {
-    if (eachHorse._id === passedProps.horseID) {
-      horseData = eachHorse
-      break;
+  let horseData = {
+    photosByID: {}
+  }
+  if (passedProps.horseID) {
+    for (let eachHorse of state.horses) {
+      if (eachHorse._id === passedProps.horseID) {
+        horseData = eachHorse
+        break;
+      }
     }
   }
+  console.log(horseData)
   return {
     horseData,
     userID: state.localState.userID,
+    newHorse: passedProps.newHorse
   }
 }
 
