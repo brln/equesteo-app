@@ -92,10 +92,6 @@ export default class PouchCouch {
   // ---END MESSAGE
 
   localReplicateDB(db, userIDs, followerUserIDs) {
-    console.log('userIDs')
-    console.log(userIDs)
-    console.log('followerUserIDs')
-    console.log(followerUserIDs)
     switch(db) {
       case 'horses':
         return this.localReplicateHorses(userIDs)

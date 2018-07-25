@@ -128,6 +128,7 @@ export default function AppReducer(state=initialState, action) {
 
       const allRides = action.localData.rides.reduce((accum, ride) => {
         ride.photosByID = Map(ride.photosByID)
+        ride.rideCoordinates = List(ride.rideCoordinates)
         accum[ride._id] = Map(ride)
         return accum
       }, {})

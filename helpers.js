@@ -165,3 +165,7 @@ export function logError (error) {
 export function logInfo (info) {
   console.log(info)
 }
+
+export function logRender(component) {
+  console.log(component)
+}

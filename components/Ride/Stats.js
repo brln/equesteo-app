@@ -48,11 +48,11 @@ export default class Stats extends PureComponent {
   makeAvgSpeed () {
     return `${(
       this.props.ride.get('distance') / (this.props.ride.get('elapsedTimeSecs') / 3600)
-    ).toFixed(2)} mph`
+    ).toFixed(1)} mph`
   }
 
   makeMaxSpeed () {
-    return `${this.props.maxSpeed.toFixed(2)} mph`
+    return `${this.props.maxSpeed.toFixed(1)} mph`
   }
 
   render () {

@@ -67,7 +67,7 @@ class HorseProfileContainer extends NavigatorComponent {
   }
 
   deleteHorse () {
-    this.props.dispatch(updateHorse({...this.props.horse, deleted: true}))
+    this.props.dispatch(updateHorse(this.props.horse.set('deleted', true)))
     this.props.navigator.pop()
   }
 

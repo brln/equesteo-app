@@ -13,7 +13,7 @@ class MapContainer extends NavigatorComponent {
     console.log('rendering MapContainer')
     return (
       <Map
-        rideCoords={this.props.ride.get('rideCoordinates')}
+        rideCoords={this.props.ride.get('rideCoordinates').toJS()}
       />
     )
   }
@@ -21,7 +21,7 @@ class MapContainer extends NavigatorComponent {
 
 function mapStateToProps (state, passedProps) {
   return {
-    ride: state.getIn(['main', 'rides']).filter(r => r.get('_id') === passedProps.rideID).get(0)
+    ride: state.getIn(['main', 'rides', passedProps.rideID])
   }
 }
 

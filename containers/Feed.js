@@ -7,6 +7,7 @@ import {
   syncDBPull,
   toggleRideCarrot
 } from "../actions";
+import { logRender } from '../helpers'
 import Feed from '../components/Feed/Feed'
 import NavigatorComponent from './NavigatorComponent'
 import { FEED, RIDE_COMMENTS } from '../screens'

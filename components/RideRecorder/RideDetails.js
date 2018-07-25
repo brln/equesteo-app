@@ -55,6 +55,7 @@ export default class RideDetails extends Component {
                 style={{width: '100%'}}
                 value={this.props.rideName}
                 onChangeText={this.changeRideName}
+                selectTextOnFocus={true}
                 underlineColorAndroid={darkBrand}
               />
             </CardItem>
