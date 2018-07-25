@@ -66,18 +66,19 @@ function urlParams (params) {
 export function staticMap (ride) {
   const ROOT_URL = 'https://maps.googleapis.com/maps/api/staticmap?'
   const queryStringParams = {
-      size: '580x350',
+      size: '800x450',
       format: 'png',
       maptype: 'terrain',
   }
   const pathStyle = 'color:0xff0000ff|weight:5'
 
   const MAX_NUM_COORDS = 250 // Google static maps API limit of 8096 chars in URL
-  let nth = ride.rideCoordinates.length / MAX_NUM_COORDS
+  const numCoords = ride.rideCoordinates.count()
+  let nth = numCoords / MAX_NUM_COORDS
   nth = (nth < 1) ? 1 : Math.ceil(nth)
   let pathCoords = ''
-  for (let i = 0; i < ride.rideCoordinates.length; i++) {
-    const coordinate = ride.rideCoordinates[i]
+  for (let i = 0; i < numCoords; i++) {
+    const coordinate = ride.rideCoordinates.get(i)
     if (i % nth === 0) {
       pathCoords += `|${coordinate.latitude},${coordinate.longitude}`
     }
@@ -140,7 +141,7 @@ export function formattedWeekString(monday) {
 
 export function newRideName (currentRide) {
   let name
-  const hour = (new Date(currentRide.startTime)).getHours()
+  const hour = (new Date(currentRide.get('startTime'))).getHours()
   if (hour < 5) {
     name = 'Early Morning Ride'
   } else if (hour < 10) {
@@ -155,4 +156,12 @@ export function newRideName (currentRide) {
     name = 'Night Ride'
   }
   return name
+}
+
+export function logError (error) {
+  console.log(error)
+}
+
+export function logInfo (info) {
+  console.log(info)
 }

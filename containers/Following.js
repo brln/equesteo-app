@@ -20,15 +20,12 @@ class FollowingContainer extends NavigatorComponent {
     }
   }
 
-  shouldComponentUpdate (nextProps) {
-    return !!nextProps.user
-  }
-
   search (phrase) {
     this.props.dispatch(searchForFriends(phrase))
   }
 
   render() {
+    console.log('rendering FollowingContainer')
     return (
       <Following
         navigator={this.props.navigator}
@@ -41,9 +38,11 @@ class FollowingContainer extends NavigatorComponent {
 }
 
 function mapStateToProps (state) {
+  const mainState = state.get('main')
+  const localState = mainState.get('localState')
   return {
-    user: state.users[state.localState.userID],
-    userSearchResults: state.localState.userSearchResults
+    user: mainState.getIn(['users', localState.get('userID')]),
+    userSearchResults: localState.get('userSearchResults')
   }
 }
 

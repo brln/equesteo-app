@@ -3,8 +3,9 @@ import BackgroundGeolocation from 'react-native-mauron85-background-geolocation-
 import { ENV } from 'react-native-dotenv'
 import firebase from 'react-native-firebase'
 import PushNotification from 'react-native-push-notification'
+import { Map, List } from 'immutable'
 
-import { unixTimeNow, generateUUID, staticMap } from "./helpers"
+import { logError, logInfo, unixTimeNow, generateUUID, staticMap } from "./helpers"
 import { FEED } from './screens'
 import { LocalStorage, PouchCouch, UserAPI } from './services'
 import {BadRequestError, NotConnectedError, UnauthorizedError} from "./errors"
@@ -245,11 +246,11 @@ export function startRide(firstCoord) {
   }
   return {
     type: START_RIDE,
-    currentRide: {
-      rideCoordinates: coords,
+    currentRide: Map({
+      rideCoordinates: List(coords),
       distance: 0,
       startTime: unixTimeNow()
-    },
+    }),
   }
 }
 
@@ -300,28 +301,16 @@ export function appInitialized () {
 
 export function changeHorsePhotoData(horseID, photoID, uri) {
   return async (dispatch, getState) => {
-    let horseData = null
-    for (let horse of getState().horses) {
-      if (horse._id === horseID) {
-        horseData = {...horse}
-        break;
-      }
-    }
+    let horse = getState().getIn(['main', 'horses']).get(horseID)
 
     let timestamp = unixTimeNow()
-    if (horseData.photosByID[photoID]) {
-      timestamp = horseData.photosByID[photoID].timestamp
+    if (horse.getIn(['photosByID', photoID])) {
+      timestamp = horse.getIn(['photosByID', photoID, 'timestamp'])
     } else {
-      horseData.profilePhotoID = photoID
+      horse = horse.set('profilePhotoID', photoID)
     }
-
-    const photosClone = {...horseData.photosByID}
-    photosClone[photoID] = {
-      timestamp,
-      uri
-    }
-    horseData.photosByID = photosClone
-    dispatch(saveHorse(horseData))
+    horse = horse.setIn(['photosByID', photoID], {timestamp, uri})
+    dispatch(saveHorse(horse))
   }
 }
 
@@ -338,15 +327,15 @@ export function getFCMToken () {
     try {
       fcmToken = await firebase.messaging().getToken();
     } catch (e) {
-      console.log(e)
+      logError(e)
     }
-    const localUser = getState().users[getState().localState.userID]
+    const currentUserID = getState().getIn(['main', 'localState', 'userID'])
+    const localUser = getState().getIn(['main', 'users']).get(currentUserID)
     if (fcmToken && localUser) {
-      if (fcmToken !== localUser.fcmToken) {
-        const user = {...localUser, fcmToken}
-        dispatch(updateUser(user))
+      if (fcmToken !== localUser.get('fcmToken')) {
+        dispatch(updateUser(localUser.set('fcmToken', fcmToken)))
       } else {
-        console.log('Token unchanged')
+        logInfo('Token unchanged')
       }
     } else {
       throw Error('cant get token or user for some reason')
@@ -395,99 +384,92 @@ export function exchangePWCode (email, code) {
 
 export function changeRidePhotoData(rideID, photoID, uri) {
   return async (dispatch, getState) => {
-    let rideData = null
-    for (let ride of getState().rides) {
-      if (ride._id === rideID) {
-        rideData = {...ride}
-        break
-      }
+    let ride = getState().getIn(['main', 'rides']).get(rideID)
+
+    let timestamp = unixTimeNow()
+    if (ride.getIn(['photosByID', photoID])) {
+      timestamp = ride.getIn(['photosByID', photoID, 'timestamp'])
+    } else {
+      ride = ride.set('profilePhotoID', photoID)
     }
-    const photosClone = {...rideData.photosByID}
-    photosClone[photoID] = {
-      ...photosClone[photoID],
-      uri,
-    }
-    rideData.photosByID = photosClone
-    dispatch(saveRide(rideData))
+    ride = ride.setIn(['photosByID', photoID], {timestamp, uri})
+    dispatch(saveRide(ride))
   }
 }
 
 export function changeUserPhotoData (photoID, uri) {
   return async (dispatch, getState) => {
-    const userID = getState().localState.userID
-    const userDoc = getState().users[userID]
-    const userClone = {...userDoc}
+    const currentUserID = getState().getIn(['main', 'localState', 'userID'])
+    let user = getState().getIn(['main', 'users']).get(currentUserID)
 
     let timestamp = unixTimeNow()
-    if (userClone.photosByID[photoID]) {
-      timestamp = userClone.photosByID[photoID].timestamp
+    if (user.getIn(['photosByID', photoID])) {
+      timestamp = user.getIn(['photosByID', photoID, 'timestamp'])
     } else {
-      userClone.profilePhotoID = photoID
+      user = user.set('profilePhotoID', photoID)
     }
-
-    const photosClone = {...userDoc.photosByID}
-    photosClone[photoID] = {
-      timestamp,
-      uri,
-    }
-    userClone.photosByID = photosClone
-    dispatch(updateUser(userClone))
+    user = user.setIn(['photosByID', photoID], {timestamp, uri})
+    dispatch(updateUser(user))
   }
 }
 
-export function createHorse (horseData) {
+export function createHorse (horse) {
   return async (dispatch, getState) => {
-    const pouchCouch = new PouchCouch(getState().localState.jwt)
+    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const pouchCouch = new PouchCouch(jwt)
     const newHorse = {
-      _id: horseData._id,
-      breed: horseData.breed,
-      birthDay: horseData.birthDay,
-      birthMonth: horseData.birthMonth,
-      birthYear: horseData.birthYear,
-      description: horseData.description,
-      heightHands: horseData.heightHands,
-      heightInches: horseData.heightInches,
-      name: horseData.name,
-      profilePhotoID: horseData.profilePhotoID,
-      photosByID: horseData.photosByID,
-      sex: horseData.sex,
-      userID: horseData.userID
+      _id: horse.get('_id'),
+      breed: horse.get('breed'),
+      birthDay: horse.get('birthDay'),
+      birthMonth: horse.get('birthMonth'),
+      birthYear: horse.get('birthYear'),
+      description: horse.get('description'),
+      heightHands: horse.get('heightHands'),
+      heightInches: horse.get('heightInches'),
+      name: horse.get('name'),
+      profilePhotoID: horse.get('profilePhotoID'),
+      photosByID: horse.get('photosByID'),
+      sex: horse.get('sex'),
+      userID: horse.get('userID'),
+      createTime: unixTimeNow(),
+      type: 'horse'
     }
     const doc = await pouchCouch.saveHorse(newHorse)
-    dispatch(horseCreated({...newHorse, _rev: doc.rev}))
+    dispatch(horseCreated(Map({...newHorse, _rev: doc.rev})))
     dispatch(needsRemotePersist('horses'))
   }
 }
 
 export function createRide (rideData) {
   return async (dispatch, getState) => {
-    const pouchCouch = new PouchCouch()
-    const currentRide = getState().localState.currentRide
+    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const pouchCouch = new PouchCouch(jwt)
+    const currentRide = getState().getIn(['main', 'localState', 'currentRide'])
     const theRide = {
-      ...getState().localState.currentRide,
-      rideCoordinates: currentRide.rideCoordinates,
-      distance: currentRide.distance,
-      startTime: currentRide.startTime,
-      _id: rideData._id,
-      elapsedTimeSecs: rideData.elapsedTimeSecs,
-      name: rideData.name,
-      horseID: rideData.horseID,
-      userID: rideData.userID,
-      photosByID: rideData.photosByID,
-      coverPhotoID: rideData.coverPhotoID,
+      rideCoordinates: currentRide.get('rideCoordinates'),
+      distance: currentRide.get('distance'),
+      startTime: currentRide.get('startTime'),
+      _id: rideData.get('_id'),
+      elapsedTimeSecs: rideData.get('elapsedTimeSecs'),
+      name: rideData.get('name'),
+      horseID: rideData.get('horseID'),
+      userID: rideData.get('userID'),
+      photosByID: rideData.get('photosByID'),
+      coverPhotoID: rideData.get('coverPhotoID'),
       type: 'ride',
     }
     theRide.mapURL = staticMap(theRide)
     const doc = await pouchCouch.saveRide(theRide)
-    dispatch(rideCreated({...theRide, _id: doc.id, _rev: doc.rev}))
+    dispatch(rideCreated(Map({...theRide, _rev: doc.rev})))
     dispatch(needsRemotePersist('rides'))
   }
 }
 
 export function createRideComment(commentData) {
   return async (dispatch, getState) => {
-    const pouchCouch = new PouchCouch(getState().localState.jwt)
-    const currentUserID = getState().localState.userID
+    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const pouchCouch = new PouchCouch(jwt)
+    const currentUserID = getState().getIn(['main', 'localState', 'userID'])
     const commentID = `${currentUserID}_${(new Date).getTime().toString()}`
     const newComment = {
       _id: commentID,
@@ -499,33 +481,31 @@ export function createRideComment(commentData) {
       timestamp: commentData.timestamp
     }
     const doc = await pouchCouch.saveRide(newComment)
-    dispatch(rideCommentCreated({...newComment, _rev: doc.rev}))
+    dispatch(rideCommentCreated(Map(newComment).set('_rev', doc.rev)))
     dispatch(needsRemotePersist('rides'))
   }
 }
 
 export function createFollow (followingID) {
   return async (dispatch, getState) => {
-    const userID = getState().localState.userID
-    const followRecordID = `${userID}_${followingID}`
-
-    let followingDoc = {
-      _id: followRecordID,
-      followingID,
-      followerID: userID,
-      deleted: false,
-      type: "follow"
+    const userID = getState().getIn(['main', 'localState', 'userID'])
+    const followID = `${userID}_${followingID}`
+    let found = getState().getIn(['main', 'follows', followID])
+    if (!found) {
+      found = Map({
+        _id: followID,
+        followingID,
+        followerID: userID,
+        deleted: false,
+        type: "follow"
+      })
+    } else {
+      found = found.set('deleted', false)
     }
-    for (let followID of Object.keys(getState().follows)) {
-      const followRecord = getState().follows[followID]
-      if (followID === followRecordID) {
-        followingDoc = {...followRecord, deleted: false}
-      }
-    }
-
-    const pouchCouch = new PouchCouch(getState().localState.jwt)
-    const doc = await pouchCouch.saveUser(followingDoc)
-    await dispatch(followUpdated({...followingDoc, _rev: doc.rev}))
+    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const pouchCouch = new PouchCouch(jwt)
+    const doc = await pouchCouch.saveUser(found.toJS())
+    await dispatch(followUpdated(found.set('_rev', doc.rev)))
     dispatch(needsRemotePersist('users'))
     dispatch(syncDBPull('all'))
   }
@@ -533,22 +513,14 @@ export function createFollow (followingID) {
 
 export function deleteFollow (followingID) {
   return async (dispatch, getState) => {
-    const userID = getState().localState.userID
-    const followRecordID = `${userID}_${followingID}`
-    let followingDoc
-    for (let followID of Object.keys(getState().follows)) {
-      const followRecord = getState().follows[followID]
-      if (followID === followRecordID) {
-        followingDoc = {...followRecord, deleted: true}
-      }
-    }
-    if (!followingDoc) {
-      throw Error('should have found a following doc')
-    }
+    const userID = getState().getIn(['main', 'localState', 'userID'])
+    const followID = `${userID}_${followingID}`
+    let found = getState().getIn(['main', 'follows', followID]).set('deleted', true)
 
-    const pouchCouch = new PouchCouch(getState().localState.jwt)
-    const doc = await pouchCouch.saveUser(followingDoc)
-    dispatch(followUpdated({...followingDoc, _rev: doc.rev}))
+    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const pouchCouch = new PouchCouch(jwt)
+    const doc = await pouchCouch.saveUser(found.toJS())
+    await dispatch(followUpdated(found.set('_rev', doc.rev)))
     dispatch(needsRemotePersist('users'))
   }
 }
@@ -569,7 +541,8 @@ function findLocalToken () {
 
 function loadLocalData () {
   return async (dispatch, getState) => {
-    const pouchCouch = new PouchCouch(getState().localState.jwt)
+    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const pouchCouch = new PouchCouch(jwt)
     const localData = await pouchCouch.localLoad()
     dispatch(localDataLoaded(localData))
   }
@@ -577,24 +550,26 @@ function loadLocalData () {
 
 export function newPassword (password) {
   return async (dispatch, getState) => {
-    const userAPI = new UserAPI(getState().localState.jwt)
+    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const userAPI = new UserAPI(jwt)
     try {
       await userAPI.changePassword(password)
       dispatch((setAppRoot('after-login')))
     } catch (e) {
-      console.log(e)
+      logError(e)
     }
   }
 }
 
 export function searchForFriends (phrase) {
   return async (dispatch, getState) => {
-    const userAPI = new UserAPI(getState().localState.jwt)
+    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const userAPI = new UserAPI(jwt)
     try {
       const resp = await userAPI.findUser(phrase)
       dispatch(userSearchReturned(resp))
     } catch (e) {
-      console.log(e)
+      logError(e)
     }
   }
 }
@@ -602,17 +577,18 @@ export function searchForFriends (phrase) {
 export function saveRide (rideData) {
   return async (dispatch) => {
     const pouchCouch = new PouchCouch()
-    const doc = await pouchCouch.saveRide(rideData)
-    dispatch(rideSaved({...rideData, _rev: doc.rev}))
+    const doc = await pouchCouch.saveRide(rideData.toJS())
+    dispatch(rideSaved(rideData.set('_rev', doc.rev)))
     dispatch(needsRemotePersist('rides'))
   }
 }
 
-export function saveHorse (horseData) {
+export function saveHorse (horse) {
   return async (dispatch) => {
+    console.log('saving horse')
     const pouchCouch = new PouchCouch()
-    const doc = await pouchCouch.saveHorse(horseData)
-    dispatch(horseSaved({...horseData, _rev: doc.rev}))
+    const doc = await pouchCouch.saveHorse(horse.toJS())
+    dispatch(horseSaved(horse.set('_rev', doc.rev)))
     dispatch(needsRemotePersist('horses'))
   }
 }
@@ -679,8 +655,8 @@ function startListeningFCM () {
       }
     })
     firebase.messaging().onTokenRefresh((m) => {
-      console.log('token refresh handler')
-      console.log(m)
+      logInfo('token refresh handler')
+      logInfo(m)
     })
     firebase.messaging().onMessage(async (m) => {
       const userID = m._data.userID
@@ -694,8 +670,8 @@ function startListeningFCM () {
       })
     })
     firebase.notifications().onNotificationOpened((m) => {
-      console.log('notification opened')
-      console.log(m)
+      logInfo('notification opened')
+      logInfo(m)
     })
 
 
@@ -771,20 +747,23 @@ export function submitSignup (email, password) {
 
 export function syncDBPull (db) {
   return async (dispatch, getState) => {
-    const pouchCouch = new PouchCouch(getState().localState.jwt)
-    const userID = getState().localState.userID
-    const following = Object.values(getState().follows).filter(
-      f => !f.deleted && f.followerID === userID
+    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const pouchCouch = new PouchCouch(jwt)
+    const userID = getState().getIn(['main', 'localState', 'userID'])
+    const follows = getState().getIn(['main', 'follows'])
+    const following = follows.valueSeq().filter(
+      _, f => !f.get('deleted') && f.get('followerID') === userID
     ).map(
-      f => f.followingID
-    )
+      f => f.get('followingID')
+    ).toJS()
 
-    const followers = Object.values(getState().follows).filter(
-      f => !f.deleted && f.followingID === userID
+    const followers = follows.valueSeq().filter(
+      f => !f.get('deleted') && f.get('followingID') === userID
     ).map(
-      f => f.followerID
-    )
-    await pouchCouch.localReplicateDB(db, [...following, userID], followers)
+      f => f.get('followerID')
+    ).toJS()
+    following.push(userID)
+    await pouchCouch.localReplicateDB(db, following, followers)
     await dispatch(loadLocalData())
     dispatch(syncComplete())
   }
@@ -792,16 +771,17 @@ export function syncDBPull (db) {
 
 export function toggleRideCarrot (rideID) {
   return async (dispatch, getState) => {
-    const pouchCouch = new PouchCouch(getState().localState.jwt)
-    const currentUserID = getState().localState.userID
-    let existing = getState().rideCarrots.filter((c) => {
-      return c.rideID === rideID && c.userID === currentUserID
+    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const pouchCouch = new PouchCouch(jwt)
+    const currentUserID = getState().getIn(['main', 'localState', 'userID'])
+    let existing = getState().getIn(['main', 'rideCarrots']).valueSeq().filter((c) => {
+      return c.get('rideID') === rideID && c.get('userID') === currentUserID
     })
-    existing = existing.length > 0 ? existing[0] : null
+    existing = existing.count() > 0 ? existing.get(0) : null
     if (existing) {
-      let toggled = {...existing, deleted: !existing.deleted}
-      const doc = await pouchCouch.saveRide(toggled)
-      dispatch(rideCarrotSaved({...toggled, _rev: doc.rev}))
+      let toggled = existing.set('deleted', !existing.get('deleted'))
+      const doc = await pouchCouch.saveRide(toggled.toJS())
+      dispatch(rideCarrotSaved(toggled.set('_rev', doc.rev)))
     } else {
       const carrotID = `${currentUserID}_${(new Date).getTime().toString()}`
       const newCarrot = {
@@ -813,7 +793,7 @@ export function toggleRideCarrot (rideID) {
       }
 
       const doc = await pouchCouch.saveRide(newCarrot)
-      dispatch(rideCarrotCreated({...newCarrot, _rev: doc.rev}))
+      dispatch(rideCarrotCreated(Map(newCarrot).set('_rev', doc.rev)))
     }
     dispatch(needsRemotePersist('rides'))
   }
@@ -821,27 +801,30 @@ export function toggleRideCarrot (rideID) {
 
 export function updateHorse (horseDetails) {
   return async (dispatch, getState) => {
-    const pouchCouch = new PouchCouch(getState().localState.jwt)
-    const doc = await pouchCouch.saveHorse(horseDetails)
-    dispatch(horseSaved({...horseDetails, _rev: doc.rev}))
+    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const pouchCouch = new PouchCouch(jwt)
+    const doc = await pouchCouch.saveHorse(horseDetails.toJS())
+    dispatch(horseSaved(horseDetails.set('_rev', doc.rev)))
     dispatch(needsRemotePersist('horses'))
   }
 }
 
 export function updateRide (rideDetails) {
   return async (dispatch, getState) => {
-    const pouchCouch = new PouchCouch(getState().localState.jwt)
-    const doc = await pouchCouch.saveRide(rideDetails)
-    dispatch(rideSaved({...rideDetails, _rev: doc.rev}))
+    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const pouchCouch = new PouchCouch(jwt)
+    const doc = await pouchCouch.saveRide(rideDetails.toJS())
+    dispatch(rideSaved(rideDetails.set('_rev', doc.rev)))
     dispatch(needsRemotePersist('rides'))
   }
 }
 
 export function updateUser (userDetails) {
   return async (dispatch, getState) => {
-    const pouchCouch = new PouchCouch(getState().localState.jwt)
-    const doc = await pouchCouch.saveUser(userDetails)
-    dispatch(userUpdated({...userDetails, _rev: doc.rev}))
+    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const pouchCouch = new PouchCouch(jwt)
+    const doc = await pouchCouch.saveUser(userDetails.toJS())
+    dispatch(userUpdated(userDetails.set('_rev', doc.rev)))
     dispatch(needsRemotePersist('users'))
   }
 }
@@ -849,7 +832,7 @@ export function updateUser (userDetails) {
 export function uploadHorsePhoto (photoLocation, horseID) {
   return async (dispatch) => {
     const photoID = generateUUID()
-    dispatch(changeHorsePhotoData(horseID, photoID, photoLocation, false))
+    dispatch(changeHorsePhotoData(horseID, photoID, photoLocation))
     enqueueHorsePhoto(photoLocation, photoID, horseID)
     dispatch(needsPhotoUpload('horse'))
   }

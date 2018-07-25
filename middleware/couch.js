@@ -1,4 +1,5 @@
 import { clearState, remotePersistComplete } from '../actions'
+import { logInfo, logError } from '../helpers'
 import { PouchCouch } from '../services/index'
 
 let queue = []
@@ -6,12 +7,17 @@ let savingRemotely = false
 
 export default storeToCouch = store => dispatch => action => {
   dispatch(action)
-  let currentState = store.getState()
-  const needsPersist = Object.values(currentState.localState.needsRemotePersist).filter((x) => x).length > 0
-  if (needsPersist && currentState.localState.jwt && currentState.localState.goodConnection) {
-    const pouchCouch = new PouchCouch(currentState.localState.jwt)
-    for (let db of Object.keys(currentState.localState.needsRemotePersist)) {
-      if (currentState.localState.needsRemotePersist[db]) {
+  const currentState = store.getState().get('main')
+  const localState = currentState.get('localState')
+  const needsPersist = localState.get('needsRemotePersist')
+  const needsAnyPersist = needsPersist.valueSeq().filter(x => x).count() > 0
+  const jwt = localState.get('jwt')
+  const goodConnection = localState.get('goodConnection')
+  const clearStateAfterPersist = localState.get('clearStateAfterPersist')
+  if (needsAnyPersist && jwt && goodConnection) {
+    const pouchCouch = new PouchCouch(jwt)
+    for (let db of needsPersist.keySeq()) {
+      if (needsPersist.get(db)) {
         if (savingRemotely) {
           queue.push(db)
         } else {
@@ -19,7 +25,7 @@ export default storeToCouch = store => dispatch => action => {
         }
       }
     }
-  } else if (!needsPersist && currentState.localState.clearStateAfterPersist) {
+  } else if (!needsAnyPersist && clearStateAfterPersist) {
     store.dispatch(clearState())
   }
 }
@@ -37,15 +43,16 @@ function remotePersist (db, store, pouchCouch) {
     } else {
       store.dispatch(remotePersistComplete(db))
       savingRemotely = false
-      if (store.getState().localState.clearStateAfterPersist) {
+      const clear = store.getState().getIn(['main', 'localState', 'clearStateAfterPersist'])
+      if (clear) {
         store.dispatch(clearState())
       }
     }
   }).on('error', (e) => {
     queue = []
     savingRemotely = false
-    console.log('Remote replication error follows: ')
-    console.log(e)
+    logInfo('Remote replication error follows: ')
+    logError(e)
   })
 }
 

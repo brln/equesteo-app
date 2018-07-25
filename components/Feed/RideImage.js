@@ -11,7 +11,7 @@ export default class RideImage extends PureComponent {
     return (
       <Image
         source={{uri: uriWithKey}}
-        style={{height: 200, width: null, flex: 1}}
+        style={{height: this.props.height, width: null, flex: 1}}
       />
     )
   }

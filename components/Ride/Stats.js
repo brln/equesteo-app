@@ -26,28 +26,28 @@ export default class Stats extends PureComponent {
   whichHorse () {
     let found = null
     for (let horse of this.props.horses) {
-      if (horse._id === this.props.ride.horseID) {
+      if (horse.get('_id') === this.props.ride.get('horseID')) {
         found = horse
       }
     }
-    return found ? found.name : 'none'
+    return found ? found.get('name') : 'none'
   }
 
   makeTimeRiding () {
-    return moment.utc(this.props.ride.elapsedTimeSecs * 1000).format('HH:mm:ss')
+    return moment.utc(this.props.ride.get('elapsedTimeSecs') * 1000).format('HH:mm:ss')
   }
 
   makeStartTime () {
-    return moment(this.props.ride.startTime).format('h:mm a')
+    return moment(this.props.ride.get('startTime')).format('h:mm a')
   }
 
   makeDistance () {
-    return `${this.props.ride.distance.toFixed(2)} mi`
+    return `${this.props.ride.get('distance').toFixed(2)} mi`
   }
 
   makeAvgSpeed () {
     return `${(
-      this.props.ride.distance / (this.props.ride.elapsedTimeSecs / 3600)
+      this.props.ride.get('distance') / (this.props.ride.get('elapsedTimeSecs') / 3600)
     ).toFixed(2)} mph`
   }
 

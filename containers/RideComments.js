@@ -1,3 +1,4 @@
+import { Map } from 'immutable'
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
@@ -36,7 +37,7 @@ class RideCommentsContainer extends NavigatorComponent {
       if (event.id === 'submit' && !!this.state.newComment !== false) {
         this.props.dispatch(createRideComment({
           comment: this.state.newComment,
-          rideID: this.props.ride._id,
+          rideID: this.props.ride.get('_id'),
           timestamp: unixTimeNow()
         }))
         this.setState({newComment: null})
@@ -58,16 +59,15 @@ class RideCommentsContainer extends NavigatorComponent {
 }
 
 function mapStateToProps (state, passedProps) {
-  const rideComments = state.rideComments.filter(
-    (rc) => rc.rideID === passedProps.rideID
+  const rideComments = state.getIn(['main', 'rideComments']).valueSeq().filter(
+    (rc) => rc.get('rideID') === passedProps.rideID
   ).sort(
-    (a, b) => b.timestamp - a.timestamp
-  )
-  console.log(rideComments.map(r => r.timestamp))
+    (a, b) => b.get('timestamp') - a.get('timestamp')
+  ).toList()
   return {
-    ride: state.rides.filter((r) => r._id === passedProps.rideID)[0],
+    ride: state.getIn(['main', 'rides', passedProps.rideID]),
     rideComments,
-    users: state.users
+    users: state.getIn(['main', 'users'])
   }
 }
 

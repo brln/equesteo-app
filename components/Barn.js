@@ -54,8 +54,8 @@ export default class Barn extends Component {
             {
               [...this.props.horses.map((horse, i) => {
                 let source = require('../img/emptyHorseBlack.png')
-                if (horse.profilePhotoID) {
-                  source = {uri: horse.photosByID[horse.profilePhotoID].uri}
+                if (horse.get('profilePhotoID')) {
+                  source = {uri: horse.getIn(['photosByID', horse.get('profilePhotoID')]).uri}
                 }
                 return (
                   <View key={i} elevation={5} style={{
@@ -101,7 +101,7 @@ export default class Barn extends Component {
                               textShadowOffset: {
                                 width: -1,
                                 height: 1
-                              }}}>{horse.name}</Text>
+                              }}}>{horse.get('name')}</Text>
                           </View>
                         </View>
                       </View>

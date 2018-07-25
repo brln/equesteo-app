@@ -1,6 +1,7 @@
 import PouchDB from 'pouchdb-react-native'
 import { API_URL } from 'react-native-dotenv'
 
+import { logInfo, logError } from '../helpers'
 
 export default class PouchCouch {
   constructor (jwt) {
@@ -22,9 +23,8 @@ export default class PouchCouch {
   }
 
   catchError (e) {
-    console.log("ERROR TO FOLLOW: ")
-    console.log(e)
-    debugger
+    logInfo("ERROR TO FOLLOW: ")
+    logError(e)
     throw e
   }
 
@@ -33,19 +33,31 @@ export default class PouchCouch {
   }
 
   saveHorse (horseData) {
-    return this.localHorsesDB.put(horseData).catch(this.catchError)
+    return this.localHorsesDB.put(horseData).catch((e) => {
+      console.log('error saving horse')
+      this.catchError(e)
+    })
   }
 
   saveRide (rideData) {
-    return this.localRidesDB.put(rideData).catch(this.catchError)
+    return this.localRidesDB.put(rideData).catch((e) => {
+      console.log('error saving ride')
+      this.catchError(e)
+    })
   }
 
   saveUser (userData) {
-    return this.localUsersDB.put(userData).catch(this.catchError)
+    return this.localUsersDB.put(userData).catch((e) => {
+      console.log('error saving user')
+      this.catchError(e)
+    })
   }
 
   deleteRide (id, rev) {
-    return this.localRidesDB.remove(id, rev).catch(this.catchError)
+    return this.localRidesDB.remove(id, rev).catch((e) => {
+      console.log('error deleting ride')
+      this.catchError(e)
+    })
   }
 
   remoteReplicateDB(db) {
@@ -80,6 +92,10 @@ export default class PouchCouch {
   // ---END MESSAGE
 
   localReplicateDB(db, userIDs, followerUserIDs) {
+    console.log('userIDs')
+    console.log(userIDs)
+    console.log('followerUserIDs')
+    console.log(followerUserIDs)
     switch(db) {
       case 'horses':
         return this.localReplicateHorses(userIDs)
@@ -113,7 +129,7 @@ export default class PouchCouch {
       ).on('complete', () => {
         resolve()
       }).on('error', (e) => {
-        console.log(e)
+        logError(e)
         reject()
       })
     })
@@ -132,7 +148,7 @@ export default class PouchCouch {
       ).on('complete', () => {
           resolve()
       }).on('error', (e) => {
-        console.log(e)
+        logError(e)
         reject()
       })
     })
@@ -151,7 +167,7 @@ export default class PouchCouch {
       ).on('complete', () => {
         resolve()
       }).on('error', (e) => {
-        console.log(e)
+        logError(e)
         reject()
       })
     })

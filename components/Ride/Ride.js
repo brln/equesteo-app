@@ -59,7 +59,7 @@ export default class Ride extends Component {
                   screen: RIDE_DETAILS,
                   title: 'Update Ride',
                   passProps: {
-                    rideID: this.props.ride._id
+                    rideID: this.props.ride.get('_id')
                   },
                   navigatorStyle: {},
                   navigatorButtons: {},
@@ -127,7 +127,7 @@ export default class Ride extends Component {
       title: 'Map',
       animationType: 'slide-up',
       passProps: {
-        rideID: this.props.ride._id
+        rideID: this.props.ride.get('_id')
       }
     })
   }
@@ -145,8 +145,8 @@ export default class Ride extends Component {
 
   render () {
     let speedChart = <Text>Not enough points for Speed Chart</Text>
-    let speedData = this.memoizedParse(this.props.ride.rideCoordinates)
-    if (this.props.ride.rideCoordinates.length > 2) {
+    let speedData = this.memoizedParse(this.props.ride.get('rideCoordinates'))
+    if (this.props.ride.get('rideCoordinates').length > 2) {
       speedChart = (
         <View style={styles.slide}>
           <SpeedChart
@@ -164,14 +164,14 @@ export default class Ride extends Component {
           text={"Are you sure you want to delete this ride?"}
         />
         <View style={{flex: 1}}>
-          <View style={{height: ((height / 2) - 20)}}>
+          <View style={{height: (width * 9 / 16) + 20}}>
             <Swiper
               loop={false}
             >
               <TouchableWithoutFeedback style={styles.slide}
                 onPress={this.fullscreenMap}
               >
-                <Image style={styles.image} source={{uri: this.props.ride.mapURL }} />
+                <Image style={styles.image} source={{uri: this.props.ride.get('mapURL') }} />
               </TouchableWithoutFeedback>
               { speedChart }
             </Swiper>
@@ -183,8 +183,8 @@ export default class Ride extends Component {
               maxSpeed={speedData.maxSpeed}
             />
             <PhotosByTimestamp
-              photosByID={this.props.ride.photosByID}
-              profilePhotoID={this.props.ride.profilePhotoID}
+              photosByID={this.props.ride.get('photosByID')}
+              profilePhotoID={this.props.ride.get('profilePhotoID')}
               changeProfilePhoto={() => {}}
             />
           </View>

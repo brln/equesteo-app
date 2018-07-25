@@ -17,38 +17,37 @@ import PhotosByTimestamp from './PhotosByTimestamp'
 export default class UpdateProfile extends Component {
   constructor (props) {
     super(props)
+    this.inputs = {}
     this.changeFirstName = this.changeFirstName.bind(this)
     this.changeLastName = this.changeLastName.bind(this)
     this.changeAboutMe = this.changeAboutMe.bind(this)
     this.changeProfilePhotoID = this.changeProfilePhotoID.bind(this)
+    this.moveToLastName = this.moveToLastName.bind(this)
+    this.moveToAboutMe = this.moveToAboutMe.bind(this)
+  }
+
+  moveToLastName () {
+    this.inputs['lastName'].focus()
+  }
+
+  moveToAboutMe () {
+    this.inputs['aboutMe'].focus()
   }
 
   changeFirstName (newText) {
-    this.props.changeAccountDetails({
-      ...this.props.user,
-      firstName: newText
-    })
+    this.props.changeAccountDetails(this.props.user.set('firstName', newText))
   }
 
   changeLastName (newText) {
-    this.props.changeAccountDetails({
-      ...this.props.user,
-      lastName: newText
-    })
+    this.props.changeAccountDetails(this.props.user.set('lastName', newText))
   }
 
   changeProfilePhotoID (profilePhotoID) {
-    this.props.changeAccountDetails({
-      ...this.props.user,
-      profilePhotoID
-    })
+    this.props.changeAccountDetails(this.props.user.set('profilePhotoID', profilePhotoID))
   }
 
   changeAboutMe (newText) {
-    this.props.changeAccountDetails({
-      ...this.props.user,
-      aboutMe: newText
-    })
+    this.props.changeAccountDetails(this.props.user.set('aboutMe', newText))
   }
 
   render() {
@@ -66,7 +65,9 @@ export default class UpdateProfile extends Component {
                   style={{width: '100%'}}
                   underlineColorAndroid={darkBrand}
                   onChangeText={this.changeFirstName}
-                  value={this.props.user.firstName}
+                  value={this.props.user.get('firstName')}
+                  ref={(i) => this.inputs['firstName'] = i}
+                  onSubmitEditing={this.moveToLastName}
                 />
               </CardItem>
 
@@ -79,7 +80,9 @@ export default class UpdateProfile extends Component {
                   style={{width: '100%'}}
                   underlineColorAndroid={darkBrand}
                   onChangeText={this.changeLastName}
-                  value={this.props.user.lastName}
+                  value={this.props.user.get('lastName')}
+                  ref={(i) => this.inputs['lastName'] = i}
+                  onSubmitEditing={this.moveToAboutMe}
                 />
               </CardItem>
 
@@ -92,7 +95,8 @@ export default class UpdateProfile extends Component {
                   style={{width: '100%'}}
                   underlineColorAndroid={darkBrand}
                   onChangeText={this.changeAboutMe}
-                  value={this.props.user.aboutMe}
+                  value={this.props.user.get('aboutMe')}
+                  ref={(i) => this.inputs['aboutMe'] = i}
                 />
               </CardItem>
             </Card>
@@ -104,8 +108,8 @@ export default class UpdateProfile extends Component {
               <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
                 <PhotosByTimestamp
                   changeProfilePhoto={this.changeProfilePhotoID}
-                  photosByID={this.props.user.photosByID}
-                  profilePhotoID={this.props.user.profilePhotoID}
+                  photosByID={this.props.user.get('photosByID')}
+                  profilePhotoID={this.props.user.get('profilePhotoID')}
                 />
               </CardItem>
             </Card>

@@ -1,7 +1,6 @@
 import { API_URL } from 'react-native-dotenv'
 import {BadRequestError, UnauthorizedError, NotConnectedError} from '../errors'
 
-
 export default class ApiClient {
   DELETE = 'delete'
   GET = 'get'

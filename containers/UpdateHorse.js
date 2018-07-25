@@ -1,3 +1,4 @@
+import { Map } from 'immutable'
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
@@ -20,7 +21,7 @@ class UpdateHorseContainer extends NavigatorComponent {
     super(props)
     this.state = {
       userMadeChanges: false,
-      horseData: null,
+      horse: null,
     }
     this.changeHorseDetails = this.changeHorseDetails.bind(this)
     this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
@@ -29,9 +30,9 @@ class UpdateHorseContainer extends NavigatorComponent {
 
   static getDerivedStateFromProps (props, state) {
     let nextState = null
-    if (!state.horseData || props.horseData._rev !== state.horseData._rev) {
+    if (!state.horse || props.horse._rev !== state.horse._rev) {
       nextState = {
-        horseData: props.horseData,
+        horse: props.horse,
         userMadeChanges: false
       }
     }
@@ -42,13 +43,15 @@ class UpdateHorseContainer extends NavigatorComponent {
     if (event.type === 'NavBarButtonPress') {
       if (event.id === 'save') {
         if (this.props.newHorse) {
-          this.props.dispatch(createHorse({
-            ...this.state.horseData,
+          const newProps = Map({
             _id:  `${this.props.userID.toString()}_${(new Date).getTime().toString()}`,
             userID: this.props.userID
-          }))
+          })
+          const withNewProps = this.state.horse.merge(newProps)
+          console.log(withNewProps)
+          this.props.dispatch(createHorse(withNewProps))
         } else {
-          this.props.dispatch(updateHorse(this.state.horseData))
+          this.props.dispatch(updateHorse(this.state.horse))
         }
         this.props.navigator.pop()
       }
@@ -56,20 +59,21 @@ class UpdateHorseContainer extends NavigatorComponent {
   }
 
   changeHorseDetails (newDetails) {
-    const newData = { ...this.state.horseData, ...newDetails }
+    const newHorse = this.state.horse.merge(newDetails)
     this.setState({
       userMadeChanges: true,
-      horseData: newData
+      horse: newHorse
     })
   }
 
   render() {
+    console.log('rendering UpdateHorseContainer')
     return (
       <UpdateHorse
         changeHorseDetails={this.changeHorseDetails}
         closeDeleteModal={this.closeDeleteModal}
         deleteHorse={this.deleteHorse}
-        horse={this.state.horseData}
+        horse={this.state.horse}
         modalOpen={this.state.modalOpen}
         navigator={this.props.navigator}
         uploadPhoto={this.uploadPhoto}
@@ -80,21 +84,15 @@ class UpdateHorseContainer extends NavigatorComponent {
 }
 
 function mapStateToProps (state, passedProps) {
-  let horseData = {
-    photosByID: {}
-  }
+  let horse = Map({
+    photosByID: Map()
+  })
   if (passedProps.horseID) {
-    for (let eachHorse of state.horses) {
-      if (eachHorse._id === passedProps.horseID) {
-        horseData = eachHorse
-        break;
-      }
-    }
+    horse = state.getIn(['main' , 'horses', passedProps.horseID])
   }
-  console.log(horseData)
   return {
-    horseData,
-    userID: state.localState.userID,
+    horse,
+    userID: state.getIn(['main', 'localState', 'userID']),
     newHorse: passedProps.newHorse
   }
 }

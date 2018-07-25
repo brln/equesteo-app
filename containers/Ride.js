@@ -12,19 +12,17 @@ class RideContainer extends NavigatorComponent {
   }
 
   componentWillReceiveProps (nextProps) {
-    if (nextProps.ride.name !== this.props.ride.name) {
-      this.props.navigator.setTitle({title: nextProps.ride.name})
+    if (nextProps.ride.get('name') !== this.props.ride.get('name')) {
+      this.props.navigator.setTitle({title: nextProps.ride.get('name')})
     }
   }
 
   deleteRide () {
-    this.props.dispatch(updateRide({
-      ...this.props.ride,
-      deleted: true,
-    }))
+    this.props.dispatch(updateRide(this.props.ride.set('deleted', true)))
   }
 
   render() {
+    console.log('rendering RideContainer')
     return (
       <Ride
         deleteRide={this.deleteRide}
@@ -37,9 +35,10 @@ class RideContainer extends NavigatorComponent {
 }
 
 function mapStateToProps (state, passedProps) {
+  const mainState = state.get('main')
   return {
-    horses: state.horses,
-    ride: state.rides.filter((r) => r._id === passedProps.rideID)[0],
+    horses: mainState.get('horses').toList(),
+    ride: mainState.getIn(['rides', passedProps.rideID])
   }
 }
 

@@ -10,6 +10,7 @@ class PhotoLightboxContainer extends NavigatorComponent {
   }
 
   render() {
+    console.log('rendering PhotoLightboxContainer')
     return (
       <PhotoLightbox
         close={this.props.close}

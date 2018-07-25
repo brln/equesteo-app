@@ -37,8 +37,8 @@ export default class RideRecorder extends Component {
   }
 
   rideComplete () {
-    if (this.props.currentRide.rideCoordinates.length > 0) {
-      const elapsedTime = (unixTimeNow() - this.props.currentRide.startTime) / 1000
+    if (this.props.currentRide.get('rideCoordinates').count() > 0) {
+      const elapsedTime = (unixTimeNow() - this.props.currentRide.get('startTime')) / 1000
       this.props.navigator.push({
         screen: RIDE_DETAILS,
         title: 'Ride Details',
@@ -84,15 +84,15 @@ export default class RideRecorder extends Component {
           <View style={{flex: 4}}>
             <RidingMap
               mode={"duringRide"}
-              rideCoords={this.props.currentRide.rideCoordinates}
+              rideCoords={this.props.currentRide.get('rideCoordinates')}
               lastLocation={this.props.lastLocation}
             />
           </View>
           <View style={styles.bottomSection}>
             <RideStats
               appState={this.props.appState}
-              startTime={this.props.currentRide.startTime}
-              distance={this.props.currentRide.distance}
+              startTime={this.props.currentRide.get('startTime')}
+              distance={this.props.currentRide.get('distance')}
             />
             <TouchableOpacity style={styles.rideComplete} onPress={this.rideComplete}>
               <Text style={styles.rideCompleteText}>

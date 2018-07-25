@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
 import URI from 'urijs'
 import {
@@ -22,7 +22,7 @@ import ForgotForm from '../components/SignupLogin/ForgotForm'
 import SignupForm from '../components/SignupLogin/SignupForm'
 import LoginForm from '../components/SignupLogin/LoginForm'
 
-class SignupLoginContainer extends Component {
+class SignupLoginContainer extends PureComponent {
   static navigatorStyle = {
     navBarHidden: true
   }
@@ -111,6 +111,7 @@ class SignupLoginContainer extends Component {
   }
 
   render() {
+    console.log('rendering SignupLoginContainer')
     let form = (
       <LoginForm
         doingInitialLoad={this.props.doingInitialLoad}
@@ -174,10 +175,9 @@ const styles = StyleSheet.create({
 
 function mapStateToProps (state) {
   return {
-    awaitingPWChange: state.localState.awaitingPWChange,
-    doingInitialLoad: state.localState.doingInitialLoad,
-    error: state.localState.error,
-    resetCodeAccepted: state.localState.resetCodeAccepted
+    awaitingPWChange: state.getIn(['main', 'localState', 'awaitingPWChange']),
+    doingInitialLoad: state.getIn(['main', 'localState', 'doingInitialLoad']),
+    error: state.getIn(['main', 'localState', 'error']),
   }
 }
 

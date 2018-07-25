@@ -30,14 +30,14 @@ export default class HorseSelector extends Component {
 
   thumbnail (horse, style) {
     let source = require('../../img/emptyHorseBlack.png')
-    if (horse.profilePhotoID) {
-      source = {uri: horse.photosByID[horse.profilePhotoID].uri}
+    if (horse.get('profilePhotoID')) {
+      source = {uri: horse.getIn(['photosByID', horse.get('profilePhotoID')]).uri}
     }
     return (
       <TouchableOpacity
-        key={horse._id}
+        key={horse.get('_id')}
         style={styles.photoThumbnail}
-        onPress={this.changeHorseID(horse._id)}
+        onPress={this.changeHorseID(horse.get('_id'))}
       >
         <Image
           style={style}
@@ -62,7 +62,7 @@ export default class HorseSelector extends Component {
             textShadowOffset: {
               width: -1,
               height: 1
-            }}}>{horse.name}</Text>
+            }}}>{horse.get('name')}</Text>
         </View>
       </TouchableOpacity>
     )
@@ -70,7 +70,7 @@ export default class HorseSelector extends Component {
 
   render () {
     const thumbnails = this.props.horses.map((h) => {
-      const style = h._id === this.props.horseID ? styles.chosenThumb : styles.thumbnail
+      const style = h.get('_id') === this.props.horseID ? styles.chosenThumb : styles.thumbnail
       return this.thumbnail(
         h,
         style,

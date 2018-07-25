@@ -44,40 +44,47 @@ export default class HorseProfile extends Component {
 
   makeBirthday () {
     const horse = this.props.horse
-    if (horse.birthMonth && horse.birthDay && horse.birthYear) {
-      return `${horse.birthMonth}-${horse.birthDay}-${horse.birthYear}`
-    } else if (horse.birthMonth && horse.birthYear) {
-      return `${horse.birthMonth}-${horse.birthYear}`
+    const birthMonth = horse.get('birthMonth')
+    const birthDay = horse.get('birthDay')
+    const birthYear = horse.get('birthYear')
+    if (birthMonth && birthDay && birthYear) {
+      return `${birthMonth}-${birthDay}-${birthYear}`
+    } else if (birthMonth && birthYear) {
+      return `${birthMonth}-${birthYear}`
     }
     else return 'unknown'
   }
 
   makeHeight () {
     const horse = this.props.horse
-    if (horse.heightHands && horse.heightInches) {
-       return `${horse.heightHands}.${horse.heightInches} hh`
-    } else if (horse.heightHands) {
-      return `${horse.heightHands} hh`
+    const heightHands = horse.get('heightHands')
+    const heightInches = horse.get('heightInches')
+    if (heightHands && heightInches) {
+       return `${heightHands}.${heightInches} hh`
+    } else if (heightHands) {
+      return `${heightHands} hh`
     } else return 'unknown'
 
   }
 
   renderImages () {
     const images = []
-    if (Object.keys(this.props.horse.photosByID).length > 0) {
+    const horse = this.props.horse
+    if (horse.get('photosByID').keySeq().count() > 0) {
+      console.log(horse.getIn(['photosByID', horse.get('profilePhotoID')]))
       images.push(
         <SwipablePhoto
           key="profile"
-          source={{uri: this.props.horse.photosByID[this.props.horse.profilePhotoID].uri}}
+          source={{ uri: horse.getIn(['photosByID', horse.get('profilePhotoID')]).uri }}
           navigator={this.props.navigator}
         />
       )
-      for (let imageID of Object.keys(this.props.horse.photosByID)) {
-        if (imageID !== this.props.horse.profilePhotoID) {
+      for (let imageID of horse.get('photosByID').keySeq()) {
+        if (imageID !== horse.get('profilePhotoID')) {
           images.push(
             <SwipablePhoto
               key={imageID}
-              source={{uri: this.props.horse.photosByID[imageID].uri}}
+              source={{ uri: horse.getIn(['photosByID', imageID]).uri }}
               navigator={this.props.navigator}
             />
           )
@@ -93,7 +100,7 @@ export default class HorseProfile extends Component {
 
   renderImageSwiper () {
     let fab
-    if (this.props.horse.userID === this.props.user._id) {
+    if (this.props.horse.get('userID') === this.props.user.get('_id')) {
       fab = (
         <Fab
           direction="up"
@@ -133,7 +140,7 @@ export default class HorseProfile extends Component {
               </View>
             </CardItem>
             <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20}}>
-              <Text>{this.props.horse.description || 'nothing'}</Text>
+              <Text>{this.props.horse.get('description') || 'nothing'}</Text>
             </CardItem>
           </Card>
 
@@ -149,7 +156,7 @@ export default class HorseProfile extends Component {
                   <Stat
                     imgSrc={require('../img/breed.png')}
                     text={'Breed'}
-                    value={this.props.horse.breed || 'none'}
+                    value={this.props.horse.get('breed') || 'none'}
                   />
                 </View>
                 <View style={{flex: 1, flexDirection: 'row'}}>
@@ -161,7 +168,7 @@ export default class HorseProfile extends Component {
                   <Stat
                     imgSrc={require('../img/type.png')}
                     text={'Sex'}
-                    value={this.props.horse.sex || 'none'}
+                    value={this.props.horse.get('sex') || 'none'}
                   />
                 </View>
               </View>

@@ -1,6 +1,7 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
 import {
+  Dimensions,
   Image,
   StyleSheet,
   Text,
@@ -22,7 +23,10 @@ import {
 import { changeScreen } from '../actions'
 import { brand, lightGrey } from '../colors'
 
-class DrawerContainer extends Component {
+
+const { width } = Dimensions.get('window')
+
+class DrawerContainer extends PureComponent {
   constructor (props) {
     super(props)
     this.toggleDrawer = this.toggleDrawer.bind(this)
@@ -128,6 +132,7 @@ class DrawerContainer extends Component {
   }
 
   render() {
+    console.log('rendering DrawerContainer')
     let feed = null
     let barnScreen = null
 		let myAccountScreen = null
@@ -207,20 +212,19 @@ class DrawerContainer extends Component {
           flex: 1,
           backgroundColor: lightGrey,
           alignItems: 'center',
-          flexDirection: 'row',
-          paddingLeft: 25
+          justifyContent: 'center',
+          flexDirection: 'column',
         }}>
           <Image
-            source={require('../img/logo.png')}
+            source={require('../img/logo250.png')}
             style={{
-              width: 80,
-              height: 80,
+              width: 120,
+              height: 120,
               alignItems: 'center',
-              paddingRight: 15,
             }}
           />
           <Text style={{
-            fontFamily: 'RockSalt',
+            fontFamily: 'Panama-Light',
             fontSize: 30,
             color: 'black',
           }}>
@@ -229,11 +233,11 @@ class DrawerContainer extends Component {
         </View>
 				<View style={styles.container}>
 					<View style={styles.drawerList}>
-            {feed}
-            {following}
-            {training}
             {recorder}
-						{barnScreen}
+            {feed}
+            {barnScreen}
+            {training}
+            {following}
 						{myAccountScreen}
 					</View>
 				</View>
@@ -270,13 +274,16 @@ const styles = StyleSheet.create({
 	},
 	linearGradient: {
 		flex: 1,
+    width: width * 0.75
 	},
 });
 
 function mapStateToProps (state) {
+  const users = state.getIn(['main', 'users'])
+  const userID = state.getIn(['main', 'localState', 'userID'])
   return {
-  	currentScreen: state.localState.currentScreen,
-    user: state.users[state.localState.userID],
+  	currentScreen: state.getIn(['main', 'localState', 'currentScreen']),
+    user: users.get(userID)
 	}
 }
 

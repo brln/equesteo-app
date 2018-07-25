@@ -84,7 +84,7 @@ export default class UpdateHorse extends Component {
     return (
       <View style={{borderColor: darkBrand, borderWidth: 1}}>
         <Picker
-          selectedValue={this.props.horse.birthMonth}
+          selectedValue={this.props.horse.get('birthMonth')}
           style={{ height: 50, width: 100 }}
           onValueChange={onValueChange}
         >
@@ -114,8 +114,8 @@ export default class UpdateHorse extends Component {
     return (
       <View style={{borderColor: darkBrand, borderWidth: 1}}>
         <Picker
-          selectedValue={this.props.horse.birthDay}
-          style={{ height: 50, width: 80 }}
+          selectedValue={this.props.horse.get('birthDay')}
+          style={{ height: 50, width: 100 }}
           onValueChange={onValueChange}
         >
           {allDays}
@@ -133,7 +133,7 @@ export default class UpdateHorse extends Component {
     return (
       <View style={{borderColor: darkBrand, borderWidth: 1}}>
         <Picker
-          selectedValue={this.props.horse.birthYear}
+          selectedValue={this.props.horse.get('birthYear')}
           style={{ height: 50, width: 100 }}
           onValueChange={onValueChange}
         >
@@ -147,7 +147,7 @@ export default class UpdateHorse extends Component {
     return (
       <View style={{borderColor: darkBrand, borderWidth: 1}}>
         <Picker
-          selectedValue={this.props.horse.sex}
+          selectedValue={this.props.horse.get('sex')}
           style={{ height: 50, width: 200 }}
           onValueChange={onValueChange}
         >
@@ -166,9 +166,9 @@ export default class UpdateHorse extends Component {
       <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
         <View style={{borderColor: darkBrand, borderWidth: 1}}>
           <Picker
-            selectedValue={this.props.horse.heightHands}
+            selectedValue={this.props.horse.get('heightHands')}
             onValueChange={this.changeHorseHeightHands}
-            style={{ height: 50, width: 80 }}
+            style={{ height: 50, width: 100 }}
           >
             <Picker.Item label="" value={null} />
             <Picker.Item label="11" value="11" />
@@ -182,7 +182,7 @@ export default class UpdateHorse extends Component {
         </View>
         <View style={{borderColor: darkBrand, borderWidth: 1}}>
           <Picker
-            selectedValue={this.props.horse.heightInches}
+            selectedValue={this.props.horse.get('heightInches')}
             style={{ height: 50, width: 80 }}
             onValueChange={this.changeHorseHeightInches}
           >
@@ -209,7 +209,7 @@ export default class UpdateHorse extends Component {
               <CardItem cardBody style={{marginLeft: 20, marginRight: 20}}>
                 <TextInput
                   style={{width: '100%'}}
-                  value={this.props.horse.name}
+                  value={this.props.horse.get('name')}
                   onChangeText={this.changeHorseName}
                   underlineColorAndroid={darkBrand}
                 />
@@ -221,7 +221,7 @@ export default class UpdateHorse extends Component {
               <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
                 <TextInput
                   style={{width: '100%', borderColor: darkBrand, borderWidth: 1}}
-                  value={this.props.horse.description}
+                  value={this.props.horse.get('description')}
                   onChangeText={this.changeHorseDescription}
                   multiline={true}
                   numberOfLines={3}
@@ -256,7 +256,7 @@ export default class UpdateHorse extends Component {
               <CardItem cardBody style={{marginLeft: 20, marginRight: 20}}>
                 <TextInput
                   style={{width: '100%'}}
-                  value={this.props.horse.breed}
+                  value={this.props.horse.get('breed')}
                   onChangeText={this.changeHorseBreed}
                   underlineColorAndroid={darkBrand}
                 />
@@ -280,8 +280,8 @@ export default class UpdateHorse extends Component {
               <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
                 <PhotosByTimestamp
                   changeProfilePhoto={this.changeProfilePhotoID}
-                  photosByID={this.props.horse.photosByID}
-                  profilePhotoID={this.props.horse.profilePhotoID}
+                  photosByID={this.props.horse.get('photosByID')}
+                  profilePhotoID={this.props.horse.get('profilePhotoID')}
                 />
               </CardItem>
             </Card>

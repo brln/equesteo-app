@@ -43,8 +43,8 @@ export default class PhotosByTimestamp extends Component {
 
   render () {
     const byTimestamp = {}
-    for (let photoID of Object.keys(this.props.photosByID)) {
-      const photoData = this.props.photosByID[photoID]
+    for (let photoID of this.props.photosByID.keySeq()) {
+      const photoData = this.props.photosByID.get(photoID)
       const source = {uri: photoData.uri}
       let style = styles.thumbnail
       if (photoID === this.props.profilePhotoID) {

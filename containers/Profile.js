@@ -23,12 +23,6 @@ class ProfileContainer extends NavigatorComponent {
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent)
   }
 
-  shouldComponentUpdate (nextProps) {
-    // When you log out there is no profileUser but it tries to render
-    // and blows up.
-    return !(!nextProps.profileUser || !nextProps.user )
-  }
-
   onNavigatorEvent(event) {
     if (event.type == 'NavBarButtonPress') {
       if (event.id == 'dropdown') {
@@ -77,27 +71,39 @@ class ProfileContainer extends NavigatorComponent {
   }
 
   render() {
-    return (
-      <Profile
-        createFollow={this.createFollow}
-        deleteFollow={this.deleteFollow}
-        follows={this.props.follows}
-        horses={this.props.horses}
-        navigator={this.props.navigator}
-        profileUser={this.props.profileUser}
-        uploadProfilePhoto={this.uploadProfilePhoto}
-        user={this.props.user}
-      />
-    )
+    console.log('rendering ProfileContainer')
+    if (!(!this.props.profileUser || !this.props.user )) {
+      return (
+        <Profile
+          createFollow={this.createFollow}
+          deleteFollow={this.deleteFollow}
+          follows={this.props.follows}
+          horses={this.props.horses}
+          navigator={this.props.navigator}
+          profileUser={this.props.profileUser}
+          uploadProfilePhoto={this.uploadProfilePhoto}
+          user={this.props.user}
+        />
+      )
+    } else {
+      return null
+    }
+
   }
 }
 
 function mapStateToProps (state, passedProps) {
+  const mainState = state.get('main')
+  const localState = state.getIn(['main', 'localState'])
+  const userID = localState.get('userID')
+  const horses = mainState.get('horses').toList().filter(
+    (h) => h.get('userID') === passedProps.profileUser.get('_id') && h.get('deleted') !== true
+  )
   return {
-    horses: state.horses.filter((h) => h.userID === passedProps.profileUser._id && h.deleted !== true),
-    profileUser: state.users[passedProps.profileUser._id] || passedProps.profileUser,
-    user: state.users[state.localState.userID],
-    follows: Object.values(state.follows).filter(f => !f.deleted && f.followerID === state.localState.userID)
+    horses,
+    profileUser: mainState.get('users').get(passedProps.profileUser.get('_id')) || passedProps.profileUser,
+    user: mainState.get('users').get(userID),
+    follows: mainState.get('follows').filter(f => !f.get('deleted') && f.get('followerID') === userID)
   }
 }
 

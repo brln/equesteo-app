@@ -1,3 +1,4 @@
+import { Map } from 'immutable'
 import React, { Component } from 'react';
 import Swiper from 'react-native-swiper';
 import ImagePicker from 'react-native-image-crop-picker'
@@ -50,16 +51,16 @@ export default class Profile extends Component {
   }
 
   follow () {
-    this.props.createFollow(this.props.profileUser._id)
+    this.props.createFollow(this.props.profileUser.get('_id'))
   }
 
   unfollow () {
-    this.props.deleteFollow(this.props.profileUser._id)
+    this.props.deleteFollow(this.props.profileUser.get('_id'))
   }
 
   horseProfile (horse) {
     let rightButtons = []
-    if (this.props.profileUser._id === this.props.user._id) {
+    if (this.props.profileUser.get('_id') === this.props.user.get('_id')) {
       rightButtons.push(
         {
           icon: require('../img/threedot.png'),
@@ -70,7 +71,7 @@ export default class Profile extends Component {
     return () => {
       this.props.navigator.push({
         screen: HORSE_PROFILE,
-        title: horse.name,
+        title: horse.get('name'),
         passProps: {
           horse: horse,
           horseUser: this.props.profileUser,
@@ -88,7 +89,12 @@ export default class Profile extends Component {
       uri = item.photosByID[item.profilePhotoID].uri
     }
     return (
-      <ListItem avatar noBorder={true} style={{height: 80}} onPress={this.horseProfile(item)}>
+      <ListItem
+        avatar
+        noBorder={true}
+        style={{height: 80}}
+        onPress={this.horseProfile(Map(item))}
+      >
         <Left>
           <Thumbnail size={30} source={{ uri }} />
         </Left>
@@ -100,10 +106,10 @@ export default class Profile extends Component {
   }
 
   renderHorses (horses) {
-    if (horses.length > 0) {
+    if (horses.count() > 0) {
       return (
         <FlatList
-          data={horses}
+          data={horses.toJS()}
           renderItem={this.renderHorse}
           keyExtractor={(i) => i._id}
           ItemSeparatorComponent={null}
@@ -115,20 +121,20 @@ export default class Profile extends Component {
   renderImages () {
     const images = []
     const user = this.props.profileUser
-    if (Object.keys(user.photosByID).length > 0) {
+    if (user.get('photosByID').keySeq().count() > 0) {
       images.push(
         <SwipablePhoto
           key="profile"
-          source={{uri: user.photosByID[user.profilePhotoID].uri}}
+          source={{uri: user.getIn(['photosByID', user.get('profilePhotoID')]).uri}}
           navigator={this.props.navigator}
         />
       )
-      for (let imageID of Object.keys(user.photosByID)) {
+      for (let imageID of user.get('photosByID').keySeq()) {
         if (imageID !== user.profilePhotoID) {
           images.push(
             <SwipablePhoto
               key={imageID}
-              source={{uri: user.photosByID[imageID].uri}}
+              source={{uri: user.getIn(['photosByID', imageID]).uri}}
               navigator={this.props.navigator}
             />
           )
@@ -146,7 +152,7 @@ export default class Profile extends Component {
   renderImageSwiper () {
     let fab
     let followButton
-    if (this.props.profileUser._id === this.props.user._id) {
+    if (this.props.profileUser.get('_id') === this.props.user.get('_id')) {
       fab = (
         <Fab
           direction="up"
@@ -165,8 +171,8 @@ export default class Profile extends Component {
           title="Follow"
         />
       )
-      for (let follow of this.props.follows) {
-        if (follow.followingID === this.props.profileUser._id) {
+      for (let follow of this.props.follows.valueSeq()) {
+        if (follow.get('followingID') === this.props.profileUser.get('_id')) {
           followButton = (
             <Button
               style={styles.followButton}
@@ -194,7 +200,7 @@ export default class Profile extends Component {
   }
 
   horsesCard () {
-    if (this.props.horses.length > 0) {
+    if (this.props.horses.count() > 0) {
       return (
         <Card>
           <CardItem header style={{padding: 5}}>
@@ -211,6 +217,7 @@ export default class Profile extends Component {
   }
 
   render() {
+    console.log('rendering ProfileComponent')
     return (
       <ScrollView>
         {this.renderImageSwiper()}
@@ -222,7 +229,7 @@ export default class Profile extends Component {
               </View>
             </CardItem>
             <CardItem cardBody style={{marginLeft: 20, marginRight: 20}}>
-              <Text>{this.props.profileUser.firstName || ''} {this.props.profileUser.lastName || ''}</Text>
+              <Text>{this.props.profileUser.get('firstName') || ''} {this.props.profileUser.get('lastName') || ''}</Text>
             </CardItem>
 
             <CardItem header style={{padding: 5}}>
@@ -231,7 +238,7 @@ export default class Profile extends Component {
               </View>
             </CardItem>
             <CardItem cardBody style={{marginLeft: 20, marginBottom: 20, marginRight: 20}}>
-              <Text>{this.props.profileUser.aboutMe || 'nothing'}</Text>
+              <Text>{this.props.profileUser.get('aboutMe') || 'nothing'}</Text>
             </CardItem>
           </Card>
 

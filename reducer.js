@@ -1,5 +1,8 @@
+import { List, Map } from 'immutable'
+
 import {
-  CHANGE_SCREEN, CLEAR_LAST_LOCATION,
+  CHANGE_SCREEN,
+  CLEAR_LAST_LOCATION,
   CLEAR_SEARCH,
   CLEAR_STATE,
   CLEAR_STATE_AFTER_PERSIST,
@@ -16,7 +19,6 @@ import {
   NEW_APP_STATE,
   NEW_LOCATION,
   NEW_NETWORK_STATE,
-  ONGOING_NOTIFICATION_SHOWN,
   PHOTO_PERSIST_COMPLETE,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
@@ -42,412 +44,204 @@ import {
 } from './helpers'
 import { FEED } from './screens'
 
-const initialState = {
-  localState: {
+const initialState = Map({
+  localState: Map({
     appState: appStates.active,
     awaitingPWChange: false,
     clearStateAfterPersist: false,
     currentScreen: FEED,
-    currentRide: null,
+    currentRide: null, // still needs to be converted
     doingInitialLoad: false,
     error: null,
     goodConnection: false,
     justFinishedRide: false,
     jwt: null,
-    lastFullSync: null,
     lastLocation: null,
-    locallyPersisting: false,
-    needsPhotoUploads: {
+    needsPhotoUploads: Map({
       profile: false,
       horse: false
-    },
-    needsRemotePersist: {
+    }),
+    needsRemotePersist: Map({
       horses: false,
       rides: false,
       users: false,
-    },
-    ongoingNotificationShown: false,
+    }),
     root: 'login',
     userID: null,
-    userLoaded: false,
-    userSearchResults: [],
-  },
-  horses: [],
-  follows: {},
-  rides: [],
-  rideCarrots: [],
-  rideComments: [],
-  users: {},
-  version: 1
-}
+    userSearchResults: List(),
+  }),
+  horses: Map(),
+  follows: Map(),
+  lastFullSync: null,
+  rides: Map(),
+  rideCarrots: Map(),
+  rideComments: Map(),
+  users: Map(),
+})
 
 export default function AppReducer(state=initialState, action) {
   switch (action.type) {
     case CHANGE_SCREEN:
-      return {
-        ...state,
-        localState: {
-          ...state.localState,
-          currentScreen: action.screen,
-        }
-      }
+      return state.setIn(['localState', 'currentScreen'], action.screen)
     case CLEAR_LAST_LOCATION:
-      return {
-        ...state,
-        localState: {
-          ...state.localState,
-          lastLocation: null,
-        }
-      }
+      return state.setIn(['localState', 'lastLocation'], null)
     case CLEAR_SEARCH:
-      return {
-        ...state,
-        localState: {
-          ...state.localState,
-          userSearchResults: []
-        }
-      }
+      return state.setIn(['localState', 'lastLocation'], [])
     case CLEAR_STATE:
-      return {
-        ...initialState,
-        localState: {
-          ...initialState.localState,
-          goodConnection: state.localState.goodConnection,
-        }
-      }
+      return initialState.setIn(
+        ['localState', 'goodConnection'],
+        state.getIn('localState', 'goodConnection')
+      )
     case CLEAR_STATE_AFTER_PERSIST:
-      return {
-        ...state,
-        localState: {
-          ...state.localState,
-          clearStateAfterPersist: true
-        }
-      }
+      return state.setIn(['localState', 'clearStateAfterPersist'], true)
     case DISCARD_RIDE:
-      return {
-        ...state,
-        localState: {
-          ...state.localState,
-          currentRide: null
-        }
-      }
+      return state.setIn(['localState', 'currentRide'], null)
     case DISMISS_ERROR:
-      return {
-        ...state,
-        localState: {
-          ...state.localState,
-          error: null
-        }
-      }
+      return state.setIn(['localState', 'error'], null)
     case ERROR_OCCURRED:
-      return {
-        ...state,
-        localState: {
-          ...state.localState,
-          error: action.message
-        }
-      }
+      return state.setIn(['localState', 'error'], action.message)
     case FOLLOW_UPDATED:
-      const followsClone = {...state.follows}
-      followsClone[action.follow._id] = action.follow
-      return {
-        ...state,
-        follows: followsClone
-      }
+      return state.setIn(['follows', action.follow.get('_id')], action.follow)
     case HORSE_CREATED:
-      return {
-        ...state,
-        horses: [action.horse, ...state.horses]
-      }
+      return state.set('horses', state.get('horses').set(action.horse.get('_id'), action.horse))
     case HORSE_SAVED:
-      // @TODO: ugh, these need to be in a map by ID
-      let j = 0
-      let foundHorse = null
-      for (j; j < state.horses.length; j++) {
-        const horse = state.horses[j]
-        if (horse._id === action.horse._id) {
-          foundHorse = {...horse, ...action.horse}
-          break
-        }
-      }
-      const horsesClone = [...state.horses]
-      horsesClone[j] = foundHorse
-      return {
-        ...state,
-        horses: horsesClone
-      }
+      return state.set('horses', state.get('horses').set(action.horse.get('_id'), action.horse))
     case JUST_FINISHED_RIDE_SHOWN:
-      return {
-        ...state,
-        localState: {
-          ...state.localState,
-          justFinishedRide: false
-        }
-      }
+      return state.setIn(['localState', 'justFinishedRide'], false)
     case LOCAL_DATA_LOADED:
-      const allUsers = {}
-      for (let user of action.localData.users) {
-        allUsers[user._id] = user
-      }
+      const allUsers = action.localData.users.reduce((accum, user) => {
+        user.photosByID = Map(user.photosByID)
+        accum[user._id] = Map(user)
+        return accum
+      }, {})
 
-      const allFollows = {}
-      for (let follow of action.localData.follows) {
-        allFollows[follow._id] = follow
-      }
-      return {
-        ...state,
-        follows: allFollows,
-        rides: action.localData.rides,
-        rideCarrots: action.localData.rideCarrots,
-        rideComments: action.localData.rideComments,
-        horses: action.localData.horses,
-        users: allUsers,
-      }
+      const allFollows = action.localData.follows.reduce((accum, follow) => {
+        accum[follow._id] = Map(follow)
+        return accum
+      }, {})
+
+      const allHorses = action.localData.horses.reduce((accum, horse) => {
+        horse.photosByID = Map(horse.photosByID)
+        accum[horse._id] = Map(horse)
+        return accum
+      }, {})
+
+      const allRides = action.localData.rides.reduce((accum, ride) => {
+        ride.photosByID = Map(ride.photosByID)
+        accum[ride._id] = Map(ride)
+        return accum
+      }, {})
+
+      const allCarrots = action.localData.rideCarrots.reduce((accum, carrot) => {
+        accum[carrot._id] = Map(carrot)
+        return accum
+      }, {})
+
+      const allComments = action.localData.rideComments.reduce((accum, comment) => {
+        accum[comment._id] = Map(comment)
+        return accum
+      }, {})
+
+      return state.merge(Map({
+        users: Map(allUsers),
+        follows: Map(allFollows),
+        rides: Map(allRides),
+        rideCarrots: Map(allCarrots),
+        rideComments: Map(allComments),
+        horses: Map(allHorses),
+      }))
     case NEEDS_PHOTO_UPLOAD:
-      const needsPhotoUploads = {
-        ...state.localState.needsPhotoUploads
-      }
-      needsPhotoUploads[action.photoType] = true
-      return {
-        ...state,
-        localState: {
-          ...state.localState,
-          needsPhotoUploads
-        }
-      }
+      return state.setIn(['localState', 'needsPhotoUploads', action.photoType], true)
     case NEEDS_REMOTE_PERSIST:
-      let newNeeds = {...state.localState.needsRemotePersist}
-      newNeeds[action.database] = true
-      return {
-        ...state,
-        localState: {
-          ...state.localState,
-          needsRemotePersist: newNeeds
-        }
-      }
+      return state.setIn(['localState', 'needsRemotePersist', action.database], true)
     case NEW_APP_STATE:
-      return {
-        ...state,
-        localState: {
-          ...state.localState,
-          appState: action.newState
-        }
-      }
+      return state.setIn(['localState', 'appState'], action.newState)
     case NEW_LOCATION:
-      const newState = {
-        ...state,
-        localState: {
-          ...state.localState,
-          lastLocation: action.location
-        }
-      }
-      if (state.localState.currentRide) {
+      const newState = state.setIn(['localState', 'lastLocation'], action.location)
+      const currentRide = state.getIn(['localState', 'currentRide'])
+      if (currentRide) {
         let newDistance = 0
-        if (state.localState.lastLocation) {
+        const lastLocation = state.getIn(['localState', 'lastLocation'])
+        if (lastLocation) {
           newDistance = haversine(
-            state.localState.lastLocation.latitude,
-            state.localState.lastLocation.longitude,
+            lastLocation.latitude,
+            lastLocation.longitude,
             action.location.latitude,
             action.location.longitude
           )
         }
-        const rideCoordinates = [...state.localState.currentRide.rideCoordinates, action.location].sort((a, b) => {
+        const rideCoordinates = state.getIn(
+          ['localState', 'currentRide', 'rideCoordinates']
+        ).push(
+          action.location
+        ).sort((a, b) => {
           return new Date(a.timestamp) - new Date(b.timestamp);
         })
-        newState.localState.currentRide = {
-          ...state.localState.currentRide,
-          rideCoordinates,
-          distance: state.localState.currentRide.distance + newDistance,
-        }
+        const totalDistance = currentRide.get('distance') + newDistance
+        const newCurrentRide = currentRide.merge(Map({rideCoordinates, distance: totalDistance}))
+        return newState.setIn(['localState', 'currentRide'], newCurrentRide)
+      } else {
+        return newState
       }
-      return newState
     case NEW_NETWORK_STATE:
-      return {
-        ...state,
-        localState: {
-          ...state.localState,
-          goodConnection: goodConnection(
-            action.connectionType,
-            action.effectiveConnectionType
-          )
-        }
-      }
-    case ONGOING_NOTIFICATION_SHOWN:
-      return {
-        ...state,
-        localState: {
-          ...state.localState,
-          ongoingNotificationShown: action.isShowing
-        }
-      }
+      return state.setIn(
+        ['localState', 'goodConnection'],
+        goodConnection(
+          action.connectionType,
+          action.effectiveConnectionType
+        )
+      )
     case PHOTO_PERSIST_COMPLETE:
-      const newPhotoFalse = {...state.localState.needsPhotoUploads}
-      for (let type of Object.keys(newPhotoFalse)) {
-        newPhotoFalse[type] = false
-      }
-      return {
-        ...state,
-        localState: {
-          ...state.localState,
-          needsPhotoUploads: newPhotoFalse
-        }
-      }
+      return state.setIn(
+        ['localState', 'needsPhotoUploads'],
+        initialState.getIn(['localState', 'needsPhotoUploads'])
+      )
     case RECEIVE_JWT:
-      return {
-        ...state,
-        localState: {
-          ...state.localState,
-          jwt: action.token
-        }
-      }
+      return state.setIn(['localState', 'jwt'], action.token)
     case REMOTE_PERSIST_COMPLETE:
-      let newNeedsFalse = {...state.localState.needsRemotePersist}
-      newNeedsFalse[action.database] = false
-      return {
-        ...state,
-        localState: {
-          ...state.localState,
-          needsRemotePersist: newNeedsFalse
-        }
-      }
+      return state.setIn(['localState', 'needsRemotePersist', action.database], false)
     case REMOVE_RIDE_FROM_STATE:
-      let rideFound = null
-      let l = 0
-      for (l; l < state.rides.length; l++) {
-        const ride = state.rides[l]
-        if (ride._id === action.rideID) {
-          rideFound = ride
-          break
-        }
-      }
-      if (rideFound) {
-        const removeRidesClone = [...state.rides]
-        removeRidesClone.splice(l, 1)
-        return {
-          ...state,
-          rides: removeRidesClone
-        }
-      }
-      return
+      return state.remove(action.rideID)
     case RIDE_CARROT_CREATED:
-      return {
-        ...state,
-        rideCarrots: [action.carrotData, ...state.rideCarrots]
-      }
+      return state.setIn(['rideCarrots', action.carrotData.get('_id')], action.carrotData)
     case RIDE_CARROT_SAVED:
-      // @TODO: ugh, these need to be in a map by ID, and this function needs to be de-duped
-      let rideCarrotFound = null
-      let k = 0
-      for (k; k < state.rideCarrots.length; k++) {
-        const currentRideCarrot = state.rideCarrots[k]
-        if (currentRideCarrot._id === action.carrotData._id) {
-          rideCarrotFound = {...currentRideCarrot, ...action.carrotData}
-          break
-        }
-      }
-      const rideCarrotClone = [...state.rideCarrots]
-      rideCarrotClone[k] = rideCarrotFound
-      return {
-        ...state,
-        rideCarrots: rideCarrotClone
-      }
+      return state.setIn(['rideCarrots', action.carrotData.get('_id')], action.carrotData)
     case RIDE_COMMENT_CREATED:
-      return {
-        ...state,
-        rideComments: [action.rideComment, ...state.rideComments]
-      }
+      return state.setIn(['rideComments', action.rideComment.get('_id')], action.rideComment)
     case RIDE_CREATED:
-      const newRide = { ...action.ride }
-      return {
-        ...state,
-        rides: [newRide, ...state.rides],
-        localState: {
-          ...state.localState,
-          justFinishedRide: true,
-          currentRide: null,
-        }
-      }
+      return state.setIn(
+        ['rides', action.ride.get('_id')], action.ride
+      ).setIn(
+        ['localState', 'justFinishedRide'], true
+      ).setIn(
+        ['localState', 'currentRide'], null
+      )
     case RIDE_SAVED:
-      // @TODO: ugh, these need to be in a map by ID
-      let found = null
-      let i = 0
-      for (i; i < state.rides.length; i++) {
-        const ride = state.rides[i]
-        if (ride._id === action.ride._id) {
-          found = {...ride, ...action.ride}
-          break
-        }
-      }
-      const ridesClone = [...state.rides]
-      ridesClone[i] = found
-      return {
-        ...state,
-        rides: ridesClone
-      }
+      return state.setIn(['rides', action.ride.get('_id')], action.ride)
     case SAVE_USER_ID:
-      return {
-        ...state,
-        localState: {
-          ...state.localState,
-          userLoaded: true,
-          userID: action.userID
-        },
-      }
+      return state.setIn(
+        ['localState', 'userID'], action.userID
+      )
     case SET_APP_ROOT:
-      return {
-        ...state,
-        localState: {
-          ...state.localState,
-          root: action.root
-        }
-      }
+      return state.setIn(['localState', 'root'], action.root)
     case START_RIDE:
-      return {
-        ...state,
-        localState: {
-          ...state.localState,
-          currentRide: action.currentRide,
-        }
-      }
+      return state.setIn(['localState', 'currentRide'], action.currentRide)
     case SYNC_COMPLETE:
-      return {
-        ...state,
-        localState: {
-          ...state.localState,
-          lastFullSync: new Date()
-        }
-      }
+      return state.setIn(['localState', 'lastFullSync'], new Date())
     case TOGGLE_AWAITING_PW_CHANGE:
-      return {
-        ...state,
-        localState: {
-          ...state.localState,
-          awaitingPWChange: !state.localState.awaitingPWChange
-        }
-      }
+      return state.setIn(
+        ['localState', 'awaitingPWChange'],
+        !state.getIn(['localState', 'awaitingPWChange'])
+      )
     case TOGGLE_DOING_INITIAL_LOAD:
-      return {
-        ...state,
-        localState: {
-          ...state.localState,
-          doingInitialLoad: !state.localState.doingInitialLoad
-        }
-      }
+      return state.setIn(
+        ['localState', 'doingInitialLoad'],
+        !state.getIn(['localState', 'doingInitialLoad'])
+      )
     case USER_UPDATED:
-      const usersClone = {...state.users}
-      usersClone[action.userData._id] = action.userData
-      return {
-        ...state,
-        users: usersClone
-      }
+      return state.setIn(['users', action.userData.get('_id')], action.userData)
     case USER_SEARCH_RETURNED:
-      return {
-        ...state,
-        localState: {
-          ...state.localState,
-          userSearchResults: action.userSearchResults
-        }
-      }
+      return state.setIn(['localState', 'userSearchResults'], action.userSearchResults)
     default:
       return state
   }

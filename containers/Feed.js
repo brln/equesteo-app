@@ -1,7 +1,12 @@
 import React, { Component } from 'react'
-import { connect } from 'react-redux';
+import { connect } from 'react-redux'
 
-import { changeScreen, justFinishedRideShown, syncDBPull, toggleRideCarrot } from "../actions";
+import {
+  changeScreen,
+  justFinishedRideShown,
+  syncDBPull,
+  toggleRideCarrot
+} from "../actions";
 import Feed from '../components/Feed/Feed'
 import NavigatorComponent from './NavigatorComponent'
 import { FEED, RIDE_COMMENTS } from '../screens'
@@ -52,12 +57,13 @@ class FeedContainer extends NavigatorComponent {
       screen: RIDE_COMMENTS,
       title: 'Comments',
       passProps: {
-        rideID: ride._id
+        rideID: ride.get('_id')
       }
     })
   }
 
   render() {
+    console.log('rendering feedContainer')
     return (
       <Feed
         deleteRide={this.deleteRide}
@@ -80,35 +86,38 @@ class FeedContainer extends NavigatorComponent {
   }
 }
 
-function followingRideFilter (state) {
-  const following = Object.values(state.follows).filter(
-    f => !f.deleted && f.followerID === state.localState.userID
+function followingRideFilter (state, userID) {
+  const following = state.getIn(['main', 'follows']).valueSeq().filter(
+    f => f.get('deleted') !== true && f.get('followerID') === userID
   ).map(
-    f => f.followingID
+    f => f.get('followingID')
   )
-  return state.rides.filter(
-    r => r.userID !== state.localState.userID // not the users rides
-      && r.deleted !== true // hasn't been deleted
-      && following.indexOf(r.userID) >= 0 // user hasn't removed follow
+  return state.getIn(['main', 'rides']).valueSeq().filter(
+    r => r.get('userID') !== userID // not the users rides
+      && r.get('deleted') !== true // hasn't been deleted
+      && following.indexOf(r.get('userID')) >= 0 // user hasn't removed follow
   ).sort(
-    (a, b) => b.startTime - a.startTime
-  )
-
+    (a, b) => b.get('startTime') - a.get('startTime')
+  ).toList()
 }
 
 function mapStateToProps (state) {
+  const mainState = state.get('main')
+  const localState = mainState.get('localState')
+  const userID = localState.get('userID')
+  const yourRides = mainState.get('rides').valueSeq().filter(
+      (r) => r.get('userID') === userID && r.get('deleted') !== true
+    ).sort((a, b) => b.get('startTime') - a.get('startTime')).toList()
   return {
-    followingRides: followingRideFilter(state),
-    horses: state.horses,
-    justFinishedRide: state.localState.justFinishedRide,
-    lastFullSync: state.localState.lastFullSync,
-    rideCarrots: state.rideCarrots,
-    rideComments: state.rideComments,
-    users: state.users,
-    userID: state.localState.userID,
-    yourRides: state.rides.filter(
-      (r) => r.userID === state.localState.userID && r.deleted !== true
-    ).sort((a, b) => b.startTime - a.startTime),
+    followingRides: followingRideFilter(state, userID),
+    horses: mainState.get('horses').toList(),
+    justFinishedRide: localState.get('justFinishedRide'),
+    lastFullSync: localState.get('lastFullSync'),
+    rideCarrots: mainState.get('rideCarrots').toList(),
+    rideComments: mainState.get('rideComments').toList(),
+    users: mainState.get('users'),
+    userID,
+    yourRides,
   }
 }
 

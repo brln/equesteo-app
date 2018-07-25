@@ -17,7 +17,7 @@ export default class Feed extends Component {
 
   componentWillReceiveProps (nextProps) {
     if (nextProps.justFinishedRide) {
-      this.showRide(nextProps.yourRides[0])
+      this.showRide(nextProps.yourRides.get(0))
       this.props.justFinishedRideShown()
     }
   }
@@ -28,7 +28,7 @@ export default class Feed extends Component {
 
   showRide (ride) {
     let rightButtons = []
-    if (this.props.userID === ride.userID) {
+    if (this.props.userID === ride.get('userID')) {
       rightButtons = [
         {
           icon: require('../../img/threedot.png'),
@@ -38,9 +38,9 @@ export default class Feed extends Component {
     }
     this.props.navigator.push({
       screen: RIDE,
-      title: ride.name,
+      title: ride.get('name'),
       passProps: {
-        rideID: ride._id,
+        rideID: ride.get('_id'),
       },
       navigatorButtons: {
         leftButtons: [],
@@ -56,7 +56,7 @@ export default class Feed extends Component {
         <Tabs initialPage={0} locked={true}>
           <Tab tabStyle={{backgroundColor: brand}} activeTabStyle={{backgroundColor: brand}} heading="Following">
             <RideList
-              horses={this.props.horses}
+              horses={this.props.horses.filter(h => h.get('userID') !== this.props.userID)}
               navigator={this.props.navigator}
               refreshing={this.props.refreshing}
               rides={this.props.followingRides}
@@ -72,7 +72,7 @@ export default class Feed extends Component {
           </Tab>
           <Tab tabStyle={{backgroundColor: brand}} activeTabStyle={{backgroundColor: brand}} heading="You">
             <RideList
-              horses={this.props.horses}
+              horses={this.props.horses.filter(h => h.get('userID') === this.props.userID)}
               navigator={this.props.navigator}
               refreshing={this.props.refreshing}
               rides={this.props.yourRides}

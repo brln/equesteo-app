@@ -21,12 +21,12 @@ function RideDay (props) {
         fontSize: 25,
         fontWeight: 'bold'}}
       >
-        {props.ride.distance.toFixed(1)}
+        {props.ride.get('distance').toFixed(1)}
       </Text>
     )
   } else if (props.chosenType === props.types.TIME) {
     showString = props.timeString(
-      props.ride.elapsedTimeSecs,
+      props.ride.get('elapsedTimeSecs'),
       {textAlign: 'center', fontSize: 15, fontWeight: 'bold'},
       false
     )
@@ -53,18 +53,18 @@ function MultiRideDay (props) {
                 fontSize: 25,
                 fontWeight: 'bold'}}
               >
-                {r.distance.toFixed(1)}
+                {r.get('distance').toFixed(1)}
               </Text>
             )
           } else if (props.chosenType === props.types.TIME) {
             showString = props.timeString(
-              r.elapsedTimeSecs,
+              r.get('elapsedTimeSecs'),
               {textAlign: 'center', fontSize: 15, fontWeight: 'bold'},
               false
             )
           }
           return (
-            <TouchableOpacity key={r._id} onPress={() => { props.showRide(r)} }>
+            <TouchableOpacity key={r.get('_id')} onPress={() => { props.showRide(r)} }>
               { showString }
             </TouchableOpacity>
           )
@@ -97,9 +97,9 @@ export default class Week extends Component {
   showRide (ride) {
     this.props.navigator.push({
       screen: RIDE,
-      title: ride.name,
+      title: ride.get('name'),
       passProps: {
-        rideID: ride._id,
+        rideID: ride.get('_id'),
       },
       navigatorButtons: {
         leftButtons: [],
@@ -124,12 +124,12 @@ export default class Week extends Component {
       const eachDay = moment(start).add(i, 'days')
       const daysRides = []
       for (let ride of this.props.rides) {
-        const showingID = ride.horseID ? ride.horseID : null
-        if (moment(ride.startTime).date() === eachDay.date()
+        const showingID = ride.get('horseID') ? ride.get('horseID') : null
+        if (moment(ride.get('startTime')).date() === eachDay.date()
           && (showingID === this.props.chosenHorseID || this.props.chosenHorseID === this.props.showEveryone)) {
           daysRides.push(ride)
-          totalDistance += ride.distance
-          totalTime += ride.elapsedTimeSecs
+          totalDistance += ride.get('distance')
+          totalTime += ride.get('elapsedTimeSecs')
         }
       }
 

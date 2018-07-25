@@ -1,7 +1,7 @@
 import ImagePicker from 'react-native-image-crop-picker'
 
 import { changeHorsePhotoData, changeRidePhotoData, changeUserPhotoData, photoPersistComplete } from '../actions'
-import { horsePhotoURL, profilePhotoURL, ridePhotoURL } from '../helpers'
+import { horsePhotoURL, logInfo, logError, profilePhotoURL, ridePhotoURL } from '../helpers'
 import UserAPI from '../services/user_api'
 import { dequeuePhoto } from '../photoQueue'
 
@@ -10,12 +10,16 @@ let savingRemotely = false
 
 export default uploadPhotos = store => dispatch => action => {
   dispatch(action)
-  let currentState = store.getState()
-  const needsPersist = Object.values(currentState.localState.needsPhotoUploads).filter((x) => x).length > 0
-  if (needsPersist && currentState.localState.jwt && currentState.localState.goodConnection) {
-    let userAPI = new UserAPI(currentState.localState.jwt)
-    for (let type of Object.keys(currentState.localState.needsPhotoUploads)) {
-      if (currentState.localState.needsPhotoUploads[type]) {
+  const currentState = store.getState().get('main')
+  const localState = currentState.get('localState')
+  const needsPhotoUploads = localState.get('needsPhotoUploads')
+  const needsAnyPhotoUpload = needsPhotoUploads.valueSeq().filter(x => x).count() > 0
+  const jwt = localState.get('jwt')
+  const goodConnection = localState.get('goodConnection')
+  if (needsAnyPhotoUpload && jwt && goodConnection) {
+    let userAPI = new UserAPI(jwt)
+    for (let type of needsPhotoUploads.keySeq()) {
+      if (needsPhotoUploads.get(type)) {
         let nextItem = dequeuePhoto(type)
         while (nextItem) {
           if (savingRemotely) {
@@ -66,7 +70,7 @@ function remotePersist (item, store, userAPI) {
   }).catch((e) => {
     queue = []
     savingRemotely = false
-    console.log('photo upload error')
-    console.log(e)
+    logInfo('photo upload error')
+    logError(e)
   })
 }

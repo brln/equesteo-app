@@ -1,12 +1,11 @@
 import PushNotification from 'react-native-push-notification'
 
 export default async (m) => {
-  console.log(m)
   const userID = m.data.userID
   const rideID = m.data.rideID
   const userName = m.data.userName
   const distance = m.data.distance
-  const message = `${userName} went for a ${distance} mile ride!`
+  const message = `${userName} went for a ${distance.toFixed(1)} mile ride!`
   PushNotification.localNotification({
     message: message,
   })

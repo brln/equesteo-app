@@ -76,6 +76,7 @@ class RecorderContainer extends NavigatorComponent {
   }
 
   render() {
+    console.log('rendering RecorderContainer')
     return (
       <RideRecorder
         appState={this.props.appState}
@@ -93,10 +94,10 @@ class RecorderContainer extends NavigatorComponent {
 
 function mapStateToProps (state) {
   return {
-    appState: state.localState.appState,
-    currentRide: state.localState.currentRide,
-    horses: state.horses,
-    lastLocation: state.localState.lastLocation,
+    appState: state.getIn(['main', 'localState', 'appState']),
+    currentRide: state.getIn(['main', 'localState', 'currentRide']),
+    horses: state.getIn(['main', 'horses']).toList(),
+    lastLocation: state.getIn(['main', 'localState', 'lastLocation'])
   }
 }
 

@@ -5,6 +5,7 @@ import thunkMiddleware from 'redux-thunk'
 import { Navigation, NativeEventsReceiver } from 'react-native-navigation'
 import { Sentry } from 'react-native-sentry'
 import { ENV, SENTRY_DSN } from 'react-native-dotenv'
+import { combineReducers, getIn } from 'redux-immutable';
 
 import { appInitialized } from "./actions"
 import logger from './middleware/logger'
@@ -14,7 +15,7 @@ import AppReducer from './reducer'
 import { DRAWER, FEED_DETAILS, SIGNUP_LOGIN, registerScreens } from './screens'
 
 const store = createStore(
-  AppReducer,
+  combineReducers({main: AppReducer}),
   undefined,
   applyMiddleware(
     thunkMiddleware,
@@ -37,7 +38,7 @@ export default class App {
   }
 
   onStoreUpdate() {
-    const root = store.getState().localState.root
+    const root = store.getState().getIn(['main', 'localState', 'root'])
     if (this.currentRoot !== root) {
       this.currentRoot = root
 
@@ -72,7 +73,7 @@ export default class App {
         })
         return
       default:
-        console.log('unknown app root!')
+        throw Error('unknown app root!')
         return
 
     }

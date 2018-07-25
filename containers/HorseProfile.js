@@ -51,7 +51,7 @@ class HorseProfileContainer extends NavigatorComponent {
                   screen: UPDATE_HORSE,
                   title: 'Update Horse',
                   passProps: {
-                    horseID: this.props.horse._id,
+                    horseID: this.props.horse.get('_id'),
                     newHorse: false
                   },
                   animationType: 'slide-up',
@@ -72,10 +72,11 @@ class HorseProfileContainer extends NavigatorComponent {
   }
 
   uploadPhoto (location) {
-    this.props.dispatch(uploadHorsePhoto(location, this.props.horse._id))
+    this.props.dispatch(uploadHorsePhoto(location, this.props.horse.get('_id')))
   }
 
   render() {
+    console.log('rendering HorseProfileContainer')
     return (
       <HorseProfile
         closeDeleteModal={this.closeDeleteModal}
@@ -91,10 +92,12 @@ class HorseProfileContainer extends NavigatorComponent {
 }
 
 function mapStateToProps (state, passedProps) {
+  const mainState = state.get('main')
+  const localState = mainState.get('localState')
   return {
-    horse: state.horses.filter((h) => h._id === passedProps.horse._id)[0],
+    horse: mainState.get('horses').toList().filter((h) => h.get('_id') === passedProps.horse.get('_id')).get(0),
     horseUser: passedProps.user,
-    user: state.users[state.localState.userID]
+    user: mainState.get('users').get(localState.get('userID'))
   }
 }
 

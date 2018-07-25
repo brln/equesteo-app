@@ -20,6 +20,7 @@ class TrainingContainer extends NavigatorComponent {
   }
 
   render() {
+    console.log('rendering SignupLoginContainer')
     return (
       <Training
         horses={this.props.horses}
@@ -32,10 +33,19 @@ class TrainingContainer extends NavigatorComponent {
 }
 
 function mapStateToProps (state, passedProps) {
+  const mainState = state.get('main')
+  const localState = mainState.get('localState')
+  const userID = localState.get('userID')
+  const rides = mainState.get('rides').valueSeq().filter(
+    (r) => r.get('userID') === userID && r.get('deleted') !== true
+  ).toList()
+  const horses = mainState.get('horses').valueSeq().filter(
+    (r) => r.get('userID') === userID && r.get('deleted') !== true
+  ).toList()
   return {
-    horses: state.horses,
-    rides: state.rides.filter((r) => r.userID === state.localState.userID && r.deleted !== true),
-    user: state.users[state.localState.userID]
+    horses,
+    rides,
+    user: mainState.getIn(['users', userID])
   }
 }
 

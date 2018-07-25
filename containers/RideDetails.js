@@ -1,3 +1,4 @@
+import { Map } from 'immutable'
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
@@ -53,15 +54,15 @@ class RideDetailsContainer extends NavigatorComponent {
       const name = newRideName(props.currentRide)
       const _id = `${props.userID.toString()}_${(new Date).getTime().toString()}`
       nextState = {
-        ride: {
+        ride: Map({
           _id,
           elapsedTimeSecs: props.elapsedTime,
           horseID: null,
           name,
           userID: props.userID,
-          photosByID: {},
+          photosByID: Map({}),
           coverPhotoID: null,
-        },
+        }),
         userMadeChanges: true
       }
     } else if (!state.ride) {
@@ -75,10 +76,7 @@ class RideDetailsContainer extends NavigatorComponent {
   changeRideName (text) {
     this.setState({
       ...this.state,
-      ride: {
-        ...this.state.ride,
-        name: text
-      }
+      ride: this.state.ride.set('name', text)
     })
   }
 
@@ -86,10 +84,7 @@ class RideDetailsContainer extends NavigatorComponent {
     this.setState({
       ...this.state,
       horseSelected: true,
-      ride: {
-        ...this.state.ride,
-        horseID
-      }
+      ride: this.state.ride.set('horseID', horseID)
     })
   }
 
@@ -119,68 +114,73 @@ class RideDetailsContainer extends NavigatorComponent {
 
   createRide () {
     this.props.dispatch(stopLocationTracking())
-    for (let photoID of Object.keys(this.state.ride.photosByID)) {
-      this.props.dispatch(uploadRidePhoto(photoID, this.state.ride.photosByID[photoID].uri, this.state.ride._id))
+    for (let photoID of this.state.ride.get('photosByID').keySeq()) {
+      this.props.dispatch(
+        uploadRidePhoto(
+          photoID,
+          this.state.ride.getIn(['photosByID', photoID]).uri,
+          this.state.ride.get('_id')
+        )
+      )
     }
     this.props.dispatch(createRide(this.state.ride))
     this.doneOnPage()
   }
 
   changeCoverPhoto (coverPhotoID) {
-    console.log('changing: ' + coverPhotoID)
+    const newRide = this.state.ride.set('coverPhotoID', coverPhotoID)
     this.setState({
       ...this.state,
-      ride: {
-        ...this.state.ride,
-        coverPhotoID
-      }
+      ride: newRide
     })
   }
 
   uploadPhoto (photoURI) {
     const photoID = generateUUID()
-    const newPhotosByID = {...this.state.ride.photosByID}
-    newPhotosByID[photoID] = {uri: photoURI, timestamp: unixTimeNow()}
+    const newPhotosByID = this.state.ride.get('photosByID').set(photoID, {uri: photoURI, timestamp: unixTimeNow()})
+    const newRide = this.state.ride.set('coverPhotoID', photoID).set('photosByID', newPhotosByID)
     this.setState({
       ...this.state,
       horseSelected: true,
-      ride: {
-        ...this.state.ride,
-        coverPhotoID: photoID,
-        photosByID: newPhotosByID
-      }
+      ride: newRide
     })
   }
 
   render() {
+    console.log('rendering RideDetailsContainer')
     return (
       <RideDetails
         changeCoverPhoto={this.changeCoverPhoto}
-        coverPhotoID={this.state.ride.coverPhotoID}
-        photosByID={this.state.ride.photosByID}
+        coverPhotoID={this.state.ride.get('coverPhotoID')}
+        photosByID={this.state.ride.get('photosByID')}
         horses={this.props.horses}
-        horseID={this.state.ride.horseID}
+        horseID={this.state.ride.get('horseID')}
         horseSelected={this.state.horseSelected}
         changeRideName={this.changeRideName}
         changeHorseID={this.changeHorseID}
-        rideName={this.state.ride.name}
+        rideName={this.state.ride.get('name')}
         uploadPhoto={this.uploadPhoto}
       />
     )
   }
 }
 
-function mapStateToProps (state, ownProps) {
-  const newRide = !ownProps.rideID
-  let currentRide = state.localState.currentRide
+function mapStateToProps (state, passedProps) {
+  const newRide = !passedProps.rideID
+  const mainState = state.get('main')
+  const localState = mainState.get('localState')
+  const userID = localState.get('userID')
+  let currentRide = localState.get('currentRide')
   if (!newRide) {
-    currentRide = state.rides.filter(r => r._id === ownProps.rideID)[0]
+    currentRide = mainState.getIn(['rides', passedProps.rideID])
   }
   return {
     currentRide,
-    horses: state.horses.filter((h) => h.userID === state.localState.userID && h.deleted !== true),
+    horses: mainState.get('horses').toList().filter(
+      h => h.get('userID') === userID && h.get('deleted') !== true
+    ),
     newRide,
-    userID: state.localState.userID,
+    userID,
   }
 }
 

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import {
   Body,
   Left,
@@ -14,35 +14,31 @@ import {
 } from 'react-native';
 import moment from 'moment'
 
-export default class CommentList extends Component {
+export default class CommentList extends PureComponent {
   constructor (props) {
     super(props)
     this.singleComment = this.singleComment.bind(this)
   }
 
-  shouldComponentUpdate (nextProps) {
-    return this.props.rideComments.length !== nextProps.rideComments.length
-  }
-
   commentProfilePhotoURL (user) {
-    const profilePhotoID = user.profilePhotoID
+    const profilePhotoID = user.get('profilePhotoID')
     let profilePhotoURL = null
     if (profilePhotoID) {
-      profilePhotoURL = user.photosByID[profilePhotoID].uri
+      profilePhotoURL = user.getIn(['photosByID', profilePhotoID]).uri
     }
     return profilePhotoURL
   }
 
   singleComment({item}) {
     const rideComment = item
-    const commentUser = this.props.users[rideComment.userID]
+    const commentUser = this.props.users.get(rideComment.userID)
     return (
       <ListItem avatar key={rideComment._id}>
         <Left>
           <Thumbnail source={{ uri: this.commentProfilePhotoURL(commentUser) }} />
         </Left>
         <Body>
-        <Text>{commentUser.firstName || ''} {commentUser.lastName || ''}</Text>
+        <Text>{commentUser.get('firstName') || ''} {commentUser.get('lastName') || ''}</Text>
         <Text note>{rideComment.comment}</Text>
         </Body>
         <Right>
@@ -53,11 +49,10 @@ export default class CommentList extends Component {
   }
 
   render() {
-    console.log('rendering CommentList')
     return (
       <ScrollView>
         <FlatList
-          data={this.props.rideComments}
+          data={this.props.rideComments.toJS()}
           keyExtractor={(i) => i._id}
           renderItem={this.singleComment}
         />

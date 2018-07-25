@@ -55,7 +55,7 @@ export default class Training extends Component {
   ridesToWeeks (rides) {
     const rideWeeks = {}
     for (let ride of rides) {
-      let monday = getMonday(ride.startTime)
+      let monday = getMonday(ride.get('startTime'))
       if (!rideWeeks[monday]) {
         rideWeeks[monday] = []
       }
@@ -99,8 +99,8 @@ export default class Training extends Component {
         <Picker selectedValue={this.state.chosenHorseID} onValueChange={this.pickHorse}>
           <Picker.Item key="everyone" label="All Horses" value={this.SHOW_EVERYONE} />
           {
-            this.props.horses.filter(h => h.userID === this.props.user._id).map(h => {
-              return <Picker.Item key={h._id} label={h.name} value={h._id} />
+            this.props.horses.filter(h => h.get('userID') === this.props.user.get('_id')).map(h => {
+              return <Picker.Item key={h.get('_id')} label={h.get('name')} value={h.get('_id')} />
             })
           }
           <Picker.Item key="none" label="No Horse" value={null} />

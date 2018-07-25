@@ -20,16 +20,8 @@ export default class RidingMap extends Component {
     this.gpsStatusImage = this.gpsStatusImage.bind(this)
   }
 
-  shouldComponentUpdate(nextProps) {
-    let should = false
-    if (nextProps.rideCoords.length !== this.props.rideCoords.length) {
-      should = true
-    }
-    return should
-  }
-
   componentDidUpdate(prevProps) {
-    if (prevProps.rideCoords.length === 0 && this.props.rideCoords.length === 1) {
+    if (prevProps.rideCoords.count() === 0 && this.props.rideCoords.count() === 1) {
       this.map.animateToRegion(this.fitToElements())
     }
     this.changeBearing()
@@ -57,7 +49,7 @@ export default class RidingMap extends Component {
 
   changeBearing () {
     let newBearing = 0
-    let coordinates = this.props.rideCoords
+    let coordinates = this.props.rideCoords.toJS()
     const lastCoord = coordinates[coordinates.length -1]
     if (coordinates.length > 1) {
       newBearing = bearing(
@@ -90,6 +82,7 @@ export default class RidingMap extends Component {
   }
 
   render() {
+    console.log('render ridingmap')
     return (
       <View style ={styles.container}>
         <View style={{flex: 1}}>
@@ -100,7 +93,7 @@ export default class RidingMap extends Component {
           >
             <MapView.Polyline
               style={styles.map}
-              coordinates={this.props.rideCoords}
+              coordinates={this.props.rideCoords.toJS()}
               strokeColor="#dc0202"
               strokeWidth={5}
             >
