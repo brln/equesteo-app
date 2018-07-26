@@ -1,11 +1,11 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import ImageViewer from 'react-native-image-zoom-viewer'
 import {
   StyleSheet,
   View
 } from 'react-native';
 
-export default class PhotoLightbox extends Component {
+export default class PhotoLightbox extends PureComponent {
   constructor (props) {
     super(props)
     this.close = this.close.bind(this)

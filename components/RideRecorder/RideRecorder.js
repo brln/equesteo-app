@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import {
   StyleSheet,
   Text,
@@ -14,7 +14,7 @@ import RidingMap from './RidingMap'
 import RideStats from './RideStats'
 import { RIDE_DETAILS } from "../../screens"
 
-export default class RideRecorder extends Component {
+export default class RideRecorder extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {

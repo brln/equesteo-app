@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import {
   Picker,
   ScrollView,
@@ -16,7 +16,7 @@ import { darkBrand } from '../colors'
 import PhotosByTimestamp from './PhotosByTimestamp'
 
 
-export default class UpdateHorse extends Component {
+export default class UpdateHorse extends PureComponent {
   constructor (props) {
     super(props)
     this.changeHorseBirthDay = this.changeHorseBirthDay.bind(this)

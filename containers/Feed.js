@@ -17,6 +17,8 @@ class FeedContainer extends NavigatorComponent {
       refreshing: false,
       lastFullSync: null
     }
+    this.filteredHorses = this.filteredHorses.bind(this)
+    this.followIDs = this.followIDs.bind(this)
     this.followingRides = this.followingRides.bind(this)
     this.justFinishedRideShown = this.justFinishedRideShown.bind(this)
     this.toggleCarrot = this.toggleCarrot.bind(this)
@@ -62,22 +64,33 @@ class FeedContainer extends NavigatorComponent {
   yourRides () {
     return this.props.rides.valueSeq().filter(
       (r) => r.get('userID') === this.props.userID && r.get('deleted') !== true
-    ).sort((a, b) => b.get('startTime') - a.get('startTime')).toList()
+    ).sort((a, b) =>
+      b.get('startTime') - a.get('startTime')
+    ).toList()
   }
 
-  followingRides () {
-    const following = this.props.follows.valueSeq().filter(
+  followIDs () {
+    return this.props.follows.valueSeq().filter(
       f => f.get('deleted') !== true && f.get('followerID') === this.props.userID
     ).map(
       f => f.get('followingID')
-    )
+    ).toList()
+  }
+
+  followingRides () {
     return this.props.rides.valueSeq().filter(
       r => r.get('userID') !== this.props.userID // not the users rides
         && r.get('deleted') !== true // hasn't been deleted
-        && following.indexOf(r.get('userID')) >= 0 // user hasn't removed follow
+        && this.followIDs().indexOf(r.get('userID')) >= 0 // user hasn't removed follow
     ).sort(
       (a, b) => b.get('startTime') - a.get('startTime')
     ).toList()
+  }
+
+  filteredHorses () {
+    return this.props.horses.valueSeq().filter(h => {
+      return this.followIDs().indexOf(h.get('userID')) >= 0 || h.get('userID') === this.props.userID
+    }).toList()
   }
 
   render() {
@@ -86,7 +99,7 @@ class FeedContainer extends NavigatorComponent {
       <Feed
         deleteRide={this.deleteRide}
         followingRides={this.followingRides()}
-        horses={this.props.horses.toList()}
+        horses={this.filteredHorses()}
         justFinishedRide={this.props.justFinishedRide}
         justFinishedRideShown={this.justFinishedRideShown}
         navigator={this.props.navigator}

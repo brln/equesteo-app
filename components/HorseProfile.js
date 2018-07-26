@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import ImagePicker from 'react-native-image-crop-picker'
 import {
   Card,
@@ -24,7 +24,7 @@ import Stat from './Stat'
 const { height } = Dimensions.get('window')
 
 
-export default class HorseProfile extends Component {
+export default class HorseProfile extends PureComponent {
   constructor (props) {
     super(props)
     this.makeBirthday = this.makeBirthday.bind(this)

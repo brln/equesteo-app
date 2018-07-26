@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import {
   StyleSheet,
   Text,
@@ -8,7 +8,7 @@ import {
 
 import CommentList from './CommentList'
 
-export default class RideComments extends Component {
+export default class RideComments extends PureComponent {
   constructor (props) {
     super(props)
   }

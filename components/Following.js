@@ -1,5 +1,5 @@
 import { Map } from 'immutable'
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import {
   FlatList,
   ScrollView,
@@ -17,7 +17,7 @@ import {
 
 import { PROFILE } from '../screens'
 
-export default class Following extends Component {
+export default class Following extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {

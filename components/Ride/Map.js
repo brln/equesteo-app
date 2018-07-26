@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import MapView from 'react-native-maps';
 
 import {
@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 
 
-export default class Map extends Component {
+export default class Map extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {}

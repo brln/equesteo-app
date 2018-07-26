@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 
 import {
   StyleSheet,
@@ -8,7 +8,7 @@ import {
   View
 } from 'react-native';
 
-export default class ForgotForm extends Component {
+export default class ForgotForm extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {

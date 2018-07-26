@@ -1,12 +1,9 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import {
-  Button,
   Dimensions,
   Image,
-  ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View
 } from 'react-native';
@@ -15,7 +12,7 @@ import { orange } from '../../colors'
 
 const { width } = Dimensions.get('window')
 
-export default class HorseSelector extends Component {
+export default class HorseSelector extends PureComponent {
   constructor (props) {
     super(props)
     this.thumbnail = this.thumbnail.bind(this)

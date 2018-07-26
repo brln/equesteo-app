@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import {
   StyleSheet,
   Text,
@@ -9,7 +9,7 @@ const initialState = {
   elapsedTime: undefined
 }
 
-export default class TimeElapsed extends Component {
+export default class TimeElapsed extends PureComponent {
   constructor (props) {
     super(props)
     this.state = { ...initialState }

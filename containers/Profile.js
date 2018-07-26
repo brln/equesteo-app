@@ -85,7 +85,7 @@ class ProfileContainer extends NavigatorComponent {
         <Profile
           createFollow={this.createFollow}
           deleteFollow={this.deleteFollow}
-          follows={this.props.follows}
+          follows={this.yourFollows()}
           horses={this.yourHorses()}
           navigator={this.props.navigator}
           profileUser={this.props.profileUser}

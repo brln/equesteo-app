@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import Swiper from 'react-native-swiper';
 import memoizeOne from 'memoize-one';
 import {
@@ -18,9 +18,9 @@ import SpeedChart from './SpeedChart'
 import Stats from './Stats'
 import DeleteModal from '../DeleteModal'
 
-const { height, width } = Dimensions.get('window')
+const { width } = Dimensions.get('window')
 
-export default class Ride extends Component {
+export default class Ride extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {

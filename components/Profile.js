@@ -1,5 +1,5 @@
 import { Map } from 'immutable'
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import Swiper from 'react-native-swiper';
 import ImagePicker from 'react-native-image-crop-picker'
 import {
@@ -29,7 +29,7 @@ import FabImage from './FabImage'
 
 const { height } = Dimensions.get('window')
 
-export default class Profile extends Component {
+export default class Profile extends PureComponent {
   constructor (props) {
     super(props)
     this.follow = this.follow.bind(this)

@@ -1,6 +1,5 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import {
-  Button,
   ScrollView,
   StyleSheet,
   Text,
@@ -19,7 +18,7 @@ import FabImage from '../FabImage'
 import HorseSelector from './HorseSelector'
 import PhotosByTimestamp from '../PhotosByTimestamp'
 
-export default class RideDetails extends Component {
+export default class RideDetails extends PureComponent {
   constructor (props) {
     super(props)
     this.uploadPhoto = this.uploadPhoto.bind(this)

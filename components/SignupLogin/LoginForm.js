@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import {
   ActivityIndicator,
   StyleSheet,
@@ -11,7 +11,7 @@ import {
 import { darkBrand } from '../../colors'
 
 
-export default class LoginForm extends Component {
+export default class LoginForm extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {

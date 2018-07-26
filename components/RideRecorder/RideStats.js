@@ -1,23 +1,25 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import TimeElapsed from './TimeElapsed'
 
-export default RideStats = (props) => {
-  return (
-    <View style={styles.rideStats}>
-      <Text
-        style={styles.statFont}
-      >
-        { props.distance.toFixed(2).toString() } mi
-      </Text>
-      <TimeElapsed
-        appState={props.appState}
-        startTime={props.startTime}
-        fontStyle={styles.statFont}
-      />
-    </View>
-  )
+export default class RideStats extends PureComponent {
+  render () {
+    return (
+      <View style={styles.rideStats}>
+        <Text
+          style={styles.statFont}
+        >
+          {this.props.distance.toFixed(2).toString()} mi
+        </Text>
+        <TimeElapsed
+          appState={this.props.appState}
+          startTime={this.props.startTime}
+          fontStyle={styles.statFont}
+        />
+      </View>
+    )
+  }
 }
 
 const styles = StyleSheet.create({

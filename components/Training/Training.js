@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
   FlatList,
   Picker,
@@ -31,7 +31,7 @@ function DaysOfWeek () {
   )
 }
 
-export default class Training extends Component {
+export default class Training extends PureComponent {
   constructor (props) {
     super(props)
     this.TYPES = {

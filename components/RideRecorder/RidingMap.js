@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import MapView from 'react-native-maps';
 
 import {
@@ -10,7 +10,7 @@ import {
 
 import { bearing, rideCoordsToMapCoords } from '../../helpers'
 
-export default class RidingMap extends Component {
+export default class RidingMap extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {}

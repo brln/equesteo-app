@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,7 +6,7 @@ import {
   View
 } from 'react-native';
 
-export default class NewHorse extends Component {
+export default class NewHorse extends PureComponent {
   static navigatorButtons = {
     leftButtons: [],
     rightButtons: [

@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { VictoryArea, VictoryAxis, VictoryChart } from "victory-native"
 import {
   Dimensions,
@@ -8,7 +8,7 @@ import {
 
 const { height, width } = Dimensions.get('window')
 
-export default class SpeedChart extends Component {
+export default class SpeedChart extends PureComponent {
   constructor (props) {
     super(props)
   }

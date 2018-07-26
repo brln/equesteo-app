@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import {
   Image,
   TouchableWithoutFeedback,
@@ -8,7 +8,7 @@ import {
 import { brand } from '../colors'
 import { PHOTO_LIGHTBOX } from '../screens'
 
-export default class SwipablePhoto extends Component {
+export default class SwipablePhoto extends PureComponent {
   constructor (props) {
     super(props)
     this.closeLightbox = this.closeLightbox.bind(this)

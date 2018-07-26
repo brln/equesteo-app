@@ -1,11 +1,12 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { green, danger } from '../../colors'
 
-export default GPSStatus = (props) => {
+export default class GPSStatus extends PureComponent {
+  render () {
     let positionFound = <Text style={styles.locationNotFound}>Location Not Found</Text>
-    if (props.lastLocation) {
+    if (this.props.lastLocation) {
       positionFound = <Text style={styles.locationFound}>Location Found!</Text>
     }
     return (
@@ -13,6 +14,7 @@ export default GPSStatus = (props) => {
         {positionFound}
       </View>
     )
+  }
 }
 
 const styles = StyleSheet.create({

@@ -1,5 +1,4 @@
-import React, { Component } from 'react';
-import { Navigation } from 'react-native-navigation'
+import React, { PureComponent } from 'react';
 import {
   Dimensions,
   Image,
@@ -17,7 +16,7 @@ import { UPDATE_HORSE } from '../screens'
 const { width } = Dimensions.get('window')
 
 
-export default class Barn extends Component {
+export default class Barn extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {}
