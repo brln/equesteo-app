@@ -146,7 +146,6 @@ export default class Ride extends Component {
   render () {
     let speedChart = <Text>Not enough points for Speed Chart</Text>
     let speedData = this.memoizedParse(this.props.ride.get('rideCoordinates').toJS())
-    console.log(speedData)
     if (this.props.ride.get('rideCoordinates').count() >= 2) {
       speedChart = (
         <View style={styles.slide}>

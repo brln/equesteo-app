@@ -1,7 +1,6 @@
 import { List, Map } from 'immutable'
 
 import {
-  CHANGE_SCREEN,
   CLEAR_LAST_LOCATION,
   CLEAR_SEARCH,
   CLEAR_STATE,
@@ -81,8 +80,6 @@ const initialState = Map({
 
 export default function AppReducer(state=initialState, action) {
   switch (action.type) {
-    case CHANGE_SCREEN:
-      return state.setIn(['localState', 'currentScreen'], action.screen)
     case CLEAR_LAST_LOCATION:
       return state.setIn(['localState', 'lastLocation'], null)
     case CLEAR_SEARCH:

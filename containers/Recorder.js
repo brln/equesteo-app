@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import LocationServicesDialogBox from "react-native-android-location-services-dialog-box";
 
 import {
-  changeScreen,
   discardRide,
   stopLocationTracking,
   startRide,
@@ -45,7 +44,6 @@ class RecorderContainer extends NavigatorComponent {
 
   onNavigatorEvent (event) {
     if (event.id === 'willDisappear' && event.type === 'ScreenChangedEvent') {
-      this.props.dispatch(changeScreen(FEED))
       if (!this.props.currentRide) {
         this.stopLocationTracking()
       }
@@ -53,7 +51,6 @@ class RecorderContainer extends NavigatorComponent {
   }
 
   backToFeed () {
-    this.props.dispatch(changeScreen(FEED))
     this.props.navigator.popToRoot()
   }
 
@@ -72,7 +69,6 @@ class RecorderContainer extends NavigatorComponent {
   discardRide () {
     this.props.dispatch(discardRide())
     this.props.navigator.popToRoot({animated: false, animationType: 'none'})
-    this.props.dispatch(changeScreen(FEED))
   }
 
   render() {
@@ -82,7 +78,7 @@ class RecorderContainer extends NavigatorComponent {
         appState={this.props.appState}
         currentRide={this.props.currentRide}
         discardRide={this.discardRide}
-        horses={this.props.horses}
+        horses={this.props.horses.toList()}
         lastLocation={this.props.lastLocation}
         navigator={this.props.navigator}
         startRide={this.startRide}
@@ -96,7 +92,7 @@ function mapStateToProps (state) {
   return {
     appState: state.getIn(['main', 'localState', 'appState']),
     currentRide: state.getIn(['main', 'localState', 'currentRide']),
-    horses: state.getIn(['main', 'horses']).toList(),
+    horses: state.getIn(['main', 'horses']),
     lastLocation: state.getIn(['main', 'localState', 'lastLocation'])
   }
 }

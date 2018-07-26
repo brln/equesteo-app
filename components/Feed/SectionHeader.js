@@ -3,12 +3,8 @@ import {
   Text,
   View
 } from 'react-native'
-import {
-  Card,
-} from 'native-base';
 
 import { formattedWeekString } from "../../helpers"
-import { darkBrand } from '../../colors'
 
 export default function SectionHeader (props) {
   return (

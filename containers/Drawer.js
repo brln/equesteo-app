@@ -11,8 +11,6 @@ import {
 
 import {
   BARN,
-  FEED,
-  FEED_DETAILS,
   FOLLOWING,
   PROFILE,
   RIDES,
@@ -20,7 +18,6 @@ import {
   RECORDER,
   TRAINING,
 } from '../screens'
-import { changeScreen } from '../actions'
 import { brand, lightGrey } from '../colors'
 
 
@@ -32,20 +29,12 @@ class DrawerContainer extends PureComponent {
     this.toggleDrawer = this.toggleDrawer.bind(this)
 		this.openAccount = this.openAccount.bind(this)
     this.openBarn = this.openBarn.bind(this)
-    this.openFeed = this.openFeed.bind(this)
     this.openFollowing = this.openFollowing.bind(this)
 		this.openRecorder = this.openRecorder.bind(this)
     this.openTraining = this.openTraining.bind(this)
   }
 
-  openFeed () {
-    this.props.dispatch(changeScreen(FEED))
-    this.toggleDrawer()
-    this.props.navigator.push(FEED_DETAILS)
-  }
-
   openFollowing () {
-    this.props.dispatch(changeScreen(FOLLOWING))
     this.toggleDrawer()
     this.props.navigator.push({
       screen: FOLLOWING,
@@ -59,7 +48,6 @@ class DrawerContainer extends PureComponent {
   }
 
   openRecorder () {
-    this.props.dispatch(changeScreen(RECORDER))
     this.toggleDrawer()
     this.props.navigator.push({
       screen: RECORDER,
@@ -73,7 +61,6 @@ class DrawerContainer extends PureComponent {
 	}
 
 	openAccount () {
-    this.props.dispatch(changeScreen(PROFILE))
     this.toggleDrawer()
     this.props.navigator.push({
       screen: PROFILE,
@@ -96,7 +83,6 @@ class DrawerContainer extends PureComponent {
 	}
 
   openBarn () {
-    this.props.dispatch(changeScreen(BARN))
     this.toggleDrawer()
     this.props.navigator.push({
       screen: BARN,
@@ -110,7 +96,6 @@ class DrawerContainer extends PureComponent {
   }
 
   openTraining () {
-    this.props.dispatch(changeScreen(TRAINING))
     this.toggleDrawer()
     this.props.navigator.push({
       screen: TRAINING,
@@ -133,79 +118,6 @@ class DrawerContainer extends PureComponent {
 
   render() {
     console.log('rendering DrawerContainer')
-    let feed = null
-    let barnScreen = null
-		let myAccountScreen = null
-    let recorder = null
-    let following = null
-    let training = null
-    if (this.props.currentScreen !== FEED) {
-      feed = (
-        <TouchableOpacity onPress={this.openFeed}>
-          <View style={styles.drawerListItem}>
-            <Text style={styles.drawerListItemText}>
-              Feed
-            </Text>
-          </View>
-        </TouchableOpacity>
-      )
-    }
-    if (this.props.currentScreen !== BARN) {
-      barnScreen = (
-        <TouchableOpacity onPress={this.openBarn}>
-          <View style={styles.drawerListItem}>
-            <Text style={styles.drawerListItemText}>
-              Barn
-            </Text>
-          </View>
-        </TouchableOpacity>
-			)
-    }
-    if (this.props.currentScreen !== PROFILE) {
-			myAccountScreen = (
-        <TouchableOpacity onPress={this.openAccount}>
-          <View style={styles.drawerListItem}>
-            <Text style={styles.drawerListItemText}>
-              My Account
-            </Text>
-          </View>
-        </TouchableOpacity>
-			)
-		}
-		if (this.props.currentScreen !== RECORDER) {
-      recorder = (
-				<TouchableOpacity onPress={this.openRecorder}>
-					<View style={styles.drawerListItem}>
-						<Text style={styles.drawerListItemText} onTouch>
-							Go Ride
-						</Text>
-					</View>
-				</TouchableOpacity>
-      )
-    }
-    if (this.props.currentScreen !== FOLLOWING) {
-      following = (
-        <TouchableOpacity onPress={this.openFollowing}>
-          <View style={styles.drawerListItem}>
-            <Text style={styles.drawerListItemText} onTouch>
-              Following
-            </Text>
-          </View>
-        </TouchableOpacity>
-      )
-    }
-    if (this.props.currentScreen !== TRAINING) {
-      training = (
-        <TouchableOpacity onPress={this.openTraining}>
-          <View style={styles.drawerListItem}>
-            <Text style={styles.drawerListItemText} onTouch>
-              Training
-            </Text>
-          </View>
-        </TouchableOpacity>
-      )
-    }
-
     return (
       <View style={styles.linearGradient}>
         <View style={{
@@ -233,12 +145,46 @@ class DrawerContainer extends PureComponent {
         </View>
 				<View style={styles.container}>
 					<View style={styles.drawerList}>
-            {recorder}
-            {feed}
-            {barnScreen}
-            {training}
-            {following}
-						{myAccountScreen}
+            <TouchableOpacity onPress={this.openRecorder}>
+              <View style={styles.drawerListItem}>
+                <Text style={styles.drawerListItemText} onTouch>
+                  Go Ride
+                </Text>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={this.openBarn}>
+              <View style={styles.drawerListItem}>
+                <Text style={styles.drawerListItemText}>
+                  Barn
+                </Text>
+              </View>
+            </TouchableOpacity>
+
+
+            <TouchableOpacity onPress={this.openTraining}>
+              <View style={styles.drawerListItem}>
+                <Text style={styles.drawerListItemText} onTouch>
+                  Training
+                </Text>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={this.openFollowing}>
+              <View style={styles.drawerListItem}>
+                <Text style={styles.drawerListItemText} onTouch>
+                  Following
+                </Text>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={this.openAccount}>
+              <View style={styles.drawerListItem}>
+                <Text style={styles.drawerListItemText}>
+                  My Account
+                </Text>
+              </View>
+            </TouchableOpacity>
 					</View>
 				</View>
 			</View>
@@ -282,7 +228,6 @@ function mapStateToProps (state) {
   const users = state.getIn(['main', 'users'])
   const userID = state.getIn(['main', 'localState', 'userID'])
   return {
-  	currentScreen: state.getIn(['main', 'localState', 'currentScreen']),
     user: users.get(userID)
 	}
 }

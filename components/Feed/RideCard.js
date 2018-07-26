@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
   Button,
   Card,
@@ -24,7 +24,7 @@ import RideImage from './RideImage'
 
 const { width } = Dimensions.get('window')
 
-export default class RideCard extends Component {
+export default class RideCard extends PureComponent {
   constructor (props) {
     super(props)
     this.avgSpeed = this.avgSpeed.bind(this)

@@ -12,7 +12,6 @@ import {BadRequestError, NotConnectedError, UnauthorizedError} from "./errors"
 import { enqueueHorsePhoto, enqueueProfilePhoto, enqueueRidePhoto } from './photoQueue'
 
 import {
-  CHANGE_SCREEN,
   CLEAR_LAST_LOCATION,
   CLEAR_SEARCH,
   CLEAR_STATE,
@@ -47,14 +46,6 @@ import {
   USER_UPDATED,
   USER_SEARCH_RETURNED,
 } from './constants'
-
-export function changeScreen(screen) {
-  return {
-    type: CHANGE_SCREEN,
-    logData: ['screen'],
-    screen,
-  }
-}
 
 export function clearLastLocation () {
   return {
@@ -710,7 +701,6 @@ export function submitLogin (email, password) {
       dispatch(receiveJWT(resp.token))
       dispatch(setAppRoot('after-login'))
       dispatch(saveUserID(resp.id))
-      dispatch(changeScreen(FEED))
       await dispatch(loadLocalData())
       dispatch(getFCMToken())
       await LocalStorage.saveToken(resp.token, resp.id);

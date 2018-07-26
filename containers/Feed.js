@@ -2,12 +2,10 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import {
-  changeScreen,
   justFinishedRideShown,
   syncDBPull,
   toggleRideCarrot
 } from "../actions";
-import { logRender } from '../helpers'
 import Feed from '../components/Feed/Feed'
 import NavigatorComponent from './NavigatorComponent'
 import { FEED, RIDE_COMMENTS } from '../screens'
@@ -19,14 +17,12 @@ class FeedContainer extends NavigatorComponent {
       refreshing: false,
       lastFullSync: null
     }
+    this.followingRides = this.followingRides.bind(this)
     this.justFinishedRideShown = this.justFinishedRideShown.bind(this)
     this.toggleCarrot = this.toggleCarrot.bind(this)
     this.showComments = this.showComments.bind(this)
     this.syncDBPull = this.syncDBPull.bind(this)
-  }
-
-  componentDidMount () {
-    this.props.dispatch(changeScreen(FEED))
+    this.yourRides = this.yourRides.bind(this)
   }
 
   static getDerivedStateFromProps (nextProps, prevState) {
@@ -63,62 +59,65 @@ class FeedContainer extends NavigatorComponent {
     })
   }
 
+  yourRides () {
+    return this.props.rides.valueSeq().filter(
+      (r) => r.get('userID') === this.props.userID && r.get('deleted') !== true
+    ).sort((a, b) => b.get('startTime') - a.get('startTime')).toList()
+  }
+
+  followingRides () {
+    const following = this.props.follows.valueSeq().filter(
+      f => f.get('deleted') !== true && f.get('followerID') === this.props.userID
+    ).map(
+      f => f.get('followingID')
+    )
+    return this.props.rides.valueSeq().filter(
+      r => r.get('userID') !== this.props.userID // not the users rides
+        && r.get('deleted') !== true // hasn't been deleted
+        && following.indexOf(r.get('userID')) >= 0 // user hasn't removed follow
+    ).sort(
+      (a, b) => b.get('startTime') - a.get('startTime')
+    ).toList()
+  }
+
   render() {
     console.log('rendering feedContainer')
     return (
       <Feed
         deleteRide={this.deleteRide}
-        followingRides={this.props.followingRides}
-        horses={this.props.horses}
+        followingRides={this.followingRides()}
+        horses={this.props.horses.toList()}
         justFinishedRide={this.props.justFinishedRide}
         justFinishedRideShown={this.justFinishedRideShown}
         navigator={this.props.navigator}
         refreshing={this.state.refreshing}
-        rideCarrots={this.props.rideCarrots}
-        rideComments={this.props.rideComments}
+        rideCarrots={this.props.rideCarrots.toList()}
+        rideComments={this.props.rideComments.toList()}
         showComments={this.showComments}
         syncDBPull={this.syncDBPull}
         toggleCarrot={this.toggleCarrot}
         userID={this.props.userID}
         users={this.props.users}
-        yourRides={this.props.yourRides}
+        yourRides={this.yourRides()}
       />
     )
   }
-}
-
-function followingRideFilter (state, userID) {
-  const following = state.getIn(['main', 'follows']).valueSeq().filter(
-    f => f.get('deleted') !== true && f.get('followerID') === userID
-  ).map(
-    f => f.get('followingID')
-  )
-  return state.getIn(['main', 'rides']).valueSeq().filter(
-    r => r.get('userID') !== userID // not the users rides
-      && r.get('deleted') !== true // hasn't been deleted
-      && following.indexOf(r.get('userID')) >= 0 // user hasn't removed follow
-  ).sort(
-    (a, b) => b.get('startTime') - a.get('startTime')
-  ).toList()
 }
 
 function mapStateToProps (state) {
   const mainState = state.get('main')
   const localState = mainState.get('localState')
   const userID = localState.get('userID')
-  const yourRides = mainState.get('rides').valueSeq().filter(
-      (r) => r.get('userID') === userID && r.get('deleted') !== true
-    ).sort((a, b) => b.get('startTime') - a.get('startTime')).toList()
   return {
-    followingRides: followingRideFilter(state, userID),
-    horses: mainState.get('horses').toList(),
+    follows: mainState.get('follows'),
+    horses: mainState.get('horses'),
     justFinishedRide: localState.get('justFinishedRide'),
     lastFullSync: localState.get('lastFullSync'),
-    rideCarrots: mainState.get('rideCarrots').toList(),
-    rideComments: mainState.get('rideComments').toList(),
+    rides: mainState.get('rides'),
+    rideCarrots: mainState.get('rideCarrots'),
+    rideComments: mainState.get('rideComments'),
     users: mainState.get('users'),
     userID,
-    yourRides,
   }
 }
 

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { Container, Tab, Tabs } from 'native-base';
 import {
   StyleSheet,
@@ -8,7 +8,7 @@ import RideList from './RideList'
 import { RIDE } from '../../screens'
 import { brand } from '../../colors'
 
-export default class Feed extends Component {
+export default class Feed extends PureComponent {
   constructor (props) {
     super(props)
     this.showRide = this.showRide.bind(this)

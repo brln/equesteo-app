@@ -24,7 +24,8 @@ class RideCommentsContainer extends NavigatorComponent {
       newComment: null
     }
     this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
-    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
+    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent)
+    this.rideComments = this.rideComments.bind(this)
     this.updateNewComment = this.updateNewComment.bind(this)
   }
 
@@ -45,12 +46,20 @@ class RideCommentsContainer extends NavigatorComponent {
     }
   }
 
+  rideComments () {
+    return this.props.rideComments.valueSeq().filter(
+      (rc) => rc.get('rideID') === this.props.ride.get('_id')
+    ).sort(
+      (a, b) => b.get('timestamp') - a.get('timestamp')
+    ).toList()
+  }
+
   render() {
     return (
       <RideComments
         navigator={this.props.navigator}
         newComment={this.state.newComment}
-        rideComments={this.props.rideComments}
+        rideComments={this.rideComments()}
         updateNewComment={this.updateNewComment}
         users={this.props.users}
       />
@@ -59,14 +68,9 @@ class RideCommentsContainer extends NavigatorComponent {
 }
 
 function mapStateToProps (state, passedProps) {
-  const rideComments = state.getIn(['main', 'rideComments']).valueSeq().filter(
-    (rc) => rc.get('rideID') === passedProps.rideID
-  ).sort(
-    (a, b) => b.get('timestamp') - a.get('timestamp')
-  ).toList()
   return {
     ride: state.getIn(['main', 'rides', passedProps.rideID]),
-    rideComments,
+    rideComments: state.getIn(['main', 'rideComments']),
     users: state.getIn(['main', 'users'])
   }
 }

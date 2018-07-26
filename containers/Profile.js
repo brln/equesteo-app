@@ -3,14 +3,13 @@ import { connect } from 'react-redux';
 
 import Profile from '../components/Profile'
 import {
-  changeScreen,
   clearSearch,
   createFollow,
   deleteFollow ,
   signOut,
   uploadProfilePhoto,
 } from "../actions"
-import { FEED, UPDATE_PROFILE } from '../screens'
+import { UPDATE_PROFILE } from '../screens'
 import NavigatorComponent from './NavigatorComponent'
 
 class ProfileContainer extends NavigatorComponent {
@@ -21,6 +20,8 @@ class ProfileContainer extends NavigatorComponent {
     this.uploadProfilePhoto = this.uploadProfilePhoto.bind(this)
     this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent)
+    this.yourHorses = this.yourHorses.bind(this)
+    this.yourFollows = this.yourFollows.bind(this)
   }
 
   onNavigatorEvent(event) {
@@ -52,9 +53,6 @@ class ProfileContainer extends NavigatorComponent {
         );
       }
     }
-    if (event.id === 'willDisappear' && event.type === 'ScreenChangedEvent') {
-      this.props.dispatch(changeScreen(FEED))
-    }
   }
 
   createFollow (followingID) {
@@ -70,6 +68,16 @@ class ProfileContainer extends NavigatorComponent {
     this.props.dispatch(uploadProfilePhoto(location))
   }
 
+  yourHorses () {
+    return this.props.horses.toList().filter(h => {
+      return h.get('userID') === this.props.user.get('_id') && h.get('deleted') !== true
+    })
+  }
+
+  yourFollows () {
+    return this.props.follows.filter(f => !f.get('deleted') && f.get('followerID') === this.props.user.get('_id'))
+  }
+
   render() {
     console.log('rendering ProfileContainer')
     if (!(!this.props.profileUser || !this.props.user )) {
@@ -78,7 +86,7 @@ class ProfileContainer extends NavigatorComponent {
           createFollow={this.createFollow}
           deleteFollow={this.deleteFollow}
           follows={this.props.follows}
-          horses={this.props.horses}
+          horses={this.yourHorses()}
           navigator={this.props.navigator}
           profileUser={this.props.profileUser}
           uploadProfilePhoto={this.uploadProfilePhoto}
@@ -96,14 +104,12 @@ function mapStateToProps (state, passedProps) {
   const mainState = state.get('main')
   const localState = state.getIn(['main', 'localState'])
   const userID = localState.get('userID')
-  const horses = mainState.get('horses').toList().filter(
-    (h) => h.get('userID') === passedProps.profileUser.get('_id') && h.get('deleted') !== true
-  )
+
   return {
-    horses,
-    profileUser: mainState.get('users').get(passedProps.profileUser.get('_id')) || passedProps.profileUser,
-    user: mainState.get('users').get(userID),
-    follows: mainState.get('follows').filter(f => !f.get('deleted') && f.get('followerID') === userID)
+    horses: mainState.get('horses'),
+    profileUser: mainState.getIn(['users', passedProps.profileUser.get('_id')]) || passedProps.profileUser,
+    user: mainState.getIn(['users', userID]),
+    follows: mainState.get('follows')
   }
 }
 

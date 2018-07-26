@@ -71,7 +71,6 @@ export default class HorseProfile extends Component {
     const images = []
     const horse = this.props.horse
     if (horse.get('photosByID').keySeq().count() > 0) {
-      console.log(horse.getIn(['photosByID', horse.get('profilePhotoID')]))
       images.push(
         <SwipablePhoto
           key="profile"

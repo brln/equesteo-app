@@ -95,7 +95,7 @@ function mapStateToProps (state, passedProps) {
   const mainState = state.get('main')
   const localState = mainState.get('localState')
   return {
-    horse: mainState.get('horses').toList().filter((h) => h.get('_id') === passedProps.horse.get('_id')).get(0),
+    horse: mainState.getIn(['horses', passedProps.horse.get('_id')]),
     horseUser: passedProps.user,
     user: mainState.get('users').get(localState.get('userID'))
   }

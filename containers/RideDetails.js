@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 
 
 import {
-  changeScreen,
   discardRide,
   createRide,
   stopLocationTracking,
@@ -90,7 +89,6 @@ class RideDetailsContainer extends NavigatorComponent {
 
   doneOnPage () {
     this.props.navigator.popToRoot({animated: false, animationType: 'none'})
-    this.props.dispatch(changeScreen(FEED))
   }
 
   onNavigatorEvent (event) {

@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import {
   Card,
   CardItem,
@@ -17,7 +17,7 @@ import Swiper from 'react-native-swiper';
 import { darkGrey } from '../../colors'
 import { HORSE_PROFILE, PROFILE } from '../../screens'
 
-export default class HorseCard extends Component {
+export default class HorseCard extends PureComponent {
   constructor (props) {
     super(props)
     this.createTime = this.createTime.bind(this)
