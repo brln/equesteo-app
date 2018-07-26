@@ -123,6 +123,7 @@ class SignupLoginContainer extends PureComponent {
     if (this.state.signup) {
       form = (
         <SignupForm
+          doingInitialLoad={this.props.doingInitialLoad}
           submitSignup={this.submitSignup}
           showLogin={this.showLogin}
         />

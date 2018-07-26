@@ -1,12 +1,15 @@
 import React, { PureComponent } from 'react';
 
 import {
+  ActivityIndicator,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View
 } from 'react-native';
+
+import { darkBrand } from '../../colors'
 
 export default class SignupForm extends PureComponent {
   constructor (props) {
@@ -17,6 +20,8 @@ export default class SignupForm extends PureComponent {
       password2: null,
       showMismatch: false,
     }
+    this._renderSignupForm = this._renderSignupForm.bind(this)
+    this._renderLoading = this._renderLoading.bind(this)
     this.changeEmail = this.changeEmail.bind(this)
     this.changePassword1 = this.changePassword1.bind(this)
     this.changePassword2 = this.changePassword2.bind(this)
@@ -62,10 +67,10 @@ export default class SignupForm extends PureComponent {
     }
   }
 
-  render() {
+  _renderSignupForm () {
     let dontMatchMessage = <Text>The passwords do not match</Text>
     return (
-      <View style={styles.container}>
+      <View>
         { this.state.showMismatch ? dontMatchMessage : null }
         <Text>Email:</Text>
         <TextInput
@@ -108,7 +113,24 @@ export default class SignupForm extends PureComponent {
           </TouchableOpacity>
         </View>
       </View>
-    );
+    )
+  }
+
+  _renderLoading () {
+    return (
+      <View>
+        <ActivityIndicator size="large" color={darkBrand} />
+        <Text style={{textAlign: 'center', color: darkBrand}}>Loading Data...</Text>
+      </View>
+    )
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        { this.props.doingInitialLoad ? this._renderLoading() : this._renderSignupForm() }
+      </View>
+    )
   }
 }
 

@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import {
+  CheckBox,
   ScrollView,
   StyleSheet,
   Text,
@@ -98,6 +99,26 @@ export default class RideDetails extends PureComponent {
                 onPress={this.uploadPhoto}>
                 <FabImage source={require('../../img/addphoto.png')} height={30} width={30} />
               </Fab>
+            </View>
+          </Card>
+
+          <Card>
+            <CardItem header style={{padding: 5}}>
+              <View style={{paddingLeft: 5}}>
+                <Text style={{color: darkBrand}}>Privacy</Text>
+              </View>
+            </CardItem>
+
+            <View style={{marginLeft: 20, marginBottom: 30}}>
+              <View style={{flex: 1, flexDirection: 'row'}}>
+                <CheckBox
+                  value={this.props.isPublic}
+                  onValueChange={this.props.changePublic}
+                />
+                <View style={{justifyContent: 'center'}}>
+                  <Text>Show this ride on other people's feed.</Text>
+                </View>
+              </View>
             </View>
           </Card>
         </View>

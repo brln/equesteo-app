@@ -38,11 +38,12 @@ class RideDetailsContainer extends NavigatorComponent {
     }
     this.changeCoverPhoto = this.changeCoverPhoto.bind(this)
     this.changeHorseID = this.changeHorseID.bind(this)
+    this.changePublic = this.changePublic.bind(this)
     this.changeRideName = this.changeRideName.bind(this)
     this.createRide = this.createRide.bind(this)
     this.doneOnPage = this.doneOnPage.bind(this)
     this.uploadPhoto = this.uploadPhoto.bind(this)
-
+    this.yourHorses = this.yourHorses.bind(this)
     this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
   }
@@ -61,6 +62,7 @@ class RideDetailsContainer extends NavigatorComponent {
           userID: props.userID,
           photosByID: Map({}),
           coverPhotoID: null,
+          isPublic: props.user.get('ridesDefaultPublic')
         }),
         userMadeChanges: true
       }
@@ -70,6 +72,14 @@ class RideDetailsContainer extends NavigatorComponent {
       }
     }
     return nextState
+  }
+
+  changePublic (newVal) {
+    console.log(newVal)
+    this.setState({
+      ...this.state,
+      ride: this.state.ride.set('isPublic', newVal)
+    })
   }
 
   changeRideName (text) {
@@ -106,7 +116,6 @@ class RideDetailsContainer extends NavigatorComponent {
         }
         this.props.navigator.pop()
       }
-
     }
   }
 
@@ -144,18 +153,26 @@ class RideDetailsContainer extends NavigatorComponent {
     })
   }
 
+  yourHorses () {
+    return this.props.horses.toList().filter(
+      h => h.get('userID') === this.props.userID && h.get('deleted') !== true
+    )
+  }
+
   render() {
     console.log('rendering RideDetailsContainer')
     return (
       <RideDetails
         changeCoverPhoto={this.changeCoverPhoto}
-        coverPhotoID={this.state.ride.get('coverPhotoID')}
-        photosByID={this.state.ride.get('photosByID')}
-        horses={this.props.horses}
-        horseID={this.state.ride.get('horseID')}
-        horseSelected={this.state.horseSelected}
         changeRideName={this.changeRideName}
         changeHorseID={this.changeHorseID}
+        changePublic={this.changePublic}
+        coverPhotoID={this.state.ride.get('coverPhotoID')}
+        photosByID={this.state.ride.get('photosByID')}
+        horses={this.yourHorses()}
+        horseID={this.state.ride.get('horseID')}
+        horseSelected={this.state.horseSelected}
+        isPublic={this.state.ride.get('isPublic')}
         rideName={this.state.ride.get('name')}
         uploadPhoto={this.uploadPhoto}
       />
@@ -174,12 +191,11 @@ function mapStateToProps (state, passedProps) {
   }
   return {
     currentRide,
-    horses: mainState.get('horses').toList().filter(
-      h => h.get('userID') === userID && h.get('deleted') !== true
-    ),
+    horses: mainState.get('horses'),
     newRide,
     userID,
+    user: mainState.getIn(['users', localState.get('userID')]),
   }
 }
 
-export default  connect(mapStateToProps)(RideDetailsContainer)
+export default connect(mapStateToProps)(RideDetailsContainer)

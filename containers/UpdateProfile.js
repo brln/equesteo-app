@@ -41,10 +41,11 @@ class UpdateProfileContainer extends NavigatorComponent {
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
   }
 
-  changeAccountDetails (newDetails) {
+  changeAccountDetails (user) {
+    console.log(user.toJS())
     this.setState({
       userMadeChanges: true,
-      user: this.state.user.merge(newDetails)
+      user
     })
   }
 

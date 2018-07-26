@@ -4,6 +4,7 @@ import {
   CardItem,
 } from 'native-base'
 import {
+  CheckBox,
   ScrollView,
   StyleSheet,
   Text,
@@ -18,12 +19,17 @@ export default class UpdateProfile extends PureComponent {
   constructor (props) {
     super(props)
     this.inputs = {}
+    this.changeDefaultPublic = this.changeDefaultPublic.bind(this)
     this.changeFirstName = this.changeFirstName.bind(this)
     this.changeLastName = this.changeLastName.bind(this)
     this.changeAboutMe = this.changeAboutMe.bind(this)
     this.changeProfilePhotoID = this.changeProfilePhotoID.bind(this)
     this.moveToLastName = this.moveToLastName.bind(this)
     this.moveToAboutMe = this.moveToAboutMe.bind(this)
+  }
+
+  changeDefaultPublic (value) {
+    this.props.changeAccountDetails(this.props.user.set('ridesDefaultPublic', value))
   }
 
   moveToLastName () {
@@ -51,6 +57,7 @@ export default class UpdateProfile extends PureComponent {
   }
 
   render() {
+    const hasPictures = this.props.user.get('photosByID').count() > 0
     return (
       <ScrollView keyboardShouldPersistTaps={'always'}>
         <View style={styles.container}>
@@ -101,7 +108,7 @@ export default class UpdateProfile extends PureComponent {
               </CardItem>
             </Card>
 
-            <Card>
+            { hasPictures ? <Card>
               <CardItem header>
                 <Text style={{color: darkBrand }}>Profile Picture:</Text>
               </CardItem>
@@ -111,6 +118,23 @@ export default class UpdateProfile extends PureComponent {
                   photosByID={this.props.user.get('photosByID')}
                   profilePhotoID={this.props.user.get('profilePhotoID')}
                 />
+              </CardItem>
+            </Card> : null }
+
+             <Card>
+              <CardItem header>
+                <Text style={{color: darkBrand }}>Privacy:</Text>
+              </CardItem>
+              <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
+                <View style={{flex: 1, flexDirection: 'row'}}>
+                  <CheckBox
+                    value={this.props.user.get('ridesDefaultPublic')}
+                    onValueChange={this.changeDefaultPublic}
+                  />
+                  <View style={{justifyContent: 'center'}}>
+                    <Text>Default my rides to publicly viewable.</Text>
+                  </View>
+                </View>
               </CardItem>
             </Card>
 

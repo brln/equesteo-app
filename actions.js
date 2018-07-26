@@ -448,6 +448,7 @@ export function createRide (rideData) {
       photosByID: rideData.get('photosByID'),
       coverPhotoID: rideData.get('coverPhotoID'),
       type: 'ride',
+      isPublic: rideData.get('isPublic')
     }
     theRide.mapURL = staticMap(theRide)
     const doc = await pouchCouch.saveRide(theRide)
@@ -719,6 +720,8 @@ export function submitSignup (email, password) {
     const userAPI = new UserAPI()
     try {
       const resp = await userAPI.signup(email, password)
+      dispatch(dismissError())
+      dispatch(toggleDoingInitialLoad())
       await LocalStorage.saveToken(resp.token, resp.id);
       const pouchCouch = new PouchCouch(resp.token)
       await pouchCouch.replicateOwnUser(resp.id)

@@ -80,6 +80,7 @@ class FeedContainer extends NavigatorComponent {
   followingRides () {
     return this.props.rides.valueSeq().filter(
       r => r.get('userID') !== this.props.userID // not the users rides
+        && r.get('isPublic') === true // is a public ride @TODO: filter this when replicating
         && r.get('deleted') !== true // hasn't been deleted
         && this.followIDs().indexOf(r.get('userID')) >= 0 // user hasn't removed follow
     ).sort(
