@@ -104,7 +104,10 @@ export default class RideCard extends PureComponent {
         source={{uri: horseProfileURL}}
       />)
     } else {
-      el = <Text>{this.props.horse.get('name') || 'None'}</Text>
+      el = (<Thumbnail
+        small
+        source={require('../../img/breed.png')}
+      />)
     }
     return (
       <TouchableOpacity
@@ -163,8 +166,8 @@ export default class RideCard extends PureComponent {
       let section = null
       if (this.props.ride.get('horseID')) {
         section = (
-          <View style={{flex: 1}}>
-            <Text style={{color: darkGrey, fontSize: 12}}>Horse</Text>
+          <View style={{flex: 1, alignItems: 'center'}}>
+            <Text style={{color: darkGrey, fontSize: 12}}>{this.props.horse.get('name')}</Text>
             { this.horseAvatar() }
           </View>
         )

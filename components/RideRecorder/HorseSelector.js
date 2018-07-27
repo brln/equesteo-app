@@ -33,12 +33,12 @@ export default class HorseSelector extends PureComponent {
     return (
       <TouchableOpacity
         key={horse.get('_id')}
-        style={styles.photoThumbnail}
+        style={[style, {marginRight: 5}]}
         onPress={this.changeHorseID(horse.get('_id'))}
       >
         <Image
-          style={style}
           square
+          style={styles.thumbnail}
           source={source}
         />
         <View style={{
@@ -66,24 +66,45 @@ export default class HorseSelector extends PureComponent {
   }
 
   render () {
-    const thumbnails = this.props.horses.map((h) => {
+    const thumbnails = this.props.horses.reduce((accum, h) => {
       const style = h.get('_id') === this.props.horseID ? styles.chosenThumb : styles.thumbnail
-      return this.thumbnail(
+      accum.push(this.thumbnail(
         h,
         style,
-      )
-    })
-    const noneStyle = this.props.horseID ? styles.thumbnail : styles.chosenThumb
+      ))
+      return accum
+    }, [])
+    const noneStyle = this.props.horseID ? styles.thumbnail : [styles.thumbnail, styles.chosenThumb]
     thumbnails.push(
       <TouchableOpacity
-        style={[{borderColor: 'black', borderWidth: 1}, noneStyle, {margin: 5}]}
-        key='none'
+        key={null}
+        style={[noneStyle, {marginRight: 5}]}
         onPress={this.changeHorseID(null)}
       >
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', padding: 5}}>
-          <Text>
-            None
-          </Text>
+        <Image
+          square
+          style={styles.thumbnail}
+          source={{uri: null}}
+        />
+        <View style={{
+          position: 'absolute',
+          alignItems: 'center',
+          justifyContent: 'center',
+          left: 5,
+          right: 5,
+          top: 5,
+          bottom: 5,
+          padding: 5
+        }}>
+          <Text style={{
+            textAlign: 'center',
+            color: 'white',
+            textShadowColor: 'black',
+            textShadowRadius: 5,
+            textShadowOffset: {
+              width: -2,
+              height: 2
+            }}}>None</Text>
         </View>
       </TouchableOpacity>
     )
@@ -101,16 +122,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
-  photoThumbnail: {
-    padding: 5
-  },
   thumbnail: {
     width: width / 4,
     height: width / 4,
   },
   chosenThumb: {
-    width: width / 4,
-    height: width / 4,
     borderWidth: 5,
     borderColor: orange
   }
