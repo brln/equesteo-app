@@ -652,10 +652,9 @@ function startListeningFCM () {
     })
     firebase.messaging().onMessage(async (m) => {
       const userID = m._data.userID
-      const rideID = m._data.rideID
       const distance = m._data.distance
-      const user = getState().users[userID]
-      const message = `${user.firstName} went for a ${distance.toFixed(1)} mile ride!`
+      const user = getState().getIn(['main', 'users']).get(userID)
+      const message = `${user.get('firstName')} went for a ${distance.toFixed(1)} mile ride!`
       await dispatch(syncDBPull('rides'))
       PushNotification.localNotification({
         message: message,

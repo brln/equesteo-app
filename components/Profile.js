@@ -47,7 +47,7 @@ export default class Profile extends PureComponent {
       cropping: true
     }).then(image => {
       this.props.uploadProfilePhoto(image.path)
-    });
+    }).catch(() => {})
   }
 
   follow () {

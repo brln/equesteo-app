@@ -7,7 +7,6 @@ import {
 } from 'native-base';
 import {
   Dimensions,
-  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -15,13 +14,14 @@ import {
 } from 'react-native';
 import Swiper from 'react-native-swiper';
 
-import { brand, darkBrand } from '../colors'
-import DeleteModal from './DeleteModal'
-import SwipablePhoto from './SwipablePhoto'
-import FabImage from './FabImage'
-import Stat from './Stat'
+import { brand, darkBrand } from '../../colors'
+import DeleteModal from '../DeleteModal'
+import SwipablePhoto from '../SwipablePhoto'
+import FabImage from '../FabImage'
+import TrainingCard from './TrainingCard'
+import Stat from '../Stat'
 
-const { height } = Dimensions.get('window')
+const { height, width } = Dimensions.get('window')
 
 
 export default class HorseProfile extends PureComponent {
@@ -39,7 +39,7 @@ export default class HorseProfile extends PureComponent {
       cropping: true
     }).then(image => {
       this.props.uploadPhoto(image.path)
-    }).catch(() => {});
+    }).catch(() => {})
   }
 
   makeBirthday () {
@@ -91,7 +91,7 @@ export default class HorseProfile extends PureComponent {
       }
     } else {
       images.push(
-        <SwipablePhoto key="empty" source={require('../img/emptyHorse.png')} />
+        <SwipablePhoto key="empty" source={require('../../img/emptyHorse.png')} />
       )
     }
     return images
@@ -106,7 +106,7 @@ export default class HorseProfile extends PureComponent {
           style={{ backgroundColor: brand }}
           position="bottomRight"
           onPress={this.uploadPhoto}>
-            <FabImage source={require('../img/addphoto.png')} height={30} width={30} />
+            <FabImage source={require('../../img/addphoto.png')} height={30} width={30} />
         </Fab>
       )
     }
@@ -144,28 +144,33 @@ export default class HorseProfile extends PureComponent {
           </Card>
 
           <Card style={{flex: 1}}>
+            <CardItem header style={{padding: 5}}>
+              <View style={{paddingLeft: 5}}>
+                <Text style={{color: darkBrand}}>Info</Text>
+              </View>
+            </CardItem>
             <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20, flex: 1}}>
               <View style={{flex: 1, paddingTop: 20}}>
                 <View style={{flex: 1, flexDirection: 'row', paddingBottom: 10}}>
                   <Stat
-                    imgSrc={require('../img/birthday.png')}
+                    imgSrc={require('../../img/birthday.png')}
                     text={'Birthday'}
                     value={this.makeBirthday()}
                   />
                   <Stat
-                    imgSrc={require('../img/breed.png')}
+                    imgSrc={require('../../img/breed.png')}
                     text={'Breed'}
                     value={this.props.horse.get('breed') || 'none'}
                   />
                 </View>
                 <View style={{flex: 1, flexDirection: 'row'}}>
                   <Stat
-                    imgSrc={require('../img/height.png')}
+                    imgSrc={require('../../img/height.png')}
                     text={'Height'}
                     value={this.makeHeight()}
                   />
                   <Stat
-                    imgSrc={require('../img/type.png')}
+                    imgSrc={require('../../img/type.png')}
                     text={'Sex'}
                     value={this.props.horse.get('sex') || 'none'}
                   />
@@ -173,7 +178,9 @@ export default class HorseProfile extends PureComponent {
               </View>
             </CardItem>
           </Card>
-
+          <TrainingCard
+            rides={this.props.rides}
+          />
         </View>
       </ScrollView>
     )

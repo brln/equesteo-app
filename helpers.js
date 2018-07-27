@@ -128,6 +128,14 @@ export function getMonday (d) {
   return new Date(d.setDate(diff))
 }
 
+export function getFirstOfMonth (d) {
+  return new Date(d.getFullYear(), d.getMonth(), 1);
+}
+
+export function getFirstOfYear (d) {
+  return new Date(d.getFullYear(), 1, 1)
+}
+
 export function formattedWeekString(monday) {
   const start = moment(new Date(monday))
   const startString = start.format('MMMM D')

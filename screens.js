@@ -40,7 +40,13 @@ export const FEED_DETAILS = {
   navigatorButtons: {
     leftButtons: [{
       id: 'sideMenu'
-    }]
+    }],
+    rightButtons: [
+      {
+        icon: require('./img/logo250.png'),
+        id: 'icon',
+      }
+    ]
   }
 }
 
