@@ -67,7 +67,7 @@ export default class RideCard extends PureComponent {
 
     this.props.navigator.push({
       screen: HORSE_PROFILE,
-      title: this.props.horse.name,
+      title: this.props.horse.get('name'),
       animationType: 'slide-up',
       passProps: {
         horse: this.props.horse,

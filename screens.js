@@ -41,12 +41,12 @@ export const FEED_DETAILS = {
     leftButtons: [{
       id: 'sideMenu'
     }],
-    rightButtons: [
-      {
-        icon: require('./img/logo250.png'),
-        id: 'icon',
-      }
-    ]
+    // rightButtons: [
+    //   {
+    //     icon: require('./img/logo250.png'),
+    //     id: 'icon',
+    //   }
+    // ] This breaks react-native-navigation v1, put it back in when you upgrade to V2
   }
 }
 
