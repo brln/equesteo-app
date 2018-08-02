@@ -1,4 +1,4 @@
-import { Map } from 'immutable'
+import { fromJS } from 'immutable'
 import React, { PureComponent } from 'react';
 import {
   FlatList,
@@ -41,7 +41,7 @@ export default class Following extends PureComponent {
 
   showProfile (profileUser) {
     return () => {
-      const madeImmutable = Map(profileUser).set('photosByID', Map(profileUser.photosByID))
+      const madeImmutable = fromJS(profileUser)
       this.props.navigator.push({
         screen: PROFILE,
         animationType: 'slide-up',
@@ -78,7 +78,7 @@ export default class Following extends PureComponent {
           <FlatList
             keyExtractor={(u) => u._id}
             containerStyle={{marginTop: 0}}
-            data={this.props.userSearchResults.filter(u => u._id !== this.props.user.get('_id'))}
+            data={this.props.userSearchResults.filter(u => u.get('_id') !== this.props.user.get('_id')).toJS()}
             renderItem={this.renderResult}
           />
         </ScrollView>

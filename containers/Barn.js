@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
-import Barn from '../components/Barn'
+import Barn from '../components/Barn/Barn'
 import NavigatorComponent from './NavigatorComponent'
-import { FEED, HORSE_PROFILE } from '../screens'
+import { HORSE_PROFILE } from '../screens'
 
 class BarnContainer extends NavigatorComponent {
   constructor (props) {
@@ -30,9 +30,9 @@ class BarnContainer extends NavigatorComponent {
   }
 
   yourHorses () {
-    return this.props.horses.toList().filter((h) => {
+    return this.props.horses.valueSeq().filter((h) => {
       return (h.get('userID') === this.props.userID) && h.get('deleted') !== true
-    })
+    }).toList()
   }
 
   render() {

@@ -1,76 +1,85 @@
 import ImagePicker from 'react-native-image-crop-picker'
 
-import { changeHorsePhotoData, changeRidePhotoData, changeUserPhotoData, photoPersistComplete } from '../actions'
-import { horsePhotoURL, logInfo, logError, profilePhotoURL, ridePhotoURL } from '../helpers'
+import {
+  changeHorsePhotoData,
+  changeRidePhotoData,
+  changeUserPhotoData,
+  dequeuePhoto,
+} from '../actions'
+import {
+  generateUUID,
+  horsePhotoURL,
+  logInfo,
+  logError,
+  profilePhotoURL,
+  ridePhotoURL
+} from '../helpers'
 import UserAPI from '../services/user_api'
-import { dequeuePhoto } from '../photoQueue'
 
-let queue = []
-let savingRemotely = false
+let queueID = generateUUID()
+let workingQueue = []
+let currentlySaving = null
 
 export default uploadPhotos = store => dispatch => action => {
   dispatch(action)
-  const currentState = store.getState().get('main')
-  const localState = currentState.get('localState')
-  const needsPhotoUploads = localState.get('needsPhotoUploads')
-  const needsAnyPhotoUpload = needsPhotoUploads.valueSeq().filter(x => x).count() > 0
+  const localState = store.getState().getIn(['main', 'localState'])
+  const needsPhotoUploads = localState.get('photoQueue').count() > 0
   const jwt = localState.get('jwt')
   const goodConnection = localState.get('goodConnection')
-  if (needsAnyPhotoUpload && jwt && goodConnection) {
-    let userAPI = new UserAPI(jwt)
-    for (let type of needsPhotoUploads.keySeq()) {
-      if (needsPhotoUploads.get(type)) {
-        let nextItem = dequeuePhoto(type)
-        while (nextItem) {
-          if (savingRemotely) {
-            queue.push(nextItem)
-          } else {
-            recursiveEmptyQueue(nextItem, store, userAPI)
-          }
-          nextItem = dequeuePhoto(type)
+  if (needsPhotoUploads && jwt && goodConnection) {
+    localState.get('photoQueue').forEach((queueItem, _) => {
+      if (workingQueue.indexOf(queueItem) < 0 && currentlySaving !== queueItem.get('photoID')) {
+        if (currentlySaving !== null) {
+          workingQueue.push(queueItem)
+        } else {
+          const userAPI = new UserAPI(jwt)
+          recursiveEmptyQueue(queueItem, store, userAPI)
         }
-
       }
-    }
+    })
   }
 }
 
 function recursiveEmptyQueue (item, store, userAPI) {
-  savingRemotely = true
+  currentlySaving = item.get('photoID')
   remotePersist(item, store, userAPI)
 }
 
 function remotePersist (item, store, userAPI) {
-  userAPI.uploadPhoto(item.type, item.filepath, item.photoID).then(() => {
-    switch (item.type) {
+  const photoID = item.get('photoID')
+  userAPI.uploadPhoto(item.get('type'), item.get('photoLocation'), photoID).then(() => {
+    logInfo('photo upload success')
+    store.dispatch(dequeuePhoto(photoID))
+    switch (item.get('type')) {
       case 'horse':
-        const uploadedHorseURI = horsePhotoURL(item.photoID)
-        store.dispatch(changeHorsePhotoData(item.horseID, item.photoID, uploadedHorseURI))
+        const uploadedHorseURI = horsePhotoURL(photoID)
+        store.dispatch(changeHorsePhotoData(item.get('horseID'), photoID, uploadedHorseURI))
         break
       case 'ride':
-        const uploadedRideURI = ridePhotoURL(item.photoID)
-        store.dispatch(changeRidePhotoData(item.rideID, item.photoID, uploadedRideURI))
+        const uploadedRideURI = ridePhotoURL(photoID)
+        store.dispatch(changeRidePhotoData(item.get('rideID'), photoID, uploadedRideURI))
         break
       case 'profile':
-        const uploadedProfilePhotoURI = profilePhotoURL(item.photoID)
-        store.dispatch(changeUserPhotoData(item.photoID, uploadedProfilePhotoURI))
+        const uploadedProfilePhotoURI = profilePhotoURL(photoID)
+        store.dispatch(changeUserPhotoData(photoID, uploadedProfilePhotoURI))
         break
       default:
-        throw Error('cant persist type i dont know about')
+        throw Error('cant persist type I don\'t know about')
     }
-    ImagePicker.cleanSingle(item.filepath)
+    ImagePicker.cleanSingle(item.get('photoLocation'))
 
-    if (queue.length) {
-      const item = queue.shift()
+    if (workingQueue.length) {
+      const item = workingQueue.shift()
+      currentlySaving = item.get('photoID')
       recursiveEmptyQueue(item, store, userAPI)
     } else {
-      store.dispatch(photoPersistComplete())
-      savingRemotely = false
+      currentlySaving = null
     }
   }).catch((e) => {
-    queue = []
-    savingRemotely = false
     logInfo('photo upload error')
+    workingQueue = []
+    queueID = generateUUID()
+    currentlySaving = null
     logError(e)
   })
 }

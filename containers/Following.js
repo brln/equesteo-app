@@ -2,9 +2,9 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
 import { searchForFriends } from "../actions"
+import { logRender } from '../helpers'
 import Following from '../components/Following'
 import NavigatorComponent from './NavigatorComponent'
-import { FEED } from '../screens'
 
 class FollowingContainer extends NavigatorComponent {
   constructor (props) {
@@ -17,7 +17,7 @@ class FollowingContainer extends NavigatorComponent {
   }
 
   render() {
-    console.log('rendering FollowingContainer')
+    logRender('FollowingContainer')
     return (
       <Following
         navigator={this.props.navigator}

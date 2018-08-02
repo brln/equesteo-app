@@ -48,7 +48,6 @@ class UpdateHorseContainer extends NavigatorComponent {
             userID: this.props.userID
           })
           const withNewProps = this.state.horse.merge(newProps)
-          console.log(withNewProps)
           this.props.dispatch(createHorse(withNewProps))
         } else {
           this.props.dispatch(updateHorse(this.state.horse))

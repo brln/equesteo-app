@@ -6,6 +6,8 @@ import {
   View,
 } from 'react-native'
 
+import { logRender } from '../../helpers'
+
 const { height, width } = Dimensions.get('window')
 
 export default class SpeedChart extends PureComponent {
@@ -14,6 +16,7 @@ export default class SpeedChart extends PureComponent {
   }
 
   render () {
+    logRender('rendering SpeedChart')
     return (
       <View style={styles.container}>
         <VictoryChart width={width} height={(height / 2) - 20}>

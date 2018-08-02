@@ -1,24 +1,26 @@
-import { List, Map } from 'immutable'
+import { fromJS, List, Map } from 'immutable'
 
 import {
   CLEAR_LAST_LOCATION,
   CLEAR_SEARCH,
   CLEAR_STATE,
   CLEAR_STATE_AFTER_PERSIST,
+  DEQUEUE_PHOTO,
   DISCARD_RIDE,
   DISMISS_ERROR,
+  ENQUEUE_PHOTO,
   ERROR_OCCURRED,
   FOLLOW_UPDATED,
   HORSE_CREATED,
   HORSE_SAVED,
   JUST_FINISHED_RIDE_SHOWN,
+  LOAD_LOCAL_STATE,
   LOCAL_DATA_LOADED,
-  NEEDS_PHOTO_UPLOAD,
+  MARK_PHOTO_ENQUEUED,
   NEEDS_REMOTE_PERSIST,
   NEW_APP_STATE,
   NEW_LOCATION,
   NEW_NETWORK_STATE,
-  PHOTO_PERSIST_COMPLETE,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
   REMOVE_RIDE_FROM_STATE,
@@ -49,22 +51,19 @@ const initialState = Map({
     awaitingPWChange: false,
     clearStateAfterPersist: false,
     currentScreen: FEED,
-    currentRide: null, // still needs to be converted
+    currentRide: null,
     doingInitialLoad: false,
     error: null,
     goodConnection: false,
     justFinishedRide: false,
     jwt: null,
     lastLocation: null,
-    needsPhotoUploads: Map({
-      profile: false,
-      horse: false
-    }),
     needsRemotePersist: Map({
       horses: false,
       rides: false,
       users: false,
     }),
+    photoQueue: Map(),
     root: 'login',
     userID: null,
     userSearchResults: List(),
@@ -83,7 +82,7 @@ export default function AppReducer(state=initialState, action) {
     case CLEAR_LAST_LOCATION:
       return state.setIn(['localState', 'lastLocation'], null)
     case CLEAR_SEARCH:
-      return state.setIn(['localState', 'lastLocation'], [])
+      return state.setIn(['localState', 'userSearchResults'], List())
     case CLEAR_STATE:
       return initialState.setIn(
         ['localState', 'goodConnection'],
@@ -91,10 +90,14 @@ export default function AppReducer(state=initialState, action) {
       )
     case CLEAR_STATE_AFTER_PERSIST:
       return state.setIn(['localState', 'clearStateAfterPersist'], true)
+    case DEQUEUE_PHOTO:
+      return state.deleteIn(['localState', 'photoQueue', action.photoID])
     case DISCARD_RIDE:
       return state.setIn(['localState', 'currentRide'], null)
     case DISMISS_ERROR:
       return state.setIn(['localState', 'error'], null)
+    case ENQUEUE_PHOTO:
+      return state.setIn(['localState', 'photoQueue', action.queueItem.get('photoID')], action.queueItem)
     case ERROR_OCCURRED:
       return state.setIn(['localState', 'error'], action.message)
     case FOLLOW_UPDATED:
@@ -105,38 +108,36 @@ export default function AppReducer(state=initialState, action) {
       return state.set('horses', state.get('horses').set(action.horse.get('_id'), action.horse))
     case JUST_FINISHED_RIDE_SHOWN:
       return state.setIn(['localState', 'justFinishedRide'], false)
+    case LOAD_LOCAL_STATE:
+      return state.set('localState', action.localState)
     case LOCAL_DATA_LOADED:
       const allUsers = action.localData.users.reduce((accum, user) => {
-        user.photosByID = Map(user.photosByID)
-        accum[user._id] = Map(user)
+        accum[user._id] = fromJS(user)
         return accum
       }, {})
 
       const allFollows = action.localData.follows.reduce((accum, follow) => {
-        accum[follow._id] = Map(follow)
+        accum[follow._id] = fromJS(follow)
         return accum
       }, {})
 
       const allHorses = action.localData.horses.reduce((accum, horse) => {
-        horse.photosByID = Map(horse.photosByID)
-        accum[horse._id] = Map(horse)
+        accum[horse._id] = fromJS(horse)
         return accum
       }, {})
 
       const allRides = action.localData.rides.reduce((accum, ride) => {
-        ride.photosByID = Map(ride.photosByID)
-        ride.rideCoordinates = List(ride.rideCoordinates)
-        accum[ride._id] = Map(ride)
+        accum[ride._id] = fromJS(ride)
         return accum
       }, {})
 
       const allCarrots = action.localData.rideCarrots.reduce((accum, carrot) => {
-        accum[carrot._id] = Map(carrot)
+        accum[carrot._id] = fromJS(carrot)
         return accum
       }, {})
 
       const allComments = action.localData.rideComments.reduce((accum, comment) => {
-        accum[comment._id] = Map(comment)
+        accum[comment._id] = fromJS(comment)
         return accum
       }, {})
 
@@ -148,8 +149,8 @@ export default function AppReducer(state=initialState, action) {
         rideComments: Map(allComments),
         horses: Map(allHorses),
       }))
-    case NEEDS_PHOTO_UPLOAD:
-      return state.setIn(['localState', 'needsPhotoUploads', action.photoType], true)
+    case MARK_PHOTO_ENQUEUED:
+      return state.setIn(['localState', 'photoQueue', action.queueItemID, 'queueID'], action.queueID)
     case NEEDS_REMOTE_PERSIST:
       return state.setIn(['localState', 'needsRemotePersist', action.database], true)
     case NEW_APP_STATE:
@@ -162,10 +163,10 @@ export default function AppReducer(state=initialState, action) {
         const lastLocation = state.getIn(['localState', 'lastLocation'])
         if (lastLocation) {
           newDistance = haversine(
-            lastLocation.latitude,
-            lastLocation.longitude,
-            action.location.latitude,
-            action.location.longitude
+            lastLocation.get('latitude'),
+            lastLocation.get('longitude'),
+            action.location.get('latitude'),
+            action.location.get('longitude')
           )
         }
         const rideCoordinates = state.getIn(
@@ -188,11 +189,6 @@ export default function AppReducer(state=initialState, action) {
           action.connectionType,
           action.effectiveConnectionType
         )
-      )
-    case PHOTO_PERSIST_COMPLETE:
-      return state.setIn(
-        ['localState', 'needsPhotoUploads'],
-        initialState.getIn(['localState', 'needsPhotoUploads'])
       )
     case RECEIVE_JWT:
       return state.setIn(['localState', 'jwt'], action.token)

@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 
-import { haversine } from '../../helpers'
+import { haversine, logRender } from '../../helpers'
 import { MAP, RIDE_DETAILS } from '../../screens'
 import PhotosByTimestamp from '../PhotosByTimestamp'
 import SpeedChart from './SpeedChart'
@@ -99,6 +99,9 @@ export default class Ride extends PureComponent {
         fullDistance += distance
 
         const timeDiff = (rideCoord.timestamp / 1000) - (lastPoint.timestamp / 1000)
+        if (timeDiff === 0) {
+          continue
+        }
         const mpSecond = distance / timeDiff
         const mph = mpSecond * 60 * 60
         parsedBucket.push({ pace: mph })
@@ -144,9 +147,11 @@ export default class Ride extends PureComponent {
   }
 
   render () {
+    logRender('Ride.Ride')
     let speedChart = <Text>Not enough points for Speed Chart</Text>
     let speedData = this.memoizedParse(this.props.ride.get('rideCoordinates').toJS())
-    if (this.props.ride.get('rideCoordinates').count() >= 2) {
+    console.log(speedData)
+    if (speedData.avgSpeed.length >= 2) {
       speedChart = (
         <View style={styles.slide}>
           <SpeedChart

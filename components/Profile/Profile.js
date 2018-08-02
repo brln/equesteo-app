@@ -21,11 +21,11 @@ import {
   View
 } from 'react-native';
 
-import { danger, darkBrand, green } from '../colors'
-import { HORSE_PROFILE } from '../screens'
-import { brand } from '../colors'
-import SwipablePhoto from './SwipablePhoto'
-import FabImage from './FabImage'
+import { brand, danger, darkBrand, green } from '../../colors'
+import { logRender } from '../../helpers'
+import { HORSE_PROFILE } from '../../screens'
+import SwipablePhoto from '../SwipablePhoto'
+import FabImage from '../FabImage'
 
 const { height } = Dimensions.get('window')
 
@@ -63,7 +63,7 @@ export default class Profile extends PureComponent {
     if (this.props.profileUser.get('_id') === this.props.user.get('_id')) {
       rightButtons.push(
         {
-          icon: require('../img/threedot.png'),
+          icon: require('../../img/threedot.png'),
           id: 'dropdown',
         }
       )
@@ -125,7 +125,7 @@ export default class Profile extends PureComponent {
       images.push(
         <SwipablePhoto
           key="profile"
-          source={{uri: user.getIn(['photosByID', user.get('profilePhotoID')]).uri}}
+          source={{uri: user.getIn(['photosByID', user.get('profilePhotoID'), 'uri'])}}
           navigator={this.props.navigator}
         />
       )
@@ -134,7 +134,7 @@ export default class Profile extends PureComponent {
           images.push(
             <SwipablePhoto
               key={imageID}
-              source={{uri: user.getIn(['photosByID', imageID]).uri}}
+              source={{uri: user.getIn(['photosByID', imageID, 'uri'])}}
               navigator={this.props.navigator}
             />
           )
@@ -143,7 +143,7 @@ export default class Profile extends PureComponent {
 
     } else {
       images.push(
-        <SwipablePhoto key="empty" source={require('../img/emptyProfile.png')} />
+        <SwipablePhoto key="empty" source={require('../../img/emptyProfile.png')} />
       )
     }
     return images
@@ -159,7 +159,7 @@ export default class Profile extends PureComponent {
           style={{ backgroundColor: brand }}
           position="bottomRight"
           onPress={this.uploadProfile}>
-          <FabImage source={require('../img/addphoto.png')} height={30} width={30} />
+          <FabImage source={require('../../img/addphoto.png')} height={30} width={30} />
         </Fab>
       )
     } else {
@@ -217,7 +217,7 @@ export default class Profile extends PureComponent {
   }
 
   render() {
-    console.log('rendering ProfileComponent')
+    logRender('ProfileComponent')
     return (
       <ScrollView>
         {this.renderImageSwiper()}

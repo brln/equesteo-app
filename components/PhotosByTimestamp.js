@@ -45,12 +45,12 @@ export default class PhotosByTimestamp extends Component {
     const byTimestamp = {}
     for (let photoID of this.props.photosByID.keySeq()) {
       const photoData = this.props.photosByID.get(photoID)
-      const source = {uri: photoData.uri}
+      const source = {uri: photoData.get('uri')}
       let style = styles.thumbnail
       if (photoID === this.props.profilePhotoID) {
         style = styles.profilePhoto
       }
-      byTimestamp[photoData.timestamp] = this.thumbnail(photoID, style, source)
+      byTimestamp[photoData.get('timestamp')] = this.thumbnail(photoID, style, source)
     }
     const sortedKeys = Object.keys(byTimestamp).sort((a, b) => b - a)
     const sortedVals = []

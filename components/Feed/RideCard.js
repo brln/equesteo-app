@@ -81,7 +81,7 @@ export default class RideCard extends PureComponent {
     const profilePhotoID = this.props.horse.get('profilePhotoID')
     if (this.props.horse && profilePhotoID &&
       this.props.horse.getIn(['photosByID', profilePhotoID])) {
-      return this.props.horse.getIn(['photosByID', profilePhotoID]).uri
+      return this.props.horse.getIn(['photosByID', profilePhotoID, 'uri'])
     }
   }
 
@@ -199,7 +199,11 @@ export default class RideCard extends PureComponent {
         const photo = this.props.ride.getIn(['photosByID', id])
         const thisImage = (
           <TouchableOpacity onPress={this.showRide} style={{flex: 1}} key="map">
-            <Image style={{height: width * (9/16)}} key={photo.uri} source={{uri: photo.uri}} />
+            <Image
+              style={{height: width * (9/16)}}
+              key={photo.get('uri')}
+              source={{uri: photo.get('uri')}}
+            />
           </TouchableOpacity>
         )
         if (id !== this.props.ride.get('coverPhotoID')) {

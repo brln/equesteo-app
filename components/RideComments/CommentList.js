@@ -24,7 +24,7 @@ export default class CommentList extends PureComponent {
     const profilePhotoID = user.get('profilePhotoID')
     let profilePhotoURL = null
     if (profilePhotoID) {
-      profilePhotoURL = user.getIn(['photosByID', profilePhotoID]).uri
+      profilePhotoURL = user.getIn(['photosByID', profilePhotoID, 'uri'])
     }
     return profilePhotoURL
   }

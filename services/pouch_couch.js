@@ -1,6 +1,7 @@
 import PouchDB from 'pouchdb-react-native'
 import { API_URL } from 'react-native-dotenv'
 
+
 import { logInfo, logError } from '../helpers'
 
 export default class PouchCouch {
@@ -34,28 +35,28 @@ export default class PouchCouch {
 
   saveHorse (horseData) {
     return this.localHorsesDB.put(horseData).catch((e) => {
-      console.log('error saving horse')
+      logInfo('error saving horse')
       this.catchError(e)
     })
   }
 
   saveRide (rideData) {
     return this.localRidesDB.put(rideData).catch((e) => {
-      console.log('error saving ride')
+      logInfo('error saving ride')
       this.catchError(e)
     })
   }
 
   saveUser (userData) {
     return this.localUsersDB.put(userData).catch((e) => {
-      console.log('error saving user')
+      logInfo('error saving user')
       this.catchError(e)
     })
   }
 
   deleteRide (id, rev) {
     return this.localRidesDB.remove(id, rev).catch((e) => {
-      console.log('error deleting ride')
+      logInfo('error deleting ride')
       this.catchError(e)
     })
   }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
-import Profile from '../components/Profile'
+import Profile from '../components/Profile/Profile'
 import {
   clearSearch,
   createFollow,
@@ -69,9 +69,9 @@ class ProfileContainer extends NavigatorComponent {
   }
 
   yourHorses () {
-    return this.props.horses.toList().filter(h => {
-      return h.get('userID') === this.props.user.get('_id') && h.get('deleted') !== true
-    })
+    return this.props.horses.valueSeq().filter(h => {
+      return h.get('userID') === this.props.profileUser.get('_id') && h.get('deleted') !== true
+    }).toList()
   }
 
   yourFollows () {
@@ -109,7 +109,7 @@ function mapStateToProps (state, passedProps) {
     horses: mainState.get('horses'),
     profileUser: mainState.getIn(['users', passedProps.profileUser.get('_id')]) || passedProps.profileUser,
     user: mainState.getIn(['users', userID]),
-    follows: mainState.get('follows')
+    follows: mainState.get('follows'),
   }
 }
 

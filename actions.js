@@ -3,33 +3,32 @@ import BackgroundGeolocation from 'react-native-mauron85-background-geolocation-
 import { ENV } from 'react-native-dotenv'
 import firebase from 'react-native-firebase'
 import PushNotification from 'react-native-push-notification'
-import { Map, List } from 'immutable'
+import { fromJS, Map, List } from 'immutable'
 
 import { logError, logInfo, unixTimeNow, generateUUID, staticMap } from "./helpers"
-import { FEED } from './screens'
 import { LocalStorage, PouchCouch, UserAPI } from './services'
 import {BadRequestError, NotConnectedError, UnauthorizedError} from "./errors"
-import { enqueueHorsePhoto, enqueueProfilePhoto, enqueueRidePhoto } from './photoQueue'
 
 import {
   CLEAR_LAST_LOCATION,
   CLEAR_SEARCH,
   CLEAR_STATE,
   CLEAR_STATE_AFTER_PERSIST,
+  DEQUEUE_PHOTO,
   DISCARD_RIDE,
   DISMISS_ERROR,
+  ENQUEUE_PHOTO,
   ERROR_OCCURRED,
   FOLLOW_UPDATED,
   HORSE_CREATED,
   HORSE_SAVED,
   JUST_FINISHED_RIDE_SHOWN,
+  LOAD_LOCAL_STATE,
   LOCAL_DATA_LOADED,
-  NEEDS_PHOTO_UPLOAD,
   NEEDS_REMOTE_PERSIST,
   NEW_LOCATION,
   NEW_APP_STATE,
   NEW_NETWORK_STATE,
-  PHOTO_PERSIST_COMPLETE,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
   RIDE_CARROT_CREATED,
@@ -71,6 +70,13 @@ function clearStateAfterPersist () {
   }
 }
 
+export function dequeuePhoto (photoID) {
+  return {
+    type: DEQUEUE_PHOTO,
+    photoID
+  }
+}
+
 export function discardRide ()  {
   return {
     type: DISCARD_RIDE
@@ -83,17 +89,17 @@ export function dismissError () {
   }
 }
 
+export function enqueuePhoto (queueItem) {
+  return {
+    type: ENQUEUE_PHOTO,
+    queueItem
+  }
+}
+
 export function horseSaved (horse) {
   return {
     type: HORSE_SAVED,
     horse
-  }
-}
-
-export function needsPhotoUpload (photoType) {
-  return {
-    type: NEEDS_PHOTO_UPLOAD,
-    photoType
   }
 }
 
@@ -121,6 +127,13 @@ function horseCreated (horse) {
 export function justFinishedRideShown () {
   return {
     type: JUST_FINISHED_RIDE_SHOWN
+  }
+}
+
+export function loadLocalState (localState) {
+  return {
+    type: LOAD_LOCAL_STATE,
+    localState
   }
 }
 
@@ -158,12 +171,6 @@ function newNetworkState (connectionType, effectiveConnectionType) {
     type: NEW_NETWORK_STATE,
     connectionType,
     effectiveConnectionType,
-  }
-}
-
-export function photoPersistComplete () {
-  return {
-    type: PHOTO_PERSIST_COMPLETE
   }
 }
 
@@ -283,6 +290,7 @@ export function userUpdated (userData) {
 
 export function appInitialized () {
   return async (dispatch) => {
+    await dispatch(tryToLoadLocalState())
     dispatch(findLocalToken())
     dispatch(checkFCMPermission())
     dispatch(startNetworkTracking())
@@ -300,7 +308,7 @@ export function changeHorsePhotoData(horseID, photoID, uri) {
     } else {
       horse = horse.set('profilePhotoID', photoID)
     }
-    horse = horse.setIn(['photosByID', photoID], {timestamp, uri})
+    horse = horse.setIn(['photosByID', photoID], Map({timestamp, uri}))
     dispatch(saveHorse(horse))
   }
 }
@@ -321,7 +329,7 @@ export function getFCMToken () {
       logError(e)
     }
     const currentUserID = getState().getIn(['main', 'localState', 'userID'])
-    const localUser = getState().getIn(['main', 'users']).get(currentUserID)
+    const localUser = getState().getIn(['main', 'users', currentUserID])
     if (fcmToken && localUser) {
       if (fcmToken !== localUser.get('fcmToken')) {
         dispatch(updateUser(localUser.set('fcmToken', fcmToken)))
@@ -383,7 +391,7 @@ export function changeRidePhotoData(rideID, photoID, uri) {
     } else {
       ride = ride.set('profilePhotoID', photoID)
     }
-    ride = ride.setIn(['photosByID', photoID], {timestamp, uri})
+    ride = ride.setIn(['photosByID', photoID], Map({timestamp, uri}))
     dispatch(saveRide(ride))
   }
 }
@@ -399,7 +407,7 @@ export function changeUserPhotoData (photoID, uri) {
     } else {
       user = user.set('profilePhotoID', photoID)
     }
-    user = user.setIn(['photosByID', photoID], {timestamp, uri})
+    user = user.setIn(['photosByID', photoID], Map({timestamp, uri}))
     dispatch(updateUser(user))
   }
 }
@@ -535,8 +543,13 @@ function loadLocalData () {
   return async (dispatch, getState) => {
     const jwt = getState().getIn(['main', 'localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
-    const localData = await pouchCouch.localLoad()
-    dispatch(localDataLoaded(localData))
+    try {
+      const localData = await pouchCouch.localLoad()
+      dispatch(localDataLoaded(localData))
+    } catch (e) {
+      logError(e)
+      throw e
+    }
   }
 }
 
@@ -559,7 +572,7 @@ export function searchForFriends (phrase) {
     const userAPI = new UserAPI(jwt)
     try {
       const resp = await userAPI.findUser(phrase)
-      dispatch(userSearchReturned(resp))
+      dispatch(userSearchReturned(fromJS(resp)))
     } catch (e) {
       logError(e)
     }
@@ -577,7 +590,6 @@ export function saveRide (rideData) {
 
 export function saveHorse (horse) {
   return async (dispatch) => {
-    console.log('saving horse')
     const pouchCouch = new PouchCouch()
     const doc = await pouchCouch.saveHorse(horse.toJS())
     dispatch(horseSaved(horse.set('_rev', doc.rev)))
@@ -588,6 +600,7 @@ export function saveHorse (horse) {
 export function signOut () {
   return async(dispatch) => {
     await LocalStorage.deleteToken()
+    await LocalStorage.deleteLocalState()
     const pouchCouch = new PouchCouch()
     await pouchCouch.deleteLocalDBs()
     dispatch(stopLocationTracking())
@@ -612,12 +625,12 @@ export function startLocationTracking () {
     });
 
     BackgroundGeolocation.on('location', (location) => {
-      const parsedLocation = {
+      const parsedLocation = Map({
         accuracy: location.accuracy,
         latitude: location.latitude,
         longitude: location.longitude,
         timestamp: location.time,
-      }
+      })
       dispatch(newLocation(parsedLocation))
     })
 
@@ -791,6 +804,17 @@ export function toggleRideCarrot (rideID) {
   }
 }
 
+export function tryToLoadLocalState () {
+  return async (dispatch) => {
+    const localState = await LocalStorage.loadLocalState()
+    if (localState) {
+      dispatch(loadLocalState(localState))
+    } else {
+      logInfo('no cached local state found')
+    }
+  }
+}
+
 export function updateHorse (horseDetails) {
   return async (dispatch, getState) => {
     const jwt = getState().getIn(['main', 'localState', 'jwt'])
@@ -825,24 +849,21 @@ export function uploadHorsePhoto (photoLocation, horseID) {
   return async (dispatch) => {
     const photoID = generateUUID()
     dispatch(changeHorsePhotoData(horseID, photoID, photoLocation))
-    enqueueHorsePhoto(photoLocation, photoID, horseID)
-    dispatch(needsPhotoUpload('horse'))
+    dispatch(enqueuePhoto(Map({type: 'horse', photoLocation, photoID, horseID})))
   }
 }
 
 export function uploadProfilePhoto (photoLocation) {
   return async (dispatch) => {
-    const profilePhotoID = generateUUID()
-    dispatch(changeUserPhotoData(profilePhotoID, photoLocation))
-    enqueueProfilePhoto(photoLocation, profilePhotoID)
-    dispatch(needsPhotoUpload('profile'))
+    const photoID = generateUUID()
+    dispatch(changeUserPhotoData(photoID, photoLocation))
+    dispatch(enqueuePhoto(Map({type: 'profile', photoLocation, photoID})))
   }
 }
 
 export function uploadRidePhoto (photoID, photoLocation, rideID) {
   return async (dispatch) => {
-    enqueueRidePhoto(photoLocation, photoID, rideID)
-    dispatch(needsPhotoUpload('ride'))
+    dispatch(enqueuePhoto(Map({type: 'ride', photoLocation, photoID, rideID})))
   }
 }
 

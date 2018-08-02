@@ -42,7 +42,6 @@ class UpdateProfileContainer extends NavigatorComponent {
   }
 
   changeAccountDetails (user) {
-    console.log(user.toJS())
     this.setState({
       userMadeChanges: true,
       user

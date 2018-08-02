@@ -1,5 +1,7 @@
 import { API_URL } from 'react-native-dotenv'
+import { logError } from '../helpers'
 import {BadRequestError, UnauthorizedError, NotConnectedError} from '../errors'
+
 
 export default class ApiClient {
   DELETE = 'delete'
@@ -51,6 +53,7 @@ export default class ApiClient {
     ).catch(e => {
       if (e instanceof TypeError) {
         if (e.toString() === 'TypeError: Network request failed') {
+          logError(e)
           throw new NotConnectedError('Cannot find the internet.')
         }
       }

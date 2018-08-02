@@ -75,7 +75,6 @@ class RideDetailsContainer extends NavigatorComponent {
   }
 
   changePublic (newVal) {
-    console.log(newVal)
     this.setState({
       ...this.state,
       ride: this.state.ride.set('isPublic', newVal)
@@ -125,7 +124,7 @@ class RideDetailsContainer extends NavigatorComponent {
       this.props.dispatch(
         uploadRidePhoto(
           photoID,
-          this.state.ride.getIn(['photosByID', photoID]).uri,
+          this.state.ride.getIn(['photosByID', photoID, 'uri']),
           this.state.ride.get('_id')
         )
       )
@@ -144,7 +143,12 @@ class RideDetailsContainer extends NavigatorComponent {
 
   uploadPhoto (photoURI) {
     const photoID = generateUUID()
-    const newPhotosByID = this.state.ride.get('photosByID').set(photoID, {uri: photoURI, timestamp: unixTimeNow()})
+    const newPhotosByID = this.state.ride.get(
+      'photosByID'
+    ).set(
+      photoID,
+      Map({uri: photoURI, timestamp: unixTimeNow()})
+    )
     const newRide = this.state.ride.set('coverPhotoID', photoID).set('photosByID', newPhotosByID)
     this.setState({
       ...this.state,

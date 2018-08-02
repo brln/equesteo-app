@@ -132,7 +132,7 @@ export default class HorseCard extends PureComponent {
         const photo = photos.get(id)
         const thisImage = (
           <TouchableOpacity onPress={this.showHorseProfile} style={{flex: 1}} key="map">
-            <Image style={{height: 200}} key={photo.uri} source={{uri: photo.uri}} />
+            <Image style={{height: 200}} key={photo.get('uri')} source={{uri: photo.get('uri')}} />
           </TouchableOpacity>
         )
         if (id !== this.props.horse.get('profilePhotoID')) {

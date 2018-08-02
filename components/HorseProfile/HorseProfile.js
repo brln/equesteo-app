@@ -74,7 +74,7 @@ export default class HorseProfile extends PureComponent {
       images.push(
         <SwipablePhoto
           key="profile"
-          source={{ uri: horse.getIn(['photosByID', horse.get('profilePhotoID')]).uri }}
+          source={{ uri: horse.getIn(['photosByID', horse.get('profilePhotoID'), 'uri']) }}
           navigator={this.props.navigator}
         />
       )
@@ -83,7 +83,7 @@ export default class HorseProfile extends PureComponent {
           images.push(
             <SwipablePhoto
               key={imageID}
-              source={{ uri: horse.getIn(['photosByID', imageID]).uri }}
+              source={{ uri: horse.getIn(['photosByID', imageID, 'uri']) }}
               navigator={this.props.navigator}
             />
           )

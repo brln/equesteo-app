@@ -11,6 +11,7 @@ import { appInitialized } from "./actions"
 import logger from './middleware/logger'
 import storeToCouch from './middleware/couch'
 import uploadPhotos from './middleware/photos'
+import storeLocalState from './middleware/localstate'
 import AppReducer from './reducer'
 import { DRAWER, FEED_DETAILS, SIGNUP_LOGIN, registerScreens } from './screens'
 
@@ -22,6 +23,7 @@ const store = createStore(
     logger,
     uploadPhotos,
     storeToCouch,
+    storeLocalState,
   )
 )
 
@@ -32,7 +34,7 @@ if (ENV !== 'local') {
 }
 
 export default class App {
-  constructor(context) {
+  constructor() {
     store.subscribe(this.onStoreUpdate.bind(this));
     store.dispatch(appInitialized());
   }

@@ -28,7 +28,7 @@ export default class HorseSelector extends PureComponent {
   thumbnail (horse, style) {
     let source = require('../../img/emptyHorseBlack.png')
     if (horse.get('profilePhotoID')) {
-      source = {uri: horse.getIn(['photosByID', horse.get('profilePhotoID')]).uri}
+      source = {uri: horse.getIn(['photosByID', horse.get('profilePhotoID'), 'uri'])}
     }
     return (
       <TouchableOpacity

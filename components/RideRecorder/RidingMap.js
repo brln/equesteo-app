@@ -4,11 +4,10 @@ import MapView from 'react-native-maps';
 import {
   Image,
   StyleSheet,
-  Text,
   View
 } from 'react-native';
 
-import { bearing, rideCoordsToMapCoords } from '../../helpers'
+import { bearing, logRender } from '../../helpers'
 
 export default class RidingMap extends PureComponent {
   constructor (props) {
@@ -28,8 +27,8 @@ export default class RidingMap extends PureComponent {
   }
 
   fitToElements() {
-    const lats = this.props.rideCoords.map(c => c.latitude)
-    const longs = this.props.rideCoords.map(c => c.longitude)
+    const lats = this.props.rideCoords.map(c => c.get('latitude'))
+    const longs = this.props.rideCoords.map(c => c.get('longitude'))
     const maxLat = Math.max(...lats)
     const minLat = Math.min(...lats)
     const maxLong = Math.max(...longs)
@@ -82,7 +81,7 @@ export default class RidingMap extends PureComponent {
   }
 
   render() {
-    console.log('render ridingmap')
+    logRender('RideRecorder.RidingMap')
     return (
       <View style ={styles.container}>
         <View style={{flex: 1}}>

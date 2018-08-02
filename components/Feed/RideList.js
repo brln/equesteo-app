@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 
 
-import { getMonday } from '../../helpers'
+import { getMonday, logInfo } from '../../helpers'
 import HorseCard from './HorseCard'
 import RideCard from './RideCard'
 import SectionHeader from './SectionHeader'
@@ -24,7 +24,13 @@ export default class RideList extends PureComponent {
     if (!item.get('userID')) {
       throw Error(`Item does not have userID: ${item.get('type')} ${item.get('_id')}` )
     }
-    return this.props.users.get(item.get('userID'))
+    const user = this.props.users.get(item.get('userID'))
+    if (!user) {
+      logInfo(item.get('userID'))
+      logInfo(this.props.users.toJSON())
+      throw Error('User does not exist.')
+    }
+    return user
   }
 
   getUserProfilePhotoURL (item) {
@@ -32,7 +38,7 @@ export default class RideList extends PureComponent {
     const profilePhotoID = foundUser.get('profilePhotoID')
     let profilePhotoURL = null
     if (profilePhotoID) {
-      profilePhotoURL = foundUser.getIn(['photosByID', profilePhotoID]).uri
+      profilePhotoURL = foundUser.getIn(['photosByID', profilePhotoID, 'uri'])
     }
     return profilePhotoURL
   }
