@@ -41,6 +41,7 @@ class RideDetailsContainer extends NavigatorComponent {
     this.changePublic = this.changePublic.bind(this)
     this.changeRideName = this.changeRideName.bind(this)
     this.createRide = this.createRide.bind(this)
+    this.deletePhoto = this.deletePhoto.bind(this)
     this.doneOnPage = this.doneOnPage.bind(this)
     this.uploadPhoto = this.uploadPhoto.bind(this)
     this.yourHorses = this.yourHorses.bind(this)
@@ -73,6 +74,20 @@ class RideDetailsContainer extends NavigatorComponent {
       }
     }
     return nextState
+  }
+
+  deletePhoto (photoID) {
+    const newPhotos = this.state.ride.get('photosByID').delete(photoID)
+    let newDeets = Map({
+      photosByID: newPhotos
+    })
+    if (photoID === this.state.ride.get('coverPhotoID')) {
+      newDeets = newDeets.set('coverPhotoID', null)
+    }
+    this.setState({
+      ride: this.state.ride.merge(newDeets),
+      userMadeChanges: true,
+    })
   }
 
   changePublic (newVal) {
@@ -122,7 +137,6 @@ class RideDetailsContainer extends NavigatorComponent {
 
   uploadNewPhotos () {
     for (let photoID of this.state.newPhotoIDs) {
-      console.log('uploading photo: ' + photoID)
       this.props.dispatch(
         uploadRidePhoto(
           photoID,
@@ -180,6 +194,7 @@ class RideDetailsContainer extends NavigatorComponent {
         changeHorseID={this.changeHorseID}
         changePublic={this.changePublic}
         coverPhotoID={this.state.ride.get('coverPhotoID')}
+        deletePhoto={this.deletePhoto}
         photosByID={this.state.ride.get('photosByID')}
         horses={this.yourHorses()}
         horseID={this.state.ride.get('horseID')}

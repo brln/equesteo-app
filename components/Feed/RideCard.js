@@ -214,7 +214,7 @@ export default class RideCard extends PureComponent {
         return accum
       }, images)
       images.push(mapImage)
-      images.unshift(coverImage)
+      if (coverImage) images.unshift(coverImage)
       return (
         <Swiper
           loop={false}

@@ -22,7 +22,8 @@ export default class UpdateProfile extends PureComponent {
     super(props)
     this.inputs = {}
     this.state = {
-      showPhotoMenu: false
+      showPhotoMenu: false,
+      selectedPhotoID: null
     }
     this.changeDefaultPublic = this.changeDefaultPublic.bind(this)
     this.changeFirstName = this.changeFirstName.bind(this)
