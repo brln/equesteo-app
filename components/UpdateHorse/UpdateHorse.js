@@ -1,3 +1,4 @@
+import { Map } from 'immutable'
 import React, { PureComponent } from 'react';
 import {
   Picker,
@@ -12,13 +13,18 @@ import {
   CardItem,
 } from 'native-base';
 
-import { darkBrand } from '../colors'
-import PhotosByTimestamp from './PhotosByTimestamp'
+import { darkBrand } from '../../colors'
+import PhotosByTimestamp from '../PhotosByTimestamp'
+import PhotoMenu from './PhotoMenu'
 
 
 export default class UpdateHorse extends PureComponent {
   constructor (props) {
     super(props)
+    this.state = {
+      showPhotoMenu: false,
+      selectedPhotoID: null
+    }
     this.changeHorseBirthDay = this.changeHorseBirthDay.bind(this)
     this.changeHorseBirthMonth = this.changeHorseBirthMonth.bind(this)
     this.changeHorseBirthYear = this.changeHorseBirthYear.bind(this)
@@ -27,13 +33,53 @@ export default class UpdateHorse extends PureComponent {
     this.changeHorseHeightInches = this.changeHorseHeightInches.bind(this)
     this.changeHorseHeightHands = this.changeHorseHeightHands.bind(this)
     this.changeHorseName = this.changeHorseName.bind(this)
+    this.clearPhotoMenu = this.clearPhotoMenu.bind(this)
     this.renderHandsPicker = this.renderHandsPicker.bind(this)
     this.changeHorseSex = this.changeHorseSex.bind(this)
     this.changeProfilePhotoID = this.changeProfilePhotoID.bind(this)
+    this.deletePhoto = this.deletePhoto.bind(this)
+    this.openPhotoMenu = this.openPhotoMenu.bind(this)
   }
 
-  changeProfilePhotoID (profilePhotoID) {
-    this.props.changeHorseDetails({ profilePhotoID })
+  openPhotoMenu (profilePhotoID) {
+    this.setState({
+      showPhotoMenu: true,
+      selectedPhotoID: profilePhotoID
+    })
+  }
+
+  changeProfilePhotoID () {
+    this.props.changeHorseDetails({
+      profilePhotoID: this.state.selectedPhotoID
+    })
+    this.setState({
+      showPhotoMenu: false,
+      selectedPhotoID: null
+    })
+  }
+
+  deletePhoto () {
+    const newPhotos = this.props.horse.get('photosByID').delete(this.state.selectedPhotoID)
+    let newDeets = Map({
+      photosByID: newPhotos
+    })
+    if (this.state.selectedPhotoID === this.props.horse.get('profilePhotoID')) {
+      newDeets = newDeets.set('profilePhotoID', null)
+    }
+    this.props.changeHorseDetails(newDeets)
+    this.setState({
+      showPhotoMenu: false,
+      selectedPhotoID: null
+    })
+
+  }
+
+  clearPhotoMenu () {
+    console.log('clearing')
+    this.setState({
+      showPhotoMenu: false,
+      selectedPhotoID: null
+    })
   }
 
   changeHorseBirthDay (birthDay) {
@@ -198,96 +244,110 @@ export default class UpdateHorse extends PureComponent {
   }
 
   render() {
+    let photoMenu = null
+    if (this.state.showPhotoMenu) {
+      photoMenu = (
+        <PhotoMenu
+          changeProfilePhotoID={this.changeProfilePhotoID}
+          deletePhoto={this.deletePhoto}
+          clearPhotoMenu={this.clearPhotoMenu}
+          selectedPhotoID={this.state.selectedPhotoID}
+        />
+      )
+    }
     return (
-      <ScrollView keyboardShouldPersistTaps={'always'}>
-        <View style={styles.container}>
-          <View style={{flex: 1, padding: 5}}>
-            <Card>
-              <CardItem header>
-                <Text style={{color: darkBrand }}>Name:</Text>
-              </CardItem>
-              <CardItem cardBody style={{marginLeft: 20, marginRight: 20}}>
-                <TextInput
-                  style={{width: '100%'}}
-                  value={this.props.horse.get('name')}
-                  onChangeText={this.changeHorseName}
-                  underlineColorAndroid={darkBrand}
-                />
-              </CardItem>
+      <View>
+        <ScrollView keyboardShouldPersistTaps={'always'}>
+          <View style={styles.container}>
+            <View style={{flex: 1, padding: 5}}>
+              <Card>
+                <CardItem header>
+                  <Text style={{color: darkBrand }}>Name:</Text>
+                </CardItem>
+                <CardItem cardBody style={{marginLeft: 20, marginRight: 20}}>
+                  <TextInput
+                    style={{width: '100%'}}
+                    value={this.props.horse.get('name')}
+                    onChangeText={this.changeHorseName}
+                    underlineColorAndroid={darkBrand}
+                  />
+                </CardItem>
 
-              <CardItem header>
-                <Text style={{color: darkBrand }}>Description:</Text>
-              </CardItem>
-              <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
-                <TextInput
-                  style={{width: '100%', borderColor: darkBrand, borderWidth: 1}}
-                  value={this.props.horse.get('description')}
-                  onChangeText={this.changeHorseDescription}
-                  multiline={true}
-                  numberOfLines={3}
-                  underlineColorAndroid="white"
-                />
-              </CardItem>
-            </Card>
+                <CardItem header>
+                  <Text style={{color: darkBrand }}>Description:</Text>
+                </CardItem>
+                <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
+                  <TextInput
+                    style={{width: '100%', borderColor: darkBrand, borderWidth: 1}}
+                    value={this.props.horse.get('description')}
+                    onChangeText={this.changeHorseDescription}
+                    multiline={true}
+                    numberOfLines={3}
+                    underlineColorAndroid="white"
+                  />
+                </CardItem>
+              </Card>
 
-            <Card>
-              <CardItem header>
-                <Text style={{color: darkBrand }}>Height:</Text>
-              </CardItem>
-              <CardItem cardBody style={{marginLeft: 20, marginRight: 20}}>
-                {this.renderHandsPicker()}
-              </CardItem>
+              <Card>
+                <CardItem header>
+                  <Text style={{color: darkBrand }}>Height:</Text>
+                </CardItem>
+                <CardItem cardBody style={{marginLeft: 20, marginRight: 20}}>
+                  {this.renderHandsPicker()}
+                </CardItem>
 
-              <CardItem header>
-                <Text style={{color: darkBrand }}>Birthday:</Text>
-              </CardItem>
-              <CardItem cardBody style={{marginLeft: 20, marginRight: 20}}>
-                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
-                  {this.monthPicker(this.changeHorseBirthMonth)}
-                  {this.dayPicker(this.changeHorseBirthDay)}
-                  {this.yearPicker(this.changeHorseBirthYear)}
-                </View>
-              </CardItem>
-
-
-              <CardItem header>
-                <Text style={{color: darkBrand }}>Breed:</Text>
-              </CardItem>
-              <CardItem cardBody style={{marginLeft: 20, marginRight: 20}}>
-                <TextInput
-                  style={{width: '100%'}}
-                  value={this.props.horse.get('breed')}
-                  onChangeText={this.changeHorseBreed}
-                  underlineColorAndroid={darkBrand}
-                />
-              </CardItem>
+                <CardItem header>
+                  <Text style={{color: darkBrand }}>Birthday:</Text>
+                </CardItem>
+                <CardItem cardBody style={{marginLeft: 20, marginRight: 20}}>
+                  <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+                    {this.monthPicker(this.changeHorseBirthMonth)}
+                    {this.dayPicker(this.changeHorseBirthDay)}
+                    {this.yearPicker(this.changeHorseBirthYear)}
+                  </View>
+                </CardItem>
 
 
-              <CardItem header>
-                <Text style={{color: darkBrand }}>Sex:</Text>
-              </CardItem>
-              <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
-                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
-                  {this.sexPicker(this.changeHorseSex)}
-                </View>
-              </CardItem>
-            </Card>
+                <CardItem header>
+                  <Text style={{color: darkBrand }}>Breed:</Text>
+                </CardItem>
+                <CardItem cardBody style={{marginLeft: 20, marginRight: 20}}>
+                  <TextInput
+                    style={{width: '100%'}}
+                    value={this.props.horse.get('breed')}
+                    onChangeText={this.changeHorseBreed}
+                    underlineColorAndroid={darkBrand}
+                  />
+                </CardItem>
 
-            <Card>
-              <CardItem header>
-                <Text style={{color: darkBrand }}>Profile Picture:</Text>
-              </CardItem>
-              <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
-                <PhotosByTimestamp
-                  changeProfilePhoto={this.changeProfilePhotoID}
-                  photosByID={this.props.horse.get('photosByID')}
-                  profilePhotoID={this.props.horse.get('profilePhotoID')}
-                />
-              </CardItem>
-            </Card>
+
+                <CardItem header>
+                  <Text style={{color: darkBrand }}>Sex:</Text>
+                </CardItem>
+                <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
+                  <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+                    {this.sexPicker(this.changeHorseSex)}
+                  </View>
+                </CardItem>
+              </Card>
+
+              <Card>
+                <CardItem header>
+                  <Text style={{color: darkBrand }}>Profile Picture:</Text>
+                </CardItem>
+                <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
+                  <PhotosByTimestamp
+                    changeProfilePhoto={this.openPhotoMenu}
+                    photosByID={this.props.horse.get('photosByID')}
+                    profilePhotoID={this.props.horse.get('profilePhotoID')}
+                  />
+                </CardItem>
+              </Card>
+            </View>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+        { photoMenu }
+      </View>
     )
   }
 }

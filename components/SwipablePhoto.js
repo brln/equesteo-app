@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react';
 import {
   Image,
-  TouchableWithoutFeedback,
   StyleSheet,
+  TouchableWithoutFeedback,
 } from 'react-native'
 
 import { brand } from '../colors'

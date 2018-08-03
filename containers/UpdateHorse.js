@@ -2,7 +2,7 @@ import { Map } from 'immutable'
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
-import UpdateHorse from '../components/UpdateHorse'
+import UpdateHorse from '../components/UpdateHorse/UpdateHorse'
 import { createHorse, updateHorse } from '../actions'
 import NavigatorComponent from './NavigatorComponent'
 
@@ -30,7 +30,7 @@ class UpdateHorseContainer extends NavigatorComponent {
 
   static getDerivedStateFromProps (props, state) {
     let nextState = null
-    if (!state.horse || props.horse._rev !== state.horse._rev) {
+    if (!state.horse || props.horse.get('_rev') !== state.horse.get('_rev')) {
       nextState = {
         horse: props.horse,
         userMadeChanges: false

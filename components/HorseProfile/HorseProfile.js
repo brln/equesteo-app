@@ -21,7 +21,7 @@ import FabImage from '../FabImage'
 import TrainingCard from './TrainingCard'
 import Stat from '../Stat'
 
-const { height, width } = Dimensions.get('window')
+const { height } = Dimensions.get('window')
 
 
 export default class HorseProfile extends PureComponent {
@@ -70,14 +70,16 @@ export default class HorseProfile extends PureComponent {
   renderImages () {
     const images = []
     const horse = this.props.horse
-    if (horse.get('photosByID').keySeq().count() > 0) {
+    if (horse.get('profilePhotoID')) {
       images.push(
         <SwipablePhoto
           key="profile"
-          source={{ uri: horse.getIn(['photosByID', horse.get('profilePhotoID'), 'uri']) }}
+          source={{uri: horse.getIn(['photosByID', horse.get('profilePhotoID'), 'uri'])}}
           navigator={this.props.navigator}
         />
       )
+    }
+    if (horse.get('photosByID').keySeq().count() > 0) {
       for (let imageID of horse.get('photosByID').keySeq()) {
         if (imageID !== horse.get('profilePhotoID')) {
           images.push(

@@ -10,9 +10,8 @@ import {
   updateRide,
   uploadRidePhoto
 } from '../actions'
-import { generateUUID, newRideName, unixTimeNow } from '../helpers'
+import { generateUUID, logRender, newRideName, unixTimeNow } from '../helpers'
 import RideDetails from '../components/RideRecorder/RideDetails'
-import { FEED } from '../screens'
 import NavigatorComponent from './NavigatorComponent'
 
 class RideDetailsContainer extends NavigatorComponent {
@@ -164,7 +163,7 @@ class RideDetailsContainer extends NavigatorComponent {
   }
 
   render() {
-    console.log('rendering RideDetailsContainer')
+    logRender('rendering RideDetailsContainer')
     return (
       <RideDetails
         changeCoverPhoto={this.changeCoverPhoto}
