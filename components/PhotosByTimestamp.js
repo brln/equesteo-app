@@ -42,6 +42,7 @@ export default class PhotosByTimestamp extends Component {
   }
 
   render () {
+    console.log(this.props.photosByID.toJSON())
     const byTimestamp = {}
     for (let photoID of this.props.photosByID.keySeq()) {
       const photoData = this.props.photosByID.get(photoID)

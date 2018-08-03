@@ -121,7 +121,7 @@ export default class Profile extends PureComponent {
   renderImages () {
     const images = []
     const user = this.props.profileUser
-    if (user.get('photosByID').keySeq().count() > 0) {
+    if (user.get('profilePhotoID')) {
       images.push(
         <SwipablePhoto
           key="profile"
@@ -129,8 +129,10 @@ export default class Profile extends PureComponent {
           navigator={this.props.navigator}
         />
       )
+    }
+    if (user.get('photosByID').keySeq().count() > 0) {
       for (let imageID of user.get('photosByID').keySeq()) {
-        if (imageID !== user.profilePhotoID) {
+        if (imageID !== user.get('profilePhotoID')) {
           images.push(
             <SwipablePhoto
               key={imageID}
@@ -140,7 +142,6 @@ export default class Profile extends PureComponent {
           )
         }
       }
-
     } else {
       images.push(
         <SwipablePhoto key="empty" source={require('../../img/emptyProfile.png')} />

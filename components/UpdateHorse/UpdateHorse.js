@@ -71,7 +71,6 @@ export default class UpdateHorse extends PureComponent {
       showPhotoMenu: false,
       selectedPhotoID: null
     })
-
   }
 
   clearPhotoMenu () {
