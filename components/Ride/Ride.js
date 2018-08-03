@@ -13,7 +13,7 @@ import {
 
 import { haversine, logRender } from '../../helpers'
 import { MAP, RIDE_DETAILS } from '../../screens'
-import PhotosByTimestamp from '../PhotosByTimestamp'
+import PhotoFilmstrip from './PhotoFilmstrip'
 import SpeedChart from './SpeedChart'
 import Stats from './Stats'
 import DeleteModal from '../DeleteModal'
@@ -150,7 +150,6 @@ export default class Ride extends PureComponent {
     logRender('Ride.Ride')
     let speedChart = <Text>Not enough points for Speed Chart</Text>
     let speedData = this.memoizedParse(this.props.ride.get('rideCoordinates').toJS())
-    console.log(speedData)
     if (speedData.avgSpeed.length >= 2) {
       speedChart = (
         <View style={styles.slide}>
@@ -187,10 +186,9 @@ export default class Ride extends PureComponent {
               horses={this.props.horses}
               maxSpeed={speedData.maxSpeed}
             />
-            <PhotosByTimestamp
+            <PhotoFilmstrip
               photosByID={this.props.ride.get('photosByID')}
-              profilePhotoID={this.props.ride.get('profilePhotoID')}
-              changeProfilePhoto={() => {}}
+              navigator={this.props.navigator}
             />
           </View>
         </View>

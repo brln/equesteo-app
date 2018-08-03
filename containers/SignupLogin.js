@@ -21,6 +21,7 @@ import {
 import ForgotForm from '../components/SignupLogin/ForgotForm'
 import SignupForm from '../components/SignupLogin/SignupForm'
 import LoginForm from '../components/SignupLogin/LoginForm'
+import { logRender } from '../helpers'
 
 class SignupLoginContainer extends PureComponent {
   static navigatorStyle = {
@@ -111,7 +112,7 @@ class SignupLoginContainer extends PureComponent {
   }
 
   render() {
-    console.log('rendering SignupLoginContainer')
+    logRender('SignupLoginContainer')
     let form = (
       <LoginForm
         doingInitialLoad={this.props.doingInitialLoad}

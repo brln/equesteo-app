@@ -75,7 +75,6 @@ export default class UpdateHorse extends PureComponent {
   }
 
   clearPhotoMenu () {
-    console.log('clearing')
     this.setState({
       showPhotoMenu: false,
       selectedPhotoID: null

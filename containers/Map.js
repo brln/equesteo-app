@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 
 import Map from '../components/Ride/Map'
 import NavigatorComponent from './NavigatorComponent'
+import { logRender } from '../helpers'
 
 class MapContainer extends NavigatorComponent {
   constructor (props) {
@@ -10,7 +11,7 @@ class MapContainer extends NavigatorComponent {
   }
 
   render() {
-    console.log('rendering MapContainer')
+    logRender('MapContainer')
     return (
       <Map
         rideCoords={this.props.ride.get('rideCoordinates').toJS()}

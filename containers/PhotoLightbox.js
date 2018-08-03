@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
+import { logRender } from '../helpers'
 
 import PhotoLightbox from '../components/PhotoLightbox'
 import NavigatorComponent from './NavigatorComponent'
@@ -10,7 +11,7 @@ class PhotoLightboxContainer extends NavigatorComponent {
   }
 
   render() {
-    console.log('rendering PhotoLightboxContainer')
+    logRender('PhotoLightboxContainer')
     return (
       <PhotoLightbox
         close={this.props.close}

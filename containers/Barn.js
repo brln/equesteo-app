@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
 import Barn from '../components/Barn/Barn'
+import { logRender } from '../helpers'
 import NavigatorComponent from './NavigatorComponent'
 import { HORSE_PROFILE } from '../screens'
 
@@ -36,7 +37,7 @@ class BarnContainer extends NavigatorComponent {
   }
 
   render() {
-    console.log('rendering BarnContainer')
+    logRender('BarnContainer')
     return (
       <Barn
         horses={this.yourHorses()}

@@ -5,6 +5,7 @@ import { updateHorse, uploadHorsePhoto } from '../actions'
 import { UPDATE_HORSE } from '../screens'
 import HorseProfile from '../components/HorseProfile/HorseProfile'
 import NavigatorComponent from './NavigatorComponent'
+import { logRender } from '../helpers'
 
 class HorseProfileContainer extends NavigatorComponent {
   constructor (props) {
@@ -86,7 +87,7 @@ class HorseProfileContainer extends NavigatorComponent {
   }
 
   render() {
-    console.log('rendering HorseProfileContainer')
+    logRender('HorseProfileContainer')
     return (
       <HorseProfile
         closeDeleteModal={this.closeDeleteModal}

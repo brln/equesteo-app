@@ -33,7 +33,8 @@ class RideDetailsContainer extends NavigatorComponent {
     this.state = {
       ride: null,
       horseSelected: false,
-      userMadeChanges: false
+      userMadeChanges: false,
+      newPhotoIDs: []
     }
     this.changeCoverPhoto = this.changeCoverPhoto.bind(this)
     this.changeHorseID = this.changeHorseID.bind(this)
@@ -45,6 +46,7 @@ class RideDetailsContainer extends NavigatorComponent {
     this.yourHorses = this.yourHorses.bind(this)
     this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
+    this.uploadNewPhotos = this.uploadNewPhotos.bind(this)
   }
 
   static getDerivedStateFromProps (props, state) {
@@ -110,6 +112,7 @@ class RideDetailsContainer extends NavigatorComponent {
         }
       } else {
         if (event.id === 'save') {
+          this.uploadNewPhotos()
           this.props.dispatch(updateRide(this.state.ride))
         }
         this.props.navigator.pop()
@@ -117,9 +120,9 @@ class RideDetailsContainer extends NavigatorComponent {
     }
   }
 
-  createRide () {
-    this.props.dispatch(stopLocationTracking())
-    for (let photoID of this.state.ride.get('photosByID').keySeq()) {
+  uploadNewPhotos () {
+    for (let photoID of this.state.newPhotoIDs) {
+      console.log('uploading photo: ' + photoID)
       this.props.dispatch(
         uploadRidePhoto(
           photoID,
@@ -128,6 +131,11 @@ class RideDetailsContainer extends NavigatorComponent {
         )
       )
     }
+  }
+
+  createRide () {
+    this.props.dispatch(stopLocationTracking())
+    this.uploadNewPhotos()
     this.props.dispatch(createRide(this.state.ride))
     this.doneOnPage()
   }
@@ -152,7 +160,8 @@ class RideDetailsContainer extends NavigatorComponent {
     this.setState({
       ...this.state,
       horseSelected: true,
-      ride: newRide
+      ride: newRide,
+      newPhotoIDs: [...this.state.newPhotoIDs, photoID]
     })
   }
 

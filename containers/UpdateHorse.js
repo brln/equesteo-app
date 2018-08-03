@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import UpdateHorse from '../components/UpdateHorse/UpdateHorse'
 import { createHorse, updateHorse } from '../actions'
 import NavigatorComponent from './NavigatorComponent'
+import { logRender } from '../helpers'
 
 class UpdateHorseContainer extends NavigatorComponent {
   static navigatorButtons = {
@@ -66,7 +67,7 @@ class UpdateHorseContainer extends NavigatorComponent {
   }
 
   render() {
-    console.log('rendering UpdateHorseContainer')
+    logRender('UpdateHorseContainer')
     return (
       <UpdateHorse
         changeHorseDetails={this.changeHorseDetails}

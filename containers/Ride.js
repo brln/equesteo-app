@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 
 import Ride from '../components/Ride/Ride'
 import { updateRide } from '../actions'
+import { logRender } from '../helpers'
 import NavigatorComponent from './NavigatorComponent'
 
 class RideContainer extends NavigatorComponent {
@@ -22,7 +23,7 @@ class RideContainer extends NavigatorComponent {
   }
 
   render() {
-    console.log('rendering RideContainer')
+    logRender('RideContainer')
     return (
       <Ride
         deleteRide={this.deleteRide}

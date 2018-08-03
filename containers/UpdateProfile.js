@@ -5,6 +5,7 @@ import { signOut } from '../actions'
 import UpdateProfile from '../components/UpdateProfile'
 import { updateUser, uploadProfilePhoto } from "../actions"
 import NavigatorComponent from './NavigatorComponent'
+import { logRender } from '../helpers'
 
 class UpdateProfileContainer extends NavigatorComponent {
   static navigatorButtons = {
@@ -66,7 +67,7 @@ class UpdateProfileContainer extends NavigatorComponent {
   }
 
   render() {
-    console.log('rendering UpdateProfileContainer')
+    logRender('UpdateProfileContainer')
     return (
       <UpdateProfile
         user={this.state.userMadeChanges ? this.state.user : this.props.user }

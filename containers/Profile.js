@@ -11,6 +11,7 @@ import {
 } from "../actions"
 import { UPDATE_PROFILE } from '../screens'
 import NavigatorComponent from './NavigatorComponent'
+import { logRender } from '../helpers'
 
 class ProfileContainer extends NavigatorComponent {
   constructor (props) {
@@ -79,7 +80,7 @@ class ProfileContainer extends NavigatorComponent {
   }
 
   render() {
-    console.log('rendering ProfileContainer')
+    logRender('ProfileContainer')
     if (!(!this.props.profileUser || !this.props.user )) {
       return (
         <Profile

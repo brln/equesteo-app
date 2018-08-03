@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 
 import Training from '../components/Training/Training'
 import NavigatorComponent from './NavigatorComponent'
+import { logRender } from '../helpers'
 
 class TrainingContainer extends NavigatorComponent {
   constructor (props) {
@@ -10,7 +11,7 @@ class TrainingContainer extends NavigatorComponent {
   }
 
   render() {
-    console.log('rendering SignupLoginContainer')
+    logRender('SignupLoginContainer')
     return (
       <Training
         horses={this.props.horses}

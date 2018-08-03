@@ -9,8 +9,8 @@ import {
   startLocationTracking
 } from '../actions'
 import RideRecorder from '../components/RideRecorder/RideRecorder'
-import { FEED } from '../screens'
 import NavigatorComponent from './NavigatorComponent'
+import { logRender } from '../helpers'
 
 class RecorderContainer extends NavigatorComponent {
   constructor (props) {
@@ -72,7 +72,7 @@ class RecorderContainer extends NavigatorComponent {
   }
 
   render() {
-    console.log('rendering RecorderContainer')
+    logRender('RecorderContainer')
     return (
       <RideRecorder
         appState={this.props.appState}

@@ -8,7 +8,8 @@ import {
 } from "../actions";
 import Feed from '../components/Feed/Feed'
 import NavigatorComponent from './NavigatorComponent'
-import { FEED, RIDE_COMMENTS } from '../screens'
+import { logRender } from '../helpers'
+import { RIDE_COMMENTS } from '../screens'
 
 class FeedContainer extends NavigatorComponent {
   constructor (props) {
@@ -95,7 +96,7 @@ class FeedContainer extends NavigatorComponent {
   }
 
   render() {
-    console.log('rendering feedContainer')
+    logRender('feedContainer')
     return (
       <Feed
         deleteRide={this.deleteRide}

@@ -19,6 +19,7 @@ import {
   TRAINING,
 } from '../screens'
 import { brand, lightGrey } from '../colors'
+import { logRender } from '../helpers'
 
 
 const { width } = Dimensions.get('window')
@@ -117,7 +118,7 @@ class DrawerContainer extends PureComponent {
   }
 
   render() {
-    console.log('rendering DrawerContainer')
+    logRender('DrawerContainer')
     return (
       <View style={styles.linearGradient}>
         <View style={{
