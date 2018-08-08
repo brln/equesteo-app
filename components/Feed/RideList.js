@@ -88,7 +88,14 @@ export default class RideList extends PureComponent {
 
   _makeSections () {
     const rideWeeks = {}
-    const existingHorses = this.props.horses.filter(h => h.get('deleted') !== true)
+    const existingHorses = this.props.horses.filter((h) => {
+      return h.get('deleted') !== true
+        && (
+          !this.props.ownRideList ||
+          (this.props.ownRideList && h.get('userID') === this.props.userID)
+        )
+
+    })
 
     const ridesAndHorses = this.props.rides.concat(existingHorses).sort((a, b) => {
       let aVal

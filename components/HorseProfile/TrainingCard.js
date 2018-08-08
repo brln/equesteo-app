@@ -53,24 +53,24 @@ export default class TrainingCard extends PureComponent {
       if (rideStart > thisMonday) {
         data.rides.thisWeek += 1
         data.miles.thisWeek += ride.get('distance')
-        data.hours.thisWeek += ride.get('elapsedTimeSecs') / 60
+        data.hours.thisWeek += ride.get('elapsedTimeSecs') / 60 / 60
       }
 
       if (rideStart > firstOfMonth) {
         data.rides.thisMonth += 1
         data.miles.thisMonth += ride.get('distance')
-        data.hours.thisMonth += ride.get('elapsedTimeSecs') / 60
+        data.hours.thisMonth += ride.get('elapsedTimeSecs') / 60 / 60
       }
 
       if (rideStart > firstOfYear) {
         data.rides.thisYear += 1
         data.miles.thisYear += ride.get('distance')
-        data.hours.thisYear += ride.get('elapsedTimeSecs') / 60
+        data.hours.thisYear += ride.get('elapsedTimeSecs') / 60 / 60
       }
 
       data.rides.allTime += 1
       data.miles.allTime += ride.get('distance')
-      data.hours.allTime += ride.get('elapsedTimeSecs') / 60
+      data.hours.allTime += ride.get('elapsedTimeSecs') / 60 / 60
     }
     return data
   }

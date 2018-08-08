@@ -51,6 +51,8 @@ export default class HorseProfile extends PureComponent {
       return `${birthMonth}-${birthDay}-${birthYear}`
     } else if (birthMonth && birthYear) {
       return `${birthMonth}-${birthYear}`
+    } else if (birthYear) {
+      return `${birthYear}`
     }
     else return 'unknown'
   }

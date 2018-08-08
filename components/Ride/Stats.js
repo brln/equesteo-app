@@ -60,33 +60,36 @@ export default class Stats extends PureComponent {
   }
 
   showHorseProfile (horse) {
-    return () => {
-      let rightButtons = []
-      if (this.props.ride.get('userID') === this.props.userID) {
-        rightButtons = [
-          {
-            title: "Edit",
-            id: 'edit',
+    if (horse) {
+      return () => {
+        let rightButtons = []
+        if (this.props.ride.get('userID') === this.props.userID) {
+          rightButtons = [
+            {
+              title: "Edit",
+              id: 'edit',
+            },
+            {
+              title: "Delete",
+              id: 'delete',
+            }
+          ]
+        }
+
+        this.props.navigator.push({
+          screen: HORSE_PROFILE,
+          title: horse.get('name'),
+          animationType: 'slide-up',
+          passProps: {
+            horse: horse,
+            user: this.props.rideUser,
           },
-          {
-            title: "Delete",
-            id: 'delete',
-          }
-        ]
+          rightButtons
+        })
       }
-
-      this.props.navigator.push({
-        screen: HORSE_PROFILE,
-        title: horse.get('name'),
-        animationType: 'slide-up',
-        passProps: {
-          horse: horse,
-          user: this.props.rideUser,
-        },
-        rightButtons
-      })
+    } else {
+      return () => {}
     }
-
   }
 
   makeTimeRiding () {
