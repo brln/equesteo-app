@@ -72,8 +72,12 @@ class DrawerContainer extends PureComponent {
         }],
         rightButtons: [
           {
-            icon: require('../img/threedot.png'),
-            id: 'dropdown',
+            title: "Edit",
+            id: 'edit',
+          },
+          {
+            title: "Log Out",
+            id: 'logout',
           }
         ]
       },

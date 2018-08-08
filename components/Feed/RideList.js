@@ -58,6 +58,7 @@ export default class RideList extends PureComponent {
         <RideCard
           horse={this.getHorse(item)}
           navigator={this.props.navigator}
+          ownRideList={this.props.ownRideList}
           ride={item}
           rideCarrots={this.props.rideCarrots.filter(childFilter(item))}
           rideComments={this.props.rideComments.filter(childFilter(item))}

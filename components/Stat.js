@@ -11,7 +11,10 @@ export default function Stat (props) {
     <View style={{flex: 1}}>
       <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
         <View style={{flex: 1, paddingRight: 10}}>
-          <Image source={props.imgSrc} style={{flex: 1, height: null, width: null, resizeMode: 'contain'}}/>
+          <Image
+            source={props.imgSrc}
+            style={[{flex: 1, height: null, width: null, resizeMode: 'contain'}, props.imgStyle]}
+          />
         </View>
         <View style={{flex: 3}}>
           <View style={{paddingBottom: 3}}>

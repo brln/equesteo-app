@@ -40,37 +40,21 @@ export default class Ride extends PureComponent {
   }
 
   onNavigatorEvent(event) {
-    if (event.type == 'NavBarButtonPress') {
-      if (event.id == 'dropdown') {
-       this.props.navigator.showContextualMenu(
-          {
-            rightButtons: [
-              {
-                title: 'Edit',
-              },
-              {
-                title: 'Delete',
-              }
-            ],
-            onButtonPressed: (index) => {
-              if (index === 0) {
-                this.props.navigator.dismissAllModals()
-                this.props.navigator.push({
-                  screen: RIDE_DETAILS,
-                  title: 'Update Ride',
-                  passProps: {
-                    rideID: this.props.ride.get('_id')
-                  },
-                  navigatorStyle: {},
-                  navigatorButtons: {},
-                  animationType: 'slide-up',
-                });
-              } else if (index === 1) {
-                this.setState({modalOpen: true})
-              }
-            }
-          }
-        );
+    if (event.type === 'NavBarButtonPress') {
+      if (event.id === 'edit') {
+        this.props.navigator.dismissAllModals()
+        this.props.navigator.push({
+          screen: RIDE_DETAILS,
+          title: 'Update Ride',
+          passProps: {
+            rideID: this.props.ride.get('_id')
+          },
+          navigatorStyle: {},
+          navigatorButtons: {},
+          animationType: 'slide-up',
+        });
+      } else if (event.id === 'delete') {
+        this.setState({modalOpen: true})
       }
     }
   }
@@ -159,6 +143,7 @@ export default class Ride extends PureComponent {
         </View>
       )
     }
+    const height = (width * 9 / 16) + 20
     return (
       <ScrollView style={{flex: 1}}>
         <DeleteModal
@@ -168,7 +153,7 @@ export default class Ride extends PureComponent {
           text={"Are you sure you want to delete this ride?"}
         />
         <View style={{flex: 1}}>
-          <View style={{height: (width * 9 / 16) + 20}}>
+          <View style={{height}}>
             <Swiper
               loop={false}
             >
@@ -185,6 +170,9 @@ export default class Ride extends PureComponent {
               ride={this.props.ride}
               horses={this.props.horses}
               maxSpeed={speedData.maxSpeed}
+              navigator={this.props.navigator}
+              rideUser={this.props.rideUser}
+              userID={this.props.userID}
             />
             <PhotoFilmstrip
               photosByID={this.props.ride.get('photosByID')}

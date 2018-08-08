@@ -22,8 +22,12 @@ class BarnContainer extends NavigatorComponent {
         leftButtons: [],
         rightButtons: [
           {
-            icon: require('../img/threedot.png'),
-            id: 'dropdown',
+            title: "Edit",
+            id: 'edit',
+          },
+          {
+            title: "Delete",
+            id: 'delete',
           }
         ]
       },

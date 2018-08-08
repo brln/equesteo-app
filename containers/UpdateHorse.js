@@ -3,9 +3,9 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
 import UpdateHorse from '../components/UpdateHorse/UpdateHorse'
-import { createHorse, updateHorse } from '../actions'
+import { createHorse, updateHorse, uploadHorsePhoto } from '../actions'
 import NavigatorComponent from './NavigatorComponent'
-import { logRender } from '../helpers'
+import { generateUUID, logRender, unixTimeNow } from '../helpers'
 
 class UpdateHorseContainer extends NavigatorComponent {
   static navigatorButtons = {
@@ -23,10 +23,12 @@ class UpdateHorseContainer extends NavigatorComponent {
     this.state = {
       userMadeChanges: false,
       horse: null,
+      newPhotos: []
     }
     this.changeHorseDetails = this.changeHorseDetails.bind(this)
     this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent)
+    this.uploadPhoto = this.uploadPhoto.bind(this)
   }
 
   static getDerivedStateFromProps (props, state) {
@@ -64,6 +66,23 @@ class UpdateHorseContainer extends NavigatorComponent {
       userMadeChanges: true,
       horse: newHorse
     })
+  }
+
+  uploadPhoto (uri) {
+    if (this.props.newHorse) {
+      let horse = this.state.horse
+      let timestamp = unixTimeNow()
+      let photoID = generateUUID()
+      horse = horse.set('profilePhotoID', photoID)
+      horse = horse.setIn(['photosByID', photoID], Map({timestamp, uri}))
+      this.setState({
+        horse,
+        newPhotos: [...this.state.newPhotos, photoID]
+      })
+    } else {
+      this.props.dispatch(uploadHorsePhoto(uri, this.state.horse.get('_id')))
+    }
+
   }
 
   render() {

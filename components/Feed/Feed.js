@@ -31,8 +31,12 @@ export default class Feed extends PureComponent {
     if (this.props.userID === ride.get('userID')) {
       rightButtons = [
         {
-          icon: require('../../img/threedot.png'),
-          id: 'dropdown',
+          title: "Edit",
+          id: 'edit',
+        },
+        {
+          title: "Delete",
+          id: 'delete',
         }
       ]
     }
@@ -56,8 +60,9 @@ export default class Feed extends PureComponent {
         <Tabs initialPage={0} locked={true}>
           <Tab tabStyle={{backgroundColor: brand}} activeTabStyle={{backgroundColor: brand}} heading="Following">
             <RideList
-              horses={this.props.horses.filter(h => h.get('userID') !== this.props.userID)}
+              horses={this.props.horses}
               navigator={this.props.navigator}
+              ownRideList={false}
               refreshing={this.props.refreshing}
               rides={this.props.followingRides}
               rideCarrots={this.props.rideCarrots}
@@ -72,8 +77,9 @@ export default class Feed extends PureComponent {
           </Tab>
           <Tab tabStyle={{backgroundColor: brand}} activeTabStyle={{backgroundColor: brand}} heading="You">
             <RideList
-              horses={this.props.horses.filter(h => h.get('userID') === this.props.userID)}
+              horses={this.props.horses}
               navigator={this.props.navigator}
+              ownRideList={true}
               refreshing={this.props.refreshing}
               rides={this.props.yourRides}
               rideCarrots={this.props.rideCarrots}

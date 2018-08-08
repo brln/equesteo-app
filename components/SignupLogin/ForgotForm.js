@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 
 import {
+  ActivityIndicator,
   StyleSheet,
   Text,
   TextInput,
@@ -8,13 +9,14 @@ import {
   View
 } from 'react-native';
 
+import { darkBrand } from '../../colors'
+
 export default class ForgotForm extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
       email: null,
       resetCode: null,
-      resetCodeSubmitted: false,
       pw1: null,
       pw2: null,
     }
@@ -27,15 +29,6 @@ export default class ForgotForm extends PureComponent {
     this.submitResetCode = this.submitResetCode.bind(this)
     this._moveToPassword2 = this._moveToPassword2.bind(this)
     this.submitNewPassword = this.submitNewPassword.bind(this)
-  }
-
-  static getDerivedStateFromProps (props, state) {
-    let nextState = {...state}
-    if (props.error) {
-      nextState.resetCode = null
-      nextState.resetCodeSubmitted = null
-    }
-    return nextState
   }
 
   changeEmail (text) {
@@ -69,9 +62,6 @@ export default class ForgotForm extends PureComponent {
 
   submitResetCode () {
     this.props.exchangePWCode(this.state.email, this.state.resetCode)
-    this.setState({
-      resetCodeSubmitted: true
-    })
   }
 
   submitNewPassword () {
@@ -157,13 +147,18 @@ export default class ForgotForm extends PureComponent {
 
   render() {
     let form
-    if (this.props.forgotSubmitted && !this.state.resetCodeSubmitted) {
+    if (this.props.forgotSubmitted && !this.props.resetCodeSubmitted) {
       form = this._submittedForm()
-    } else if (!this.props.forgotSubmitted && !this.state.resetCodeSubmitted) {
+    } else if (!this.props.forgotSubmitted && !this.props.resetCodeSubmitted) {
       form = this._unsubmittedForm()
     } else if (this.state.resetCodeSubmitted && !this.props.awaitingPWChange) {
-      form = <Text>spinner</Text>
-    } else if (this.state.resetCodeSubmitted && this.props.awaitingPWChange) {
+      form = (
+        <View>
+          <ActivityIndicator size="large" color={darkBrand} />
+          <Text style={{textAlign: 'center', color: darkBrand}}>Loading...</Text>
+        </View>
+      )
+    } else if (this.props.resetCodeSubmitted && this.props.awaitingPWChange) {
       form = this._newPasswordForm()
     }
     return (

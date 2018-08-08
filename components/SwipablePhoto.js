@@ -21,17 +21,12 @@ export default class SwipablePhoto extends PureComponent {
 
   showLightbox () {
     if (this.props.navigator) {
-      this.props.navigator.showLightBox({
+      this.props.navigator.push({
         screen: PHOTO_LIGHTBOX,
         passProps: {
           source: this.props.source,
           close: this.closeLightbox
         },
-        style: {
-          backgroundBlur: 'dark', // 'dark' / 'light' / 'xlight' / 'none' - the type of blur on the background
-          backgroundColor: brand + 'AA',
-          tapBackgroundToDismiss: true // dismisses LightBox on background taps (optional)
-        }
       })
     }
 

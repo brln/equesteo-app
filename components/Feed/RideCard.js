@@ -7,16 +7,16 @@ import {
   Right,
   Text,
   Thumbnail,
-} from 'native-base';
+} from 'native-base'
 import {
   Dimensions,
   Image,
   StyleSheet,
   TouchableOpacity,
   View,
-} from 'react-native';
+} from 'react-native'
 import moment from 'moment'
-import Swiper from 'react-native-swiper';
+import Swiper from 'react-native-swiper'
 
 import { brand, darkGrey } from '../../colors'
 import { HORSE_PROFILE, PROFILE } from '../../screens'
@@ -59,8 +59,12 @@ export default class RideCard extends PureComponent {
     if (this.props.userID === this.props.rideUser.get('_id')) {
       rightButtons = [
         {
-          icon: require('../../img/threedot.png'),
-          id: 'dropdown',
+          title: "Edit",
+          id: 'edit',
+        },
+        {
+          title: "Delete",
+          id: 'delete',
         }
       ]
     }
@@ -120,7 +124,7 @@ export default class RideCard extends PureComponent {
 
   userAvatar () {
     let avatar
-    if (this.props.userID !== this.props.rideUser.get('_id')) {
+    if (this.props.userID !== this.props.rideUser.get('_id') || !this.props.ownRideList) {
       let source
       if (this.props.userProfilePhotoURL) {
         source = {uri: this.props.userProfilePhotoURL}
@@ -145,7 +149,7 @@ export default class RideCard extends PureComponent {
   userName () {
     const firstName = this.props.rideUser.get('firstName')
     const lastName = this.props.rideUser.get('lastName')
-    if (this.props.rideUser.get('_id') !== this.props.userID) {
+    if (this.props.rideUser.get('_id') !== this.props.userID || !this.props.ownRideList) {
       if (firstName && lastName) {
         return `${firstName} ${lastName}`
       } else if (firstName || lastName) {

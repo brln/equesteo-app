@@ -34,36 +34,20 @@ class HorseProfileContainer extends NavigatorComponent {
   }
 
   onNavigatorEvent(event) {
-    if (event.type == 'NavBarButtonPress') {
-      if (event.id == 'dropdown') {
-        this.props.navigator.showContextualMenu(
-          {
-            rightButtons: [
-              {
-                title: 'Edit',
-              },
-              {
-                title: 'Delete',
-              }
-            ],
-            onButtonPressed: (index) => {
-              if (index === 0) {
-                this.props.navigator.dismissAllModals()
-                this.props.navigator.push({
-                  screen: UPDATE_HORSE,
-                  title: 'Update Horse',
-                  passProps: {
-                    horseID: this.props.horse.get('_id'),
-                    newHorse: false
-                  },
-                  animationType: 'slide-up',
-                });
-              } else if (index === 1) {
-                this.setState({modalOpen: true})
-              }
-            }
-          }
-        );
+    if (event.type === 'NavBarButtonPress') {
+      if (event.id === 'edit') {
+        this.props.navigator.dismissAllModals()
+        this.props.navigator.push({
+          screen: UPDATE_HORSE,
+          title: 'Update Horse',
+          passProps: {
+            horseID: this.props.horse.get('_id'),
+            newHorse: false
+          },
+          animationType: 'slide-up',
+        });
+      } else if (event.id === 'delete') {
+        this.setState({modalOpen: true})
       }
     }
   }

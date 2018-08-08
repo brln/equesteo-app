@@ -61,12 +61,16 @@ export default class Profile extends PureComponent {
   horseProfile (horse) {
     let rightButtons = []
     if (this.props.profileUser.get('_id') === this.props.user.get('_id')) {
-      rightButtons.push(
+      rightButtons = [
         {
-          icon: require('../../img/threedot.png'),
-          id: 'dropdown',
+          title: "Edit",
+          id: 'edit',
+        },
+        {
+          title: "Delete",
+          id: 'delete',
         }
-      )
+      ]
     }
     return () => {
       this.props.navigator.push({

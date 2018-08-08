@@ -33,7 +33,8 @@ class SignupLoginContainer extends PureComponent {
     this.state = {
       signup: false,
       forgot: false,
-      forgotSubmitted: false
+      forgotSubmitted: false,
+      resetCodeSubmitted: false,
     }
     this.errorOccurred = this.errorOccurred.bind(this)
     this.exchangePWCode = this.exchangePWCode.bind(this)
@@ -50,7 +51,8 @@ class SignupLoginContainer extends PureComponent {
   static getDerivedStateFromProps (props, state) {
     let nextState = {...state}
     if (props.error) {
-      nextState.forgotSubmitted = null
+      nextState.forgotSubmitted = true
+      nextState.resetCodeSubmitted = false
     }
     return nextState
   }
@@ -59,7 +61,7 @@ class SignupLoginContainer extends PureComponent {
     Linking.addEventListener('url', ({ url }) => {
       const parsedURL = URI(url)
       const token = parsedURL.search(true).token
-    });
+    })
   }
 
   errorOccurred (errorText) {
@@ -84,14 +86,19 @@ class SignupLoginContainer extends PureComponent {
   }
 
   exchangePWCode (email, code) {
+    this.props.dispatch(dismissError())
     this.props.dispatch(exchangePWCode(email, code))
+    this.setState({
+      resetCodeSubmitted: true
+    })
   }
 
   showSignup () {
     this.props.dispatch(dismissError())
     this.setState({
       signup: true,
-      forgot: false
+      forgot: false,
+      forgotSubmitted: false
     })
   }
 
@@ -107,7 +114,8 @@ class SignupLoginContainer extends PureComponent {
     this.props.dispatch(dismissError())
     this.setState({
       signup: false,
-      forgot: false
+      forgot: false,
+      forgotSubmitted: false
     })
   }
 
@@ -141,7 +149,7 @@ class SignupLoginContainer extends PureComponent {
           showSignup={this.showSignup}
           showLogin={this.showLogin}
           getPWCode={this.getPWCode}
-          resetCodeAccepted={this.props.resetCodeAccepted}
+          resetCodeSubmitted={this.state.resetCodeSubmitted}
         />
       )
     }

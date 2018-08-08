@@ -4,7 +4,7 @@ export default async (m) => {
   const userID = m.data.userID
   const rideID = m.data.rideID
   const userName = m.data.userName
-  const distance = m.data.distance
+  const distance = parseFloat(m.data.distance)
   const message = `${userName} went for a ${distance.toFixed(1)} mile ride!`
   PushNotification.localNotification({
     message: message,

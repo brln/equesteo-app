@@ -27,31 +27,15 @@ class ProfileContainer extends NavigatorComponent {
 
   onNavigatorEvent(event) {
     if (event.type == 'NavBarButtonPress') {
-      if (event.id == 'dropdown') {
-        this.props.navigator.showContextualMenu(
-          {
-            rightButtons: [
-              {
-                title: 'Edit',
-              },
-              {
-                title: 'Log Out',
-              }
-            ],
-            onButtonPressed: (index) => {
-              if (index === 0) {
-                this.props.navigator.dismissAllModals()
-                this.props.navigator.push({
-                  screen: UPDATE_PROFILE,
-                  title: 'Update Profile',
-                  animationType: 'slide-up',
-                });
-              } else if (index === 1) {
-                this.props.dispatch(signOut())
-              }
-            }
-          }
-        );
+      if (event.id == 'edit') {
+        this.props.navigator.dismissAllModals()
+        this.props.navigator.push({
+          screen: UPDATE_PROFILE,
+          title: 'Update Profile',
+          animationType: 'slide-up',
+        });
+      } else if (event.id == 'logout') {
+        this.props.dispatch(signOut())
       }
     }
   }

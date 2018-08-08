@@ -291,6 +291,7 @@ export function userUpdated (userData) {
 export function appInitialized () {
   return async (dispatch) => {
     await dispatch(tryToLoadLocalState())
+    dispatch(dismissError())
     dispatch(findLocalToken())
     dispatch(checkFCMPermission())
     dispatch(startNetworkTracking())
@@ -362,18 +363,21 @@ export function exchangePWCode (email, code) {
     let userAPI = new UserAPI()
     try {
       const resp = await userAPI.exchangePWCodeForToken(email, code)
+      dispatch(dismissError())
       const token = resp.token
       const userID = resp.id
       const following = resp.following
+      const followers = resp.followers
       const pouchCouch = new PouchCouch(token)
       dispatch(toggleAwaitingPasswordChange())
-      await pouchCouch.localReplicateDB('all', [...following, userID])
+      await pouchCouch.localReplicateDB('all', [...following, userID], followers)
       dispatch(receiveJWT(resp.token))
       dispatch(saveUserID(resp.id))
       await dispatch(loadLocalData())
       dispatch(getFCMToken())
       await LocalStorage.saveToken(resp.token, resp.id);
     } catch (e) {
+      logError(e)
       if (e instanceof UnauthorizedError) {
         dispatch(errorOccurred(e.message))
       }
@@ -434,8 +438,18 @@ export function createHorse (horse) {
       type: 'horse'
     }
     const doc = await pouchCouch.saveHorse(newHorse)
-    dispatch(horseCreated(Map({...newHorse, _rev: doc.rev})))
+    const asMap = Map({...newHorse, _rev: doc.rev})
+    dispatch(horseCreated(asMap))
     dispatch(needsRemotePersist('horses'))
+
+    asMap.get('photosByID').forEach((photoInfo, photoID) => {
+      dispatch(enqueuePhoto(Map({
+        type: 'horse',
+        photoLocation: photoInfo.get('uri'),
+        photoID,
+        horseID: horse.get('_id')
+      })))
+    })
   }
 }
 
@@ -664,8 +678,9 @@ function startListeningFCM () {
       logInfo(m)
     })
     firebase.messaging().onMessage(async (m) => {
+      console.log(m)
       const userID = m._data.userID
-      const distance = m._data.distance
+      const distance = parseFloat(m._data.distance)
       const user = getState().getIn(['main', 'users']).get(userID)
       const message = `${user.get('firstName')} went for a ${distance.toFixed(1)} mile ride!`
       await dispatch(syncDBPull('rides'))

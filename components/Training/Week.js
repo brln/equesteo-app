@@ -105,8 +105,12 @@ export default class Week extends Component {
         leftButtons: [],
         rightButtons: [
           {
-            icon: require('../../img/threedot.png'),
-            id: 'dropdown',
+            title: "Edit",
+            id: 'edit',
+          },
+          {
+            title: "Delete",
+            id: 'delete',
           }
         ]
       },

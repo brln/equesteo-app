@@ -3,6 +3,7 @@ import React, { PureComponent } from 'react'
 import { StyleSheet } from 'react-native'
 
 import {
+  TouchableOpacity,
   View,
 } from 'react-native';
 import {
@@ -10,17 +11,41 @@ import {
   CardItem,
 } from 'native-base'
 
+import { HORSE_PROFILE } from '../../screens'
 import Stat from '../Stat'
 
 export default class Stats extends PureComponent {
   constructor (props) {
     super(props)
-    this.whichHorse = this.whichHorse.bind(this)
+    this.horseAvatar = this.horseAvatar.bind(this)
+    this.horseProfileURL = this.horseProfileURL.bind(this)
     this.makeTimeRiding = this.makeTimeRiding.bind(this)
     this.makeStartTime = this.makeStartTime.bind(this)
     this.makeDistance = this.makeDistance.bind(this)
     this.makeAvgSpeed = this.makeAvgSpeed.bind(this)
     this.makeMaxSpeed = this.makeMaxSpeed.bind(this)
+    this.whichHorse = this.whichHorse.bind(this)
+  }
+
+  horseProfileURL (horse) {
+    if (horse) {
+      const profilePhotoID = horse.get('profilePhotoID')
+      if (horse && profilePhotoID &&
+        horse.getIn(['photosByID', profilePhotoID])) {
+        return horse.getIn(['photosByID', profilePhotoID, 'uri'])
+      }
+    }
+  }
+
+  horseAvatar (horse) {
+    const horseProfileURL = this.horseProfileURL(horse)
+    let source
+    if (horseProfileURL) {
+      source = { uri: horseProfileURL }
+    } else {
+      source = require('../../img/breed.png')
+    }
+    return source
   }
 
   whichHorse () {
@@ -28,9 +53,40 @@ export default class Stats extends PureComponent {
     for (let horse of this.props.horses) {
       if (horse.get('_id') === this.props.ride.get('horseID')) {
         found = horse
+        break
       }
     }
-    return found ? found.get('name') : 'none'
+    return found
+  }
+
+  showHorseProfile (horse) {
+    return () => {
+      let rightButtons = []
+      if (this.props.ride.get('userID') === this.props.userID) {
+        rightButtons = [
+          {
+            title: "Edit",
+            id: 'edit',
+          },
+          {
+            title: "Delete",
+            id: 'delete',
+          }
+        ]
+      }
+
+      this.props.navigator.push({
+        screen: HORSE_PROFILE,
+        title: horse.get('name'),
+        animationType: 'slide-up',
+        passProps: {
+          horse: horse,
+          user: this.props.rideUser,
+        },
+        rightButtons
+      })
+    }
+
   }
 
   makeTimeRiding () {
@@ -56,16 +112,20 @@ export default class Stats extends PureComponent {
   }
 
   render () {
+    const horse = this.whichHorse()
     return (
       <Card style={{flex: 1}}>
         <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20, flex: 1}}>
           <View style={{flex: 1, paddingTop: 20}}>
             <View style={{flex: 1, flexDirection: 'row', paddingBottom: 10}}>
-              <Stat
-                imgSrc={require('../../img/breed.png')}
-                text={'Horse'}
-                value={this.whichHorse()}
-              />
+              <TouchableOpacity style={{flex: 1}} onPress={this.showHorseProfile(horse)}>
+                <Stat
+                  imgSrc={this.horseAvatar(horse)}
+                  imgStyle={{borderRadius: 900}}
+                  text={'Horse'}
+                  value={ horse ? horse.get('name') : 'none'}
+                />
+              </TouchableOpacity>
               <Stat
                 imgSrc={require('../../img/clock.png')}
                 text={'Start Time'}

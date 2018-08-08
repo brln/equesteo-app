@@ -116,6 +116,18 @@ export default class UpdateProfile extends PureComponent {
         <ScrollView keyboardShouldPersistTaps={'always'}>
           <View style={styles.container}>
             <View style={{flex: 1, padding: 5}}>
+              { hasPictures ? <Card>
+                <CardItem header>
+                  <Text style={{color: darkBrand }}>Profile Picture:</Text>
+                </CardItem>
+                <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
+                  <PhotosByTimestamp
+                    changeProfilePhoto={this.openPhotoMenu}
+                    photosByID={this.props.user.get('photosByID')}
+                    profilePhotoID={this.props.user.get('profilePhotoID')}
+                  />
+                </CardItem>
+              </Card> : null }
 
               <Card>
                 <CardItem header>
@@ -161,19 +173,6 @@ export default class UpdateProfile extends PureComponent {
                   />
                 </CardItem>
               </Card>
-
-              { hasPictures ? <Card>
-                <CardItem header>
-                  <Text style={{color: darkBrand }}>Profile Picture:</Text>
-                </CardItem>
-                <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
-                  <PhotosByTimestamp
-                    changeProfilePhoto={this.openPhotoMenu}
-                    photosByID={this.props.user.get('photosByID')}
-                    profilePhotoID={this.props.user.get('profilePhotoID')}
-                  />
-                </CardItem>
-              </Card> : null }
 
                <Card>
                 <CardItem header>

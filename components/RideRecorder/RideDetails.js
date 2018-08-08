@@ -98,6 +98,32 @@ export default class RideDetails extends PureComponent {
             <Card>
               <CardItem header style={{padding: 5}}>
                 <View style={{paddingLeft: 5}}>
+                  <Text style={{color: darkBrand}}>Ride Photos</Text>
+                </View>
+              </CardItem>
+
+              <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20}}>
+                <PhotosByTimestamp
+                  photosByID={this.props.photosByID}
+                  profilePhotoID={this.props.coverPhotoID}
+                  changeProfilePhoto={this.openPhotoMenu}
+                />
+              </CardItem>
+
+              <View style={{paddingTop: 15}}>
+                <Fab
+                  direction="up"
+                  style={{ backgroundColor: brand }}
+                  position="bottomRight"
+                  onPress={this.uploadPhoto}>
+                  <FabImage source={require('../../img/addphoto.png')} height={30} width={30} />
+                </Fab>
+              </View>
+            </Card>
+
+            <Card>
+              <CardItem header style={{padding: 5}}>
+                <View style={{paddingLeft: 5}}>
                   <Text style={{color: darkBrand}}>Ride Name</Text>
                 </View>
               </CardItem>
@@ -124,32 +150,6 @@ export default class RideDetails extends PureComponent {
                   horseID={this.props.horseID}
                   horses={this.props.horses}
                 />
-              </View>
-            </Card>
-
-            <Card>
-              <CardItem header style={{padding: 5}}>
-                <View style={{paddingLeft: 5}}>
-                  <Text style={{color: darkBrand}}>Ride Photos</Text>
-                </View>
-              </CardItem>
-
-              <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20}}>
-                <PhotosByTimestamp
-                  photosByID={this.props.photosByID}
-                  profilePhotoID={this.props.coverPhotoID}
-                  changeProfilePhoto={this.openPhotoMenu}
-                />
-              </CardItem>
-
-              <View style={{paddingTop: 15}}>
-                <Fab
-                  direction="up"
-                  style={{ backgroundColor: brand }}
-                  position="bottomRight"
-                  onPress={this.uploadPhoto}>
-                  <FabImage source={require('../../img/addphoto.png')} height={30} width={30} />
-                </Fab>
               </View>
             </Card>
 

@@ -56,6 +56,8 @@ export default class ApiClient {
           logError(e)
           throw new NotConnectedError('Cannot find the internet.')
         }
+      } else {
+        logError(e)
       }
     })
 

@@ -1,5 +1,6 @@
 import { Map } from 'immutable'
 import React, { PureComponent } from 'react';
+import ImagePicker from 'react-native-image-crop-picker'
 import {
   Picker,
   ScrollView,
@@ -11,9 +12,11 @@ import {
 import {
   Card,
   CardItem,
+  Fab,
 } from 'native-base';
 
-import { darkBrand } from '../../colors'
+import { brand, darkBrand } from '../../colors'
+import FabImage from '../FabImage'
 import PhotosByTimestamp from '../PhotosByTimestamp'
 import PhotoMenu from './PhotoMenu'
 
@@ -33,12 +36,23 @@ export default class UpdateHorse extends PureComponent {
     this.changeHorseHeightInches = this.changeHorseHeightInches.bind(this)
     this.changeHorseHeightHands = this.changeHorseHeightHands.bind(this)
     this.changeHorseName = this.changeHorseName.bind(this)
-    this.clearPhotoMenu = this.clearPhotoMenu.bind(this)
-    this.renderHandsPicker = this.renderHandsPicker.bind(this)
     this.changeHorseSex = this.changeHorseSex.bind(this)
     this.changeProfilePhotoID = this.changeProfilePhotoID.bind(this)
+    this.clearPhotoMenu = this.clearPhotoMenu.bind(this)
     this.deletePhoto = this.deletePhoto.bind(this)
     this.openPhotoMenu = this.openPhotoMenu.bind(this)
+    this.pickPhoto = this.pickPhoto.bind(this)
+    this.renderHandsPicker = this.renderHandsPicker.bind(this)
+  }
+
+  pickPhoto () {
+    ImagePicker.openPicker({
+      width: 1080,
+      height: 1080,
+      cropping: true
+    }).then(image => {
+      this.props.uploadPhoto(image.path)
+    }).catch(() => {})
   }
 
   openPhotoMenu (profilePhotoID) {
@@ -260,6 +274,30 @@ export default class UpdateHorse extends PureComponent {
             <View style={{flex: 1, padding: 5}}>
               <Card>
                 <CardItem header>
+                  <Text style={{color: darkBrand }}>Profile Picture:</Text>
+                </CardItem>
+                <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
+                  <PhotosByTimestamp
+                    changeProfilePhoto={this.openPhotoMenu}
+                    photosByID={this.props.horse.get('photosByID')}
+                    profilePhotoID={this.props.horse.get('profilePhotoID')}
+                  />
+                </CardItem>
+
+                <View style={{paddingTop: 15}}>
+                  <Fab
+                    direction="up"
+                    style={{ backgroundColor: brand }}
+                    position="bottomRight"
+                    onPress={this.pickPhoto}>
+                    <FabImage source={require('../../img/addphoto.png')} height={30} width={30} />
+                  </Fab>
+                </View>
+              </Card>
+
+
+              <Card>
+                <CardItem header>
                   <Text style={{color: darkBrand }}>Name:</Text>
                 </CardItem>
                 <CardItem cardBody style={{marginLeft: 20, marginRight: 20}}>
@@ -329,18 +367,7 @@ export default class UpdateHorse extends PureComponent {
                 </CardItem>
               </Card>
 
-              <Card>
-                <CardItem header>
-                  <Text style={{color: darkBrand }}>Profile Picture:</Text>
-                </CardItem>
-                <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
-                  <PhotosByTimestamp
-                    changeProfilePhoto={this.openPhotoMenu}
-                    photosByID={this.props.horse.get('photosByID')}
-                    profilePhotoID={this.props.horse.get('profilePhotoID')}
-                  />
-                </CardItem>
-              </Card>
+
             </View>
           </View>
         </ScrollView>

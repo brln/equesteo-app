@@ -30,6 +30,8 @@ class RideContainer extends NavigatorComponent {
         horses={this.props.horses}
         navigator={this.props.navigator}
         ride={this.props.ride}
+        rideUser={this.props.user}
+        userID={this.props.userID}
       />
     )
   }
@@ -37,9 +39,14 @@ class RideContainer extends NavigatorComponent {
 
 function mapStateToProps (state, passedProps) {
   const mainState = state.get('main')
+  const localState = mainState.get('localState')
+  const ride = mainState.getIn(['rides', passedProps.rideID])
+  const userID = localState.get('userID')
   return {
     horses: mainState.get('horses').toList(),
-    ride: mainState.getIn(['rides', passedProps.rideID])
+    ride,
+    rideUser: mainState.getIn(['users', ride.get('userID')]),
+    userID
   }
 }
 
