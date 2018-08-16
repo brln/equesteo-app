@@ -1,7 +1,6 @@
 import PouchDB from 'pouchdb-react-native'
 import { API_URL } from 'react-native-dotenv'
 
-
 import { logInfo, logError } from '../helpers'
 
 export default class PouchCouch {
