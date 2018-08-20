@@ -3,7 +3,8 @@ import { Navigation } from 'react-native-navigation';
 import BarnContainer from './containers/Barn'
 import DrawerContainer from './containers/Drawer'
 import FeedContainer from './containers/Feed'
-import FollowingContainer from './containers/Following'
+import FindPeopleContainer from './containers/FindPeople'
+import FollowListContainer from './containers/FollowList'
 import HorseProfileContainer from './containers/HorseProfile'
 import MapContainer from './containers/Map'
 import PhotoLightboxContainer from './containers/PhotoLightbox'
@@ -20,8 +21,9 @@ import UpdateProfileContainer from './containers/UpdateProfile'
 export const BARN = 'equesteo.Barn'
 export const DRAWER = 'equesteo.Drawer'
 export const FEED = 'equesteo.Feed'
+export const FOLLOW_LIST = 'equesteo.FollowList'
 export const HORSE_PROFILE = 'equesteo.HorseProfile'
-export const FOLLOWING = 'equesteo.Following'
+export const FIND_PEOPLE = 'equesteo.FindPeople'
 export const MAP = 'equesteo.Map'
 export const PHOTO_LIGHTBOX = 'equesteo.PhotoLightbox'
 export const PROFILE = 'equesteo.Profile'
@@ -54,7 +56,8 @@ export function registerScreens(store, Provider) {
   Navigation.registerComponent(BARN, () => BarnContainer, store, Provider)
   Navigation.registerComponent(DRAWER, () => DrawerContainer, store, Provider)
   Navigation.registerComponent(FEED, () => FeedContainer, store, Provider)
-  Navigation.registerComponent(FOLLOWING, () => FollowingContainer, store, Provider)
+  Navigation.registerComponent(FIND_PEOPLE, () => FindPeopleContainer, store, Provider)
+  Navigation.registerComponent(FOLLOW_LIST, () => FollowListContainer, store, Provider)
   Navigation.registerComponent(HORSE_PROFILE, () => HorseProfileContainer, store, Provider)
   Navigation.registerComponent(MAP, () => MapContainer, store, Provider)
   Navigation.registerComponent(PHOTO_LIGHTBOX, () => PhotoLightboxContainer, store, Provider)

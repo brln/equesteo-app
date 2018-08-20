@@ -18,11 +18,12 @@ class ProfileContainer extends NavigatorComponent {
     super(props)
     this.createFollow = this.createFollow.bind(this)
     this.deleteFollow = this.deleteFollow.bind(this)
+    this.followings = this.followings.bind(this)
+    this.followers = this.followers.bind(this)
     this.uploadProfilePhoto = this.uploadProfilePhoto.bind(this)
     this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent)
     this.yourHorses = this.yourHorses.bind(this)
-    this.yourFollows = this.yourFollows.bind(this)
   }
 
   onNavigatorEvent(event) {
@@ -59,8 +60,16 @@ class ProfileContainer extends NavigatorComponent {
     }).toList()
   }
 
-  yourFollows () {
-    return this.props.follows.filter(f => !f.get('deleted') && f.get('followerID') === this.props.user.get('_id'))
+  followings () {
+    return this.props.follows.filter(
+      f => !f.get('deleted') && f.get('followerID') === this.props.profileUser.get('_id')
+    )
+  }
+
+  followers () {
+    return this.props.follows.filter(
+      f => !f.get('deleted') && f.get('followingID') === this.props.profileUser.get('_id')
+    )
   }
 
   render() {
@@ -70,18 +79,19 @@ class ProfileContainer extends NavigatorComponent {
         <Profile
           createFollow={this.createFollow}
           deleteFollow={this.deleteFollow}
-          follows={this.yourFollows()}
+          followings={this.followings()}
+          followers={this.followers()}
           horses={this.yourHorses()}
           navigator={this.props.navigator}
           profileUser={this.props.profileUser}
           uploadProfilePhoto={this.uploadProfilePhoto}
           user={this.props.user}
+          users={this.props.users}
         />
       )
     } else {
       return null
     }
-
   }
 }
 
@@ -95,6 +105,7 @@ function mapStateToProps (state, passedProps) {
     profileUser: mainState.getIn(['users', passedProps.profileUser.get('_id')]) || passedProps.profileUser,
     user: mainState.getIn(['users', userID]),
     follows: mainState.get('follows'),
+    users: mainState.get('users')
   }
 }
 

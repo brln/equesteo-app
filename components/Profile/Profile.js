@@ -18,12 +18,13 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View
 } from 'react-native';
 
 import { brand, danger, darkBrand, green } from '../../colors'
 import { logRender } from '../../helpers'
-import { HORSE_PROFILE } from '../../screens'
+import { FOLLOW_LIST, HORSE_PROFILE } from '../../screens'
 import SwipablePhoto from '../SwipablePhoto'
 import FabImage from '../FabImage'
 
@@ -176,8 +177,9 @@ export default class Profile extends PureComponent {
           title="Follow"
         />
       )
-      for (let follow of this.props.follows.valueSeq()) {
-        if (follow.get('followingID') === this.props.profileUser.get('_id')) {
+      for (let follow of this.props.followers.valueSeq()) {
+        if (follow.get('followingID') === this.props.profileUser.get('_id')
+          && follow.get('followerID') === this.props.user.get('_id')) {
           followButton = (
             <Button
               style={styles.followButton}
@@ -221,12 +223,46 @@ export default class Profile extends PureComponent {
     }
   }
 
+  showUserList (followRecords, followingOrFollower) {
+    return () => {
+      const userIDs = followRecords.valueSeq().map((f) => f.get(followingOrFollower))
+      this.props.navigator.push({
+        screen: FOLLOW_LIST,
+        animationType: 'slide-up',
+        passProps: {
+          userIDs: userIDs.toJS(),
+        }
+      })
+    }
+  }
+
   render() {
     logRender('ProfileComponent')
     return (
       <ScrollView>
         {this.renderImageSwiper()}
         <View style={{flex: 1}}>
+          <Card>
+            <CardItem>
+              <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+                <View style={{flex: 1}} />
+                <View style={{flex: 2, paddingLeft: 5, flexDirection: 'row', alignItems: 'center'}}>
+                  <Text style={{color: darkBrand, paddingRight: 10}}>Followers:</Text>
+                  <TouchableOpacity onPress={this.showUserList(this.props.followers, 'followerID')}>
+                    <Text style={{fontSize: 24}}>{this.props.followers.count()}</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={{flex: 2, paddingLeft: 5, flexDirection: 'row', alignItems: 'center'}}>
+                  <Text style={{color: darkBrand, paddingRight: 10}}>Following:</Text>
+                  <TouchableOpacity onPress={this.showUserList(this.props.followings, 'followingID')}>
+                    <Text style={{fontSize: 24}}>{this.props.followings.count()}</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={{flex: 1}} />
+              </View>
+            </CardItem>
+          </Card>
+
           <Card>
             <CardItem header style={{padding: 5}}>
               <View style={{paddingLeft: 5}}>
@@ -248,7 +284,6 @@ export default class Profile extends PureComponent {
           </Card>
 
           { this.horsesCard() }
-
         </View>
         </ScrollView>
     )

@@ -3,6 +3,7 @@ import { API_URL } from 'react-native-dotenv'
 
 import { logInfo, logError } from '../helpers'
 
+
 export default class PouchCouch {
   constructor (jwt) {
     const horsesDBName = 'horses'

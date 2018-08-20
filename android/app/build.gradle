@@ -102,8 +102,8 @@ android {
         applicationId "com.equesteo"
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 9
-        versionName "0.0.9"
+        versionCode 11
+        versionName "0.0.11"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
@@ -151,7 +151,7 @@ android {
 dependencies {
     compile project(':react-native-push-notification')
     implementation project(':react-native-firebase')
-    implementation "com.google.firebase:firebase-messaging:17.1.0"
+    implementation "com.google.firebase:firebase-messaging:17.3.0"
     implementation project(':react-native-android-location-services-dialog-box')
     implementation 'com.android.support:design:27.1.0'
     implementation project(':react-native-svg')
@@ -184,3 +184,7 @@ task copyDownloadableDepsToLibs(type: Copy) {
 }
 
 apply plugin: 'com.google.gms.google-services'
+
+// Getting error:  The library com.google.firebase:firebase-iid is being requested by various other libraries at [[17.0.0,17.0.0]], but resolves to 16.2.0. Disable the plugin and check your dependencies tree using ./gradlew :app:dependencies.
+// solution from: https://github.com/OneSignal/OneSignal-Gradle-Plugin/issues/37
+com.google.gms.googleservices.GoogleServicesPlugin.config.disableVersionCheck = true

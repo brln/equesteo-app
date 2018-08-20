@@ -332,6 +332,8 @@ export function getFCMToken () {
     const currentUserID = getState().getIn(['main', 'localState', 'userID'])
     const localUser = getState().getIn(['main', 'users', currentUserID])
     if (fcmToken && localUser) {
+      console.log('setting token for user: ' + localUser.get('email'))
+      console.log('token: ' + fcmToken)
       if (fcmToken !== localUser.get('fcmToken')) {
         dispatch(updateUser(localUser.set('fcmToken', fcmToken)))
       } else {
@@ -617,6 +619,7 @@ export function signOut () {
     await LocalStorage.deleteLocalState()
     const pouchCouch = new PouchCouch()
     await pouchCouch.deleteLocalDBs()
+    dispatch(stopListeningFCM())
     dispatch(stopLocationTracking())
     dispatch(clearStateAfterPersist())
   }
@@ -678,7 +681,6 @@ function startListeningFCM () {
       logInfo(m)
     })
     firebase.messaging().onMessage(async (m) => {
-      console.log(m)
       const userID = m._data.userID
       const distance = parseFloat(m._data.distance)
       const user = getState().getIn(['main', 'users']).get(userID)
@@ -702,6 +704,12 @@ export function stopLocationTracking () {
     BackgroundGeolocation.stop()
     BackgroundGeolocation.removeAllListeners('location')
     dispatch(clearLastLocation())
+  }
+}
+
+function stopListeningFCM () {
+  return async () => {
+    await firebase.iid().deleteToken('373350399276', 'GCM')
   }
 }
 

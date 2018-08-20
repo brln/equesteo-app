@@ -6,6 +6,7 @@ import com.facebook.react.ReactApplication;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import io.invertase.firebase.RNFirebasePackage;
 import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
+import io.invertase.firebase.instanceid.RNFirebaseInstanceIdPackage;
 import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
 import com.showlocationservicesdialogbox.LocationServicesDialogBoxPackage;
 import com.horcrux.svg.SvgPackage;
@@ -55,7 +56,8 @@ public class MainApplication extends NavigationApplication {
             new RNFirebasePackage(),
             new RNFirebaseMessagingPackage(),
             new RNFirebaseNotificationsPackage(),
-            new ReactNativePushNotificationPackage()
+            new ReactNativePushNotificationPackage(),
+            new RNFirebaseInstanceIdPackage()
         );
     }
 

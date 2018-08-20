@@ -11,7 +11,7 @@ import {
 
 import {
   BARN,
-  FOLLOWING,
+  FIND_PEOPLE,
   PROFILE,
   RIDES,
   RIDES_DETAILS,
@@ -38,8 +38,8 @@ class DrawerContainer extends PureComponent {
   openFollowing () {
     this.toggleDrawer()
     this.props.navigator.push({
-      screen: FOLLOWING,
-      title: 'Following',
+      screen: FIND_PEOPLE,
+      title: 'Find People',
       navigatorButtons: {
         leftButtons: [{
           id: 'back'
@@ -178,7 +178,7 @@ class DrawerContainer extends PureComponent {
             <TouchableOpacity onPress={this.openFollowing}>
               <View style={styles.drawerListItem}>
                 <Text style={styles.drawerListItemText} onTouch>
-                  Following
+                  Find People
                 </Text>
               </View>
             </TouchableOpacity>
