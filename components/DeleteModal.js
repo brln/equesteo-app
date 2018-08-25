@@ -20,15 +20,15 @@ export default class DeleteModal extends PureComponent {
         isOpen={this.props.modalOpen}
         onClosed={this.props.closeDeleteModal}
       >
-        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-          <Text>{this.props.text}</Text>
+        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', paddingLeft: 20, paddingRight: 20}}>
+          <Text style={{textAlign: 'center'}}>{this.props.text}</Text>
         </View>
         <View style={{flex: 1, flexDirection: 'row', height: 20, alignItems: 'center'}}>
-          <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
-            <View style={{margin: 20}} >
+          <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', width: 300}}>
+            <View style={{margin: 20, width: 120}} >
               <Button title={"Yes"} color={"red"} onPress={this.props.deleteFunc}/>
             </View>
-            <View style={{margin: 20}} >
+            <View style={{margin: 20, width: 120}} >
               <Button title={"No"} onPress={this.props.closeDeleteModal}/>
             </View>
           </View>
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
   },
   modal3: {
     marginTop: 30,
-    height: 300,
+    height: 250,
     width: 300,
   },
 });

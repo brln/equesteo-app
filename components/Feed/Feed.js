@@ -11,6 +11,7 @@ import { brand } from '../../colors'
 export default class Feed extends PureComponent {
   constructor (props) {
     super(props)
+    this.renderRideList = this.renderRideList.bind(this)
     this.showRide = this.showRide.bind(this)
     this.startRefresh = this.startRefresh.bind(this)
   }
@@ -42,7 +43,7 @@ export default class Feed extends PureComponent {
     }
     this.props.navigator.push({
       screen: RIDE,
-      title: ride.get('name'),
+      title: 'Ride',
       passProps: {
         rideID: ride.get('_id'),
       },
@@ -54,43 +55,37 @@ export default class Feed extends PureComponent {
     });
   }
 
+  renderRideList (ownRideList, rides) {
+    return (
+      <RideList
+        horses={this.props.horses}
+        horseUsers={this.props.horseUsers}
+        horseOwnerIDs={this.props.horseOwnerIDs}
+        navigator={this.props.navigator}
+        ownRideList={ownRideList}
+        refreshing={this.props.refreshing}
+        rides={rides}
+        rideCarrots={this.props.rideCarrots}
+        rideComments={this.props.rideComments}
+        showComments={this.props.showComments}
+        showRide={this.showRide}
+        startRefresh={this.startRefresh}
+        toggleCarrot={this.props.toggleCarrot}
+        userID={this.props.userID}
+        users={this.props.users}
+      />
+    )
+  }
+
   render() {
     return (
       <Container>
         <Tabs initialPage={0} locked={true}>
           <Tab tabStyle={{backgroundColor: brand}} activeTabStyle={{backgroundColor: brand}} heading="Following">
-            <RideList
-              horses={this.props.horses}
-              navigator={this.props.navigator}
-              ownRideList={false}
-              refreshing={this.props.refreshing}
-              rides={this.props.followingRides}
-              rideCarrots={this.props.rideCarrots}
-              rideComments={this.props.rideComments}
-              showComments={this.props.showComments}
-              showRide={this.showRide}
-              startRefresh={this.startRefresh}
-              toggleCarrot={this.props.toggleCarrot}
-              userID={this.props.userID}
-              users={this.props.users}
-            />
+            { this.renderRideList(false, this.props.followingRides) }
           </Tab>
           <Tab tabStyle={{backgroundColor: brand}} activeTabStyle={{backgroundColor: brand}} heading="You">
-            <RideList
-              horses={this.props.horses}
-              navigator={this.props.navigator}
-              ownRideList={true}
-              refreshing={this.props.refreshing}
-              rides={this.props.yourRides}
-              rideCarrots={this.props.rideCarrots}
-              rideComments={this.props.rideComments}
-              showComments={this.props.showComments}
-              showRide={this.showRide}
-              startRefresh={this.startRefresh}
-              toggleCarrot={this.props.toggleCarrot}
-              userID={this.props.userID}
-              users={this.props.users}
-            />
+            { this.renderRideList(true, this.props.yourRides) }
           </Tab>
         </Tabs>
       </Container>

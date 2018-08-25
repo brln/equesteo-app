@@ -24,7 +24,7 @@ function RideDay (props) {
         {props.ride.get('distance').toFixed(1)}
       </Text>
     )
-  } else if (props.chosenType === props.types.TIME) {
+  } else if (props.chosenType === props.types.TYPE_TIME) {
     showString = props.timeString(
       props.ride.get('elapsedTimeSecs'),
       {textAlign: 'center', fontSize: 15, fontWeight: 'bold'},
@@ -56,7 +56,7 @@ function MultiRideDay (props) {
                 {r.get('distance').toFixed(1)}
               </Text>
             )
-          } else if (props.chosenType === props.types.TIME) {
+          } else if (props.chosenType === props.types.TYPE_TIME) {
             showString = props.timeString(
               r.get('elapsedTimeSecs'),
               {textAlign: 'center', fontSize: 15, fontWeight: 'bold'},
@@ -95,6 +95,19 @@ export default class Week extends Component {
   }
 
   showRide (ride) {
+    let rightButtons = []
+    if (this.props.userID === ride.get('userID')) {
+      rightButtons = [
+        {
+          title: "Edit",
+          id: 'edit',
+        },
+        {
+          title: "Delete",
+          id: 'delete',
+        }
+      ]
+    }
     this.props.navigator.push({
       screen: RIDE,
       title: ride.get('name'),
@@ -103,16 +116,7 @@ export default class Week extends Component {
       },
       navigatorButtons: {
         leftButtons: [],
-        rightButtons: [
-          {
-            title: "Edit",
-            id: 'edit',
-          },
-          {
-            title: "Delete",
-            id: 'delete',
-          }
-        ]
+        rightButtons,
       },
       animationType: 'slide-up',
     });
@@ -128,9 +132,17 @@ export default class Week extends Component {
       const eachDay = moment(start).add(i, 'days')
       const daysRides = []
       for (let ride of this.props.rides) {
-        const showingID = ride.get('horseID') ? ride.get('horseID') : null
+        const showingHorseID = ride.get('horseID') ? ride.get('horseID') : null
         if (moment(ride.get('startTime')).date() === eachDay.date()
-          && (showingID === this.props.chosenHorseID || this.props.chosenHorseID === this.props.showEveryone)) {
+          && (
+            showingHorseID === this.props.chosenHorseID
+            || this.props.chosenHorseID === this.props.types.SHOW_ALL_HORSES
+          ) && (
+            ride.get('userID') === this.props.chosenUserID
+            || this.props.chosenUserID === this.props.types.SHOW_ALL_RIDERS
+          )
+
+        ) {
           daysRides.push(ride)
           totalDistance += ride.get('distance')
           totalTime += ride.get('elapsedTimeSecs')

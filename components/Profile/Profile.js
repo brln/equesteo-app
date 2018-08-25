@@ -61,15 +61,15 @@ export default class Profile extends PureComponent {
 
   horseProfile (horse) {
     let rightButtons = []
-    if (this.props.profileUser.get('_id') === this.props.user.get('_id')) {
+    if (this.props.user.get('_id') === this.props.horseOwnerIDs.get(horse.get('_id'))) {
       rightButtons = [
         {
           title: "Edit",
           id: 'edit',
         },
         {
-          title: "Delete",
-          id: 'delete',
+          title: "Archive",
+          id: 'archive',
         }
       ]
     }
@@ -77,11 +77,7 @@ export default class Profile extends PureComponent {
       this.props.navigator.push({
         screen: HORSE_PROFILE,
         title: horse.get('name'),
-        passProps: {
-          horse: horse,
-          horseUser: this.props.profileUser,
-          user: this.props.user,
-        },
+        passProps: { horse },
         rightButtons
       })
     }

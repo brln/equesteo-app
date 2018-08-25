@@ -44,7 +44,7 @@ class RideDetailsContainer extends NavigatorComponent {
     this.deletePhoto = this.deletePhoto.bind(this)
     this.doneOnPage = this.doneOnPage.bind(this)
     this.uploadPhoto = this.uploadPhoto.bind(this)
-    this.yourHorses = this.yourHorses.bind(this)
+    this.horses = this.horses.bind(this)
     this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
     this.uploadNewPhotos = this.uploadNewPhotos.bind(this)
@@ -179,10 +179,12 @@ class RideDetailsContainer extends NavigatorComponent {
     })
   }
 
-  yourHorses () {
-    return this.props.horses.toList().filter(
-      h => h.get('userID') === this.props.userID && h.get('deleted') !== true
-    )
+  horses () {
+    return this.props.horseUsers.valueSeq().filter((hu) => {
+      return (hu.get('userID') === this.props.userID) && hu.get('deleted') !== true
+    }).map((hu) => {
+      return this.props.horses.get(hu.get('horseID'))
+    })
   }
 
   render() {
@@ -196,7 +198,7 @@ class RideDetailsContainer extends NavigatorComponent {
         coverPhotoID={this.state.ride.get('coverPhotoID')}
         deletePhoto={this.deletePhoto}
         photosByID={this.state.ride.get('photosByID')}
-        horses={this.yourHorses()}
+        horses={this.horses()}
         horseID={this.state.ride.get('horseID')}
         horseSelected={this.state.horseSelected}
         isPublic={this.state.ride.get('isPublic')}
@@ -219,6 +221,7 @@ function mapStateToProps (state, passedProps) {
   return {
     currentRide,
     horses: mainState.get('horses'),
+    horseUsers: mainState.get('horseUsers'),
     newRide,
     userID,
     user: mainState.getIn(['users', localState.get('userID')]),

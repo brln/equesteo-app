@@ -13,7 +13,6 @@ class FollowListContainer extends NavigatorComponent {
 
   render() {
     logRender('FollowListContainer')
-    console.log(this.props.users.toJSON())
     return (
       <FollowList
         navigator={this.props.navigator}

@@ -12,6 +12,7 @@ import {
   ERROR_OCCURRED,
   FOLLOW_UPDATED,
   HORSE_CREATED,
+  HORSE_USER_UPDATED,
   HORSE_SAVED,
   JUST_FINISHED_RIDE_SHOWN,
   LOAD_LOCAL_STATE,
@@ -69,6 +70,7 @@ const initialState = Map({
     userSearchResults: List(),
   }),
   horses: Map(),
+  horseUsers: Map(),
   follows: Map(),
   lastFullSync: null,
   rides: Map(),
@@ -106,6 +108,8 @@ export default function AppReducer(state=initialState, action) {
       return state.set('horses', state.get('horses').set(action.horse.get('_id'), action.horse))
     case HORSE_SAVED:
       return state.set('horses', state.get('horses').set(action.horse.get('_id'), action.horse))
+    case HORSE_USER_UPDATED:
+      return state.set('horseUsers', state.get('horseUsers').set(action.horseUser.get('_id'), action.horseUser))
     case JUST_FINISHED_RIDE_SHOWN:
       return state.setIn(['localState', 'justFinishedRide'], false)
     case LOAD_LOCAL_STATE:
@@ -123,6 +127,11 @@ export default function AppReducer(state=initialState, action) {
 
       const allHorses = action.localData.horses.reduce((accum, horse) => {
         accum[horse._id] = fromJS(horse)
+        return accum
+      }, {})
+
+      const allHorseUsers = action.localData.horseUsers.reduce((accum, horseUser) => {
+        accum[horseUser._id] = fromJS(horseUser)
         return accum
       }, {})
 
@@ -148,6 +157,7 @@ export default function AppReducer(state=initialState, action) {
         rideCarrots: Map(allCarrots),
         rideComments: Map(allComments),
         horses: Map(allHorses),
+        horseUsers: Map(allHorseUsers)
       }))
     case MARK_PHOTO_ENQUEUED:
       return state.setIn(['localState', 'photoQueue', action.queueItemID, 'queueID'], action.queueID)

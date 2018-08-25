@@ -63,15 +63,15 @@ export default class Stats extends PureComponent {
     if (horse) {
       return () => {
         let rightButtons = []
-        if (this.props.ride.get('userID') === this.props.userID) {
+        if (this.props.rideHorseOwnerID === this.props.userID) {
           rightButtons = [
             {
               title: "Edit",
               id: 'edit',
             },
             {
-              title: "Delete",
-              id: 'delete',
+              title: "Archive",
+              id: 'archive',
             }
           ]
         }
@@ -80,10 +80,7 @@ export default class Stats extends PureComponent {
           screen: HORSE_PROFILE,
           title: horse.get('name'),
           animationType: 'slide-up',
-          passProps: {
-            horse: horse,
-            user: this.props.rideUser,
-          },
+          passProps: { horse: horse },
           rightButtons
         })
       }

@@ -19,8 +19,10 @@ class FeedContainer extends NavigatorComponent {
       lastFullSync: null
     }
     this.filteredHorses = this.filteredHorses.bind(this)
+    this.filteredHorseUsers = this.filteredHorseUsers.bind(this)
     this.followIDs = this.followIDs.bind(this)
     this.followingRides = this.followingRides.bind(this)
+    this.horseOwnerIDs = this.horseOwnerIDs.bind(this)
     this.justFinishedRideShown = this.justFinishedRideShown.bind(this)
     this.toggleCarrot = this.toggleCarrot.bind(this)
     this.showComments = this.showComments.bind(this)
@@ -89,9 +91,26 @@ class FeedContainer extends NavigatorComponent {
   }
 
   filteredHorses () {
-    return this.props.horses.valueSeq().filter(h => {
+    return this.props.horseUsers.filter(h => {
       return this.followIDs().indexOf(h.get('userID')) >= 0 || h.get('userID') === this.props.userID
-    }).toList()
+    }).mapEntries(([horseUserID, horseUser]) => {
+      return [horseUser.get('horseID'), this.props.horses.get(horseUser.get('horseID'))]
+    })
+  }
+
+  filteredHorseUsers () {
+    return this.props.horseUsers.filter(h => {
+      return this.followIDs().indexOf(h.get('userID')) >= 0 || h.get('userID') === this.props.userID
+    })
+  }
+
+
+  horseOwnerIDs () {
+    return this.props.horseUsers.filter(hu => {
+      return hu.get('owner') === true
+    }).mapEntries(([horseUserID, horseUser]) => {
+      return [horseUser.get('horseID'), horseUser.get('userID')]
+    })
   }
 
   render() {
@@ -101,6 +120,8 @@ class FeedContainer extends NavigatorComponent {
         deleteRide={this.deleteRide}
         followingRides={this.followingRides()}
         horses={this.filteredHorses()}
+        horseOwnerIDs={this.horseOwnerIDs()}
+        horseUsers={this.filteredHorseUsers()}
         justFinishedRide={this.props.justFinishedRide}
         justFinishedRideShown={this.justFinishedRideShown}
         navigator={this.props.navigator}
@@ -125,6 +146,7 @@ function mapStateToProps (state) {
   return {
     follows: mainState.get('follows'),
     horses: mainState.get('horses'),
+    horseUsers: mainState.get('horseUsers'),
     justFinishedRide: localState.get('justFinishedRide'),
     lastFullSync: localState.get('lastFullSync'),
     rides: mainState.get('rides'),

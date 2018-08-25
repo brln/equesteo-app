@@ -75,7 +75,6 @@ export default class RideCard extends PureComponent {
       animationType: 'slide-up',
       passProps: {
         horse: this.props.horse,
-        user: this.props.rideUser,
       },
       rightButtons
     })
@@ -240,7 +239,6 @@ export default class RideCard extends PureComponent {
         <CardItem header>
           <View style={{flex: 1}}>
             <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
-
               <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', paddingRight: 10}}>
                 { this.userAvatar() }
                 <View>

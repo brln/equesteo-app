@@ -36,20 +36,23 @@ export default class Training extends PureComponent {
     super(props)
     this.TYPES = {
       DISTANCE: 'typeDistance',
-      TYPE_TIME: 'typeTime'
+      TYPE_TIME: 'typeTime',
+      SHOW_ALL_HORSES: 'showAllHorses',
+      SHOW_ALL_RIDERS: 'showAllRiders',
     }
 
-    this.SHOW_EVERYONE = 'showEveryone'
-
     this.state = {
-      chosenHorseID: this.SHOW_EVERYONE,
-      chosenType: this.TYPES.DISTANCE
+      chosenHorseID: this.TYPES.SHOW_ALL_HORSES,
+      chosenType: this.TYPES.DISTANCE,
+      chosenUserID: this.TYPES.SHOW_ALL_RIDERS,
     }
 
     this._renderItem = this._renderItem.bind(this)
     this.horsePicker = this.horsePicker.bind(this)
     this.pickHorse = this.pickHorse.bind(this)
+    this.pickRider = this.pickRider.bind(this)
     this.pickType = this.pickType.bind(this)
+    this.userPicker = this.userPicker.bind(this)
   }
 
   ridesToWeeks (rides) {
@@ -70,12 +73,13 @@ export default class Training extends PureComponent {
          <Week
            chosenHorseID={this.state.chosenHorseID}
            chosenType={this.state.chosenType}
+           chosenUserID={this.state.chosenUserID}
            index={index}
            mondayString={item}
            navigator={this.props.navigator}
            rides={rideWeeks[item]}
-           showEveryone={this.SHOW_EVERYONE}
            types={this.TYPES}
+           userID={this.props.userID}
          />
       )
     }
@@ -93,17 +97,23 @@ export default class Training extends PureComponent {
     })
   }
 
+  pickRider (value) {
+    this.setState({
+      chosenUserID: value
+    })
+  }
+
   horsePicker () {
     return (
       <View style={{flex: 1, borderWidth: 1, borderColor: lightGrey}}>
         <Picker selectedValue={this.state.chosenHorseID} onValueChange={this.pickHorse}>
-          <Picker.Item key="everyone" label="All Horses" value={this.SHOW_EVERYONE} />
+          <Picker.Item key="everyone" label="All Horses" value={this.TYPES.SHOW_ALL_HORSES} />
           {
-            this.props.horses.filter(h => h.get('userID') === this.props.user.get('_id')).map(h => {
+            this.props.horses.valueSeq().map(h => {
               return <Picker.Item key={h.get('_id')} label={h.get('name')} value={h.get('_id')} />
             })
           }
-          <Picker.Item key="none" label="No Horse" value={null} />
+          <Picker.Item key="none" label="Rides With No Horse" value={null} />
         </Picker>
       </View>
     )
@@ -114,7 +124,31 @@ export default class Training extends PureComponent {
       <View style={{flex: 1, borderWidth: 1, borderColor: lightGrey}}>
         <Picker selectedValue={this.state.chosenType} onValueChange={this.pickType}>
           <Picker.Item key="distance" label="Distance" value={this.TYPES.DISTANCE} />
-          <Picker.Item key="time" label="Time" value={this.TYPES.TIME} />
+          <Picker.Item key="time" label="Time" value={this.TYPES.TYPE_TIME} />
+        </Picker>
+      </View>
+    )
+  }
+
+  userName(user) {
+    if (user.get('firstName') || user.get('lastName')) {
+      return `${user.get('firstName') || ''} ${user.get('lastName') || ''}`
+    } else {
+      return 'No Name'
+    }
+  }
+
+  userPicker () {
+    return (
+      <View style={{flex: 1, borderWidth: 1, borderColor: lightGrey}}>
+        <Picker selectedValue={this.state.chosenUserID} onValueChange={this.pickRider}>
+          <Picker.Item key="allRiders" label="All Riders" value={this.TYPES.SHOW_ALL_RIDERS} />
+          <Picker.Item key="onlyYou" label="Only You" value={this.props.userID} />
+          {
+            this.props.riders.valueSeq().map(r => {
+              return <Picker.Item key={r.get('_id')} label={this.userName(r)} value={r.get('_id')} />
+            })
+          }
         </Picker>
       </View>
     )
@@ -129,6 +163,7 @@ export default class Training extends PureComponent {
         <View style={{flex: 1, flexDirection: 'row'}}>
           { this.horsePicker() }
           { this.typePicker() }
+          { this.userPicker() }
         </View>
         <View style={{flex: 9}}>
           <DaysOfWeek />

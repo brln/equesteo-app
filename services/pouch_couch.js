@@ -95,7 +95,7 @@ export default class PouchCouch {
   localReplicateDB(db, userIDs, followerUserIDs) {
     switch(db) {
       case 'horses':
-        return this.localReplicateHorses(userIDs)
+        return this.localReplicateHorses([...userIDs, ...followerUserIDs])
       case 'rides':
         return this.localReplicateRides(userIDs, followerUserIDs)
       case 'users':
@@ -103,7 +103,7 @@ export default class PouchCouch {
       case 'all':
         const rideReplicate = this.localReplicateRides(userIDs, followerUserIDs)
         const userReplicate = this.localReplicateUsers([...userIDs, ...followerUserIDs])
-        const horsesReplicate = this.localReplicateHorses(userIDs)
+        const horsesReplicate = this.localReplicateHorses([...userIDs, ...followerUserIDs])
         return Promise.all([rideReplicate, horsesReplicate, userReplicate])
       default:
         throw('Local DB not found')
@@ -139,8 +139,6 @@ export default class PouchCouch {
         this.localUsersDB,
         {
           live: false,
-          filter: 'users/byUserIDs',
-          query_params: {userIDs: userIDs.join(',')}
         }
       ).on('complete', () => {
           resolve()
@@ -153,19 +151,32 @@ export default class PouchCouch {
 
   localReplicateHorses (userIDs) {
     return new Promise((resolve, reject) => {
-      PouchDB.replicate(
-        this.remoteHorsesDB,
-        this.localHorsesDB,
-        {
-          live: false,
-          filter: 'horses/byUserIDs',
-          query_params: {userIDs: userIDs.join(',')}
+      this.remoteHorsesDB.query('horses/allJoins', {}).then((resp) => {
+        const fetchIDs = []
+        for (let row of resp.rows) {
+          const joinID = row.id
+          const userID = row.key
+          const horseID = row.value
+          if (userIDs.indexOf(userID) >= 0) {
+            fetchIDs.push(joinID)
+            if (fetchIDs.indexOf(horseID) < 0) {
+              fetchIDs.push(horseID)
+            }
+          }
         }
-      ).on('complete', () => {
-        resolve()
-      }).on('error', (e) => {
-        logError(e)
-        reject()
+        PouchDB.replicate(
+          this.remoteHorsesDB,
+          this.localHorsesDB,
+          {
+            live: false,
+            doc_ids: fetchIDs,
+          }
+        ).on('complete', () => {
+          resolve()
+        }).on('error', (e) => {
+          logError(e)
+          reject()
+        })
       })
     })
   }
@@ -179,15 +190,21 @@ export default class PouchCouch {
   }
 
   async localLoad () {
-    // @TODO: these can be called async instead of sequentially
-    const horsesResp = await this.localHorsesDB.allDocs()
-    const ridesResp = await this.localRidesDB.allDocs()
-    const usersResp = await this.localUsersDB.allDocs()
-
+    async function allDocs () {
+      const promises = [
+        this.localHorsesDB.allDocs(),
+        this.localRidesDB.allDocs(),
+        this.localUsersDB.allDocs(),
+      ]
+      return Promise.all(promises)
+    }
+    [ horsesResp, ridesResp, usersResp ] = await allDocs.bind(this)()
     const rideDocs = ridesResp.rows.map(r => r.doc)
     const userDocs = usersResp.rows.map(u => u.doc)
+    const horseDocs = horsesResp.rows.map(h => h.doc)
     return {
-      horses: horsesResp.rows.map(r => r.doc),
+      horses: horseDocs.filter(h => h.type === 'horse'),
+      horseUsers: horseDocs.filter(h => h.type === 'horseUser'),
       follows: userDocs.filter(u => u.type === 'follow'),
       rideCarrots: rideDocs.filter(r => r.type === 'carrot'),
       rideComments: rideDocs.filter(r => r.type === 'comment'),

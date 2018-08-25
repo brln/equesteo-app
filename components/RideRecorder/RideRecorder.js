@@ -43,7 +43,6 @@ export default class RideRecorder extends PureComponent {
         screen: RIDE_DETAILS,
         title: 'Ride Details',
         passProps: {
-          horses: this.props.horses,
           elapsedTime,
         },
         navigatorStyle: {

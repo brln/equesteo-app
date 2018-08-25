@@ -1,16 +1,23 @@
 import React, { PureComponent } from 'react'
 import Swiper from 'react-native-swiper';
 import memoizeOne from 'memoize-one';
+import moment from 'moment'
 import {
   Dimensions,
   Image,
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
+import {
+  Thumbnail
+} from 'native-base'
 
+
+import { darkGrey } from '../../colors'
 import { haversine, logRender } from '../../helpers'
 import { MAP, RIDE_DETAILS } from '../../screens'
 import PhotoFilmstrip from './PhotoFilmstrip'
@@ -33,6 +40,9 @@ export default class Ride extends PureComponent {
 
     this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
+    this.userAvatar = this.userAvatar.bind(this)
+    this.userName = this.userName.bind(this)
+    this.rideTime = this.rideTime.bind(this)
   }
 
   componentWillUnmount() {
@@ -130,6 +140,56 @@ export default class Ride extends PureComponent {
     this.props.navigator.popToRoot()
   }
 
+
+  // @TODO: these were copypasta from the ride card, factor out into component
+  getUserProfilePhotoURL (user) {
+    const profilePhotoID = user.get('profilePhotoID')
+    let profilePhotoURL = null
+    if (profilePhotoID) {
+      profilePhotoURL = user.getIn(['photosByID', profilePhotoID, 'uri'])
+    }
+    return profilePhotoURL
+  }
+
+  userAvatar () {
+    let source
+    const userProfilePhotoURL = this.getUserProfilePhotoURL(this.props.rideUser)
+    if (userProfilePhotoURL) {
+      source = {uri: userProfilePhotoURL}
+    } else {
+      source = require('../../img/empty.png')
+    }
+    return (
+      <TouchableOpacity
+        style={{paddingRight: 10}}
+        onPress={this.showProfile}
+      >
+        <Thumbnail
+          small
+          source={source}
+        />
+      </TouchableOpacity>
+    )
+  }
+
+  userName () {
+    const firstName = this.props.rideUser.get('firstName')
+    const lastName = this.props.rideUser.get('lastName')
+    if (firstName && lastName) {
+      return `${firstName} ${lastName}`
+    } else if (firstName || lastName) {
+      return firstName || lastName
+    } else {
+      return 'No Name'
+    }
+  }
+
+  rideTime () {
+    const t = this.props.ride.get('startTime')
+    return `${moment(t).format('MMMM Do YYYY')} at ${moment(t).format('h:mm a')}`
+  }
+  // @TODO end
+
   render () {
     logRender('Ride.Ride')
     let speedChart = <Text>Not enough points for Speed Chart</Text>
@@ -152,6 +212,20 @@ export default class Ride extends PureComponent {
           deleteFunc={this.deleteRide}
           text={"Are you sure you want to delete this ride?"}
         />
+
+        <View style={{flex: 1}}>
+          <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
+            <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', paddingRight: 10, paddingLeft: 20}}>
+              { this.userAvatar() }
+              <View>
+                <Text style={{fontSize: 20, color: 'black'}}>{this.props.ride.get('name') || 'No Name'}</Text>
+                <Text style={{fontSize: 14}}>{this.userName()}</Text>
+                <Text style={{fontSize: 12, fontWeight: 'normal', color: darkGrey}}>{this.rideTime()}</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+
         <View style={{flex: 1}}>
           <View style={{height}}>
             <Swiper
@@ -167,10 +241,11 @@ export default class Ride extends PureComponent {
           </View>
           <View style={{flex: 1}}>
             <Stats
-              ride={this.props.ride}
               horses={this.props.horses}
               maxSpeed={speedData.maxSpeed}
               navigator={this.props.navigator}
+              ride={this.props.ride}
+              rideHorseOwnerID={this.props.rideHorseOwnerID}
               rideUser={this.props.rideUser}
               userID={this.props.userID}
             />

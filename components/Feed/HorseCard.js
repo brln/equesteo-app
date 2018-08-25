@@ -37,7 +37,6 @@ export default class HorseCard extends PureComponent {
       animationType: 'slide-up',
       passProps: {
         horse: this.props.horse,
-        user: this.props.horseUser,
       }
     })
   }
@@ -55,7 +54,7 @@ export default class HorseCard extends PureComponent {
       screen: PROFILE,
       animationType: 'slide-up',
       passProps: {
-        profileUser: this.props.horseUser,
+        profileUser: this.props.rider,
       }
     })
   }
@@ -82,7 +81,7 @@ export default class HorseCard extends PureComponent {
 
   userAvatar () {
     let avatar
-    if (this.props.userID !== this.props.horseUser.get('_id')) {
+    if (this.props.userID !== this.props.rider.get('_id')) {
       let source
       if (this.props.userProfilePhotoURL) {
         source = {uri: this.props.userProfilePhotoURL}
@@ -105,9 +104,9 @@ export default class HorseCard extends PureComponent {
   }
 
   userName () {
-    const firstName = this.props.horseUser.get('firstName')
-    const lastName = this.props.horseUser.get('lastName')
-    if (this.props.horseUser.get('_id') !== this.props.userID) {
+    const firstName = this.props.rider.get('firstName')
+    const lastName = this.props.rider.get('lastName')
+    if (this.props.rider.get('_id') !== this.props.userID) {
       if (firstName && lastName) {
         return `${firstName} ${lastName}`
       } else if (firstName || lastName) {
@@ -159,6 +158,36 @@ export default class HorseCard extends PureComponent {
   }
 
   render() {
+    let headline = (
+      <View style={{flex: 1, flexDirection: 'row'}}>
+        <Text
+          style={{fontSize: 20, fontWeight: 'normal'}}
+        >
+          {`A new horse in the barn for ${this.props.rider.get('firstName')}: `}
+        </Text>
+        <Text
+          style={{fontSize: 20, fontWeight: 'bold'}}
+        >
+          {this.props.horse.get('name')}!
+        </Text>
+      </View>
+    )
+    if (this.props.rider.get('_id') !== this.props.ownerID) {
+      headline = (
+        <View style={{flex: 1, flexDirection: 'row'}}>
+          <Text
+            style={{fontSize: 20, fontWeight: 'normal'}}
+          >
+            { `${this.props.rider.get('firstName')} now rides `}
+          </Text>
+          <Text
+            style={{fontSize: 20, fontWeight: 'bold'}}
+          >
+            {this.props.horse.get('name')}!
+          </Text>
+        </View>
+      )
+    }
     return (
       <Card>
         <CardItem header>
@@ -175,7 +204,7 @@ export default class HorseCard extends PureComponent {
             </View>
             <TouchableOpacity onPress={this.showHorseProfile}>
               <View style={{flex: 1, flexDirection: 'row', paddingTop: 15, paddingBottom: 15}}>
-                <Text style={{fontSize: 20, fontWeight: 'normal'}}>A new horse in the barn: </Text><Text style={{fontSize: 20, fontWeight: 'bold'}}>{this.props.horse.get('name')}!</Text>
+                { headline }
               </View>
             </TouchableOpacity>
           </View>

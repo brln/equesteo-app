@@ -16,8 +16,10 @@ import Swiper from 'react-native-swiper';
 
 import { brand, darkBrand } from '../../colors'
 import DeleteModal from '../DeleteModal'
+import RidersCard from './RidersCard'
 import SwipablePhoto from '../SwipablePhoto'
 import FabImage from '../FabImage'
+import { PROFILE } from '../../screens'
 import TrainingCard from './TrainingCard'
 import Stat from '../Stat'
 
@@ -28,8 +30,23 @@ export default class HorseProfile extends PureComponent {
   constructor (props) {
     super(props)
     this.makeBirthday = this.makeBirthday.bind(this)
+    this.renderOwner = this.renderOwner.bind(this)
+    this.renderDeleteModal = this.renderDeleteModal.bind(this)
     this.renderImageSwiper = this.renderImageSwiper.bind(this)
+    this.showRiderProfile = this.showRiderProfile.bind(this)
     this.uploadPhoto = this.uploadPhoto.bind(this)
+  }
+
+  showRiderProfile (rider) {
+    return () => {
+      this.props.navigator.push({
+        screen: PROFILE,
+        animationType: 'slide-up',
+        passProps: {
+          profileUser: rider,
+        }
+      })
+    }
   }
 
   uploadPhoto () {
@@ -124,19 +141,50 @@ export default class HorseProfile extends PureComponent {
     )
   }
 
+  renderOwner () {
+    let ownerSection = null
+    if (this.props.horseOwner !== this.props.user) {
+       ownerSection = (
+        <View>
+        <CardItem header style={{padding: 5}}>
+          <View style={{paddingLeft: 5}}>
+            <Text style={{color: darkBrand}}>Owner</Text>
+          </View>
+        </CardItem>
+        <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20}}>
+          <Text>
+            {`${this.props.horseOwner.get('firstName') || ''} ${this.props.horseOwner.get('lastName') || ''}`}
+            </Text>
+        </CardItem>
+        </View>
+      )
+    }
+    return ownerSection
+  }
+
+  renderDeleteModal () {
+    let text = "Are you sure you want to archive this horse?"
+    if (this.props.horseOwner !== this.props.user) {
+      text = "Are you sure you want to remove this horse from your barn? It will not be deleted from the owner's barn."
+    }
+    return (
+       <DeleteModal
+        modalOpen={this.props.modalOpen}
+        closeDeleteModal={this.props.closeDeleteModal}
+        deleteFunc={this.props.deleteHorse}
+        text={text}
+      />
+    )
+  }
+
   render() {
     return (
       <ScrollView>
-        <DeleteModal
-          modalOpen={this.props.modalOpen}
-          closeDeleteModal={this.props.closeDeleteModal}
-          deleteFunc={this.props.deleteHorse}
-          text={"Are you sure you want to delete this horse?"}
-        />
+        {this.renderDeleteModal()}
         {this.renderImageSwiper()}
         <View style={{flex: 1}}>
-
           <Card>
+            { this.renderOwner() }
             <CardItem header style={{padding: 5}}>
               <View style={{paddingLeft: 5}}>
                 <Text style={{color: darkBrand}}>Description</Text>
@@ -184,6 +232,12 @@ export default class HorseProfile extends PureComponent {
           </Card>
           <TrainingCard
             rides={this.props.rides}
+          />
+          <RidersCard
+            addRider={this.props.addRider}
+            riders={this.props.riders}
+            showRiderProfile={this.showRiderProfile}
+            user={this.props.user}
           />
         </View>
       </ScrollView>

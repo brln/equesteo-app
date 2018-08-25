@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
+import { List } from 'immutable'
 import Profile from '../components/Profile/Profile'
 import {
   clearSearch,
@@ -23,7 +24,7 @@ class ProfileContainer extends NavigatorComponent {
     this.uploadProfilePhoto = this.uploadProfilePhoto.bind(this)
     this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent)
-    this.yourHorses = this.yourHorses.bind(this)
+    this.profileUserHorses = this.profileUserHorses.bind(this)
   }
 
   onNavigatorEvent(event) {
@@ -54,9 +55,14 @@ class ProfileContainer extends NavigatorComponent {
     this.props.dispatch(uploadProfilePhoto(location))
   }
 
-  yourHorses () {
-    return this.props.horses.valueSeq().filter(h => {
-      return h.get('userID') === this.props.profileUser.get('_id') && h.get('deleted') !== true
+  profileUserHorses () {
+    return this.props.horseUsers.valueSeq().filter((hu) => {
+      return (hu.get('userID') === this.props.profileUser.get('_id')) && hu.get('deleted') !== true
+    }).map((hu) => {
+      if (!this.props.horses.get(hu.get('horseID'))) {
+        throw Error('Don\'t have a horse that should be here.')
+      }
+      return this.props.horses.get(hu.get('horseID'))
     }).toList()
   }
 
@@ -72,6 +78,14 @@ class ProfileContainer extends NavigatorComponent {
     )
   }
 
+  horseOwnerIDs () {
+    return this.props.horseUsers.filter(hu => {
+      return hu.get('owner') === true
+    }).mapEntries(([horseUserID, horseUser]) => {
+      return [horseUser.get('horseID'), horseUser.get('userID')]
+    })
+  }
+
   render() {
     logRender('ProfileContainer')
     if (!(!this.props.profileUser || !this.props.user )) {
@@ -81,7 +95,8 @@ class ProfileContainer extends NavigatorComponent {
           deleteFollow={this.deleteFollow}
           followings={this.followings()}
           followers={this.followers()}
-          horses={this.yourHorses()}
+          horseOwnerIDs={this.horseOwnerIDs()}
+          horses={this.profileUserHorses()}
           navigator={this.props.navigator}
           profileUser={this.props.profileUser}
           uploadProfilePhoto={this.uploadProfilePhoto}
@@ -101,6 +116,7 @@ function mapStateToProps (state, passedProps) {
   const userID = localState.get('userID')
 
   return {
+    horseUsers: mainState.get('horseUsers'),
     horses: mainState.get('horses'),
     profileUser: mainState.getIn(['users', passedProps.profileUser.get('_id')]) || passedProps.profileUser,
     user: mainState.getIn(['users', userID]),

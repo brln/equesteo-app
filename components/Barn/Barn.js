@@ -7,10 +7,8 @@ import {
 import { Icon, Fab } from 'native-base';
 
 import { brand } from '../../colors'
-import HorseCard from './HorseCard'
+import HorseBarnCard from './HorseBarnCard'
 import { UPDATE_HORSE } from '../../screens'
-
-
 
 export default class Barn extends PureComponent {
   constructor (props) {
@@ -47,7 +45,7 @@ export default class Barn extends PureComponent {
           }}>
             {
               this.props.horses.map((horse) => {
-                return <HorseCard
+                return <HorseBarnCard
                   key={horse.get('_id')}
                   horse={horse}
                   horseProfile={this.props.horseProfile}

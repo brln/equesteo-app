@@ -62,7 +62,6 @@ export default class FollowList extends PureComponent {
   }
 
   render() {
-    console.log(this.props.users.toJSON())
     return (
       <View style={styles.container}>
         <ScrollView style={{flex: 1}}>

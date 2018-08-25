@@ -15,7 +15,7 @@ const { width } = Dimensions.get('window')
 const calcWidth = (width / 2) - 41
 
 
-export default class HorseCard extends PureComponent {
+export default class HorseBarnCard extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {}

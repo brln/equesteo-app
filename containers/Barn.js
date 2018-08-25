@@ -17,7 +17,7 @@ class BarnContainer extends NavigatorComponent {
     this.props.navigator.push({
       screen: HORSE_PROFILE,
       title: horse.get('name'),
-      passProps: {horse: horse, user: this.props.user},
+      passProps: { horse },
       navigatorButtons: {
         leftButtons: [],
         rightButtons: [
@@ -26,8 +26,8 @@ class BarnContainer extends NavigatorComponent {
             id: 'edit',
           },
           {
-            title: "Delete",
-            id: 'delete',
+            title: "Archive",
+            id: 'archive',
           }
         ]
       },
@@ -35,9 +35,11 @@ class BarnContainer extends NavigatorComponent {
   }
 
   yourHorses () {
-    return this.props.horses.valueSeq().filter((h) => {
-      return (h.get('userID') === this.props.userID) && h.get('deleted') !== true
-    }).toList()
+    return this.props.horseUsers.valueSeq().filter((hu) => {
+      return (hu.get('userID') === this.props.userID) && hu.get('deleted') !== true
+    }).map((hu) => {
+      return this.props.horses.get(hu.get('horseID'))
+    })
   }
 
   render() {
@@ -56,6 +58,7 @@ function mapStateToProps (state) {
   const mainState = state.get('main')
   const localState = mainState.get('localState')
   return {
+    horseUsers: mainState.get('horseUsers'),
     horses: mainState.get('horses'),
     userID: localState.get('userID'),
     user: state.getIn(['users', localState.get('userID')])

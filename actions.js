@@ -22,6 +22,7 @@ import {
   FOLLOW_UPDATED,
   HORSE_CREATED,
   HORSE_SAVED,
+  HORSE_USER_UPDATED,
   JUST_FINISHED_RIDE_SHOWN,
   LOAD_LOCAL_STATE,
   LOCAL_DATA_LOADED,
@@ -121,6 +122,13 @@ function horseCreated (horse) {
   return {
     type: HORSE_CREATED,
     horse,
+  }
+}
+
+function horseUserUpdated (horseUser) {
+  return {
+    type: HORSE_USER_UPDATED,
+    horseUser
   }
 }
 
@@ -287,6 +295,31 @@ export function userUpdated (userData) {
 //  =========================================
 // |<  FUNCTIONAL ACTIONS                |||>>
 //  =========================================
+export function addHorseUser (horse, user) {
+  return async (dispatch, getState) => {
+    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const pouchCouch = new PouchCouch(jwt)
+    const id = `${user.get('_id')}_${horse.get('_id')}`
+    let newHorseUser = getState().getIn(['main', 'horseUsers', id])
+    if (newHorseUser) {
+      newHorseUser = newHorseUser.set('deleted', false)
+    } else {
+      newHorseUser = Map({
+        _id: id,
+        type: 'horseUser',
+        horseID: horse.get('_id'),
+        userID: user.get('_id'),
+        owner: false,
+        createTime: unixTimeNow(),
+        deleted: false,
+      })
+    }
+    const joinDoc = await pouchCouch.saveHorse(newHorseUser.toJS())
+    const joinMap = newHorseUser.set('_rev', joinDoc.rev)
+    dispatch(horseUserUpdated(joinMap))
+    dispatch(needsRemotePersist('horses'))
+  }
+}
 
 export function appInitialized () {
   return async (dispatch) => {
@@ -332,8 +365,6 @@ export function getFCMToken () {
     const currentUserID = getState().getIn(['main', 'localState', 'userID'])
     const localUser = getState().getIn(['main', 'users', currentUserID])
     if (fcmToken && localUser) {
-      console.log('setting token for user: ' + localUser.get('email'))
-      console.log('token: ' + fcmToken)
       if (fcmToken !== localUser.get('fcmToken')) {
         dispatch(updateUser(localUser.set('fcmToken', fcmToken)))
       } else {
@@ -428,6 +459,7 @@ export function createHorse (horse) {
       birthDay: horse.get('birthDay'),
       birthMonth: horse.get('birthMonth'),
       birthYear: horse.get('birthYear'),
+      createTime: unixTimeNow(),
       description: horse.get('description'),
       heightHands: horse.get('heightHands'),
       heightInches: horse.get('heightInches'),
@@ -435,16 +467,26 @@ export function createHorse (horse) {
       profilePhotoID: horse.get('profilePhotoID'),
       photosByID: horse.get('photosByID'),
       sex: horse.get('sex'),
-      userID: horse.get('userID'),
-      createTime: unixTimeNow(),
       type: 'horse'
     }
-    const doc = await pouchCouch.saveHorse(newHorse)
-    const asMap = Map({...newHorse, _rev: doc.rev})
-    dispatch(horseCreated(asMap))
+    const newHorseUser = {
+      _id: `${horse.get('userID')}_${newHorse._id}`,
+      type: 'horseUser',
+      horseID: newHorse._id,
+      userID: horse.get('userID'),
+      owner: true,
+      createTime: unixTimeNow(),
+      deleted: false,
+    }
+    const horseDoc = await pouchCouch.saveHorse(newHorse)
+    const joinDoc = await pouchCouch.saveHorse(newHorseUser)
+    const horseMap = Map({...newHorse, _rev: horseDoc.rev})
+    const joinMap = Map({...newHorseUser, _rev: joinDoc.rev})
+    dispatch(horseCreated(horseMap))
+    dispatch(horseUserUpdated(joinMap))
     dispatch(needsRemotePersist('horses'))
 
-    asMap.get('photosByID').forEach((photoInfo, photoID) => {
+    horseMap.get('photosByID').forEach((photoInfo, photoID) => {
       dispatch(enqueuePhoto(Map({
         type: 'horse',
         photoLocation: photoInfo.get('uri'),
@@ -538,6 +580,25 @@ export function deleteFollow (followingID) {
     const doc = await pouchCouch.saveUser(found.toJS())
     await dispatch(followUpdated(found.set('_rev', doc.rev)))
     dispatch(needsRemotePersist('users'))
+  }
+}
+
+export function deleteHorseUser (horseID, userID) {
+  return async (dispatch, getState) => {
+    const filterHorseUser = getState().getIn(['main', 'horseUsers']).valueSeq().filter(hu => {
+      return hu.get('horseID') === horseID && hu.get('userID') === userID
+    })
+    if (filterHorseUser.count() !== 1) {
+      throw Error('Could not find horseUser')
+    }
+    let theHorseUser = filterHorseUser.get(0)
+    theHorseUser = theHorseUser.set('deleted', true)
+    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const pouchCouch = new PouchCouch(jwt)
+    const doc = await pouchCouch.saveHorse(theHorseUser.toJS())
+    await dispatch(horseUserUpdated(theHorseUser.set('_rev', doc.rev)))
+    dispatch(needsRemotePersist('horses'))
+
   }
 }
 
@@ -780,7 +841,7 @@ export function syncDBPull (db) {
     const userID = getState().getIn(['main', 'localState', 'userID'])
     const follows = getState().getIn(['main', 'follows'])
     const following = follows.valueSeq().filter(
-      _, f => !f.get('deleted') && f.get('followerID') === userID
+      f => !f.get('deleted') && f.get('followerID') === userID
     ).map(
       f => f.get('followingID')
     ).toJS()
