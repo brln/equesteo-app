@@ -13,23 +13,26 @@ class BarnContainer extends NavigatorComponent {
     this.yourHorses = this.yourHorses.bind(this)
   }
 
-  horseProfile (horse) {
+  horseProfile (horse, ownerID) {
+    const rightButtons = [
+      {
+        title: "Archive",
+        id: 'archive',
+      }
+    ]
+    if (ownerID === this.props.userID) {
+      rightButtons.push({
+        title: "Edit",
+        id: 'edit'
+      })
+    }
     this.props.navigator.push({
       screen: HORSE_PROFILE,
       title: horse.get('name'),
       passProps: { horse },
       navigatorButtons: {
         leftButtons: [],
-        rightButtons: [
-          {
-            title: "Edit",
-            id: 'edit',
-          },
-          {
-            title: "Archive",
-            id: 'archive',
-          }
-        ]
+        rightButtons,
       },
     })
   }
@@ -42,12 +45,21 @@ class BarnContainer extends NavigatorComponent {
     })
   }
 
+  horseOwnerIDs () {
+    return this.props.horseUsers.filter(hu => {
+      return hu.get('owner') === true
+    }).mapEntries(([horseUserID, horseUser]) => {
+      return [horseUser.get('horseID'), horseUser.get('userID')]
+    })
+  }
+
   render() {
     logRender('BarnContainer')
     return (
       <Barn
         horses={this.yourHorses()}
         horseProfile={this.horseProfile}
+        horseOwnerIDs={this.horseOwnerIDs()}
         navigator={this.props.navigator}
       />
     )

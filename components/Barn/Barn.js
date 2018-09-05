@@ -4,11 +4,10 @@ import {
   ScrollView,
   View,
 } from 'react-native';
-import { Icon, Fab } from 'native-base';
 
-import { brand } from '../../colors'
 import HorseBarnCard from './HorseBarnCard'
 import { UPDATE_HORSE } from '../../screens'
+import NewHorseButton from './NewHorseButton'
 
 export default class Barn extends PureComponent {
   constructor (props) {
@@ -49,20 +48,17 @@ export default class Barn extends PureComponent {
                   key={horse.get('_id')}
                   horse={horse}
                   horseProfile={this.props.horseProfile}
+                  ownerID={this.props.horseOwnerIDs.get(horse.get('_id'))}
                 />
               }).toJS()
             }
+            {
+              <NewHorseButton
+                newHorse={this.newHorse}
+              />
+            }
           </View>
         </ScrollView>
-        <Fab
-          active={this.state.active}
-          direction="up"
-          containerStyle={{ }}
-          style={{ backgroundColor: brand }}
-          position="bottomRight"
-          onPress={this.newHorse}>
-          <Icon name="ios-add" />
-        </Fab>
       </View>
     )
   }

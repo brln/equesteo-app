@@ -34,9 +34,6 @@ class RideContainer extends NavigatorComponent {
         rideHorseOwnerID = hu.get('userID')
       }
     })
-    if (!rideHorseOwnerID) {
-      throw Error('Could not find rideHorseOwnerID')
-    }
     return rideHorseOwnerID
   }
 

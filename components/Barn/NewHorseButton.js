@@ -14,19 +14,9 @@ import { UPDATE_HORSE } from '../../screens'
 const { width } = Dimensions.get('window')
 const calcWidth = (width / 2) - 41
 
-
-export default class HorseBarnCard extends PureComponent {
-  constructor (props) {
-    super(props)
-  }
-
+export default class NewHorseButton extends PureComponent {
   render() {
     let source = require('../../img/emptyHorseBlack.png')
-    let horse = this.props.horse
-    if (horse.get('profilePhotoID')) {
-      source = {uri: horse.getIn(['photosByID', horse.get('profilePhotoID'), 'uri'])}
-    }
-
     return (
       <View
         elevation={5}
@@ -43,12 +33,10 @@ export default class HorseBarnCard extends PureComponent {
         }}
       >
         <TouchableOpacity
-          onPress={() => {
-            this.props.horseProfile(horse, this.props.ownerID)
-          }}
+          onPress={this.props.newHorse}
         >
           <View
-            title={horse.name}
+            title={''}
             style={{flex: 1}}
           >
             <View style={{flex: 1, alignItems: 'center', paddingBottom: 5}}>
@@ -76,7 +64,7 @@ export default class HorseBarnCard extends PureComponent {
                     width: -1,
                     height: 1
                   }
-                }}>{horse.get('name')}</Text>
+                }}>Add New Horse</Text>
               </View>
             </View>
           </View>
