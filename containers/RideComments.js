@@ -1,4 +1,4 @@
-import { Map } from 'immutable'
+import memoizeOne from 'memoize-one';
 import React, { Component } from 'react'
 import { connect } from 'react-redux';
 
@@ -8,49 +8,40 @@ import RideComments from '../components/RideComments/RideComments'
 import NavigatorComponent from './NavigatorComponent'
 
 class RideCommentsContainer extends NavigatorComponent {
-  static navigatorButtons = {
-    leftButtons: [],
-    rightButtons: [
-      {
-        id: 'submit',
-        title: 'Submit',
-      }
-    ],
-  }
-
   constructor (props) {
     super(props)
     this.state = {
       newComment: null
     }
-    this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
-    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent)
-    this.rideComments = this.rideComments.bind(this)
+
+    this.submitComment = this.submitComment.bind(this)
     this.updateNewComment = this.updateNewComment.bind(this)
+    this.memoRideComments = memoizeOne(this.rideComments)
   }
 
   updateNewComment (newComment) {
     this.setState({newComment})
-  }
-
-  onNavigatorEvent (event) {
-    if (event.type === 'NavBarButtonPress') {
-      if (event.id === 'submit' && !!this.state.newComment !== false) {
-        this.props.dispatch(createRideComment({
-          comment: this.state.newComment,
-          rideID: this.props.ride.get('_id'),
-          timestamp: unixTimeNow()
-        }))
-        this.setState({newComment: null})
-      }
+    if (newComment.slice(-1) === '\n') {
+      this.submitComment()
     }
   }
 
-  rideComments () {
-    return this.props.rideComments.valueSeq().filter(
+  submitComment () {
+    if (!!this.state.newComment === true) {
+      this.props.dispatch(createRideComment({
+        comment: this.state.newComment,
+        rideID: this.props.ride.get('_id'),
+        timestamp: unixTimeNow()
+      }))
+      this.setState({newComment: null})
+    }
+  }
+
+  rideComments (rideComments) {
+    return rideComments.valueSeq().filter(
       (rc) => rc.get('rideID') === this.props.ride.get('_id')
     ).sort(
-      (a, b) => b.get('timestamp') - a.get('timestamp')
+      (a, b) => a.get('timestamp') - b.get('timestamp')
     ).toList()
   }
 
@@ -59,7 +50,8 @@ class RideCommentsContainer extends NavigatorComponent {
       <RideComments
         navigator={this.props.navigator}
         newComment={this.state.newComment}
-        rideComments={this.rideComments()}
+        rideComments={this.memoRideComments(this.props.rideComments)}
+        submitComment={this.submitComment}
         updateNewComment={this.updateNewComment}
         users={this.props.users}
       />
