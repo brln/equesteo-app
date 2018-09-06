@@ -131,15 +131,14 @@ export default class RideCard extends PureComponent {
         source = require('../../img/empty.png')
       }
       avatar = (
-        <TouchableOpacity
+        <View
           style={{paddingRight: 10}}
-          onPress={this.showProfile}
         >
           <Thumbnail
             small
             source={source}
           />
-        </TouchableOpacity>
+        </View>
       )
     }
     return avatar
@@ -238,7 +237,7 @@ export default class RideCard extends PureComponent {
       <Card>
         <CardItem header>
           <View style={{flex: 1}}>
-            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
+            <TouchableOpacity style={styles.cardHeaderTouch} onPress={this.showProfile}>
               <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', paddingRight: 10}}>
                 { this.userAvatar() }
                 <View>
@@ -246,7 +245,7 @@ export default class RideCard extends PureComponent {
                   <Text style={{fontSize: 12, fontWeight: 'normal', color: darkGrey}}>{this.rideTime()}</Text>
                 </View>
               </View>
-            </View>
+            </TouchableOpacity>
             <TouchableOpacity onPress={this.showRide}>
               <View style={{flex: 1, paddingTop: 15, paddingBottom: 15}}>
                 <Text style={{fontSize: 20}}>{this.props.ride.get('name') || 'No Name'}</Text>
@@ -302,5 +301,10 @@ export default class RideCard extends PureComponent {
 const styles = StyleSheet.create({
   rideTitle: {
     fontSize: 24
+  },
+  cardHeaderTouch: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between'
   }
 });

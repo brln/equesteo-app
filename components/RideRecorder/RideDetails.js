@@ -26,6 +26,7 @@ export default class RideDetails extends PureComponent {
     this.uploadPhoto = this.uploadPhoto.bind(this)
     this.changeCoverPhoto = this.changeCoverPhoto.bind(this)
     this.changeRideName = this.changeRideName.bind(this)
+    this.changeRideNotes = this.changeRideNotes.bind(this)
     this.clearPhotoMenu = this.clearPhotoMenu.bind(this)
     this.deletePhoto = this.deletePhoto.bind(this)
     this.openPhotoMenu = this.openPhotoMenu.bind(this)
@@ -69,6 +70,10 @@ export default class RideDetails extends PureComponent {
     this.props.changeRideName(name)
   }
 
+  changeRideNotes (notes) {
+    this.props.changeRideNotes(notes)
+  }
+
   uploadPhoto() {
     ImagePicker.openPicker({
       width: 1080,
@@ -104,8 +109,8 @@ export default class RideDetails extends PureComponent {
 
               <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20}}>
                 <PhotosByTimestamp
-                  photosByID={this.props.photosByID}
-                  profilePhotoID={this.props.coverPhotoID}
+                  photosByID={this.props.ride.get('photosByID')}
+                  profilePhotoID={this.props.ride.get('coverPhotoID')}
                   changeProfilePhoto={this.openPhotoMenu}
                 />
               </CardItem>
@@ -130,7 +135,7 @@ export default class RideDetails extends PureComponent {
               <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20}}>
                 <TextInput
                   style={{width: '100%'}}
-                  value={this.props.rideName}
+                  value={this.props.ride.get('name')}
                   onChangeText={this.changeRideName}
                   selectTextOnFocus={true}
                   underlineColorAndroid={darkBrand}
@@ -147,10 +152,26 @@ export default class RideDetails extends PureComponent {
               <View style={{marginLeft: 20, marginBottom: 30}}>
                 <HorseSelector
                   changeHorseID={this.props.changeHorseID}
-                  horseID={this.props.horseID}
+                  horseID={this.props.ride.get('horseID')}
                   horses={this.props.horses}
                 />
               </View>
+            </Card>
+
+            <Card>
+              <CardItem header>
+                <Text style={{color: darkBrand }}>Notes:</Text>
+              </CardItem>
+              <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
+                <TextInput
+                  style={{width: '100%', borderColor: darkBrand, borderWidth: 1}}
+                  value={this.props.ride.get('notes')}
+                  onChangeText={this.changeRideNotes}
+                  multiline={true}
+                  numberOfLines={3}
+                  underlineColorAndroid="white"
+                />
+              </CardItem>
             </Card>
 
             <Card>
@@ -163,7 +184,7 @@ export default class RideDetails extends PureComponent {
               <View style={{marginLeft: 20, marginBottom: 30}}>
                 <View style={{flex: 1, flexDirection: 'row'}}>
                   <CheckBox
-                    value={this.props.isPublic}
+                    value={this.props.ride.get('isPublic')}
                     onValueChange={this.props.changePublic}
                   />
                   <View style={{justifyContent: 'center'}}>

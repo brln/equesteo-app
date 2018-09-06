@@ -40,6 +40,7 @@ class RideDetailsContainer extends NavigatorComponent {
     this.changeHorseID = this.changeHorseID.bind(this)
     this.changePublic = this.changePublic.bind(this)
     this.changeRideName = this.changeRideName.bind(this)
+    this.changeRideNotes = this.changeRideNotes.bind(this)
     this.createRide = this.createRide.bind(this)
     this.deletePhoto = this.deletePhoto.bind(this)
     this.doneOnPage = this.doneOnPage.bind(this)
@@ -101,6 +102,13 @@ class RideDetailsContainer extends NavigatorComponent {
     this.setState({
       ...this.state,
       ride: this.state.ride.set('name', text)
+    })
+  }
+
+  changeRideNotes (notes) {
+    this.setState({
+      ...this.state,
+      ride: this.state.ride.set('notes', notes)
     })
   }
 
@@ -193,16 +201,13 @@ class RideDetailsContainer extends NavigatorComponent {
       <RideDetails
         changeCoverPhoto={this.changeCoverPhoto}
         changeRideName={this.changeRideName}
+        changeRideNotes={this.changeRideNotes}
         changeHorseID={this.changeHorseID}
         changePublic={this.changePublic}
-        coverPhotoID={this.state.ride.get('coverPhotoID')}
         deletePhoto={this.deletePhoto}
-        photosByID={this.state.ride.get('photosByID')}
         horses={this.horses()}
-        horseID={this.state.ride.get('horseID')}
         horseSelected={this.state.horseSelected}
-        isPublic={this.state.ride.get('isPublic')}
-        rideName={this.state.ride.get('name')}
+        ride={this.state.ride}
         uploadPhoto={this.uploadPhoto}
       />
     )

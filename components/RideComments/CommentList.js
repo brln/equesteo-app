@@ -1,18 +1,20 @@
 import React, { PureComponent } from 'react';
 import {
-  Body,
-  Left,
-  ListItem,
-  Right,
   Thumbnail,
-  Text
 } from 'native-base';
 import {
+  Dimensions,
   FlatList,
   ScrollView,
   StyleSheet,
+  Text,
+  View,
 } from 'react-native';
 import moment from 'moment'
+import { darkGrey } from '../../colors'
+
+
+const { height } = Dimensions.get('window')
 
 export default class CommentList extends PureComponent {
   constructor (props) {
@@ -29,22 +31,49 @@ export default class CommentList extends PureComponent {
     return profilePhotoURL
   }
 
+
+  userAvatar (user) {
+    let source
+    let photoURL = this.commentProfilePhotoURL(user)
+    if (photoURL) {
+      source = {uri: photoURL}
+    } else {
+      source = require('../../img/empty.png')
+    }
+    return (
+      <View
+        style={{flex: 1}}
+      >
+        <Thumbnail
+          small
+          source={source}
+        />
+      </View>
+    )
+  }
+
   singleComment({item}) {
     const rideComment = item
     const commentUser = this.props.users.get(rideComment.userID)
     return (
-      <ListItem avatar key={rideComment._id}>
-        <Left>
-          <Thumbnail source={{ uri: this.commentProfilePhotoURL(commentUser) }} />
-        </Left>
-        <Body>
-        <Text>{commentUser.get('firstName') || ''} {commentUser.get('lastName') || ''}</Text>
-        <Text note>{rideComment.comment}</Text>
-        </Body>
-        <Right>
-          <Text note>{moment(rideComment.timestamp).format('MM/DD hh:mm a')}</Text>
-        </Right>
-      </ListItem>
+      <View style={{flex: 1, flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: darkGrey, padding: 20}} key={rideComment._id}>
+        { this.userAvatar(commentUser) }
+        <View style={{flex: 6}}>
+          <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
+            <View style={{flex: 1}}>
+            <Text
+              style={{fontWeight: 'bold', color: 'black'}}
+            >
+              {commentUser.get('firstName') || ''} {commentUser.get('lastName') || ''}
+            </Text>
+            </View>
+            <View style={{flex: 1}}>
+              <Text>{moment(rideComment.timestamp).format('MM/DD h:mm a')}</Text>
+            </View>
+          </View>
+          <Text note>{rideComment.comment}</Text>
+        </View>
+      </View>
     )
   }
 
