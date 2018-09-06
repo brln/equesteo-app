@@ -102,8 +102,8 @@ android {
         applicationId "com.equesteo"
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 13
-        versionName "0.0.13"
+        versionCode 14
+        versionName "0.0.14"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }

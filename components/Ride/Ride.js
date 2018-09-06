@@ -13,11 +13,13 @@ import {
   View,
 } from 'react-native';
 import {
+  Card,
+  CardItem,
   Thumbnail
 } from 'native-base'
 
 
-import { darkGrey } from '../../colors'
+import { darkBrand, darkGrey } from '../../colors'
 import { haversine, logRender } from '../../helpers'
 import { MAP, RIDE_DETAILS } from '../../screens'
 import PhotoFilmstrip from './PhotoFilmstrip'
@@ -42,6 +44,7 @@ export default class Ride extends PureComponent {
     this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
     this.userAvatar = this.userAvatar.bind(this)
     this.userName = this.userName.bind(this)
+    this.rideNotes = this.rideNotes.bind(this)
     this.rideTime = this.rideTime.bind(this)
   }
 
@@ -190,6 +193,21 @@ export default class Ride extends PureComponent {
   }
   // @TODO end
 
+  rideNotes () {
+    if (this.props.ride.get('notes')) {
+      return (
+        <Card>
+          <CardItem header>
+            <Text style={{color: darkBrand }}>Notes:</Text>
+          </CardItem>
+          <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
+            <Text>{this.props.ride.get('notes')}</Text>
+          </CardItem>
+        </Card>
+      )
+    }
+  }
+
   render () {
     logRender('Ride.Ride')
     let speedChart = <Text>Not enough points for Speed Chart</Text>
@@ -249,6 +267,9 @@ export default class Ride extends PureComponent {
               rideUser={this.props.rideUser}
               userID={this.props.userID}
             />
+
+            { this.rideNotes() }
+
             <PhotoFilmstrip
               photosByID={this.props.ride.get('photosByID')}
               navigator={this.props.navigator}

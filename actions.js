@@ -503,18 +503,19 @@ export function createRide (rideData) {
     const pouchCouch = new PouchCouch(jwt)
     const currentRide = getState().getIn(['main', 'localState', 'currentRide'])
     const theRide = {
-      rideCoordinates: currentRide.get('rideCoordinates'),
-      distance: currentRide.get('distance'),
-      startTime: currentRide.get('startTime'),
       _id: rideData.get('_id'),
-      elapsedTimeSecs: rideData.get('elapsedTimeSecs'),
-      name: rideData.get('name'),
-      horseID: rideData.get('horseID'),
-      userID: rideData.get('userID'),
-      photosByID: rideData.get('photosByID'),
       coverPhotoID: rideData.get('coverPhotoID'),
+      distance: currentRide.get('distance'),
+      elapsedTimeSecs: rideData.get('elapsedTimeSecs'),
+      horseID: rideData.get('horseID'),
+      isPublic: rideData.get('isPublic'),
+      name: rideData.get('name'),
+      notes: rideData.get('notes'),
+      photosByID: rideData.get('photosByID'),
+      rideCoordinates: currentRide.get('rideCoordinates'),
+      startTime: currentRide.get('startTime'),
       type: 'ride',
-      isPublic: rideData.get('isPublic')
+      userID: rideData.get('userID'),
     }
     theRide.mapURL = staticMap(theRide)
     const doc = await pouchCouch.saveRide(theRide)
