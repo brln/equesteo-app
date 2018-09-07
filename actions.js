@@ -1,5 +1,5 @@
 import { AppState, NetInfo } from 'react-native'
-import BackgroundGeolocation from 'react-native-mauron85-background-geolocation-brln'
+import BackgroundGeolocation from 'react-native-mauron85-background-geolocation'
 import { ENV } from 'react-native-dotenv'
 import firebase from 'react-native-firebase'
 import PushNotification from 'react-native-push-notification'
