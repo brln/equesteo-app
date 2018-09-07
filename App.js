@@ -4,8 +4,9 @@ import { createStore, applyMiddleware } from 'redux'
 import thunkMiddleware from 'redux-thunk'
 import { Navigation, NativeEventsReceiver } from 'react-native-navigation'
 import { Sentry } from 'react-native-sentry'
-import { ENV, SENTRY_DSN } from 'react-native-dotenv'
+import { DISTRIBUTION, ENV, RELEASE, SENTRY_DSN } from 'react-native-dotenv'
 import { combineReducers, getIn } from 'redux-immutable';
+
 
 import { appInitialized } from "./actions"
 import logger from './middleware/logger'
@@ -30,7 +31,11 @@ const store = createStore(
 registerScreens(store, Provider)
 
 if (ENV !== 'local') {
-  Sentry.config(SENTRY_DSN).install()
+  Sentry.config(SENTRY_DSN, {
+    release: RELEASE,
+    handlePromiseRejection: true
+  }).install()
+  Sentry.setDist(DISTRIBUTION)
 }
 
 export default class App {

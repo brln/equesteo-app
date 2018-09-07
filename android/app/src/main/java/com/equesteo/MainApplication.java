@@ -57,7 +57,8 @@ public class MainApplication extends NavigationApplication {
             new RNFirebaseMessagingPackage(),
             new RNFirebaseNotificationsPackage(),
             new ReactNativePushNotificationPackage(),
-            new RNFirebaseInstanceIdPackage()
+            new RNFirebaseInstanceIdPackage(),
+            new RNSentryPackage(MainApplication.this)
         );
     }
 
