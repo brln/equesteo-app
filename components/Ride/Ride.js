@@ -79,7 +79,7 @@ export default class Ride extends PureComponent {
     let fullDistance = 0
     let maxSpeed = 0
 
-    const desiredNumCoords = 85
+    const desiredNumCoords = 100
     const actualNumCoords = rideCoordinates.length
     const bucketSize = Math.ceil(actualNumCoords / desiredNumCoords)
 
@@ -111,7 +111,11 @@ export default class Ride extends PureComponent {
 
       if (parsedBucket.length === bucketSize) {
         const pace = parsedBucket.reduce((acc, val) => acc + val.pace, 0) / bucketSize
-        parsedData.push({ distance: fullDistance, pace })
+        console.log(parsedBucket.map(val => val.pace))
+        const paces = parsedBucket.map(val => val.pace)
+        const max = Math.max(...paces)
+        const min = Math.min(...paces)
+        parsedData.push({ distance: fullDistance, pace, max, min })
         parsedBucket = []
       }
     }
@@ -221,7 +225,7 @@ export default class Ride extends PureComponent {
         </View>
       )
     }
-    const height = (width * 9 / 16) + 20
+    const height = (width * 9 / 16) + 54
     return (
       <ScrollView style={{flex: 1}}>
         <DeleteModal
