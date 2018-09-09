@@ -159,7 +159,7 @@ export default class HorseCard extends PureComponent {
 
   render() {
     let headline = (
-      <View style={{flex: 1, flexDirection: 'row'}}>
+      <Text>
         <Text
           style={{fontSize: 20, fontWeight: 'normal'}}
         >
@@ -170,7 +170,7 @@ export default class HorseCard extends PureComponent {
         >
           {this.props.horse.get('name')}!
         </Text>
-      </View>
+      </Text>
     )
     if (this.props.rider.get('_id') !== this.props.ownerID) {
       headline = (
