@@ -1,9 +1,10 @@
 import { AppState, NetInfo } from 'react-native'
-import BackgroundGeolocation from 'react-native-mauron85-background-geolocation-brln'
+import BackgroundGeolocation from 'react-native-mauron85-background-geolocation'
 import { ENV } from 'react-native-dotenv'
 import firebase from 'react-native-firebase'
 import PushNotification from 'react-native-push-notification'
 import { fromJS, Map, List } from 'immutable'
+import { Sentry } from 'react-native-sentry'
 
 import { logError, logInfo, unixTimeNow, generateUUID, staticMap } from "./helpers"
 import { LocalStorage, PouchCouch, UserAPI } from './services'
@@ -379,11 +380,8 @@ export function getFCMToken () {
 export function checkFCMPermission () {
   return async () => {
     const enabled = await firebase.messaging().hasPermission();
-    console.log('zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz')
-    console.log(enabled)
     if (!enabled) {
       try {
-        console.log('requesting FCM Permission')
         const resp = await firebase.messaging().requestPermission();
         console.log(resp)
       } catch (error) {
@@ -410,6 +408,7 @@ export function exchangePWCode (email, code) {
       await pouchCouch.localReplicateDB('all', [...following, userID], followers)
       dispatch(receiveJWT(resp.token))
       dispatch(saveUserID(resp.id))
+      dispatch(setSentryUserContext())
       await dispatch(loadLocalData())
       dispatch(getFCMToken())
       await LocalStorage.saveToken(resp.token, resp.id);
@@ -613,6 +612,7 @@ function findLocalToken () {
     if (storedToken !== null) {
       dispatch(receiveJWT(storedToken.token))
       dispatch(saveUserID(storedToken.userID))
+      dispatch(setSentryUserContext())
       dispatch(setAppRoot('after-login'))
       await dispatch(loadLocalData())
       dispatch(startListeningFCM())
@@ -658,6 +658,15 @@ export function searchForFriends (phrase) {
     } catch (e) {
       logError(e)
     }
+  }
+}
+
+export function setSentryUserContext () {
+  return async (dispatch, getState) => {
+    const userID = getState().getIn(['main', 'localState', 'userID'])
+    Sentry.setUserContext({
+      userID,
+    });
   }
 }
 
@@ -803,6 +812,7 @@ export function submitLogin (email, password) {
       dispatch(receiveJWT(resp.token))
       dispatch(setAppRoot('after-login'))
       dispatch(saveUserID(resp.id))
+      dispatch(setSentryUserContext())
       await dispatch(loadLocalData())
       dispatch(getFCMToken())
       await LocalStorage.saveToken(resp.token, resp.id);
@@ -829,6 +839,7 @@ export function submitSignup (email, password) {
       dispatch(receiveJWT(resp.token))
       dispatch(setAppRoot('after-login'))
       dispatch(saveUserID(resp.id))
+      dispatch(setSentryUserContext())
       await dispatch(loadLocalData())
       dispatch(getFCMToken())
     } catch (e) {

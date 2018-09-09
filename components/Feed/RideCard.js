@@ -189,9 +189,10 @@ export default class RideCard extends PureComponent {
   }
 
   renderSwiper () {
+    const swiperHeight = width * (2/3)
     const mapImage = (
       <TouchableOpacity onPress={this.showRide} style={{flex: 1}} key="map">
-        <RideImage height={width * (9/16)} uri={this.props.ride.get('mapURL')} />
+        <RideImage height={swiperHeight} uri={this.props.ride.get('mapURL')} />
       </TouchableOpacity>
     )
     if (this.props.ride.get('photosByID').keySeq().count() > 0) {
@@ -202,7 +203,7 @@ export default class RideCard extends PureComponent {
         const thisImage = (
           <TouchableOpacity onPress={this.showRide} style={{flex: 1}} key="map">
             <Image
-              style={{height: width * (9/16)}}
+              style={{height: swiperHeight, width: null}}
               key={photo.get('uri')}
               source={{uri: photo.get('uri')}}
             />
@@ -222,7 +223,7 @@ export default class RideCard extends PureComponent {
           loop={false}
           showsPagination={false}
           showsButtons={true}
-          style={{height: 200}}
+          style={{height: swiperHeight}}
         >
           { images }
         </Swiper>

@@ -91,7 +91,7 @@ class DrawerContainer extends PureComponent {
     this.toggleDrawer()
     this.props.navigator.push({
       screen: BARN,
-      title: 'Barn',
+      title: 'My Barn',
       navigatorButtons: {
         leftButtons: [{
           id: 'back'
@@ -161,7 +161,7 @@ class DrawerContainer extends PureComponent {
             <TouchableOpacity onPress={this.openBarn}>
               <View style={styles.drawerListItem}>
                 <Text style={styles.drawerListItemText}>
-                  Barn
+                  My Barn
                 </Text>
               </View>
             </TouchableOpacity>

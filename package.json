@@ -18,12 +18,12 @@
     "react-native-image-crop-picker": "^0.20.0",
     "react-native-image-zoom-viewer": "^2.2.13",
     "react-native-maps": "GuilhermeEd/react-native-maps",
-    "react-native-mauron85-background-geolocation-brln": "^0.5.0-alpha.34-brln5",
+    "react-native-mauron85-background-geolocation": "^0.5.0-alpha.40",
     "react-native-modalbox": "^1.5.0",
     "react-native-navigation": "^1.1.389",
     "react-native-push-notification": "3.1.1",
     "react-native-sentry": "^0.37.1",
-    "react-native-svg": "^6.3.1",
+    "react-native-svg": "^6.5.0",
     "react-native-swiper": "^1.5.13",
     "react-native-vector-icons": "^4.5.0",
     "react-redux": "^5.0.7",
@@ -31,7 +31,7 @@
     "redux-immutable": "^4.0.0",
     "redux-thunk": "^2.2.0",
     "urijs": "^1.19.1",
-    "victory-native": "^0.18.1"
+    "victory-native": "^30.3.0"
   },
   "devDependencies": {
     "babel-plugin-transform-remove-console": "^6.9.4",
