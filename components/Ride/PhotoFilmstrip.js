@@ -18,25 +18,20 @@ export default class PhotoFilmstrip extends Component {
     this.showLightbox = this.showLightbox.bind(this)
   }
 
-
   showLightbox (source) {
     return () => {
-      this.props.navigator.showLightBox({
-        screen: PHOTO_LIGHTBOX,
-        passProps: {
-          source,
-          close: this.closeLightbox
-        },
-        style: {
-          backgroundBlur: 'dark', // 'dark' / 'light' / 'xlight' / 'none' - the type of blur on the background
-          backgroundColor: brand + 'AA',
-          tapBackgroundToDismiss: true // dismisses LightBox on background taps (optional)
-        }
-      })
+      if (this.props.navigator) {
+        this.props.navigator.push({
+          screen: PHOTO_LIGHTBOX,
+          passProps: {
+            source,
+            close: this.closeLightbox
+          },
+        })
+      }
     }
 
   }
-
 
   thumbnail (photoID, style, source) {
     return (

@@ -5,7 +5,6 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native'
 
-import { brand } from '../colors'
 import { PHOTO_LIGHTBOX } from '../screens'
 
 export default class SwipablePhoto extends PureComponent {
@@ -29,7 +28,6 @@ export default class SwipablePhoto extends PureComponent {
         },
       })
     }
-
   }
 
   render () {
