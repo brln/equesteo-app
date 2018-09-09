@@ -66,7 +66,7 @@ function urlParams (params) {
 export function staticMap (ride) {
   const ROOT_URL = 'https://maps.googleapis.com/maps/api/staticmap?'
   const queryStringParams = {
-      size: '800x450',
+      size: '600x400',
       format: 'png',
       maptype: 'terrain',
   }

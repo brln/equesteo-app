@@ -6,6 +6,7 @@ import {
   Thumbnail,
 } from 'native-base';
 import {
+  Dimensions,
   Image,
   StyleSheet,
   TouchableOpacity,
@@ -16,6 +17,8 @@ import Swiper from 'react-native-swiper';
 
 import { darkGrey } from '../../colors'
 import { HORSE_PROFILE, PROFILE } from '../../screens'
+
+const { width } = Dimensions.get('window')
 
 export default class HorseCard extends PureComponent {
   constructor (props) {
@@ -123,6 +126,7 @@ export default class HorseCard extends PureComponent {
   }
 
   renderSwiper () {
+    const swiperHeight = width * (2/3)
     const photos = this.props.horse.get('photosByID')
     if (photos.valueSeq().count() > 0) {
       const images = []
@@ -131,7 +135,7 @@ export default class HorseCard extends PureComponent {
         const photo = photos.get(id)
         const thisImage = (
           <TouchableOpacity onPress={this.showHorseProfile} style={{flex: 1}} key="map">
-            <Image style={{height: 200}} key={photo.get('uri')} source={{uri: photo.get('uri')}} />
+            <Image style={{height: swiperHeight}} key={photo.get('uri')} source={{uri: photo.get('uri')}} />
           </TouchableOpacity>
         )
         if (id !== this.props.horse.get('profilePhotoID')) {
@@ -147,7 +151,7 @@ export default class HorseCard extends PureComponent {
           loop={false}
           showsPagination={false}
           showsButtons={true}
-          style={{height: 200}}
+          style={{height: swiperHeight}}
         >
           { images }
         </Swiper>

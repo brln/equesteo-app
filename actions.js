@@ -380,11 +380,8 @@ export function getFCMToken () {
 export function checkFCMPermission () {
   return async () => {
     const enabled = await firebase.messaging().hasPermission();
-    console.log('zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz')
-    console.log(enabled)
     if (!enabled) {
       try {
-        console.log('requesting FCM Permission')
         const resp = await firebase.messaging().requestPermission();
         console.log(resp)
       } catch (error) {

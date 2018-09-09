@@ -3,6 +3,7 @@ import Swiper from 'react-native-swiper';
 import memoizeOne from 'memoize-one';
 import moment from 'moment'
 import {
+  Clipboard,
   Dimensions,
   Image,
   ScrollView,
@@ -20,7 +21,7 @@ import {
 
 
 import { darkBrand, darkGrey } from '../../colors'
-import { haversine, logRender } from '../../helpers'
+import { haversine, logRender, logInfo } from '../../helpers'
 import { MAP, RIDE_DETAILS } from '../../screens'
 import PhotoFilmstrip from './PhotoFilmstrip'
 import SpeedChart from './SpeedChart'
@@ -33,7 +34,8 @@ export default class Ride extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      modalOpen: false
+      modalOpen: false,
+      titleTouchCount: 0
     }
     this.closeDeleteModal = this.closeDeleteModal.bind(this)
     this.deleteRide = this.deleteRide.bind(this)
@@ -46,6 +48,7 @@ export default class Ride extends PureComponent {
     this.userName = this.userName.bind(this)
     this.rideNotes = this.rideNotes.bind(this)
     this.rideTime = this.rideTime.bind(this)
+    this.maybeShowID = this.maybeShowID.bind(this)
   }
 
   componentWillUnmount() {
@@ -111,7 +114,6 @@ export default class Ride extends PureComponent {
 
       if (parsedBucket.length === bucketSize) {
         const pace = parsedBucket.reduce((acc, val) => acc + val.pace, 0) / bucketSize
-        console.log(parsedBucket.map(val => val.pace))
         const paces = parsedBucket.map(val => val.pace)
         const max = Math.max(...paces)
         const min = Math.min(...paces)
@@ -212,6 +214,20 @@ export default class Ride extends PureComponent {
     }
   }
 
+  maybeShowID () {
+    this.setState({
+      titleTouchCount: this.state.titleTouchCount + 1
+    })
+    if (this.state.titleTouchCount === 5) {
+      alert(this.props.ride.get('_id'))
+      Clipboard.setString(this.props.ride.get('_id'))
+      logInfo(this.props.ride.get('_id'))
+      this.setState({
+        titleTouchCount: 0
+      })
+    }
+  }
+
   render () {
     logRender('Ride.Ride')
     let speedChart = <Text>Not enough points for Speed Chart</Text>
@@ -239,11 +255,13 @@ export default class Ride extends PureComponent {
           <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
             <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', paddingRight: 10, paddingLeft: 20}}>
               { this.userAvatar() }
-              <View>
-                <Text style={{fontSize: 20, color: 'black'}}>{this.props.ride.get('name') || 'No Name'}</Text>
-                <Text style={{fontSize: 14}}>{this.userName()}</Text>
-                <Text style={{fontSize: 12, fontWeight: 'normal', color: darkGrey}}>{this.rideTime()}</Text>
-              </View>
+              <TouchableWithoutFeedback onPress={this.maybeShowID}>
+                <View>
+                  <Text style={{fontSize: 20, color: 'black'}}>{this.props.ride.get('name') || 'No Name'}</Text>
+                  <Text style={{fontSize: 14}}>{this.userName()}</Text>
+                  <Text style={{fontSize: 12, fontWeight: 'normal', color: darkGrey}}>{this.rideTime()}</Text>
+                </View>
+              </TouchableWithoutFeedback>
             </View>
           </View>
         </View>

@@ -18,7 +18,6 @@ export default class SpeedChart extends PureComponent {
 
   render () {
     logRender('rendering SpeedChart')
-    console.log(this.props.speedData)
     return (
       <View style={styles.container}>
         <VictoryChart
