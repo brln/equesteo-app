@@ -116,6 +116,7 @@ const styles = StyleSheet.create({
     borderColor: black,
     backgroundColor: green,
     padding: 20,
+    overflow: 'hidden'
   },
   bottomSection: {
     flex: 1,

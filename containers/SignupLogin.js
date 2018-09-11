@@ -2,8 +2,10 @@ import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
 import URI from 'urijs'
 import {
+  Dimensions,
   Image,
   Linking,
+  ScrollView,
   StyleSheet,
   Text,
   View
@@ -18,10 +20,12 @@ import {
   submitLogin,
   submitSignup
 } from '../actions'
-import ForgotForm from '../components/SignupLogin/ForgotForm'
-import SignupForm from '../components/SignupLogin/SignupForm'
-import LoginForm from '../components/SignupLogin/LoginForm'
+import ForgotPage from '../components/SignupLogin/ForgotPage'
+import SignupPage from '../components/SignupLogin/SignupPage'
+import LoginPage from '../components/SignupLogin/LoginPage'
 import { logRender } from '../helpers'
+
+const { width, height } = Dimensions.get('window')
 
 class SignupLoginContainer extends PureComponent {
   static navigatorStyle = {
@@ -122,7 +126,7 @@ class SignupLoginContainer extends PureComponent {
   render() {
     logRender('SignupLoginContainer')
     let form = (
-      <LoginForm
+      <LoginPage
         doingInitialLoad={this.props.doingInitialLoad}
         submitLogin={this.submitLogin}
         showSignup={this.showSignup}
@@ -131,7 +135,7 @@ class SignupLoginContainer extends PureComponent {
     )
     if (this.state.signup) {
       form = (
-        <SignupForm
+        <SignupPage
           doingInitialLoad={this.props.doingInitialLoad}
           submitSignup={this.submitSignup}
           showLogin={this.showLogin}
@@ -139,7 +143,7 @@ class SignupLoginContainer extends PureComponent {
       )
     } else if (this.state.forgot) {
       form = (
-        <ForgotForm
+        <ForgotPage
           awaitingPWChange={this.props.awaitingPWChange}
           error={this.props.error}
           errorOccurred={this.errorOccurred}
@@ -156,12 +160,14 @@ class SignupLoginContainer extends PureComponent {
     const error = this.props.error ? <Text style={styles.errorBox}>{this.props.error}</Text> : null
     return (
         <View style={styles.container}>
-          {error}
-          <Image
-            source={require('../img/loginbg3.jpg')}
-            style={{width: "100%", height: "100%"}}
-          />
-          {form}
+          <ScrollView>
+            {error}
+            <Image
+              source={require('../img/loginbg3.jpg')}
+              style={{ width, height, resizeMode: 'stretch' }}
+            />
+            {form}
+          </ScrollView>
       </View>
     )
   }

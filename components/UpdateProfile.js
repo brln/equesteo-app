@@ -3,9 +3,9 @@ import React, { PureComponent } from 'react'
 import {
   Card,
   CardItem,
+  CheckBox,
 } from 'native-base'
 import {
-  CheckBox,
   ScrollView,
   StyleSheet,
   Text,
@@ -66,8 +66,8 @@ export default class UpdateProfile extends PureComponent {
     })
   }
 
-  changeDefaultPublic (value) {
-    this.props.changeAccountDetails(this.props.user.set('ridesDefaultPublic', value))
+  changeDefaultPublic () {
+    this.props.changeAccountDetails(this.props.user.set('ridesDefaultPublic', !this.props.user.get('ridesDefaultPublic')))
   }
 
   moveToLastName () {
@@ -135,8 +135,8 @@ export default class UpdateProfile extends PureComponent {
                 </CardItem>
                 <CardItem cardBody style={{marginLeft: 20, marginRight: 20}}>
                   <TextInput
-                    style={{width: '100%'}}
-                    underlineColorAndroid={darkBrand}
+                    style={{width: '100%', height: 50, padding: 10, borderColor: darkBrand, borderWidth: 1}}
+                    underlineColorAndroid={'transparent'}
                     onChangeText={this.changeFirstName}
                     value={this.props.user.get('firstName')}
                     ref={(i) => this.inputs['firstName'] = i}
@@ -150,8 +150,8 @@ export default class UpdateProfile extends PureComponent {
 
                 <CardItem cardBody style={{marginLeft: 20, marginRight: 20}}>
                   <TextInput
-                    style={{width: '100%'}}
-                    underlineColorAndroid={darkBrand}
+                    style={{width: '100%', height: 50, padding: 10, borderColor: darkBrand, borderWidth: 1}}
+                    underlineColorAndroid={'transparent'}
                     onChangeText={this.changeLastName}
                     value={this.props.user.get('lastName')}
                     ref={(i) => this.inputs['lastName'] = i}
@@ -165,8 +165,9 @@ export default class UpdateProfile extends PureComponent {
 
                 <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
                   <TextInput
-                    style={{width: '100%'}}
-                    underlineColorAndroid={darkBrand}
+                    multiline={true}
+                    style={{width: '100%', height: 50, padding: 10, borderColor: darkBrand, borderWidth: 1}}
+                    underlineColorAndroid={'transparent'}
                     onChangeText={this.changeAboutMe}
                     value={this.props.user.get('aboutMe')}
                     ref={(i) => this.inputs['aboutMe'] = i}
@@ -180,17 +181,18 @@ export default class UpdateProfile extends PureComponent {
                 </CardItem>
                 <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
                   <View style={{flex: 1, flexDirection: 'row'}}>
-                    <CheckBox
-                      value={this.props.user.get('ridesDefaultPublic')}
-                      onValueChange={this.changeDefaultPublic}
-                    />
-                    <View style={{justifyContent: 'center'}}>
+                    <View style={{flex: 1}}>
+                      <CheckBox
+                        checked={this.props.user.get('ridesDefaultPublic')}
+                        onPress={this.changeDefaultPublic}
+                      />
+                    </View>
+                    <View style={{flex: 6, justifyContent: 'center'}}>
                       <Text>Default my rides to publicly viewable.</Text>
                     </View>
                   </View>
                 </CardItem>
               </Card>
-
             </View>
           </View>
         </ScrollView>

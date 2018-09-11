@@ -36,22 +36,6 @@ export const TRAINING = 'equesteo.Training'
 export const UPDATE_HORSE = 'equesteo.Horse'
 export const UPDATE_PROFILE = 'equesteo.UpdateProfile'
 
-export const FEED_DETAILS = {
-  screen: FEED,
-  title: 'Feed',
-  navigatorButtons: {
-    leftButtons: [{
-      id: 'sideMenu'
-    }],
-    // rightButtons: [
-    //   {
-    //     icon: require('./img/logo250.png'),
-    //     id: 'icon',
-    //   }
-    // ] This breaks react-native-navigation v1, put it back in when you upgrade to V2
-  }
-}
-
 export function registerScreens(store, Provider) {
   Navigation.registerComponentWithRedux(BARN, () => BarnContainer, Provider, store)
   Navigation.registerComponentWithRedux(DRAWER, () => DrawerContainer, Provider, store)

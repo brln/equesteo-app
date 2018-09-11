@@ -6,8 +6,6 @@ import {
   View
 } from 'react-native';
 import { Thumbnail } from 'native-base'
-import { brand } from '../../colors'
-import { PHOTO_LIGHTBOX } from '../../screens'
 
 const { width } = Dimensions.get('window')
 

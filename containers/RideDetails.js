@@ -123,10 +123,10 @@ class RideDetailsContainer extends PureComponent {
     })
   }
 
-  changePublic (newVal) {
+  changePublic () {
     this.setState({
       ...this.state,
-      ride: this.state.ride.set('isPublic', newVal)
+      ride: this.state.ride.set('isPublic', !this.state.ride.get('isPublic'))
     })
   }
 

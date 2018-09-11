@@ -32,6 +32,9 @@ const { width } = Dimensions.get('window')
 export default class Ride extends PureComponent {
   constructor (props) {
     super(props)
+    this.state = {
+      titleTouchCount: 0
+    }
     this.fullscreenMap = this.fullscreenMap.bind(this)
     this.userAvatar = this.userAvatar.bind(this)
     this.userName = this.userName.bind(this)

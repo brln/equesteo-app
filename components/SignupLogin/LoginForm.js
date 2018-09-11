@@ -9,46 +9,10 @@ import {
 } from 'react-native';
 
 import { darkBrand } from '../../colors'
+import MultiPlatform from '../MultiPlatform'
 
-
-export default class LoginForm extends PureComponent {
-  constructor (props) {
-    super(props)
-    this.state = {
-      email: null,
-      password: null
-    }
-    this.inputs = {}
-    this.changeEmail = this.changeEmail.bind(this);
-    this.changePassword = this.changePassword.bind(this)
-    this.moveToPassword = this.moveToPassword.bind(this)
-    this._renderLoading = this._renderLoading.bind(this)
-    this._renderLoginForm = this._renderLoginForm.bind(this)
-    this.submitLogin = this.submitLogin.bind(this)
-  }
-
-  changeEmail (text) {
-    this.setState({
-      email: text
-    })
-  }
-
-  changePassword (text) {
-    this.setState({
-      password: text
-    })
-  }
-
-  submitLogin () {
-    this.props.submitLogin(this.state.email, this.state.password)
-  }
-
-
-  moveToPassword (e) {
-    this.inputs['password'].focus()
-  }
-
-  _renderLoginForm () {
+export default class LoginForm extends MultiPlatform {
+  renderAndroid () {
     return (
       <View>
         <Text>Email:</Text>
@@ -56,83 +20,58 @@ export default class LoginForm extends PureComponent {
           autoCapitalize={'none'}
           blurOnSubmit={false}
           keyboardType={'email-address'}
-          style={styles.email}
-          onChangeText={this.changeEmail}
-          onSubmitEditing={this.moveToPassword}
-          ref={(i) => this.inputs['email'] = i}
+          onChangeText={this.props.changeEmail}
+          onSubmitEditing={this.props.moveToPassword}
+          ref={(i) => this.props.inputs['email'] = i}
           underlineColorAndroid="black"
         />
         <Text>Password:</Text>
         <TextInput
           autoCapitalize={'none'}
-          onChangeText={this.changePassword}
-          onSubmitEditing={this.submitLogin}
+          onChangeText={this.props.changePassword}
+          onSubmitEditing={this.props.submitLogin}
           secureTextEntry={true}
-          style={styles.whiteText}
-          ref={(i) => this.inputs['password'] = i}
+          ref={(i) => this.props.inputs['password'] = i}
           underlineColorAndroid="black"
         />
-
-        <View>
-          <TouchableOpacity onPress={this.props.showSignup}>
-            <View style={styles.switchup} >
-              <Text style={styles.switchupText} >Or, <Text style={styles.underlineText}>Sign Up</Text>.</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={this.props.showForgot}>
-            <View>
-              <Text style={styles.switchupText}><Text style={styles.underlineText}>Forgot Your Password?</Text></Text>
-            </View>
-          </TouchableOpacity>
-        </View>
       </View>
     )
   }
 
-  _renderLoading () {
+  renderIOS () {
     return (
       <View>
-        <ActivityIndicator size="large" color={darkBrand} />
-        <Text style={{textAlign: 'center', color: darkBrand}}>Loading Data...</Text>
+        <TextInput
+          autoCapitalize={'none'}
+          blurOnSubmit={false}
+          keyboardType={'email-address'}
+          onChangeText={this.props.changeEmail}
+          onSubmitEditing={this.props.moveToPassword}
+          ref={(i) => this.props.inputs['email'] = i}
+          placeholder={'Email'}
+          style={{
+            backgroundColor: 'white',
+            height: 50,
+            paddingLeft: 20
+          }}
+        />
+        <TextInput
+          autoCapitalize={'none'}
+          onChangeText={this.props.changePassword}
+          onSubmitEditing={this.props.submitLogin}
+          secureTextEntry={true}
+          ref={(i) => this.props.inputs['password'] = i}
+          placeholder={'Password'}
+          style={{
+            backgroundColor: 'white',
+            height: 50,
+            marginTop: 20,
+            marginBottom: 20,
+            paddingLeft: 20
+          }}
+        />
       </View>
     )
   }
 
-  render() {
-    return (
-      <View style={styles.container}>
-        { this.props.doingInitialLoad ? this._renderLoading() : this._renderLoginForm() }
-      </View>
-    );
-  }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    position: 'absolute',
-    top: 20,
-    width: "100%",
-    flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'stretch',
-    padding: 30,
-  },
-  email: {
-    borderColor: 'gray',
-  },
-  password: {
-    borderColor: 'gray',
-    width: 80,
-  },
-  switchup: {
-    paddingTop: 10,
-    paddingBottom: 20,
-  },
-  switchupText: {
-    textAlign: 'center',
-  },
-  underlineText: {
-    textDecorationLine: 'underline',
-  },
-});

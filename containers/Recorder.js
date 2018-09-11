@@ -11,7 +11,7 @@ import {
 } from '../actions'
 import { brand } from '../colors'
 import RideRecorder from '../components/RideRecorder/RideRecorder'
-import { logRender, unixTimeNow } from '../helpers'
+import { isAndroid, logRender, unixTimeNow } from '../helpers'
 import { RIDE_DETAILS } from "../screens"
 
 class RecorderContainer extends PureComponent {
@@ -43,21 +43,25 @@ class RecorderContainer extends PureComponent {
   }
 
   componentDidMount () {
-    LocationServicesDialogBox.checkLocationServicesIsEnabled({
-      message: "You need to turn on the GPS and enable 'High Accuracy' to record your ride. \nPlease do so and then come back.",
-      ok: "OK",
-      cancel: "Nope",
-      enableHighAccuracy: true,
-      showDialog: true,
-      openLocationServices: true,
-      preventOutSideTouch: false,
-      preventBackClick: true,
-      providerListener: false,
-    }).then(
-      this.startLocationTracking
-    ).catch(
-      this.backToFeed
-    );
+    if (isAndroid()) {
+      LocationServicesDialogBox.checkLocationServicesIsEnabled({
+        message: "You need to turn on the GPS and enable 'High Accuracy' to record your ride. \nPlease do so and then come back.",
+        ok: "OK",
+        cancel: "Nope",
+        enableHighAccuracy: true,
+        showDialog: true,
+        openLocationServices: true,
+        preventOutSideTouch: false,
+        preventBackClick: true,
+        providerListener: false,
+      }).then(
+        this.startLocationTracking
+      ).catch(
+        this.backToFeed
+      );
+    } else {
+      this.startLocationTracking()
+    }
   }
 
   componentDidDisappear () {

@@ -13,7 +13,7 @@ class TrainingContainer extends PureComponent {
     return {
       topBar: {
         title: {
-          text: "Find People",
+          text: "Training",
           color: 'white',
         },
         background: {
@@ -56,7 +56,10 @@ class TrainingContainer extends PureComponent {
   allRidesOnYourHorses () {
     const yourHorseIDs = this.yourHorses().valueSeq().map(h => h.get('_id'))
     return this.props.rides.valueSeq().filter((ride) => {
-      return yourHorseIDs.indexOf(ride.get('horseID')) >= 0 && ride.get('deleted') !== true
+      return (
+        yourHorseIDs.indexOf(ride.get('horseID')) >= 0
+          || (ride.get('userID') === this.props.userID && ride.get('horseID') === null)
+        ) && ride.get('deleted') !== true
     })
   }
 

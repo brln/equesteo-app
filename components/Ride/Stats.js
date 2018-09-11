@@ -101,7 +101,6 @@ export default class Stats extends PureComponent {
               <TouchableOpacity style={{flex: 1}} onPress={this.showHorseProfile(horse)}>
                 <Stat
                   imgSrc={this.horseAvatar(horse)}
-                  imgStyle={{borderRadius: 900}}
                   text={'Horse'}
                   value={ horse ? horse.get('name') : 'none'}
                 />

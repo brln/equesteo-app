@@ -84,7 +84,6 @@ export default class HorseSelector extends PureComponent {
         <Image
           square
           style={styles.thumbnail}
-          source={{uri: null}}
         />
         <View style={{
           position: 'absolute',
