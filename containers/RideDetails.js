@@ -127,6 +127,7 @@ class RideDetailsContainer extends NavigatorComponent {
   onNavigatorEvent (event) {
     if (event.type === 'NavBarButtonPress') {
       if (this.props.newRide) {
+        this.props.navigator.setButtons({rightButtons: [], animation: false})
         if (event.id === 'save') {
           this.createRide(this.state.ride)
         } else if (event.id === 'discard') {
