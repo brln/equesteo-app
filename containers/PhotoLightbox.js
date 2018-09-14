@@ -1,11 +1,25 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
+import PhotoLightbox from '../components/PhotoLightbox'
+
+import { brand } from '../colors'
 import { logRender } from '../helpers'
 
-import PhotoLightbox from '../components/PhotoLightbox'
-import NavigatorComponent from './NavigatorComponent'
+class PhotoLightboxContainer extends PureComponent {
+  static options() {
+    return {
+      topBar: {
+        background: {
+          color: brand,
+        },
+        backButton: {
+          color: 'white'
+        },
+        elevation: 0
+      }
+    };
+  }
 
-class PhotoLightboxContainer extends NavigatorComponent {
   constructor (props) {
     super(props)
   }

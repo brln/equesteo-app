@@ -1,15 +1,52 @@
-import React, { Component } from 'react'
+import { Navigation } from 'react-native-navigation'
+import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
 
 import { searchForFriends } from "../actions"
+import { brand } from '../colors'
 import { logRender } from '../helpers'
+import { PROFILE } from '../screens'
 import FindPeople from '../components/FindPeople'
-import NavigatorComponent from './NavigatorComponent'
 
-class FindPeopleContainer extends NavigatorComponent {
+class FindPeopleContainer extends PureComponent {
+  static options() {
+    return {
+      topBar: {
+        title: {
+          text: "Find People",
+          color: 'white',
+        },
+        background: {
+          color: brand,
+        },
+        elevation: 0,
+        backButton: {
+          color: 'white'
+        }
+      }
+    };
+  }
+
   constructor (props) {
     super(props)
     this.search = this.search.bind(this)
+    this.showProfile = this.showProfile.bind(this)
+  }
+
+  showProfile (profileUser) {
+    let showUser = this.props.allUsers.get(profileUser.get('_id'))
+    if (!showUser) {
+      showUser = profileUser
+    }
+    Navigation.push(this.props.componentId, {
+      component: {
+        name: PROFILE,
+        id: PROFILE,
+        passProps: {
+          profileUser: showUser,
+        }
+      }
+    })
   }
 
   search (phrase) {
@@ -21,8 +58,8 @@ class FindPeopleContainer extends NavigatorComponent {
     return (
       <FindPeople
         allUsers={this.props.allUsers}
-        navigator={this.props.navigator}
         search={this.search}
+        showProfile={this.showProfile}
         user={this.props.user}
         userSearchResults={this.props.userSearchResults}
       />

@@ -1,5 +1,6 @@
 import { Map } from 'immutable'
-import React, { Component } from 'react'
+import { Navigation } from 'react-native-navigation'
+import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
 
 
@@ -10,22 +11,35 @@ import {
   updateRide,
   uploadRidePhoto
 } from '../actions'
+import { brand } from '../colors'
 import { generateUUID, logRender, newRideName, unixTimeNow } from '../helpers'
 import RideDetails from '../components/RideRecorder/RideDetails'
-import NavigatorComponent from './NavigatorComponent'
 
-class RideDetailsContainer extends NavigatorComponent {
-  static navigatorButtons = {
-    rightButtons: [
-      {
-        id: 'save',
-        title: 'Save',
-      },
-      {
-        id: 'discard',
-        title: 'Discard'
-      },
-    ],
+class RideDetailsContainer extends PureComponent {
+  static options() {
+    return {
+      topBar: {
+        background: {
+          color: brand,
+        },
+        elevation: 0,
+        backButton: {
+          color: 'white'
+        },
+        rightButtons: [
+          {
+            id: 'save',
+            text: 'Save',
+            color: 'white'
+          },
+          {
+            id: 'discard',
+            text: 'Discard',
+            color: 'white'
+          },
+        ]
+      }
+    };
   }
 
   constructor (props) {
@@ -46,9 +60,27 @@ class RideDetailsContainer extends NavigatorComponent {
     this.doneOnPage = this.doneOnPage.bind(this)
     this.uploadPhoto = this.uploadPhoto.bind(this)
     this.horses = this.horses.bind(this)
-    this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
-    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
     this.uploadNewPhotos = this.uploadNewPhotos.bind(this)
+
+    Navigation.events().bindComponent(this);
+  }
+
+  navigationButtonPressed({ buttonId }) {
+    if (this.props.newRide) {
+      Navigation.mergeOptions(this.props.componentId, {topBar: {rightButtons: []}})
+      if (buttonId === 'save') {
+        this.createRide(this.state.ride)
+      } else if (buttonId === 'discard') {
+        this.props.dispatch(discardRide())
+        this.doneOnPage()
+      }
+    } else {
+      if (buttonId === 'save') {
+        this.uploadNewPhotos()
+        this.props.dispatch(updateRide(this.state.ride))
+      }
+      Navigation.pop(this.props.componentId)
+    }
   }
 
   static getDerivedStateFromProps (props, state) {
@@ -121,27 +153,7 @@ class RideDetailsContainer extends NavigatorComponent {
   }
 
   doneOnPage () {
-    this.props.navigator.popToRoot({animated: false, animationType: 'none'})
-  }
-
-  onNavigatorEvent (event) {
-    if (event.type === 'NavBarButtonPress') {
-      if (this.props.newRide) {
-        this.props.navigator.setButtons({rightButtons: [], animation: false})
-        if (event.id === 'save') {
-          this.createRide(this.state.ride)
-        } else if (event.id === 'discard') {
-          this.props.dispatch(discardRide())
-          this.doneOnPage()
-        }
-      } else {
-        if (event.id === 'save') {
-          this.uploadNewPhotos()
-          this.props.dispatch(updateRide(this.state.ride))
-        }
-        this.props.navigator.pop()
-      }
-    }
+    Navigation.popToRoot(this.props.componentId)
   }
 
   uploadNewPhotos () {

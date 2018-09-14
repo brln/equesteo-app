@@ -1,7 +1,6 @@
 package com.equesteo;
+import com.reactnativenavigation.NavigationActivity;
 
-import com.reactnativenavigation.controllers.SplashActivity;
-
-public class MainActivity extends SplashActivity {
+public class MainActivity extends NavigationActivity {
 
 }

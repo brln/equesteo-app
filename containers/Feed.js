@@ -1,17 +1,42 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
+import { Navigation } from 'react-native-navigation'
 
 import {
-  justFinishedRideShown,
+  popShowRideShown,
   syncDBPull,
   toggleRideCarrot
 } from "../actions";
+import { brand } from '../colors'
 import Feed from '../components/Feed/Feed'
-import NavigatorComponent from './NavigatorComponent'
 import { logRender } from '../helpers'
-import { RIDE_COMMENTS } from '../screens'
+import {
+  HORSE_PROFILE,
+  PROFILE,
+  RIDE_COMMENTS,
+  RIDE
+} from '../screens'
 
-class FeedContainer extends NavigatorComponent {
+class FeedContainer extends PureComponent {
+   static options() {
+    return {
+      topBar: {
+        title: {
+          text: "Feed",
+          color: 'white',
+        },
+        leftButtons: [{
+          id: 'sideMenu',
+          icon: require('../img/hamburger.png')
+        }],
+        background: {
+          color: brand,
+        },
+        elevation: 0
+      }
+    };
+  }
+
   constructor (props) {
     super(props)
     this.state = {
@@ -23,12 +48,27 @@ class FeedContainer extends NavigatorComponent {
     this.followIDs = this.followIDs.bind(this)
     this.followingRides = this.followingRides.bind(this)
     this.horseOwnerIDs = this.horseOwnerIDs.bind(this)
-    this.justFinishedRideShown = this.justFinishedRideShown.bind(this)
     this.toggleCarrot = this.toggleCarrot.bind(this)
     this.showComments = this.showComments.bind(this)
+    this.showProfile = this.showProfile.bind(this)
+    this.showRide = this.showRide.bind(this)
+    this.showHorseProfile = this.showHorseProfile.bind(this)
     this.syncDBPull = this.syncDBPull.bind(this)
     this.yourRides = this.yourRides.bind(this)
+
+    Navigation.events().bindComponent(this)
+    this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
   }
+
+   navigationButtonPressed({ buttonId }) {
+     Navigation.mergeOptions(this.props.componentId, {
+       sideMenu: {
+         left: {
+           visible: true,
+         }
+       }
+     });
+   }
 
   static getDerivedStateFromProps (nextProps, prevState) {
     const nextState = {}
@@ -39,6 +79,62 @@ class FeedContainer extends NavigatorComponent {
     return nextState
   }
 
+  componentDidUpdate () {
+    if (this.props.popShowRide) {
+      this.showRide(this.props.rides.get(this.props.popShowRide))
+      this.props.dispatch(popShowRideShown())
+    }
+  }
+
+  showHorseProfile (horse, ownerID) {
+    Navigation.push(this.props.componentId, {
+      component: {
+        name: HORSE_PROFILE,
+        id: HORSE_PROFILE,
+        title: horse.get('name'),
+        passProps: {
+          horse,
+          ownerID
+        }
+      }
+    })
+  }
+
+  showComments (ride) {
+    Navigation.push(this.props.componentId, {
+      component: {
+        title: 'Comments',
+        name: RIDE_COMMENTS,
+        id: RIDE_COMMENTS,
+        passProps: {
+         rideID: ride.get('_id')
+        }
+      }
+    })
+  }
+
+  showProfile (user) {
+    Navigation.push(this.props.componentId, {
+      component: {
+        name: PROFILE,
+        id: PROFILE,
+        passProps: {
+          profileUser: user,
+        }
+      }
+    })
+  }
+
+  showRide (ride) {
+    Navigation.push(this.props.componentId, {
+      component: {
+        name: RIDE,
+        id: RIDE,
+        passProps: {rideID: ride.get('_id')}
+      }
+    });
+  }
+
   syncDBPull () {
     this.setState({
       refreshing: true
@@ -46,22 +142,8 @@ class FeedContainer extends NavigatorComponent {
     this.props.dispatch(syncDBPull('all'))
   }
 
-  justFinishedRideShown () {
-    this.props.dispatch(justFinishedRideShown())
-  }
-
   toggleCarrot (rideID) {
     this.props.dispatch(toggleRideCarrot(rideID))
-  }
-
-  showComments (ride) {
-    this.props.navigator.push({
-      screen: RIDE_COMMENTS,
-      title: 'Comments',
-      passProps: {
-        rideID: ride.get('_id')
-      }
-    })
   }
 
   yourRides () {
@@ -122,13 +204,13 @@ class FeedContainer extends NavigatorComponent {
         horses={this.filteredHorses()}
         horseOwnerIDs={this.horseOwnerIDs()}
         horseUsers={this.filteredHorseUsers()}
-        justFinishedRide={this.props.justFinishedRide}
-        justFinishedRideShown={this.justFinishedRideShown}
-        navigator={this.props.navigator}
         refreshing={this.state.refreshing}
         rideCarrots={this.props.rideCarrots.toList()}
         rideComments={this.props.rideComments.toList()}
+        showHorseProfile={this.showHorseProfile}
         showComments={this.showComments}
+        showProfile={this.showProfile}
+        showRide={this.showRide}
         syncDBPull={this.syncDBPull}
         toggleCarrot={this.toggleCarrot}
         userID={this.props.userID}
@@ -149,6 +231,7 @@ function mapStateToProps (state) {
     horseUsers: mainState.get('horseUsers'),
     justFinishedRide: localState.get('justFinishedRide'),
     lastFullSync: localState.get('lastFullSync'),
+    popShowRide: localState.get('popShowRide'),
     rides: mainState.get('rides'),
     rideCarrots: mainState.get('rideCarrots'),
     rideComments: mainState.get('rideComments'),

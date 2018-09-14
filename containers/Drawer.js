@@ -1,5 +1,7 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { connect } from 'react-redux';
+import { Navigation } from 'react-native-navigation'
+
 import {
   Dimensions,
   Image,
@@ -13,8 +15,6 @@ import {
   BARN,
   FIND_PEOPLE,
   PROFILE,
-  RIDES,
-  RIDES_DETAILS,
   RECORDER,
   TRAINING,
 } from '../screens'
@@ -24,101 +24,83 @@ import { logRender } from '../helpers'
 
 const { width } = Dimensions.get('window')
 
-class DrawerContainer extends PureComponent {
+class DrawerContainer extends Component {
   constructor (props) {
     super(props)
     this.toggleDrawer = this.toggleDrawer.bind(this)
 		this.openAccount = this.openAccount.bind(this)
     this.openBarn = this.openBarn.bind(this)
-    this.openFollowing = this.openFollowing.bind(this)
+    this.openFindPeople = this.openFindPeople.bind(this)
 		this.openRecorder = this.openRecorder.bind(this)
     this.openTraining = this.openTraining.bind(this)
   }
 
-  openFollowing () {
+  shouldComponentUpdate () {
+    return false
+  }
+
+  openFindPeople () {
     this.toggleDrawer()
-    this.props.navigator.push({
-      screen: FIND_PEOPLE,
-      title: 'Find People',
-      navigatorButtons: {
-        leftButtons: [{
-          id: 'back'
-        }]
+    Navigation.push(this.props.activeComponent, {
+      component: {
+        name: FIND_PEOPLE,
+        id: FIND_PEOPLE,
       }
-    })
+    });
   }
 
   openRecorder () {
     this.toggleDrawer()
-    this.props.navigator.push({
-      screen: RECORDER,
-      title: 'Go Ride',
-      navigatorButtons: {
-        leftButtons: [{
-          id: 'back'
-        }]
+    Navigation.push(this.props.activeComponent, {
+      component: {
+        name: RECORDER,
+        id: RECORDER,
       }
-		})
+    });
 	}
 
 	openAccount () {
     this.toggleDrawer()
-    this.props.navigator.push({
-      screen: PROFILE,
-      title: 'My Account',
-      navigatorButtons: {
-        leftButtons: [{
-          id: 'back'
-        }],
-        rightButtons: [
-          {
-            title: "Edit",
-            id: 'edit',
-          },
-          {
-            title: "Log Out",
-            id: 'logout',
-          }
-        ]
-      },
-      passProps: {
-        profileUser: this.props.user,
+    Navigation.push(this.props.activeComponent, {
+      component: {
+        name: PROFILE,
+        id: PROFILE,
+        title: 'My Account',
+        passProps: {
+          profileUser: this.props.user,
+        }
       }
-    })
+    });
 	}
 
   openBarn () {
     this.toggleDrawer()
-    this.props.navigator.push({
-      screen: BARN,
-      title: 'My Barn',
-      navigatorButtons: {
-        leftButtons: [{
-          id: 'back'
-        }]
+    Navigation.push(this.props.activeComponent, {
+      component: {
+        name: BARN,
+        id: BARN
       }
-    })
+    });
   }
 
   openTraining () {
     this.toggleDrawer()
-    this.props.navigator.push({
-      screen: TRAINING,
-      title: 'Training',
-      navigatorButtons: {
-        leftButtons: [{
-          id: 'back'
-        }]
+    Navigation.push(this.props.activeComponent, {
+      component: {
+        name: TRAINING,
+        id: TRAINING
       }
-    })
+    });
   }
 
 	toggleDrawer() {
-		this.props.navigator.toggleDrawer({
-			to: 'closed',
-			side: 'left',
-			animated: true
-		});
+    Navigation.mergeOptions(this.props.activeComponent, {
+      sideMenu: {
+        left: {
+          visible: false,
+        }
+      }
+    });
   }
 
   render() {
@@ -175,7 +157,7 @@ class DrawerContainer extends PureComponent {
               </View>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={this.openFollowing}>
+            <TouchableOpacity onPress={this.openFindPeople}>
               <View style={styles.drawerListItem}>
                 <Text style={styles.drawerListItemText} onTouch>
                   Find People
@@ -232,7 +214,9 @@ const styles = StyleSheet.create({
 function mapStateToProps (state) {
   const users = state.getIn(['main', 'users'])
   const userID = state.getIn(['main', 'localState', 'userID'])
+  const activeComponent = state.getIn(['main', 'localState', 'activeComponent'])
   return {
+    activeComponent,
     user: users.get(userID)
 	}
 }

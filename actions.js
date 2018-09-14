@@ -2,11 +2,13 @@ import { AppState, NetInfo } from 'react-native'
 import BackgroundGeolocation from 'react-native-mauron85-background-geolocation'
 import { ENV } from 'react-native-dotenv'
 import firebase from 'react-native-firebase'
+import { Navigation } from 'react-native-navigation'
 import PushNotification from 'react-native-push-notification'
 import { fromJS, Map, List } from 'immutable'
 import { Sentry } from 'react-native-sentry'
 
 import { logError, logInfo, unixTimeNow, generateUUID, staticMap } from "./helpers"
+import { DRAWER, FEED, SIGNUP_LOGIN } from './screens'
 import { LocalStorage, PouchCouch, UserAPI } from './services'
 import {BadRequestError, NotConnectedError, UnauthorizedError} from "./errors"
 
@@ -24,13 +26,13 @@ import {
   HORSE_CREATED,
   HORSE_SAVED,
   HORSE_USER_UPDATED,
-  JUST_FINISHED_RIDE_SHOWN,
   LOAD_LOCAL_STATE,
   LOCAL_DATA_LOADED,
   NEEDS_REMOTE_PERSIST,
   NEW_LOCATION,
   NEW_APP_STATE,
   NEW_NETWORK_STATE,
+  POP_SHOW_RIDE_SHOWN,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
   RIDE_CARROT_CREATED,
@@ -39,7 +41,7 @@ import {
   RIDE_CREATED,
   RIDE_SAVED,
   SAVE_USER_ID,
-  SET_APP_ROOT,
+  SET_ACTIVE_COMPONENT,
   START_RIDE,
   SYNC_COMPLETE,
   TOGGLE_AWAITING_PW_CHANGE,
@@ -133,9 +135,9 @@ function horseUserUpdated (horseUser) {
   }
 }
 
-export function justFinishedRideShown () {
+export function popShowRideShown () {
   return {
-    type: JUST_FINISHED_RIDE_SHOWN
+    type: POP_SHOW_RIDE_SHOWN
   }
 }
 
@@ -239,10 +241,11 @@ function rideSaved (ride) {
   }
 }
 
-function setAppRoot (root) {
+function setActiveComponent (componentID) {
   return {
-    type: SET_APP_ROOT,
-    root
+    logData: ['componentID'],
+    type: SET_ACTIVE_COMPONENT,
+    componentID
   }
 }
 
@@ -325,6 +328,7 @@ export function addHorseUser (horse, user) {
 export function appInitialized () {
   return async (dispatch) => {
     await dispatch(tryToLoadLocalState())
+    dispatch(startActiveComponentListener())
     dispatch(dismissError())
     dispatch(findLocalToken())
     dispatch(checkFCMPermission())
@@ -372,7 +376,7 @@ export function getFCMToken () {
         logInfo('Token unchanged')
       }
     } else {
-      throw Error('cant get token or user for some reason')
+      logError('cant get FCM token or user for some reason')
     }
   }
 }
@@ -606,6 +610,44 @@ export function deleteHorseUser (horseID, userID) {
   }
 }
 
+function switchRoot (newRoot) {
+  return async (dispatch) => {
+    if (newRoot === FEED) {
+      Navigation.setRoot({
+        root: {
+          sideMenu: {
+            left: {
+              visible: true,
+              component: {name: DRAWER, id: DRAWER}
+            },
+            center: {
+              stack: {
+                children: [{
+                  component: {
+                    name: FEED,
+                    id: FEED
+                  },
+                }]
+              }
+            },
+          }
+        }
+      });
+    } else if (newRoot === SIGNUP_LOGIN) {
+      Navigation.setRoot({
+        root: {
+          component: {
+            name: SIGNUP_LOGIN,
+            id: SIGNUP_LOGIN
+          },
+        }
+      });
+    } else {
+      throw Error('That\'s a bad route, jerk.')
+    }
+  }
+}
+
 function findLocalToken () {
   return async (dispatch) => {
     const storedToken = await LocalStorage.loadToken()
@@ -613,10 +655,12 @@ function findLocalToken () {
       dispatch(receiveJWT(storedToken.token))
       dispatch(saveUserID(storedToken.userID))
       dispatch(setSentryUserContext())
-      dispatch(setAppRoot('after-login'))
+      dispatch(switchRoot(FEED))
       await dispatch(loadLocalData())
       dispatch(startListeningFCM())
       dispatch(syncDBPull('all'))
+    } else {
+      dispatch(switchRoot(SIGNUP_LOGIN))
     }
   }
 }
@@ -641,7 +685,7 @@ export function newPassword (password) {
     const userAPI = new UserAPI(jwt)
     try {
       await userAPI.changePassword(password)
-      dispatch((setAppRoot('after-login')))
+      dispatch(switchRoot(FEED))
     } catch (e) {
       logError(e)
     }
@@ -697,6 +741,7 @@ export function signOut () {
     dispatch(stopListeningFCM())
     dispatch(stopLocationTracking())
     dispatch(clearStateAfterPersist())
+    dispatch(switchRoot(SIGNUP_LOGIN))
   }
 }
 
@@ -774,6 +819,14 @@ function startListeningFCM () {
   }
 }
 
+function startActiveComponentListener () {
+  return async (dispatch) => {
+    Navigation.events().registerComponentDidAppearListener( ( { componentId } ) => {
+      dispatch(setActiveComponent(componentId))
+    })
+  }
+}
+
 export function stopLocationTracking () {
   return async (dispatch) => {
     BackgroundGeolocation.stop()
@@ -810,7 +863,7 @@ export function submitLogin (email, password) {
       const pouchCouch = new PouchCouch(token)
       await pouchCouch.localReplicateDB('all', [...following, userID], followers)
       dispatch(receiveJWT(resp.token))
-      dispatch(setAppRoot('after-login'))
+      dispatch(switchRoot(FEED))
       dispatch(saveUserID(resp.id))
       dispatch(setSentryUserContext())
       await dispatch(loadLocalData())
@@ -837,7 +890,7 @@ export function submitSignup (email, password) {
       const pouchCouch = new PouchCouch(resp.token)
       await pouchCouch.replicateOwnUser(resp.id)
       dispatch(receiveJWT(resp.token))
-      dispatch(setAppRoot('after-login'))
+      dispatch(switchRoot(FEED))
       dispatch(saveUserID(resp.id))
       dispatch(setSentryUserContext())
       await dispatch(loadLocalData())

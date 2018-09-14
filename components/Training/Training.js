@@ -76,8 +76,8 @@ export default class Training extends PureComponent {
            chosenUserID={this.state.chosenUserID}
            index={index}
            mondayString={item}
-           navigator={this.props.navigator}
            rides={rideWeeks[item]}
+           showRide={this.props.showRide}
            types={this.TYPES}
            userID={this.props.userID}
          />

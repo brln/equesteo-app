@@ -1,4 +1,5 @@
-import React, { Component } from 'react'
+import { Navigation } from 'react-native-navigation'
+import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import LocationServicesDialogBox from "react-native-android-location-services-dialog-box";
 
@@ -8,25 +9,42 @@ import {
   startRide,
   startLocationTracking
 } from '../actions'
+import { brand } from '../colors'
 import RideRecorder from '../components/RideRecorder/RideRecorder'
-import NavigatorComponent from './NavigatorComponent'
-import { logRender } from '../helpers'
+import { logRender, unixTimeNow } from '../helpers'
+import { RIDE_DETAILS } from "../screens"
 
-class RecorderContainer extends NavigatorComponent {
+class RecorderContainer extends PureComponent {
+  static options() {
+    return {
+      topBar: {
+        background: {
+          color: brand,
+        },
+        elevation: 0,
+        backButton: {
+          color: 'white'
+        }
+      }
+    };
+  }
+
   constructor (props) {
     super(props)
     this.backToFeed = this.backToFeed.bind(this)
+    this.componentDidDisappear = this.componentDidDisappear.bind(this)
     this.discardRide = this.discardRide.bind(this)
+    this.showRideDetails = this.showRideDetails.bind(this)
     this.startRide = this.startRide.bind(this)
     this.startLocationTracking = this.startLocationTracking.bind(this)
     this.stopLocationTracking = this.stopLocationTracking.bind(this)
-    this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
-    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
+
+    Navigation.events().bindComponent(this);
   }
 
   componentDidMount () {
     LocationServicesDialogBox.checkLocationServicesIsEnabled({
-      message: "You need to turn on the GPS to record your ride. \nPlease do so and then come back.",
+      message: "You need to turn on the GPS and enable 'High Accuracy' to record your ride. \nPlease do so and then come back.",
       ok: "OK",
       cancel: "Nope",
       enableHighAccuracy: true,
@@ -42,16 +60,14 @@ class RecorderContainer extends NavigatorComponent {
     );
   }
 
-  onNavigatorEvent (event) {
-    if (event.id === 'willDisappear' && event.type === 'ScreenChangedEvent') {
-      if (!this.props.currentRide) {
-        this.stopLocationTracking()
-      }
+  componentDidDisappear () {
+    if (!this.props.currentRide) {
+      this.stopLocationTracking()
     }
   }
 
   backToFeed () {
-    this.props.navigator.popToRoot()
+    Navigation.popToRoot(this.props.componentId)
   }
 
   startLocationTracking () {
@@ -68,7 +84,18 @@ class RecorderContainer extends NavigatorComponent {
 
   discardRide () {
     this.props.dispatch(discardRide())
-    this.props.navigator.popToRoot({animated: false, animationType: 'none'})
+    Navigation.popToRoot(this.props.componentId)
+  }
+
+  showRideDetails () {
+    const elapsedTime = (unixTimeNow() - this.props.currentRide.get('startTime')) / 1000
+    Navigation.push(this.props.componentId, {
+      component: {
+        name: RIDE_DETAILS,
+        id: RIDE_DETAILS,
+        passProps: { elapsedTime }
+      }
+    });
   }
 
   render() {
@@ -79,7 +106,7 @@ class RecorderContainer extends NavigatorComponent {
         currentRide={this.props.currentRide}
         discardRide={this.discardRide}
         lastLocation={this.props.lastLocation}
-        navigator={this.props.navigator}
+        showRideDetails={this.showRideDetails}
         startRide={this.startRide}
         stopLocationTracking={this.stopLocationTracking}
       />

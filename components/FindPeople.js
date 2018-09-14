@@ -19,8 +19,6 @@ import {
 
 import { brand, darkGrey }  from '../colors'
 
-import { PROFILE } from '../screens'
-
 export default class FindPeople extends PureComponent {
   constructor (props) {
     super(props)
@@ -45,17 +43,7 @@ export default class FindPeople extends PureComponent {
 
   showProfile (profileUser) {
     return () => {
-      let showUser = this.props.allUsers.get(profileUser._id)
-      if (!showUser) {
-        showUser = fromJS(profileUser)
-      }
-      this.props.navigator.push({
-        screen: PROFILE,
-        animationType: 'slide-up',
-        passProps: {
-          profileUser: showUser,
-        }
-      })
+      this.props.showProfile(fromJS(profileUser))
     }
   }
 

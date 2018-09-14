@@ -24,7 +24,6 @@ import {
 
 import { brand, danger, darkBrand, green } from '../../colors'
 import { logRender } from '../../helpers'
-import { FOLLOW_LIST, HORSE_PROFILE } from '../../screens'
 import SwipablePhoto from '../SwipablePhoto'
 import FabImage from '../FabImage'
 
@@ -60,28 +59,9 @@ export default class Profile extends PureComponent {
   }
 
   horseProfile (horse) {
-    let rightButtons = []
-    if (this.props.user.get('_id') === this.props.horseOwnerIDs.get(horse.get('_id'))) {
-      rightButtons = [
-        {
-          title: "Edit",
-          id: 'edit',
-        },
-        {
-          title: "Archive",
-          id: 'archive',
-        }
-      ]
-    }
     return () => {
-      this.props.navigator.push({
-        screen: HORSE_PROFILE,
-        title: horse.get('name'),
-        passProps: { horse },
-        rightButtons
-      })
+      this.props.showHorseProfile(horse)
     }
-
   }
 
   renderHorse ({item}) {
@@ -127,7 +107,7 @@ export default class Profile extends PureComponent {
         <SwipablePhoto
           key="profile"
           source={{uri: user.getIn(['photosByID', user.get('profilePhotoID'), 'uri'])}}
-          navigator={this.props.navigator}
+          componentId={this.props.componentId}
         />
       )
     }
@@ -138,14 +118,18 @@ export default class Profile extends PureComponent {
             <SwipablePhoto
               key={imageID}
               source={{uri: user.getIn(['photosByID', imageID, 'uri'])}}
-              navigator={this.props.navigator}
+              componentId={this.props.componentId}
             />
           )
         }
       }
     } else {
       images.push(
-        <SwipablePhoto key="empty" source={require('../../img/emptyProfile.png')} />
+        <SwipablePhoto
+          key="empty"
+          source={require('../../img/emptyProfile.png')}
+          componentId={this.props.componentId}
+        />
       )
     }
     return images
@@ -221,14 +205,7 @@ export default class Profile extends PureComponent {
 
   showUserList (followRecords, followingOrFollower) {
     return () => {
-      const userIDs = followRecords.valueSeq().map((f) => f.get(followingOrFollower))
-      this.props.navigator.push({
-        screen: FOLLOW_LIST,
-        animationType: 'slide-up',
-        passProps: {
-          userIDs: userIDs.toJS(),
-        }
-      })
+      this.props.showUserList(followRecords, followingOrFollower)
     }
   }
 

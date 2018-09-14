@@ -1,8 +1,8 @@
-import App from './App';
+import start from './App';
 import { AppRegistry } from 'react-native';
 import bgMessaging from './bgMessaging'
 
-const app = new App();
+start()
 
 AppRegistry.registerHeadlessTask('RNFirebaseBackgroundMessage', () => bgMessaging);
 

@@ -34,14 +34,7 @@ export default class HorseCard extends PureComponent {
   }
 
   showHorseProfile () {
-    this.props.navigator.push({
-      screen: HORSE_PROFILE,
-      title: this.props.horse.get('name'),
-      animationType: 'slide-up',
-      passProps: {
-        horse: this.props.horse,
-      }
-    })
+    this.props.showHorseProfile(this.props.horse, this.props.ownerID)
   }
 
   horseProfileURL () {
@@ -53,13 +46,7 @@ export default class HorseCard extends PureComponent {
   }
 
   showProfile () {
-    this.props.navigator.push({
-      screen: PROFILE,
-      animationType: 'slide-up',
-      passProps: {
-        profileUser: this.props.rider,
-      }
-    })
+    this.props.showProfile(this.props.rider)
   }
 
   horseAvatar () {

@@ -22,7 +22,6 @@ import {
 
 import { darkBrand, darkGrey } from '../../colors'
 import { haversine, logRender, logInfo } from '../../helpers'
-import { MAP, RIDE_DETAILS } from '../../screens'
 import PhotoFilmstrip from './PhotoFilmstrip'
 import SpeedChart from './SpeedChart'
 import Stats from './Stats'
@@ -33,46 +32,14 @@ const { width } = Dimensions.get('window')
 export default class Ride extends PureComponent {
   constructor (props) {
     super(props)
-    this.state = {
-      modalOpen: false,
-      titleTouchCount: 0
-    }
-    this.closeDeleteModal = this.closeDeleteModal.bind(this)
-    this.deleteRide = this.deleteRide.bind(this)
     this.fullscreenMap = this.fullscreenMap.bind(this)
-    this.memoizedParse = memoizeOne(this.parseSpeedData)
-
-    this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
-    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
     this.userAvatar = this.userAvatar.bind(this)
     this.userName = this.userName.bind(this)
     this.rideNotes = this.rideNotes.bind(this)
     this.rideTime = this.rideTime.bind(this)
     this.maybeShowID = this.maybeShowID.bind(this)
-  }
 
-  componentWillUnmount() {
     this.memoizedParse = memoizeOne(this.parseSpeedData)
-  }
-
-  onNavigatorEvent(event) {
-    if (event.type === 'NavBarButtonPress') {
-      if (event.id === 'edit') {
-        this.props.navigator.dismissAllModals()
-        this.props.navigator.push({
-          screen: RIDE_DETAILS,
-          title: 'Update Ride',
-          passProps: {
-            rideID: this.props.ride.get('_id')
-          },
-          navigatorStyle: {},
-          navigatorButtons: {},
-          animationType: 'slide-up',
-        });
-      } else if (event.id === 'delete') {
-        this.setState({modalOpen: true})
-      }
-    }
   }
 
   parseSpeedData (rideCoordinates) {
@@ -128,27 +95,8 @@ export default class Ride extends PureComponent {
   }
 
   fullscreenMap () {
-    this.props.navigator.push({
-      screen: MAP,
-      title: 'Map',
-      animationType: 'slide-up',
-      passProps: {
-        rideID: this.props.ride.get('_id')
-      }
-    })
+    this.props.showFullscreenMap(this.props.ride.get('_id'))
   }
-
-  closeDeleteModal () {
-    this.setState({
-      modalOpen: false
-    })
-  }
-
-  deleteRide () {
-    this.props.deleteRide()
-    this.props.navigator.popToRoot()
-  }
-
 
   // @TODO: these were copypasta from the ride card, factor out into component
   getUserProfilePhotoURL (user) {
@@ -245,9 +193,9 @@ export default class Ride extends PureComponent {
     return (
       <ScrollView style={{flex: 1}}>
         <DeleteModal
-          modalOpen={this.state.modalOpen}
-          closeDeleteModal={this.closeDeleteModal}
-          deleteFunc={this.deleteRide}
+          modalOpen={this.props.modalOpen}
+          closeDeleteModal={this.props.closeDeleteModal}
+          deleteFunc={this.props.deleteRide}
           text={"Are you sure you want to delete this ride?"}
         />
 
@@ -283,10 +231,10 @@ export default class Ride extends PureComponent {
             <Stats
               horses={this.props.horses}
               maxSpeed={speedData.maxSpeed}
-              navigator={this.props.navigator}
               ride={this.props.ride}
               rideHorseOwnerID={this.props.rideHorseOwnerID}
               rideUser={this.props.rideUser}
+              showHorseProfile={this.props.showHorseProfile}
               userID={this.props.userID}
             />
 
@@ -294,7 +242,7 @@ export default class Ride extends PureComponent {
 
             <PhotoFilmstrip
               photosByID={this.props.ride.get('photosByID')}
-              navigator={this.props.navigator}
+              showPhotoLightbox={this.props.showPhotoLightbox}
             />
           </View>
         </View>

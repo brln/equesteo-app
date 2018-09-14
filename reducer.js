@@ -14,7 +14,6 @@ import {
   HORSE_CREATED,
   HORSE_USER_UPDATED,
   HORSE_SAVED,
-  JUST_FINISHED_RIDE_SHOWN,
   LOAD_LOCAL_STATE,
   LOCAL_DATA_LOADED,
   MARK_PHOTO_ENQUEUED,
@@ -22,6 +21,7 @@ import {
   NEW_APP_STATE,
   NEW_LOCATION,
   NEW_NETWORK_STATE,
+  POP_SHOW_RIDE_SHOWN,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
   REMOVE_RIDE_FROM_STATE,
@@ -31,7 +31,7 @@ import {
   RIDE_CREATED,
   RIDE_SAVED,
   SAVE_USER_ID,
-  SET_APP_ROOT,
+  SET_ACTIVE_COMPONENT,
   START_RIDE,
   TOGGLE_AWAITING_PW_CHANGE,
   TOGGLE_DOING_INITIAL_LOAD,
@@ -44,10 +44,11 @@ import {
   goodConnection,
   haversine
 } from './helpers'
-import { FEED } from './screens'
+import { FEED, SIGNUP_LOGIN } from './screens'
 
 const initialState = Map({
   localState: Map({
+    activeComponent: null,
     appState: appStates.active,
     awaitingPWChange: false,
     clearStateAfterPersist: false,
@@ -56,7 +57,6 @@ const initialState = Map({
     doingInitialLoad: false,
     error: null,
     goodConnection: false,
-    justFinishedRide: false,
     jwt: null,
     lastLocation: null,
     needsRemotePersist: Map({
@@ -65,7 +65,8 @@ const initialState = Map({
       users: false,
     }),
     photoQueue: Map(),
-    root: 'login',
+    popShowRide: null,
+    root: SIGNUP_LOGIN,
     userID: null,
     userSearchResults: List(),
   }),
@@ -110,8 +111,8 @@ export default function AppReducer(state=initialState, action) {
       return state.set('horses', state.get('horses').set(action.horse.get('_id'), action.horse))
     case HORSE_USER_UPDATED:
       return state.set('horseUsers', state.get('horseUsers').set(action.horseUser.get('_id'), action.horseUser))
-    case JUST_FINISHED_RIDE_SHOWN:
-      return state.setIn(['localState', 'justFinishedRide'], false)
+    case POP_SHOW_RIDE_SHOWN:
+      return state.setIn(['localState', 'popShowRide'], null)
     case LOAD_LOCAL_STATE:
       return state.set('localState', action.localState)
     case LOCAL_DATA_LOADED:
@@ -216,7 +217,7 @@ export default function AppReducer(state=initialState, action) {
       return state.setIn(
         ['rides', action.ride.get('_id')], action.ride
       ).setIn(
-        ['localState', 'justFinishedRide'], true
+        ['localState', 'popShowRide'], action.ride.get('_id')
       ).setIn(
         ['localState', 'currentRide'], null
       )
@@ -226,8 +227,10 @@ export default function AppReducer(state=initialState, action) {
       return state.setIn(
         ['localState', 'userID'], action.userID
       )
-    case SET_APP_ROOT:
-      return state.setIn(['localState', 'root'], action.root)
+    case SET_ACTIVE_COMPONENT:
+      return state.setIn(
+        ['localState', 'activeComponent'], action.componentID
+      )
     case START_RIDE:
       return state.setIn(['localState', 'currentRide'], action.currentRide)
     case SYNC_COMPLETE:

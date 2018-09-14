@@ -1,11 +1,25 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
 
+import { brand } from '../colors'
 import Map from '../components/Ride/Map'
-import NavigatorComponent from './NavigatorComponent'
 import { logRender } from '../helpers'
 
-class MapContainer extends NavigatorComponent {
+class MapContainer extends PureComponent {
+  static options() {
+    return {
+      topBar: {
+        background: {
+          color: brand,
+        },
+        backButton: {
+          color: 'white'
+        },
+        elevation: 0
+      }
+    };
+  }
+
   constructor (props) {
     super(props)
   }
