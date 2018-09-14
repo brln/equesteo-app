@@ -1,7 +1,8 @@
-import React, { Component } from 'react'
+import { Map } from 'immutable'
+import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
+import { Navigation } from 'react-native-navigation'
 
-import { List } from 'immutable'
 import Profile from '../components/Profile/Profile'
 import {
   clearSearch,
@@ -10,35 +11,74 @@ import {
   signOut,
   uploadProfilePhoto,
 } from "../actions"
-import { UPDATE_PROFILE } from '../screens'
-import NavigatorComponent from './NavigatorComponent'
+import { brand } from '../colors'
+import { FOLLOW_LIST, HORSE_PROFILE, UPDATE_PROFILE } from '../screens'
 import { logRender } from '../helpers'
 
-class ProfileContainer extends NavigatorComponent {
+class ProfileContainer extends PureComponent {
+  static options() {
+    return {
+      topBar: {
+        background: {
+          color: brand,
+        },
+        elevation: 0,
+        backButton: {
+          color: 'white'
+        },
+        title: {
+          color: 'white',
+        }
+      }
+    };
+  }
+
   constructor (props) {
     super(props)
     this.createFollow = this.createFollow.bind(this)
     this.deleteFollow = this.deleteFollow.bind(this)
     this.followings = this.followings.bind(this)
     this.followers = this.followers.bind(this)
-    this.uploadProfilePhoto = this.uploadProfilePhoto.bind(this)
-    this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
-    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent)
+    this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
     this.profileUserHorses = this.profileUserHorses.bind(this)
+    this.showHorseProfile = this.showHorseProfile.bind(this)
+    this.showUserList = this.showUserList.bind(this)
+    this.uploadProfilePhoto = this.uploadProfilePhoto.bind(this)
+
+    Navigation.events().bindComponent(this);
+
+    if (props.userID === props.profileUser.get('_id')) {
+      Navigation.mergeOptions(props.componentId, {
+        topBar: {
+          rightButtons: [
+            {
+              id: 'edit',
+              text: 'Edit',
+              color: 'white'
+            },
+            {
+              id: 'logout',
+              text: 'Log Out',
+              color: 'white'
+            }
+          ]
+        }
+      })
+    }
   }
 
-  onNavigatorEvent(event) {
-    if (event.type == 'NavBarButtonPress') {
-      if (event.id == 'edit') {
-        this.props.navigator.dismissAllModals()
-        this.props.navigator.push({
+  navigationButtonPressed ({ buttonId }) {
+    if (buttonId === 'edit') {
+      Navigation.push(this.props.componentId, {
+        component: {
+          name: UPDATE_PROFILE,
+          id: UPDATE_PROFILE,
           screen: UPDATE_PROFILE,
           title: 'Update Profile',
-          animationType: 'slide-up',
-        });
-      } else if (event.id == 'logout') {
-        this.props.dispatch(signOut())
-      }
+        }
+      });
+    } else if (buttonId === 'logout') {
+      this.props.dispatch(signOut())
     }
   }
 
@@ -55,9 +95,33 @@ class ProfileContainer extends NavigatorComponent {
     this.props.dispatch(uploadProfilePhoto(location))
   }
 
+  showUserList (followRecords, followingOrFollower) {
+    const userIDs = followRecords.valueSeq().map((f) => f.get(followingOrFollower))
+    Navigation.push(this.props.componentId, {
+      component: {
+        name: FOLLOW_LIST,
+        id: FOLLOW_LIST,
+        passProps: {
+          userIDs: userIDs.toJS(),
+        }
+      }
+    })
+  }
+
+  showHorseProfile (horse) {
+    Navigation.push(this.props.componentId, {
+      component: {
+        name: HORSE_PROFILE,
+        id: HORSE_PROFILE,
+        title: horse.get('name'),
+        passProps: {horse},
+      }
+    })
+  }
+
   profileUserHorses () {
     return this.props.horseUsers.valueSeq().filter((hu) => {
-      return (hu.get('userID') === this.props.profileUser.get('_id')) && hu.get('deleted') !== true
+      return (hu.get('userID') === this.props.profileUser.get('_id')) && hu.get('owner') === true && hu.get('deleted') !== true
     }).map((hu) => {
       if (!this.props.horses.get(hu.get('horseID'))) {
         throw Error('Don\'t have a horse that should be here.')
@@ -88,7 +152,7 @@ class ProfileContainer extends NavigatorComponent {
 
   render() {
     logRender('ProfileContainer')
-    if (!(!this.props.profileUser || !this.props.user )) {
+    if (this.props.profileUser.get('_id')) {
       return (
         <Profile
           createFollow={this.createFollow}
@@ -97,8 +161,9 @@ class ProfileContainer extends NavigatorComponent {
           followers={this.followers()}
           horseOwnerIDs={this.horseOwnerIDs()}
           horses={this.profileUserHorses()}
-          navigator={this.props.navigator}
           profileUser={this.props.profileUser}
+          showHorseProfile={this.showHorseProfile}
+          showUserList={this.showUserList}
           uploadProfilePhoto={this.uploadProfilePhoto}
           user={this.props.user}
           users={this.props.users}
@@ -115,13 +180,16 @@ function mapStateToProps (state, passedProps) {
   const localState = state.getIn(['main', 'localState'])
   const userID = localState.get('userID')
 
+  const profileUserID = passedProps.profileUser ? passedProps.profileUser.get('_id') : null
+
   return {
+    follows: mainState.get('follows'),
     horseUsers: mainState.get('horseUsers'),
     horses: mainState.get('horses'),
-    profileUser: mainState.getIn(['users', passedProps.profileUser.get('_id')]) || passedProps.profileUser,
+    profileUser: mainState.getIn(['users', profileUserID]) || passedProps.profileUser || new Map(),
     user: mainState.getIn(['users', userID]),
-    follows: mainState.get('follows'),
-    users: mainState.get('users')
+    users: mainState.get('users'),
+    userID
   }
 }
 

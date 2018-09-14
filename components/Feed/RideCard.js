@@ -19,7 +19,6 @@ import moment from 'moment'
 import Swiper from 'react-native-swiper'
 
 import { brand, darkGrey } from '../../colors'
-import { HORSE_PROFILE, PROFILE } from '../../screens'
 import RideImage from './RideImage'
 
 const { width } = Dimensions.get('window')
@@ -55,29 +54,7 @@ export default class RideCard extends PureComponent {
   }
 
   showHorseProfile () {
-    let rightButtons = []
-    if (this.props.userID === this.props.rideUser.get('_id')) {
-      rightButtons = [
-        {
-          title: "Edit",
-          id: 'edit',
-        },
-        {
-          title: "Delete",
-          id: 'delete',
-        }
-      ]
-    }
-
-    this.props.navigator.push({
-      screen: HORSE_PROFILE,
-      title: this.props.horse.get('name'),
-      animationType: 'slide-up',
-      passProps: {
-        horse: this.props.horse,
-      },
-      rightButtons
-    })
+    this.props.showHorseProfile(this.props.horse, this.props.ownerID)
   }
 
   horseProfileURL () {
@@ -89,13 +66,7 @@ export default class RideCard extends PureComponent {
   }
 
   showProfile () {
-    this.props.navigator.push({
-      screen: PROFILE,
-      animationType: 'slide-up',
-      passProps: {
-        profileUser: this.props.rideUser,
-      }
-    })
+    this.props.showProfile(this.props.rideUser)
   }
 
   horseAvatar () {
@@ -113,11 +84,9 @@ export default class RideCard extends PureComponent {
       />)
     }
     return (
-      <TouchableOpacity
-        onPress={this.showHorseProfile}
-      >
+      <View>
         {el}
-      </TouchableOpacity>
+      </View>
     )
   }
 
@@ -168,10 +137,13 @@ export default class RideCard extends PureComponent {
       let section = null
       if (this.props.ride.get('horseID')) {
         section = (
-          <View style={{flex: 1, alignItems: 'center'}}>
+          <TouchableOpacity
+            style={{flex: 1, alignItems: 'center'}}
+            onPress={this.showHorseProfile}
+          >
             <Text style={{color: darkGrey, fontSize: 12}}>{this.props.horse.get('name')}</Text>
             { this.horseAvatar() }
-          </View>
+          </TouchableOpacity>
         )
       }
       return section

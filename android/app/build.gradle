@@ -102,6 +102,7 @@ android {
         applicationId "com.equesteo"
         minSdkVersion 21
         targetSdkVersion 26
+        missingDimensionStrategy "RNN.reactNativeVersion", "reactNative55"
         versionCode 24
         versionName "0.0.24"
         ndk {
@@ -109,6 +110,10 @@ android {
         }
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
+        compileOptions {
+            sourceCompatibility JavaVersion.VERSION_1_8
+            targetCompatibility JavaVersion.VERSION_1_8
+        }
     }
     signingConfigs {
         release {

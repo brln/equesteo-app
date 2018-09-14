@@ -6,27 +6,9 @@ import {
 } from 'react-native';
 
 import HorseBarnCard from './HorseBarnCard'
-import { UPDATE_HORSE } from '../../screens'
 import NewHorseButton from './NewHorseButton'
 
 export default class Barn extends PureComponent {
-  constructor (props) {
-    super(props)
-    this.state = {}
-    this.newHorse = this.newHorse.bind(this)
-  }
-
-  newHorse () {
-    this.props.navigator.push({
-      screen: UPDATE_HORSE,
-      title: 'New Horse',
-      animationType: 'slide-up',
-      passProps: {
-        newHorse: true
-      }
-    })
-  }
-
   render() {
     return (
       <View style={{flex: 1}}>
@@ -54,7 +36,7 @@ export default class Barn extends PureComponent {
             }
             {
               <NewHorseButton
-                newHorse={this.newHorse}
+                newHorse={this.props.newHorse}
               />
             }
           </View>

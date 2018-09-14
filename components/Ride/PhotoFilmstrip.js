@@ -15,22 +15,13 @@ export default class PhotoFilmstrip extends Component {
   constructor (props) {
     super(props)
     this.thumbnail = this.thumbnail.bind(this)
-    this.showLightbox = this.showLightbox.bind(this)
+    this.showPhotoLightbox = this.showPhotoLightbox.bind(this)
   }
 
-  showLightbox (source) {
+  showPhotoLightbox (source) {
     return () => {
-      if (this.props.navigator) {
-        this.props.navigator.push({
-          screen: PHOTO_LIGHTBOX,
-          passProps: {
-            source,
-            close: this.closeLightbox
-          },
-        })
-      }
+      this.props.showPhotoLightbox(source)
     }
-
   }
 
   thumbnail (photoID, style, source) {
@@ -38,7 +29,7 @@ export default class PhotoFilmstrip extends Component {
       <TouchableOpacity
         key={photoID}
         style={styles.photoThumbnail}
-        onPress={this.showLightbox(source)}
+        onPress={this.showPhotoLightbox(source)}
       >
         <Thumbnail
           style={style}

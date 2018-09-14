@@ -62,27 +62,7 @@ export default class Stats extends PureComponent {
   showHorseProfile (horse) {
     if (horse) {
       return () => {
-        let rightButtons = []
-        if (this.props.rideHorseOwnerID === this.props.userID) {
-          rightButtons = [
-            {
-              title: "Edit",
-              id: 'edit',
-            },
-            {
-              title: "Archive",
-              id: 'archive',
-            }
-          ]
-        }
-
-        this.props.navigator.push({
-          screen: HORSE_PROFILE,
-          title: horse.get('name'),
-          animationType: 'slide-up',
-          passProps: { horse: horse },
-          rightButtons
-        })
+        this.props.showHorseProfile(horse, this.props.rideHorseOwnerID)
       }
     } else {
       return () => {}

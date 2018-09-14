@@ -3,6 +3,8 @@
 buildscript {
     repositories {
         google()
+        mavenLocal()
+        mavenCentral()
         jcenter()
     }
     dependencies {
@@ -16,6 +18,8 @@ buildscript {
 
 allprojects {
     repositories {
+        google()
+        mavenCentral()
         mavenLocal()
         jcenter()
         maven {
@@ -34,4 +38,20 @@ ext {
     supportLibVersion = "27.1.0"
     googlePlayServicesVersion = "15.0.1"
     gradle3EXPERIMENTAL = "yes"
+    minSdkVersion = 19
+}
+
+subprojects { subproject ->
+    afterEvaluate {
+        if ((subproject.plugins.hasPlugin('android') || subproject.plugins.hasPlugin('android-library'))) {
+            android {
+                variantFilter { variant ->
+                    def names = variant.flavors*.name
+                    if (names.contains("reactNative51") || names.contains("reactNative56")) {
+                        setIgnore(true)
+                    }
+                }
+            }
+        }
+    }
 }

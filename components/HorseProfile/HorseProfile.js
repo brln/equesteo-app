@@ -39,13 +39,7 @@ export default class HorseProfile extends PureComponent {
 
   showRiderProfile (rider) {
     return () => {
-      this.props.navigator.push({
-        screen: PROFILE,
-        animationType: 'slide-up',
-        passProps: {
-          profileUser: rider,
-        }
-      })
+      this.props.showRiderProfile(rider)
     }
   }
 
@@ -94,7 +88,7 @@ export default class HorseProfile extends PureComponent {
         <SwipablePhoto
           key="profile"
           source={{uri: horse.getIn(['photosByID', horse.get('profilePhotoID'), 'uri'])}}
-          navigator={this.props.navigator}
+          componentId={this.props.componentId}
         />
       )
     }
@@ -105,14 +99,18 @@ export default class HorseProfile extends PureComponent {
             <SwipablePhoto
               key={imageID}
               source={{ uri: horse.getIn(['photosByID', imageID, 'uri']) }}
-              navigator={this.props.navigator}
+              componentId={this.props.componentId}
             />
           )
         }
       }
     } else {
       images.push(
-        <SwipablePhoto key="empty" source={require('../../img/emptyHorse.png')} />
+        <SwipablePhoto
+          key="empty"
+          source={require('../../img/emptyHorse.png')}
+          componentId={this.props.componentId}
+        />
       )
     }
     return images

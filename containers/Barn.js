@@ -1,39 +1,62 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
+import { Navigation } from 'react-native-navigation'
 
 import Barn from '../components/Barn/Barn'
+import { brand } from '../colors'
 import { logRender } from '../helpers'
-import NavigatorComponent from './NavigatorComponent'
-import { HORSE_PROFILE } from '../screens'
+import { HORSE_PROFILE, UPDATE_HORSE } from '../screens'
 
-class BarnContainer extends NavigatorComponent {
+class BarnContainer extends PureComponent {
+  static options() {
+    return {
+      topBar: {
+        title: {
+          text: "My Barn",
+          color: 'white',
+        },
+        background: {
+          color: brand,
+        },
+        backButton: {
+          color: 'white'
+        },
+        elevation: 0
+      }
+    };
+  }
+
   constructor (props) {
     super(props)
     this.horseProfile = this.horseProfile.bind(this)
+    this.newHorse = this.newHorse.bind(this)
     this.yourHorses = this.yourHorses.bind(this)
   }
 
   horseProfile (horse, ownerID) {
-    const rightButtons = [
-      {
-        title: "Archive",
-        id: 'archive',
+    Navigation.push(this.props.componentId, {
+      component: {
+        name: HORSE_PROFILE,
+        id: HORSE_PROFILE,
+        title: horse.get('name'),
+        passProps: {
+          horse,
+          ownerID
+        },
       }
-    ]
-    if (ownerID === this.props.userID) {
-      rightButtons.push({
-        title: "Edit",
-        id: 'edit'
-      })
-    }
-    this.props.navigator.push({
-      screen: HORSE_PROFILE,
-      title: horse.get('name'),
-      passProps: { horse },
-      navigatorButtons: {
-        leftButtons: [],
-        rightButtons,
-      },
+    })
+  }
+
+  newHorse () {
+    Navigation.push(this.props.componentId, {
+      component: {
+        name: UPDATE_HORSE,
+        id: UPDATE_HORSE,
+        title: 'New Horse',
+        passProps: {
+          newHorse: true
+        }
+      }
     })
   }
 
@@ -60,7 +83,7 @@ class BarnContainer extends NavigatorComponent {
         horses={this.yourHorses()}
         horseProfile={this.horseProfile}
         horseOwnerIDs={this.horseOwnerIDs()}
-        navigator={this.props.navigator}
+        newHorse={this.newHorse}
       />
     )
   }

@@ -1,21 +1,36 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
+import { Navigation } from 'react-native-navigation'
 
-import { signOut } from '../actions'
-import UpdateProfile from '../components/UpdateProfile'
-import { updateUser, uploadProfilePhoto } from "../actions"
-import NavigatorComponent from './NavigatorComponent'
+import { signOut, updateUser, uploadProfilePhoto } from "../actions"
+import { brand } from '../colors'
 import { logRender } from '../helpers'
+import UpdateProfile from '../components/UpdateProfile'
 
-class UpdateProfileContainer extends NavigatorComponent {
-  static navigatorButtons = {
-    leftButtons: [],
-    rightButtons: [
-      {
-        id: 'save',
-        title: 'Save',
+class UpdateProfileContainer extends PureComponent {
+  static options() {
+    return {
+      topBar: {
+        title: {
+          text: "Edit My Account",
+          color: 'white',
+        },
+        background: {
+          color: brand,
+        },
+        backButton: {
+          color: 'white'
+        },
+        elevation: 0,
+        rightButtons: [
+          {
+            id: 'save',
+            text: 'Save',
+            color: 'white'
+          },
+        ]
       }
-    ],
+    };
   }
 
   static getDerivedStateFromProps (props, state) {
@@ -38,8 +53,9 @@ class UpdateProfileContainer extends NavigatorComponent {
     this.changeAccountDetails = this.changeAccountDetails.bind(this)
     this.signOut = this.signOut.bind(this)
     this.uploadProfilePhoto = this.uploadProfilePhoto.bind(this)
-    this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
-    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent);
+    this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
+
+    Navigation.events().bindComponent(this);
   }
 
   changeAccountDetails (user) {
@@ -49,12 +65,10 @@ class UpdateProfileContainer extends NavigatorComponent {
     })
   }
 
-  onNavigatorEvent (event) {
-    if (event.type === 'NavBarButtonPress') {
-      if (event.id === 'save') {
-        this.props.dispatch(updateUser(this.state.user))
-        this.props.navigator.pop()
-      }
+  navigationButtonPressed ({ buttonId }) {
+    if (buttonId === 'save') {
+      this.props.dispatch(updateUser(this.state.user))
+      Navigation.pop(this.props.componentId)
     }
   }
 
@@ -72,7 +86,6 @@ class UpdateProfileContainer extends NavigatorComponent {
       <UpdateProfile
         user={this.state.userMadeChanges ? this.state.user : this.props.user }
         changeAccountDetails={this.changeAccountDetails}
-        navigator={this.props.navigator}
       />
     )
   }

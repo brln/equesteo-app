@@ -1,21 +1,37 @@
 import { Map } from 'immutable'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
+import { Navigation } from 'react-native-navigation'
 
 import UpdateHorse from '../components/UpdateHorse/UpdateHorse'
 import { createHorse, updateHorse, uploadHorsePhoto } from '../actions'
-import NavigatorComponent from './NavigatorComponent'
+import { brand } from '../colors'
 import { generateUUID, logRender, unixTimeNow } from '../helpers'
 
-class UpdateHorseContainer extends NavigatorComponent {
-  static navigatorButtons = {
-    leftButtons: [],
-    rightButtons: [
-      {
-        id: 'save',
-        title: 'Save',
-      },
-    ],
+class UpdateHorseContainer extends PureComponent {
+  static options() {
+    return {
+      topBar: {
+        title: {
+          text: "Edit Horse",
+          color: 'white',
+        },
+        background: {
+          color: brand,
+        },
+        backButton: {
+          color: 'white'
+        },
+        elevation: 0,
+        rightButtons: [
+          {
+            id: 'save',
+            text: 'Save',
+            color: 'white'
+          },
+        ]
+      }
+    };
   }
 
   constructor (props) {
@@ -26,9 +42,10 @@ class UpdateHorseContainer extends NavigatorComponent {
       newPhotos: []
     }
     this.changeHorseDetails = this.changeHorseDetails.bind(this)
-    this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
-    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent)
+    this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
     this.uploadPhoto = this.uploadPhoto.bind(this)
+
+    Navigation.events().bindComponent(this);
   }
 
   static getDerivedStateFromProps (props, state) {
@@ -42,21 +59,19 @@ class UpdateHorseContainer extends NavigatorComponent {
     return nextState
   }
 
-  onNavigatorEvent (event) {
-    if (event.type === 'NavBarButtonPress') {
-      if (event.id === 'save') {
-        if (this.props.newHorse) {
-          const newProps = Map({
-            _id:  `${this.props.userID.toString()}_${(new Date).getTime().toString()}`,
-            userID: this.props.userID
-          })
-          const withNewProps = this.state.horse.merge(newProps)
-          this.props.dispatch(createHorse(withNewProps))
-        } else {
-          this.props.dispatch(updateHorse(this.state.horse))
-        }
-        this.props.navigator.pop()
+  navigationButtonPressed ({ buttonId }) {
+    if (buttonId === 'save') {
+      if (this.props.newHorse) {
+        const newProps = Map({
+          _id:  `${this.props.userID.toString()}_${(new Date).getTime().toString()}`,
+          userID: this.props.userID
+        })
+        const withNewProps = this.state.horse.merge(newProps)
+        this.props.dispatch(createHorse(withNewProps))
+      } else {
+        this.props.dispatch(updateHorse(this.state.horse))
       }
+      Navigation.pop(this.props.componentId)
     }
   }
 
@@ -94,7 +109,6 @@ class UpdateHorseContainer extends NavigatorComponent {
         deleteHorse={this.deleteHorse}
         horse={this.state.horse}
         modalOpen={this.state.modalOpen}
-        navigator={this.props.navigator}
         uploadPhoto={this.uploadPhoto}
         userID={this.props.userID}
       />

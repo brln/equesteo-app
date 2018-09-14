@@ -33,7 +33,7 @@ function RideDay (props) {
   }
   return (
     <View style={{flex: 1, justifyContent: 'center'}}>
-      <TouchableOpacity onPress={() => { props.showRide(props.ride)} }>
+      <TouchableOpacity onPress={props.showRide(props.ride)}>
         { showString }
       </TouchableOpacity>
     </View>
@@ -64,7 +64,7 @@ function MultiRideDay (props) {
             )
           }
           return (
-            <TouchableOpacity key={r.get('_id')} onPress={() => { props.showRide(r)} }>
+            <TouchableOpacity key={r.get('_id')} onPress={props.showRide(r)}>
               { showString }
             </TouchableOpacity>
           )
@@ -95,31 +95,9 @@ export default class Week extends Component {
   }
 
   showRide (ride) {
-    let rightButtons = []
-    if (this.props.userID === ride.get('userID')) {
-      rightButtons = [
-        {
-          title: "Edit",
-          id: 'edit',
-        },
-        {
-          title: "Delete",
-          id: 'delete',
-        }
-      ]
+    return () => {
+      this.props.showRide(ride)
     }
-    this.props.navigator.push({
-      screen: RIDE,
-      title: ride.get('name'),
-      passProps: {
-        rideID: ride.get('_id'),
-      },
-      navigatorButtons: {
-        leftButtons: [],
-        rightButtons,
-      },
-      animationType: 'slide-up',
-    });
   }
 
   days (mondayString) {

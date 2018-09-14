@@ -1,13 +1,31 @@
 import memoizeOne from 'memoize-one';
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
 
 import { createRideComment } from '../actions'
+import { brand } from '../colors'
 import { unixTimeNow } from '../helpers'
 import RideComments from '../components/RideComments/RideComments'
-import NavigatorComponent from './NavigatorComponent'
 
-class RideCommentsContainer extends NavigatorComponent {
+class RideCommentsContainer extends PureComponent {
+  static options() {
+    return {
+      topBar: {
+        title: {
+          text: "Comments",
+          color: 'white',
+        },
+        background: {
+          color: brand,
+        },
+        backButton: {
+          color: 'white'
+        },
+        elevation: 0
+      }
+    };
+  }
+
   constructor (props) {
     super(props)
     this.state = {
@@ -48,7 +66,6 @@ class RideCommentsContainer extends NavigatorComponent {
   render() {
     return (
       <RideComments
-        navigator={this.props.navigator}
         newComment={this.state.newComment}
         rideComments={this.memoRideComments(this.props.rideComments)}
         submitComment={this.submitComment}

@@ -1,13 +1,39 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
+import { Navigation } from 'react-native-navigation'
 
 import { addHorseUser, deleteHorseUser, uploadHorsePhoto } from '../actions'
-import { UPDATE_HORSE } from '../screens'
+import { brand } from '../colors'
+import { PROFILE, UPDATE_HORSE } from '../screens'
 import HorseProfile from '../components/HorseProfile/HorseProfile'
-import NavigatorComponent from './NavigatorComponent'
 import { logRender } from '../helpers'
 
-class HorseProfileContainer extends NavigatorComponent {
+class HorseProfileContainer extends PureComponent {
+  static options() {
+    return {
+      topBar: {
+        background: {
+          color: brand,
+        },
+        elevation: 0,
+        backButton: {
+          color: 'white'
+        },
+        title: {
+          color: 'white',
+        },
+        // @TODO: THIS SHOULD ONLY SHOW IF THE USER IS A RIDER OF THIS HORSE
+        rightButtons: [
+          {
+            id: 'archive',
+            text: 'Archive',
+            color: 'white'
+          },
+        ]
+      }
+    };
+  }
+
   constructor (props) {
     super(props)
     this.state = {
@@ -17,21 +43,36 @@ class HorseProfileContainer extends NavigatorComponent {
     this.closeDeleteModal = this.closeDeleteModal.bind(this)
     this.deleteHorse = this.deleteHorse.bind(this)
     this.horseOwner = this.horseOwner.bind(this)
-    this.onNavigatorEvent = this.onNavigatorEvent.bind(this)
-    this.props.navigator.setOnNavigatorEvent(this.onNavigatorEvent)
+    this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
+    this.showRiderProfile = this.showRiderProfile.bind(this)
     this.thisHorsesRides = this.thisHorsesRides.bind(this)
     this.thisHorsesRiders = this.thisHorsesRiders.bind(this)
     this.uploadPhoto = this.uploadPhoto.bind(this)
+
+    Navigation.events().bindComponent(this);
+
+    if (props.ownerID === props.userID) {
+      Navigation.mergeOptions(props.componentId, {
+        topBar: {
+          rightButtons: [
+            {
+              id: 'archive',
+              text: 'Archive',
+              color: 'white'
+            },
+            {
+              id: 'edit',
+              text: 'Edit',
+              color: 'white'
+            }
+          ]
+        }
+      })
+    }
   }
 
   addRider () {
     this.props.dispatch(addHorseUser(this.props.horse, this.props.user))
-  }
-
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.horse.name !== this.props.horse.name) {
-      this.props.navigator.setTitle({title: nextProps.horse.name})
-    }
   }
 
   closeDeleteModal () {
@@ -40,28 +81,39 @@ class HorseProfileContainer extends NavigatorComponent {
     })
   }
 
-  onNavigatorEvent(event) {
-    if (event.type === 'NavBarButtonPress') {
-      if (event.id === 'edit') {
-        this.props.navigator.dismissAllModals()
-        this.props.navigator.push({
-          screen: UPDATE_HORSE,
-          title: 'Update Horse',
+  navigationButtonPressed ({ buttonId }) {
+    if (buttonId === 'edit') {
+      Navigation.push(this.props.componentId, {
+        component: {
+          name: UPDATE_HORSE,
+          id: UPDATE_HORSE,
+          title: "Update Horse",
           passProps: {
             horseID: this.props.horse.get('_id'),
             newHorse: false
           },
-          animationType: 'slide-up',
-        });
-      } else if (event.id === 'archive') {
-        this.setState({modalOpen: true})
-      }
+        }
+      })
+    } else if (buttonId === 'archive') {
+      this.setState({modalOpen: true})
     }
+  }
+
+  showRiderProfile (rider) {
+    Navigation.push(this.props.componentId, {
+      component: {
+        name: PROFILE,
+        id: PROFILE,
+        passProps: {
+          profileUser: rider,
+        }
+      }
+    })
   }
 
   deleteHorse () {
     this.props.dispatch(deleteHorseUser(this.props.horse.get('_id'), this.props.user.get('_id')))
-    this.props.navigator.pop()
+    Navigation.pop(this.props.componentId)
   }
 
   uploadPhoto (location) {
@@ -104,13 +156,14 @@ class HorseProfileContainer extends NavigatorComponent {
       <HorseProfile
         addRider={this.addRider}
         closeDeleteModal={this.closeDeleteModal}
+        componentId={this.props.componentId}
         deleteHorse={this.deleteHorse}
         horse={this.props.horse}
         horseOwner={this.horseOwner()}
         modalOpen={this.state.modalOpen}
-        navigator={this.props.navigator}
         rides={this.thisHorsesRides()}
         riders={this.thisHorsesRiders()}
+        showRiderProfile={this.showRiderProfile}
         uploadPhoto={this.uploadPhoto}
         user={this.props.user}
       />
@@ -127,6 +180,7 @@ function mapStateToProps (state, passedProps) {
     horse: mainState.getIn(['horses', passedProps.horse.get('_id')]),
     rides: mainState.get('rides'),
     user: mainState.get('users').get(localState.get('userID')),
+    userID: localState.get('userID'),
     users: mainState.get('users')
   }
 }

@@ -9,10 +9,10 @@ import {
 
 import { black, brand, green, white } from '../../colors'
 import GPSStatus from './GPSStatus'
-import { unixTimeNow } from "../../helpers"
+
 import RidingMap from './RidingMap'
 import RideStats from './RideStats'
-import { RIDE_DETAILS } from "../../screens"
+
 
 export default class RideRecorder extends PureComponent {
   constructor (props) {
@@ -38,22 +38,7 @@ export default class RideRecorder extends PureComponent {
 
   rideComplete () {
     if (this.props.currentRide.get('rideCoordinates').count() > 0) {
-      const elapsedTime = (unixTimeNow() - this.props.currentRide.get('startTime')) / 1000
-      this.props.navigator.push({
-        screen: RIDE_DETAILS,
-        title: 'Ride Details',
-        passProps: {
-          elapsedTime,
-        },
-        navigatorStyle: {
-          navBarBackgroundColor: brand,
-          topBarElevationShadowEnabled: false,
-          navBarTextColor: white,
-          navBarButtonColor: white,
-        },
-        navigatorButtons: {},
-        animationType: 'slide-up',
-      });
+      this.props.showRideDetails()
     } else {
       alert('Discarding empty ride.')
       this.props.discardRide()

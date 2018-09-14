@@ -4,10 +4,13 @@ import {
   StyleSheet,
   TouchableWithoutFeedback,
 } from 'react-native'
+import { Navigation } from 'react-native-navigation'
+
 
 import { PHOTO_LIGHTBOX } from '../screens'
 
 export default class SwipablePhoto extends PureComponent {
+
   constructor (props) {
     super(props)
     this.closeLightbox = this.closeLightbox.bind(this)
@@ -15,19 +18,20 @@ export default class SwipablePhoto extends PureComponent {
   }
 
   closeLightbox () {
-    this.props.navigator.dismissLightBox()
+    Navigation.pop(this.props.componentId)
   }
 
   showLightbox () {
-    if (this.props.navigator) {
-      this.props.navigator.push({
-        screen: PHOTO_LIGHTBOX,
+    Navigation.push(this.props.componentId, {
+      component: {
+        name: PHOTO_LIGHTBOX,
+        id: PHOTO_LIGHTBOX,
         passProps: {
           source: this.props.source,
           close: this.closeLightbox
-        },
-      })
-    }
+        }
+      }
+    })
   }
 
   render () {

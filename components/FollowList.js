@@ -19,17 +19,12 @@ export default class FollowList extends PureComponent {
   constructor (props) {
     super(props)
     this.renderResult = this.renderResult.bind(this)
+    this.showProfile = this.showProfile.bind(this)
   }
 
   showProfile (showUser) {
     return () => {
-      this.props.navigator.push({
-        screen: PROFILE,
-        animationType: 'slide-up',
-        passProps: {
-          profileUser: fromJS(showUser),
-        }
-      })
+      this.props.showProfile(fromJS(showUser))
     }
   }
 

@@ -1,17 +1,48 @@
 import { Map } from 'immutable'
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
+import { Navigation } from 'react-native-navigation'
 
+import { brand } from '../colors'
 import Training from '../components/Training/Training'
-import NavigatorComponent from './NavigatorComponent'
 import { logRender } from '../helpers'
+import { RIDE } from '../screens'
 
-class TrainingContainer extends NavigatorComponent {
+class TrainingContainer extends PureComponent {
+  static options() {
+    return {
+      topBar: {
+        title: {
+          text: "Find People",
+          color: 'white',
+        },
+        background: {
+          color: brand,
+        },
+        elevation: 0,
+        backButton: {
+          color: 'white'
+        }
+      }
+    }
+  }
+
   constructor (props) {
     super(props)
     this.allRidersButYou = this.allRidersButYou.bind(this)
     this.allRidesOnYourHorses = this.allRidesOnYourHorses.bind(this)
+    this.showRide = this.showRide.bind(this)
     this.yourHorses = this.yourHorses.bind(this)
+  }
+
+  showRide (ride) {
+    Navigation.push(this.props.componentId, {
+      component: {
+        name: RIDE,
+        id: RIDE,
+        passProps: {rideID: ride.get('_id')}
+      }
+    });
   }
 
   yourHorses () {
@@ -49,9 +80,9 @@ class TrainingContainer extends NavigatorComponent {
     return (
       <Training
         horses={this.yourHorses()}
-        navigator={this.props.navigator}
         rides={this.allRidesOnYourHorses()}
         riders={this.allRidersButYou()}
+        showRide={this.showRide}
         user={this.props.user}
         userID={this.props.userID}
       />
