@@ -165,7 +165,7 @@ class ProfileContainer extends PureComponent {
           showHorseProfile={this.showHorseProfile}
           showUserList={this.showUserList}
           uploadProfilePhoto={this.uploadProfilePhoto}
-          user={this.props.user}
+          userID={this.props.userID}
           users={this.props.users}
         />
       )
@@ -187,7 +187,6 @@ function mapStateToProps (state, passedProps) {
     horseUsers: mainState.get('horseUsers'),
     horses: mainState.get('horses'),
     profileUser: mainState.getIn(['users', profileUserID]) || passedProps.profileUser || new Map(),
-    user: mainState.getIn(['users', userID]),
     users: mainState.get('users'),
     userID
   }

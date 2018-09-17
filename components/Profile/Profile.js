@@ -138,7 +138,7 @@ export default class Profile extends PureComponent {
   renderImageSwiper () {
     let fab
     let followButton
-    if (this.props.profileUser.get('_id') === this.props.user.get('_id')) {
+    if (this.props.profileUser.get('_id') === this.props.userID) {
       fab = (
         <Fab
           direction="up"
@@ -159,7 +159,7 @@ export default class Profile extends PureComponent {
       )
       for (let follow of this.props.followers.valueSeq()) {
         if (follow.get('followingID') === this.props.profileUser.get('_id')
-          && follow.get('followerID') === this.props.user.get('_id')) {
+          && follow.get('followerID') === this.props.userID) {
           followButton = (
             <Button
               style={styles.followButton}

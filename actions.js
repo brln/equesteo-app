@@ -182,6 +182,7 @@ function newNetworkState (connectionType, effectiveConnectionType) {
     type: NEW_NETWORK_STATE,
     connectionType,
     effectiveConnectionType,
+    logData: ['connectionType', 'effectiveConnectionType'],
   }
 }
 
@@ -755,7 +756,7 @@ export function startLocationTracking () {
       notificationTitle: 'You\'re out on a ride.',
       notificationText: 'Tap here to see your progress.',
       // debug: true,
-      locationProvider: BackgroundGeolocation.RAW_PROVIDER,
+      locationProvider: BackgroundGeolocation.DISTANCE_FILTER_PROVIDER,
       interval: 10000,
       fastestInterval: 5000,
       activitiesInterval: 10000,

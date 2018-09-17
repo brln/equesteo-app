@@ -19,6 +19,7 @@ import {
 
 class FeedContainer extends PureComponent {
    static options() {
+    const topBarHeight = Navigation.constants().topBarHeight;
     return {
       topBar: {
         title: {
