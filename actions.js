@@ -756,7 +756,7 @@ export function startLocationTracking () {
       notificationTitle: 'You\'re out on a ride.',
       notificationText: 'Tap here to see your progress.',
       // debug: true,
-      locationProvider: BackgroundGeolocation.DISTANCE_FILTER_PROVIDER,
+      locationProvider: BackgroundGeolocation.RAW_PROVIDER,
       interval: 10000,
       fastestInterval: 5000,
       activitiesInterval: 10000,
@@ -767,10 +767,32 @@ export function startLocationTracking () {
         accuracy: location.accuracy,
         latitude: location.latitude,
         longitude: location.longitude,
+        provider: location.provider,
+        locationProvider: location.locationProvider,
         timestamp: location.time,
+        type: 'location'
       })
       dispatch(newLocation(parsedLocation))
     })
+
+    BackgroundGeolocation.on('stationary', (location) => {
+      const parsedLocation = Map({
+        accuracy: location.accuracy,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        timestamp: location.time,
+        provider: location.provider,
+        locationProvider: location.locationProvider,
+        type: 'stationary'
+      })
+      dispatch(newLocation(parsedLocation))
+    });
+
+    BackgroundGeolocation.on('error', (error) => {
+      console.log('[ERROR] BackgroundGeolocation error:', error);
+      Sentry.captureException(new Error(JSON.stringify(error)))
+    });
+
 
     BackgroundGeolocation.start()
   }
