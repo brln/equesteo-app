@@ -55,4 +55,4 @@ buck-out/
 .swo
 .swp
 
-ios/pods/
+ios/Pods
