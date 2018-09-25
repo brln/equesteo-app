@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react';
 import {
-  CheckBox,
   ScrollView,
   StyleSheet,
   Text,
@@ -10,6 +9,7 @@ import {
 import {
   Card,
   CardItem,
+  CheckBox,
   Fab,
 } from 'native-base'
 import ImagePicker from 'react-native-image-crop-picker'
@@ -134,11 +134,10 @@ export default class RideDetails extends PureComponent {
               </CardItem>
               <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20}}>
                 <TextInput
-                  style={{width: '100%'}}
+                  style={{width: '100%', height: 50, padding: 10, borderColor: darkBrand, borderWidth: 1}}
                   value={this.props.ride.get('name')}
                   onChangeText={this.changeRideName}
-                  selectTextOnFocus={true}
-                  underlineColorAndroid={darkBrand}
+                  underlineColorAndroid={'transparent'}
                 />
               </CardItem>
             </Card>
@@ -164,12 +163,12 @@ export default class RideDetails extends PureComponent {
               </CardItem>
               <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
                 <TextInput
-                  style={{width: '100%', borderColor: darkBrand, borderWidth: 1}}
+                  style={{width: '100%', height: 50, padding: 10, borderColor: darkBrand, borderWidth: 1}}
                   value={this.props.ride.get('notes')}
                   onChangeText={this.changeRideNotes}
                   multiline={true}
                   numberOfLines={3}
-                  underlineColorAndroid="white"
+                  underlineColorAndroid="transparent"
                 />
               </CardItem>
             </Card>
@@ -183,11 +182,13 @@ export default class RideDetails extends PureComponent {
 
               <View style={{marginLeft: 20, marginBottom: 30}}>
                 <View style={{flex: 1, flexDirection: 'row'}}>
-                  <CheckBox
-                    value={this.props.ride.get('isPublic')}
-                    onValueChange={this.props.changePublic}
-                  />
-                  <View style={{justifyContent: 'center'}}>
+                  <View style={{flex: 1}}>
+                    <CheckBox
+                      checked={this.props.ride.get('isPublic')}
+                      onPress={this.props.changePublic}
+                    />
+                  </View>
+                  <View style={{flex: 6, justifyContent: 'center'}}>
                     <Text>Show this ride on other people's feed.</Text>
                   </View>
                 </View>

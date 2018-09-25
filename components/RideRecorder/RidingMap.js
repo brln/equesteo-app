@@ -15,7 +15,6 @@ export default class RidingMap extends PureComponent {
     this.state = {}
     this.fitToElements = this.fitToElements.bind(this)
     this.changeBearing = this.changeBearing.bind(this)
-    this.fitToElements = this.fitToElements.bind(this)
     this.gpsStatusImage = this.gpsStatusImage.bind(this)
   }
 
@@ -89,9 +88,9 @@ export default class RidingMap extends PureComponent {
             style={styles.map}
             ref={ref => this.map = ref}
             initialRegion={this.fitToElements()}
+            provider={"google"}
           >
             <MapView.Polyline
-              style={styles.map}
               coordinates={this.props.rideCoords.toJS()}
               strokeColor="#dc0202"
               strokeWidth={5}

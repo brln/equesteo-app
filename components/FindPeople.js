@@ -79,8 +79,8 @@ export default class FindPeople extends PureComponent {
     return (
       <View style={styles.container}>
         <ScrollView style={{flex: 1}}>
-          <Header searchBar style={{backgroundColor: brand}}>
-            <Item>
+          <Header searchBar iosBarStyle="light-content" style={{backgroundColor: brand}}>
+            <Item style={{backgroundColor: 'white', height: 40}}>
               <Icon name="ios-search" />
               <Input
                 autoFocus={true}
@@ -90,9 +90,6 @@ export default class FindPeople extends PureComponent {
               />
               <Icon name="ios-people" />
             </Item>
-            <Button transparent>
-              <Text>Search</Text>
-            </Button>
           </Header>
           <FlatList
             keyExtractor={(u) => u._id}

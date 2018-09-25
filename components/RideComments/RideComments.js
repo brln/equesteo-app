@@ -1,19 +1,18 @@
-
-
 import React, { PureComponent } from 'react';
 import {
   Image,
+  KeyboardAvoidingView,
   ScrollView,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View
 } from 'react-native';
+import MultiPlatform from '../../components/MultiPlatform'
 
 import CommentList from './CommentList'
 
-export default class RideComments extends PureComponent {
+export default class RideComments extends MultiPlatform {
   constructor (props) {
     super(props)
     this.scrollable = null
@@ -27,9 +26,25 @@ export default class RideComments extends PureComponent {
     }
   }
 
-  render() {
+  renderIOS () {
+    return (
+      <KeyboardAvoidingView keyboardVerticalOffset={54} behavior={'height'} style={styles.container}>
+        {this.renderChildren()}
+      </KeyboardAvoidingView>
+    )
+  }
+
+  renderAndroid () {
     return (
       <View style={styles.container}>
+        {this.renderChildren()}
+      </View>
+    )
+  }
+
+  renderChildren() {
+    return (
+      <View style={{flex: 1}}>
         <View style={{flex: 5}}>
           <ScrollView
             style={{flex: 1}}

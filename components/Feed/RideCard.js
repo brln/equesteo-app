@@ -178,6 +178,7 @@ export default class RideCard extends PureComponent {
               style={{height: swiperHeight, width: null}}
               key={photo.get('uri')}
               source={{uri: photo.get('uri')}}
+              onError={(error) => { logError('there was an error loading ride image 2') }}
             />
           </TouchableOpacity>
         )

@@ -3,6 +3,7 @@ import {
   Image,
 } from 'react-native';
 
+import { logError } from '../../helpers'
 import { STATIC_MAPS_API_KEY } from 'react-native-dotenv'
 
 export default class RideImage extends PureComponent {
@@ -12,6 +13,7 @@ export default class RideImage extends PureComponent {
       <Image
         source={{uri: uriWithKey}}
         style={{height: this.props.height, width: null, flex: 1}}
+        onError={(error) => { logError('there was an error loading ride image') }}
       />
     )
   }

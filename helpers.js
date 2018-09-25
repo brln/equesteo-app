@@ -1,4 +1,5 @@
 import moment from 'moment'
+import { Platform } from 'react-native'
 
 const toRad = (deg) => {
   return deg * Math.PI / 180;
@@ -176,4 +177,8 @@ export function logInfo (info) {
 
 export function logRender (componentName) {
   console.log('rendering: ' + componentName)
+}
+
+export function isAndroid () {
+  return Platform.OS === 'android'
 }

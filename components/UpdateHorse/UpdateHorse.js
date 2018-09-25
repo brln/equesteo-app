@@ -2,7 +2,6 @@ import { Map } from 'immutable'
 import React, { PureComponent } from 'react';
 import ImagePicker from 'react-native-image-crop-picker'
 import {
-  Picker,
   ScrollView,
   StyleSheet,
   Text,
@@ -14,6 +13,7 @@ import {
   CardItem,
   Fab,
 } from 'native-base';
+import RNPickerSelect from 'react-native-picker-select';
 
 import { brand, darkBrand } from '../../colors'
 import FabImage from '../FabImage'
@@ -139,117 +139,144 @@ export default class UpdateHorse extends PureComponent {
   }
 
   monthPicker (onValueChange) {
+    const items = [
+      { label: "Jan", value: "1" },
+      { label: "Feb", value: "2" },
+      { label: "Mar", value: "3" },
+      { label: "Apr", value: "4" },
+      { label: "May", value: "5" },
+      { label: "Jun", value: "6" },
+      { label: "Jul", value: "7" },
+      { label: "Aug", value: "8" },
+      { label: "Sep", value: "9" },
+      { label: "Oct", value: "10" },
+      { label: "Nov", value: "11" },
+      { label: "Dec", value: "12" },
+    ]
     return (
-      <View style={{borderColor: darkBrand, borderWidth: 1}}>
-        <Picker
-          selectedValue={this.props.horse.get('birthMonth')}
-          style={{ height: 50, width: 100 }}
+      <View style={{flex: 3, height: 50, borderColor: darkBrand, borderWidth: 1, marginRight: 10}}>
+        <RNPickerSelect
+          value={this.props.horse.get('birthMonth')}
+          items={items}
           onValueChange={onValueChange}
-        >
-          <Picker.Item label="" value={null} key="null"/>
-          <Picker.Item label="Jan" value="1" key="1"/>
-          <Picker.Item label="Feb" value="2" key="2"/>
-          <Picker.Item label="Mar" value="3" key="3"/>
-          <Picker.Item label="Apr" value="4" key="4"/>
-          <Picker.Item label="May" value="5" key="5"/>
-          <Picker.Item label="Jun" value="6" key="6"/>
-          <Picker.Item label="Jul" value="7" key="7"/>
-          <Picker.Item label="Aug" value="8" key="8"/>
-          <Picker.Item label="Sep" value="9" key="9"/>
-          <Picker.Item label="Oct" value="10" key="10"/>
-          <Picker.Item label="Nov" value="11" key="11"/>
-          <Picker.Item label="Dec" value="12" key="12"/>
-        </Picker>
+          style={{inputIOS: {fontSize: 25, fontWeight: 'bold', textAlign: 'center', paddingTop: 10}}}
+          placeholder={{
+            label: 'Month',
+            value: null,
+          }}
+        />
       </View>
     )
   }
 
   dayPicker (onValueChange) {
-    const allDays = [<Picker.Item label="" value={null} key={null}/>]
+    const allDays = []
     for (let i = 1; i <= 31; i++) {
-      allDays.push(<Picker.Item label={i.toString()} value={i.toString()} key={i} />)
+      allDays.push({ label: i.toString(), value: i.toString() })
     }
     return (
-      <View style={{borderColor: darkBrand, borderWidth: 1}}>
-        <Picker
-          selectedValue={this.props.horse.get('birthDay')}
-          style={{ height: 50, width: 100 }}
+      <View style={{flex: 2, height: 50, borderColor: darkBrand, borderWidth: 1, marginRight: 10}}>
+        <RNPickerSelect
+          value={this.props.horse.get('birthDay')}
+          items={allDays}
+          style={{inputIOS: {fontSize: 25, fontWeight: 'bold', textAlign: 'center', paddingTop: 10}}}
           onValueChange={onValueChange}
-        >
-          {allDays}
-        </Picker>
+          placeholder={{
+            label: 'Day',
+            value: null,
+          }}
+        />
       </View>
     )
   }
 
   yearPicker (onValueChange) {
     const startYear = 1980
-    const allDays = [<Picker.Item label="" value={null} key={null} />]
+    const allYears = []
     for (let i = startYear; i <= 2018; i++) {
-      allDays.push(<Picker.Item label={i.toString()} value={i.toString()} key={i} />)
+      allYears.push({label: i.toString(), value: i.toString()})
     }
     return (
-      <View style={{borderColor: darkBrand, borderWidth: 1}}>
-        <Picker
-          selectedValue={this.props.horse.get('birthYear')}
-          style={{ height: 50, width: 100 }}
+      <View style={{flex: 3, height: 50, borderColor: darkBrand, borderWidth: 1}}>
+        <RNPickerSelect
+          items={allYears}
+          value={this.props.horse.get('birthYear')}
+          style={{inputIOS: {fontSize: 25, fontWeight: 'bold', textAlign: 'center', paddingTop: 10}}}
           onValueChange={onValueChange}
-        >
-          {allDays}
-        </Picker>
+          placeholder={{
+            label: 'Year',
+            value: null,
+          }}
+        />
       </View>
     )
   }
 
   sexPicker (onValueChange) {
+    const items = [
+      {label: "Mare", value: "Mare"},
+      {label: "Stallion", value: "Stallion"},
+      {label: "Gelding", value: "Gelding"},
+      {label: "Other", value: "Other"},
+    ]
     return (
-      <View style={{borderColor: darkBrand, borderWidth: 1}}>
-        <Picker
-          selectedValue={this.props.horse.get('sex')}
-          style={{ height: 50, width: 200 }}
+      <View style={{flex: 1, height: 50, borderColor: darkBrand, borderWidth: 1}}>
+        <RNPickerSelect
+          value={this.props.horse.get('sex')}
           onValueChange={onValueChange}
-        >
-          <Picker.Item label="" value={null} />
-          <Picker.Item label="Mare" value="Mare" />
-          <Picker.Item label="Stallion" value="Stallion" />
-          <Picker.Item label="Gelding" value="Gelding" />
-          <Picker.Item label="Other" value="Other" />
-        </Picker>
+          items={items}
+          style={{inputIOS: {fontSize: 25, fontWeight: 'bold', textAlign: 'center', paddingTop: 10}}}
+          placeholder={{
+            label: 'None',
+            value: null,
+          }}
+        />
       </View>
     )
   }
 
   renderHandsPicker () {
+    const handsItems = [
+      { label: "11", value: "11" },
+      { label: "12", value: "12" },
+      { label: "13", value: "13" },
+      { label: "14", value: "14" },
+      { label: "15", value: "15" },
+      { label: "16", value: "16" },
+      { label: "17", value: "17" },
+    ]
+    const inchesItems = [
+      { label: "0", value: "0" },
+      { label: "1", value: "1" },
+      { label: "2", value: "2" },
+      { label: "3", value: "3" },
+    ]
     return (
       <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
-        <View style={{borderColor: darkBrand, borderWidth: 1}}>
-          <Picker
-            selectedValue={this.props.horse.get('heightHands')}
+        <View style={{flex: 3, height: 50, borderColor: darkBrand, borderWidth: 1, marginRight: 10}}>
+          <RNPickerSelect
+            value={this.props.horse.get('heightHands')}
             onValueChange={this.changeHorseHeightHands}
-            style={{ height: 50, width: 100 }}
-          >
-            <Picker.Item label="" value={null} />
-            <Picker.Item label="11" value="11" />
-            <Picker.Item label="12" value="12" />
-            <Picker.Item label="13" value="13" />
-            <Picker.Item label="14" value="14" />
-            <Picker.Item label="15" value="15" />
-            <Picker.Item label="16" value="16" />
-            <Picker.Item label="17" value="17" />
-          </Picker>
+            items={handsItems}
+            style={{inputIOS: {fontSize: 25, fontWeight: 'bold', textAlign: 'center', paddingTop: 10}}}
+            placeholder={{
+              label: 'Hands',
+              value: null,
+            }}
+          />
         </View>
-        <View style={{borderColor: darkBrand, borderWidth: 1}}>
-          <Picker
-            selectedValue={this.props.horse.get('heightInches')}
-            style={{ height: 50, width: 80 }}
+        <View style={{flex: 2, height: 50, borderColor: darkBrand, borderWidth: 1}}>
+          <RNPickerSelect
+            value={this.props.horse.get('heightInches')}
+            style={{inputIOS: {fontSize: 25, fontWeight: 'bold', textAlign: 'center', paddingTop: 10}}}
             onValueChange={this.changeHorseHeightInches}
+            items={inchesItems}
+            placeholder={{
+              label: 'Inches',
+              value: null,
+            }}
           >
-            <Picker.Item label="" value={null} />
-            <Picker.Item label="0" value="0" />
-            <Picker.Item label="1" value="1" />
-            <Picker.Item label="2" value="2" />
-            <Picker.Item label="3" value="3" />
-          </Picker>
+          </RNPickerSelect>
         </View>
       </View>
     )
@@ -302,10 +329,10 @@ export default class UpdateHorse extends PureComponent {
                 </CardItem>
                 <CardItem cardBody style={{marginLeft: 20, marginRight: 20}}>
                   <TextInput
-                    style={{width: '100%'}}
+                    style={{width: '100%', height: 50, padding: 10, borderColor: darkBrand, borderWidth: 1}}
                     value={this.props.horse.get('name')}
                     onChangeText={this.changeHorseName}
-                    underlineColorAndroid={darkBrand}
+                    underlineColorAndroid={'transparent'}
                   />
                 </CardItem>
 
@@ -314,12 +341,12 @@ export default class UpdateHorse extends PureComponent {
                 </CardItem>
                 <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
                   <TextInput
-                    style={{width: '100%', borderColor: darkBrand, borderWidth: 1}}
+                    style={{width: '100%', height: 50, padding: 10, borderColor: darkBrand, borderWidth: 1}}
                     value={this.props.horse.get('description')}
                     onChangeText={this.changeHorseDescription}
                     multiline={true}
                     numberOfLines={3}
-                    underlineColorAndroid="white"
+                    underlineColorAndroid="transparent"
                   />
                 </CardItem>
               </Card>
@@ -349,10 +376,10 @@ export default class UpdateHorse extends PureComponent {
                 </CardItem>
                 <CardItem cardBody style={{marginLeft: 20, marginRight: 20}}>
                   <TextInput
-                    style={{width: '100%'}}
+                    style={{width: '100%', height: 50, padding: 10, borderColor: darkBrand, borderWidth: 1}}
                     value={this.props.horse.get('breed')}
                     onChangeText={this.changeHorseBreed}
-                    underlineColorAndroid={darkBrand}
+                    underlineColorAndroid={'transparent'}
                   />
                 </CardItem>
 

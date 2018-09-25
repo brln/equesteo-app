@@ -39,10 +39,10 @@ export default class Map extends PureComponent {
           style={styles.map}
           ref={ref => this.map = ref}
           onLayout={this.fitToElements}
-          mapType="terrain"
+          mapType="standard"
+          provider={"google"}
         >
           <MapView.Polyline
-            style={styles.map}
             coordinates={this.props.rideCoords}
             strokeColor="#dc0202"
             strokeWidth={5}

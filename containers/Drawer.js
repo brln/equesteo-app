@@ -13,7 +13,6 @@ import {
 
 import {
   BARN,
-  FIND_PEOPLE,
   PROFILE,
   RECORDER,
   TRAINING,
@@ -28,25 +27,14 @@ class DrawerContainer extends Component {
   constructor (props) {
     super(props)
     this.toggleDrawer = this.toggleDrawer.bind(this)
-		this.openAccount = this.openAccount.bind(this)
+    this.openAccount = this.openAccount.bind(this)
     this.openBarn = this.openBarn.bind(this)
-    this.openFindPeople = this.openFindPeople.bind(this)
-		this.openRecorder = this.openRecorder.bind(this)
+    this.openRecorder = this.openRecorder.bind(this)
     this.openTraining = this.openTraining.bind(this)
   }
 
   shouldComponentUpdate () {
     return false
-  }
-
-  openFindPeople () {
-    this.toggleDrawer()
-    Navigation.push(this.props.activeComponent, {
-      component: {
-        name: FIND_PEOPLE,
-        id: FIND_PEOPLE,
-      }
-    });
   }
 
   openRecorder () {
@@ -59,7 +47,7 @@ class DrawerContainer extends Component {
     });
 	}
 
-	openAccount () {
+  openAccount () {
     this.toggleDrawer()
     Navigation.push(this.props.activeComponent, {
       component: {
@@ -75,6 +63,7 @@ class DrawerContainer extends Component {
 
   openBarn () {
     this.toggleDrawer()
+    console.log(this.props.activeComponent)
     Navigation.push(this.props.activeComponent, {
       component: {
         name: BARN,
@@ -93,7 +82,7 @@ class DrawerContainer extends Component {
     });
   }
 
-	toggleDrawer() {
+  toggleDrawer() {
     Navigation.mergeOptions(this.props.activeComponent, {
       sideMenu: {
         left: {
@@ -153,14 +142,6 @@ class DrawerContainer extends Component {
               <View style={styles.drawerListItem}>
                 <Text style={styles.drawerListItemText} onTouch>
                   Training
-                </Text>
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={this.openFindPeople}>
-              <View style={styles.drawerListItem}>
-                <Text style={styles.drawerListItemText} onTouch>
-                  Find People
                 </Text>
               </View>
             </TouchableOpacity>

@@ -1,9 +1,9 @@
 import React, { PureComponent } from 'react'
+import RNPickerSelect from 'react-native-picker-select';
 import {
   FlatList,
   Picker,
   ScrollView,
-  StyleSheet,
   Text,
   View,
 } from 'react-native'
@@ -39,6 +39,7 @@ export default class Training extends PureComponent {
       TYPE_TIME: 'typeTime',
       SHOW_ALL_HORSES: 'showAllHorses',
       SHOW_ALL_RIDERS: 'showAllRiders',
+      NO_HORSE: 'noHorse'
     }
 
     this.state = {
@@ -76,6 +77,7 @@ export default class Training extends PureComponent {
            chosenUserID={this.state.chosenUserID}
            index={index}
            mondayString={item}
+           pickType={this.pickType}
            rides={rideWeeks[item]}
            showRide={this.props.showRide}
            types={this.TYPES}
@@ -104,28 +106,23 @@ export default class Training extends PureComponent {
   }
 
   horsePicker () {
+    const items = this.props.horses.valueSeq().reduce((a, h) => {
+      a.push({ label: h.get('name'), value: h.get('_id') })
+      return a
+    }, [])
+    items.push({ label: "Rides With No Horse", value: 'NO HORSE' })
     return (
       <View style={{flex: 1, borderWidth: 1, borderColor: lightGrey}}>
-        <Picker selectedValue={this.state.chosenHorseID} onValueChange={this.pickHorse}>
-          <Picker.Item key="everyone" label="All Horses" value={this.TYPES.SHOW_ALL_HORSES} />
-          {
-            this.props.horses.valueSeq().map(h => {
-              return <Picker.Item key={h.get('_id')} label={h.get('name')} value={h.get('_id')} />
-            })
-          }
-          <Picker.Item key="none" label="Rides With No Horse" value={null} />
-        </Picker>
-      </View>
-    )
-  }
-
-  typePicker () {
-    return (
-      <View style={{flex: 1, borderWidth: 1, borderColor: lightGrey}}>
-        <Picker selectedValue={this.state.chosenType} onValueChange={this.pickType}>
-          <Picker.Item key="distance" label="Distance" value={this.TYPES.DISTANCE} />
-          <Picker.Item key="time" label="Time" value={this.TYPES.TYPE_TIME} />
-        </Picker>
+        <RNPickerSelect
+          value={this.state.chosenHorseID}
+          items={items}
+          onValueChange={this.pickHorse}
+          style={{inputIOS: {fontSize: 20, fontWeight: 'bold', textAlign: 'center', paddingTop: 10}, underline: { borderTopWidth: 0 }}}
+          placeholder={{
+            label: 'All Horses',
+            value: this.TYPES.SHOW_ALL_HORSES,
+          }}
+        />
       </View>
     )
   }
@@ -139,17 +136,27 @@ export default class Training extends PureComponent {
   }
 
   userPicker () {
+    const items = [
+      {label: 'Only You', value: this.props.userID}
+    ]
+    const userItems = this.props.riders.valueSeq().reduce((a, r) => {
+      a.push({ label: this.userName(r), value: r.get('_id') })
+      return a
+    }, [])
+    const allItems = [...items, ...userItems]
+
     return (
       <View style={{flex: 1, borderWidth: 1, borderColor: lightGrey}}>
-        <Picker selectedValue={this.state.chosenUserID} onValueChange={this.pickRider}>
-          <Picker.Item key="allRiders" label="All Riders" value={this.TYPES.SHOW_ALL_RIDERS} />
-          <Picker.Item key="onlyYou" label="Only You" value={this.props.userID} />
-          {
-            this.props.riders.valueSeq().map(r => {
-              return <Picker.Item key={r.get('_id')} label={this.userName(r)} value={r.get('_id')} />
-            })
-          }
-        </Picker>
+        <RNPickerSelect
+          value={this.state.chosenUserID}
+          items={allItems}
+          onValueChange={this.pickRider}
+          style={{inputIOS: {fontSize: 20, fontWeight: 'bold', textAlign: 'center', paddingTop: 10}, underline: { borderTopWidth: 0 }}}
+          placeholder={{
+            label: 'All Riders',
+            value: this.TYPES.SHOW_ALL_RIDERS,
+          }}
+        />
       </View>
     )
   }
@@ -162,10 +169,9 @@ export default class Training extends PureComponent {
       <View style={{flex: 1}}>
         <View style={{flex: 1, flexDirection: 'row'}}>
           { this.horsePicker() }
-          { this.typePicker() }
           { this.userPicker() }
         </View>
-        <View style={{flex: 9}}>
+        <View style={{flex: 10}}>
           <DaysOfWeek />
           <ScrollView>
             <FlatList
@@ -179,5 +185,3 @@ export default class Training extends PureComponent {
     )
   }
 }
-
-const styles = StyleSheet.create({});

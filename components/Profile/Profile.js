@@ -150,23 +150,25 @@ export default class Profile extends PureComponent {
       )
     } else {
       followButton = (
-        <Button
+        <TouchableOpacity
           style={styles.followButton}
-          color={green}
           onPress={this.follow}
-          title="Follow"
-        />
+          underlayColor={green}
+        >
+          <Text style={styles.followText}>Follow</Text>
+        </TouchableOpacity>
       )
       for (let follow of this.props.followers.valueSeq()) {
         if (follow.get('followingID') === this.props.profileUser.get('_id')
           && follow.get('followerID') === this.props.userID) {
           followButton = (
-            <Button
-              style={styles.followButton}
-              color={danger}
+            <TouchableOpacity
+              style={styles.unfollowButton}
               onPress={this.unfollow}
-              title="Unfollow"
-            />
+              underlayColor={danger}
+                >
+                <Text style={styles.followText}>Unfollow</Text>
+            </TouchableOpacity>
           )
           break
         }
@@ -270,11 +272,36 @@ const styles = StyleSheet.create({
     alignItems: 'stretch',
     backgroundColor: '#F5FCFF',
   },
-  followButton: {
-    backgroundColor: 'transparent',
-  },
   profileButton: {
     width: 130,
     paddingTop: 2,
+  },
+  unfollowButton:{
+    marginRight:20,
+    marginLeft:20,
+    marginTop:10,
+    paddingTop:10,
+    paddingBottom:10,
+    backgroundColor: danger ,
+    borderRadius:10,
+    borderWidth: 1,
+    borderColor: '#fff'
+  },
+  followButton:{
+    marginRight:40,
+    marginLeft:40,
+    marginTop:10,
+    paddingTop:10,
+    paddingBottom:10,
+    backgroundColor: green ,
+    borderRadius:10,
+    borderWidth: 1,
+    borderColor: '#fff'
+  },
+  followText:{
+    color:'#fff',
+    textAlign:'center',
+    paddingLeft : 10,
+    paddingRight : 10
   }
 });

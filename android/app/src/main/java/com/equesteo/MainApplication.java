@@ -1,32 +1,29 @@
 package com.equesteo;
 
 import android.app.Application;
-
-import com.facebook.react.ReactApplication;
+import com.airbnb.android.react.maps.MapsPackage;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
+import com.facebook.react.bridge.ReadableNativeArray;
+import com.facebook.react.bridge.ReadableNativeMap;
+import com.facebook.react.ReactApplication;
+import com.facebook.react.ReactNativeHost;
+import com.facebook.react.ReactPackage;
+import com.facebook.react.shell.MainReactPackage;
+import com.facebook.soloader.SoLoader;
+import com.horcrux.svg.SvgPackage;
+import com.marianhello.bgloc.react.BackgroundGeolocationPackage;
+import com.oblador.vectoricons.VectorIconsPackage;
+import com.reactnative.ivpusic.imagepicker.PickerPackage;
+import com.reactnativenavigation.NavigationApplication;
+import com.reactnativenavigation.react.NavigationReactNativeHost;
+import com.reactnativenavigation.react.ReactGateway;
+import com.showlocationservicesdialogbox.LocationServicesDialogBoxPackage;
+import io.invertase.firebase.RNFirebasePackage;
 import io.invertase.firebase.RNFirebasePackage;
 import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
 import io.invertase.firebase.instanceid.RNFirebaseInstanceIdPackage;
 import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
-import com.showlocationservicesdialogbox.LocationServicesDialogBoxPackage;
-import com.horcrux.svg.SvgPackage;
 import io.sentry.RNSentryPackage;
-import com.marianhello.bgloc.react.BackgroundGeolocationPackage;
-import com.reactnative.ivpusic.imagepicker.PickerPackage;
-import com.oblador.vectoricons.VectorIconsPackage;
-import com.facebook.react.ReactNativeHost;
-import com.facebook.react.ReactPackage;
-import com.facebook.react.shell.MainReactPackage;
-
-import com.reactnativenavigation.NavigationApplication;
-import com.reactnativenavigation.react.NavigationReactNativeHost;
-import com.reactnativenavigation.react.ReactGateway;
-
-import com.airbnb.android.react.maps.MapsPackage;
-import com.facebook.react.bridge.ReadableNativeArray;
-import com.facebook.react.bridge.ReadableNativeMap;
-import com.facebook.soloader.SoLoader;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -66,14 +63,14 @@ public class MainApplication extends NavigationApplication {
             new MapsPackage(),
             new PickerPackage(),
             new BackgroundGeolocationPackage(),
-            new SvgPackage(),
             new LocationServicesDialogBoxPackage(),
             new RNFirebasePackage(),
             new RNFirebaseMessagingPackage(),
             new RNFirebaseNotificationsPackage(),
             new ReactNativePushNotificationPackage(),
             new RNFirebaseInstanceIdPackage(),
-            new RNSentryPackage(MainApplication.this)
+            new RNSentryPackage(MainApplication.this),
+            new SvgPackage()
         );
     }
 

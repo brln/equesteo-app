@@ -157,6 +157,7 @@ export default class RideList extends PureComponent {
         renderItem={this._renderCard}
         renderSectionHeader={this._renderSectionHeader}
         sections={this._makeSections()}
+        stickySectionHeadersEnabled={false}
       />
     )
   }

@@ -612,7 +612,7 @@ export function deleteHorseUser (horseID, userID) {
 }
 
 function switchRoot (newRoot) {
-  return async (dispatch) => {
+  return async () => {
     if (newRoot === FEED) {
       Navigation.setRoot({
         root: {
@@ -626,7 +626,10 @@ function switchRoot (newRoot) {
                 children: [{
                   component: {
                     name: FEED,
-                    id: FEED
+                    id: FEED,
+                    topBar: {
+                      elevation: 0
+                    }
                   },
                 }]
               }
@@ -748,6 +751,7 @@ export function signOut () {
 
 export function startLocationTracking () {
   return async (dispatch) => {
+    logInfo('action: startLocationTracking')
     BackgroundGeolocation.configure({
       desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
       stationaryRadius: 10,
@@ -845,7 +849,9 @@ function startListeningFCM () {
 function startActiveComponentListener () {
   return async (dispatch) => {
     Navigation.events().registerComponentDidAppearListener( ( { componentId } ) => {
-      dispatch(setActiveComponent(componentId))
+      if (componentId !== DRAWER) {
+        dispatch(setActiveComponent(componentId))
+      }
     })
   }
 }

@@ -44,11 +44,25 @@ export default class Feed extends PureComponent {
   render() {
     return (
       <Container>
-        <Tabs initialPage={0} locked={true}>
-          <Tab tabStyle={{backgroundColor: brand}} activeTabStyle={{backgroundColor: brand}} heading="Following">
+        <Tabs
+          initialPage={0}
+          locked={true}
+          tabBarUnderlineStyle={{backgroundColor: 'white'}}
+        >
+          <Tab
+            tabStyle={{backgroundColor: brand}}
+            activeTabStyle={{backgroundColor: brand}}
+            heading="Following"
+            activeTextStyle={{color: 'white'}}
+          >
             { this.renderRideList(false, this.props.followingRides) }
           </Tab>
-          <Tab tabStyle={{backgroundColor: brand}} activeTabStyle={{backgroundColor: brand}} heading="You">
+          <Tab
+            tabStyle={{backgroundColor: brand}}
+            activeTabStyle={{backgroundColor: brand}}
+            activeTextStyle={{color: 'white'}}
+            heading="You"
+          >
             { this.renderRideList(true, this.props.yourRides) }
           </Tab>
         </Tabs>

@@ -11,7 +11,7 @@ import {
 
 import { darkBrand } from '../../colors'
 
-export default class SignupForm extends PureComponent {
+export default class SignupPage extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
@@ -92,7 +92,6 @@ export default class SignupForm extends PureComponent {
           onSubmitEditing={this.moveToPassword2}
           onChangeText={this.changePassword1}
           ref={(i) => this.inputs['pw1'] = i}
-          style={styles.whiteText}
           returnKeyType="next"
           underlineColorAndroid="black"
           secureTextEntry={true}
@@ -102,7 +101,6 @@ export default class SignupForm extends PureComponent {
           autoCapitalize={'none'}
           onSubmitEditing={this.submitSignup}
           secureTextEntry={true}
-          style={styles.whiteText}
           onChangeText={this.changePassword2}
           ref={(i) => this.inputs['pw2'] = i}
           underlineColorAndroid="black"
@@ -143,13 +141,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'stretch',
     padding: 30,
-  },
-  email: {
-    borderColor: 'gray',
-  },
-  password: {
-    borderColor: 'gray',
-    width: 80,
   },
   switchup: {
     paddingTop: 20,

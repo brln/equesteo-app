@@ -2,7 +2,6 @@ import moment from 'moment'
 import React, { Component } from 'react'
 
 import { lightGrey } from '../../colors'
-import { RIDE } from '../../screens'
 import { formattedWeekString } from "../../helpers"
 
 import {
@@ -92,6 +91,8 @@ export default class Week extends Component {
     super(props)
     this.days = this.days.bind(this)
     this.showRide = this.showRide.bind(this)
+    this.pickTypeDistance = this.pickTypeDistance.bind(this)
+    this.pickTypeTime = this.pickTypeTime.bind(this)
   }
 
   showRide (ride) {
@@ -110,7 +111,7 @@ export default class Week extends Component {
       const eachDay = moment(start).add(i, 'days')
       const daysRides = []
       for (let ride of this.props.rides) {
-        const showingHorseID = ride.get('horseID') ? ride.get('horseID') : null
+        const showingHorseID = ride.get('horseID') ? ride.get('horseID') : 'NO HORSE'
         if (moment(ride.get('startTime')).date() === eachDay.date()
           && (
             showingHorseID === this.props.chosenHorseID
@@ -168,7 +169,14 @@ export default class Week extends Component {
     } else {
       return <Text style={style}>{`${minutes}m`}</Text>
     }
+  }
 
+  pickTypeDistance () {
+    this.props.pickType('typeDistance')
+  }
+
+  pickTypeTime () {
+    this.props.pickType('typeTime')
   }
 
   render () {
@@ -185,14 +193,14 @@ export default class Week extends Component {
             {weekData.days}
           </View>
           <View style={{flex: 1, flexDirection: 'row'}}>
-            <View style={{flex: 1}}>
+            <TouchableOpacity style={{flex: 1}} onPress={this.pickTypeDistance}>
               <Text style={{textAlign: 'center', fontSize: 20}}>{ weekData.totalDistance.toFixed(1) } mi</Text>
               <Text style={{textAlign: 'center', fontSize: 10}}>DISTANCE</Text>
-            </View>
-            <View style={{flex: 1}}>
+            </TouchableOpacity>
+            <TouchableOpacity style={{flex: 1}}a onPress={this.pickTypeTime}>
               {this.timeString(weekData.totalTime, {textAlign: 'center', fontSize: 20})}
               <Text style={{textAlign: 'center', fontSize: 10}}>TIME</Text>
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
       )

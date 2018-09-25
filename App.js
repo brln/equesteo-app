@@ -14,7 +14,7 @@ import storeToCouch from './middleware/couch'
 import uploadPhotos from './middleware/photos'
 import storeLocalState from './middleware/localstate'
 import AppReducer from './reducer'
-import { FEED, SIGNUP_LOGIN, registerScreens } from './screens'
+import { registerScreens } from './screens'
 
 const store = createStore(
   combineReducers({main: AppReducer}),
@@ -43,49 +43,3 @@ export default function start () {
   })
 }
 
-// export default class App {
-//   constructor() {
-
-
-//   }
-//
-//   onStoreUpdate() {
-//     const root = store.getState().getIn(['main', 'localState', 'root'])
-//     if (this.currentRoot !== root) {
-//       this.currentRoot = root
-//
-//       console.log('aaaaaaaaaaaaa')
-//       Navigation.events().registerAppLaunchedListener(() => {
-//         console.log('bbbbbbbbbbbb')
-//         this.startApp(root)
-//       })
-//     }
-//   }
-//
-//   startApp(root) {
-//     switch (root) {
-//       case 'login':
-//         Navigation.startSingleScreenApp({
-//           screen: {
-//             screen: SIGNUP_LOGIN,
-//           }
-//         })
-//         return
-//       case 'after-login':
-//         Navigation.startSingleScreenApp({
-//           screen: FEED_DETAILS,
-//           drawer: {
-//             left: {
-//               screen: DRAWER,
-//             }
-//           }
-//         })
-//         return
-//       default:
-//         throw Error('unknown app root!')
-//         return
-//
-//     }
-//   }
-//
-// }

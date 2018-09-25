@@ -11,6 +11,7 @@ import { brand } from '../colors'
 import Feed from '../components/Feed/Feed'
 import { logRender } from '../helpers'
 import {
+  FIND_PEOPLE,
   HORSE_PROFILE,
   PROFILE,
   RIDE_COMMENTS,
@@ -19,7 +20,6 @@ import {
 
 class FeedContainer extends PureComponent {
    static options() {
-    const topBarHeight = Navigation.constants().topBarHeight;
     return {
       topBar: {
         title: {
@@ -28,7 +28,13 @@ class FeedContainer extends PureComponent {
         },
         leftButtons: [{
           id: 'sideMenu',
-          icon: require('../img/hamburger.png')
+          icon: require('../img/hamburger.png'),
+          color: 'white'
+        }],
+        rightButtons: [{
+          id: 'findFriends',
+          icon: require('../img/findPeople.png'),
+          color: 'white'
         }],
         background: {
           color: brand,
@@ -62,13 +68,22 @@ class FeedContainer extends PureComponent {
   }
 
    navigationButtonPressed({ buttonId }) {
-     Navigation.mergeOptions(this.props.componentId, {
-       sideMenu: {
-         left: {
-           visible: true,
+     if (buttonId === 'sideMenu') {
+       Navigation.mergeOptions(this.props.componentId, {
+         sideMenu: {
+           left: {
+             visible: true,
+           }
          }
-       }
-     });
+       });
+     } else if (buttonId === 'findFriends') {
+       Navigation.push(this.props.componentId, {
+         component: {
+           name: FIND_PEOPLE,
+           id: FIND_PEOPLE,
+         }
+       })
+     }
    }
 
   static getDerivedStateFromProps (nextProps, prevState) {
