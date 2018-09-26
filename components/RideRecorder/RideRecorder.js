@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react';
 import {
   StyleSheet,
   Text,
-  TouchableOpacity,
   View
 } from 'react-native';
 
@@ -17,55 +16,24 @@ import RideStats from './RideStats'
 export default class RideRecorder extends PureComponent {
   constructor (props) {
     super(props)
-    this.state = {
-      showGPS: true
-    }
-    this.rideComplete = this.rideComplete.bind(this)
-    this.startRide = this.startRide.bind(this)
-  }
-
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.lastLocation) {
-      this.gpsTimeout = setTimeout(() => {
-        this.setState({showGPS: false})
-      }, 2000)
-    }
-  }
-
-  componentWillUnmount () {
-    clearInterval(this.gpsTimeout)
-  }
-
-  rideComplete () {
-    if (this.props.currentRide.get('rideCoordinates').count() > 0) {
-      this.props.showRideDetails()
-    } else {
-      alert('Discarding empty ride.')
-      this.props.discardRide()
-    }
-    this.props.stopLocationTracking()
-  }
-
-  startRide () {
-    this.props.startRide()
   }
 
   render() {
     let rideStats = null
     let gpsBar = null
-    if (this.state.showGPS) {
+    if (this.props.showGPSBar) {
       gpsBar = <GPSStatus style={styles.gpsBar} lastLocation={this.props.lastLocation} />
     }
     let startButton = (
       <View style={styles.startButton}>
-        <Text onPress={this.startRide} style={styles.startText}>Start Ride</Text>
+        <Text onPress={this.props.startRide} style={styles.startText}>Start Ride</Text>
       </View>
     )
     if (this.props.currentRide) {
       startButton = null
       rideStats = (
         <View style={{flex: 1}}>
-          <View style={{flex: 4}}>
+          <View style={{flex: 5}}>
             <RidingMap
               mode={"duringRide"}
               rideCoords={this.props.currentRide.get('rideCoordinates')}
@@ -78,11 +46,6 @@ export default class RideRecorder extends PureComponent {
               startTime={this.props.currentRide.get('startTime')}
               distance={this.props.currentRide.get('distance')}
             />
-            <TouchableOpacity style={styles.rideComplete} onPress={this.rideComplete}>
-              <Text style={styles.rideCompleteText}>
-                Ride Complete
-              </Text>
-            </TouchableOpacity>
           </View>
         </View>
       )

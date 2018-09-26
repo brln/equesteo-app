@@ -94,15 +94,15 @@ export default class PouchCouch {
   localReplicateDB(db, userIDs, followerUserIDs) {
     switch(db) {
       case 'horses':
-        return this.localReplicateHorses([...userIDs, ...followerUserIDs])
+        return this.localReplicateHorses([...userIDs, ...followerUserIDs]).catch(e => {})
       case 'rides':
-        return this.localReplicateRides(userIDs, followerUserIDs)
+        return this.localReplicateRides(userIDs, followerUserIDs).catch(e => {})
       case 'users':
-        return this.localReplicateUsers([...userIDs, ...followerUserIDs])
+        return this.localReplicateUsers([...userIDs, ...followerUserIDs]).catch(e => {})
       case 'all':
-        const rideReplicate = this.localReplicateRides(userIDs, followerUserIDs)
-        const userReplicate = this.localReplicateUsers([...userIDs, ...followerUserIDs])
-        const horsesReplicate = this.localReplicateHorses([...userIDs, ...followerUserIDs])
+        const rideReplicate = this.localReplicateRides(userIDs, followerUserIDs).catch(e => {})
+        const userReplicate = this.localReplicateUsers([...userIDs, ...followerUserIDs]).catch(e => {})
+        const horsesReplicate = this.localReplicateHorses([...userIDs, ...followerUserIDs]).catch(e => {})
         return Promise.all([rideReplicate, horsesReplicate, userReplicate])
       default:
         throw('Local DB not found')

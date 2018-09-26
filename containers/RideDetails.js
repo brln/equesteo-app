@@ -7,7 +7,6 @@ import { connect } from 'react-redux';
 import {
   discardRide,
   createRide,
-  stopLocationTracking,
   updateRide,
   uploadRidePhoto
 } from '../actions'
@@ -169,7 +168,6 @@ class RideDetailsContainer extends PureComponent {
   }
 
   createRide () {
-    this.props.dispatch(stopLocationTracking())
     this.uploadNewPhotos()
     this.props.dispatch(createRide(this.state.ride))
     this.doneOnPage()

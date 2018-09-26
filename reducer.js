@@ -21,10 +21,12 @@ import {
   NEW_APP_STATE,
   NEW_LOCATION,
   NEW_NETWORK_STATE,
+  PAUSE_LOCATION_TRACKING,
   POP_SHOW_RIDE_SHOWN,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
   REMOVE_RIDE_FROM_STATE,
+  RESUME_LOCATION_TRACKING,
   RIDE_COMMENT_CREATED,
   RIDE_CARROT_CREATED,
   RIDE_CARROT_SAVED,
@@ -59,11 +61,13 @@ const initialState = Map({
     goodConnection: false,
     jwt: null,
     lastLocation: null,
+    locationTrackingPaused: false,
     needsRemotePersist: Map({
       horses: false,
       rides: false,
       users: false,
     }),
+    pausedCachedCoordinates: List(),
     photoQueue: Map(),
     popShowRide: null,
     root: SIGNUP_LOGIN,
@@ -111,6 +115,8 @@ export default function AppReducer(state=initialState, action) {
       return state.set('horses', state.get('horses').set(action.horse.get('_id'), action.horse))
     case HORSE_USER_UPDATED:
       return state.set('horseUsers', state.get('horseUsers').set(action.horseUser.get('_id'), action.horseUser))
+    case PAUSE_LOCATION_TRACKING:
+      return state.setIn(['localState', 'locationTrackingPaused'], true)
     case POP_SHOW_RIDE_SHOWN:
       return state.setIn(['localState', 'popShowRide'], null)
     case LOAD_LOCAL_STATE:
@@ -167,9 +173,11 @@ export default function AppReducer(state=initialState, action) {
     case NEW_APP_STATE:
       return state.setIn(['localState', 'appState'], action.newState)
     case NEW_LOCATION:
+      // @TODO: decide what to do with shit when it's paused
       const newState = state.setIn(['localState', 'lastLocation'], action.location)
       const currentRide = state.getIn(['localState', 'currentRide'])
-      if (currentRide) {
+      const currentlyPaused = state.getIn(['localState', 'locationTrackingPaused'])
+      if (currentRide && !currentlyPaused) {
         let newDistance = 0
         const lastLocation = state.getIn(['localState', 'lastLocation'])
         if (lastLocation) {
@@ -207,6 +215,8 @@ export default function AppReducer(state=initialState, action) {
       return state.setIn(['localState', 'needsRemotePersist', action.database], false)
     case REMOVE_RIDE_FROM_STATE:
       return state.remove(action.rideID)
+    case RESUME_LOCATION_TRACKING:
+      return state.setIn(['localState', 'locationTrackingPaused'], false)
     case RIDE_CARROT_CREATED:
       return state.setIn(['rideCarrots', action.carrotData.get('_id')], action.carrotData)
     case RIDE_CARROT_SAVED:

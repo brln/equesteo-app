@@ -797,7 +797,6 @@ export function startLocationTracking () {
       Sentry.captureException(new Error(JSON.stringify(error)))
     });
 
-
     BackgroundGeolocation.start()
   }
 }
@@ -893,6 +892,7 @@ export function submitLogin (email, password) {
       await pouchCouch.localReplicateDB('all', [...following, userID], followers)
       dispatch(receiveJWT(resp.token))
       dispatch(switchRoot(FEED))
+      dispatch(toggleDoingInitialLoad())
       dispatch(saveUserID(resp.id))
       dispatch(setSentryUserContext())
       await dispatch(loadLocalData())
@@ -920,6 +920,7 @@ export function submitSignup (email, password) {
       await pouchCouch.replicateOwnUser(resp.id)
       dispatch(receiveJWT(resp.token))
       dispatch(switchRoot(FEED))
+      dispatch(toggleDoingInitialLoad())
       dispatch(saveUserID(resp.id))
       dispatch(setSentryUserContext())
       await dispatch(loadLocalData())

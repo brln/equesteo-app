@@ -181,10 +181,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5FCFF',
   },
   errorBox: {
-    marginTop: 40,
     textAlign: 'center',
-    paddingTop: 20,
-    paddingBottom: 20,
+    paddingTop: 5,
+    paddingBottom: 5,
     backgroundColor: 'red',
   }
 });

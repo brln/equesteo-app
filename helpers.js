@@ -81,12 +81,15 @@ export function staticMap (ride) {
   for (let i = 0; i < numCoords; i++) {
     const coordinate = ride.rideCoordinates.get(i)
     if (i % nth === 0) {
-      pathCoords += `|${coordinate.get('latitude')},${coordinate.get('longitude')}`
+      const parsedLat = Number(coordinate.get('latitude')).toFixed(4).toString()
+      const parsedLong = Number(coordinate.get('longitude')).toFixed(4).toString()
+      pathCoords += `|${parsedLat},${parsedLong}`
     }
   }
 
   queryStringParams['path'] = pathStyle + pathCoords
   const queryString = urlParams(queryStringParams)
+  console.log(queryString)
   return ROOT_URL + queryString
 }
 

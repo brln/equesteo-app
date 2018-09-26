@@ -5,7 +5,6 @@ import LocationServicesDialogBox from "react-native-android-location-services-di
 
 import {
   discardRide,
-  stopLocationTracking,
   startRide,
   startLocationTracking
 } from '../actions'
@@ -31,15 +30,49 @@ class RecorderContainer extends PureComponent {
 
   constructor (props) {
     super(props)
+    this.state = {
+      showGPSBar: true
+    }
+
     this.backToFeed = this.backToFeed.bind(this)
-    this.componentDidDisappear = this.componentDidDisappear.bind(this)
     this.discardRide = this.discardRide.bind(this)
+    this.finishRide = this.finishRide.bind(this)
     this.showRideDetails = this.showRideDetails.bind(this)
     this.startRide = this.startRide.bind(this)
-    this.startLocationTracking = this.startLocationTracking.bind(this)
-    this.stopLocationTracking = this.stopLocationTracking.bind(this)
 
     Navigation.events().bindComponent(this);
+
+    if (props.currentRide) {
+      Navigation.mergeOptions(this.props.componentId, {
+        topBar: {
+          rightButtons: [
+            {
+              id: 'finishRide',
+              text: 'Finish Ride',
+              color: 'white'
+            },
+          ]
+        }
+      })
+    }
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.lastLocation) {
+      this.gpsTimeout = setTimeout(() => {
+        this.setState({showGPSBar: false})
+      }, 2000)
+    }
+  }
+
+  componentDidDisappear () {
+     clearInterval(this.gpsTimeout)
+  }
+
+  navigationButtonPressed ({ buttonId }) {
+    if (buttonId === 'finishRide') {
+      this.finishRide()
+    }
   }
 
   componentDidMount () {
@@ -55,18 +88,12 @@ class RecorderContainer extends PureComponent {
         preventBackClick: true,
         providerListener: false,
       }).then(
-        this.startLocationTracking
+        this.props.dispatch(startLocationTracking())
       ).catch(
         this.backToFeed
       );
     } else {
-      this.startLocationTracking()
-    }
-  }
-
-  componentDidDisappear () {
-    if (!this.props.currentRide) {
-      this.stopLocationTracking()
+      this.props.dispatch(startLocationTracking())
     }
   }
 
@@ -74,16 +101,29 @@ class RecorderContainer extends PureComponent {
     Navigation.popToRoot(this.props.componentId)
   }
 
-  startLocationTracking () {
-    this.props.dispatch(startLocationTracking())
-  }
-
-  stopLocationTracking () {
-    this.props.dispatch(stopLocationTracking())
-  }
-
   startRide () {
+    console.log('weeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
+    Navigation.mergeOptions(this.props.componentId, {
+      topBar: {
+        rightButtons: [
+          {
+            id: 'finishRide',
+            text: 'Finish Ride',
+            color: 'white'
+          },
+        ]
+      }
+    })
     this.props.dispatch(startRide(this.props.lastLocation))
+  }
+
+  finishRide () {
+    if (this.props.currentRide.get('rideCoordinates').count() > 0) {
+      this.showRideDetails()
+    } else {
+      alert('Discarding empty ride.')
+      this.props.discardRide()
+    }
   }
 
   discardRide () {
@@ -110,9 +150,9 @@ class RecorderContainer extends PureComponent {
         currentRide={this.props.currentRide}
         discardRide={this.discardRide}
         lastLocation={this.props.lastLocation}
+        showGPSBar={this.state.showGPSBar}
         showRideDetails={this.showRideDetails}
         startRide={this.startRide}
-        stopLocationTracking={this.stopLocationTracking}
       />
     )
   }
