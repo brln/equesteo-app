@@ -41,7 +41,10 @@ export default class PhotoMenu extends PureComponent {
               <TouchableOpacity style={{flex: 1, paddingTop: 20}} onPress={this.props.changeProfilePhotoID}>
                 <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
                   <View style={{flex: 1}}>
-                    <Image source={require('../../img/selectImage.png')} style={{flex: 1, height: null, width: null, resizeMode: 'contain'}}/>
+                    <Image
+                      source={require('../../img/selectImage.png')}
+                      style={{flex: 1, height: null, width: null, resizeMode: 'contain'}}
+                    />
                   </View>
                   <View style={{flex: 3}}>
                     <Text style={{fontSize: 20}}>Set as Profile Photo</Text>
@@ -51,7 +54,10 @@ export default class PhotoMenu extends PureComponent {
               <TouchableOpacity style={{flex: 1, paddingTop: 20, paddingBottom: 20}} onPress={this.props.deletePhoto}>
                 <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
                   <View style={{flex: 1}}>
-                    <Image source={require('../../img/deleteImage.png')} style={{flex: 1, height: null, width: null, resizeMode: 'contain'}}/>
+                    <Image
+                      source={require('../../img/deleteImage.png')}
+                      style={{flex: 1, height: null, width: null, resizeMode: 'contain'}}
+                    />
                   </View>
                   <View style={{flex: 3}}>
                     <Text style={{fontSize: 20}}>Delete Photo</Text>

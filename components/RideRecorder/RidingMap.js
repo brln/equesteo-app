@@ -7,7 +7,7 @@ import {
   View
 } from 'react-native';
 
-import { bearing, logRender } from '../../helpers'
+import { bearing, logError, logRender } from '../../helpers'
 
 export default class RidingMap extends PureComponent {
   constructor (props) {
@@ -99,7 +99,11 @@ export default class RidingMap extends PureComponent {
           </MapView>
         </View>
         <View style={{position: 'absolute', right: 0, top: 0}} >
-          <Image source={this.gpsStatusImage()} style={{width: 50, height: 50}}/>
+          <Image
+            source={this.gpsStatusImage()}
+            style={{width: 50, height: 50}}
+            onError={(e) => { logError('there was an error loading RidingMap image') }}
+          />
         </View>
       </View>
     )

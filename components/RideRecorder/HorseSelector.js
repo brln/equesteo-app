@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 
 import { orange } from '../../colors'
+import { logError } from '../../helpers'
 
 const { width } = Dimensions.get('window')
 
@@ -40,6 +41,7 @@ export default class HorseSelector extends PureComponent {
           square
           style={styles.thumbnail}
           source={source}
+          onError={(e) => { logError('there was an error loading HorseSelector avatar') }}
         />
         <View style={{
           position: 'absolute',
@@ -84,6 +86,7 @@ export default class HorseSelector extends PureComponent {
         <Image
           square
           style={styles.thumbnail}
+          onError={(e) => { logError('there was an error loading HorseSelector thumbnail') }}
         />
         <View style={{
           position: 'absolute',

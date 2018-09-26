@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 
 import { black, brand } from '../../colors'
-import { UPDATE_HORSE } from '../../screens'
+import { logError } from '../../helpers'
 
 const { width } = Dimensions.get('window')
 const calcWidth = (width / 2) - 41
@@ -55,6 +55,7 @@ export default class HorseBarnCard extends PureComponent {
               <Image
                 source={source}
                 style={{height: calcWidth, width: calcWidth, margin: 10}}
+                onError={e => logError("Can't load HorseBarnCard image")}
               />
               <View style={{
                 position: 'absolute',

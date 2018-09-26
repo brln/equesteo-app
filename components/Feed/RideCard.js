@@ -19,6 +19,7 @@ import moment from 'moment'
 import Swiper from 'react-native-swiper'
 
 import { brand, darkGrey } from '../../colors'
+import { logError } from '../../helpers'
 import RideImage from './RideImage'
 
 const { width } = Dimensions.get('window')
@@ -178,7 +179,7 @@ export default class RideCard extends PureComponent {
               style={{height: swiperHeight, width: null}}
               key={photo.get('uri')}
               source={{uri: photo.get('uri')}}
-              onError={(error) => { logError('there was an error loading ride image 2') }}
+              onError={(e) => { logError('there was an error loading RideCard image') }}
             />
           </TouchableOpacity>
         )
@@ -256,13 +257,19 @@ export default class RideCard extends PureComponent {
         <CardItem footer>
           <Left>
             <Button transparent onPress={this.toggleCarrot}>
-              <Image source={require('../../img/carrot.png')} style={{height: 20, width: 20}} />
+              <Image
+                source={require('../../img/carrot.png')}
+                style={{height: 20, width: 20}}
+              />
               <Text style={{color: brand}}>{this.props.rideCarrots.count()} Carrots</Text>
             </Button>
           </Left>
           <Right>
             <Button transparent onPress={this.showComments}>
-              <Image source={require('../../img/comment.png')} style={{height: 20, width: 20}} />
+              <Image
+                source={require('../../img/comment.png')}
+                style={{height: 20, width: 20}}
+              />
               <Text style={{color: brand}}>{this.props.rideComments.count()} comments</Text>
             </Button>
           </Right>

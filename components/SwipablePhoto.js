@@ -7,6 +7,7 @@ import {
 import { Navigation } from 'react-native-navigation'
 
 
+import { logError } from '../helpers'
 import { PHOTO_LIGHTBOX } from '../screens'
 
 export default class SwipablePhoto extends PureComponent {
@@ -40,6 +41,7 @@ export default class SwipablePhoto extends PureComponent {
         <Image
           style={{width: '100%', height: '100%'}}
           source={this.props.source}
+          onError={e => logError("Can't load SwipablePhoto image")}
         />
       </TouchableWithoutFeedback>
     )

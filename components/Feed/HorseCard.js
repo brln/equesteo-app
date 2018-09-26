@@ -16,7 +16,7 @@ import moment from 'moment'
 import Swiper from 'react-native-swiper';
 
 import { darkGrey } from '../../colors'
-import { HORSE_PROFILE, PROFILE } from '../../screens'
+import { logError } from '../../helpers'
 
 const { width } = Dimensions.get('window')
 
@@ -122,7 +122,12 @@ export default class HorseCard extends PureComponent {
         const photo = photos.get(id)
         const thisImage = (
           <TouchableOpacity onPress={this.showHorseProfile} style={{flex: 1}} key="map">
-            <Image style={{height: swiperHeight}} key={photo.get('uri')} source={{uri: photo.get('uri')}} />
+            <Image
+              style={{height: swiperHeight}}
+              key={photo.get('uri')}
+              source={{uri: photo.get('uri')}}
+              onError={e => logError("Can't load HorseCard image")}
+            />
           </TouchableOpacity>
         )
         if (id !== this.props.horse.get('profilePhotoID')) {

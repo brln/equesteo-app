@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { logError } from '../../helpers'
 import MultiPlatform from '../../components/MultiPlatform'
 
 import CommentList from './CommentList'
@@ -75,6 +76,7 @@ export default class RideComments extends MultiPlatform {
               <Image
                 style={{height: 50, width: 50}}
                 source={require('../../img/caretRight.png')}
+                onError={(e) => { logError('there was an error loading RideComments image') }}
               />
             </TouchableOpacity>
           </View>
