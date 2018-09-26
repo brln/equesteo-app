@@ -31,7 +31,8 @@ class RecorderContainer extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      showGPSBar: true
+      showGPSBar: true,
+      gpsBarShown: false
     }
 
     this.backToFeed = this.backToFeed.bind(this)
@@ -58,14 +59,14 @@ class RecorderContainer extends PureComponent {
   }
 
   componentWillReceiveProps (nextProps) {
-    if (nextProps.lastLocation) {
+    if (nextProps.lastLocation && !this.state.gpsBarShown) {
       this.gpsTimeout = setTimeout(() => {
-        this.setState({showGPSBar: false})
+        this.setState({showGPSBar: false, gpsBarShown: true})
       }, 2000)
     }
   }
 
-  componentDidDisappear () {
+  componentWillUnmount () {
      clearInterval(this.gpsTimeout)
   }
 
