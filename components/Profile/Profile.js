@@ -163,8 +163,8 @@ export default class Profile extends PureComponent {
               style={styles.unfollowButton}
               onPress={this.unfollow}
               underlayColor={danger}
-                >
-                <Text style={styles.followText}>Unfollow</Text>
+            >
+              <Text style={styles.followText}>Unfollow</Text>
             </TouchableOpacity>
           )
           break

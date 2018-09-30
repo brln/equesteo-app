@@ -86,7 +86,7 @@ class RideContainer extends PureComponent {
 
   deleteRide () {
     this.props.dispatch(updateRide(this.props.ride.set('deleted', true)))
-    Navigation.popToRoot(this.props.componentId)
+    Navigation.pop(this.props.componentId)
   }
 
   horses () {
