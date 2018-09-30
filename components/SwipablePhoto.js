@@ -26,7 +26,6 @@ export default class SwipablePhoto extends PureComponent {
     Navigation.push(this.props.componentId, {
       component: {
         name: PHOTO_LIGHTBOX,
-        id: PHOTO_LIGHTBOX,
         passProps: {
           source: this.props.source,
           close: this.closeLightbox

@@ -7,21 +7,22 @@ import {
 } from 'native-base';
 import {
   Dimensions,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View
 } from 'react-native';
-import Swiper from 'react-native-swiper';
 
 import { brand, darkBrand } from '../../colors'
+import { logError } from '../../helpers'
 import DeleteModal from '../DeleteModal'
 import RidersCard from './RidersCard'
-import SwipablePhoto from '../SwipablePhoto'
 import FabImage from '../FabImage'
-import { PROFILE } from '../../screens'
 import TrainingCard from './TrainingCard'
 import Stat from '../Stat'
+import PhotoFilmstrip from "../Ride/PhotoFilmstrip"
 
 const { height } = Dimensions.get('window')
 
@@ -80,37 +81,33 @@ export default class HorseProfile extends PureComponent {
 
   }
 
-  renderImages () {
+  renderProfileImage () {
     const images = []
     const horse = this.props.horse
     if (horse.get('profilePhotoID')) {
+      const profileSource = {uri: horse.getIn(['photosByID', horse.get('profilePhotoID'), 'uri'])}
       images.push(
-        <SwipablePhoto
-          key="profile"
-          source={{uri: horse.getIn(['photosByID', horse.get('profilePhotoID'), 'uri'])}}
-          componentId={this.props.componentId}
-        />
+        <TouchableOpacity
+          key={"profile"}
+          style={styles.slide}
+          onPress={() => this.props.showPhotoLightbox(profileSource)}
+        >
+          <Image
+            style={{width: '100%', height: '100%'}}
+            source={profileSource}
+            onError={e => logError("Can't load HorseProfile image")}
+          />
+        </TouchableOpacity>
       )
-    }
-    if (horse.get('photosByID').keySeq().count() > 0) {
-      for (let imageID of horse.get('photosByID').keySeq()) {
-        if (imageID !== horse.get('profilePhotoID')) {
-          images.push(
-            <SwipablePhoto
-              key={imageID}
-              source={{ uri: horse.getIn(['photosByID', imageID, 'uri']) }}
-              componentId={this.props.componentId}
-            />
-          )
-        }
-      }
     } else {
       images.push(
-        <SwipablePhoto
-          key="empty"
-          source={require('../../img/emptyHorse.png')}
-          componentId={this.props.componentId}
-        />
+        <View style={styles.slide}>
+          <Image
+            style={{width: '100%', height: '100%'}}
+            source={require('../../img/emptyHorse.png')}
+            onError={e => logError("Can't load Empty Horse Profile image")}
+          />
+        </View>
       )
     }
     return images
@@ -130,11 +127,16 @@ export default class HorseProfile extends PureComponent {
       )
     }
     return (
-      <View style={{height: ((height / 2) - 20)}}>
-        <Swiper loop={false} showsPagination={false}>
-          {this.renderImages()}
-        </Swiper>
-        { fab }
+      <View>
+        <View style={{height: ((height / 2) - 20)}}>
+          {this.renderProfileImage()}
+          { fab }
+        </View>
+        <PhotoFilmstrip
+          photosByID={this.props.horse.get('photosByID')}
+          showPhotoLightbox={this.props.showPhotoLightbox}
+          exclude={[this.props.horse.get('profilePhotoID')]}
+        />
       </View>
     )
   }

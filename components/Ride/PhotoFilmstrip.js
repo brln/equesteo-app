@@ -42,22 +42,30 @@ export default class PhotoFilmstrip extends Component {
 
   render () {
     const byTimestamp = {}
+    let renderAnything = false
     for (let photoID of this.props.photosByID.keySeq()) {
-      const photoData = this.props.photosByID.get(photoID)
-      const source = {uri: photoData.get('uri')}
-      let style = styles.thumbnail
-      byTimestamp[photoData.get('timestamp')] = this.thumbnail(photoID, style, source)
+      if (this.props.exclude.indexOf(photoID) < 0) {
+        const photoData = this.props.photosByID.get(photoID)
+        const source = {uri: photoData.get('uri')}
+        let style = styles.thumbnail
+        byTimestamp[photoData.get('timestamp')] = this.thumbnail(photoID, style, source)
+        renderAnything = true
+      }
     }
     const sortedKeys = Object.keys(byTimestamp).sort((a, b) => b - a)
     const sortedVals = []
     for (let key of sortedKeys) {
       sortedVals.push(byTimestamp[key])
     }
-    return (
-      <ScrollView horizontal={true} style={styles.photoContainer}>
-        {sortedVals}
-      </ScrollView>
-    )
+    let toRender = null
+    if (renderAnything) {
+      toRender = (
+        <ScrollView horizontal={true} style={styles.photoContainer}>
+          {sortedVals}
+        </ScrollView>
+      )
+    }
+    return toRender
   }
 }
 

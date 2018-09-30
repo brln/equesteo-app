@@ -4,7 +4,7 @@ import { Navigation } from 'react-native-navigation'
 
 import { addHorseUser, deleteHorseUser, uploadHorsePhoto } from '../actions'
 import { brand } from '../colors'
-import { PROFILE, UPDATE_HORSE } from '../screens'
+import { PHOTO_LIGHTBOX, PROFILE, UPDATE_HORSE } from '../screens'
 import HorseProfile from '../components/HorseProfile/HorseProfile'
 import { logRender } from '../helpers'
 
@@ -41,9 +41,11 @@ class HorseProfileContainer extends PureComponent {
     }
     this.addRider = this.addRider.bind(this)
     this.closeDeleteModal = this.closeDeleteModal.bind(this)
+    this.closeLightbox = this.closeLightbox.bind(this)
     this.deleteHorse = this.deleteHorse.bind(this)
     this.horseOwner = this.horseOwner.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
+    this.showPhotoLightbox = this.showPhotoLightbox.bind(this)
     this.showRiderProfile = this.showRiderProfile.bind(this)
     this.thisHorsesRides = this.thisHorsesRides.bind(this)
     this.thisHorsesRiders = this.thisHorsesRiders.bind(this)
@@ -69,6 +71,22 @@ class HorseProfileContainer extends PureComponent {
         }
       })
     }
+  }
+
+  showPhotoLightbox (source) {
+    Navigation.push(this.props.componentId, {
+      component: {
+        name: PHOTO_LIGHTBOX,
+        passProps: {
+          source,
+          close: this.closeLightbox
+        }
+      }
+    })
+  }
+
+  closeLightbox () {
+    Navigation.pop(this.props.componentId)
   }
 
   addRider () {
@@ -162,6 +180,7 @@ class HorseProfileContainer extends PureComponent {
         rides={this.thisHorsesRides()}
         riders={this.thisHorsesRiders()}
         showRiderProfile={this.showRiderProfile}
+        showPhotoLightbox={this.showPhotoLightbox}
         uploadPhoto={this.uploadPhoto}
         user={this.props.user}
       />
