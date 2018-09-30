@@ -12,7 +12,12 @@ import {
   uploadProfilePhoto,
 } from "../actions"
 import { brand } from '../colors'
-import { FOLLOW_LIST, HORSE_PROFILE, UPDATE_PROFILE } from '../screens'
+import {
+  FOLLOW_LIST,
+  HORSE_PROFILE,
+  PHOTO_LIGHTBOX,
+  UPDATE_PROFILE
+} from '../screens'
 import { logRender } from '../helpers'
 
 class ProfileContainer extends PureComponent {
@@ -35,6 +40,7 @@ class ProfileContainer extends PureComponent {
 
   constructor (props) {
     super(props)
+    this.closeLightbox = this.closeLightbox.bind(this)
     this.createFollow = this.createFollow.bind(this)
     this.deleteFollow = this.deleteFollow.bind(this)
     this.followings = this.followings.bind(this)
@@ -42,6 +48,7 @@ class ProfileContainer extends PureComponent {
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
     this.profileUserHorses = this.profileUserHorses.bind(this)
     this.showHorseProfile = this.showHorseProfile.bind(this)
+    this.showPhotoLightbox = this.showPhotoLightbox.bind(this)
     this.showUserList = this.showUserList.bind(this)
     this.uploadProfilePhoto = this.uploadProfilePhoto.bind(this)
 
@@ -65,6 +72,22 @@ class ProfileContainer extends PureComponent {
         }
       })
     }
+  }
+
+  showPhotoLightbox (source) {
+    Navigation.push(this.props.componentId, {
+      component: {
+        name: PHOTO_LIGHTBOX,
+        passProps: {
+          source,
+          close: this.closeLightbox
+        }
+      }
+    })
+  }
+
+  closeLightbox () {
+    Navigation.pop(this.props.componentId)
   }
 
   navigationButtonPressed ({ buttonId }) {
@@ -160,6 +183,7 @@ class ProfileContainer extends PureComponent {
           horses={this.profileUserHorses()}
           profileUser={this.props.profileUser}
           showHorseProfile={this.showHorseProfile}
+          showPhotoLightbox={this.showPhotoLightbox}
           showUserList={this.showUserList}
           uploadProfilePhoto={this.uploadProfilePhoto}
           userID={this.props.userID}

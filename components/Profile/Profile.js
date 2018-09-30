@@ -12,9 +12,9 @@ import {
   Thumbnail,
 } from 'native-base';
 import {
-  Button,
   Dimensions,
   FlatList,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -23,8 +23,9 @@ import {
 } from 'react-native';
 
 import { brand, danger, darkBrand, green } from '../../colors'
-import { logRender } from '../../helpers'
-import SwipablePhoto from '../SwipablePhoto'
+import { logRender, logError } from '../../helpers'
+import PhotoFilmstrip from '../Ride/PhotoFilmstrip'
+
 import FabImage from '../FabImage'
 
 const { height } = Dimensions.get('window')
@@ -99,37 +100,33 @@ export default class Profile extends PureComponent {
     }
   }
 
-  renderImages () {
+  renderProfileImage () {
     const images = []
     const user = this.props.profileUser
     if (user.get('profilePhotoID')) {
+      const profileSource = {uri: user.getIn(['photosByID', user.get('profilePhotoID'), 'uri'])}
       images.push(
-        <SwipablePhoto
-          key="profile"
-          source={{uri: user.getIn(['photosByID', user.get('profilePhotoID'), 'uri'])}}
-          componentId={this.props.componentId}
-        />
+        <TouchableOpacity
+          style={styles.slide}
+          onPress={() => {this.props.showPhotoLightbox(profileSource)}}
+          key={"profile"}
+        >
+          <Image
+            style={{width: '100%', height: '100%'}}
+            source={profileSource}
+            onError={e => logError("Can't load Profile image")}
+          />
+        </TouchableOpacity>
       )
-    }
-    if (user.get('photosByID').keySeq().count() > 0) {
-      for (let imageID of user.get('photosByID').keySeq()) {
-        if (imageID !== user.get('profilePhotoID')) {
-          images.push(
-            <SwipablePhoto
-              key={imageID}
-              source={{uri: user.getIn(['photosByID', imageID, 'uri'])}}
-              componentId={this.props.componentId}
-            />
-          )
-        }
-      }
     } else {
       images.push(
-        <SwipablePhoto
-          key="empty"
-          source={require('../../img/emptyProfile.png')}
-          componentId={this.props.componentId}
-        />
+        <View style={styles.slide} key={"empty"}>
+          <Image
+            style={{width: '100%', height: '100%'}}
+            source={require('../../img/emptyProfile.png')}
+            onError={e => logError("Can't load SwipablePhoto image")}
+          />
+        </View>
       )
     }
     return images
@@ -176,14 +173,21 @@ export default class Profile extends PureComponent {
     }
 
     return (
-      <View style={{height: ((height / 2) - 20)}}>
-        <Swiper loop={false} showsPagination={false}>
-          {this.renderImages()}
-        </Swiper>
-        { fab }
-        <View style={{position: 'absolute', width: 150, bottom: 10, right: 10}}>
-          { followButton }
+      <View>
+        <View style={{height: ((height / 2) - 20)}}>
+          <Swiper loop={false} showsPagination={false}>
+            {this.renderProfileImage()}
+          </Swiper>
+          { fab }
+          <View style={{position: 'absolute', width: 150, bottom: 10, right: 10}}>
+            { followButton }
+          </View>
         </View>
+        <PhotoFilmstrip
+          photosByID={this.props.profileUser.get('photosByID')}
+          showPhotoLightbox={this.props.showPhotoLightbox}
+          exclude={[this.props.profileUser.get('profilePhotoID')]}
+        />
       </View>
     )
   }
