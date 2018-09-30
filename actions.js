@@ -14,6 +14,7 @@ import {BadRequestError, NotConnectedError, UnauthorizedError} from "./errors"
 
 import {
   CLEAR_LAST_LOCATION,
+  CLEAR_PAUSED_LOCATIONS,
   CLEAR_SEARCH,
   CLEAR_STATE,
   CLEAR_STATE_AFTER_PERSIST,
@@ -28,10 +29,12 @@ import {
   HORSE_USER_UPDATED,
   LOAD_LOCAL_STATE,
   LOCAL_DATA_LOADED,
+  MERGE_PAUSED_LOCATIONS,
   NEEDS_REMOTE_PERSIST,
   NEW_LOCATION,
   NEW_APP_STATE,
   NEW_NETWORK_STATE,
+  PAUSE_LOCATION_TRACKING,
   POP_SHOW_RIDE_SHOWN,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
@@ -46,6 +49,7 @@ import {
   SYNC_COMPLETE,
   TOGGLE_AWAITING_PW_CHANGE,
   TOGGLE_DOING_INITIAL_LOAD,
+  UNPAUSE_LOCATION_TRACKING,
   USER_UPDATED,
   USER_SEARCH_RETURNED,
 } from './constants'
@@ -53,6 +57,12 @@ import {
 export function clearLastLocation () {
   return {
     type: CLEAR_LAST_LOCATION,
+  }
+}
+
+export function clearPausedLocations () {
+  return {
+    type: CLEAR_PAUSED_LOCATIONS
   }
 }
 
@@ -155,6 +165,12 @@ export function localDataLoaded (localData) {
   }
 }
 
+export function mergePausedLocations () {
+  return {
+    type: MERGE_PAUSED_LOCATIONS,
+  }
+}
+
 export function needsRemotePersist (database) {
   return {
     type: NEEDS_REMOTE_PERSIST,
@@ -183,6 +199,12 @@ function newNetworkState (connectionType, effectiveConnectionType) {
     connectionType,
     effectiveConnectionType,
     logData: ['connectionType', 'effectiveConnectionType'],
+  }
+}
+
+export function pauseLocationTracking () {
+  return {
+    type: PAUSE_LOCATION_TRACKING
   }
 }
 
@@ -280,6 +302,12 @@ function toggleAwaitingPasswordChange () {
 function toggleDoingInitialLoad () {
   return {
     type: TOGGLE_DOING_INITIAL_LOAD
+  }
+}
+
+export function unpauseLocationTracking () {
+  return {
+    type: UNPAUSE_LOCATION_TRACKING
   }
 }
 
@@ -388,7 +416,6 @@ export function checkFCMPermission () {
     if (!enabled) {
       try {
         const resp = await firebase.messaging().requestPermission();
-        console.log(resp)
       } catch (error) {
         alert('YOU HAVE TO.')
         throw error

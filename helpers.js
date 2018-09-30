@@ -89,7 +89,6 @@ export function staticMap (ride) {
 
   queryStringParams['path'] = pathStyle + pathCoords
   const queryString = urlParams(queryStringParams)
-  console.log(queryString)
   return ROOT_URL + queryString
 }
 

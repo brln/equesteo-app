@@ -2,6 +2,7 @@ import { fromJS, List, Map } from 'immutable'
 
 import {
   CLEAR_LAST_LOCATION,
+  CLEAR_PAUSED_LOCATIONS,
   CLEAR_SEARCH,
   CLEAR_STATE,
   CLEAR_STATE_AFTER_PERSIST,
@@ -17,6 +18,7 @@ import {
   LOAD_LOCAL_STATE,
   LOCAL_DATA_LOADED,
   MARK_PHOTO_ENQUEUED,
+  MERGE_PAUSED_LOCATIONS,
   NEEDS_REMOTE_PERSIST,
   NEW_APP_STATE,
   NEW_LOCATION,
@@ -38,6 +40,7 @@ import {
   TOGGLE_AWAITING_PW_CHANGE,
   TOGGLE_DOING_INITIAL_LOAD,
   SYNC_COMPLETE,
+  UNPAUSE_LOCATION_TRACKING,
   USER_SEARCH_RETURNED,
   USER_UPDATED,
 } from './constants'
@@ -88,6 +91,8 @@ export default function AppReducer(state=initialState, action) {
   switch (action.type) {
     case CLEAR_LAST_LOCATION:
       return state.setIn(['localState', 'lastLocation'], null)
+    case CLEAR_PAUSED_LOCATIONS:
+      return state.setIn(['localState', 'pausedCachedCoordinates'], List())
     case CLEAR_SEARCH:
       return state.setIn(['localState', 'userSearchResults'], List())
     case CLEAR_STATE:
@@ -168,12 +173,26 @@ export default function AppReducer(state=initialState, action) {
       }))
     case MARK_PHOTO_ENQUEUED:
       return state.setIn(['localState', 'photoQueue', action.queueItemID, 'queueID'], action.queueID)
+    case MERGE_PAUSED_LOCATIONS:
+      const rideCoordinates = state.getIn(
+        ['localState', 'currentRide', 'rideCoordinates']
+      )
+      const pausedCoordinates = state.getIn(
+        ['localState', 'pausedCachedCoordinates']
+      )
+      const merged = rideCoordinates.concat(pausedCoordinates)
+      return state.setIn(
+        ['localState', 'currentRide', 'rideCoordinates'],
+        merged
+      ).setIn(
+        ['localState', 'pausedCachedCoordinates'],
+        List()
+      )
     case NEEDS_REMOTE_PERSIST:
       return state.setIn(['localState', 'needsRemotePersist', action.database], true)
     case NEW_APP_STATE:
       return state.setIn(['localState', 'appState'], action.newState)
     case NEW_LOCATION:
-      // @TODO: decide what to do with shit when it's paused
       const newState = state.setIn(['localState', 'lastLocation'], action.location)
       const currentRide = state.getIn(['localState', 'currentRide'])
       const currentlyPaused = state.getIn(['localState', 'locationTrackingPaused'])
@@ -198,6 +217,18 @@ export default function AppReducer(state=initialState, action) {
         const totalDistance = currentRide.get('distance') + newDistance
         const newCurrentRide = currentRide.merge(Map({rideCoordinates, distance: totalDistance}))
         return newState.setIn(['localState', 'currentRide'], newCurrentRide)
+      } else if (currentRide && currentlyPaused) {
+        const pausedCoordinates = state.getIn(
+          ['localState', 'pausedCachedCoordinates']
+        ).push(
+          action.location
+        ).sort((a, b) => {
+          return new Date(a.timestamp) - new Date(b.timestamp);
+        })
+        return newState.setIn(
+          ['localState', 'pausedCachedCoordinates'],
+          pausedCoordinates
+        )
       } else {
         return newState
       }
@@ -255,6 +286,8 @@ export default function AppReducer(state=initialState, action) {
         ['localState', 'doingInitialLoad'],
         !state.getIn(['localState', 'doingInitialLoad'])
       )
+    case UNPAUSE_LOCATION_TRACKING:
+      return state.setIn(['localState', 'locationTrackingPaused'], false)
     case USER_UPDATED:
       return state.setIn(['users', action.userData.get('_id')], action.userData)
     case USER_SEARCH_RETURNED:

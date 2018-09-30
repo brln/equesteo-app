@@ -5,8 +5,13 @@ import { connect } from 'react-redux';
 
 
 import {
-  discardRide,
+  clearPausedLocations,
   createRide,
+  discardRide,
+  mergePausedLocations,
+  pauseLocationTracking,
+  stopLocationTracking,
+  unpauseLocationTracking,
   updateRide,
   uploadRidePhoto
 } from '../actions'
@@ -25,6 +30,13 @@ class RideDetailsContainer extends PureComponent {
         backButton: {
           color: 'white'
         },
+        leftButtons: [
+          {
+            id: 'resume',
+            text: 'Return to Ride',
+            color: 'white'
+          }
+        ],
         rightButtons: [
           {
             id: 'save',
@@ -62,16 +74,28 @@ class RideDetailsContainer extends PureComponent {
     this.uploadNewPhotos = this.uploadNewPhotos.bind(this)
 
     Navigation.events().bindComponent(this);
+
+    if (props.newRide) {
+      props.dispatch(pauseLocationTracking())
+    }
   }
 
   navigationButtonPressed({ buttonId }) {
     if (this.props.newRide) {
       Navigation.mergeOptions(this.props.componentId, {topBar: {rightButtons: []}})
       if (buttonId === 'save') {
+        this.props.dispatch(clearPausedLocations())
+        this.props.dispatch(stopLocationTracking())
         this.createRide(this.state.ride)
       } else if (buttonId === 'discard') {
+        this.props.dispatch(clearPausedLocations())
+        this.props.dispatch(stopLocationTracking())
         this.props.dispatch(discardRide())
         this.doneOnPage()
+      } else if (buttonId === 'resume') {
+        this.props.dispatch(unpauseLocationTracking())
+        this.props.dispatch(mergePausedLocations())
+        Navigation.pop(this.props.componentId)
       }
     } else {
       if (buttonId === 'save') {

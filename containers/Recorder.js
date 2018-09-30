@@ -6,7 +6,8 @@ import LocationServicesDialogBox from "react-native-android-location-services-di
 import {
   discardRide,
   startRide,
-  startLocationTracking
+  startLocationTracking,
+  unpauseLocationTracking,
 } from '../actions'
 import { brand } from '../colors'
 import RideRecorder from '../components/RideRecorder/RideRecorder'
@@ -67,7 +68,8 @@ class RecorderContainer extends PureComponent {
   }
 
   componentWillUnmount () {
-     clearInterval(this.gpsTimeout)
+    console.log('CLEARING gpsTimeout in RecorderContainer')
+    clearInterval(this.gpsTimeout)
   }
 
   navigationButtonPressed ({ buttonId }) {
@@ -103,7 +105,6 @@ class RecorderContainer extends PureComponent {
   }
 
   startRide () {
-    console.log('weeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
     Navigation.mergeOptions(this.props.componentId, {
       topBar: {
         rightButtons: [
@@ -115,6 +116,7 @@ class RecorderContainer extends PureComponent {
         ]
       }
     })
+    this.props.dispatch(unpauseLocationTracking())
     this.props.dispatch(startRide(this.props.lastLocation))
   }
 
