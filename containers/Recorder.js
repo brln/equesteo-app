@@ -139,7 +139,6 @@ class RecorderContainer extends PureComponent {
     Navigation.push(this.props.componentId, {
       component: {
         name: RIDE_DETAILS,
-        id: RIDE_DETAILS,
         passProps: { elapsedTime }
       }
     });

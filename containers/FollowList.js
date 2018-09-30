@@ -35,7 +35,6 @@ class FollowListContainer extends PureComponent {
     Navigation.push(this.props.componentId, {
       component: {
         name: PROFILE,
-        id: PROFILE,
         passProps: {
           profileUser,
         }

@@ -42,7 +42,6 @@ class RideContainer extends PureComponent {
     if (buttonId === 'edit') {
       Navigation.push(this.props.componentId, {
         component: {
-          id: RIDE_DETAILS,
           name: RIDE_DETAILS,
           passProps: {
             rideID: this.props.ride.get('_id')
@@ -98,7 +97,6 @@ class RideContainer extends PureComponent {
     Navigation.push(this.props.componentId, {
       component: {
         name: PHOTO_LIGHTBOX,
-        id: PHOTO_LIGHTBOX,
         passProps: {
           source
         }
@@ -110,7 +108,6 @@ class RideContainer extends PureComponent {
     Navigation.push(this.props.componentId, {
       component: {
         name: MAP,
-        id: MAP,
         passProps: { rideID }
       }
     })
@@ -120,7 +117,6 @@ class RideContainer extends PureComponent {
     Navigation.push(this.props.componentId, {
       component: {
         name: HORSE_PROFILE,
-        id: HORSE_PROFILE,
         title: horse.get('name'),
         passProps: { horse, ownerID },
       }

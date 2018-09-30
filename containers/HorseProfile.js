@@ -86,7 +86,6 @@ class HorseProfileContainer extends PureComponent {
       Navigation.push(this.props.componentId, {
         component: {
           name: UPDATE_HORSE,
-          id: UPDATE_HORSE,
           title: "Update Horse",
           passProps: {
             horseID: this.props.horse.get('_id'),
@@ -103,7 +102,6 @@ class HorseProfileContainer extends PureComponent {
     Navigation.push(this.props.componentId, {
       component: {
         name: PROFILE,
-        id: PROFILE,
         passProps: {
           profileUser: rider,
         }

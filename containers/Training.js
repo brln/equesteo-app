@@ -39,7 +39,6 @@ class TrainingContainer extends PureComponent {
     Navigation.push(this.props.componentId, {
       component: {
         name: RIDE,
-        id: RIDE,
         passProps: {rideID: ride.get('_id')}
       }
     });

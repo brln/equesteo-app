@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import {
   Dimensions,
+  ScrollView,
   StyleSheet,
   TouchableOpacity,
   View
@@ -53,9 +54,9 @@ export default class PhotoFilmstrip extends Component {
       sortedVals.push(byTimestamp[key])
     }
     return (
-      <View style={styles.photoContainer}>
+      <ScrollView horizontal={true} style={styles.photoContainer}>
         {sortedVals}
-      </View>
+      </ScrollView>
     )
   }
 }

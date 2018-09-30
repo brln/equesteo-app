@@ -42,7 +42,6 @@ class DrawerContainer extends Component {
     Navigation.push(this.props.activeComponent, {
       component: {
         name: RECORDER,
-        id: RECORDER,
       }
     });
 	}
@@ -52,7 +51,6 @@ class DrawerContainer extends Component {
     Navigation.push(this.props.activeComponent, {
       component: {
         name: PROFILE,
-        id: PROFILE,
         title: 'My Account',
         passProps: {
           profileUser: this.props.user,
@@ -67,7 +65,6 @@ class DrawerContainer extends Component {
     Navigation.push(this.props.activeComponent, {
       component: {
         name: BARN,
-        id: BARN
       }
     });
   }
@@ -77,7 +74,6 @@ class DrawerContainer extends Component {
     Navigation.push(this.props.activeComponent, {
       component: {
         name: TRAINING,
-        id: TRAINING
       }
     });
   }
@@ -110,7 +106,7 @@ class DrawerContainer extends Component {
               height: 120,
               alignItems: 'center',
             }}
-          />
+        />
           <Text style={{
             fontFamily: 'Panama-Light',
             fontSize: 30,

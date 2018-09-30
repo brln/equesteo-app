@@ -118,7 +118,7 @@ export default class HorseProfile extends PureComponent {
 
   renderImageSwiper () {
     let fab
-    if (this.props.horse.get('userID') === this.props.user.get('_id')) {
+    if (this.props.horseOwner === this.props.user) {
       fab = (
         <Fab
           direction="up"

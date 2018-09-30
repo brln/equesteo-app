@@ -80,7 +80,6 @@ class FeedContainer extends PureComponent {
        Navigation.push(this.props.componentId, {
          component: {
            name: FIND_PEOPLE,
-           id: FIND_PEOPLE,
          }
        })
      }
@@ -106,7 +105,6 @@ class FeedContainer extends PureComponent {
     Navigation.push(this.props.componentId, {
       component: {
         name: HORSE_PROFILE,
-        id: HORSE_PROFILE,
         title: horse.get('name'),
         passProps: {
           horse,
@@ -121,7 +119,6 @@ class FeedContainer extends PureComponent {
       component: {
         title: 'Comments',
         name: RIDE_COMMENTS,
-        id: RIDE_COMMENTS,
         passProps: {
          rideID: ride.get('_id')
         }
@@ -133,7 +130,6 @@ class FeedContainer extends PureComponent {
     Navigation.push(this.props.componentId, {
       component: {
         name: PROFILE,
-        id: PROFILE,
         passProps: {
           profileUser: user,
         }
@@ -145,7 +141,6 @@ class FeedContainer extends PureComponent {
     Navigation.push(this.props.componentId, {
       component: {
         name: RIDE,
-        id: RIDE,
         passProps: {rideID: ride.get('_id')}
       }
     });

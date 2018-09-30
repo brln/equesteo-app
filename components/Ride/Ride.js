@@ -230,6 +230,12 @@ export default class Ride extends PureComponent {
               { speedChart }
             </Swiper>
           </View>
+
+          <PhotoFilmstrip
+            photosByID={this.props.ride.get('photosByID')}
+            showPhotoLightbox={this.props.showPhotoLightbox}
+          />
+
           <View style={{flex: 1}}>
             <Stats
               horses={this.props.horses}
@@ -243,10 +249,7 @@ export default class Ride extends PureComponent {
 
             { this.rideNotes() }
 
-            <PhotoFilmstrip
-              photosByID={this.props.ride.get('photosByID')}
-              showPhotoLightbox={this.props.showPhotoLightbox}
-            />
+
           </View>
         </View>
       </ScrollView>

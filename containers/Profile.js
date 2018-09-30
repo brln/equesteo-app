@@ -72,7 +72,6 @@ class ProfileContainer extends PureComponent {
       Navigation.push(this.props.componentId, {
         component: {
           name: UPDATE_PROFILE,
-          id: UPDATE_PROFILE,
           screen: UPDATE_PROFILE,
           title: 'Update Profile',
         }
@@ -100,7 +99,6 @@ class ProfileContainer extends PureComponent {
     Navigation.push(this.props.componentId, {
       component: {
         name: FOLLOW_LIST,
-        id: FOLLOW_LIST,
         passProps: {
           userIDs: userIDs.toJS(),
         }
@@ -112,7 +110,6 @@ class ProfileContainer extends PureComponent {
     Navigation.push(this.props.componentId, {
       component: {
         name: HORSE_PROFILE,
-        id: HORSE_PROFILE,
         title: horse.get('name'),
         passProps: {horse},
       }
