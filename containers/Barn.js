@@ -14,6 +14,7 @@ class BarnContainer extends PureComponent {
         title: {
           text: "My Barn",
           color: 'white',
+          fontSize: 20
         },
         background: {
           color: brand,

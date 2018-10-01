@@ -21,6 +21,7 @@ class RideContainer extends PureComponent {
         },
         title: {
           color: 'white',
+          fontSize: 20
         },
         rightButtons: [
           {

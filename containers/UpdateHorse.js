@@ -15,6 +15,7 @@ class UpdateHorseContainer extends PureComponent {
         title: {
           text: "Edit Horse",
           color: 'white',
+          fontSize: 20
         },
         background: {
           color: brand,

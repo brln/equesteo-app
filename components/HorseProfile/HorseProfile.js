@@ -101,7 +101,7 @@ export default class HorseProfile extends PureComponent {
       )
     } else {
       images.push(
-        <View style={styles.slide}>
+        <View style={styles.slide} key={"empty"}>
           <Image
             style={{width: '100%', height: '100%'}}
             source={require('../../img/emptyHorse.png')}

@@ -15,6 +15,7 @@ class FindPeopleContainer extends PureComponent {
         title: {
           text: "Find People",
           color: 'white',
+          fontSize: 20
         },
         background: {
           color: brand,

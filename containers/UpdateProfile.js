@@ -14,6 +14,7 @@ class UpdateProfileContainer extends PureComponent {
         title: {
           text: "Edit My Account",
           color: 'white',
+          fontSize: 20
         },
         background: {
           color: brand,

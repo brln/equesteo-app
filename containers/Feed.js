@@ -25,6 +25,7 @@ class FeedContainer extends PureComponent {
         title: {
           text: "Feed",
           color: 'white',
+          fontSize: 20
         },
         leftButtons: [{
           id: 'sideMenu',

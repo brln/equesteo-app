@@ -15,6 +15,7 @@ class TrainingContainer extends PureComponent {
         title: {
           text: "Training",
           color: 'white',
+          fontSize: 20
         },
         background: {
           color: brand,

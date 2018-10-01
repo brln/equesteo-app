@@ -14,6 +14,7 @@ class RideCommentsContainer extends PureComponent {
         title: {
           text: "Comments",
           color: 'white',
+          fontSize: 20
         },
         background: {
           color: brand,

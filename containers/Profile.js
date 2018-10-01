@@ -33,6 +33,7 @@ class ProfileContainer extends PureComponent {
         },
         title: {
           color: 'white',
+          fontSize: 20
         }
       }
     };

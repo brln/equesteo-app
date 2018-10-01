@@ -195,8 +195,7 @@ export default class RideCard extends PureComponent {
       return (
         <Swiper
           loop={false}
-          showsPagination={false}
-          showsButtons={true}
+          showsPagination={true}
           style={{height: swiperHeight}}
         >
           { images }
