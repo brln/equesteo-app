@@ -5,6 +5,8 @@ import { Navigation } from 'react-native-navigation'
 import {
   Dimensions,
   Image,
+  ScrollView,
+  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -21,7 +23,7 @@ import { brand, lightGrey } from '../colors'
 import { logRender } from '../helpers'
 
 
-const { width } = Dimensions.get('window')
+const { height, width } = Dimensions.get('window')
 
 class DrawerContainer extends Component {
   constructor (props) {
@@ -91,78 +93,79 @@ class DrawerContainer extends Component {
   render() {
     logRender('DrawerContainer')
     return (
-      <View style={styles.linearGradient}>
-        <View style={{
-          flex: 1,
-          backgroundColor: lightGrey,
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'column',
-        }}>
-          <Image
-            source={require('../img/logo250.png')}
-            style={{
-              width: 120,
-              height: 120,
-              alignItems: 'center',
-            }}
-        />
-          <Text style={{
-            fontFamily: 'Panama-Light',
-            fontSize: 30,
-            color: 'black',
+      <ScrollView style={styles.linearGradient}>
+        <View style={{height: height - StatusBar.currentHeight}}>
+          <View style={{
+            flex: 1,
+            backgroundColor: lightGrey,
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
           }}>
-            Equesteo
-          </Text>
+            <Image
+              source={require('../img/logo250.png')}
+              style={{
+                width: 120,
+                height: 120,
+                alignItems: 'center',
+              }}
+          />
+            <Text style={{
+              fontFamily: 'Panama-Light',
+              fontSize: 30,
+              color: 'black',
+            }}>
+              Equesteo
+            </Text>
+          </View>
+          <View style={styles.container}>
+              <View style={styles.drawerList}>
+                <TouchableOpacity onPress={this.openRecorder}>
+                  <View style={styles.drawerListItem}>
+                    <Text style={styles.drawerListItemText} onTouch>
+                      Go Ride
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={this.openBarn}>
+                  <View style={styles.drawerListItem}>
+                    <Text style={styles.drawerListItemText}>
+                      My Barn
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={this.openTraining}>
+                  <View style={styles.drawerListItem}>
+                    <Text style={styles.drawerListItemText} onTouch>
+                      Training
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={this.openAccount}>
+                  <View style={styles.drawerListItem}>
+                    <Text style={styles.drawerListItemText}>
+                      My Account
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </View>
         </View>
-				<View style={styles.container}>
-					<View style={styles.drawerList}>
-            <TouchableOpacity onPress={this.openRecorder}>
-              <View style={styles.drawerListItem}>
-                <Text style={styles.drawerListItemText} onTouch>
-                  Go Ride
-                </Text>
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={this.openBarn}>
-              <View style={styles.drawerListItem}>
-                <Text style={styles.drawerListItemText}>
-                  My Barn
-                </Text>
-              </View>
-            </TouchableOpacity>
-
-
-            <TouchableOpacity onPress={this.openTraining}>
-              <View style={styles.drawerListItem}>
-                <Text style={styles.drawerListItemText} onTouch>
-                  Training
-                </Text>
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={this.openAccount}>
-              <View style={styles.drawerListItem}>
-                <Text style={styles.drawerListItemText}>
-                  My Account
-                </Text>
-              </View>
-            </TouchableOpacity>
-					</View>
-				</View>
-			</View>
+      </ScrollView>
     )
   }
 }
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 2,
-    paddingTop: 30,
-		paddingLeft: 20,
-		justifyContent: 'flex-start',
-    backgroundColor: brand,
+      flex: 2,
+      paddingTop: 30,
+      paddingLeft: 20,
+      justifyContent: 'flex-start',
+      backgroundColor: brand,
 	},
 	drawerList: {
 
@@ -171,9 +174,9 @@ const styles = StyleSheet.create({
 		width: 27
 	},
 	drawerListItem: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginBottom: 23
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 23
 	},
 	drawerListItemText: {
 		color: 'white',
@@ -183,8 +186,9 @@ const styles = StyleSheet.create({
 		flex: 1
 	},
 	linearGradient: {
-		flex: 1,
-    width: width * 0.75
+      flex: 1,
+      height: height,
+      width: width * 0.75
 	},
 });
 

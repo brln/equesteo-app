@@ -160,7 +160,9 @@ class SignupLoginContainer extends PureComponent {
     const error = this.props.error ? <Text style={styles.errorBox}>{this.props.error}</Text> : null
     return (
         <View style={styles.container}>
-          <ScrollView>
+          <ScrollView
+            keyboardShouldPersistTaps={'always'}
+          >
             {error}
             <Image
               source={require('../img/loginbg3.jpg')}

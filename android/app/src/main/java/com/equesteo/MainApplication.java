@@ -48,6 +48,12 @@ public class MainApplication extends NavigationApplication {
         SoLoader.init(this, /* native exopackage */ false);
         ReadableNativeArray.setUseNativeAccessor(true);
         ReadableNativeMap.setUseNativeAccessor(true);
+
+
+        // https://codedaily.io/tutorials/4/Increase-Android-AsyncStorage-Size-in-React-Native
+        // https://sentry.io/equesteo/equesteo-android/issues/707620247/
+        long size = 50L * 1024L * 1024L; // 50 MB
+        com.facebook.react.modules.storage.ReactDatabaseSupplier.getInstance(getApplicationContext()).setMaximumSize(size);
     }
 
     @Override

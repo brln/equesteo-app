@@ -21,8 +21,9 @@ import {
 
 
 import { darkBrand, darkGrey } from '../../colors'
-import { haversine, logRender, logInfo } from '../../helpers'
+import { haversine, logRender, logInfo, logError } from '../../helpers'
 import PhotoFilmstrip from './PhotoFilmstrip'
+import RideImage from '../Feed/RideImage'
 import SpeedChart from './SpeedChart'
 import Stats from './Stats'
 import DeleteModal from '../DeleteModal'
@@ -225,7 +226,10 @@ export default class Ride extends PureComponent {
               <TouchableWithoutFeedback style={styles.slide}
                 onPress={this.fullscreenMap}
               >
-                <Image style={styles.image} source={{uri: this.props.ride.get('mapURL') }} />
+                <RideImage
+                  style={styles.image}
+                  uri={this.props.ride.get('mapURL') }
+                />
               </TouchableWithoutFeedback>
               { speedChart }
             </Swiper>
@@ -247,10 +251,7 @@ export default class Ride extends PureComponent {
               showHorseProfile={this.props.showHorseProfile}
               userID={this.props.userID}
             />
-
             { this.rideNotes() }
-
-
           </View>
         </View>
       </ScrollView>

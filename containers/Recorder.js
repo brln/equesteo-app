@@ -7,6 +7,7 @@ import {
   discardRide,
   startRide,
   startLocationTracking,
+  stopLocationTracking,
   unpauseLocationTracking,
 } from '../actions'
 import { brand } from '../colors'
@@ -22,9 +23,13 @@ class RecorderContainer extends PureComponent {
           color: brand,
         },
         elevation: 0,
-        backButton: {
-          color: 'white'
-        }
+        leftButtons: [
+          {
+            id: 'back',
+            icon: require('../img/back-arrow.png'),
+            color: 'white'
+          }
+        ],
       }
     };
   }
@@ -32,8 +37,7 @@ class RecorderContainer extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      showGPSBar: true,
-      gpsBarShown: false
+      showGPSBar: !props.currentRide,
     }
 
     this.backToFeed = this.backToFeed.bind(this)
@@ -60,9 +64,9 @@ class RecorderContainer extends PureComponent {
   }
 
   componentWillReceiveProps (nextProps) {
-    if (nextProps.lastLocation && !this.state.gpsBarShown) {
+    if (nextProps.lastLocation && !this.gpsTimeout) {
       this.gpsTimeout = setTimeout(() => {
-        this.setState({showGPSBar: false, gpsBarShown: true})
+        this.setState({showGPSBar: false})
       }, 2000)
     }
   }
@@ -75,6 +79,12 @@ class RecorderContainer extends PureComponent {
   navigationButtonPressed ({ buttonId }) {
     if (buttonId === 'finishRide') {
       this.finishRide()
+    } else if (buttonId === 'back') {
+      if (!this.props.currentRide) {
+        // @TODO: TEST THIS!!!!! not sure if right
+        this.props.dispatch(stopLocationTracking())
+      }
+      Navigation.pop(this.props.componentId)
     }
   }
 
@@ -125,7 +135,7 @@ class RecorderContainer extends PureComponent {
       this.showRideDetails()
     } else {
       alert('Discarding empty ride.')
-      this.props.discardRide()
+      this.discardRide()
     }
   }
 

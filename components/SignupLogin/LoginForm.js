@@ -8,7 +8,6 @@ import {
   View
 } from 'react-native';
 
-import { darkBrand } from '../../colors'
 import MultiPlatform from '../MultiPlatform'
 
 export default class LoginForm extends MultiPlatform {

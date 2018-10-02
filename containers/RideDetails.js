@@ -32,8 +32,8 @@ class RideDetailsContainer extends PureComponent {
         },
         leftButtons: [
           {
-            id: 'resume',
-            text: 'Return to Ride',
+            id: 'back',
+            icon: require('../img/back-arrow.png'),
             color: 'white'
           }
         ],
@@ -92,7 +92,7 @@ class RideDetailsContainer extends PureComponent {
         this.props.dispatch(stopLocationTracking())
         this.props.dispatch(discardRide())
         this.doneOnPage()
-      } else if (buttonId === 'resume') {
+      } else if (buttonId === 'back') {
         this.props.dispatch(unpauseLocationTracking())
         this.props.dispatch(mergePausedLocations())
         Navigation.pop(this.props.componentId)

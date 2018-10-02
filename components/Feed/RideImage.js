@@ -12,8 +12,11 @@ export default class RideImage extends PureComponent {
     return (
       <Image
         source={{uri: uriWithKey}}
-        style={{height: this.props.height, width: null, flex: 1}}
-        onError={(e) => { logError('there was an error loading RideImage image') }}
+        style={this.props.style}
+        onError={(e) => {
+          logError('there was an error loading RideImage image')
+          logError(uriWithKey)
+        }}
       />
     )
   }

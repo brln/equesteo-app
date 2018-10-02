@@ -654,8 +654,10 @@ function switchRoot (newRoot) {
                   component: {
                     name: FEED,
                     id: FEED,
-                    topBar: {
-                      elevation: 0
+                    options: {
+                      topBar: {
+                        elevation: 0
+                      }
                     }
                   },
                 }]

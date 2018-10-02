@@ -1,4 +1,5 @@
 import { fromJS, List, Map } from 'immutable'
+import BackgroundGeolocation from 'react-native-mauron85-background-geolocation'
 
 import {
   CLEAR_LAST_LOCATION,

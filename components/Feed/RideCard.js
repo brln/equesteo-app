@@ -165,7 +165,10 @@ export default class RideCard extends PureComponent {
     const swiperHeight = width * (2/3)
     const mapImage = (
       <TouchableOpacity onPress={this.showRide} style={{flex: 1}} key="map">
-        <RideImage height={swiperHeight} uri={this.props.ride.get('mapURL')} />
+        <RideImage
+          uri={this.props.ride.get('mapURL')}
+          style={{height: swiperHeight, width: null, flex: 1}}
+        />
       </TouchableOpacity>
     )
     if (this.props.ride.get('photosByID').keySeq().count() > 0) {
