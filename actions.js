@@ -942,8 +942,10 @@ export function submitSignup (email, password) {
       dispatch(dismissError())
       dispatch(toggleDoingInitialLoad())
       await LocalStorage.saveToken(resp.token, resp.id);
+      const following = resp.following
+      const userID = resp.id
       const pouchCouch = new PouchCouch(resp.token)
-      await pouchCouch.replicateOwnUser(resp.id)
+      await pouchCouch.localReplicateDB('all', [...following, userID], [])
       dispatch(receiveJWT(resp.token))
       dispatch(switchRoot(FEED))
       dispatch(toggleDoingInitialLoad())

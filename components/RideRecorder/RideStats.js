@@ -48,9 +48,7 @@ export default class RideStats extends PureComponent {
         last.get('latitude'),
         last.get('longitude')
       )
-      console.log(distance)
       const hours = ((last.get('timestamp') / 1000) - (secondToLast.get('timestamp') / 1000)) / 60 / 60
-      console.log(hours)
       return (distance / hours).toFixed(1).toString()
     } else {
       return '0.0'

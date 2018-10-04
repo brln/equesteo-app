@@ -72,7 +72,6 @@ class RecorderContainer extends PureComponent {
   }
 
   componentWillUnmount () {
-    console.log('CLEARING gpsTimeout in RecorderContainer')
     clearInterval(this.gpsTimeout)
   }
 
