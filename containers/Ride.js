@@ -6,7 +6,13 @@ import Ride from '../components/Ride/Ride'
 import { updateRide } from '../actions'
 import { brand } from '../colors'
 import { logRender } from '../helpers'
-import { HORSE_PROFILE, MAP, PHOTO_LIGHTBOX, RIDE_DETAILS } from '../screens'
+import {
+  HORSE_PROFILE,
+  MAP,
+  PHOTO_LIGHTBOX,
+  PROFILE,
+  RIDE_DETAILS
+} from '../screens'
 
 class RideContainer extends PureComponent {
   static options() {
@@ -67,6 +73,7 @@ class RideContainer extends PureComponent {
     this.showFullscreenMap = this.showFullscreenMap.bind(this)
     this.showHorseProfile = this.showHorseProfile.bind(this)
     this.showPhotoLightbox = this.showPhotoLightbox.bind(this)
+    this.showProfile = this.showProfile.bind(this)
 
     Navigation.events().bindComponent(this);
 
@@ -77,6 +84,17 @@ class RideContainer extends PureComponent {
         }
       })
     }
+  }
+
+  showProfile (user) {
+    Navigation.push(this.props.componentId, {
+      component: {
+        name: PROFILE,
+        passProps: {
+          profileUser: user,
+        }
+      }
+    })
   }
 
   closeDeleteModal () {
@@ -148,6 +166,7 @@ class RideContainer extends PureComponent {
         showFullscreenMap={this.showFullscreenMap}
         showHorseProfile={this.showHorseProfile}
         showPhotoLightbox={this.showPhotoLightbox}
+        showProfile={this.showProfile}
         userID={this.props.userID}
       />
     )
