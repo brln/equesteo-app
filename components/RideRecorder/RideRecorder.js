@@ -33,7 +33,7 @@ export default class RideRecorder extends PureComponent {
       startButton = null
       rideStats = (
         <View style={{flex: 1}}>
-          <View style={{flex: 5}}>
+          <View style={{flex: 3}}>
             <RidingMap
               mode={"duringRide"}
               rideCoords={this.props.currentRide.get('rideCoordinates')}
@@ -45,6 +45,7 @@ export default class RideRecorder extends PureComponent {
               appState={this.props.appState}
               startTime={this.props.currentRide.get('startTime')}
               distance={this.props.currentRide.get('distance')}
+              rideCoords={this.props.currentRide.get('rideCoordinates')}
             />
           </View>
         </View>

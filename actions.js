@@ -803,7 +803,7 @@ export function startLocationTracking () {
         provider: location.provider,
         locationProvider: location.locationProvider,
         timestamp: location.time,
-        type: 'location'
+        type: 'l'
       })
       dispatch(newLocation(parsedLocation))
     })
@@ -816,7 +816,7 @@ export function startLocationTracking () {
         timestamp: location.time,
         provider: location.provider,
         locationProvider: location.locationProvider,
-        type: 'stationary'
+        type: 's'
       })
       dispatch(newLocation(parsedLocation))
     });

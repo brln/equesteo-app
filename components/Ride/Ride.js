@@ -223,14 +223,14 @@ export default class Ride extends PureComponent {
             <Swiper
               loop={false}
             >
-              <TouchableWithoutFeedback style={styles.slide}
+              <TouchableOpacity style={styles.slide}
                 onPress={this.fullscreenMap}
               >
                 <RideImage
                   style={styles.image}
                   uri={this.props.ride.get('mapURL') }
                 />
-              </TouchableWithoutFeedback>
+              </TouchableOpacity>
               { speedChart }
             </Swiper>
           </View>

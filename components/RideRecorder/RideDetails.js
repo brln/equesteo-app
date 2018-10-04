@@ -163,7 +163,14 @@ export default class RideDetails extends PureComponent {
               </CardItem>
               <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
                 <TextInput
-                  style={{width: '100%', height: 50, padding: 10, borderColor: darkBrand, borderWidth: 1}}
+                  style={{
+                    width: '100%',
+                    height: 150,
+                    padding: 10,
+                    borderColor: darkBrand,
+                    borderWidth: 1,
+                    textAlignVertical: "top"
+                  }}
                   value={this.props.ride.get('notes')}
                   onChangeText={this.changeRideNotes}
                   multiline={true}

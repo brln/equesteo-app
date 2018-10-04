@@ -341,7 +341,14 @@ export default class UpdateHorse extends PureComponent {
                 </CardItem>
                 <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
                   <TextInput
-                    style={{width: '100%', height: 50, padding: 10, borderColor: darkBrand, borderWidth: 1}}
+                    style={{
+                      width: '100%',
+                      height: 100,
+                      padding: 10,
+                      borderColor: darkBrand,
+                      borderWidth: 1,
+                      textAlignVertical: "top"
+                    }}
                     value={this.props.horse.get('description')}
                     onChangeText={this.changeHorseDescription}
                     multiline={true}
