@@ -23,7 +23,7 @@ export default class RideStats extends PureComponent {
     let hours = 0
     let minutes = 0
     let seconds = 0
-    if (!(typeof(elapsed) === 'undefined')) {
+    if (!(typeof(elapsed) === 'undefined') && elapsed !== 0) {
       hours = elapsed.getUTCHours()
       minutes = elapsed.getUTCMinutes()
       seconds = elapsed.getUTCSeconds()

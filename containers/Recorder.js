@@ -81,7 +81,6 @@ class RecorderContainer extends PureComponent {
       this.finishRide()
     } else if (buttonId === 'back') {
       if (!this.props.currentRide) {
-        // @TODO: TEST THIS!!!!! not sure if right
         this.props.dispatch(stopLocationTracking())
       }
       Navigation.pop(this.props.componentId)

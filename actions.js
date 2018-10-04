@@ -778,55 +778,51 @@ export function signOut () {
   }
 }
 
+let locationTimeout = null
 export function startLocationTracking () {
   return async (dispatch) => {
     logInfo('action: startLocationTracking')
     BackgroundGeolocation.configure({
       desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
-      stationaryRadius: 10,
+      locationProvider: BackgroundGeolocation.RAW_PROVIDER,
       distanceFilter: 10,
       maxLocations: 10,
+      interval: 7000,
       notificationTitle: 'You\'re out on a ride.',
       notificationText: 'Tap here to see your progress.',
-      // debug: true,
-      locationProvider: BackgroundGeolocation.RAW_PROVIDER,
-      interval: 10000,
-      fastestInterval: 5000,
-      activitiesInterval: 10000,
     });
 
-    BackgroundGeolocation.on('location', (location) => {
+    function onNewLocation (location) {
       const parsedLocation = Map({
         accuracy: location.accuracy,
         latitude: location.latitude,
         longitude: location.longitude,
         provider: location.provider,
-        locationProvider: location.locationProvider,
         timestamp: location.time,
-        type: 'l'
       })
       dispatch(newLocation(parsedLocation))
-    })
+    }
 
-    BackgroundGeolocation.on('stationary', (location) => {
-      const parsedLocation = Map({
-        accuracy: location.accuracy,
-        latitude: location.latitude,
-        longitude: location.longitude,
-        timestamp: location.time,
-        provider: location.provider,
-        locationProvider: location.locationProvider,
-        type: 's'
-      })
-      dispatch(newLocation(parsedLocation))
-    });
-
-    BackgroundGeolocation.on('error', (error) => {
-      console.log('[ERROR] BackgroundGeolocation error:', error);
-      Sentry.captureException(new Error(JSON.stringify(error)))
-    });
+    function onError ({ code, message }) {
+      logError(`Geolocation Error: ${code}: ${message}`)
+    }
 
     BackgroundGeolocation.start()
+    BackgroundGeolocation.getCurrentLocation((location) => {
+      onNewLocation(location)
+      locationTimeout = setInterval(
+        () => {
+          BackgroundGeolocation.getCurrentLocation(
+            onNewLocation,
+            onError, {
+              timeout: 14000,
+              maximumAge: 14000,
+              enableHighAccuracy: true
+            }
+          )
+        }, 15000
+      )
+    }, onError, {timeout: 120000, maximumAge: 30000, enableHighAccuracy: true})
   }
 }
 
@@ -888,6 +884,7 @@ export function stopLocationTracking () {
   return async (dispatch) => {
     BackgroundGeolocation.stop()
     BackgroundGeolocation.removeAllListeners('location')
+    clearTimeout(locationTimeout)
     dispatch(clearLastLocation())
   }
 }
