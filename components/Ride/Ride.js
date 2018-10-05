@@ -42,8 +42,13 @@ export default class Ride extends PureComponent {
     this.rideNotes = this.rideNotes.bind(this)
     this.rideTime = this.rideTime.bind(this)
     this.maybeShowID = this.maybeShowID.bind(this)
+    this.showProfile = this.showProfile.bind(this)
 
     this.memoizedParse = memoizeOne(this.parseSpeedData)
+  }
+
+  showProfile () {
+    this.props.showProfile(this.props.rideUser)
   }
 
   parseSpeedData (rideCoordinates) {
@@ -113,24 +118,29 @@ export default class Ride extends PureComponent {
   }
 
   userAvatar () {
-    let source
-    const userProfilePhotoURL = this.getUserProfilePhotoURL(this.props.rideUser)
-    if (userProfilePhotoURL) {
-      source = {uri: userProfilePhotoURL}
+    if (this.props.userID !== this.props.rideUser.get('_id')) {
+      let source
+      const userProfilePhotoURL = this.getUserProfilePhotoURL(this.props.rideUser)
+      if (userProfilePhotoURL) {
+        source = {uri: userProfilePhotoURL}
+      } else {
+        source = require('../../img/empty.png')
+      }
+      return (
+        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', marginRight: -20}}>
+          <TouchableOpacity
+            onPress={this.showProfile}
+          >
+            <Thumbnail
+              small
+              source={source}
+            />
+          </TouchableOpacity>
+        </View>
+      )
     } else {
-      source = require('../../img/empty.png')
+      return null
     }
-    return (
-      <TouchableOpacity
-        style={{paddingRight: 10}}
-        onPress={this.showProfile}
-      >
-        <Thumbnail
-          small
-          source={source}
-        />
-      </TouchableOpacity>
-    )
   }
 
   userName () {
@@ -203,18 +213,16 @@ export default class Ride extends PureComponent {
           text={"Are you sure you want to delete this ride?"}
         />
 
-        <View style={{flex: 1}}>
-          <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
-            <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', paddingRight: 10, paddingLeft: 20}}>
-              { this.userAvatar() }
-              <TouchableWithoutFeedback onPress={this.maybeShowID}>
-                <View>
-                  <Text style={{fontSize: 20, color: 'black'}}>{this.props.ride.get('name') || 'No Name'}</Text>
-                  <Text style={{fontSize: 14}}>{this.userName()}</Text>
-                  <Text style={{fontSize: 12, fontWeight: 'normal', color: darkGrey}}>{this.rideTime()}</Text>
-                </View>
-              </TouchableWithoutFeedback>
-            </View>
+        <View style={{flex: 1, flexDirection: 'row', paddingTop: 10, paddingBottom: 10}}>
+          { this.userAvatar() }
+          <View style={{flex: 4, paddingLeft: 20, paddingRight: 20}}>
+            <TouchableWithoutFeedback onPress={this.maybeShowID}>
+              <View>
+                <Text style={{fontSize: 20, color: 'black'}}>{this.props.ride.get('name') || 'No Name'}</Text>
+                <Text style={{fontSize: 14}}>{this.userName()}</Text>
+                <Text style={{fontSize: 12, fontWeight: 'normal', color: darkGrey}}>{this.rideTime()}</Text>
+              </View>
+            </TouchableWithoutFeedback>
           </View>
         </View>
 

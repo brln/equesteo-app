@@ -57,10 +57,13 @@ export default class RideComments extends MultiPlatform {
             />
           </ScrollView>
         </View>
-        <View style={{flex: 1, backgroundColor: 'white', width: '100%', elevation: 20, minHeight: 40}}>
+        <View style={{flex: 1, backgroundColor: 'white', width: '100%', elevation: 20, minHeight: 100}}>
           <View style={{flex: 1, flexDirection: 'row'}}>
-            <View style={{flex: 5, padding: 20}}>
+            <View style={{flex: 5, paddingLeft: 20, paddingRight: 20, paddingTop: 5, paddingBottom: 5}}>
               <TextInput
+                style={{
+                  textAlignVertical: "top"
+                }}
                 autoFocus={true}
                 multiline={true}
                 placeholder={"Add a comment"}

@@ -6,6 +6,7 @@ import {
   Image,
   Linking,
   ScrollView,
+  StatusBar,
   StyleSheet,
   Text,
   View
@@ -163,12 +164,14 @@ class SignupLoginContainer extends PureComponent {
           <ScrollView
             keyboardShouldPersistTaps={'always'}
           >
-            {error}
-            <Image
-              source={require('../img/loginbg3.jpg')}
-              style={{ width, height, resizeMode: 'stretch' }}
-            />
-            {form}
+            <View style={{height: height - StatusBar.currentHeight}}>
+              {error}
+              <Image
+                source={require('../img/loginbg3.jpg')}
+                style={{ width, height, resizeMode: 'stretch' }}
+              />
+              {form}
+            </View>
           </ScrollView>
       </View>
     )

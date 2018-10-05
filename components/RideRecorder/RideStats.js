@@ -23,7 +23,7 @@ export default class RideStats extends PureComponent {
     let hours = 0
     let minutes = 0
     let seconds = 0
-    if (!(typeof(elapsed) === 'undefined')) {
+    if (!(typeof(elapsed) === 'undefined') && elapsed !== 0) {
       hours = elapsed.getUTCHours()
       minutes = elapsed.getUTCMinutes()
       seconds = elapsed.getUTCSeconds()
@@ -39,18 +39,14 @@ export default class RideStats extends PureComponent {
   currentSpeed () {
     const secondToLast = this.props.rideCoords.get(-2)
     const last = this.props.rideCoords.get(-1)
-    if (last && last.get('type') === 's') {
-      return '0.0'
-    } else if (secondToLast && last) {
+    if (secondToLast && last) {
       const distance = haversine(
         secondToLast.get('latitude'),
         secondToLast.get('longitude'),
         last.get('latitude'),
         last.get('longitude')
       )
-      console.log(distance)
       const hours = ((last.get('timestamp') / 1000) - (secondToLast.get('timestamp') / 1000)) / 60 / 60
-      console.log(hours)
       return (distance / hours).toFixed(1).toString()
     } else {
       return '0.0'

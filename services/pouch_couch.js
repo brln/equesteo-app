@@ -29,10 +29,6 @@ export default class PouchCouch {
     throw e
   }
 
-  replicateOwnUser (id) {
-    return this.localReplicateUsers([id])
-  }
-
   saveHorse (horseData) {
     return this.localHorsesDB.put(horseData).catch((e) => {
       logInfo('error saving horse')
@@ -132,7 +128,7 @@ export default class PouchCouch {
     })
   }
 
-  localReplicateUsers (userIDs) {
+  localReplicateUsers () {
     return new Promise((resolve, reject) => {
       PouchDB.replicate(
         this.remoteUsersDB,

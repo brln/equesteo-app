@@ -778,21 +778,18 @@ export function signOut () {
   }
 }
 
+let locationTimeout = null
 export function startLocationTracking () {
   return async (dispatch) => {
     logInfo('action: startLocationTracking')
     BackgroundGeolocation.configure({
       desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
-      stationaryRadius: 10,
-      distanceFilter: 10,
+      locationProvider: BackgroundGeolocation.RAW_PROVIDER,
+      distanceFilter: 1,
       maxLocations: 10,
+      interval: 1,
       notificationTitle: 'You\'re out on a ride.',
       notificationText: 'Tap here to see your progress.',
-      // debug: true,
-      locationProvider: BackgroundGeolocation.RAW_PROVIDER,
-      interval: 10000,
-      fastestInterval: 5000,
-      activitiesInterval: 10000,
     });
 
     BackgroundGeolocation.on('location', (location) => {
@@ -803,23 +800,9 @@ export function startLocationTracking () {
         provider: location.provider,
         locationProvider: location.locationProvider,
         timestamp: location.time,
-        type: 'l'
       })
       dispatch(newLocation(parsedLocation))
     })
-
-    BackgroundGeolocation.on('stationary', (location) => {
-      const parsedLocation = Map({
-        accuracy: location.accuracy,
-        latitude: location.latitude,
-        longitude: location.longitude,
-        timestamp: location.time,
-        provider: location.provider,
-        locationProvider: location.locationProvider,
-        type: 's'
-      })
-      dispatch(newLocation(parsedLocation))
-    });
 
     BackgroundGeolocation.on('error', (error) => {
       console.log('[ERROR] BackgroundGeolocation error:', error);
@@ -888,6 +871,7 @@ export function stopLocationTracking () {
   return async (dispatch) => {
     BackgroundGeolocation.stop()
     BackgroundGeolocation.removeAllListeners('location')
+    clearTimeout(locationTimeout)
     dispatch(clearLastLocation())
   }
 }
@@ -945,8 +929,10 @@ export function submitSignup (email, password) {
       dispatch(dismissError())
       dispatch(toggleDoingInitialLoad())
       await LocalStorage.saveToken(resp.token, resp.id);
+      const following = resp.following
+      const userID = resp.id
       const pouchCouch = new PouchCouch(resp.token)
-      await pouchCouch.replicateOwnUser(resp.id)
+      await pouchCouch.localReplicateDB('all', [...following, userID], [])
       dispatch(receiveJWT(resp.token))
       dispatch(switchRoot(FEED))
       dispatch(toggleDoingInitialLoad())
