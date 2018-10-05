@@ -785,44 +785,31 @@ export function startLocationTracking () {
     BackgroundGeolocation.configure({
       desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
       locationProvider: BackgroundGeolocation.RAW_PROVIDER,
-      distanceFilter: 10,
+      distanceFilter: 0,
       maxLocations: 10,
-      interval: 7000,
+      interval: 0,
       notificationTitle: 'You\'re out on a ride.',
       notificationText: 'Tap here to see your progress.',
     });
 
-    function onNewLocation (location) {
+    BackgroundGeolocation.on('location', (location) => {
       const parsedLocation = Map({
         accuracy: location.accuracy,
         latitude: location.latitude,
         longitude: location.longitude,
         provider: location.provider,
+        locationProvider: location.locationProvider,
         timestamp: location.time,
       })
       dispatch(newLocation(parsedLocation))
-    }
+    })
 
-    function onError ({ code, message }) {
-      logError(`Geolocation Error: ${code}: ${message}`)
-    }
+    BackgroundGeolocation.on('error', (error) => {
+      console.log('[ERROR] BackgroundGeolocation error:', error);
+      Sentry.captureException(new Error(JSON.stringify(error)))
+    });
 
     BackgroundGeolocation.start()
-    BackgroundGeolocation.getCurrentLocation((location) => {
-      onNewLocation(location)
-      locationTimeout = setInterval(
-        () => {
-          BackgroundGeolocation.getCurrentLocation(
-            onNewLocation,
-            onError, {
-              timeout: 14000,
-              maximumAge: 14000,
-              enableHighAccuracy: true
-            }
-          )
-        }, 15000
-      )
-    }, onError, {timeout: 120000, maximumAge: 30000, enableHighAccuracy: true})
   }
 }
 

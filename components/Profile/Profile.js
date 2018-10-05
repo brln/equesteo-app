@@ -12,6 +12,7 @@ import {
   Thumbnail,
 } from 'native-base';
 import {
+  Clipboard,
   Dimensions,
   FlatList,
   Image,
@@ -19,11 +20,12 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View
 } from 'react-native';
 
 import { brand, danger, darkBrand, green } from '../../colors'
-import { logRender, logError } from '../../helpers'
+import { logRender, logError, logInfo } from '../../helpers'
 import PhotoFilmstrip from '../Ride/PhotoFilmstrip'
 
 import FabImage from '../FabImage'
@@ -33,12 +35,32 @@ const { height } = Dimensions.get('window')
 export default class Profile extends PureComponent {
   constructor (props) {
     super(props)
+    this.state = {
+      touches: 0
+    }
     this.follow = this.follow.bind(this)
     this.unfollow = this.unfollow.bind(this)
     this.horseProfile = this.horseProfile.bind(this)
     this.horsesCard = this.horsesCard.bind(this)
+    this.maybeShowID = this.maybeShowID.bind(this)
     this.renderHorse = this.renderHorse.bind(this)
     this.uploadProfile = this.uploadProfile.bind(this)
+  }
+
+  maybeShowID () {
+    if (this.state.touches === 5) {
+      const id = this.props.profileUser.get('_id')
+      alert(id)
+      Clipboard.setString(id)
+      logInfo(id)
+      this.setState({
+        touches: 0
+      })
+    } else {
+      this.setState({
+        touches: this.state.touches + 1
+      })
+    }
   }
 
   uploadProfile () {
@@ -245,7 +267,11 @@ export default class Profile extends PureComponent {
           <Card>
             <CardItem header style={{padding: 5}}>
               <View style={{paddingLeft: 5}}>
-                <Text style={{color: darkBrand}}>Name</Text>
+                <TouchableWithoutFeedback onPress={this.maybeShowID}>
+                  <View>
+                    <Text style={{color: darkBrand}}>Name</Text>
+                  </View>
+                </TouchableWithoutFeedback>
               </View>
             </CardItem>
             <CardItem cardBody style={{marginLeft: 20, marginRight: 20}}>
