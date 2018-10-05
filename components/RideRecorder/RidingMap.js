@@ -65,11 +65,11 @@ export default class RidingMap extends PureComponent {
       switch (true) {
         case this.props.lastLocation.get('accuracy') < 10:
           return require('../../img/gps/gps5.png')
-        case this.props.lastLocation.get('accuracy') < 15:
-          return require('../../img/gps/gps4.png')
         case this.props.lastLocation.get('accuracy') < 20:
+          return require('../../img/gps/gps4.png')
+        case this.props.lastLocation.get('accuracy') < 30:
           return require('../../img/gps/gps3.png')
-        case this.props.lastLocation.get('accuracy') < 25:
+        case this.props.lastLocation.get('accuracy') < 40:
           return require('../../img/gps/gps2.png')
         default:
           return require('../../img/gps/gps1.png')

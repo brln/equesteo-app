@@ -782,26 +782,22 @@ let locationTimeout = null
 export function startLocationTracking () {
   return async (dispatch) => {
     logInfo('action: startLocationTracking')
-    BackgroundGeolocation.configure({
-      desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
-      locationProvider: BackgroundGeolocation.RAW_PROVIDER,
-      distanceFilter: 1,
-      maxLocations: 10,
-      interval: 1,
-      notificationTitle: 'You\'re out on a ride.',
-      notificationText: 'Tap here to see your progress.',
-    });
+    dispatch(configureBackgroundGeolocation())
 
     BackgroundGeolocation.on('location', (location) => {
-      const parsedLocation = Map({
-        accuracy: location.accuracy,
-        latitude: location.latitude,
-        longitude: location.longitude,
-        provider: location.provider,
-        locationProvider: location.locationProvider,
-        timestamp: location.time,
-      })
-      dispatch(newLocation(parsedLocation))
+      if (location.accuracy < 50) {
+        const parsedLocation = Map({
+          accuracy: location.accuracy,
+          latitude: location.latitude,
+          longitude: location.longitude,
+          provider: location.provider,
+          locationProvider: location.locationProvider,
+          timestamp: location.time,
+        })
+        dispatch(newLocation(parsedLocation))
+      } else {
+        dispatch(configureBackgroundGeolocation())
+      }
     })
 
     BackgroundGeolocation.on('error', (error) => {
@@ -810,6 +806,21 @@ export function startLocationTracking () {
     });
 
     BackgroundGeolocation.start()
+  }
+}
+
+function configureBackgroundGeolocation () {
+  return async () => {
+    logInfo('configuring geolocation')
+    BackgroundGeolocation.configure({
+      desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
+      locationProvider: BackgroundGeolocation.RAW_PROVIDER,
+      distanceFilter: 1,
+      maxLocations: 10,
+      interval: 15000,
+      notificationTitle: 'You\'re out on a ride.',
+      notificationText: 'Tap here to see your progress.',
+    });
   }
 }
 
