@@ -39,9 +39,7 @@ export default class RideStats extends PureComponent {
   currentSpeed () {
     const secondToLast = this.props.rideCoords.get(-2)
     const last = this.props.rideCoords.get(-1)
-    if (last && last.get('type') === 's') {
-      return '0.0'
-    } else if (secondToLast && last) {
+    if (secondToLast && last) {
       const distance = haversine(
         secondToLast.get('latitude'),
         secondToLast.get('longitude'),

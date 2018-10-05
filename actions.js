@@ -785,9 +785,9 @@ export function startLocationTracking () {
     BackgroundGeolocation.configure({
       desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
       locationProvider: BackgroundGeolocation.RAW_PROVIDER,
-      distanceFilter: 0,
+      distanceFilter: 1,
       maxLocations: 10,
-      interval: 0,
+      interval: 1,
       notificationTitle: 'You\'re out on a ride.',
       notificationText: 'Tap here to see your progress.',
     });
