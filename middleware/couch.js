@@ -1,6 +1,7 @@
 import { clearState, remotePersistComplete } from '../actions'
 import { logInfo, logError } from '../helpers'
 import { PouchCouch } from '../services/index'
+import { Sentry } from 'react-native-sentry'
 
 let queue = []
 let savingRemotely = false
@@ -49,6 +50,7 @@ function remotePersist (db, store, pouchCouch) {
       }
     }
   }).on('error', (e) => {
+    Sentry.captureException(e)
     queue = []
     savingRemotely = false
     logInfo('Remote replication error follows: ')

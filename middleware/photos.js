@@ -1,4 +1,5 @@
 import ImagePicker from 'react-native-image-crop-picker'
+import { Sentry } from 'react-native-sentry'
 
 import {
   changeHorsePhotoData,
@@ -76,7 +77,7 @@ function remotePersist (item, store, userAPI) {
       currentlySaving = null
     }
   }).catch((e) => {
-    logInfo('photo upload error')
+    Sentry.captureException(e)
     workingQueue = []
     queueID = generateUUID()
     currentlySaving = null
