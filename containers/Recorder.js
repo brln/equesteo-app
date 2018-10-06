@@ -139,6 +139,7 @@ class RecorderContainer extends PureComponent {
 
   discardRide () {
     this.props.dispatch(discardRide())
+    this.props.dispatch(stopLocationTracking())
     Navigation.popToRoot(this.props.componentId)
   }
 

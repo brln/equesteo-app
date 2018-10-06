@@ -778,7 +778,6 @@ export function signOut () {
   }
 }
 
-let locationTimeout = null
 export function startLocationTracking () {
   return async (dispatch) => {
     logInfo('action: startLocationTracking')
@@ -882,7 +881,6 @@ export function stopLocationTracking () {
   return async (dispatch) => {
     BackgroundGeolocation.stop()
     BackgroundGeolocation.removeAllListeners('location')
-    clearTimeout(locationTimeout)
     dispatch(clearLastLocation())
   }
 }
