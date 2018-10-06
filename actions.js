@@ -7,11 +7,17 @@ import PushNotification from 'react-native-push-notification'
 import { fromJS, Map, List } from 'immutable'
 import { Sentry } from 'react-native-sentry'
 
-import { logError, logInfo, unixTimeNow, generateUUID, staticMap } from "./helpers"
+import {
+  haversine,
+  logError,
+  logInfo,
+  unixTimeNow,
+  generateUUID,
+  staticMap
+} from "./helpers"
 import { DRAWER, FEED, SIGNUP_LOGIN } from './screens'
 import { LocalStorage, PouchCouch, UserAPI } from './services'
 import {BadRequestError, NotConnectedError, UnauthorizedError} from "./errors"
-
 import {
   CLEAR_LAST_LOCATION,
   CLEAR_PAUSED_LOCATIONS,
@@ -38,6 +44,7 @@ import {
   POP_SHOW_RIDE_SHOWN,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
+  REPLACE_LAST_LOCATION,
   RIDE_CARROT_CREATED,
   RIDE_CARROT_SAVED,
   RIDE_COMMENT_CREATED,
@@ -145,12 +152,6 @@ function horseUserUpdated (horseUser) {
   }
 }
 
-export function popShowRideShown () {
-  return {
-    type: POP_SHOW_RIDE_SHOWN
-  }
-}
-
 export function loadLocalState (localState) {
   return {
     type: LOAD_LOCAL_STATE,
@@ -208,6 +209,12 @@ export function pauseLocationTracking () {
   }
 }
 
+export function popShowRideShown () {
+  return {
+    type: POP_SHOW_RIDE_SHOWN
+  }
+}
+
 function receiveJWT (token) {
   return {
     type: RECEIVE_JWT,
@@ -215,10 +222,10 @@ function receiveJWT (token) {
   }
 }
 
-export function saveUserID(userID) {
+export function replaceLastLocation (newLocation) {
   return {
-    type: SAVE_USER_ID,
-    userID
+    type: REPLACE_LAST_LOCATION,
+    newLocation
   }
 }
 
@@ -261,6 +268,13 @@ function rideSaved (ride) {
   return {
     type: RIDE_SAVED,
     ride
+  }
+}
+
+export function saveUserID(userID) {
+  return {
+    type: SAVE_USER_ID,
+    userID
   }
 }
 
@@ -779,23 +793,36 @@ export function signOut () {
 }
 
 export function startLocationTracking () {
-  return async (dispatch) => {
+  return async (dispatch, getState) => {
     logInfo('action: startLocationTracking')
-    dispatch(configureBackgroundGeolocation())
+    await configureBackgroundGeolocation()()
 
     BackgroundGeolocation.on('location', (location) => {
-      if (location.accuracy < 50) {
-        const parsedLocation = Map({
-          accuracy: location.accuracy,
-          latitude: location.latitude,
-          longitude: location.longitude,
-          provider: location.provider,
-          locationProvider: location.locationProvider,
-          timestamp: location.time,
-        })
+      const lastLocation = getState().getIn(['main', 'localState', 'lastLocation'])
+      let parsedLocation = Map({
+        accuracy: location.accuracy,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        provider: location.provider,
+        timestamp: location.time,
+      })
+
+      let replaced = false
+      if (lastLocation) {
+        let distance = haversine(
+          lastLocation.get('latitude'),
+          lastLocation.get('longitude'),
+          location.latitude,
+          location.longitude
+        )
+        let lastAccuracy = lastLocation.get('accuracy')
+        if (distance < 0.02 && location.accuracy < lastAccuracy) {
+          dispatch(replaceLastLocation(parsedLocation))
+          replaced = true
+        }
+      }
+      if (!replaced) {
         dispatch(newLocation(parsedLocation))
-      } else {
-        dispatch(configureBackgroundGeolocation())
       }
     })
 
@@ -816,7 +843,7 @@ function configureBackgroundGeolocation () {
       locationProvider: BackgroundGeolocation.RAW_PROVIDER,
       distanceFilter: 1,
       maxLocations: 10,
-      interval: 15000,
+      interval: 3000,
       notificationTitle: 'You\'re out on a ride.',
       notificationText: 'Tap here to see your progress.',
     });

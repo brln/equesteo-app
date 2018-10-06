@@ -1,5 +1,4 @@
 import { fromJS, List, Map } from 'immutable'
-import BackgroundGeolocation from 'react-native-mauron85-background-geolocation'
 
 import {
   CLEAR_LAST_LOCATION,
@@ -29,6 +28,7 @@ import {
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
   REMOVE_RIDE_FROM_STATE,
+  REPLACE_LAST_LOCATION,
   RESUME_LOCATION_TRACKING,
   RIDE_COMMENT_CREATED,
   RIDE_CARROT_CREATED,
@@ -52,7 +52,7 @@ import {
 } from './helpers'
 import { FEED, SIGNUP_LOGIN } from './screens'
 
-const initialState = Map({
+export const initialState = Map({
   localState: Map({
     activeComponent: null,
     appState: appStates.active,
@@ -247,6 +247,52 @@ export default function AppReducer(state=initialState, action) {
       return state.setIn(['localState', 'needsRemotePersist', action.database], false)
     case REMOVE_RIDE_FROM_STATE:
       return state.remove(action.rideID)
+    case REPLACE_LAST_LOCATION:
+      const oldLastLocation = state.getIn(['localState', 'lastLocation'])
+      let replacedLastLocation = state.setIn(['localState', 'lastLocation'], action.newLocation)
+      const currentRide1 = state.getIn(['localState', 'currentRide'])
+      if (currentRide1) {
+        const rideCoords = currentRide1.get('rideCoordinates')
+        if (rideCoords.count() === 1) {
+          return replacedLastLocation.setIn(
+            ['localState', 'currentRide', 'rideCoordinates'],
+            List().push(action.newLocation)
+          )
+        } else if (rideCoords.count() > 1) {
+          const lastCoord = rideCoords.get(-2)
+          const oldDistance = haversine(
+            oldLastLocation.get('latitude'),
+            oldLastLocation.get('longitude'),
+            lastCoord.get('latitude'),
+            lastCoord.get('longitude')
+          )
+          const newDistance = haversine(
+            lastCoord.get('latitude'),
+            lastCoord.get('longitude'),
+            action.newLocation.get('latitude'),
+            action.newLocation.get('longitude')
+          )
+          const newRideCoordinates = replacedLastLocation.getIn(
+            ['localState', 'currentRide', 'rideCoordinates']
+          ).pop().push(
+            action.newLocation
+          ).sort((a, b) => {
+            return new Date(a.timestamp) - new Date(b.timestamp);
+          })
+
+          const totalDistance = currentRide1.get('distance')
+            - oldDistance
+            + newDistance
+          return replacedLastLocation.setIn(
+            ['localState', 'currentRide', 'distance'],
+            totalDistance
+          ).setIn(
+            ['localState', 'currentRide', 'rideCoordinates'],
+            newRideCoordinates
+          )
+        }
+      }
+      return replacedLastLocation
     case RESUME_LOCATION_TRACKING:
       return state.setIn(['localState', 'locationTrackingPaused'], false)
     case RIDE_CARROT_CREATED:

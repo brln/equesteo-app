@@ -40,6 +40,7 @@ export default class RideStats extends PureComponent {
     const secondToLast = this.props.rideCoords.get(-2)
     const last = this.props.rideCoords.get(-1)
     if (secondToLast && last) {
+      console.log(secondToLast.toJSON())
       const distance = haversine(
         secondToLast.get('latitude'),
         secondToLast.get('longitude'),
