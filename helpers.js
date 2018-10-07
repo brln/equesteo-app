@@ -212,9 +212,7 @@ export const appStates = {
 
 export function goodConnection(type, effectiveType) {
   return (type === connectionType.wifi || (
-    type === connectionType.cellular && (
-      effectiveType === effectiveConnectionType.threeG || effectiveConnectionType.fourG
-    )
+    type === connectionType.cellular && (effectiveType === effectiveConnectionType.fourG)
   ))
 }
 
