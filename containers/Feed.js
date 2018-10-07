@@ -42,6 +42,9 @@ class FeedContainer extends PureComponent {
           color: brand,
         },
         elevation: 0
+      },
+      layout: {
+        orientation: ['portrait']
       }
     };
   }

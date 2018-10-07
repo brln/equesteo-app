@@ -22,6 +22,9 @@ class FollowListContainer extends PureComponent {
         title: {
           color: 'white',
         }
+      },
+      layout: {
+        orientation: ['portrait']
       }
     };
   }

@@ -36,8 +36,11 @@ class ProfileContainer extends PureComponent {
           color: 'white',
           fontSize: 20
         }
+      },
+      layout: {
+        orientation: ['portrait']
       }
-    };
+    }
   }
 
   constructor (props) {

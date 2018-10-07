@@ -910,8 +910,6 @@ function startListeningFCM () {
       logInfo('notification opened')
       logInfo(m)
     })
-
-
   }
 }
 

@@ -24,6 +24,9 @@ class FindPeopleContainer extends PureComponent {
         backButton: {
           color: 'white'
         }
+      },
+      layout: {
+        orientation: ['portrait']
       }
     };
   }

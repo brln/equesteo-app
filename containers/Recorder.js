@@ -30,8 +30,11 @@ class RecorderContainer extends PureComponent {
             color: 'white'
           }
         ],
+      },
+      layout: {
+        orientation: ['portrait']
       }
-    };
+    }
   }
 
   constructor (props) {

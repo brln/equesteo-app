@@ -30,6 +30,9 @@ class HorseProfileContainer extends PureComponent {
             color: 'white'
           },
         ]
+      },
+      layout: {
+        orientation: ['portrait']
       }
     };
   }

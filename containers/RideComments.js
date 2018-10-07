@@ -23,8 +23,11 @@ class RideCommentsContainer extends PureComponent {
           color: 'white'
         },
         elevation: 0
+      },
+      layout: {
+        orientation: ['portrait']
       }
-    };
+    }
   }
 
   constructor (props) {

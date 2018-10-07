@@ -30,8 +30,11 @@ class UpdateProfileContainer extends PureComponent {
             color: 'white'
           },
         ]
+      },
+      layout: {
+        orientation: ['portrait']
       }
-    };
+    }
   }
 
   static getDerivedStateFromProps (props, state) {
