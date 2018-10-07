@@ -164,6 +164,7 @@ class RecorderContainer extends PureComponent {
         currentRide={this.props.currentRide}
         discardRide={this.discardRide}
         lastLocation={this.props.lastLocation}
+        moving={this.props.moving}
         showGPSBar={this.state.showGPSBar}
         showRideDetails={this.showRideDetails}
         startRide={this.startRide}
@@ -179,6 +180,7 @@ function mapStateToProps (state) {
     appState: localState.get('appState'),
     currentRide: localState.get('currentRide'),
     lastLocation: localState.get('lastLocation'),
+    moving: localState.get('moving')
   }
 }
 

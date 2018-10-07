@@ -3,20 +3,10 @@ import { List, Map } from 'immutable'
 import 'react-native';
 import React from 'react';
 
-import AppReducer, { initialState } from '../reducer'
-import { replaceLastLocation }  from '../actions'
+import AppReducer, { initialState } from '../../reducer'
+import { replaceLastLocation }  from '../../actions'
 
-it('runs a test', () => {
-  expect(1+1).toEqual(2)
-});
-
-describe('reducer', () => {
-  it('should return initial state if it doesn\'t recognize the action', () => {
-    const tinyInitialState = {'some': 'state'}
-    expect(AppReducer(tinyInitialState, {type: 'NO_TYPE'})).toEqual(tinyInitialState)
-  })
-
-
+describe('REPLACE_LAST_LOCATION', () => {
   it('should replace last location', () => {
     const initialState = Map({
       localState: Map({
@@ -29,7 +19,7 @@ describe('reducer', () => {
   })
 
 
-  it('should replace the only coordinate if theres only one coordinate in the new ride', () => {
+  it('should replace the only coordinate if there\'s only one coordinate in the new ride', () => {
     const initialState = Map({
       localState: Map({
         currentRide: Map({
@@ -55,7 +45,7 @@ describe('reducer', () => {
   })
 
 
-  it('should replace the last coordinate if theres more than one coordinate in the new ride', () => {
+  it('should replace the last coordinate if there\'s more than one coordinate in the new ride', () => {
     const lastCoord = Map({
       'some': 'third coordinate',
       "latitude": 3,

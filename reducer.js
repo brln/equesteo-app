@@ -24,6 +24,8 @@ import {
   NEW_APP_STATE,
   NEW_LOCATION,
   NEW_NETWORK_STATE,
+  NOT_MOVING,
+  NOW_MOVING,
   PAUSE_LOCATION_TRACKING,
   POP_SHOW_RIDE_SHOWN,
   RECEIVE_JWT,
@@ -70,6 +72,7 @@ export const initialState = Map({
     jwt: null,
     lastLocation: null,
     locationTrackingPaused: false,
+    moving: false,
     needsRemotePersist: Map({
       horses: false,
       rides: false,
@@ -78,6 +81,7 @@ export const initialState = Map({
     pausedCachedCoordinates: List(),
     photoQueue: Map(),
     popShowRide: null,
+    refiningLocation: null,
     remotePersistActive: false,
     root: SIGNUP_LOGIN,
     userID: null,
@@ -211,7 +215,13 @@ export default function AppReducer(state=initialState, action) {
     case NEW_APP_STATE:
       return state.setIn(['localState', 'appState'], action.newState)
     case NEW_LOCATION:
-      const newState = state.setIn(['localState', 'lastLocation'], action.location)
+      const newState = state.setIn(
+        ['localState', 'lastLocation'],
+        action.location
+      ).setIn(
+        ['localState', 'refiningLocation'],
+        action.location
+      )
       const currentRide = state.getIn(['localState', 'currentRide'])
       const currentlyPaused = state.getIn(['localState', 'locationTrackingPaused'])
       if (currentRide && !currentlyPaused) {
@@ -258,6 +268,10 @@ export default function AppReducer(state=initialState, action) {
           action.effectiveConnectionType
         )
       )
+    case NOT_MOVING:
+      return state.setIn(['localState', 'moving'], false)
+    case NOW_MOVING:
+      return state.setIn(['localState', 'moving'], true)
     case RECEIVE_JWT:
       return state.setIn(['localState', 'jwt'], action.token)
     case REMOTE_PERSIST_COMPLETE:

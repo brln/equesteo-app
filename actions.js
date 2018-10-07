@@ -41,6 +41,8 @@ import {
   NEW_LOCATION,
   NEW_APP_STATE,
   NEW_NETWORK_STATE,
+  NOT_MOVING,
+  NOW_MOVING,
   PAUSE_LOCATION_TRACKING,
   POP_SHOW_RIDE_SHOWN,
   RECEIVE_JWT,
@@ -209,6 +211,18 @@ function newNetworkState (connectionType, effectiveConnectionType) {
     connectionType,
     effectiveConnectionType,
     logData: ['connectionType', 'effectiveConnectionType'],
+  }
+}
+
+function notMoving () {
+  return {
+    type: NOT_MOVING
+  }
+}
+
+function nowMoving () {
+  return {
+    type: NOW_MOVING
   }
 }
 
@@ -817,9 +831,10 @@ export function startLocationTracking () {
   return async (dispatch, getState) => {
     logInfo('action: startLocationTracking')
     await configureBackgroundGeolocation()()
-
+    const METERS_TO_MILES = 0.0006213712
     BackgroundGeolocation.on('location', (location) => {
-      const lastLocation = getState().getIn(['main', 'localState', 'lastLocation'])
+
+      const refiningLocation = getState().getIn(['main', 'localState', 'refiningLocation'])
       let parsedLocation = Map({
         accuracy: location.accuracy,
         latitude: location.latitude,
@@ -829,20 +844,24 @@ export function startLocationTracking () {
       })
 
       let replaced = false
-      if (lastLocation) {
+      if (refiningLocation) {
         let distance = haversine(
-          lastLocation.get('latitude'),
-          lastLocation.get('longitude'),
+          refiningLocation.get('latitude'),
+          refiningLocation.get('longitude'),
           location.latitude,
           location.longitude
         )
-        let lastAccuracy = lastLocation.get('accuracy')
-        if (distance < 0.02 && location.accuracy < lastAccuracy) {
+        let refiningAccuracy = refiningLocation.get('accuracy')
+        console.log('distance: ' + distance)
+        console.log('refining accuracy: ' + refiningAccuracy * METERS_TO_MILES)
+        if (distance < (refiningAccuracy * METERS_TO_MILES) && location.accuracy <= refiningAccuracy) {
+          dispatch(notMoving())
           dispatch(replaceLastLocation(parsedLocation))
           replaced = true
         }
       }
       if (!replaced) {
+        dispatch(nowMoving())
         dispatch(newLocation(parsedLocation))
       }
     })

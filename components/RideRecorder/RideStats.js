@@ -43,25 +43,24 @@ export default class RideStats extends PureComponent {
   }
 
   currentSpeed (rideCoords) {
-    const secondToLast = rideCoords.get(-2)
-    const last = rideCoords.get(-1)
-    if (secondToLast && last) {
-      const distance = haversine(
-        secondToLast.get('latitude'),
-        secondToLast.get('longitude'),
-        last.get('latitude'),
-        last.get('longitude')
-      )
-      const hours = ((last.get('timestamp') / 1000) - (secondToLast.get('timestamp') / 1000)) / 60 / 60
-      if (hours > 0 && distance > 0) {
-        return (distance / hours).toFixed(1).toString()
-      } else{
-        return '0.0'
+    let speed = '0.0'
+    if (this.props.moving) {
+      const secondToLast = rideCoords.get(-2)
+      const last = rideCoords.get(-1)
+      if (secondToLast && last) {
+        const distance = haversine(
+          secondToLast.get('latitude'),
+          secondToLast.get('longitude'),
+          last.get('latitude'),
+          last.get('longitude')
+        )
+        const hours = ((last.get('timestamp') / 1000) - (secondToLast.get('timestamp') / 1000)) / 60 / 60
+        if (hours > 0 && distance > 0) {
+          speed = (distance / hours).toFixed(1).toString()
+        }
       }
-    } else {
-      return '0.0'
     }
-
+    return speed
   }
 
   componentDidMount() {
@@ -146,8 +145,6 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 35,
     textAlign: 'center',
-    paddingLeft: 30,
-    paddingRight: 30,
   },
   statName: {
     paddingLeft: 5,
