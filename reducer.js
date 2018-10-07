@@ -333,7 +333,7 @@ export default function AppReducer(state=initialState, action) {
             ['localState', 'currentRide', 'rideCoordinates'],
             List().push(action.newLocation)
           )
-        } else if (rideCoords.count() > 1) {
+        } else if (rideCoords.count() > 1 && oldLastLocation) {
           const lastCoord = rideCoords.get(-2)
           const oldDistance = haversine(
             oldLastLocation.get('latitude'),
