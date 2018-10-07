@@ -1,6 +1,7 @@
 import { fromJS, List, Map } from 'immutable'
-
+import { green, warning, danger } from './colors'
 import {
+  CLEAR_FEED_MESSAGE,
   CLEAR_LAST_LOCATION,
   CLEAR_PAUSED_LOCATIONS,
   CLEAR_SEARCH,
@@ -27,6 +28,8 @@ import {
   POP_SHOW_RIDE_SHOWN,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
+  REMOTE_PERSIST_ERROR,
+  REMOTE_PERSIST_STARTED,
   REMOVE_RIDE_FROM_STATE,
   REPLACE_LAST_LOCATION,
   RESUME_LOCATION_TRACKING,
@@ -62,6 +65,7 @@ export const initialState = Map({
     currentRide: null,
     doingInitialLoad: false,
     error: null,
+    feedMessage: null,
     goodConnection: false,
     jwt: null,
     lastLocation: null,
@@ -74,6 +78,7 @@ export const initialState = Map({
     pausedCachedCoordinates: List(),
     photoQueue: Map(),
     popShowRide: null,
+    remotePersistActive: false,
     root: SIGNUP_LOGIN,
     userID: null,
     userSearchResults: List(),
@@ -90,6 +95,8 @@ export const initialState = Map({
 
 export default function AppReducer(state=initialState, action) {
   switch (action.type) {
+    case CLEAR_FEED_MESSAGE:
+      return state.setIn(['localState', 'feedMessage'], null)
     case CLEAR_LAST_LOCATION:
       return state.setIn(['localState', 'lastLocation'], null)
     case CLEAR_PAUSED_LOCATIONS:
@@ -126,7 +133,7 @@ export default function AppReducer(state=initialState, action) {
     case POP_SHOW_RIDE_SHOWN:
       return state.setIn(['localState', 'popShowRide'], null)
     case LOAD_LOCAL_STATE:
-      return state.set('localState', action.localState)
+      return state.set('localState', action.localState).setIn(['localState', 'feedMessage'], null)
     case LOCAL_DATA_LOADED:
       const allUsers = action.localData.users.reduce((accum, user) => {
         accum[user._id] = fromJS(user)
@@ -190,7 +197,17 @@ export default function AppReducer(state=initialState, action) {
         List()
       )
     case NEEDS_REMOTE_PERSIST:
-      return state.setIn(['localState', 'needsRemotePersist', action.database], true)
+      return state.setIn(
+        ['localState', 'needsRemotePersist', action.database],
+        true
+      ).setIn(
+        ['localState', 'feedMessage'],
+        Map({
+          message: 'Data Needs to Upload',
+          color: warning,
+          timeout: false
+        })
+      )
     case NEW_APP_STATE:
       return state.setIn(['localState', 'appState'], action.newState)
     case NEW_LOCATION:
@@ -244,7 +261,51 @@ export default function AppReducer(state=initialState, action) {
     case RECEIVE_JWT:
       return state.setIn(['localState', 'jwt'], action.token)
     case REMOTE_PERSIST_COMPLETE:
-      return state.setIn(['localState', 'needsRemotePersist', action.database], false)
+      let dbSwitched = state.setIn(
+        ['localState', 'needsRemotePersist', action.database],
+        false
+      )
+      const allDone = dbSwitched.getIn(
+        ['localState', 'needsRemotePersist']
+      ).valueSeq().filter(x => x).count() === 0
+      if (allDone) {
+        dbSwitched = dbSwitched.setIn(
+          ['localState', 'feedMessage'],
+          Map({
+            message: 'All Data Uploaded',
+            color: green,
+            timeout: 3000
+          })
+        ).setIn(
+            ['localState', 'remotePersistActive'],
+            false
+          )
+        }
+      return dbSwitched
+    case REMOTE_PERSIST_ERROR:
+      return state.setIn(
+        ['localState', 'feedMessage'],
+        Map({
+          message: 'Can\'t Upload Data',
+          color: danger,
+          timeout: false
+        })
+      ).setIn(
+        ['localState', 'remotePersistActive'],
+        false
+      )
+    case REMOTE_PERSIST_STARTED:
+      return state.setIn(
+        ['localState', 'feedMessage'],
+        Map({
+          message: 'Data Uploading',
+          color: warning,
+          timeout: false
+        })
+      ).setIn(
+        ['localState', 'remotePersistActive'],
+        true
+      )
     case REMOVE_RIDE_FROM_STATE:
       return state.remove(action.rideID)
     case REPLACE_LAST_LOCATION:

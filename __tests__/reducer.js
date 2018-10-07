@@ -99,7 +99,6 @@ describe('reducer', () => {
       ['localState', 'currentRide', 'distance'],
       488.048463762285
     )
-    console.log(expectedNewState.toJSON())
 
     expect(AppReducer(initialState, replaceLastLocation(newLocation))).toEqual(expectedNewState)
     expect(

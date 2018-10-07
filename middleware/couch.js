@@ -1,4 +1,9 @@
-import { clearState, remotePersistComplete } from '../actions'
+import {
+  clearState,
+  remotePersistComplete,
+  remotePersistError,
+  remotePersistStarted
+} from '../actions'
 import { logInfo, logError } from '../helpers'
 import { PouchCouch } from '../services/index'
 import { Sentry } from 'react-native-sentry'
@@ -33,10 +38,15 @@ export default storeToCouch = store => dispatch => action => {
 
 function recursiveEmptyQueue (db, store, pouchCouch) {
   savingRemotely = true
+
   remotePersist(db, store, pouchCouch)
 }
 
 function remotePersist (db, store, pouchCouch) {
+  const knowsAboutPersist = store.getState().getIn(['main', 'localState', 'remotePersistActive'])
+  if (!knowsAboutPersist) {
+    store.dispatch(remotePersistStarted())
+  }
   pouchCouch.remoteReplicateDB(db).on('complete', () => {
     if (queue.length) {
       const db = queue.shift()
@@ -50,11 +60,16 @@ function remotePersist (db, store, pouchCouch) {
       }
     }
   }).on('error', (e) => {
+    const knowsAboutError = store.getState().getIn(['main', 'localState', 'remotePersistError'])
+    if (!knowsAboutError) {
+      store.dispatch(remotePersistError())
+    }
     Sentry.captureException(e)
     queue = []
     savingRemotely = false
-    logInfo('Remote replication error follows: ')
+    logInfo('Remote replication error follows ============================')
     logError(e)
+    logInfo('=============================================================')
   })
 }
 

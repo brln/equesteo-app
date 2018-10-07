@@ -6,6 +6,7 @@ import {
 
 import RideList from './RideList'
 import { brand } from '../../colors'
+import SyncingStatus from './SyncingStatus'
 
 export default class Feed extends PureComponent {
   constructor (props) {
@@ -42,6 +43,16 @@ export default class Feed extends PureComponent {
   }
 
   render() {
+    let statusBar
+    if (this.props.feedMessage) {
+      statusBar = (
+        <SyncingStatus
+          clearFeedMessage={this.props.clearFeedMessage}
+          feedMessage={this.props.feedMessage}
+        />
+      )
+    }
+
     return (
       <Container>
         <Tabs
@@ -55,6 +66,7 @@ export default class Feed extends PureComponent {
             heading="Following"
             activeTextStyle={{color: 'white'}}
           >
+            { statusBar }
             { this.renderRideList(false, this.props.followingRides) }
           </Tab>
           <Tab
@@ -63,6 +75,7 @@ export default class Feed extends PureComponent {
             activeTextStyle={{color: 'white'}}
             heading="You"
           >
+            { statusBar }
             { this.renderRideList(true, this.props.yourRides) }
           </Tab>
         </Tabs>

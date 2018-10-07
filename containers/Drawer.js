@@ -63,7 +63,6 @@ class DrawerContainer extends Component {
 
   openBarn () {
     this.toggleDrawer()
-    console.log(this.props.activeComponent)
     Navigation.push(this.props.activeComponent, {
       component: {
         name: BARN,

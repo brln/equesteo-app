@@ -19,6 +19,7 @@ import { DRAWER, FEED, SIGNUP_LOGIN } from './screens'
 import { LocalStorage, PouchCouch, UserAPI } from './services'
 import {BadRequestError, NotConnectedError, UnauthorizedError} from "./errors"
 import {
+  CLEAR_FEED_MESSAGE,
   CLEAR_LAST_LOCATION,
   CLEAR_PAUSED_LOCATIONS,
   CLEAR_SEARCH,
@@ -44,6 +45,8 @@ import {
   POP_SHOW_RIDE_SHOWN,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
+  REMOTE_PERSIST_ERROR,
+  REMOTE_PERSIST_STARTED,
   REPLACE_LAST_LOCATION,
   RIDE_CARROT_CREATED,
   RIDE_CARROT_SAVED,
@@ -60,6 +63,12 @@ import {
   USER_UPDATED,
   USER_SEARCH_RETURNED,
 } from './constants'
+
+export function clearFeedMessage () {
+  return {
+    type: CLEAR_FEED_MESSAGE
+  }
+}
 
 export function clearLastLocation () {
   return {
@@ -222,6 +231,12 @@ function receiveJWT (token) {
   }
 }
 
+export function remotePersistStarted () {
+  return {
+    type: REMOTE_PERSIST_STARTED
+  }
+}
+
 export function replaceLastLocation (newLocation) {
   return {
     type: REPLACE_LAST_LOCATION,
@@ -233,6 +248,12 @@ export function remotePersistComplete (database) {
   return {
     type: REMOTE_PERSIST_COMPLETE,
     database
+  }
+}
+
+export function remotePersistError () {
+  return {
+    type: REMOTE_PERSIST_ERROR,
   }
 }
 
@@ -827,7 +848,7 @@ export function startLocationTracking () {
     })
 
     BackgroundGeolocation.on('error', (error) => {
-      console.log('[ERROR] BackgroundGeolocation error:', error);
+      logError('[ERROR] BackgroundGeolocation error:', error);
       Sentry.captureException(new Error(JSON.stringify(error)))
     });
 
