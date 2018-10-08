@@ -42,6 +42,8 @@ import {
   RIDE_SAVED,
   SAVE_USER_ID,
   SET_ACTIVE_COMPONENT,
+  SET_FEED_MESSAGE,
+  SET_FULL_SYNC_FAIL,
   START_RIDE,
   TOGGLE_AWAITING_PW_CHANGE,
   TOGGLE_DOING_INITIAL_LOAD,
@@ -68,6 +70,7 @@ export const initialState = Map({
     doingInitialLoad: false,
     error: null,
     feedMessage: null,
+    fullSyncFail: false,
     goodConnection: false,
     jwt: null,
     lastLocation: null,
@@ -126,6 +129,8 @@ export default function AppReducer(state=initialState, action) {
       return state.setIn(['localState', 'error'], action.message)
     case FOLLOW_UPDATED:
       return state.setIn(['follows', action.follow.get('_id')], action.follow)
+    case SET_FULL_SYNC_FAIL:
+      return state.setIn(['localState', 'fullSyncFail'], action.status)
     case HORSE_CREATED:
       return state.set('horses', state.get('horses').set(action.horse.get('_id'), action.horse))
     case HORSE_SAVED:
@@ -204,13 +209,6 @@ export default function AppReducer(state=initialState, action) {
       return state.setIn(
         ['localState', 'needsRemotePersist', action.database],
         true
-      ).setIn(
-        ['localState', 'feedMessage'],
-        Map({
-          message: 'Data Needs to Upload',
-          color: warning,
-          timeout: false
-        })
       )
     case NEW_APP_STATE:
       return state.setIn(['localState', 'appState'], action.newState)
@@ -284,39 +282,17 @@ export default function AppReducer(state=initialState, action) {
       ).valueSeq().filter(x => x).count() === 0
       if (allDone) {
         dbSwitched = dbSwitched.setIn(
-          ['localState', 'feedMessage'],
-          Map({
-            message: 'All Data Uploaded',
-            color: green,
-            timeout: 3000
-          })
-        ).setIn(
-            ['localState', 'remotePersistActive'],
-            false
-          )
-        }
+          ['localState', 'remotePersistActive'],
+          false
+        )}
       return dbSwitched
     case REMOTE_PERSIST_ERROR:
       return state.setIn(
-        ['localState', 'feedMessage'],
-        Map({
-          message: 'Can\'t Upload Data',
-          color: danger,
-          timeout: false
-        })
-      ).setIn(
         ['localState', 'remotePersistActive'],
         false
       )
     case REMOTE_PERSIST_STARTED:
       return state.setIn(
-        ['localState', 'feedMessage'],
-        Map({
-          message: 'Data Uploading',
-          color: warning,
-          timeout: false
-        })
-      ).setIn(
         ['localState', 'remotePersistActive'],
         true
       )
@@ -393,6 +369,10 @@ export default function AppReducer(state=initialState, action) {
     case SET_ACTIVE_COMPONENT:
       return state.setIn(
         ['localState', 'activeComponent'], action.componentID
+      )
+    case SET_FEED_MESSAGE:
+      return state.setIn(
+        ['localState', 'feedMessage'], action.message
       )
     case START_RIDE:
       return state.setIn(['localState', 'currentRide'], action.currentRide)

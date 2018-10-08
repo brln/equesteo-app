@@ -94,7 +94,7 @@ class FeedContainer extends PureComponent {
   static getDerivedStateFromProps (nextProps, prevState) {
     const nextState = {}
     nextState.lastFullSync = nextProps.lastFullSync
-    if (prevState.lastFullSync !== nextProps.lastFullSync) {
+    if (prevState.lastFullSync !== nextProps.lastFullSync || nextProps.fullSyncFail) {
       nextState.refreshing = false
     }
     return nextState
@@ -251,6 +251,7 @@ function mapStateToProps (state) {
   return {
     feedMessage: localState.get('feedMessage'),
     follows: mainState.get('follows'),
+    fullSyncFail: localState.get('fullSyncFail'),
     horses: mainState.get('horses'),
     horseUsers: mainState.get('horseUsers'),
     justFinishedRide: localState.get('justFinishedRide'),

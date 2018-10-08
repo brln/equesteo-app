@@ -5,6 +5,7 @@ import BarnContainer from './containers/Barn'
 import DrawerContainer from './containers/Drawer'
 import FeedContainer from './containers/Feed'
 import FindPeopleContainer from './containers/FindPeople'
+import FirstStartContainer from './containers/FirstStart'
 import FollowListContainer from './containers/FollowList'
 import HorseProfileContainer from './containers/HorseProfile'
 import MapContainer from './containers/Map'
@@ -23,6 +24,7 @@ export const ABOUT_PAGE = 'equesteo.About'
 export const BARN = 'equesteo.Barn'
 export const DRAWER = 'equesteo.Drawer'
 export const FEED = 'equesteo.Feed'
+export const FIRST_START = 'equesteo.FirstStart'
 export const FOLLOW_LIST = 'equesteo.FollowList'
 export const HORSE_PROFILE = 'equesteo.HorseProfile'
 export const FIND_PEOPLE = 'equesteo.FindPeople'
@@ -44,6 +46,7 @@ export function registerScreens(store, Provider) {
   Navigation.registerComponentWithRedux(DRAWER, () => DrawerContainer, Provider, store)
   Navigation.registerComponentWithRedux(FEED, () => FeedContainer, Provider, store)
   Navigation.registerComponentWithRedux(FIND_PEOPLE, () => FindPeopleContainer, Provider, store)
+  Navigation.registerComponentWithRedux(FIRST_START, () => FirstStartContainer, Provider, store)
   Navigation.registerComponentWithRedux(FOLLOW_LIST, () => FollowListContainer, Provider, store)
   Navigation.registerComponentWithRedux(HORSE_PROFILE, () => HorseProfileContainer, Provider, store)
   Navigation.registerComponentWithRedux(MAP, () => MapContainer, Provider, store)

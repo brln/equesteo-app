@@ -96,9 +96,9 @@ export default class PouchCouch {
       case 'users':
         return this.localReplicateUsers([...userIDs, ...followerUserIDs]).catch(e => {})
       case 'all':
-        const rideReplicate = this.localReplicateRides(userIDs, followerUserIDs).catch(e => {})
-        const userReplicate = this.localReplicateUsers([...userIDs, ...followerUserIDs]).catch(e => {})
-        const horsesReplicate = this.localReplicateHorses([...userIDs, ...followerUserIDs]).catch(e => {})
+        const rideReplicate = this.localReplicateRides(userIDs, followerUserIDs)
+        const userReplicate = this.localReplicateUsers([...userIDs, ...followerUserIDs])
+        const horsesReplicate = this.localReplicateHorses([...userIDs, ...followerUserIDs])
         return Promise.all([rideReplicate, horsesReplicate, userReplicate])
       default:
         throw('Local DB not found')
@@ -121,6 +121,7 @@ export default class PouchCouch {
       ).on('complete', () => {
         resolve()
       }).on('error', (e) => {
+        console.log('localReplicateRides')
         logError(e)
         reject()
       })
@@ -138,6 +139,7 @@ export default class PouchCouch {
       ).on('complete', () => {
           resolve()
       }).on('error', (e) => {
+        console.log('localReplicateUsers')
         logError(e)
         reject()
       })
@@ -169,9 +171,14 @@ export default class PouchCouch {
         ).on('complete', () => {
           resolve()
         }).on('error', (e) => {
+          console.log('localReplicateHorses')
           logError(e)
           reject()
         })
+      }).catch((e) => {
+        console.log('localReplicateHorses allJoins error')
+        logError(e)
+        reject()
       })
     })
   }

@@ -15,6 +15,7 @@ import {
   generateUUID,
   staticMap
 } from "./helpers"
+import { danger, green, warning } from './colors'
 import { DRAWER, FEED, SIGNUP_LOGIN } from './screens'
 import { LocalStorage, PouchCouch, UserAPI } from './services'
 import {BadRequestError, NotConnectedError, UnauthorizedError} from "./errors"
@@ -57,6 +58,8 @@ import {
   RIDE_SAVED,
   SAVE_USER_ID,
   SET_ACTIVE_COMPONENT,
+  SET_FEED_MESSAGE,
+  SET_FULL_SYNC_FAIL,
   START_RIDE,
   SYNC_COMPLETE,
   TOGGLE_AWAITING_PW_CHANGE,
@@ -149,6 +152,21 @@ export function followUpdated (follow) {
   }
 }
 
+export function setFeedMessage (message) {
+  return {
+    type: SET_FEED_MESSAGE,
+    message
+  }
+}
+
+export function setFullSyncFail (status) {
+  return {
+    type: SET_FULL_SYNC_FAIL,
+    status,
+    logData: ['status']
+  }
+}
+
 function horseCreated (horse) {
   return {
     type: HORSE_CREATED,
@@ -183,7 +201,7 @@ export function mergePausedLocations () {
   }
 }
 
-export function needsRemotePersist (database) {
+export function setRemotePersistDB (database) {
   return {
     type: NEEDS_REMOTE_PERSIST,
     database
@@ -245,7 +263,7 @@ function receiveJWT (token) {
   }
 }
 
-export function remotePersistStarted () {
+export function setRemotePersistStarted () {
   return {
     type: REMOTE_PERSIST_STARTED
   }
@@ -258,14 +276,14 @@ export function replaceLastLocation (newLocation) {
   }
 }
 
-export function remotePersistComplete (database) {
+export function setRemotePersistComplete (database) {
   return {
     type: REMOTE_PERSIST_COMPLETE,
     database
   }
 }
 
-export function remotePersistError () {
+export function setRemotePersistError () {
   return {
     type: REMOTE_PERSIST_ERROR,
   }
@@ -687,6 +705,17 @@ export function deleteHorseUser (horseID, userID) {
   }
 }
 
+export function needsRemotePersist(db) {
+  return async (dispatch) => {
+    dispatch(setFeedMessage(Map({
+      message: 'Data Needs to Upload',
+      color: warning,
+      timeout: false
+    })))
+    dispatch(setRemotePersistDB(db))
+  }
+}
+
 function switchRoot (newRoot) {
   return async () => {
     if (newRoot === FEED) {
@@ -771,6 +800,39 @@ export function newPassword (password) {
     } catch (e) {
       logError(e)
     }
+  }
+}
+
+export function remotePersistComplete (db) {
+  return async (dispatch) => {
+    dispatch(setRemotePersistComplete(db))
+    dispatch(setFeedMessage(Map({
+      message: 'All Data Uploaded',
+      color: green,
+      timeout: 3000
+    })))
+  }
+}
+
+export function remotePersistError () {
+  return async (dispatch) => {
+    dispatch(setRemotePersistError())
+    dispatch(setFeedMessage(Map({
+      message: 'Can\'t Upload Data',
+      color: danger,
+      timeout: false
+    })))
+  }
+}
+
+export function remotePersistStarted () {
+  return async (dispatch) => {
+    dispatch(setRemotePersistStarted())
+    dispatch(setFeedMessage(Map({
+      message: 'Data Uploading',
+      color: warning,
+      timeout: false
+    })))
   }
 }
 
@@ -1043,9 +1105,21 @@ export function syncDBPull (db) {
       f => f.get('followerID')
     ).toJS()
     following.push(userID)
-    await pouchCouch.localReplicateDB(db, following, followers)
-    await dispatch(loadLocalData())
-    dispatch(syncComplete())
+    try {
+      dispatch(setFullSyncFail(false))
+      await pouchCouch.localReplicateDB(db, following, followers)
+      console.log('returned from localReplicateDB')
+      await dispatch(loadLocalData())
+      dispatch(syncComplete())
+    } catch (e) {
+      console.log('syncDBPull1``````````````````````````````````````````')
+      dispatch(setFeedMessage(Map({
+        message: 'Error Fetching Data',
+        color: warning,
+        timeout: 3000
+      })))
+      dispatch(setFullSyncFail(true))
+    }
   }
 }
 
