@@ -855,9 +855,12 @@ export function startLocationTracking () {
         console.log('distance: ' + distance)
         console.log('refining accuracy: ' + refiningAccuracy * METERS_TO_MILES)
         if (distance < (refiningAccuracy * METERS_TO_MILES) && location.accuracy <= refiningAccuracy) {
-          dispatch(notMoving())
           dispatch(replaceLastLocation(parsedLocation))
           replaced = true
+        }
+        console.log(distance)
+        if (distance < (25 / 5280)) {
+          dispatch(notMoving())
         }
       }
       if (!replaced) {

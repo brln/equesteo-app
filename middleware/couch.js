@@ -64,12 +64,17 @@ function remotePersist (db, store, pouchCouch) {
     if (!knowsAboutError) {
       store.dispatch(remotePersistError())
     }
-    Sentry.captureException(e)
-    queue = []
-    savingRemotely = false
+    try {
+       Sentry.captureException(new Error(e))
+    } catch (e) { logError(e) }
+
+
     logInfo('Remote replication error follows ============================')
     logError(e)
     logInfo('=============================================================')
+
+    queue = []
+    savingRemotely = false
   })
 }
 

@@ -77,7 +77,9 @@ function remotePersist (item, store, userAPI) {
       currentlySaving = null
     }
   }).catch((e) => {
-    Sentry.captureException(e)
+    try {
+      Sentry.captureException(new Error(e))
+    } catch (e) { logError(e) }
     workingQueue = []
     queueID = generateUUID()
     currentlySaving = null
