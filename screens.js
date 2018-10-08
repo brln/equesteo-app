@@ -1,5 +1,6 @@
 import { Navigation } from 'react-native-navigation';
 
+import About from './components/About'
 import BarnContainer from './containers/Barn'
 import DrawerContainer from './containers/Drawer'
 import FeedContainer from './containers/Feed'
@@ -18,6 +19,7 @@ import TrainingContainer from './containers/Training'
 import UpdateHorseContainer from './containers/UpdateHorse'
 import UpdateProfileContainer from './containers/UpdateProfile'
 
+export const ABOUT_PAGE = 'equesteo.About'
 export const BARN = 'equesteo.Barn'
 export const DRAWER = 'equesteo.Drawer'
 export const FEED = 'equesteo.Feed'
@@ -37,6 +39,7 @@ export const UPDATE_HORSE = 'equesteo.Horse'
 export const UPDATE_PROFILE = 'equesteo.UpdateProfile'
 
 export function registerScreens(store, Provider) {
+  Navigation.registerComponent(ABOUT_PAGE, () => About)
   Navigation.registerComponentWithRedux(BARN, () => BarnContainer, Provider, store)
   Navigation.registerComponentWithRedux(DRAWER, () => DrawerContainer, Provider, store)
   Navigation.registerComponentWithRedux(FEED, () => FeedContainer, Provider, store)

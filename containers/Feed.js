@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { Navigation } from 'react-native-navigation'
 
 import {
+  clearFeedMessage,
   popShowRideShown,
   syncDBPull,
   toggleRideCarrot
@@ -41,6 +42,9 @@ class FeedContainer extends PureComponent {
           color: brand,
         },
         elevation: 0
+      },
+      layout: {
+        orientation: ['portrait']
       }
     };
   }
@@ -51,6 +55,7 @@ class FeedContainer extends PureComponent {
       refreshing: false,
       lastFullSync: null
     }
+    this.clearFeedMessage = this.clearFeedMessage.bind(this)
     this.filteredHorses = this.filteredHorses.bind(this)
     this.filteredHorseUsers = this.filteredHorseUsers.bind(this)
     this.followIDs = this.followIDs.bind(this)
@@ -93,6 +98,10 @@ class FeedContainer extends PureComponent {
       nextState.refreshing = false
     }
     return nextState
+  }
+
+  clearFeedMessage () {
+     this.props.dispatch(clearFeedMessage())
   }
 
   componentDidUpdate () {
@@ -211,7 +220,9 @@ class FeedContainer extends PureComponent {
     logRender('feedContainer')
     return (
       <Feed
+        clearFeedMessage={this.clearFeedMessage}
         deleteRide={this.deleteRide}
+        feedMessage={this.props.feedMessage}
         followingRides={this.followingRides()}
         horses={this.filteredHorses()}
         horseOwnerIDs={this.horseOwnerIDs()}
@@ -238,6 +249,7 @@ function mapStateToProps (state) {
   const localState = mainState.get('localState')
   const userID = localState.get('userID')
   return {
+    feedMessage: localState.get('feedMessage'),
     follows: mainState.get('follows'),
     horses: mainState.get('horses'),
     horseUsers: mainState.get('horseUsers'),

@@ -43,9 +43,10 @@ export default class RideRecorder extends PureComponent {
           <View style={styles.bottomSection}>
             <RideStats
               appState={this.props.appState}
-              startTime={this.props.currentRide.get('startTime')}
               distance={this.props.currentRide.get('distance')}
+              moving={this.props.moving}
               rideCoords={this.props.currentRide.get('rideCoordinates')}
+              startTime={this.props.currentRide.get('startTime')}
             />
           </View>
         </View>

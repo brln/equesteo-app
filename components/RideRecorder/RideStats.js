@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import memoizeOne from 'memoize-one';
 
 import { darkGrey, lightGrey } from '../../colors'
 import { haversine } from '../../helpers'
@@ -16,42 +17,50 @@ export default class RideStats extends PureComponent {
     this.state = { ...initialState }
     this.elapsedAsString = this.elapsedAsString.bind(this)
     this.currentSpeed = this.currentSpeed.bind(this)
+    this.timeToString = this.timeToString.bind(this)
+
+    this.memoAvgSpeed = memoizeOne(this.avgSpeed)
+    this.memoCurrentSpeed = memoizeOne(this.currentSpeed)
+    this.memoTimeToString = memoizeOne(this.timeToString)
   }
 
-  avgSpeed () {
-    const elapsed = this.state.elapsedTime
+  avgSpeed (time, distance) {
+    const elapsed = time
     let hours = 0
     let minutes = 0
     let seconds = 0
-    if (!(typeof(elapsed) === 'undefined') && elapsed !== 0) {
+    if (elapsed > 0 && this.props.distance) {
       hours = elapsed.getUTCHours()
       minutes = elapsed.getUTCMinutes()
       seconds = elapsed.getUTCSeconds()
 
       const totalHours = hours + (minutes / 60) + (seconds / 60 / 60)
-      const milesPerHour = this.props.distance / totalHours
+      const milesPerHour = distance / totalHours
       return milesPerHour.toFixed(1).toString()
     } else {
       return '0.0'
     }
   }
 
-  currentSpeed () {
-    const secondToLast = this.props.rideCoords.get(-2)
-    const last = this.props.rideCoords.get(-1)
-    if (secondToLast && last) {
-      const distance = haversine(
-        secondToLast.get('latitude'),
-        secondToLast.get('longitude'),
-        last.get('latitude'),
-        last.get('longitude')
-      )
-      const hours = ((last.get('timestamp') / 1000) - (secondToLast.get('timestamp') / 1000)) / 60 / 60
-      return (distance / hours).toFixed(1).toString()
-    } else {
-      return '0.0'
+  currentSpeed (rideCoords) {
+    let speed = '0.0'
+    if (this.props.moving) {
+      const secondToLast = rideCoords.get(-2)
+      const last = rideCoords.get(-1)
+      if (secondToLast && last) {
+        const distance = haversine(
+          secondToLast.get('latitude'),
+          secondToLast.get('longitude'),
+          last.get('latitude'),
+          last.get('longitude')
+        )
+        const hours = ((last.get('timestamp') / 1000) - (secondToLast.get('timestamp') / 1000)) / 60 / 60
+        if (hours > 0 && distance > 0) {
+          speed = (distance / hours).toFixed(1).toString()
+        }
+      }
     }
-
+    return speed
   }
 
   componentDidMount() {
@@ -79,17 +88,18 @@ export default class RideStats extends PureComponent {
     return pad.substring(0, pad.length - str.length) + str
   }
 
+  timeToString (elapsed, elapsedSeconds) {
+    const hours = this.leftpad(elapsed.getUTCHours())
+    const minutes = this.leftpad(elapsed.getUTCMinutes())
+    const seconds = this.leftpad(elapsedSeconds)
+    return `${hours}:${minutes}:${seconds}`
+  }
+
   elapsedAsString () {
     const elapsed = this.state.elapsedTime
-    let hours = '00'
-    let minutes = '00'
-    let seconds = '00'
-    if (!(typeof(elapsed) === 'undefined')) {
-      hours = this.leftpad(elapsed.getUTCHours())
-      minutes = this.leftpad(elapsed.getUTCMinutes())
-      seconds = this.leftpad(elapsed.getUTCSeconds())
+    if (elapsed) {
+      return this.memoTimeToString(elapsed, elapsed.getUTCSeconds())
     }
-    return `${hours}:${minutes}:${seconds}`
   }
 
   render () {
@@ -104,7 +114,7 @@ export default class RideStats extends PureComponent {
           </View>
           <View style={[styles.statBox, {borderTopWidth: 1, borderBottomWidth: 2, borderRightWidth: 1, borderLeftWidth: 2}]}>
             <Text style={styles.statName}>Current Speed</Text>
-            <Text style={styles.statFont}>{this.currentSpeed()} <Text style={styles.unitsFont}>mi/h</Text></Text>
+            <Text style={styles.statFont}>{this.memoCurrentSpeed(this.props.rideCoords)} <Text style={styles.unitsFont}>mi/h</Text></Text>
           </View>
         </View>
         <View style={{flex: 1}}>
@@ -114,7 +124,9 @@ export default class RideStats extends PureComponent {
           </View>
           <View style={[styles.statBox, {borderTopWidth: 1, borderBottomWidth: 2, borderRightWidth: 2, borderLeftWidth: 1}]}>
             <Text style={styles.statName}>Avg. Speed</Text>
-            <Text style={styles.statFont}>{this.avgSpeed()} <Text style={styles.unitsFont}>mi/h</Text></Text>
+            <Text style={styles.statFont}>
+              {this.memoAvgSpeed(this.state.elapsedTime, this.props.distance)} <Text style={styles.unitsFont}>mi/h</Text>
+            </Text>
           </View>
         </View>
       </View>
@@ -133,8 +145,6 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 35,
     textAlign: 'center',
-    paddingLeft: 30,
-    paddingRight: 30,
   },
   statName: {
     paddingLeft: 5,

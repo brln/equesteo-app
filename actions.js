@@ -7,12 +7,19 @@ import PushNotification from 'react-native-push-notification'
 import { fromJS, Map, List } from 'immutable'
 import { Sentry } from 'react-native-sentry'
 
-import { logError, logInfo, unixTimeNow, generateUUID, staticMap } from "./helpers"
+import {
+  haversine,
+  logError,
+  logInfo,
+  unixTimeNow,
+  generateUUID,
+  staticMap
+} from "./helpers"
 import { DRAWER, FEED, SIGNUP_LOGIN } from './screens'
 import { LocalStorage, PouchCouch, UserAPI } from './services'
 import {BadRequestError, NotConnectedError, UnauthorizedError} from "./errors"
-
 import {
+  CLEAR_FEED_MESSAGE,
   CLEAR_LAST_LOCATION,
   CLEAR_PAUSED_LOCATIONS,
   CLEAR_SEARCH,
@@ -34,10 +41,15 @@ import {
   NEW_LOCATION,
   NEW_APP_STATE,
   NEW_NETWORK_STATE,
+  NOT_MOVING,
+  NOW_MOVING,
   PAUSE_LOCATION_TRACKING,
   POP_SHOW_RIDE_SHOWN,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
+  REMOTE_PERSIST_ERROR,
+  REMOTE_PERSIST_STARTED,
+  REPLACE_LAST_LOCATION,
   RIDE_CARROT_CREATED,
   RIDE_CARROT_SAVED,
   RIDE_COMMENT_CREATED,
@@ -53,6 +65,12 @@ import {
   USER_UPDATED,
   USER_SEARCH_RETURNED,
 } from './constants'
+
+export function clearFeedMessage () {
+  return {
+    type: CLEAR_FEED_MESSAGE
+  }
+}
 
 export function clearLastLocation () {
   return {
@@ -145,12 +163,6 @@ function horseUserUpdated (horseUser) {
   }
 }
 
-export function popShowRideShown () {
-  return {
-    type: POP_SHOW_RIDE_SHOWN
-  }
-}
-
 export function loadLocalState (localState) {
   return {
     type: LOAD_LOCAL_STATE,
@@ -202,9 +214,27 @@ function newNetworkState (connectionType, effectiveConnectionType) {
   }
 }
 
+function notMoving () {
+  return {
+    type: NOT_MOVING
+  }
+}
+
+function nowMoving () {
+  return {
+    type: NOW_MOVING
+  }
+}
+
 export function pauseLocationTracking () {
   return {
     type: PAUSE_LOCATION_TRACKING
+  }
+}
+
+export function popShowRideShown () {
+  return {
+    type: POP_SHOW_RIDE_SHOWN
   }
 }
 
@@ -215,10 +245,16 @@ function receiveJWT (token) {
   }
 }
 
-export function saveUserID(userID) {
+export function remotePersistStarted () {
   return {
-    type: SAVE_USER_ID,
-    userID
+    type: REMOTE_PERSIST_STARTED
+  }
+}
+
+export function replaceLastLocation (newLocation) {
+  return {
+    type: REPLACE_LAST_LOCATION,
+    newLocation
   }
 }
 
@@ -226,6 +262,12 @@ export function remotePersistComplete (database) {
   return {
     type: REMOTE_PERSIST_COMPLETE,
     database
+  }
+}
+
+export function remotePersistError () {
+  return {
+    type: REMOTE_PERSIST_ERROR,
   }
 }
 
@@ -261,6 +303,13 @@ function rideSaved (ride) {
   return {
     type: RIDE_SAVED,
     ride
+  }
+}
+
+export function saveUserID(userID) {
+  return {
+    type: SAVE_USER_ID,
+    userID
   }
 }
 
@@ -778,30 +827,50 @@ export function signOut () {
   }
 }
 
-let locationTimeout = null
 export function startLocationTracking () {
-  return async (dispatch) => {
+  return async (dispatch, getState) => {
     logInfo('action: startLocationTracking')
-    dispatch(configureBackgroundGeolocation())
-
+    await configureBackgroundGeolocation()()
+    const METERS_TO_MILES = 0.0006213712
     BackgroundGeolocation.on('location', (location) => {
-      if (location.accuracy < 50) {
-        const parsedLocation = Map({
-          accuracy: location.accuracy,
-          latitude: location.latitude,
-          longitude: location.longitude,
-          provider: location.provider,
-          locationProvider: location.locationProvider,
-          timestamp: location.time,
-        })
+
+      const refiningLocation = getState().getIn(['main', 'localState', 'refiningLocation'])
+      let parsedLocation = Map({
+        accuracy: location.accuracy,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        provider: location.provider,
+        timestamp: location.time,
+      })
+
+      let replaced = false
+      if (refiningLocation) {
+        let distance = haversine(
+          refiningLocation.get('latitude'),
+          refiningLocation.get('longitude'),
+          location.latitude,
+          location.longitude
+        )
+        let refiningAccuracy = refiningLocation.get('accuracy')
+        console.log('distance: ' + distance)
+        console.log('refining accuracy: ' + refiningAccuracy * METERS_TO_MILES)
+        if (distance < (refiningAccuracy * METERS_TO_MILES) && location.accuracy <= refiningAccuracy) {
+          dispatch(replaceLastLocation(parsedLocation))
+          replaced = true
+        }
+        console.log(distance)
+        if (distance < (25 / 5280)) {
+          dispatch(notMoving())
+        }
+      }
+      if (!replaced) {
+        dispatch(nowMoving())
         dispatch(newLocation(parsedLocation))
-      } else {
-        dispatch(configureBackgroundGeolocation())
       }
     })
 
     BackgroundGeolocation.on('error', (error) => {
-      console.log('[ERROR] BackgroundGeolocation error:', error);
+      logError('[ERROR] BackgroundGeolocation error:', error);
       Sentry.captureException(new Error(JSON.stringify(error)))
     });
 
@@ -817,7 +886,7 @@ function configureBackgroundGeolocation () {
       locationProvider: BackgroundGeolocation.RAW_PROVIDER,
       distanceFilter: 1,
       maxLocations: 10,
-      interval: 15000,
+      interval: 3000,
       notificationTitle: 'You\'re out on a ride.',
       notificationText: 'Tap here to see your progress.',
     });
@@ -863,8 +932,6 @@ function startListeningFCM () {
       logInfo('notification opened')
       logInfo(m)
     })
-
-
   }
 }
 
@@ -882,7 +949,6 @@ export function stopLocationTracking () {
   return async (dispatch) => {
     BackgroundGeolocation.stop()
     BackgroundGeolocation.removeAllListeners('location')
-    clearTimeout(locationTimeout)
     dispatch(clearLastLocation())
   }
 }

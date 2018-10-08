@@ -13,6 +13,7 @@ import {
 } from "../actions"
 import { brand } from '../colors'
 import {
+  ABOUT_PAGE,
   FOLLOW_LIST,
   HORSE_PROFILE,
   PHOTO_LIGHTBOX,
@@ -35,8 +36,11 @@ class ProfileContainer extends PureComponent {
           color: 'white',
           fontSize: 20
         }
+      },
+      layout: {
+        orientation: ['portrait']
       }
-    };
+    }
   }
 
   constructor (props) {
@@ -48,6 +52,7 @@ class ProfileContainer extends PureComponent {
     this.followers = this.followers.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
     this.profileUserHorses = this.profileUserHorses.bind(this)
+    this.showAboutPage = this.showAboutPage.bind(this)
     this.showHorseProfile = this.showHorseProfile.bind(this)
     this.showPhotoLightbox = this.showPhotoLightbox.bind(this)
     this.showUserList = this.showUserList.bind(this)
@@ -83,6 +88,14 @@ class ProfileContainer extends PureComponent {
           source,
           close: this.closeLightbox
         }
+      }
+    })
+  }
+
+  showAboutPage () {
+    Navigation.push(this.props.componentId, {
+      component: {
+        name: ABOUT_PAGE,
       }
     })
   }
@@ -183,6 +196,7 @@ class ProfileContainer extends PureComponent {
           horseOwnerIDs={this.horseOwnerIDs()}
           horses={this.profileUserHorses()}
           profileUser={this.props.profileUser}
+          showAboutPage={this.showAboutPage}
           showHorseProfile={this.showHorseProfile}
           showPhotoLightbox={this.showPhotoLightbox}
           showUserList={this.showUserList}

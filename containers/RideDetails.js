@@ -49,8 +49,11 @@ class RideDetailsContainer extends PureComponent {
             color: 'white'
           },
         ]
+      },
+      layout: {
+        orientation: ['portrait']
       }
-    };
+    }
   }
 
   constructor (props) {

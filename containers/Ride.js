@@ -41,8 +41,11 @@ class RideContainer extends PureComponent {
             color: 'white'
           },
         ]
+      },
+      layout: {
+        orientation: ['portrait']
       }
-    };
+    }
   }
 
   navigationButtonPressed({ buttonId }) {

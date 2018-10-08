@@ -10,7 +10,7 @@ export default class GPSStatus extends PureComponent {
       positionFound = <Text style={styles.locationFound}>Location Found!</Text>
     }
     return (
-      <View style={styles.container}>
+      <View>
         {positionFound}
       </View>
     )

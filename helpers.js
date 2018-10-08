@@ -72,24 +72,119 @@ export function staticMap (ride) {
       maptype: 'terrain',
   }
   const pathStyle = 'color:0xff0000ff|weight:5'
+  const toSimplify = ride.rideCoordinates.map((coord) => {
+    return {
+      lat: coord.get('latitude'),
+      lng: coord.get('longitude')
+    }
+  }).toJS()
 
-  const MAX_NUM_COORDS = 250 // Google static maps API limit of 8096 chars in URL
-  const numCoords = ride.rideCoordinates.count()
-  let nth = numCoords / MAX_NUM_COORDS
-  nth = (nth < 1) ? 1 : Math.ceil(nth)
-  let pathCoords = ''
-  for (let i = 0; i < numCoords; i++) {
-    const coordinate = ride.rideCoordinates.get(i)
-    if (i % nth === 0) {
-      const parsedLat = Number(coordinate.get('latitude')).toFixed(4).toString()
-      const parsedLong = Number(coordinate.get('longitude')).toFixed(4).toString()
+  let tolerance = 0.00006
+  let lengthURL = false
+  let fullURL
+  while (!lengthURL || lengthURL > 6000) {
+    const simplified = simplifyLine(tolerance, toSimplify)
+    let pathCoords = ''
+    for (let coord of simplified) {
+      const parsedLat = coord.lat.toString()
+      const parsedLong = coord.lng.toString()
       pathCoords += `|${parsedLat},${parsedLong}`
     }
-  }
 
-  queryStringParams['path'] = pathStyle + pathCoords
-  const queryString = urlParams(queryStringParams)
-  return ROOT_URL + queryString
+    queryStringParams['path'] = pathStyle + pathCoords
+    const queryString = urlParams(queryStringParams)
+    fullURL = ROOT_URL + queryString
+    lengthURL = fullURL.length
+    tolerance += 0.000001
+  }
+  return fullURL
+}
+
+function simplifyLine (tolerance, points) {
+  // stolen from https://gist.github.com/adammiller/826148
+  let res = null;
+
+  if(points.length){
+    class Line {
+      constructor(p1, p2 ) {
+        this.p1 = p1;
+        this.p2 = p2;
+      }
+
+      distanceToPoint ( point ) {
+        // slope
+        let m = ( this.p2.lat - this.p1.lat ) / ( this.p2.lng - this.p1.lng ),
+          // y offset
+          b = this.p1.lat - ( m * this.p1.lng ),
+          d = [];
+        // distance to the linear equation
+        d.push( Math.abs( point.lat - ( m * point.lng ) - b ) / Math.sqrt( Math.pow( m, 2 ) + 1 ) );
+        // distance to p1
+        d.push( Math.sqrt( Math.pow( ( point.lng - this.p1.lng ), 2 ) + Math.pow( ( point.lat - this.p1.lat ), 2 ) ) );
+        // distance to p2
+        d.push( Math.sqrt( Math.pow( ( point.lng - this.p2.lng ), 2 ) + Math.pow( ( point.lat - this.p2.lat ), 2 ) ) );
+        // return the smallest distance
+        return d.sort( function( a, b ) {
+          return ( a - b ); //causes an array to be sorted numerically and ascending
+        } )[0];
+      };
+    };
+
+    let douglasPeucker = function( points, tolerance ) {
+      if ( points.length <= 2 ) {
+        return [points[0]];
+      }
+      let returnPoints = [],
+        // make line from start to end
+        line = new Line( points[0], points[points.length - 1] ),
+        // find the largest distance from intermediate points to this line
+        maxDistance = 0,
+        maxDistanceIndex = 0,
+        p;
+      for( let i = 1; i <= points.length - 2; i++ ) {
+        let distance = line.distanceToPoint( points[ i ] );
+        if( distance > maxDistance ) {
+          maxDistance = distance;
+          maxDistanceIndex = i;
+        }
+      }
+      // check if the max distance is greater than our tolerance allows
+      if ( maxDistance >= tolerance ) {
+        p = points[maxDistanceIndex];
+        line.distanceToPoint( p, true );
+        // include this point in the output
+        returnPoints = returnPoints.concat(
+          douglasPeucker(
+            points.slice(
+              0,
+              maxDistanceIndex + 1
+            ),
+            tolerance
+          )
+        )
+        // returnPoints.push( points[maxDistanceIndex] );
+        returnPoints = returnPoints.concat(
+          douglasPeucker(
+            points.slice(
+              maxDistanceIndex,
+              points.length
+            ),
+            tolerance
+          )
+        );
+      } else {
+        // ditching this point
+        p = points[maxDistanceIndex];
+        line.distanceToPoint( p, true );
+        returnPoints = [points[0]];
+      }
+      return returnPoints;
+    };
+    res = douglasPeucker( points, tolerance );
+    // always have to push the very last point on so it doesn't get left off
+    res.push( points[points.length - 1 ] );
+  }
+  return res;
 }
 
 export const connectionType = {
@@ -117,9 +212,7 @@ export const appStates = {
 
 export function goodConnection(type, effectiveType) {
   return (type === connectionType.wifi || (
-    type === connectionType.cellular && (
-      effectiveType === effectiveConnectionType.threeG || effectiveConnectionType.fourG
-    )
+    type === connectionType.cellular && (effectiveType === effectiveConnectionType.fourG)
   ))
 }
 

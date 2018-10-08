@@ -3,7 +3,11 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node node_modules/react-native/local-cli/cli.js start"
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "./node_modules/jest/bin/jest.js --verbose"
+  },
+  "jest": {
+    "preset": "react-native"
   },
   "dependencies": {
     "immutable": "^3.8.2",
@@ -35,10 +39,14 @@
     "victory-native": "^30.0.0"
   },
   "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-jest": "^23.6.0",
     "babel-plugin-transform-remove-console": "^6.9.4",
     "babel-preset-react-native": "^4.0.0",
+    "jest": "^23.6.0",
     "react-native-dotenv": "^0.1.1",
-    "react-test-renderer": "16.2.0"
+    "react-test-renderer": "16.2.0",
+    "regenerator-runtime": "^0.12.1"
   },
   "assets": [
     "assets/fonts/Panama-Light",

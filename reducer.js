@@ -1,7 +1,7 @@
 import { fromJS, List, Map } from 'immutable'
-import BackgroundGeolocation from 'react-native-mauron85-background-geolocation'
-
+import { green, warning, danger } from './colors'
 import {
+  CLEAR_FEED_MESSAGE,
   CLEAR_LAST_LOCATION,
   CLEAR_PAUSED_LOCATIONS,
   CLEAR_SEARCH,
@@ -24,11 +24,16 @@ import {
   NEW_APP_STATE,
   NEW_LOCATION,
   NEW_NETWORK_STATE,
+  NOT_MOVING,
+  NOW_MOVING,
   PAUSE_LOCATION_TRACKING,
   POP_SHOW_RIDE_SHOWN,
   RECEIVE_JWT,
   REMOTE_PERSIST_COMPLETE,
+  REMOTE_PERSIST_ERROR,
+  REMOTE_PERSIST_STARTED,
   REMOVE_RIDE_FROM_STATE,
+  REPLACE_LAST_LOCATION,
   RESUME_LOCATION_TRACKING,
   RIDE_COMMENT_CREATED,
   RIDE_CARROT_CREATED,
@@ -52,7 +57,7 @@ import {
 } from './helpers'
 import { FEED, SIGNUP_LOGIN } from './screens'
 
-const initialState = Map({
+export const initialState = Map({
   localState: Map({
     activeComponent: null,
     appState: appStates.active,
@@ -62,10 +67,12 @@ const initialState = Map({
     currentRide: null,
     doingInitialLoad: false,
     error: null,
+    feedMessage: null,
     goodConnection: false,
     jwt: null,
     lastLocation: null,
     locationTrackingPaused: false,
+    moving: false,
     needsRemotePersist: Map({
       horses: false,
       rides: false,
@@ -74,6 +81,8 @@ const initialState = Map({
     pausedCachedCoordinates: List(),
     photoQueue: Map(),
     popShowRide: null,
+    refiningLocation: null,
+    remotePersistActive: false,
     root: SIGNUP_LOGIN,
     userID: null,
     userSearchResults: List(),
@@ -90,6 +99,8 @@ const initialState = Map({
 
 export default function AppReducer(state=initialState, action) {
   switch (action.type) {
+    case CLEAR_FEED_MESSAGE:
+      return state.setIn(['localState', 'feedMessage'], null)
     case CLEAR_LAST_LOCATION:
       return state.setIn(['localState', 'lastLocation'], null)
     case CLEAR_PAUSED_LOCATIONS:
@@ -126,7 +137,7 @@ export default function AppReducer(state=initialState, action) {
     case POP_SHOW_RIDE_SHOWN:
       return state.setIn(['localState', 'popShowRide'], null)
     case LOAD_LOCAL_STATE:
-      return state.set('localState', action.localState)
+      return state.set('localState', action.localState).setIn(['localState', 'feedMessage'], null)
     case LOCAL_DATA_LOADED:
       const allUsers = action.localData.users.reduce((accum, user) => {
         accum[user._id] = fromJS(user)
@@ -190,11 +201,27 @@ export default function AppReducer(state=initialState, action) {
         List()
       )
     case NEEDS_REMOTE_PERSIST:
-      return state.setIn(['localState', 'needsRemotePersist', action.database], true)
+      return state.setIn(
+        ['localState', 'needsRemotePersist', action.database],
+        true
+      ).setIn(
+        ['localState', 'feedMessage'],
+        Map({
+          message: 'Data Needs to Upload',
+          color: warning,
+          timeout: false
+        })
+      )
     case NEW_APP_STATE:
       return state.setIn(['localState', 'appState'], action.newState)
     case NEW_LOCATION:
-      const newState = state.setIn(['localState', 'lastLocation'], action.location)
+      const newState = state.setIn(
+        ['localState', 'lastLocation'],
+        action.location
+      ).setIn(
+        ['localState', 'refiningLocation'],
+        action.location
+      )
       const currentRide = state.getIn(['localState', 'currentRide'])
       const currentlyPaused = state.getIn(['localState', 'locationTrackingPaused'])
       if (currentRide && !currentlyPaused) {
@@ -241,12 +268,106 @@ export default function AppReducer(state=initialState, action) {
           action.effectiveConnectionType
         )
       )
+    case NOT_MOVING:
+      return state.setIn(['localState', 'moving'], false)
+    case NOW_MOVING:
+      return state.setIn(['localState', 'moving'], true)
     case RECEIVE_JWT:
       return state.setIn(['localState', 'jwt'], action.token)
     case REMOTE_PERSIST_COMPLETE:
-      return state.setIn(['localState', 'needsRemotePersist', action.database], false)
+      let dbSwitched = state.setIn(
+        ['localState', 'needsRemotePersist', action.database],
+        false
+      )
+      const allDone = dbSwitched.getIn(
+        ['localState', 'needsRemotePersist']
+      ).valueSeq().filter(x => x).count() === 0
+      if (allDone) {
+        dbSwitched = dbSwitched.setIn(
+          ['localState', 'feedMessage'],
+          Map({
+            message: 'All Data Uploaded',
+            color: green,
+            timeout: 3000
+          })
+        ).setIn(
+            ['localState', 'remotePersistActive'],
+            false
+          )
+        }
+      return dbSwitched
+    case REMOTE_PERSIST_ERROR:
+      return state.setIn(
+        ['localState', 'feedMessage'],
+        Map({
+          message: 'Can\'t Upload Data',
+          color: danger,
+          timeout: false
+        })
+      ).setIn(
+        ['localState', 'remotePersistActive'],
+        false
+      )
+    case REMOTE_PERSIST_STARTED:
+      return state.setIn(
+        ['localState', 'feedMessage'],
+        Map({
+          message: 'Data Uploading',
+          color: warning,
+          timeout: false
+        })
+      ).setIn(
+        ['localState', 'remotePersistActive'],
+        true
+      )
     case REMOVE_RIDE_FROM_STATE:
       return state.remove(action.rideID)
+    case REPLACE_LAST_LOCATION:
+      const oldLastLocation = state.getIn(['localState', 'lastLocation'])
+      let replacedLastLocation = state.setIn(['localState', 'lastLocation'], action.newLocation)
+      const currentRide1 = state.getIn(['localState', 'currentRide'])
+      if (currentRide1) {
+        const rideCoords = currentRide1.get('rideCoordinates')
+        if (rideCoords.count() === 1) {
+          return replacedLastLocation.setIn(
+            ['localState', 'currentRide', 'rideCoordinates'],
+            List().push(action.newLocation)
+          )
+        } else if (rideCoords.count() > 1 && oldLastLocation) {
+          const lastCoord = rideCoords.get(-2)
+          const oldDistance = haversine(
+            oldLastLocation.get('latitude'),
+            oldLastLocation.get('longitude'),
+            lastCoord.get('latitude'),
+            lastCoord.get('longitude')
+          )
+          const newDistance = haversine(
+            lastCoord.get('latitude'),
+            lastCoord.get('longitude'),
+            action.newLocation.get('latitude'),
+            action.newLocation.get('longitude')
+          )
+          const newRideCoordinates = replacedLastLocation.getIn(
+            ['localState', 'currentRide', 'rideCoordinates']
+          ).pop().push(
+            action.newLocation
+          ).sort((a, b) => {
+            return new Date(a.timestamp) - new Date(b.timestamp);
+          })
+
+          const totalDistance = currentRide1.get('distance')
+            - oldDistance
+            + newDistance
+          return replacedLastLocation.setIn(
+            ['localState', 'currentRide', 'distance'],
+            totalDistance
+          ).setIn(
+            ['localState', 'currentRide', 'rideCoordinates'],
+            newRideCoordinates
+          )
+        }
+      }
+      return replacedLastLocation
     case RESUME_LOCATION_TRACKING:
       return state.setIn(['localState', 'locationTrackingPaused'], false)
     case RIDE_CARROT_CREATED:

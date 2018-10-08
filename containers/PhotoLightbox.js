@@ -16,8 +16,11 @@ class PhotoLightboxContainer extends PureComponent {
           color: 'white'
         },
         elevation: 0
+      },
+      layout: {
+        orientation: ['portrait']
       }
-    };
+    }
   }
 
   constructor (props) {

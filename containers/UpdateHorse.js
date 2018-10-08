@@ -31,6 +31,9 @@ class UpdateHorseContainer extends PureComponent {
             color: 'white'
           },
         ]
+      },
+      layout: {
+        orientation: ['portrait']
       }
     };
   }

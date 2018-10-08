@@ -30,8 +30,11 @@ class RecorderContainer extends PureComponent {
             color: 'white'
           }
         ],
+      },
+      layout: {
+        orientation: ['portrait']
       }
-    };
+    }
   }
 
   constructor (props) {
@@ -139,6 +142,7 @@ class RecorderContainer extends PureComponent {
 
   discardRide () {
     this.props.dispatch(discardRide())
+    this.props.dispatch(stopLocationTracking())
     Navigation.popToRoot(this.props.componentId)
   }
 
@@ -160,6 +164,7 @@ class RecorderContainer extends PureComponent {
         currentRide={this.props.currentRide}
         discardRide={this.discardRide}
         lastLocation={this.props.lastLocation}
+        moving={this.props.moving}
         showGPSBar={this.state.showGPSBar}
         showRideDetails={this.showRideDetails}
         startRide={this.startRide}
@@ -175,6 +180,7 @@ function mapStateToProps (state) {
     appState: localState.get('appState'),
     currentRide: localState.get('currentRide'),
     lastLocation: localState.get('lastLocation'),
+    moving: localState.get('moving')
   }
 }
 

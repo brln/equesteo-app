@@ -12,6 +12,7 @@ import {
   Thumbnail,
 } from 'native-base';
 import {
+  Button,
   Clipboard,
   Dimensions,
   FlatList,
@@ -30,7 +31,7 @@ import PhotoFilmstrip from '../Ride/PhotoFilmstrip'
 
 import FabImage from '../FabImage'
 
-const { height } = Dimensions.get('window')
+const { width, height } = Dimensions.get('window')
 
 export default class Profile extends PureComponent {
   constructor (props) {
@@ -239,6 +240,22 @@ export default class Profile extends PureComponent {
 
   render() {
     logRender('ProfileComponent')
+
+    let aboutButton = null
+    if (this.props.profileUser.get('_id') === this.props.userID) {
+      aboutButton = (
+          <View style={{width, flex: 1, justifyContent: 'center', alignItems: 'center', marginBottom: 30}}>
+            <TouchableOpacity
+              style={styles.aboutButton}
+              underlayColor={green}
+              onPress={this.props.showAboutPage}
+            >
+              <Text style={styles.followText}>About Equesteo</Text>
+            </TouchableOpacity>
+          </View>
+      )
+    }
+
     return (
       <ScrollView>
         {this.renderImageSwiper()}
@@ -289,8 +306,9 @@ export default class Profile extends PureComponent {
           </Card>
 
           { this.horsesCard() }
+          { aboutButton }
         </View>
-        </ScrollView>
+      </ScrollView>
     )
   }
 }
@@ -333,5 +351,14 @@ const styles = StyleSheet.create({
     textAlign:'center',
     paddingLeft : 10,
     paddingRight : 10
+  },
+  aboutButton: {
+    marginRight:40,
+    marginLeft:40,
+    marginTop:10,
+    paddingTop:10,
+    paddingBottom:10,
+    backgroundColor: brand,
+    borderRadius:10,
   }
 });

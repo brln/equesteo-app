@@ -29,6 +29,14 @@ import { logRender } from '../helpers'
 const { width, height } = Dimensions.get('window')
 
 class SignupLoginContainer extends PureComponent {
+  static options() {
+    return {
+      layout: {
+        orientation: ['portrait']
+      }
+    }
+  }
+
   static navigatorStyle = {
     navBarHidden: true
   }
