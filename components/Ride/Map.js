@@ -6,12 +6,15 @@ import {
   View
 } from 'react-native';
 
+import Kalman from '../../services/Kalman'
+
 
 export default class Map extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {}
     this.fitToElements = this.fitToElements.bind(this)
+    this.kalmanFilter = new Kalman(6)
   }
 
   fitToElements() {
@@ -33,6 +36,19 @@ export default class Map extends PureComponent {
     const lastIndex = this.props.rideCoords.length - 1
     const firstCoord = this.props.rideCoords[0]
     const lastCoord = this.props.rideCoords[lastIndex]
+    const filtered = this.props.rideCoords.reduce((accum, coord) => {
+      const {lat, lng} = this.kalmanFilter.Process(
+        coord.latitude,
+        coord.longitude,
+        coord.accuracy,
+        coord.timestamp
+      )
+      accum.push({
+        latitude: lat,
+        longitude: lng
+      })
+      return accum
+    }, [])
     return (
       <View style={styles.container}>
         <MapView
@@ -42,8 +58,13 @@ export default class Map extends PureComponent {
           mapType="standard"
           provider={"google"}
         >
+          {/*<MapView.Polyline*/}
+            {/*coordinates={this.props.rideCoords}*/}
+            {/*strokeColor="#dc0202"*/}
+            {/*strokeWidth={5}*/}
+          {/*/>*/}
           <MapView.Polyline
-            coordinates={this.props.rideCoords}
+            coordinates={filtered}
             strokeColor="#dc0202"
             strokeWidth={5}
           />

@@ -12,7 +12,6 @@ import {
   Thumbnail,
 } from 'native-base';
 import {
-  Button,
   Clipboard,
   Dimensions,
   FlatList,

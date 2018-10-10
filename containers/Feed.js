@@ -13,6 +13,7 @@ import Feed from '../components/Feed/Feed'
 import { logRender } from '../helpers'
 import {
   FIND_PEOPLE,
+  FIRST_START,
   HORSE_PROFILE,
   PROFILE,
   RIDE_COMMENTS,
@@ -53,7 +54,8 @@ class FeedContainer extends PureComponent {
     super(props)
     this.state = {
       refreshing: false,
-      lastFullSync: null
+      lastFullSync: null,
+      firstStartPopped: false,
     }
     this.clearFeedMessage = this.clearFeedMessage.bind(this)
     this.filteredHorses = this.filteredHorses.bind(this)
@@ -109,6 +111,12 @@ class FeedContainer extends PureComponent {
       this.showRide(this.props.rides.get(this.props.popShowRide))
       this.props.dispatch(popShowRideShown())
     }
+    if (this.props.user && (!this.state.firstStartPopped && !this.props.user.get('finishedFirstStart'))) {
+      this.showFirstStart()
+      this.setState({
+        firstStartPopped: true
+      })
+    }
   }
 
   showHorseProfile (horse, ownerID) {
@@ -134,6 +142,14 @@ class FeedContainer extends PureComponent {
         }
       }
     })
+  }
+
+  showFirstStart () {
+     Navigation.push(this.props.componentId, {
+       component: {
+         name: FIRST_START,
+       }
+     })
   }
 
   showProfile (user) {
@@ -262,6 +278,7 @@ function mapStateToProps (state) {
     rideComments: mainState.get('rideComments'),
     users: mainState.get('users'),
     userID,
+    user: mainState.getIn(['users', localState.get('userID')])
   }
 }
 

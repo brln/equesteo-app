@@ -895,7 +895,6 @@ export function startLocationTracking () {
     await configureBackgroundGeolocation()()
     const METERS_TO_MILES = 0.0006213712
     BackgroundGeolocation.on('location', (location) => {
-
       const refiningLocation = getState().getIn(['main', 'localState', 'refiningLocation'])
       let parsedLocation = Map({
         accuracy: location.accuracy,
@@ -914,13 +913,10 @@ export function startLocationTracking () {
           location.longitude
         )
         let refiningAccuracy = refiningLocation.get('accuracy')
-        console.log('distance: ' + distance)
-        console.log('refining accuracy: ' + refiningAccuracy * METERS_TO_MILES)
         if (distance < (refiningAccuracy * METERS_TO_MILES) && location.accuracy <= refiningAccuracy) {
           dispatch(replaceLastLocation(parsedLocation))
           replaced = true
         }
-        console.log(distance)
         if (distance < (25 / 5280)) {
           dispatch(notMoving())
         }
@@ -946,7 +942,7 @@ function configureBackgroundGeolocation () {
     BackgroundGeolocation.configure({
       desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
       locationProvider: BackgroundGeolocation.RAW_PROVIDER,
-      distanceFilter: 1,
+      distanceFilter: 0,
       maxLocations: 10,
       interval: 3000,
       notificationTitle: 'You\'re out on a ride.',
@@ -1108,11 +1104,9 @@ export function syncDBPull (db) {
     try {
       dispatch(setFullSyncFail(false))
       await pouchCouch.localReplicateDB(db, following, followers)
-      console.log('returned from localReplicateDB')
       await dispatch(loadLocalData())
       dispatch(syncComplete())
     } catch (e) {
-      console.log('syncDBPull1``````````````````````````````````````````')
       dispatch(setFeedMessage(Map({
         message: 'Error Fetching Data',
         color: warning,
