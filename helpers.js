@@ -100,13 +100,13 @@ export function staticMap (ride) {
   return fullURL
 }
 
-function simplifyLine (tolerance, points) {
+export function simplifyLine (tolerance, points) {
   // stolen from https://gist.github.com/adammiller/826148
   let res = null;
 
   if(points.length){
     class Line {
-      constructor(p1, p2 ) {
+      constructor(p1, p2) {
         this.p1 = p1;
         this.p2 = p2;
       }

@@ -108,7 +108,6 @@ class FirstStartContainer extends PureComponent {
   }
 
   addHorseProfilePhoto (uri) {
-    console.log('addddddddddddddddding')
     let timestamp = unixTimeNow()
     let photoID = generateUUID()
     let horse = this.state.horse.set('profilePhotoID', photoID)

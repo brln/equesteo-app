@@ -6,6 +6,7 @@ import { Navigation } from 'react-native-navigation'
 import PushNotification from 'react-native-push-notification'
 import { fromJS, Map, List } from 'immutable'
 import { Sentry } from 'react-native-sentry'
+import kalmanFilter from './services/Kalman'
 
 import {
   haversine,
@@ -894,8 +895,11 @@ export function startLocationTracking () {
     logInfo('action: startLocationTracking')
     await configureBackgroundGeolocation()()
     const METERS_TO_MILES = 0.0006213712
+    const KALMAN_FILTER_Q = 6
+    const NOT_MOVING_RADIUS = 25 / 5280
     BackgroundGeolocation.on('location', (location) => {
       const refiningLocation = getState().getIn(['main', 'localState', 'refiningLocation'])
+      const lastLocation = getState().getIn(['main', 'localState', 'lastLocation'])
       let parsedLocation = Map({
         accuracy: location.accuracy,
         latitude: location.latitude,
@@ -905,24 +909,32 @@ export function startLocationTracking () {
       })
 
       let replaced = false
-      if (refiningLocation) {
+      if (refiningLocation && lastLocation) {
+        parsedLocation = kalmanFilter(
+          parsedLocation,
+          lastLocation,
+          KALMAN_FILTER_Q
+        )
+
         let distance = haversine(
           refiningLocation.get('latitude'),
           refiningLocation.get('longitude'),
-          location.latitude,
-          location.longitude
+          parsedLocation.get('latitude'),
+          parsedLocation.get('longitude')
         )
         let refiningAccuracy = refiningLocation.get('accuracy')
         if (distance < (refiningAccuracy * METERS_TO_MILES) && location.accuracy <= refiningAccuracy) {
           dispatch(replaceLastLocation(parsedLocation))
           replaced = true
         }
-        if (distance < (25 / 5280)) {
+
+        if (distance < NOT_MOVING_RADIUS) {
           dispatch(notMoving())
+        } else {
+          dispatch(nowMoving())
         }
       }
       if (!replaced) {
-        dispatch(nowMoving())
         dispatch(newLocation(parsedLocation))
       }
     })

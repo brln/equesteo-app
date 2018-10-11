@@ -40,7 +40,6 @@ export default class FirstHorsePhoto extends PureComponent {
   }
 
   render() {
-    console.log(this.props.horse.toJSON())
     logRender('FirstHorsePhoto')
     let button = (
       <Button
