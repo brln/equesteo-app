@@ -45,6 +45,7 @@ export default class Ride extends PureComponent {
     this.showProfile = this.showProfile.bind(this)
 
     this.memoizedParse = memoizeOne(this.parseSpeedData)
+    this.memoizedMaxSpeed = memoizeOne(this.maxSpeed)
   }
 
   showProfile () {
@@ -56,7 +57,6 @@ export default class Ride extends PureComponent {
     let parsedBucket = []
     let lastPoint = null
     let fullDistance = 0
-    let maxSpeed = 0
 
     const desiredNumCoords = 100
     const actualNumCoords = rideCoordinates.length
@@ -82,9 +82,6 @@ export default class Ride extends PureComponent {
         const mph = mpSecond * 60 * 60
         parsedBucket.push({ pace: mph })
 
-        if (mph > maxSpeed) {
-          maxSpeed = mph
-        }
       }
       lastPoint = rideCoord
 
@@ -97,10 +94,42 @@ export default class Ride extends PureComponent {
         parsedBucket = []
       }
     }
-    return {
-      avgSpeed: parsedData,
-      maxSpeed: maxSpeed
+    return parsedData
+  }
+
+  maxSpeed(rideCoordinates) {
+    let bucketDistance = 0
+    let bucketTime = 0
+    let lastPoint = null
+    let maxSpeed = 0
+
+    const minDistance = (50 * 3) / 5280 // 50 yards
+    for (let rideCoord of rideCoordinates) {
+      if (!lastPoint) {
+        console.log('firstPoint')
+        lastPoint = rideCoord
+      } else {
+        bucketDistance += haversine(
+          lastPoint.latitude,
+          lastPoint.longitude,
+          rideCoord.latitude,
+          rideCoord.longitude
+        )
+
+        bucketTime += (rideCoord.timestamp / 1000) - (lastPoint.timestamp / 1000)
+
+        if (bucketDistance > minDistance) {
+          const bucketSpeed = bucketDistance / (bucketTime / 60 / 60)
+          if (bucketSpeed > maxSpeed) {
+            maxSpeed = bucketSpeed
+          }
+          bucketDistance = 0
+          bucketTime = 0
+        }
+        lastPoint = rideCoord
+      }
     }
+    return maxSpeed
   }
 
   fullscreenMap () {
@@ -194,11 +223,12 @@ export default class Ride extends PureComponent {
     logRender('Ride.Ride')
     let speedChart = <Text>Not enough points for Speed Chart</Text>
     let speedData = this.memoizedParse(this.props.ride.get('rideCoordinates').toJS())
-    if (speedData.avgSpeed.length >= 2) {
+    let maxSpeed = this.memoizedMaxSpeed(this.props.ride.get('rideCoordinates').toJS())
+    if (speedData.length >= 2) {
       speedChart = (
         <View style={styles.slide}>
           <SpeedChart
-            speedData={speedData.avgSpeed}
+            speedData={speedData}
           />
         </View>
       )
@@ -252,7 +282,7 @@ export default class Ride extends PureComponent {
           <View style={{flex: 1}}>
             <Stats
               horses={this.props.horses}
-              maxSpeed={speedData.maxSpeed}
+              maxSpeed={maxSpeed}
               ride={this.props.ride}
               rideHorseOwnerID={this.props.rideHorseOwnerID}
               rideUser={this.props.rideUser}
