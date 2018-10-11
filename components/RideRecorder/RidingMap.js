@@ -42,14 +42,13 @@ export default class RidingMap extends PureComponent {
       latitudeDelta,
       longitudeDelta,
     }
-
   }
 
   changeBearing () {
     let newBearing = 0
     let coordinates = this.props.rideCoords.toJS()
     const lastCoord = coordinates[coordinates.length -1]
-    if (coordinates.length > 1) {
+    if (coordinates.length > 1 && lastCoord.speed > 0) {
       newBearing = bearing(
         coordinates[coordinates.length - 2].latitude,
         coordinates[coordinates.length - 2].longitude,

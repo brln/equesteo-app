@@ -56,6 +56,8 @@ export default function kalmanFilter (point, lastPoint, Q) { //lat_measurement, 
   return Map({
     provider: point.get('provider'),
     timestamp: point.get('timestamp'),
+    altitude: point.get('altitude'),
+    speed: point.get('speed'),
     latitude: lastPoint.get('latitude') + K * (point.get('latitude') - lastPoint.get('latitude')),
     longitude: lastPoint.get('longitude') + K * (point.get('longitude') - lastPoint.get('longitude')),
     accuracy: Math.sqrt((1 - K) * variance)

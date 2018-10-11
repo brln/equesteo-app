@@ -7,6 +7,7 @@ import PushNotification from 'react-native-push-notification'
 import { fromJS, Map, List } from 'immutable'
 import { Sentry } from 'react-native-sentry'
 import kalmanFilter from './services/Kalman'
+import { simplifyLine } from './services/DouglasPeucker'
 
 import {
   haversine,
@@ -43,8 +44,6 @@ import {
   NEW_LOCATION,
   NEW_APP_STATE,
   NEW_NETWORK_STATE,
-  NOT_MOVING,
-  NOW_MOVING,
   PAUSE_LOCATION_TRACKING,
   POP_SHOW_RIDE_SHOWN,
   RECEIVE_JWT,
@@ -230,18 +229,6 @@ function newNetworkState (connectionType, effectiveConnectionType) {
     connectionType,
     effectiveConnectionType,
     logData: ['connectionType', 'effectiveConnectionType'],
-  }
-}
-
-function notMoving () {
-  return {
-    type: NOT_MOVING
-  }
-}
-
-function nowMoving () {
-  return {
-    type: NOW_MOVING
   }
 }
 
@@ -602,9 +589,13 @@ export function createHorse (horse) {
 
 export function createRide (rideData) {
   return async (dispatch, getState) => {
+    const TEN_FEED_AS_DEG_LATITUDE = 0.0000274
     const jwt = getState().getIn(['main', 'localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
     const currentRide = getState().getIn(['main', 'localState', 'currentRide'])
+    const simplifiedCoords = simplifyLine(
+      TEN_FEED_AS_DEG_LATITUDE,
+      currentRide.get('rideCoordinates'))
     const theRide = {
       _id: rideData.get('_id'),
       coverPhotoID: rideData.get('coverPhotoID'),
@@ -615,7 +606,7 @@ export function createRide (rideData) {
       name: rideData.get('name'),
       notes: rideData.get('notes'),
       photosByID: rideData.get('photosByID'),
-      rideCoordinates: currentRide.get('rideCoordinates'),
+      rideCoordinates: simplifiedCoords,
       startTime: currentRide.get('startTime'),
       type: 'ride',
       userID: rideData.get('userID'),
@@ -896,7 +887,6 @@ export function startLocationTracking () {
     await configureBackgroundGeolocation()()
     const METERS_TO_MILES = 0.0006213712
     const KALMAN_FILTER_Q = 6
-    const NOT_MOVING_RADIUS = 25 / 5280
     BackgroundGeolocation.on('location', (location) => {
       const refiningLocation = getState().getIn(['main', 'localState', 'refiningLocation'])
       const lastLocation = getState().getIn(['main', 'localState', 'lastLocation'])
@@ -906,6 +896,8 @@ export function startLocationTracking () {
         longitude: location.longitude,
         provider: location.provider,
         timestamp: location.time,
+        altitude: location.altitude,
+        speed: location.speed,
       })
 
       let replaced = false
@@ -926,12 +918,6 @@ export function startLocationTracking () {
         if (distance < (refiningAccuracy * METERS_TO_MILES) && location.accuracy <= refiningAccuracy) {
           dispatch(replaceLastLocation(parsedLocation))
           replaced = true
-        }
-
-        if (distance < NOT_MOVING_RADIUS) {
-          dispatch(notMoving())
-        } else {
-          dispatch(nowMoving())
         }
       }
       if (!replaced) {
@@ -956,7 +942,7 @@ function configureBackgroundGeolocation () {
       locationProvider: BackgroundGeolocation.RAW_PROVIDER,
       distanceFilter: 0,
       maxLocations: 10,
-      interval: 3000,
+      interval: 0,
       notificationTitle: 'You\'re out on a ride.',
       notificationText: 'Tap here to see your progress.',
     });

@@ -36,6 +36,9 @@ export default class Map extends PureComponent {
     const lastIndex = this.props.rideCoords.length - 1
     const firstCoord = this.props.rideCoords[0]
     const lastCoord = this.props.rideCoords[lastIndex]
+    console.log('original: ' + this.props.rideCoords.length)
+    console.log('filtered: '+ this.props.filtered.length)
+
     return (
       <View style={styles.container}>
         <MapView
@@ -48,6 +51,11 @@ export default class Map extends PureComponent {
           <MapView.Polyline
             coordinates={this.props.rideCoords}
             strokeColor={"#dc0202"}
+            strokeWidth={5}
+          />
+          <MapView.Polyline
+            coordinates={this.props.filtered}
+            strokeColor={"#1514dc"}
             strokeWidth={5}
           />
           <MapView.Marker

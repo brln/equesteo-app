@@ -1,5 +1,4 @@
 import { fromJS, List, Map } from 'immutable'
-import { green, warning, danger } from './colors'
 import {
   CLEAR_FEED_MESSAGE,
   CLEAR_LAST_LOCATION,
@@ -24,8 +23,6 @@ import {
   NEW_APP_STATE,
   NEW_LOCATION,
   NEW_NETWORK_STATE,
-  NOT_MOVING,
-  NOW_MOVING,
   PAUSE_LOCATION_TRACKING,
   POP_SHOW_RIDE_SHOWN,
   RECEIVE_JWT,
@@ -266,10 +263,6 @@ export default function AppReducer(state=initialState, action) {
           action.effectiveConnectionType
         )
       )
-    case NOT_MOVING:
-      return state.setIn(['localState', 'moving'], false)
-    case NOW_MOVING:
-      return state.setIn(['localState', 'moving'], true)
     case RECEIVE_JWT:
       return state.setIn(['localState', 'jwt'], action.token)
     case REMOTE_PERSIST_COMPLETE:

@@ -1,6 +1,8 @@
 import moment from 'moment'
 import { Platform } from 'react-native'
 
+import { simplifyLine } from './services/DouglasPeucker'
+
 const toRad = (deg) => {
   return deg * Math.PI / 180;
 }
@@ -72,22 +74,17 @@ export function staticMap (ride) {
       maptype: 'terrain',
   }
   const pathStyle = 'color:0xff0000ff|weight:5'
-  const toSimplify = ride.rideCoordinates.map((coord) => {
-    return {
-      lat: coord.get('latitude'),
-      lng: coord.get('longitude')
-    }
-  }).toJS()
 
   let tolerance = 0.00006
   let lengthURL = false
   let fullURL
   while (!lengthURL || lengthURL > 6000) {
-    const simplified = simplifyLine(tolerance, toSimplify)
+    const simplified = simplifyLine(tolerance, ride.rideCoordinates)
+    console.log(simplified.toJSON())
     let pathCoords = ''
     for (let coord of simplified) {
-      const parsedLat = coord.lat.toString()
-      const parsedLong = coord.lng.toString()
+      const parsedLat = coord.get('latitude').toString()
+      const parsedLong = coord.get('longitude').toString()
       pathCoords += `|${parsedLat},${parsedLong}`
     }
 
@@ -100,7 +97,7 @@ export function staticMap (ride) {
   return fullURL
 }
 
-export function simplifyLine (tolerance, points) {
+export function simplifyLiner (tolerance, points) {
   // stolen from https://gist.github.com/adammiller/826148
   let res = null;
 
