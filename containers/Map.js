@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { brand } from '../colors'
 import Map from '../components/Ride/Map'
 import { logRender } from '../helpers'
-import { simplifyLine } from '../services/DouglasPeucker'
 
 class MapContainer extends PureComponent {
   static options() {
@@ -33,7 +32,6 @@ class MapContainer extends PureComponent {
     return (
       <Map
         rideCoords={this.props.ride.get('rideCoordinates').toJS()}
-        filtered={simplifyLine(0.000027, this.props.ride.get('rideCoordinates')).toJS()}
       />
     )
   }
