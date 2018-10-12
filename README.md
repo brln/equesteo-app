@@ -15,3 +15,6 @@ log stream --predicate '(processImagePath contains "equesteo") and senderImageUU
 
 # converting icon size
 svgexport ~/Downloads/noun_Hamburger_564924.svg hamburger@3x.png 120:120
+
+# generate splashscreen images
+yo rn-toolbox:assets --splash splashscreen.svg --android

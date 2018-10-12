@@ -888,40 +888,48 @@ export function startLocationTracking () {
     const METERS_TO_MILES = 0.0006213712
     const KALMAN_FILTER_Q = 6
     BackgroundGeolocation.on('location', (location) => {
-      const refiningLocation = getState().getIn(['main', 'localState', 'refiningLocation'])
       const lastLocation = getState().getIn(['main', 'localState', 'lastLocation'])
-      let parsedLocation = Map({
-        accuracy: location.accuracy,
-        latitude: location.latitude,
-        longitude: location.longitude,
-        provider: location.provider,
-        timestamp: location.time,
-        altitude: location.altitude,
-        speed: location.speed,
-      })
-
-      let replaced = false
-      if (refiningLocation && lastLocation) {
-        parsedLocation = kalmanFilter(
-          parsedLocation,
-          lastLocation,
-          KALMAN_FILTER_Q
-        )
-
-        let distance = haversine(
-          refiningLocation.get('latitude'),
-          refiningLocation.get('longitude'),
-          parsedLocation.get('latitude'),
-          parsedLocation.get('longitude')
-        )
-        let refiningAccuracy = refiningLocation.get('accuracy')
-        if (distance < (refiningAccuracy * METERS_TO_MILES) && location.accuracy <= refiningAccuracy) {
-          dispatch(replaceLastLocation(parsedLocation))
-          replaced = true
-        }
+      let timeDiff = 0
+      if (lastLocation) {
+        timeDiff = (location.time / 1000) - (lastLocation.get('timestamp') / 1000)
       }
-      if (!replaced) {
-        dispatch(newLocation(parsedLocation))
+
+      if (!lastLocation || timeDiff > 5) {
+        const refiningLocation = getState().getIn(['main', 'localState', 'refiningLocation'])
+
+        let parsedLocation = Map({
+          accuracy: location.accuracy,
+          latitude: location.latitude,
+          longitude: location.longitude,
+          provider: location.provider,
+          timestamp: location.time,
+          altitude: location.altitude,
+          speed: location.speed,
+        })
+
+        let replaced = false
+        if (refiningLocation && lastLocation) {
+          parsedLocation = kalmanFilter(
+            parsedLocation,
+            lastLocation,
+            KALMAN_FILTER_Q
+          )
+
+          let distance = haversine(
+            refiningLocation.get('latitude'),
+            refiningLocation.get('longitude'),
+            parsedLocation.get('latitude'),
+            parsedLocation.get('longitude')
+          )
+          let refiningAccuracy = refiningLocation.get('accuracy')
+          if (distance < (refiningAccuracy * METERS_TO_MILES) && location.accuracy <= refiningAccuracy) {
+            dispatch(replaceLastLocation(parsedLocation))
+            replaced = true
+          }
+        }
+        if (!replaced) {
+          dispatch(newLocation(parsedLocation))
+        }
       }
     })
 

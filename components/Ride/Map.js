@@ -6,10 +6,6 @@ import {
   View
 } from 'react-native';
 
-import KalmanFilter from '../../services/Kalman'
-import { simplifyLine } from '../../helpers'
-
-
 export default class Map extends PureComponent {
   constructor (props) {
     super(props)
