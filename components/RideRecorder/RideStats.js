@@ -16,10 +16,12 @@ export default class RideStats extends PureComponent {
     this.avgSpeed = this.avgSpeed.bind(this)
     this.state = { ...initialState }
     this.elapsedAsString = this.elapsedAsString.bind(this)
+    this.currentAltitude = this.currentAltitude.bind(this)
     this.currentSpeed = this.currentSpeed.bind(this)
     this.timeToString = this.timeToString.bind(this)
 
     this.memoAvgSpeed = memoizeOne(this.avgSpeed)
+    this.memoCurrentAltitude = memoizeOne(this.currentAltitude)
     this.memoCurrentSpeed = memoizeOne(this.currentSpeed)
     this.memoTimeToString = memoizeOne(this.timeToString)
   }
@@ -45,9 +47,28 @@ export default class RideStats extends PureComponent {
   currentSpeed (rideCoords) {
     const last = rideCoords.get(-1)
     if (last) {
-      return (last.get('speed') * 2.236936).toFixed(1)
+      const found = last.get('speed')
+      if (found || found === 0) {
+        return (last.get('speed') * 2.236936).toFixed(1)
+      } else {
+        return '-'
+      }
     } else {
       return '0.0'
+    }
+  }
+
+  currentAltitude (rideCoords) {
+    const last = rideCoords.get(-1)
+    if (last) {
+      const found = last.get('elevation')
+      if (found) {
+        return Math.round(last.get('elevation') * 3.28084)
+      } else {
+        return '-'
+      }
+    } else {
+      return '0'
     }
   }
 
@@ -97,12 +118,16 @@ export default class RideStats extends PureComponent {
           <View style={[styles.statBox, {borderTopWidth: 2, borderBottomWidth: 1, borderRightWidth: 1, borderLeftWidth: 2}]}>
             <Text style={styles.statName}>Distance</Text>
             <Text style={styles.statFont}>
-              {this.props.distance.toFixed(2).toString()} <Text style={styles.unitsFont}>mi</Text>
+              {this.props.distance.toFixed(2)} <Text style={styles.unitsFont}>mi</Text>
             </Text>
           </View>
           <View style={[styles.statBox, {borderTopWidth: 1, borderBottomWidth: 2, borderRightWidth: 1, borderLeftWidth: 2}]}>
             <Text style={styles.statName}>Current Speed</Text>
             <Text style={styles.statFont}>{this.memoCurrentSpeed(this.props.rideCoords)} <Text style={styles.unitsFont}>mi/h</Text></Text>
+          </View>
+          <View style={[styles.statBox, {borderTopWidth: 1, borderBottomWidth: 2, borderRightWidth: 1, borderLeftWidth: 2}]}>
+            <Text style={styles.statName}>Altitude</Text>
+            <Text style={styles.statFont}>{this.memoCurrentAltitude(this.props.rideCoords)} <Text style={styles.unitsFont}>ft</Text></Text>
           </View>
         </View>
         <View style={{flex: 1}}>
@@ -114,6 +139,12 @@ export default class RideStats extends PureComponent {
             <Text style={styles.statName}>Avg. Speed</Text>
             <Text style={styles.statFont}>
               {this.memoAvgSpeed(this.state.elapsedTime, this.props.distance)} <Text style={styles.unitsFont}>mi/h</Text>
+            </Text>
+          </View>
+          <View style={[styles.statBox, {borderTopWidth: 1, borderBottomWidth: 2, borderRightWidth: 2, borderLeftWidth: 1}]}>
+            <Text style={styles.statName}>Elevation Gain</Text>
+            <Text style={styles.statFont}>
+              {Math.round(this.props.elevationGain)} <Text style={styles.unitsFont}>ft</Text>
             </Text>
           </View>
         </View>

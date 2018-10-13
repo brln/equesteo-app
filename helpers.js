@@ -22,7 +22,7 @@ export const haversine = (lat1, lon1, lat2, lon2) => {
     Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
     Math.sin(dLon/2) * Math.sin(dLon/2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
+  return Number((R * c).toFixed(6));
 }
 
 export const bearing = (lat1,lng1,lat2,lng2) => {
@@ -80,7 +80,6 @@ export function staticMap (ride) {
   let fullURL
   while (!lengthURL || lengthURL > 6000) {
     const simplified = simplifyLine(tolerance, ride.rideCoordinates)
-    console.log(simplified.toJSON())
     let pathCoords = ''
     for (let coord of simplified) {
       const parsedLat = coord.get('latitude').toString()

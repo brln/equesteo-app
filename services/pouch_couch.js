@@ -65,7 +65,6 @@ export default class PouchCouch {
       case 'users':
         return this.remoteReplicateUsers()
       default:
-        debugger
         throw('Remote DB not found')
     }
   }

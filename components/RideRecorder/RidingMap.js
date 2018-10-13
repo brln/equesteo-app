@@ -4,6 +4,7 @@ import MapView from 'react-native-maps';
 import {
   Image,
   StyleSheet,
+  TouchableOpacity,
   View
 } from 'react-native';
 
@@ -80,6 +81,28 @@ export default class RidingMap extends PureComponent {
 
   render() {
     logRender('RideRecorder.RidingMap')
+    let lastLocAccuracy
+    let refiningLocationLimit
+    if (this.props.showCircles) {
+      refiningLocationLimit = (
+         <MapView.Circle
+          center={this.props.refiningLocation.toJS()}
+          radius={(25 * 0.3048)}
+          strokeColor={'blue'}
+          strokeWidth={2}
+        />
+      )
+      if (this.props.lastLocation) {
+        lastLocAccuracy = (
+          <MapView.Circle
+            center={this.props.lastLocation.toJS()}
+            radius={(this.props.lastLocation.get('accuracy'))}
+            strokeColor={'purple'}
+            strokeWidth={2}
+          />
+        )
+      }
+    }
     return (
       <View style ={styles.container}>
         <View style={{flex: 1}}>
@@ -93,16 +116,19 @@ export default class RidingMap extends PureComponent {
               coordinates={this.props.rideCoords.toJS()}
               strokeColor="#dc0202"
               strokeWidth={5}
-            >
-            </MapView.Polyline>
+            />
+            { refiningLocationLimit }
+            { lastLocAccuracy }
           </MapView>
         </View>
         <View style={{position: 'absolute', right: 0, top: 0}} >
-          <Image
-            source={this.gpsStatusImage()}
-            style={{width: 50, height: 50}}
-            onError={(e) => { logError('there was an error loading RidingMap image') }}
-          />
+          <TouchableOpacity onPress={this.props.tapGPS}>
+            <Image
+              source={this.gpsStatusImage()}
+              style={{width: 50, height: 50}}
+              onError={(e) => { logError('there was an error loading RidingMap image') }}
+            />
+          </TouchableOpacity>
         </View>
       </View>
     )

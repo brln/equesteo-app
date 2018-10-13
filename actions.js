@@ -216,10 +216,11 @@ function newAppState (newState) {
   }
 }
 
-function newLocation (location) {
+export function newLocation (location, elevation) {
   return {
     type: NEW_LOCATION,
-    location
+    location,
+    elevation,
   }
 }
 
@@ -257,10 +258,11 @@ export function setRemotePersistStarted () {
   }
 }
 
-export function replaceLastLocation (newLocation) {
+export function replaceLastLocation (newLocation, newElevation) {
   return {
     type: REPLACE_LAST_LOCATION,
-    newLocation
+    newLocation,
+    newElevation,
   }
 }
 
@@ -327,18 +329,19 @@ function setActiveComponent (componentID) {
   }
 }
 
-export function startRide(firstCoord) {
-  const coords = []
-  if (firstCoord) {
-    coords.push(firstCoord)
-  }
+export function startRide(firstCoord, startTime) {
+  const coords = [firstCoord]
   return {
     type: START_RIDE,
     currentRide: Map({
       rideCoordinates: List(coords),
       distance: 0,
-      startTime: unixTimeNow()
+      startTime
     }),
+    currentElevations: Map({
+      elevationGain: 0,
+      elevations: Map()
+    })
   }
 }
 
@@ -885,7 +888,6 @@ export function startLocationTracking () {
   return async (dispatch, getState) => {
     logInfo('action: startLocationTracking')
     await configureBackgroundGeolocation()()
-    const METERS_TO_MILES = 0.0006213712
     const KALMAN_FILTER_Q = 6
     BackgroundGeolocation.on('location', (location) => {
       const lastLocation = getState().getIn(['main', 'localState', 'lastLocation'])
@@ -898,13 +900,18 @@ export function startLocationTracking () {
         const refiningLocation = getState().getIn(['main', 'localState', 'refiningLocation'])
 
         let parsedLocation = Map({
-          accuracy: location.accuracy,
-          latitude: location.latitude,
-          longitude: location.longitude,
+          accuracy: Number(location.accuracy.toFixed(2)),
+          latitude: Number(location.latitude.toFixed(5)),
+          longitude: Number(location.longitude.toFixed(5)),
           provider: location.provider,
           timestamp: location.time,
-          altitude: location.altitude,
           speed: location.speed,
+        })
+
+        let parsedElevation = Map({
+          latitude: Number(location.latitude.toFixed(4)),
+          longitude: Number(location.longitude.toFixed(4)),
+          elevation: location.altitude,
         })
 
         let replaced = false
@@ -921,14 +928,13 @@ export function startLocationTracking () {
             parsedLocation.get('latitude'),
             parsedLocation.get('longitude')
           )
-          let refiningAccuracy = refiningLocation.get('accuracy')
-          if (distance < (refiningAccuracy * METERS_TO_MILES) && location.accuracy <= refiningAccuracy) {
-            dispatch(replaceLastLocation(parsedLocation))
+          if (distance < (30 / 5280)) {
+            dispatch(replaceLastLocation(parsedLocation, parsedElevation))
             replaced = true
           }
         }
         if (!replaced) {
-          dispatch(newLocation(parsedLocation))
+          dispatch(newLocation(parsedLocation, parsedElevation))
         }
       }
     })

@@ -128,7 +128,7 @@ class RecorderContainer extends PureComponent {
       }
     })
     this.props.dispatch(unpauseLocationTracking())
-    this.props.dispatch(startRide(this.props.lastLocation))
+    this.props.dispatch(startRide(this.props.lastLocation, unixTimeNow()))
   }
 
   finishRide () {
@@ -165,6 +165,7 @@ class RecorderContainer extends PureComponent {
         discardRide={this.discardRide}
         lastLocation={this.props.lastLocation}
         moving={this.props.moving}
+        refiningLocation={this.props.refiningLocation}
         showGPSBar={this.state.showGPSBar}
         showRideDetails={this.showRideDetails}
         startRide={this.startRide}
@@ -180,6 +181,7 @@ function mapStateToProps (state) {
     appState: localState.get('appState'),
     currentRide: localState.get('currentRide'),
     lastLocation: localState.get('lastLocation'),
+    refiningLocation: localState.get('refiningLocation'),
     moving: localState.get('moving')
   }
 }
