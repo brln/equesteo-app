@@ -358,17 +358,16 @@ export default function AppReducer(state=initialState, action) {
           return replacedLastLocation.setIn(
             ['localState', 'currentRideElevations', 'elevationGain'],
             0
-          ).setIn([
-            'localState',
-            'currentRideElevations',
-            'elevations'
-          ], Map()).setIn(
+          ).setIn(
+            ['localState', 'currentRideElevations', 'elevations'],
+            Map()
+          ).setIn(
             [
               'localState',
               'currentRideElevations',
               'elevations',
-              action.newElevation.get('latitude'),
-              action.newElevation.get('longitude'),
+              action.newElevation.get('latitude').toFixed(4),
+              action.newElevation.get('longitude').toFixed(4),
             ],
             action.newElevation.get('elevation')
           ).setIn(
@@ -376,6 +375,8 @@ export default function AppReducer(state=initialState, action) {
             List().push(action.newLocation)
           )
         } else if (rideCoords.count() > 1 && oldLastLocation) {
+          const rideElevations = state.getIn(['localState', 'currentRideElevations', 'elevations'])
+          const oldElevationTotalGain = state.getIn(['localState', 'currentRideElevations', 'elevationGain'])
           const lastCoord = rideCoords.get(-2)
           const oldDistance = haversine(
             oldLastLocation.get('latitude'),
@@ -383,14 +384,26 @@ export default function AppReducer(state=initialState, action) {
             lastCoord.get('latitude'),
             lastCoord.get('longitude')
           )
-          const oldElevationGain = oldLastLocation.get('elevation') - lastCoord.get('elevation')
+          const lastElevation = rideElevations.get(
+            lastCoord.get('latitude').toFixed(4)
+          ).get(
+            lastCoord.get('longitude').toFixed(4)
+          )
+          const oldLastElevation = rideElevations.get(
+            oldLastLocation.get('latitude').toFixed(4)
+          ).get(
+            oldLastLocation.get('longitude').toFixed(4)
+          )
           const newDistance = haversine(
             lastCoord.get('latitude'),
             lastCoord.get('longitude'),
             action.newLocation.get('latitude'),
             action.newLocation.get('longitude')
           )
-          const newElevationChange = action.newLocation.get('elevation') - lastCoord.get('elevation')
+          const oldElevationChange = oldLastElevation - lastElevation
+          const oldElevationGain = oldElevationChange >= 0 ? oldElevationChange : 0
+
+          const newElevationChange = action.newElevation.get('elevation') - lastElevation
           const newElevationGain = newElevationChange >= 0 ? newElevationChange : 0
           const newRideCoordinates = replacedLastLocation.getIn(
             ['localState', 'currentRide', 'rideCoordinates']
@@ -403,7 +416,7 @@ export default function AppReducer(state=initialState, action) {
           const totalDistance = currentRide1.get('distance')
             - oldDistance
             + newDistance
-          const totalChange = currentRide1.get('elevationGain') - oldElevationGain + newElevationGain
+          const totalChange = oldElevationTotalGain - oldElevationGain + newElevationGain
           return replacedLastLocation.setIn(
             ['localState', 'currentRide', 'distance'],
             totalDistance
@@ -411,8 +424,17 @@ export default function AppReducer(state=initialState, action) {
             ['localState', 'currentRide', 'rideCoordinates'],
             newRideCoordinates
           ).setIn(
-            ['localState', 'currentRide', 'elevationGain'],
+            ['localState', 'currentRideElevations', 'elevationGain'],
             totalChange
+          ).setIn(
+            [
+              'localState',
+              'currentRideElevations',
+              'elevations',
+              action.newElevation.get('latitude').toFixed(4),
+              action.newElevation.get('longitude').toFixed(4),
+            ],
+            action.newElevation.get('elevation')
           )
         }
       }

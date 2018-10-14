@@ -170,15 +170,15 @@ describe('NEW_LOCATION', () => {
     const startTime = unixTimeNow()
     const firstPoint = Map({
       accuracy: 5,
-      latitude: 45.2200,
-      longitude: 27.2900,
+      latitude: 45.220011,
+      longitude: 27.290012,
       provider: 'gps',
       timestamp: 1,
       speed: 1,
     })
     const firstElevation = Map({
-      latitude: 45.2200,
-      longitude: 27.2900,
+      latitude: 45.220023,
+      longitude: 27.290034,
       elevation: 1000
     })
     const initialState = Map({

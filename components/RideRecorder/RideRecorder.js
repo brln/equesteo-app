@@ -61,7 +61,6 @@ export default class RideRecorder extends PureComponent {
         <View style={{flex: 1}}>
           <View style={{flex: 5}}>
             <RidingMap
-              mode={"duringRide"}
               refiningLocation={this.props.refiningLocation}
               rideCoords={this.props.currentRide.get('rideCoordinates')}
               showCircles={this.state.showCircles}
@@ -72,8 +71,8 @@ export default class RideRecorder extends PureComponent {
           <View style={styles.bottomSection}>
             <RideStats
               appState={this.props.appState}
+              currentRideElevations={this.props.currentRideElevations}
               distance={this.props.currentRide.get('distance')}
-              elevationGain={this.props.currentRide.get('elevationGain')}
               moving={this.props.moving}
               rideCoords={this.props.currentRide.get('rideCoordinates')}
               startTime={this.props.currentRide.get('startTime')}

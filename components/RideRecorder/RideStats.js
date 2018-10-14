@@ -3,7 +3,6 @@ import { StyleSheet, Text, View } from 'react-native';
 import memoizeOne from 'memoize-one';
 
 import { darkGrey, lightGrey } from '../../colors'
-import { haversine } from '../../helpers'
 
 const initialState = {
   starting: null,
@@ -58,10 +57,16 @@ export default class RideStats extends PureComponent {
     }
   }
 
-  currentAltitude (rideCoords) {
+  currentAltitude (rideCoords, currentRideElevations) {
     const last = rideCoords.get(-1)
     if (last) {
-      const found = last.get('elevation')
+      console.log(currentRideElevations.toJSON())
+      console.log(last.toJSON())
+      const found = currentRideElevations.get('elevations').get(
+        last.get('latitude').toFixed(4)
+      ).get(
+        last.get('longitude').toFixed(4)
+      )
       if (found) {
         return Math.round(last.get('elevation') * 3.28084)
       } else {
@@ -127,7 +132,7 @@ export default class RideStats extends PureComponent {
           </View>
           <View style={[styles.statBox, {borderTopWidth: 1, borderBottomWidth: 2, borderRightWidth: 1, borderLeftWidth: 2}]}>
             <Text style={styles.statName}>Altitude</Text>
-            <Text style={styles.statFont}>{this.memoCurrentAltitude(this.props.rideCoords)} <Text style={styles.unitsFont}>ft</Text></Text>
+            <Text style={styles.statFont}>{this.memoCurrentAltitude(this.props.rideCoords, this.props.currentRideElevations)} <Text style={styles.unitsFont}>ft</Text></Text>
           </View>
         </View>
         <View style={{flex: 1}}>
@@ -144,7 +149,7 @@ export default class RideStats extends PureComponent {
           <View style={[styles.statBox, {borderTopWidth: 1, borderBottomWidth: 2, borderRightWidth: 2, borderLeftWidth: 1}]}>
             <Text style={styles.statName}>Elevation Gain</Text>
             <Text style={styles.statFont}>
-              {Math.round(this.props.elevationGain)} <Text style={styles.unitsFont}>ft</Text>
+              {Math.round(this.props.currentRideElevations.get('elevationGain'))} <Text style={styles.unitsFont}>ft</Text>
             </Text>
           </View>
         </View>

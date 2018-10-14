@@ -27,6 +27,8 @@ export default class RidingMap extends PureComponent {
   }
 
   fitToElements() {
+    console.log('zzzzzzzzzzzzzzzzzzzzzzzzzzzzz')
+    console.log(this.props.rideCoords.toJSON())
     const lats = this.props.rideCoords.map(c => c.get('latitude'))
     const longs = this.props.rideCoords.map(c => c.get('longitude'))
     const maxLat = Math.max(...lats)
