@@ -330,7 +330,10 @@ function setActiveComponent (componentID) {
 }
 
 export function startRide(firstCoord, startTime) {
-  const coords = [firstCoord]
+  const coords = []
+  if (firstCoord) {
+    coords.push(firstCoord)
+  }
   return {
     type: START_RIDE,
     currentRide: Map({
@@ -900,17 +903,17 @@ export function startLocationTracking () {
         const refiningLocation = getState().getIn(['main', 'localState', 'refiningLocation'])
 
         let parsedLocation = Map({
-          accuracy: Number(location.accuracy.toFixed(2)),
-          latitude: Number(location.latitude.toFixed(5)),
-          longitude: Number(location.longitude.toFixed(5)),
+          accuracy: location.accuracy,
+          latitude: location.latitude,
+          longitude: location.longitude,
           provider: location.provider,
           timestamp: location.time,
           speed: location.speed,
         })
 
         let parsedElevation = Map({
-          latitude: Number(location.latitude.toFixed(4)),
-          longitude: Number(location.longitude.toFixed(4)),
+          latitude: location.latitude,
+          longitude: location.longitude,
           elevation: location.altitude,
         })
 

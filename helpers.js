@@ -187,3 +187,10 @@ export function logRender (componentName) {
 export function isAndroid () {
   return Platform.OS === 'android'
 }
+
+export function toElevationKey (coord) {
+  console.log('start coord: ' + coord)
+  const key = coord.toFixed(4)
+  console.log('return key: ' + key)
+  return key
+}

@@ -164,6 +164,7 @@ class RecorderContainer extends PureComponent {
         currentRide={this.props.currentRide}
         currentRideElevations={this.props.currentRideElevations}
         discardRide={this.discardRide}
+        lastElevation={this.props.lastElevation}
         lastLocation={this.props.lastLocation}
         moving={this.props.moving}
         refiningLocation={this.props.refiningLocation}
@@ -182,6 +183,7 @@ function mapStateToProps (state) {
     appState: localState.get('appState'),
     currentRide: localState.get('currentRide'),
     currentRideElevations: localState.get('currentRideElevations'),
+    lastElevation: localState.get('lastElevation'),
     lastLocation: localState.get('lastLocation'),
     refiningLocation: localState.get('refiningLocation'),
     moving: localState.get('moving')

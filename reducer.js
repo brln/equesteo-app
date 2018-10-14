@@ -52,7 +52,8 @@ import {
 import {
   appStates,
   goodConnection,
-  haversine
+  haversine,
+  toElevationKey
 } from './helpers'
 import { FEED, SIGNUP_LOGIN } from './screens'
 
@@ -267,8 +268,8 @@ export default function AppReducer(state=initialState, action) {
           ).setIn(
             [
               'elevations',
-              action.elevation.get('latitude'),
-              action.elevation.get('longitude'),
+              toElevationKey(action.elevation.get('latitude')),
+              toElevationKey(action.elevation.get('longitude')),
             ],
             action.elevation.get('elevation')
         )
@@ -284,8 +285,8 @@ export default function AppReducer(state=initialState, action) {
           currentElevations.setIn(
             [
               'elevations',
-              action.elevation.get('latitude'),
-              action.elevation.get('longitude'),
+              toElevationKey(action.elevation.get('latitude')),
+              toElevationKey(action.elevation.get('longitude')),
             ],
             action.elevation.get('elevation')
           )
@@ -366,8 +367,8 @@ export default function AppReducer(state=initialState, action) {
               'localState',
               'currentRideElevations',
               'elevations',
-              action.newElevation.get('latitude').toFixed(4),
-              action.newElevation.get('longitude').toFixed(4),
+              toElevationKey(action.newElevation.get('latitude')),
+              toElevationKey(action.newElevation.get('longitude'))
             ],
             action.newElevation.get('elevation')
           ).setIn(
@@ -385,14 +386,14 @@ export default function AppReducer(state=initialState, action) {
             lastCoord.get('longitude')
           )
           const lastElevation = rideElevations.get(
-            lastCoord.get('latitude').toFixed(4)
+            toElevationKey(lastCoord.get('latitude'))
           ).get(
-            lastCoord.get('longitude').toFixed(4)
+            toElevationKey(lastCoord.get('longitude'))
           )
           const oldLastElevation = rideElevations.get(
-            oldLastLocation.get('latitude').toFixed(4)
+            toElevationKey(oldLastLocation.get('latitude'))
           ).get(
-            oldLastLocation.get('longitude').toFixed(4)
+            toElevationKey(oldLastLocation.get('longitude'))
           )
           const newDistance = haversine(
             lastCoord.get('latitude'),
@@ -431,8 +432,8 @@ export default function AppReducer(state=initialState, action) {
               'localState',
               'currentRideElevations',
               'elevations',
-              action.newElevation.get('latitude').toFixed(4),
-              action.newElevation.get('longitude').toFixed(4),
+              toElevationKey(action.newElevation.get('latitude')),
+              toElevationKey(action.newElevation.get('longitude')),
             ],
             action.newElevation.get('elevation')
           )

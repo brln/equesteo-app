@@ -106,7 +106,6 @@ export default class Ride extends PureComponent {
     const minDistance = (50 * 3) / 5280 // 50 yards
     for (let rideCoord of rideCoordinates) {
       if (!lastPoint) {
-        console.log('firstPoint')
         lastPoint = rideCoord
       } else {
         bucketDistance += haversine(

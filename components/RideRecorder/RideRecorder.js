@@ -24,7 +24,6 @@ export default class RideRecorder extends PureComponent {
   }
 
   tapGPS () {
-    console.log('tappy')
     if (this.state.gpsTaps === 5) {
       this.setState({
         gpsTaps: 0,
@@ -73,6 +72,7 @@ export default class RideRecorder extends PureComponent {
               appState={this.props.appState}
               currentRideElevations={this.props.currentRideElevations}
               distance={this.props.currentRide.get('distance')}
+              lastElevation={this.props.lastElevation}
               moving={this.props.moving}
               rideCoords={this.props.currentRide.get('rideCoordinates')}
               startTime={this.props.currentRide.get('startTime')}

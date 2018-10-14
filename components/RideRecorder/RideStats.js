@@ -57,16 +57,9 @@ export default class RideStats extends PureComponent {
     }
   }
 
-  currentAltitude (rideCoords, currentRideElevations) {
-    const last = rideCoords.get(-1)
+  currentAltitude (rideCoords, last) {
     if (last) {
-      console.log(currentRideElevations.toJSON())
-      console.log(last.toJSON())
-      const found = currentRideElevations.get('elevations').get(
-        last.get('latitude').toFixed(4)
-      ).get(
-        last.get('longitude').toFixed(4)
-      )
+      const found = last.get('elevation')
       if (found) {
         return Math.round(last.get('elevation') * 3.28084)
       } else {
@@ -132,7 +125,7 @@ export default class RideStats extends PureComponent {
           </View>
           <View style={[styles.statBox, {borderTopWidth: 1, borderBottomWidth: 2, borderRightWidth: 1, borderLeftWidth: 2}]}>
             <Text style={styles.statName}>Altitude</Text>
-            <Text style={styles.statFont}>{this.memoCurrentAltitude(this.props.rideCoords, this.props.currentRideElevations)} <Text style={styles.unitsFont}>ft</Text></Text>
+            <Text style={styles.statFont}>{this.memoCurrentAltitude(this.props.rideCoords, this.props.lastElevation)} <Text style={styles.unitsFont}>ft</Text></Text>
           </View>
         </View>
         <View style={{flex: 1}}>
