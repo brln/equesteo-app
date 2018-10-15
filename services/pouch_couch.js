@@ -120,7 +120,7 @@ export default class PouchCouch {
       ).on('complete', () => {
         resolve()
       }).on('error', (e) => {
-        console.log('localReplicateRides')
+        logError('localReplicateRides')
         logError(e)
         reject()
       })
@@ -138,7 +138,7 @@ export default class PouchCouch {
       ).on('complete', () => {
           resolve()
       }).on('error', (e) => {
-        console.log('localReplicateUsers')
+        logError('localReplicateUsers')
         logError(e)
         reject()
       })
@@ -170,19 +170,17 @@ export default class PouchCouch {
         ).on('complete', () => {
           resolve()
         }).on('error', (e) => {
-          console.log('localReplicateHorses')
+          logError('localReplicateHorses')
           logError(e)
           reject()
         })
       }).catch((e) => {
-        console.log('localReplicateHorses allJoins error')
+        logError('localReplicateHorses allJoins error')
         logError(e)
         reject()
       })
     })
   }
-
-
 
   async deleteLocalDBs () {
     await this.localHorsesDB.destroy()
@@ -209,6 +207,7 @@ export default class PouchCouch {
       follows: userDocs.filter(u => u.type === 'follow'),
       rideCarrots: rideDocs.filter(r => r.type === 'carrot'),
       rideComments: rideDocs.filter(r => r.type === 'comment'),
+      rideElevations: rideDocs.filter(r => r.type === 'rideElevations'),
       rides: rideDocs.filter(r => r.type === 'ride'),
       users: userDocs.filter(u => u.type === 'user')
     }

@@ -1,4 +1,5 @@
 import { Sentry } from 'react-native-sentry'
+import { logInfo } from '../helpers'
 
 export default logger = store => dispatch => action => {
   const toLog = {'action': action.type}
@@ -8,7 +9,7 @@ export default logger = store => dispatch => action => {
     }
   }
   const asString = JSON.stringify(toLog)
-  console.log(asString)
+  logInfo(asString)
   Sentry.captureBreadcrumb(
     {
       message: asString,

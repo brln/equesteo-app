@@ -128,7 +128,7 @@ class RecorderContainer extends PureComponent {
       }
     })
     this.props.dispatch(unpauseLocationTracking())
-    this.props.dispatch(startRide(this.props.lastLocation, unixTimeNow()))
+    this.props.dispatch(startRide(this.props.lastLocation, this.props.lastElevation, unixTimeNow()))
   }
 
   finishRide () {

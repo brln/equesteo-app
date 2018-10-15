@@ -5,7 +5,6 @@ import moment from 'moment'
 import {
   Clipboard,
   Dimensions,
-  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -19,14 +18,14 @@ import {
   Thumbnail
 } from 'native-base'
 
-
 import { darkBrand, darkGrey } from '../../colors'
-import { haversine, logRender, logInfo, logError } from '../../helpers'
+import { haversine, logRender, logInfo, toElevationKey } from '../../helpers'
 import PhotoFilmstrip from './PhotoFilmstrip'
 import RideImage from '../Feed/RideImage'
 import SpeedChart from './SpeedChart'
 import Stats from './Stats'
 import DeleteModal from '../DeleteModal'
+import ElevationChart from './ElevationChart'
 
 const { width } = Dimensions.get('window')
 
@@ -42,14 +41,58 @@ export default class Ride extends PureComponent {
     this.rideNotes = this.rideNotes.bind(this)
     this.rideTime = this.rideTime.bind(this)
     this.maybeShowID = this.maybeShowID.bind(this)
+    this.parseElevationData = this.parseElevationData.bind(this)
     this.showProfile = this.showProfile.bind(this)
+    this.speedChart = this.speedChart.bind(this)
 
     this.memoizedParse = memoizeOne(this.parseSpeedData)
     this.memoizedMaxSpeed = memoizeOne(this.maxSpeed)
+    this.memoizedParseElevation = memoizeOne(this.parseElevationData)
   }
 
   showProfile () {
     this.props.showProfile(this.props.rideUser)
+  }
+
+  parseElevationData (rideCoordinates, rideElevations) {
+    console.log(rideCoordinates.toJSON())
+    console.log(rideElevations.toJSON())
+    let totalDistance = 0
+    let totalGain = 0
+    let lastPoint = null
+    let points = []
+
+    for (let rideCoord of rideCoordinates) {
+      if (!lastPoint) {
+        lastPoint = rideCoord
+      } else {
+        totalDistance += haversine(
+          lastPoint.get('latitude'),
+          lastPoint.get('longitude'),
+          rideCoord.get('latitude'),
+          rideCoord.get('longitude')
+        )
+        const elevation = rideElevations.getIn([
+          toElevationKey(rideCoord.get('latitude')),
+          toElevationKey(rideCoord.get('longitude'))
+        ])
+        const lastElevation = rideElevations.getIn([
+          toElevationKey(lastPoint.get('latitude')),
+          toElevationKey(lastPoint.get('longitude'))
+        ])
+        const elevationChange = elevation - lastElevation
+        totalGain += elevationChange > 0 ? elevationChange : 0
+        points.push({
+          elevation,
+          distance: totalDistance,
+          gain: totalGain
+        })
+        lastPoint = rideCoord
+        // @TODO: put the gain chart in
+      }
+    }
+    console.log(points)
+    return points
   }
 
   parseSpeedData (rideCoordinates) {
@@ -218,11 +261,13 @@ export default class Ride extends PureComponent {
     }
   }
 
-  render () {
-    logRender('Ride.Ride')
-    let speedChart = <Text>Not enough points for Speed Chart</Text>
+  speedChart () {
+    let speedChart = (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <Text>Not enough points for Speed Chart</Text>
+      </View>
+    )
     let speedData = this.memoizedParse(this.props.ride.get('rideCoordinates').toJS())
-    let maxSpeed = this.memoizedMaxSpeed(this.props.ride.get('rideCoordinates').toJS())
     if (speedData.length >= 2) {
       speedChart = (
         <View style={styles.slide}>
@@ -232,6 +277,36 @@ export default class Ride extends PureComponent {
         </View>
       )
     }
+    return speedChart
+  }
+
+  elevationProfile () {
+    let elevationProfile = (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <Text>Not enough points for an Elevation Profile</Text>
+      </View>
+    )
+    if (this.props.rideElevations) {
+      let elevationData = this.memoizedParseElevation(
+        this.props.ride.get('rideCoordinates'),
+        this.props.rideElevations.get('elevations')
+      )
+      if (elevationData.length >= 2) {
+        elevationProfile = (
+          <View style={styles.slide}>
+            <ElevationChart
+              elevationData={elevationData}
+            />
+          </View>
+        )
+      }
+    }
+    return elevationProfile
+  }
+
+  render () {
+    logRender('Ride.Ride')
+    let maxSpeed = this.memoizedMaxSpeed(this.props.ride.get('rideCoordinates').toJS())
     const height = (width * 9 / 16) + 54
     return (
       <ScrollView style={{flex: 1}}>
@@ -268,7 +343,8 @@ export default class Ride extends PureComponent {
                   uri={this.props.ride.get('mapURL') }
                 />
               </TouchableOpacity>
-              { speedChart }
+              { this.speedChart() }
+              { this.elevationProfile() }
             </Swiper>
           </View>
 

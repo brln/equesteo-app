@@ -36,6 +36,7 @@ import {
   RIDE_CARROT_CREATED,
   RIDE_CARROT_SAVED,
   RIDE_CREATED,
+  RIDE_ELEVATIONS_CREATED,
   RIDE_SAVED,
   SAVE_USER_ID,
   SET_ACTIVE_COMPONENT,
@@ -97,6 +98,7 @@ export const initialState = Map({
   rides: Map(),
   rideCarrots: Map(),
   rideComments: Map(),
+  rideElevations: Map(),
   users: Map(),
 })
 
@@ -185,12 +187,18 @@ export default function AppReducer(state=initialState, action) {
         return accum
       }, {})
 
+      const allRideElevations = action.localData.rideElevations.reduce((accum, elevation) => {
+        accum[elevation._id] = fromJS(elevation)
+        return accum
+      }, {})
+
       return state.merge(Map({
         users: Map(allUsers),
         follows: Map(allFollows),
         rides: Map(allRides),
         rideCarrots: Map(allCarrots),
         rideComments: Map(allComments),
+        rideElevations: Map(allRideElevations),
         horses: Map(allHorses),
         horseUsers: Map(allHorseUsers)
       }))
@@ -265,30 +273,29 @@ export default function AppReducer(state=initialState, action) {
           currentElevations.set(
             'elevationGain',
             totalElevationGain
-          ).setIn(
-            [
-              'elevations',
-              toElevationKey(action.elevation.get('latitude')),
-              toElevationKey(action.elevation.get('longitude')),
-            ],
-            action.elevation.get('elevation')
+          ).setIn([
+            'elevations',
+            toElevationKey(action.elevation.get('latitude')),
+            toElevationKey(action.elevation.get('longitude')),
+          ], action.elevation.get('elevation')
         )
-        return newState.setIn(
+        const getRidOfMe = newState.setIn(
           ['localState', 'currentRide'],
           newCurrentRide
         ).setIn(
           ['localState', 'currentRideElevations'],
           newRideElevations
         )
+        console.log(getRidOfMe.getIn(['localState', 'currentRide', 'rideCoordinates']).toJSON())
+        console.log(getRidOfMe.getIn(['localState', 'currentRideElevations']).toJSON())
+        return getRidOfMe
       } else if (currentRide && currentlyPaused) {
         const newRideElevations =
           currentElevations.setIn(
-            [
-              'elevations',
+            ['elevations',
               toElevationKey(action.elevation.get('latitude')),
               toElevationKey(action.elevation.get('longitude')),
-            ],
-            action.elevation.get('elevation')
+            ], action.elevation.get('elevation')
           )
         const pausedCoordinates = state.getIn(
           ['localState', 'pausedCachedCoordinates']
@@ -362,15 +369,13 @@ export default function AppReducer(state=initialState, action) {
           ).setIn(
             ['localState', 'currentRideElevations', 'elevations'],
             Map()
-          ).setIn(
-            [
-              'localState',
-              'currentRideElevations',
-              'elevations',
-              toElevationKey(action.newElevation.get('latitude')),
-              toElevationKey(action.newElevation.get('longitude'))
-            ],
-            action.newElevation.get('elevation')
+          ).setIn([
+            'localState',
+            'currentRideElevations',
+            'elevations',
+            toElevationKey(action.newElevation.get('latitude')),
+            toElevationKey(action.newElevation.get('longitude'))
+            ], action.newElevation.get('elevation')
           ).setIn(
             ['localState', 'currentRide', 'rideCoordinates'],
             List().push(action.newLocation)
@@ -456,6 +461,8 @@ export default function AppReducer(state=initialState, action) {
       ).setIn(
         ['localState', 'currentRide'], null
       )
+    case RIDE_ELEVATIONS_CREATED:
+      return state.setIn(['rideElevations', action.elevationData.get('_id')], action.elevationData)
     case RIDE_SAVED:
       return state.setIn(['rides', action.ride.get('_id')], action.ride)
     case SAVE_USER_ID:

@@ -67,7 +67,7 @@ export default class FirstHorsePage extends PureComponent {
               onChangeText={this.changeHorseName}
               onSubmitEditing={() => {this.props.inputs['breed'].focus()}}
               style={{
-                backgroundColor: 'white',
+                backgroundColor: 'transparent',
                 height: 50,
               }}
             />
@@ -81,7 +81,7 @@ export default class FirstHorsePage extends PureComponent {
               onChangeText={this.changeHorseBreed}
               ref={(i) => this.props.inputs['breed'] = i}
               style={{
-                backgroundColor: 'white',
+                backgroundColor: 'transparent',
                 height: 50,
               }}
             />
@@ -97,7 +97,7 @@ export default class FirstHorsePage extends PureComponent {
           </View>
 
           <TouchableOpacity onPress={this.skipHorse} style={{paddingTop: 10}}>
-            <Text style={{textAlign: 'center', textDecorationLine: 'underline', fontSize: 10}}>Not now.</Text>
+            <Text style={{textAlign: 'center', textDecorationLine: 'underline', fontSize: 10, color: 'black'}}>Not now.</Text>
           </TouchableOpacity>
         </View>
 

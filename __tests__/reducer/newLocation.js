@@ -234,7 +234,7 @@ describe('NEW_LOCATION', () => {
       })
     })
     expectedNewState = expectedNewState.setIn(
-      ['localState', 'currentRideElevations', 'elevations', latitude, longitude],
+      ['localState', 'currentRideElevations', 'elevations', latitude.toFixed(4), longitude.toFixed(4)],
       elevationPoint
     )
 

@@ -15,7 +15,8 @@ import {
   logInfo,
   unixTimeNow,
   generateUUID,
-  staticMap
+  staticMap,
+  toElevationKey,
 } from "./helpers"
 import { danger, green, warning } from './colors'
 import { DRAWER, FEED, SIGNUP_LOGIN } from './screens'
@@ -55,6 +56,7 @@ import {
   RIDE_CARROT_SAVED,
   RIDE_COMMENT_CREATED,
   RIDE_CREATED,
+  RIDE_ELEVATIONS_CREATED,
   RIDE_SAVED,
   SAVE_USER_ID,
   SET_ACTIVE_COMPONENT,
@@ -307,6 +309,13 @@ function rideCreated (ride) {
   }
 }
 
+function rideElevationsCreated (elevationData) {
+  return {
+    type: RIDE_ELEVATIONS_CREATED,
+    elevationData
+  }
+}
+
 function rideSaved (ride) {
   return {
     type: RIDE_SAVED,
@@ -329,10 +338,15 @@ function setActiveComponent (componentID) {
   }
 }
 
-export function startRide(firstCoord, startTime) {
+export function startRide(firstCoord, firstElevation, startTime) {
   const coords = []
+  let elevations = Map()
   if (firstCoord) {
     coords.push(firstCoord)
+    elevations = elevations.setIn([
+      toElevationKey(firstElevation.get('latitude')),
+      toElevationKey(firstElevation.get('longitude'))
+    ], firstElevation.get('elevation'))
   }
   return {
     type: START_RIDE,
@@ -343,7 +357,7 @@ export function startRide(firstCoord, startTime) {
     }),
     currentElevations: Map({
       elevationGain: 0,
-      elevations: Map()
+      elevations
     })
   }
 }
@@ -595,12 +609,13 @@ export function createHorse (horse) {
 
 export function createRide (rideData) {
   return async (dispatch, getState) => {
-    const TEN_FEED_AS_DEG_LATITUDE = 0.0000274
+    const TEN_FEET_AS_DEG_LATITUDE = 0.0000274
     const jwt = getState().getIn(['main', 'localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
     const currentRide = getState().getIn(['main', 'localState', 'currentRide'])
+    const currentRideElevations = getState().getIn(['main', 'localState', 'currentRideElevations'])
     const simplifiedCoords = simplifyLine(
-      TEN_FEED_AS_DEG_LATITUDE,
+      TEN_FEET_AS_DEG_LATITUDE,
       currentRide.get('rideCoordinates'))
     const theRide = {
       _id: rideData.get('_id'),
@@ -618,8 +633,21 @@ export function createRide (rideData) {
       userID: rideData.get('userID'),
     }
     theRide.mapURL = staticMap(theRide)
-    const doc = await pouchCouch.saveRide(theRide)
-    dispatch(rideCreated(Map({...theRide, _rev: doc.rev})))
+
+    const elevationData = {
+      _id: theRide._id + '_elevations',
+      rideID: theRide._id,
+      elevationGain: currentRideElevations.get('elevationGain'),
+      elevations: currentRideElevations.get('elevations'),
+      type: 'rideElevations',
+      userID: rideData.get('userID'),
+    }
+
+    const rideDoc = await pouchCouch.saveRide(theRide)
+    const elevationDoc = await pouchCouch.saveRide(elevationData)
+
+    dispatch(rideElevationsCreated(Map({...elevationData, _rev: elevationDoc.rev})))
+    dispatch(rideCreated(Map({...theRide, _rev: rideDoc.rev})))
     dispatch(needsRemotePersist('rides'))
   }
 }
@@ -923,6 +951,13 @@ export function startLocationTracking () {
             parsedLocation,
             lastLocation,
             KALMAN_FILTER_Q
+          )
+          parsedElevation = parsedElevation.set(
+            'latitude', parsedLocation.get('latitude')
+          ).set(
+            'longitude', parsedLocation.get('longitude')
+          ).set(
+            'accuracy', parsedLocation.get('accuracy')
           )
 
           let distance = haversine(

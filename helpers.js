@@ -181,7 +181,7 @@ export function logInfo (info) {
 }
 
 export function logRender (componentName) {
-  console.log('rendering: ' + componentName)
+  logInfo('rendering: ' + componentName)
 }
 
 export function isAndroid () {
@@ -189,10 +189,7 @@ export function isAndroid () {
 }
 
 export function toElevationKey (coord) {
-  console.log('start coord: ' + coord)
-  const key = coord.toFixed(4)
-  console.log('return key: ' + key)
-  return key
+  return coord.toFixed(4)
 }
 
 export function metersToFeet(meters) {

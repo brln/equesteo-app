@@ -50,7 +50,7 @@ export default class FirstHorsePhoto extends PureComponent {
     )
     let skip = (
       <TouchableOpacity onPress={this.props.nextPage} style={{paddingTop: 10}}>
-        <Text style={{textAlign: 'center', textDecorationLine: 'underline'}}>No, thanks.</Text>
+        <Text style={{textAlign: 'center', textDecorationLine: 'underline', color: "black", fontSize: 10}}>No, thanks.</Text>
       </TouchableOpacity>
     )
     let source = require('../../img/emptyHorse.png')

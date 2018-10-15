@@ -65,7 +65,7 @@ export default class NamePage extends PureComponent {
               onSubmitEditing={() => {this.props.inputs['lastName'].focus()}}
               ref={(i) => this.props.inputs['firstName'] = i}
               style={{
-                backgroundColor: 'white',
+                backgroundColor: 'transparent',
                 height: 50,
               }}
             />
@@ -81,7 +81,7 @@ export default class NamePage extends PureComponent {
               onSubmitEditing={this.nextPage}
               ref={(i) => this.props.inputs['lastName'] = i}
               style={{
-                backgroundColor: 'white',
+                backgroundColor: 'transparent',
                 height: 50,
               }}
             />
