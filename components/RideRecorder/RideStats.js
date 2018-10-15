@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import memoizeOne from 'memoize-one';
 
 import { darkGrey, lightGrey } from '../../colors'
+import { metersToFeet } from '../../helpers'
 
 const initialState = {
   starting: null,
@@ -61,7 +62,7 @@ export default class RideStats extends PureComponent {
     if (last) {
       const found = last.get('elevation')
       if (found) {
-        return Math.round(last.get('elevation') * 3.28084)
+        return Math.round(metersToFeet(last.get('elevation')))
       } else {
         return '-'
       }
@@ -142,7 +143,7 @@ export default class RideStats extends PureComponent {
           <View style={[styles.statBox, {borderTopWidth: 1, borderBottomWidth: 2, borderRightWidth: 2, borderLeftWidth: 1}]}>
             <Text style={styles.statName}>Elevation Gain</Text>
             <Text style={styles.statFont}>
-              {Math.round(this.props.currentRideElevations.get('elevationGain'))} <Text style={styles.unitsFont}>ft</Text>
+              {Math.round(metersToFeet(this.props.currentRideElevations.get('elevationGain')))} <Text style={styles.unitsFont}>ft</Text>
             </Text>
           </View>
         </View>

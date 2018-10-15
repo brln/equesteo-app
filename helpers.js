@@ -194,3 +194,7 @@ export function toElevationKey (coord) {
   console.log('return key: ' + key)
   return key
 }
+
+export function metersToFeet(meters) {
+  return meters * 3.28084
+}

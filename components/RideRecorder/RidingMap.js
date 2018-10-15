@@ -83,7 +83,7 @@ export default class RidingMap extends PureComponent {
     logRender('RideRecorder.RidingMap')
     let lastLocAccuracy
     let refiningLocationLimit
-    if (this.props.showCircles) {
+    if (this.props.showCircles && this.props.refiningLocation) {
       refiningLocationLimit = (
          <MapView.Circle
           center={this.props.refiningLocation.toJS()}
