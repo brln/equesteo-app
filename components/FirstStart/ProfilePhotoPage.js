@@ -3,7 +3,6 @@ import ImagePicker from 'react-native-image-crop-picker'
 import React, { PureComponent } from 'react'
 import {
   Dimensions,
-  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -14,6 +13,7 @@ import BuildImage from '../BuildImage'
 import { brand } from '../../colors'
 import { logRender } from '../../helpers'
 import Button from '../Button'
+import URIImage from '../URIImage'
 
 const { width } = Dimensions.get('window')
 
@@ -64,7 +64,7 @@ export default class ProfilePhotoPage extends PureComponent {
       )
       skip = null
       profilePhoto = (
-        <Image
+        <URIImage
           source={{uri: this.props.user.getIn(['photosByID', this.props.user.get('profilePhotoID'), 'uri'])}}
           style={{width: '100%', height: '100%'}}
         />

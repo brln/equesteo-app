@@ -3,10 +3,8 @@ import ImagePicker from 'react-native-image-crop-picker'
 import React, { PureComponent } from 'react'
 import {
   Dimensions,
-  Image,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View
 } from 'react-native'
@@ -15,6 +13,7 @@ import BuildImage from '../BuildImage'
 import { brand } from '../../colors'
 import { logRender } from '../../helpers'
 import Button from '../Button'
+import URIImage from '../URIImage'
 
 const { width } = Dimensions.get('window')
 
@@ -71,8 +70,9 @@ export default class FirstHorsePhoto extends PureComponent {
       )
       skip = null
       horseProfileImage = (
-        <Image
+        <URIImage
           source={{uri: this.props.horse.getIn(['photosByID', this.props.horse.get('profilePhotoID'), 'uri'])}}
+          style={{width: '100%', height: '100%'}}
         />
       )
     }

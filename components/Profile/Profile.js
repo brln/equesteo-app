@@ -15,7 +15,6 @@ import {
   Clipboard,
   Dimensions,
   FlatList,
-  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -28,6 +27,7 @@ import BuildImage from '../BuildImage'
 import { brand, danger, darkBrand, green } from '../../colors'
 import { logRender, logError, logInfo } from '../../helpers'
 import PhotoFilmstrip from '../Ride/PhotoFilmstrip'
+import URIImage from '../URIImage'
 
 import FabImage from '../FabImage'
 
@@ -134,10 +134,11 @@ export default class Profile extends PureComponent {
           onPress={() => {this.props.showPhotoLightbox(profileSource)}}
           key={"profile"}
         >
-          <Image
+          <URIImage
             style={{width: '100%', height: '100%'}}
             source={profileSource}
             onError={e => logError("Can't load Profile image")}
+            showSource={true}
           />
         </TouchableOpacity>
       )

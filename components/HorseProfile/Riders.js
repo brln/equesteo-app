@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react';
 import {
   Dimensions,
-  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -11,6 +10,7 @@ import {
 import BuildImage from '../BuildImage'
 import { orange } from '../../colors'
 import { logError } from '../../helpers'
+import URIImage from '../URIImage'
 
 const { width } = Dimensions.get('window')
 
@@ -30,7 +30,7 @@ export default class Riders extends PureComponent {
 
     if (rider.get('profilePhotoID')) {
       profileThumb = (
-        <Image
+        <URIImage
           style={styles.thumbnail}
           source={{uri: rider.getIn(['photosByID', rider.get('profilePhotoID'), 'uri'])}}
           onError={e => { logError('there was an error loading Riders image') }}

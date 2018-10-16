@@ -7,7 +7,6 @@ import {
 } from 'native-base';
 import {
   Dimensions,
-  Image,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -15,6 +14,7 @@ import {
 import moment from 'moment'
 import Swiper from 'react-native-swiper';
 
+import URIImage from '../URIImage'
 import { darkGrey } from '../../colors'
 import { logError } from '../../helpers'
 
@@ -122,7 +122,7 @@ export default class HorseCard extends PureComponent {
         const photo = photos.get(id)
         const thisImage = (
           <TouchableOpacity onPress={this.showHorseProfile} style={{flex: 1}} key="map">
-            <Image
+            <URIImage
               style={{height: swiperHeight}}
               key={photo.get('uri')}
               source={{uri: photo.get('uri')}}

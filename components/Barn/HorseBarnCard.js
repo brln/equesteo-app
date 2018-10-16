@@ -1,13 +1,13 @@
 import React, { PureComponent } from 'react';
 import {
   Dimensions,
-  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 
+import URIImage from '../URIImage'
 import BuildImage from '../BuildImage'
 import { black, brand } from '../../colors'
 import { logError } from '../../helpers'
@@ -33,10 +33,11 @@ export default class HorseBarnCard extends PureComponent {
     let horse = this.props.horse
     if (horse.get('profilePhotoID')) {
       horseImage = (
-        <Image
+        <URIImage
           source={{uri: horse.getIn(['photosByID', horse.get('profilePhotoID'), 'uri'])}}
           style={horseImageStyle}
           onError={e => logError("Can't load HorseBarnCard image")}
+          showSource={false}
         />
       )
     }

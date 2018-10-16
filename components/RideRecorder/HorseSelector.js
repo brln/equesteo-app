@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react';
 import {
   Dimensions,
-  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -11,6 +10,7 @@ import {
 import BuildImage from '../BuildImage'
 import { orange } from '../../colors'
 import { logError } from '../../helpers'
+import URIImage from '../URIImage'
 
 const { width } = Dimensions.get('window')
 
@@ -37,7 +37,7 @@ export default class HorseSelector extends PureComponent {
 
     if (horse.get('profilePhotoID')) {
       horseThumb = (
-        <Image
+        <URIImage
           source={{uri: horse.getIn(['photosByID', horse.get('profilePhotoID'), 'uri'])}}
           style={styles.thumbnail}
           onError={(e) => { logError('there was an error loading HorseSelector avatar') }}

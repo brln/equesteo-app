@@ -4,7 +4,6 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  View
 } from 'react-native';
 import { Thumbnail } from 'native-base'
 

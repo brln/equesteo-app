@@ -22,6 +22,7 @@ import BuildImage from '../BuildImage'
 import { brand, darkGrey } from '../../colors'
 import { logError } from '../../helpers'
 import RideImage from './RideImage'
+import URIImage from '../URIImage'
 
 const { width } = Dimensions.get('window')
 
@@ -179,11 +180,12 @@ export default class RideCard extends PureComponent {
         const photo = this.props.ride.getIn(['photosByID', id])
         const thisImage = (
           <TouchableOpacity onPress={this.showRide} style={{flex: 1}} key="map">
-            <Image
+            <URIImage
               style={{height: swiperHeight, width: null}}
               key={photo.get('uri')}
               source={{uri: photo.get('uri')}}
               onError={(e) => { logError('there was an error loading RideCard image') }}
+              showSource={true}
             />
           </TouchableOpacity>
         )
