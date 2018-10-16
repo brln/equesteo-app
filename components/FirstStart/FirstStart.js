@@ -1,10 +1,10 @@
 import React, { PureComponent } from 'react'
 import {
   Dimensions,
-  Image,
   View
 } from 'react-native'
 
+import BuildImage from '../BuildImage'
 import { logRender } from '../../helpers'
 import FinalPage from './FinalPage'
 import FirstHorsePage from './FirstHorsePage'
@@ -96,7 +96,7 @@ export default class FirstStart extends PureComponent {
               flex: 2,
               paddingTop: 20
             }}>
-              <Image
+              <BuildImage
                 source={require('../../img/logo250.png')}
                 style={{
                   width: 60,
@@ -107,7 +107,7 @@ export default class FirstStart extends PureComponent {
               />
             </View>
             <View style={{flex: 3, justifyContent: 'flex-end', backgroundColor: 'white'}}>
-              <Image
+              <BuildImage
                 source={require('../../img/firstStart.jpg')}
                 style={{
                   width,

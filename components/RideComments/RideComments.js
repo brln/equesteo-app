@@ -1,6 +1,5 @@
-import React, { PureComponent } from 'react';
+import React from 'react';
 import {
-  Image,
   KeyboardAvoidingView,
   ScrollView,
   StyleSheet,
@@ -8,9 +7,10 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+
+import BuildImage from '../BuildImage'
 import { logError } from '../../helpers'
 import MultiPlatform from '../../components/MultiPlatform'
-
 import CommentList from './CommentList'
 
 export default class RideComments extends MultiPlatform {
@@ -76,7 +76,7 @@ export default class RideComments extends MultiPlatform {
               style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}
               onPress={this.props.submitComment}
             >
-              <Image
+              <BuildImage
                 style={{height: 50, width: 50}}
                 source={require('../../img/caretRight.png')}
                 onError={(e) => { logError('there was an error loading RideComments image') }}

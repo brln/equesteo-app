@@ -18,6 +18,7 @@ import {
 import moment from 'moment'
 import Swiper from 'react-native-swiper'
 
+import BuildImage from '../BuildImage'
 import { brand, darkGrey } from '../../colors'
 import { logError } from '../../helpers'
 import RideImage from './RideImage'
@@ -259,7 +260,7 @@ export default class RideCard extends PureComponent {
         <CardItem footer>
           <Left>
             <Button transparent onPress={this.toggleCarrot}>
-              <Image
+              <BuildImage
                 source={require('../../img/carrot.png')}
                 style={{height: 20, width: 20}}
               />
@@ -268,7 +269,7 @@ export default class RideCard extends PureComponent {
           </Left>
           <Right>
             <Button transparent onPress={this.showComments}>
-              <Image
+              <BuildImage
                 source={require('../../img/comment.png')}
                 style={{height: 20, width: 20}}
               />

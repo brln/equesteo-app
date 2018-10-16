@@ -2,12 +2,12 @@ import React, { PureComponent } from 'react';
 import MapView from 'react-native-maps';
 
 import {
-  Image,
   StyleSheet,
   TouchableOpacity,
   View
 } from 'react-native';
 
+import BuildImage from '../BuildImage'
 import { bearing, logError, logRender } from '../../helpers'
 
 export default class RidingMap extends PureComponent {
@@ -123,7 +123,7 @@ export default class RidingMap extends PureComponent {
         </View>
         <View style={{position: 'absolute', right: 0, top: 0}} >
           <TouchableOpacity onPress={this.props.tapGPS}>
-            <Image
+            <BuildImage
               source={this.gpsStatusImage()}
               style={{width: 50, height: 50}}
               onError={(e) => { logError('there was an error loading RidingMap image') }}

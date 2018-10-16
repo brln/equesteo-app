@@ -4,7 +4,6 @@ import { Navigation } from 'react-native-navigation'
 
 import {
   Dimensions,
-  Image,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -19,6 +18,7 @@ import {
   RECORDER,
   TRAINING,
 } from '../screens'
+import BuildImage from '../components/BuildImage'
 import { brand, lightGrey } from '../colors'
 import { logRender } from '../helpers'
 
@@ -101,7 +101,7 @@ class DrawerContainer extends Component {
             justifyContent: 'center',
             flexDirection: 'column',
           }}>
-            <Image
+            <BuildImage
               source={require('../img/logo250.png')}
               style={{
                 width: 120,

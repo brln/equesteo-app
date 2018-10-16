@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import URI from 'urijs'
 import {
   Dimensions,
-  Image,
   Linking,
   ScrollView,
   StatusBar,
@@ -21,6 +20,7 @@ import {
   submitLogin,
   submitSignup
 } from '../actions'
+import BuildImage from '../components/BuildImage'
 import ForgotPage from '../components/SignupLogin/ForgotPage'
 import SignupPage from '../components/SignupLogin/SignupPage'
 import LoginPage from '../components/SignupLogin/LoginPage'
@@ -174,7 +174,7 @@ class SignupLoginContainer extends PureComponent {
           >
             <View style={{height: height - StatusBar.currentHeight}}>
               {error}
-              <Image
+              <BuildImage
                 source={require('../img/loginbg3.jpg')}
                 style={{ width, height, resizeMode: 'stretch' }}
               />

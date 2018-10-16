@@ -24,6 +24,7 @@ import {
   View
 } from 'react-native';
 
+import BuildImage from '../BuildImage'
 import { brand, danger, darkBrand, green } from '../../colors'
 import { logRender, logError, logInfo } from '../../helpers'
 import PhotoFilmstrip from '../Ride/PhotoFilmstrip'
@@ -143,10 +144,10 @@ export default class Profile extends PureComponent {
     } else {
       images.push(
         <View style={styles.slide} key={"empty"}>
-          <Image
+          <BuildImage
             style={{width: '100%', height: '100%'}}
             source={require('../../img/emptyProfile.png')}
-            onError={e => logError("Can't load SwipablePhoto image")}
+            onError={e => logError("Can't load empty profile image")}
           />
         </View>
       )

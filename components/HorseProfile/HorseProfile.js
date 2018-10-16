@@ -15,6 +15,7 @@ import {
   View
 } from 'react-native';
 
+import BuildImage from '../BuildImage'
 import { brand, darkBrand } from '../../colors'
 import { logError } from '../../helpers'
 import DeleteModal from '../DeleteModal'
@@ -102,7 +103,7 @@ export default class HorseProfile extends PureComponent {
     } else {
       images.push(
         <View style={styles.slide} key={"empty"}>
-          <Image
+          <BuildImage
             style={{width: '100%', height: '100%'}}
             source={require('../../img/emptyHorse.png')}
             onError={e => logError("Can't load Empty Horse Profile image")}

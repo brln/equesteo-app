@@ -1,13 +1,13 @@
 import React, { PureComponent } from 'react';
 import {
   Dimensions,
-  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 
+import BuildImage from '../BuildImage'
 import { black, brand } from '../../colors'
 import { logError } from '../../helpers'
 
@@ -40,7 +40,7 @@ export default class NewHorseButton extends PureComponent {
             style={{flex: 1}}
           >
             <View style={{flex: 1, alignItems: 'center', paddingBottom: 5}}>
-              <Image
+              <BuildImage
                 source={source}
                 style={{height: calcWidth, width: calcWidth, margin: 10}}
                 onError={e => logError("Can't load NewHorseButton image")}
