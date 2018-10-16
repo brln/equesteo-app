@@ -11,11 +11,12 @@ import {
   View
 } from 'react-native'
 
+import BuildImage from '../BuildImage'
 import { brand } from '../../colors'
 import { logRender } from '../../helpers'
 import Button from '../Button'
 
-const { height, width } = Dimensions.get('window')
+const { width } = Dimensions.get('window')
 
 export default class FirstHorsePhoto extends PureComponent {
   constructor () {
@@ -53,7 +54,12 @@ export default class FirstHorsePhoto extends PureComponent {
         <Text style={{textAlign: 'center', textDecorationLine: 'underline', color: "black", fontSize: 10}}>No, thanks.</Text>
       </TouchableOpacity>
     )
-    let source = require('../../img/emptyHorse.png')
+    let horseProfileImage = (
+      <BuildImage
+        style={{width: '100%', height: '100%'}}
+        source={require('../../img/emptyHorse.png')}
+      />
+    )
 
     if (this.props.horse.get('profilePhotoID')) {
       button = (
@@ -64,7 +70,11 @@ export default class FirstHorsePhoto extends PureComponent {
         />
       )
       skip = null
-      source = {uri: this.props.horse.getIn(['photosByID', this.props.horse.get('profilePhotoID'), 'uri'])}
+      horseProfileImage = (
+        <Image
+          source={{uri: this.props.horse.getIn(['photosByID', this.props.horse.get('profilePhotoID'), 'uri'])}}
+        />
+      )
     }
 
     return (
@@ -80,12 +90,9 @@ export default class FirstHorsePhoto extends PureComponent {
           </Text>
         </View>
         <View style={{flex: 1, alignItems: 'center'}}>
-          <View style={{paddingTop: 30, paddingLeft: 10, paddingRight: 10, width: width * .66, height: width * .66}}>
+          <View style={{paddingTop: 30, paddingLeft: 10, paddingRight: 10, width: width * .5, height: width * .5}}>
             <View style={{borderColor: brand, borderWidth: 5, backgroundColor: 'white'}}>
-              <Image
-                style={{width: '100%', height: '100%'}}
-                source={source}
-              />
+              { horseProfileImage }
             </View>
           </View>
           <View style={{paddingTop: 20}}>

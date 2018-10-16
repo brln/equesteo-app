@@ -10,11 +10,12 @@ import {
   View
 } from 'react-native'
 
+import BuildImage from '../BuildImage'
 import { brand } from '../../colors'
 import { logRender } from '../../helpers'
 import Button from '../Button'
 
-const { height, width } = Dimensions.get('window')
+const { width } = Dimensions.get('window')
 
 export default class ProfilePhotoPage extends PureComponent {
   constructor () {
@@ -46,7 +47,12 @@ export default class ProfilePhotoPage extends PureComponent {
         <Text style={{fontSize: 10, textAlign: 'center', textDecorationLine: 'underline'}}>No, thanks.</Text>
       </TouchableOpacity>
     )
-    let source = require('../../img/emptyProfile.png')
+    let profilePhoto = (
+      <BuildImage
+        source={require('../../img/emptyProfile.png')}
+        style={{width: '100%', height: '100%'}}
+      />
+    )
 
     if (this.props.user.get('profilePhotoID')) {
       button = (
@@ -57,7 +63,13 @@ export default class ProfilePhotoPage extends PureComponent {
         />
       )
       skip = null
-      source = {uri: this.props.user.getIn(['photosByID', this.props.user.get('profilePhotoID'), 'uri'])}
+      profilePhoto = (
+        <Image
+          source={{uri: this.props.user.getIn(['photosByID', this.props.user.get('profilePhotoID'), 'uri'])}}
+          style={{width: '100%', height: '100%'}}
+        />
+      )
+
     }
 
     return (
@@ -73,12 +85,9 @@ export default class ProfilePhotoPage extends PureComponent {
           </Text>
         </View>
         <View style={{flex: 1, alignItems: 'center'}}>
-          <View style={{paddingTop: 30, paddingLeft: 10, paddingRight: 10, width: width * .66, height: width * .66}}>
+          <View style={{paddingTop: 30, paddingLeft: 10, paddingRight: 10, width: width * .5, height: width * .5}}>
             <View style={{borderColor: brand, borderWidth: 5, backgroundColor: 'white'}}>
-              <Image
-                style={{width: '100%', height: '100%'}}
-                source={source}
-              />
+              { profilePhoto }
             </View>
           </View>
           <View style={{paddingTop: 20}}>

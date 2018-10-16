@@ -8,6 +8,7 @@ import {
   View
 } from 'react-native';
 
+import BuildImage from '../BuildImage'
 import { orange } from '../../colors'
 import { logError } from '../../helpers'
 
@@ -20,9 +21,21 @@ export default class Riders extends PureComponent {
   }
 
   thumbnail (rider) {
-    let source = require('../../img/emptyProfile.png')
+    let profileThumb = (
+      <BuildImage
+        style={styles.thumbnail}
+        source={require('../../img/emptyProfile.png')}
+      />
+    )
+
     if (rider.get('profilePhotoID')) {
-      source = {uri: rider.getIn(['photosByID', rider.get('profilePhotoID'), 'uri'])}
+      profileThumb = (
+        <Image
+          style={styles.thumbnail}
+          source={{uri: rider.getIn(['photosByID', rider.get('profilePhotoID'), 'uri'])}}
+          onError={e => { logError('there was an error loading Riders image') }}
+        />
+      )
     }
     return (
       <TouchableOpacity
@@ -30,12 +43,7 @@ export default class Riders extends PureComponent {
         style={{marginRight: 5}}
         onPress={this.props.showRiderProfile(rider)}
       >
-        <Image
-          square
-          style={styles.thumbnail}
-          source={source}
-          onError={(e) => { logError('there was an error loading Riders image') }}
-        />
+        { profileThumb }
         <View style={{
           position: 'absolute',
           alignItems: 'center',

@@ -8,6 +8,7 @@ import {
   View
 } from 'react-native';
 
+import BuildImage from '../BuildImage'
 import { orange } from '../../colors'
 import { logError } from '../../helpers'
 
@@ -27,9 +28,22 @@ export default class HorseSelector extends PureComponent {
   }
 
   thumbnail (horse, style) {
-    let source = require('../../img/emptyHorseBlack.png')
+    let horseThumb = (
+      <BuildImage
+        source={require('../../img/emptyHorseBlack.png')}
+        style={styles.thumbnail}
+      />
+    )
+
     if (horse.get('profilePhotoID')) {
-      source = {uri: horse.getIn(['photosByID', horse.get('profilePhotoID'), 'uri'])}
+      horseThumb = (
+        <Image
+          source={{uri: horse.getIn(['photosByID', horse.get('profilePhotoID'), 'uri'])}}
+          style={styles.thumbnail}
+          onError={(e) => { logError('there was an error loading HorseSelector avatar') }}
+        />
+      )
+
     }
     return (
       <TouchableOpacity
@@ -37,12 +51,7 @@ export default class HorseSelector extends PureComponent {
         style={[style, {marginRight: 5}]}
         onPress={this.changeHorseID(horse.get('_id'))}
       >
-        <Image
-          square
-          style={styles.thumbnail}
-          source={source}
-          onError={(e) => { logError('there was an error loading HorseSelector avatar') }}
-        />
+        { horseThumb }
         <View style={{
           position: 'absolute',
           alignItems: 'center',
@@ -83,11 +92,6 @@ export default class HorseSelector extends PureComponent {
         style={[noneStyle, {marginRight: 5}]}
         onPress={this.changeHorseID(null)}
       >
-        <Image
-          square
-          style={styles.thumbnail}
-          onError={(e) => { logError('there was an error loading HorseSelector thumbnail') }}
-        />
         <View style={{
           position: 'absolute',
           alignItems: 'center',
