@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import {
   Image,
+  Text,
   View
 } from 'react-native'
 import BuildImage from './BuildImage'
@@ -48,12 +49,16 @@ export default class URIIImage extends PureComponent {
 
   mainImage () {
     let mainImage
-    if (this.props.error) {
+    if (this.state.error) {
       mainImage = (
-        <BuildImage
-          source={require('../img/error.png')}
-          style={{width: '50%', height: '50%'}}
-        />
+        <View style={{height: '100%', width: '100%', padding: 5, justifyContent: 'center', alignItems: 'center'}}>
+          <BuildImage
+            source={require('../img/error.png')}
+            style={{width: 30, height: 30}}
+          />
+          <Text style={{textAlign: 'center'}}>Could not load Image</Text>
+        </View>
+
       )
     } else {
       mainImage = (
