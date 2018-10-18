@@ -10,6 +10,7 @@ import kalmanFilter from './services/Kalman'
 import { simplifyLine } from './services/DouglasPeucker'
 
 import {
+  appStates,
   haversine,
   logError,
   logInfo,
@@ -23,6 +24,7 @@ import { DRAWER, FEED, SIGNUP_LOGIN } from './screens'
 import { LocalStorage, PouchCouch, UserAPI } from './services'
 import {BadRequestError, NotConnectedError, UnauthorizedError} from "./errors"
 import {
+  AWAIT_FULL_SYNC,
   CLEAR_FEED_MESSAGE,
   CLEAR_LAST_LOCATION,
   CLEAR_PAUSED_LOCATIONS,
@@ -62,6 +64,8 @@ import {
   SET_ACTIVE_COMPONENT,
   SET_FEED_MESSAGE,
   SET_FULL_SYNC_FAIL,
+  SET_POP_SHOW_RIDE,
+  SHOW_POP_SHOW_RIDE,
   START_RIDE,
   SYNC_COMPLETE,
   TOGGLE_AWAITING_PW_CHANGE,
@@ -70,6 +74,12 @@ import {
   USER_UPDATED,
   USER_SEARCH_RETURNED,
 } from './constants'
+
+export function awaitFullSync () {
+  return {
+    type: AWAIT_FULL_SYNC
+  }
+}
 
 export function clearFeedMessage () {
   return {
@@ -254,6 +264,20 @@ function receiveJWT (token) {
   }
 }
 
+export function setPopShowRide (rideID, showRideNow) {
+  return {
+    type: SET_POP_SHOW_RIDE,
+    rideID,
+    showRideNow,
+  }
+}
+
+export function showPopShowRide () {
+  return {
+    type: SHOW_POP_SHOW_RIDE,
+  }
+}
+
 export function setRemotePersistStarted () {
   return {
     type: REMOTE_PERSIST_STARTED
@@ -434,8 +458,8 @@ export function appInitialized () {
     await dispatch(tryToLoadLocalState())
     dispatch(startActiveComponentListener())
     dispatch(dismissError())
-    dispatch(findLocalToken())
     dispatch(checkFCMPermission())
+    dispatch(findLocalToken())
     dispatch(startNetworkTracking())
     dispatch(startAppStateTracking())
   }
@@ -464,23 +488,15 @@ export function getPWCode (email) {
 }
 
 export function getFCMToken () {
-  return async (dispatch, getState) => {
+  return async (dispatch) => {
     let fcmToken
     try {
       fcmToken = await firebase.messaging().getToken();
     } catch (e) {
-      logError(e)
+      logInfo('no token available')
     }
-    const currentUserID = getState().getIn(['main', 'localState', 'userID'])
-    const localUser = getState().getIn(['main', 'users', currentUserID])
-    if (fcmToken && localUser) {
-      if (fcmToken !== localUser.get('fcmToken')) {
-        dispatch(updateUser(localUser.set('fcmToken', fcmToken)))
-      } else {
-        logInfo('Token unchanged')
-      }
-    } else {
-      logError('cant get FCM token or user for some reason')
+    if (fcmToken) {
+      dispatch(setFCMTokenOnServer(fcmToken))
     }
   }
 }
@@ -500,33 +516,7 @@ export function checkFCMPermission () {
   }
 }
 
-export function exchangePWCode (email, code) {
-  return async (dispatch) => {
-    let userAPI = new UserAPI()
-    try {
-      const resp = await userAPI.exchangePWCodeForToken(email, code)
-      dispatch(dismissError())
-      const token = resp.token
-      const userID = resp.id
-      const following = resp.following
-      const followers = resp.followers
-      const pouchCouch = new PouchCouch(token)
-      dispatch(toggleAwaitingPasswordChange())
-      await pouchCouch.localReplicateDB('all', [...following, userID], followers)
-      dispatch(receiveJWT(resp.token))
-      dispatch(saveUserID(resp.id))
-      dispatch(setSentryUserContext())
-      await dispatch(loadLocalData())
-      dispatch(getFCMToken())
-      await LocalStorage.saveToken(resp.token, resp.id);
-    } catch (e) {
-      logError(e)
-      if (e instanceof UnauthorizedError) {
-        dispatch(errorOccurred(e.message))
-      }
-    }
-  }
-}
+
 
 export function changeRidePhotoData(rideID, photoID, uri) {
   return async (dispatch, getState) => {
@@ -556,6 +546,21 @@ export function changeUserPhotoData (photoID, uri) {
     }
     user = user.setIn(['photosByID', photoID], Map({timestamp, uri}))
     dispatch(updateUser(user))
+  }
+}
+
+function configureBackgroundGeolocation () {
+  return async () => {
+    logInfo('configuring geolocation')
+    BackgroundGeolocation.configure({
+      desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
+      locationProvider: BackgroundGeolocation.RAW_PROVIDER,
+      distanceFilter: 0,
+      maxLocations: 10,
+      interval: 0,
+      notificationTitle: 'You\'re out on a ride.',
+      notificationText: 'Tap here to see your progress.',
+    });
   }
 }
 
@@ -648,6 +653,7 @@ export function createRide (rideData) {
 
     dispatch(rideElevationsCreated(Map({...elevationData, _rev: elevationDoc.rev})))
     dispatch(rideCreated(Map({...theRide, _rev: rideDoc.rev})))
+    dispatch(setPopShowRide(theRide._id, true))
     dispatch(needsRemotePersist('rides'))
   }
 }
@@ -694,7 +700,7 @@ export function createFollow (followingID) {
     const doc = await pouchCouch.saveUser(found.toJS())
     await dispatch(followUpdated(found.set('_rev', doc.rev)))
     dispatch(needsRemotePersist('users'))
-    dispatch(syncDBPull('all'))
+    dispatch(syncDBPull())
   }
 }
 
@@ -728,6 +734,36 @@ export function deleteHorseUser (horseID, userID) {
     await dispatch(horseUserUpdated(theHorseUser.set('_rev', doc.rev)))
     dispatch(needsRemotePersist('horses'))
 
+  }
+}
+
+export function exchangePWCode (email, code) {
+  return async (dispatch) => {
+    let userAPI = new UserAPI()
+    try {
+      const resp = await userAPI.exchangePWCodeForToken(email, code)
+      dispatch(dismissError())
+      const token = resp.token
+      const userID = resp.id
+      const following = resp.following
+      const followers = resp.followers
+      const pouchCouch = new PouchCouch(token)
+      dispatch(toggleAwaitingPasswordChange())
+      await pouchCouch.localReplicateDB('all', [...following, userID], followers)
+      dispatch(receiveJWT(resp.token))
+      dispatch(saveUserID(resp.id))
+      dispatch(setSentryUserContext())
+      await dispatch(loadLocalData())
+      dispatch(startListeningFCMTokenRefresh())
+      dispatch(getFCMToken())
+      dispatch(startListeningFCM())
+      await LocalStorage.saveToken(resp.token, resp.id);
+    } catch (e) {
+      logError(e)
+      if (e instanceof UnauthorizedError) {
+        dispatch(errorOccurred(e.message))
+      }
+    }
   }
 }
 
@@ -794,6 +830,8 @@ function findLocalToken () {
       dispatch(setSentryUserContext())
       dispatch(switchRoot(FEED))
       await dispatch(loadLocalData())
+      dispatch(startListeningFCMTokenRefresh())
+      dispatch(getFCMToken())
       dispatch(startListeningFCM())
       dispatch(syncDBPull('all'))
     } else {
@@ -902,6 +940,19 @@ export function saveHorse (horse) {
   }
 }
 
+export function setFCMTokenOnServer (token) {
+  return async (_, getState) => {
+    try {
+      const jwt = getState().getIn(['main', 'localState', 'jwt'])
+      const userAPI = new UserAPI(jwt)
+      const currentUserID = getState().getIn(['main', 'localState', 'userID'])
+      await userAPI.setFCMToken(currentUserID, token)
+    } catch (e) {
+      logError('Could not set FCM token')
+    }
+  }
+}
+
 export function signOut () {
   return async(dispatch) => {
     await LocalStorage.deleteToken()
@@ -986,20 +1037,7 @@ export function startLocationTracking () {
   }
 }
 
-function configureBackgroundGeolocation () {
-  return async () => {
-    logInfo('configuring geolocation')
-    BackgroundGeolocation.configure({
-      desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
-      locationProvider: BackgroundGeolocation.RAW_PROVIDER,
-      distanceFilter: 0,
-      maxLocations: 10,
-      interval: 0,
-      notificationTitle: 'You\'re out on a ride.',
-      notificationText: 'Tap here to see your progress.',
-    });
-  }
-}
+
 
 function startNetworkTracking () {
   return async (dispatch) => {
@@ -1018,27 +1056,32 @@ function startNetworkTracking () {
 function startListeningFCM () {
   return async (dispatch, getState) => {
     PushNotification.configure({
-      onNotification: (notification) => {
-        alert('clicked')
+      onNotification: async () => {
+        await dispatch(syncDBPull())
+        dispatch(showPopShowRide())
       }
     })
-    firebase.messaging().onTokenRefresh((m) => {
-      logInfo('token refresh handler')
-      logInfo(m)
-    })
+
     firebase.messaging().onMessage(async (m) => {
       const userID = m._data.userID
       const distance = parseFloat(m._data.distance)
+      const rideID = m._data.rideID
       const user = getState().getIn(['main', 'users']).get(userID)
       const message = `${user.get('firstName')} went for a ${distance.toFixed(1)} mile ride!`
-      await dispatch(syncDBPull('rides'))
+      dispatch(awaitFullSync())
+      dispatch(setPopShowRide(rideID, false))
+      await dispatch(syncDBPull())
       PushNotification.localNotification({
         message: message,
       })
     })
-    firebase.notifications().onNotificationOpened((m) => {
-      logInfo('notification opened')
-      logInfo(m)
+  }
+}
+
+function startListeningFCMTokenRefresh () {
+  return async (dispatch, getState) => {
+    firebase.messaging().onTokenRefresh(async (newToken) => {
+      dispatch(setFCMTokenOnServer(newToken))
     })
   }
 }
@@ -1063,7 +1106,9 @@ export function stopLocationTracking () {
 
 function stopListeningFCM () {
   return async () => {
+    // maybe delete token on server here?
     await firebase.iid().deleteToken('373350399276', 'GCM')
+    firebase.messaging().onTokenRefresh(() => {})
   }
 }
 
@@ -1094,7 +1139,9 @@ export function submitLogin (email, password) {
       dispatch(saveUserID(resp.id))
       dispatch(setSentryUserContext())
       await dispatch(loadLocalData())
+      dispatch(startListeningFCMTokenRefresh())
       dispatch(getFCMToken())
+      dispatch(startListeningFCM())
       await LocalStorage.saveToken(resp.token, resp.id);
     } catch (e) {
       if (e instanceof UnauthorizedError) {
@@ -1124,7 +1171,9 @@ export function submitSignup (email, password) {
       dispatch(saveUserID(resp.id))
       dispatch(setSentryUserContext())
       await dispatch(loadLocalData())
+      dispatch(startListeningFCMTokenRefresh())
       dispatch(getFCMToken())
+      dispatch(startListeningFCM())
     } catch (e) {
       if (e instanceof BadRequestError) {
         dispatch(errorOccurred(e.message))
@@ -1133,8 +1182,14 @@ export function submitSignup (email, password) {
   }
 }
 
-export function syncDBPull (db) {
+export function syncDBPull () {
   return async (dispatch, getState) => {
+    logInfo('action syncDBPull')
+    dispatch(setFeedMessage(Map({
+      message: 'Loading New Rides',
+      color: warning,
+      timeout: null
+    })))
     const jwt = getState().getIn(['main', 'localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
     const userID = getState().getIn(['main', 'localState', 'userID'])
@@ -1153,9 +1208,14 @@ export function syncDBPull (db) {
     following.push(userID)
     try {
       dispatch(setFullSyncFail(false))
-      await pouchCouch.localReplicateDB(db, following, followers)
+      await pouchCouch.localReplicateDB('all', following, followers)
       await dispatch(loadLocalData())
       dispatch(syncComplete())
+      dispatch(setFeedMessage(Map({
+        message: 'All Rides Loaded!',
+        color: green,
+        timeout: 3000
+      })))
     } catch (e) {
       dispatch(setFeedMessage(Map({
         message: 'Error Fetching Data',

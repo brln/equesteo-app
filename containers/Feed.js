@@ -107,8 +107,14 @@ class FeedContainer extends PureComponent {
   }
 
   componentDidUpdate () {
-    if (this.props.popShowRide) {
-      this.showRide(this.props.rides.get(this.props.popShowRide))
+    if (this.props.popShowRideNow && !this.props.awaitingFullSync) {
+      const showRide = this.props.rides.get(this.props.popShowRide)
+      if (showRide) {
+        // PushNotification.showNotification gets called when it shouldn't if the app reboots unexpectedly.
+        // This makes popShowRideNow get set when it shouldn't, so make sure we have a ride to show here.
+        this.showRide(showRide)
+
+      }
       this.props.dispatch(popShowRideShown())
     }
     if (this.props.user && (!this.state.firstStartPopped && !this.props.user.get('finishedFirstStart'))) {
@@ -176,7 +182,7 @@ class FeedContainer extends PureComponent {
     this.setState({
       refreshing: true
     })
-    this.props.dispatch(syncDBPull('all'))
+    this.props.dispatch(syncDBPull())
   }
 
   toggleCarrot (rideID) {
@@ -265,6 +271,7 @@ function mapStateToProps (state) {
   const localState = mainState.get('localState')
   const userID = localState.get('userID')
   return {
+    awaitingFullSync: localState.get('awaitingFullSync'),
     feedMessage: localState.get('feedMessage'),
     follows: mainState.get('follows'),
     fullSyncFail: localState.get('fullSyncFail'),
@@ -273,6 +280,7 @@ function mapStateToProps (state) {
     justFinishedRide: localState.get('justFinishedRide'),
     lastFullSync: localState.get('lastFullSync'),
     popShowRide: localState.get('popShowRide'),
+    popShowRideNow: localState.get('popShowRideNow'),
     rides: mainState.get('rides'),
     rideCarrots: mainState.get('rideCarrots'),
     rideComments: mainState.get('rideComments'),

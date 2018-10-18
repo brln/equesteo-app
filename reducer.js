@@ -1,5 +1,6 @@
 import { fromJS, List, Map } from 'immutable'
 import {
+  AWAIT_FULL_SYNC,
   CLEAR_FEED_MESSAGE,
   CLEAR_LAST_LOCATION,
   CLEAR_PAUSED_LOCATIONS,
@@ -42,6 +43,8 @@ import {
   SET_ACTIVE_COMPONENT,
   SET_FEED_MESSAGE,
   SET_FULL_SYNC_FAIL,
+  SET_POP_SHOW_RIDE,
+  SHOW_POP_SHOW_RIDE,
   START_RIDE,
   TOGGLE_AWAITING_PW_CHANGE,
   TOGGLE_DOING_INITIAL_LOAD,
@@ -63,6 +66,7 @@ export const initialState = Map({
     activeComponent: null,
     appState: appStates.active,
     awaitingPWChange: false,
+    awaitingFullSync: false,
     clearStateAfterPersist: false,
     currentScreen: FEED,
     currentRide: null,
@@ -85,6 +89,7 @@ export const initialState = Map({
     pausedCachedCoordinates: List(),
     photoQueue: Map(),
     popShowRide: null,
+    popShowRideNow: null,
     refiningLocation: null,
     remotePersistActive: false,
     root: SIGNUP_LOGIN,
@@ -104,6 +109,8 @@ export const initialState = Map({
 
 export default function AppReducer(state=initialState, action) {
   switch (action.type) {
+    case AWAIT_FULL_SYNC:
+      return state.setIn(['localState', 'awaitingFullSync'], true)
     case CLEAR_FEED_MESSAGE:
       return state.setIn(['localState', 'feedMessage'], null)
     case CLEAR_LAST_LOCATION:
@@ -148,9 +155,19 @@ export default function AppReducer(state=initialState, action) {
     case PAUSE_LOCATION_TRACKING:
       return state.setIn(['localState', 'locationTrackingPaused'], true)
     case POP_SHOW_RIDE_SHOWN:
-      return state.setIn(['localState', 'popShowRide'], null)
+      return state.setIn(
+        ['localState', 'popShowRide'], null
+      ).setIn(
+        ['localState', 'popShowRideNow'], null
+      )
+
     case LOAD_LOCAL_STATE:
-      return state.set('localState', action.localState).setIn(['localState', 'feedMessage'], null)
+      return state.set(
+        'localState', action.localState
+      ).setIn(
+        ['localState', 'feedMessage'],
+        null
+      )
     case LOCAL_DATA_LOADED:
       const allUsers = action.localData.users.reduce((accum, user) => {
         accum[user._id] = fromJS(user)
@@ -279,16 +296,13 @@ export default function AppReducer(state=initialState, action) {
             toElevationKey(action.elevation.get('longitude')),
           ], action.elevation.get('elevation')
         )
-        const getRidOfMe = newState.setIn(
+        return newState.setIn(
           ['localState', 'currentRide'],
           newCurrentRide
         ).setIn(
           ['localState', 'currentRideElevations'],
           newRideElevations
         )
-        console.log(getRidOfMe.getIn(['localState', 'currentRide', 'rideCoordinates']).toJSON())
-        console.log(getRidOfMe.getIn(['localState', 'currentRideElevations']).toJSON())
-        return getRidOfMe
       } else if (currentRide && currentlyPaused) {
         const newRideElevations =
           currentElevations.setIn(
@@ -457,8 +471,6 @@ export default function AppReducer(state=initialState, action) {
       return state.setIn(
         ['rides', action.ride.get('_id')], action.ride
       ).setIn(
-        ['localState', 'popShowRide'], action.ride.get('_id')
-      ).setIn(
         ['localState', 'currentRide'], null
       )
     case RIDE_ELEVATIONS_CREATED:
@@ -477,6 +489,16 @@ export default function AppReducer(state=initialState, action) {
       return state.setIn(
         ['localState', 'feedMessage'], action.message
       )
+    case SET_POP_SHOW_RIDE:
+      return state.setIn(
+        ['localState', 'popShowRide'], action.rideID
+      ).setIn(
+        ['localState', 'popShowRideNow'], action.showRideNow
+      )
+    case SHOW_POP_SHOW_RIDE:
+      return state.setIn(
+        ['localState', 'popShowRideNow'], true
+      )
     case START_RIDE:
       return state.setIn(
         ['localState', 'currentRide'],
@@ -486,7 +508,11 @@ export default function AppReducer(state=initialState, action) {
         action.currentElevations
       )
     case SYNC_COMPLETE:
-      return state.setIn(['localState', 'lastFullSync'], new Date())
+      return state.setIn(
+        ['localState', 'lastFullSync'], new Date()
+      ).setIn(
+        ['localState', 'awaitingFullSync'], false
+      )
     case TOGGLE_AWAITING_PW_CHANGE:
       return state.setIn(
         ['localState', 'awaitingPWChange'],

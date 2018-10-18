@@ -41,5 +41,6 @@ export default function start () {
   Navigation.events().registerAppLaunchedListener(async () => {
     await store.dispatch(appInitialized())
   })
+  return store
 }
 

@@ -55,8 +55,6 @@ export default class Ride extends PureComponent {
   }
 
   parseElevationData (rideCoordinates, rideElevations) {
-    console.log(rideCoordinates.toJSON())
-    console.log(rideElevations.toJSON())
     let totalDistance = 0
     let totalGain = 0
     let lastPoint = null
@@ -91,7 +89,6 @@ export default class Ride extends PureComponent {
         // @TODO: put the gain chart in
       }
     }
-    console.log(points)
     return points
   }
 

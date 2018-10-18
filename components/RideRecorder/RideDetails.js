@@ -134,6 +134,7 @@ export default class RideDetails extends PureComponent {
               </CardItem>
               <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20}}>
                 <TextInput
+                  selectTextOnFocus={true}
                   style={{width: '100%', height: 50, padding: 10, borderColor: darkBrand, borderWidth: 1}}
                   value={this.props.ride.get('name')}
                   onChangeText={this.changeRideName}
