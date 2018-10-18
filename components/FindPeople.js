@@ -9,7 +9,6 @@ import {
   View,
 } from 'react-native'
 import {
-  Button,
   Header,
   Icon,
   Input,

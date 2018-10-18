@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 
 import URIImage from './URIImage'
-import { orange } from '../colors'
+import { darkGrey, orange } from '../colors'
 
 const { width } = Dimensions.get('window')
 
@@ -31,12 +31,12 @@ export default class PhotosByTimestamp extends Component {
         style={styles.photoThumbnail}
         onPress={this.changeProfilePhoto(photoID)}
       >
-        <URIImage
-          style={{width: '100%', height: '100%'}}
-          source={source}
-          onError={e => logError("Can't load Profile image")}
-          showSource={true}
-        />
+        <View style={{borderColor: darkGrey, borderWidth: 2, width: width / 3.5, height: width / 3.5}}>
+          <URIImage
+            source={source}
+            style={{width: '100%', height: '100%'}}
+          />
+        </View>
       </TouchableOpacity>
     )
   }
