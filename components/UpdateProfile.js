@@ -141,6 +141,7 @@ export default class UpdateProfile extends PureComponent {
                     value={this.props.user.get('firstName')}
                     ref={(i) => this.inputs['firstName'] = i}
                     onSubmitEditing={this.moveToLastName}
+                    maxLength={200}
                   />
                 </CardItem>
 
@@ -156,6 +157,7 @@ export default class UpdateProfile extends PureComponent {
                     value={this.props.user.get('lastName')}
                     ref={(i) => this.inputs['lastName'] = i}
                     onSubmitEditing={this.moveToAboutMe}
+                    maxLength={200}
                   />
                 </CardItem>
 
@@ -171,6 +173,7 @@ export default class UpdateProfile extends PureComponent {
                     onChangeText={this.changeAboutMe}
                     value={this.props.user.get('aboutMe')}
                     ref={(i) => this.inputs['aboutMe'] = i}
+                    maxLength={2000}
                   />
                 </CardItem>
               </Card>

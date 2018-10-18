@@ -70,6 +70,7 @@ export default class FirstHorsePage extends PureComponent {
                 backgroundColor: 'transparent',
                 height: 50,
               }}
+              maxLength={200}
             />
 
             <Text style={{fontSize: 12}}>Breed</Text>
@@ -84,6 +85,7 @@ export default class FirstHorsePage extends PureComponent {
                 backgroundColor: 'transparent',
                 height: 50,
               }}
+              maxLength={200}
             />
           </View>
 

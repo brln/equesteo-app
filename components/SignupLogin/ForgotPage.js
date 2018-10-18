@@ -87,6 +87,7 @@ export default class ForgotPage extends PureComponent {
           returnKeyType="send"
           underlineColorAndroid="black"
           value={this.state.email}
+          maxLength={200}
         />
       </View>
     )
@@ -107,6 +108,7 @@ export default class ForgotPage extends PureComponent {
           returnKeyType="send"
           underlineColorAndroid="black"
           value={this.state.resetCode}
+          maxLength={30}
         />
       </View>
     )
@@ -130,6 +132,7 @@ export default class ForgotPage extends PureComponent {
           underlineColorAndroid="black"
           secureTextEntry={true}
           value={this.state.pw1}
+          maxLength={200}
         />
         <Text>Password Again:</Text>
         <TextInput
@@ -140,6 +143,7 @@ export default class ForgotPage extends PureComponent {
           ref={(i) => this.inputs['pw2'] = i}
           underlineColorAndroid="black"
           value={this.state.pw2}
+          maxLength={200}
         />
       </View>
     )

@@ -70,6 +70,7 @@ export default class RideComments extends MultiPlatform {
                 onChangeText={this.props.updateNewComment}
                 value={this.props.newComment}
                 underlineColorAndroid={'transparent'}
+                maxLength={2000}
               />
             </View>
             <TouchableOpacity

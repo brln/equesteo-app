@@ -139,6 +139,7 @@ export default class RideDetails extends PureComponent {
                   value={this.props.ride.get('name')}
                   onChangeText={this.changeRideName}
                   underlineColorAndroid={'transparent'}
+                  maxLength={500}
                 />
               </CardItem>
             </Card>
@@ -177,6 +178,7 @@ export default class RideDetails extends PureComponent {
                   multiline={true}
                   numberOfLines={3}
                   underlineColorAndroid="transparent"
+                  maxLength={5000}
                 />
               </CardItem>
             </Card>

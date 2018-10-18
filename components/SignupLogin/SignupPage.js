@@ -84,6 +84,7 @@ export default class SignupPage extends PureComponent {
           returnKeyType="next"
           ref={(i) => this.inputs['email'] = i}
           underlineColorAndroid="black"
+          maxLength={200}
         />
         <Text>Password:</Text>
         <TextInput
@@ -95,6 +96,7 @@ export default class SignupPage extends PureComponent {
           returnKeyType="next"
           underlineColorAndroid="black"
           secureTextEntry={true}
+          maxLength={200}
         />
         <Text>Password Again:</Text>
         <TextInput
@@ -104,6 +106,7 @@ export default class SignupPage extends PureComponent {
           onChangeText={this.changePassword2}
           ref={(i) => this.inputs['pw2'] = i}
           underlineColorAndroid="black"
+          maxLength={200}
         />
         <View style={styles.switchup}>
           <TouchableOpacity onPress={this.props.showLogin}>

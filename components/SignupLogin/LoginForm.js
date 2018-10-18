@@ -23,6 +23,7 @@ export default class LoginForm extends MultiPlatform {
           onSubmitEditing={this.props.moveToPassword}
           ref={(i) => this.props.inputs['email'] = i}
           underlineColorAndroid="black"
+          maxLength={200}
         />
         <Text>Password:</Text>
         <TextInput
@@ -32,6 +33,7 @@ export default class LoginForm extends MultiPlatform {
           secureTextEntry={true}
           ref={(i) => this.props.inputs['password'] = i}
           underlineColorAndroid="black"
+          maxLength={200}
         />
       </View>
     )
@@ -53,6 +55,7 @@ export default class LoginForm extends MultiPlatform {
             height: 50,
             paddingLeft: 20
           }}
+          maxLength={200}
         />
         <TextInput
           autoCapitalize={'none'}
@@ -68,6 +71,7 @@ export default class LoginForm extends MultiPlatform {
             marginBottom: 20,
             paddingLeft: 20
           }}
+          maxLength={200}
         />
       </View>
     )

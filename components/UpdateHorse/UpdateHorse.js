@@ -333,6 +333,7 @@ export default class UpdateHorse extends PureComponent {
                     value={this.props.horse.get('name')}
                     onChangeText={this.changeHorseName}
                     underlineColorAndroid={'transparent'}
+                    maxLength={200}
                   />
                 </CardItem>
 
@@ -354,6 +355,7 @@ export default class UpdateHorse extends PureComponent {
                     multiline={true}
                     numberOfLines={3}
                     underlineColorAndroid="transparent"
+                    maxLength={5000}
                   />
                 </CardItem>
               </Card>
@@ -387,6 +389,7 @@ export default class UpdateHorse extends PureComponent {
                     value={this.props.horse.get('breed')}
                     onChangeText={this.changeHorseBreed}
                     underlineColorAndroid={'transparent'}
+                    maxLength={500}
                   />
                 </CardItem>
 
