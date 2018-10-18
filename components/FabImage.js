@@ -1,11 +1,11 @@
 import React from 'react';
-import { Image } from 'react-native'
 
 import { logError } from '../helpers'
+import BuildImage from './BuildImage'
 
 export default function FabImage (props) {
   return (
-    <Image
+    <BuildImage
       source={props.source}
       style={{width: props.width, height: props.height}}
       onError={() => logError("Can't load FabImage")}

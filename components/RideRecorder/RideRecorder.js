@@ -16,13 +16,38 @@ import RideStats from './RideStats'
 export default class RideRecorder extends PureComponent {
   constructor (props) {
     super(props)
+    this.state = {
+      gpsTaps: 0,
+      showCircles: false
+    }
+    this.tapGPS = this.tapGPS.bind(this)
+  }
+
+  tapGPS () {
+    if (this.state.gpsTaps === 5) {
+      this.setState({
+        gpsTaps: 0,
+        showCircles: true
+      })
+    } else {
+      this.setState({
+        gpsTaps: this.state.gpsTaps + 1,
+        showCircles: false
+      })
+    }
   }
 
   render() {
     let rideStats = null
     let gpsBar = null
     if (this.props.showGPSBar) {
-      gpsBar = <GPSStatus style={styles.gpsBar} lastLocation={this.props.lastLocation} />
+      gpsBar = (
+        <GPSStatus
+          style={styles.gpsBar}
+          lastLocation={this.props.lastLocation}
+          tapGPS={this.tapGPS}
+        />
+      )
     }
     let startButton = (
       <View style={styles.startButton}>
@@ -33,17 +58,21 @@ export default class RideRecorder extends PureComponent {
       startButton = null
       rideStats = (
         <View style={{flex: 1}}>
-          <View style={{flex: 3}}>
+          <View style={{flex: 5}}>
             <RidingMap
-              mode={"duringRide"}
+              refiningLocation={this.props.refiningLocation}
               rideCoords={this.props.currentRide.get('rideCoordinates')}
+              showCircles={this.state.showCircles}
+              tapGPS={this.tapGPS}
               lastLocation={this.props.lastLocation}
             />
           </View>
           <View style={styles.bottomSection}>
             <RideStats
               appState={this.props.appState}
+              currentRideElevations={this.props.currentRideElevations}
               distance={this.props.currentRide.get('distance')}
+              lastElevation={this.props.lastElevation}
               moving={this.props.moving}
               rideCoords={this.props.currentRide.get('rideCoordinates')}
               startTime={this.props.currentRide.get('startTime')}
@@ -84,7 +113,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden'
   },
   bottomSection: {
-    flex: 1,
+    flex: 3,
   },
   rideComplete: {
     backgroundColor: brand,

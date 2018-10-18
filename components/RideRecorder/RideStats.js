@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import memoizeOne from 'memoize-one';
 
 import { darkGrey, lightGrey } from '../../colors'
-import { haversine } from '../../helpers'
+import { metersToFeet } from '../../helpers'
 
 const initialState = {
   starting: null,
@@ -16,10 +16,12 @@ export default class RideStats extends PureComponent {
     this.avgSpeed = this.avgSpeed.bind(this)
     this.state = { ...initialState }
     this.elapsedAsString = this.elapsedAsString.bind(this)
+    this.currentAltitude = this.currentAltitude.bind(this)
     this.currentSpeed = this.currentSpeed.bind(this)
     this.timeToString = this.timeToString.bind(this)
 
     this.memoAvgSpeed = memoizeOne(this.avgSpeed)
+    this.memoCurrentAltitude = memoizeOne(this.currentAltitude)
     this.memoCurrentSpeed = memoizeOne(this.currentSpeed)
     this.memoTimeToString = memoizeOne(this.timeToString)
   }
@@ -43,24 +45,30 @@ export default class RideStats extends PureComponent {
   }
 
   currentSpeed (rideCoords) {
-    let speed = '0.0'
-    if (this.props.moving) {
-      const secondToLast = rideCoords.get(-2)
-      const last = rideCoords.get(-1)
-      if (secondToLast && last) {
-        const distance = haversine(
-          secondToLast.get('latitude'),
-          secondToLast.get('longitude'),
-          last.get('latitude'),
-          last.get('longitude')
-        )
-        const hours = ((last.get('timestamp') / 1000) - (secondToLast.get('timestamp') / 1000)) / 60 / 60
-        if (hours > 0 && distance > 0) {
-          speed = (distance / hours).toFixed(1).toString()
-        }
+    const last = rideCoords.get(-1)
+    if (last) {
+      const found = last.get('speed')
+      if (found || found === 0) {
+        return (last.get('speed') * 2.236936).toFixed(1)
+      } else {
+        return '-'
       }
+    } else {
+      return '0.0'
     }
-    return speed
+  }
+
+  currentAltitude (rideCoords, last) {
+    if (last) {
+      const found = last.get('elevation')
+      if (found) {
+        return Math.round(metersToFeet(last.get('elevation')))
+      } else {
+        return '-'
+      }
+    } else {
+      return '0'
+    }
   }
 
   componentDidMount() {
@@ -109,12 +117,16 @@ export default class RideStats extends PureComponent {
           <View style={[styles.statBox, {borderTopWidth: 2, borderBottomWidth: 1, borderRightWidth: 1, borderLeftWidth: 2}]}>
             <Text style={styles.statName}>Distance</Text>
             <Text style={styles.statFont}>
-              {this.props.distance.toFixed(2).toString()} <Text style={styles.unitsFont}>mi</Text>
+              {this.props.distance.toFixed(2)} <Text style={styles.unitsFont}>mi</Text>
             </Text>
           </View>
           <View style={[styles.statBox, {borderTopWidth: 1, borderBottomWidth: 2, borderRightWidth: 1, borderLeftWidth: 2}]}>
             <Text style={styles.statName}>Current Speed</Text>
             <Text style={styles.statFont}>{this.memoCurrentSpeed(this.props.rideCoords)} <Text style={styles.unitsFont}>mi/h</Text></Text>
+          </View>
+          <View style={[styles.statBox, {borderTopWidth: 1, borderBottomWidth: 2, borderRightWidth: 1, borderLeftWidth: 2}]}>
+            <Text style={styles.statName}>Altitude</Text>
+            <Text style={styles.statFont}>{this.memoCurrentAltitude(this.props.rideCoords, this.props.lastElevation)} <Text style={styles.unitsFont}>ft</Text></Text>
           </View>
         </View>
         <View style={{flex: 1}}>
@@ -126,6 +138,12 @@ export default class RideStats extends PureComponent {
             <Text style={styles.statName}>Avg. Speed</Text>
             <Text style={styles.statFont}>
               {this.memoAvgSpeed(this.state.elapsedTime, this.props.distance)} <Text style={styles.unitsFont}>mi/h</Text>
+            </Text>
+          </View>
+          <View style={[styles.statBox, {borderTopWidth: 1, borderBottomWidth: 2, borderRightWidth: 2, borderLeftWidth: 1}]}>
+            <Text style={styles.statName}>Elevation Gain</Text>
+            <Text style={styles.statFont}>
+              {Math.round(metersToFeet(this.props.currentRideElevations.get('elevationGain')))} <Text style={styles.unitsFont}>ft</Text>
             </Text>
           </View>
         </View>

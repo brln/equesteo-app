@@ -1,6 +1,8 @@
 import moment from 'moment'
 import { Platform } from 'react-native'
 
+import { simplifyLine } from './services/DouglasPeucker'
+
 const toRad = (deg) => {
   return deg * Math.PI / 180;
 }
@@ -20,7 +22,7 @@ export const haversine = (lat1, lon1, lat2, lon2) => {
     Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
     Math.sin(dLon/2) * Math.sin(dLon/2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
+  return Number((R * c).toFixed(6));
 }
 
 export const bearing = (lat1,lng1,lat2,lng2) => {
@@ -72,22 +74,16 @@ export function staticMap (ride) {
       maptype: 'terrain',
   }
   const pathStyle = 'color:0xff0000ff|weight:5'
-  const toSimplify = ride.rideCoordinates.map((coord) => {
-    return {
-      lat: coord.get('latitude'),
-      lng: coord.get('longitude')
-    }
-  }).toJS()
 
   let tolerance = 0.00006
   let lengthURL = false
   let fullURL
   while (!lengthURL || lengthURL > 6000) {
-    const simplified = simplifyLine(tolerance, toSimplify)
+    const simplified = simplifyLine(tolerance, ride.rideCoordinates)
     let pathCoords = ''
     for (let coord of simplified) {
-      const parsedLat = coord.lat.toString()
-      const parsedLong = coord.lng.toString()
+      const parsedLat = coord.get('latitude').toString()
+      const parsedLong = coord.get('longitude').toString()
       pathCoords += `|${parsedLat},${parsedLong}`
     }
 
@@ -100,92 +96,6 @@ export function staticMap (ride) {
   return fullURL
 }
 
-function simplifyLine (tolerance, points) {
-  // stolen from https://gist.github.com/adammiller/826148
-  let res = null;
-
-  if(points.length){
-    class Line {
-      constructor(p1, p2 ) {
-        this.p1 = p1;
-        this.p2 = p2;
-      }
-
-      distanceToPoint ( point ) {
-        // slope
-        let m = ( this.p2.lat - this.p1.lat ) / ( this.p2.lng - this.p1.lng ),
-          // y offset
-          b = this.p1.lat - ( m * this.p1.lng ),
-          d = [];
-        // distance to the linear equation
-        d.push( Math.abs( point.lat - ( m * point.lng ) - b ) / Math.sqrt( Math.pow( m, 2 ) + 1 ) );
-        // distance to p1
-        d.push( Math.sqrt( Math.pow( ( point.lng - this.p1.lng ), 2 ) + Math.pow( ( point.lat - this.p1.lat ), 2 ) ) );
-        // distance to p2
-        d.push( Math.sqrt( Math.pow( ( point.lng - this.p2.lng ), 2 ) + Math.pow( ( point.lat - this.p2.lat ), 2 ) ) );
-        // return the smallest distance
-        return d.sort( function( a, b ) {
-          return ( a - b ); //causes an array to be sorted numerically and ascending
-        } )[0];
-      };
-    };
-
-    let douglasPeucker = function( points, tolerance ) {
-      if ( points.length <= 2 ) {
-        return [points[0]];
-      }
-      let returnPoints = [],
-        // make line from start to end
-        line = new Line( points[0], points[points.length - 1] ),
-        // find the largest distance from intermediate points to this line
-        maxDistance = 0,
-        maxDistanceIndex = 0,
-        p;
-      for( let i = 1; i <= points.length - 2; i++ ) {
-        let distance = line.distanceToPoint( points[ i ] );
-        if( distance > maxDistance ) {
-          maxDistance = distance;
-          maxDistanceIndex = i;
-        }
-      }
-      // check if the max distance is greater than our tolerance allows
-      if ( maxDistance >= tolerance ) {
-        p = points[maxDistanceIndex];
-        line.distanceToPoint( p, true );
-        // include this point in the output
-        returnPoints = returnPoints.concat(
-          douglasPeucker(
-            points.slice(
-              0,
-              maxDistanceIndex + 1
-            ),
-            tolerance
-          )
-        )
-        // returnPoints.push( points[maxDistanceIndex] );
-        returnPoints = returnPoints.concat(
-          douglasPeucker(
-            points.slice(
-              maxDistanceIndex,
-              points.length
-            ),
-            tolerance
-          )
-        );
-      } else {
-        // ditching this point
-        p = points[maxDistanceIndex];
-        line.distanceToPoint( p, true );
-        returnPoints = [points[0]];
-      }
-      return returnPoints;
-    };
-    res = douglasPeucker( points, tolerance );
-    // always have to push the very last point on so it doesn't get left off
-    res.push( points[points.length - 1 ] );
-  }
-  return res;
-}
 
 export const connectionType = {
   none: 'none',
@@ -271,9 +181,17 @@ export function logInfo (info) {
 }
 
 export function logRender (componentName) {
-  console.log('rendering: ' + componentName)
+  logInfo('rendering: ' + componentName)
 }
 
 export function isAndroid () {
   return Platform.OS === 'android'
+}
+
+export function toElevationKey (coord) {
+  return coord.toFixed(4)
+}
+
+export function metersToFeet(meters) {
+  return meters * 3.28084
 }

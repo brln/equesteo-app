@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import {
-  Image,
   Text,
   View
 } from 'react-native';
 
+import BuildImage from './BuildImage'
 import { logError } from '../helpers'
 
 export default function Stat (props) {
@@ -12,7 +12,7 @@ export default function Stat (props) {
     <View style={{flex: 1}}>
       <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
         <View style={{flex: 1, paddingRight: 10}}>
-          <Image
+          <BuildImage
             source={props.imgSrc}
             style={[{flex: 1, height: null, width: null, resizeMode: 'contain'}, props.imgStyle]}
             onError={e => logError("Can't load Stat image")}

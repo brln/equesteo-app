@@ -1,6 +1,6 @@
 import { fromJS, List, Map } from 'immutable'
-import { green, warning, danger } from './colors'
 import {
+  AWAIT_FULL_SYNC,
   CLEAR_FEED_MESSAGE,
   CLEAR_LAST_LOCATION,
   CLEAR_PAUSED_LOCATIONS,
@@ -24,8 +24,6 @@ import {
   NEW_APP_STATE,
   NEW_LOCATION,
   NEW_NETWORK_STATE,
-  NOT_MOVING,
-  NOW_MOVING,
   PAUSE_LOCATION_TRACKING,
   POP_SHOW_RIDE_SHOWN,
   RECEIVE_JWT,
@@ -39,9 +37,14 @@ import {
   RIDE_CARROT_CREATED,
   RIDE_CARROT_SAVED,
   RIDE_CREATED,
+  RIDE_ELEVATIONS_CREATED,
   RIDE_SAVED,
   SAVE_USER_ID,
   SET_ACTIVE_COMPONENT,
+  SET_FEED_MESSAGE,
+  SET_FULL_SYNC_FAIL,
+  SET_POP_SHOW_RIDE,
+  SHOW_POP_SHOW_RIDE,
   START_RIDE,
   TOGGLE_AWAITING_PW_CHANGE,
   TOGGLE_DOING_INITIAL_LOAD,
@@ -53,7 +56,8 @@ import {
 import {
   appStates,
   goodConnection,
-  haversine
+  haversine,
+  toElevationKey
 } from './helpers'
 import { FEED, SIGNUP_LOGIN } from './screens'
 
@@ -62,14 +66,18 @@ export const initialState = Map({
     activeComponent: null,
     appState: appStates.active,
     awaitingPWChange: false,
+    awaitingFullSync: false,
     clearStateAfterPersist: false,
     currentScreen: FEED,
     currentRide: null,
+    currentRideElevations: null,
     doingInitialLoad: false,
     error: null,
     feedMessage: null,
+    fullSyncFail: false,
     goodConnection: false,
     jwt: null,
+    lastElevation: null,
     lastLocation: null,
     locationTrackingPaused: false,
     moving: false,
@@ -81,6 +89,7 @@ export const initialState = Map({
     pausedCachedCoordinates: List(),
     photoQueue: Map(),
     popShowRide: null,
+    popShowRideNow: null,
     refiningLocation: null,
     remotePersistActive: false,
     root: SIGNUP_LOGIN,
@@ -94,15 +103,24 @@ export const initialState = Map({
   rides: Map(),
   rideCarrots: Map(),
   rideComments: Map(),
+  rideElevations: Map(),
   users: Map(),
 })
 
 export default function AppReducer(state=initialState, action) {
   switch (action.type) {
+    case AWAIT_FULL_SYNC:
+      return state.setIn(['localState', 'awaitingFullSync'], true)
     case CLEAR_FEED_MESSAGE:
       return state.setIn(['localState', 'feedMessage'], null)
     case CLEAR_LAST_LOCATION:
-      return state.setIn(['localState', 'lastLocation'], null)
+      return state.setIn(
+        ['localState', 'lastLocation'],
+        null
+      ).setIn(
+        ['localState', 'refiningLocation'],
+        null
+      )
     case CLEAR_PAUSED_LOCATIONS:
       return state.setIn(['localState', 'pausedCachedCoordinates'], List())
     case CLEAR_SEARCH:
@@ -126,6 +144,8 @@ export default function AppReducer(state=initialState, action) {
       return state.setIn(['localState', 'error'], action.message)
     case FOLLOW_UPDATED:
       return state.setIn(['follows', action.follow.get('_id')], action.follow)
+    case SET_FULL_SYNC_FAIL:
+      return state.setIn(['localState', 'fullSyncFail'], action.status)
     case HORSE_CREATED:
       return state.set('horses', state.get('horses').set(action.horse.get('_id'), action.horse))
     case HORSE_SAVED:
@@ -135,9 +155,19 @@ export default function AppReducer(state=initialState, action) {
     case PAUSE_LOCATION_TRACKING:
       return state.setIn(['localState', 'locationTrackingPaused'], true)
     case POP_SHOW_RIDE_SHOWN:
-      return state.setIn(['localState', 'popShowRide'], null)
+      return state.setIn(
+        ['localState', 'popShowRide'], null
+      ).setIn(
+        ['localState', 'popShowRideNow'], null
+      )
+
     case LOAD_LOCAL_STATE:
-      return state.set('localState', action.localState).setIn(['localState', 'feedMessage'], null)
+      return state.set(
+        'localState', action.localState
+      ).setIn(
+        ['localState', 'feedMessage'],
+        null
+      )
     case LOCAL_DATA_LOADED:
       const allUsers = action.localData.users.reduce((accum, user) => {
         accum[user._id] = fromJS(user)
@@ -174,12 +204,18 @@ export default function AppReducer(state=initialState, action) {
         return accum
       }, {})
 
+      const allRideElevations = action.localData.rideElevations.reduce((accum, elevation) => {
+        accum[elevation._id] = fromJS(elevation)
+        return accum
+      }, {})
+
       return state.merge(Map({
         users: Map(allUsers),
         follows: Map(allFollows),
         rides: Map(allRides),
         rideCarrots: Map(allCarrots),
         rideComments: Map(allComments),
+        rideElevations: Map(allRideElevations),
         horses: Map(allHorses),
         horseUsers: Map(allHorseUsers)
       }))
@@ -204,13 +240,6 @@ export default function AppReducer(state=initialState, action) {
       return state.setIn(
         ['localState', 'needsRemotePersist', action.database],
         true
-      ).setIn(
-        ['localState', 'feedMessage'],
-        Map({
-          message: 'Data Needs to Upload',
-          color: warning,
-          timeout: false
-        })
       )
     case NEW_APP_STATE:
       return state.setIn(['localState', 'appState'], action.newState)
@@ -221,19 +250,28 @@ export default function AppReducer(state=initialState, action) {
       ).setIn(
         ['localState', 'refiningLocation'],
         action.location
+      ).setIn(
+        ['localState', 'lastElevation'],
+        action.elevation
       )
       const currentRide = state.getIn(['localState', 'currentRide'])
+      const currentElevations = state.getIn(['localState', 'currentRideElevations'])
       const currentlyPaused = state.getIn(['localState', 'locationTrackingPaused'])
-      if (currentRide && !currentlyPaused) {
+
+      if (currentRide && currentElevations && !currentlyPaused) {
         let newDistance = 0
+        let elevationGain = 0
         const lastLocation = state.getIn(['localState', 'lastLocation'])
-        if (lastLocation) {
+        const lastElevation = state.getIn(['localState', 'lastElevation'])
+        if (lastLocation && lastElevation) {
           newDistance = haversine(
             lastLocation.get('latitude'),
             lastLocation.get('longitude'),
             action.location.get('latitude'),
             action.location.get('longitude')
           )
+          const elevationChange = action.elevation.get('elevation') - lastElevation.get('elevation')
+          elevationGain = elevationChange >= 0 ? elevationChange : 0
         }
         const rideCoordinates = state.getIn(
           ['localState', 'currentRide', 'rideCoordinates']
@@ -243,9 +281,36 @@ export default function AppReducer(state=initialState, action) {
           return new Date(a.timestamp) - new Date(b.timestamp);
         })
         const totalDistance = currentRide.get('distance') + newDistance
-        const newCurrentRide = currentRide.merge(Map({rideCoordinates, distance: totalDistance}))
-        return newState.setIn(['localState', 'currentRide'], newCurrentRide)
+        const totalElevationGain = currentElevations.get('elevationGain') + elevationGain
+        const newCurrentRide = currentRide.merge(Map({
+          rideCoordinates,
+          distance: totalDistance,
+        }))
+        const newRideElevations =
+          currentElevations.set(
+            'elevationGain',
+            totalElevationGain
+          ).setIn([
+            'elevations',
+            toElevationKey(action.elevation.get('latitude')),
+            toElevationKey(action.elevation.get('longitude')),
+          ], action.elevation.get('elevation')
+        )
+        return newState.setIn(
+          ['localState', 'currentRide'],
+          newCurrentRide
+        ).setIn(
+          ['localState', 'currentRideElevations'],
+          newRideElevations
+        )
       } else if (currentRide && currentlyPaused) {
+        const newRideElevations =
+          currentElevations.setIn(
+            ['elevations',
+              toElevationKey(action.elevation.get('latitude')),
+              toElevationKey(action.elevation.get('longitude')),
+            ], action.elevation.get('elevation')
+          )
         const pausedCoordinates = state.getIn(
           ['localState', 'pausedCachedCoordinates']
         ).push(
@@ -256,6 +321,9 @@ export default function AppReducer(state=initialState, action) {
         return newState.setIn(
           ['localState', 'pausedCachedCoordinates'],
           pausedCoordinates
+        ).setIn(
+          ['localState', 'currentRideElevations'],
+          newRideElevations
         )
       } else {
         return newState
@@ -268,10 +336,6 @@ export default function AppReducer(state=initialState, action) {
           action.effectiveConnectionType
         )
       )
-    case NOT_MOVING:
-      return state.setIn(['localState', 'moving'], false)
-    case NOW_MOVING:
-      return state.setIn(['localState', 'moving'], true)
     case RECEIVE_JWT:
       return state.setIn(['localState', 'jwt'], action.token)
     case REMOTE_PERSIST_COMPLETE:
@@ -284,39 +348,17 @@ export default function AppReducer(state=initialState, action) {
       ).valueSeq().filter(x => x).count() === 0
       if (allDone) {
         dbSwitched = dbSwitched.setIn(
-          ['localState', 'feedMessage'],
-          Map({
-            message: 'All Data Uploaded',
-            color: green,
-            timeout: 3000
-          })
-        ).setIn(
-            ['localState', 'remotePersistActive'],
-            false
-          )
-        }
+          ['localState', 'remotePersistActive'],
+          false
+        )}
       return dbSwitched
     case REMOTE_PERSIST_ERROR:
       return state.setIn(
-        ['localState', 'feedMessage'],
-        Map({
-          message: 'Can\'t Upload Data',
-          color: danger,
-          timeout: false
-        })
-      ).setIn(
         ['localState', 'remotePersistActive'],
         false
       )
     case REMOTE_PERSIST_STARTED:
       return state.setIn(
-        ['localState', 'feedMessage'],
-        Map({
-          message: 'Data Uploading',
-          color: warning,
-          timeout: false
-        })
-      ).setIn(
         ['localState', 'remotePersistActive'],
         true
       )
@@ -324,16 +366,37 @@ export default function AppReducer(state=initialState, action) {
       return state.remove(action.rideID)
     case REPLACE_LAST_LOCATION:
       const oldLastLocation = state.getIn(['localState', 'lastLocation'])
-      let replacedLastLocation = state.setIn(['localState', 'lastLocation'], action.newLocation)
+      let replacedLastLocation = state.setIn(
+        ['localState', 'lastLocation'],
+        action.newLocation
+      ).setIn(
+        ['localState', 'lastElevation'],
+        action.newElevation
+      )
       const currentRide1 = state.getIn(['localState', 'currentRide'])
       if (currentRide1) {
         const rideCoords = currentRide1.get('rideCoordinates')
         if (rideCoords.count() === 1) {
           return replacedLastLocation.setIn(
+            ['localState', 'currentRideElevations', 'elevationGain'],
+            0
+          ).setIn(
+            ['localState', 'currentRideElevations', 'elevations'],
+            Map()
+          ).setIn([
+            'localState',
+            'currentRideElevations',
+            'elevations',
+            toElevationKey(action.newElevation.get('latitude')),
+            toElevationKey(action.newElevation.get('longitude'))
+            ], action.newElevation.get('elevation')
+          ).setIn(
             ['localState', 'currentRide', 'rideCoordinates'],
             List().push(action.newLocation)
           )
         } else if (rideCoords.count() > 1 && oldLastLocation) {
+          const rideElevations = state.getIn(['localState', 'currentRideElevations', 'elevations'])
+          const oldElevationTotalGain = state.getIn(['localState', 'currentRideElevations', 'elevationGain'])
           const lastCoord = rideCoords.get(-2)
           const oldDistance = haversine(
             oldLastLocation.get('latitude'),
@@ -341,12 +404,27 @@ export default function AppReducer(state=initialState, action) {
             lastCoord.get('latitude'),
             lastCoord.get('longitude')
           )
+          const lastElevation = rideElevations.get(
+            toElevationKey(lastCoord.get('latitude'))
+          ).get(
+            toElevationKey(lastCoord.get('longitude'))
+          )
+          const oldLastElevation = rideElevations.get(
+            toElevationKey(oldLastLocation.get('latitude'))
+          ).get(
+            toElevationKey(oldLastLocation.get('longitude'))
+          )
           const newDistance = haversine(
             lastCoord.get('latitude'),
             lastCoord.get('longitude'),
             action.newLocation.get('latitude'),
             action.newLocation.get('longitude')
           )
+          const oldElevationChange = oldLastElevation - lastElevation
+          const oldElevationGain = oldElevationChange >= 0 ? oldElevationChange : 0
+
+          const newElevationChange = action.newElevation.get('elevation') - lastElevation
+          const newElevationGain = newElevationChange >= 0 ? newElevationChange : 0
           const newRideCoordinates = replacedLastLocation.getIn(
             ['localState', 'currentRide', 'rideCoordinates']
           ).pop().push(
@@ -358,12 +436,25 @@ export default function AppReducer(state=initialState, action) {
           const totalDistance = currentRide1.get('distance')
             - oldDistance
             + newDistance
+          const totalChange = oldElevationTotalGain - oldElevationGain + newElevationGain
           return replacedLastLocation.setIn(
             ['localState', 'currentRide', 'distance'],
             totalDistance
           ).setIn(
             ['localState', 'currentRide', 'rideCoordinates'],
             newRideCoordinates
+          ).setIn(
+            ['localState', 'currentRideElevations', 'elevationGain'],
+            totalChange
+          ).setIn(
+            [
+              'localState',
+              'currentRideElevations',
+              'elevations',
+              toElevationKey(action.newElevation.get('latitude')),
+              toElevationKey(action.newElevation.get('longitude')),
+            ],
+            action.newElevation.get('elevation')
           )
         }
       }
@@ -380,10 +471,10 @@ export default function AppReducer(state=initialState, action) {
       return state.setIn(
         ['rides', action.ride.get('_id')], action.ride
       ).setIn(
-        ['localState', 'popShowRide'], action.ride.get('_id')
-      ).setIn(
         ['localState', 'currentRide'], null
       )
+    case RIDE_ELEVATIONS_CREATED:
+      return state.setIn(['rideElevations', action.elevationData.get('_id')], action.elevationData)
     case RIDE_SAVED:
       return state.setIn(['rides', action.ride.get('_id')], action.ride)
     case SAVE_USER_ID:
@@ -394,10 +485,34 @@ export default function AppReducer(state=initialState, action) {
       return state.setIn(
         ['localState', 'activeComponent'], action.componentID
       )
+    case SET_FEED_MESSAGE:
+      return state.setIn(
+        ['localState', 'feedMessage'], action.message
+      )
+    case SET_POP_SHOW_RIDE:
+      return state.setIn(
+        ['localState', 'popShowRide'], action.rideID
+      ).setIn(
+        ['localState', 'popShowRideNow'], action.showRideNow
+      )
+    case SHOW_POP_SHOW_RIDE:
+      return state.setIn(
+        ['localState', 'popShowRideNow'], true
+      )
     case START_RIDE:
-      return state.setIn(['localState', 'currentRide'], action.currentRide)
+      return state.setIn(
+        ['localState', 'currentRide'],
+        action.currentRide
+      ).setIn(
+        ['localState', 'currentRideElevations'],
+        action.currentElevations
+      )
     case SYNC_COMPLETE:
-      return state.setIn(['localState', 'lastFullSync'], new Date())
+      return state.setIn(
+        ['localState', 'lastFullSync'], new Date()
+      ).setIn(
+        ['localState', 'awaitingFullSync'], false
+      )
     case TOGGLE_AWAITING_PW_CHANGE:
       return state.setIn(
         ['localState', 'awaitingPWChange'],

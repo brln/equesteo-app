@@ -1,13 +1,14 @@
 import React, { PureComponent } from 'react';
 import {
   Dimensions,
-  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 
+import URIImage from '../URIImage'
+import BuildImage from '../BuildImage'
 import { black, brand } from '../../colors'
 import { logError } from '../../helpers'
 
@@ -21,10 +22,24 @@ export default class HorseBarnCard extends PureComponent {
   }
 
   render() {
-    let source = require('../../img/emptyHorseBlack.png')
+    let horseImageStyle = {height: calcWidth, width: calcWidth, margin: 10}
+    let horseImage = (
+      <BuildImage
+        source={require('../../img/emptyHorseBlack.png')}
+        style={horseImageStyle}
+      />
+    )
+
     let horse = this.props.horse
     if (horse.get('profilePhotoID')) {
-      source = {uri: horse.getIn(['photosByID', horse.get('profilePhotoID'), 'uri'])}
+      horseImage = (
+        <URIImage
+          source={{uri: horse.getIn(['photosByID', horse.get('profilePhotoID'), 'uri'])}}
+          style={horseImageStyle}
+          onError={e => logError("Can't load HorseBarnCard image")}
+          showSource={false}
+        />
+      )
     }
 
     return (
@@ -52,11 +67,7 @@ export default class HorseBarnCard extends PureComponent {
             style={{flex: 1}}
           >
             <View style={{flex: 1, alignItems: 'center', paddingBottom: 5}}>
-              <Image
-                source={source}
-                style={{height: calcWidth, width: calcWidth, margin: 10}}
-                onError={e => logError("Can't load HorseBarnCard image")}
-              />
+              { horseImage }
               <View style={{
                 position: 'absolute',
                 alignItems: 'center',

@@ -7,7 +7,6 @@ import {
 } from 'native-base';
 import {
   Dimensions,
-  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -15,6 +14,7 @@ import {
   View
 } from 'react-native';
 
+import BuildImage from '../BuildImage'
 import { brand, darkBrand } from '../../colors'
 import { logError } from '../../helpers'
 import DeleteModal from '../DeleteModal'
@@ -23,6 +23,7 @@ import FabImage from '../FabImage'
 import TrainingCard from './TrainingCard'
 import Stat from '../Stat'
 import PhotoFilmstrip from "../Ride/PhotoFilmstrip"
+import URIImage from '../URIImage'
 
 const { height } = Dimensions.get('window')
 
@@ -92,17 +93,18 @@ export default class HorseProfile extends PureComponent {
           style={styles.slide}
           onPress={() => this.props.showPhotoLightbox(profileSource)}
         >
-          <Image
+          <URIImage
             style={{width: '100%', height: '100%'}}
             source={profileSource}
             onError={e => logError("Can't load HorseProfile image")}
+            showSource={true}
           />
         </TouchableOpacity>
       )
     } else {
       images.push(
         <View style={styles.slide} key={"empty"}>
-          <Image
+          <BuildImage
             style={{width: '100%', height: '100%'}}
             source={require('../../img/emptyHorse.png')}
             onError={e => logError("Can't load Empty Horse Profile image")}

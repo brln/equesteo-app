@@ -166,6 +166,7 @@ class RideContainer extends PureComponent {
         ride={this.props.ride}
         rideHorseOwnerID={this.rideHorseOwnerID()}
         rideUser={this.props.rideUser}
+        rideElevations={this.props.rideElevations}
         showFullscreenMap={this.showFullscreenMap}
         showHorseProfile={this.showHorseProfile}
         showPhotoLightbox={this.showPhotoLightbox}
@@ -180,11 +181,13 @@ function mapStateToProps (state, passedProps) {
   const mainState = state.get('main')
   const localState = mainState.get('localState')
   const ride = mainState.getIn(['rides', passedProps.rideID])
+  const rideElevations = mainState.getIn(['rideElevations', passedProps.rideID + '_elevations'])
   const userID = localState.get('userID')
   return {
     horses: mainState.get('horses'),
     horseUsers: mainState.get('horseUsers'),
     ride,
+    rideElevations,
     rideUser: mainState.getIn(['users', ride.get('userID')]),
     userID
   }

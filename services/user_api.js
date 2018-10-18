@@ -36,6 +36,10 @@ export default class UserAPI {
     return await this.apiClient.post('/users/exchangePWCode', { email, code })
   }
 
+  async setFCMToken (id, token) {
+    return await this.apiClient.post('/users/setFCMToken', { id, token })
+  }
+
   _uploadProfilePhoto (imageLocation, photoID) {
     return this.apiClient.uploadImage('/users/profilePhoto', photoID, imageLocation)
   }

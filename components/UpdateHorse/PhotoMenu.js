@@ -2,14 +2,13 @@ import React, { PureComponent } from 'react';
 import {
   BackHandler,
   Dimensions,
-  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-
+import BuildImage from '../BuildImage'
 
 const { width } = Dimensions.get('window')
 
@@ -41,7 +40,7 @@ export default class PhotoMenu extends PureComponent {
               <TouchableOpacity style={{flex: 1, paddingTop: 20}} onPress={this.props.changeProfilePhotoID}>
                 <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
                   <View style={{flex: 1}}>
-                    <Image
+                    <BuildImage
                       source={require('../../img/selectImage.png')}
                       style={{flex: 1, height: null, width: null, resizeMode: 'contain'}}
                     />
@@ -54,7 +53,7 @@ export default class PhotoMenu extends PureComponent {
               <TouchableOpacity style={{flex: 1, paddingTop: 20, paddingBottom: 20}} onPress={this.props.deletePhoto}>
                 <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
                   <View style={{flex: 1}}>
-                    <Image
+                    <BuildImage
                       source={require('../../img/deleteImage.png')}
                       style={{flex: 1, height: null, width: null, resizeMode: 'contain'}}
                     />

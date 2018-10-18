@@ -38,7 +38,6 @@ export default storeToCouch = store => dispatch => action => {
 
 function recursiveEmptyQueue (db, store, pouchCouch) {
   savingRemotely = true
-
   remotePersist(db, store, pouchCouch)
 }
 
@@ -69,9 +68,9 @@ function remotePersist (db, store, pouchCouch) {
     } catch (e) { logError(e) }
 
 
-    logInfo('Remote replication error follows ============================')
+    logError('Remote replication error follows ============================')
     logError(e)
-    logInfo('=============================================================')
+    logError('=============================================================')
 
     queue = []
     savingRemotely = false

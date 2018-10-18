@@ -65,7 +65,6 @@ export default class PouchCouch {
       case 'users':
         return this.remoteReplicateUsers()
       default:
-        debugger
         throw('Remote DB not found')
     }
   }
@@ -96,9 +95,9 @@ export default class PouchCouch {
       case 'users':
         return this.localReplicateUsers([...userIDs, ...followerUserIDs]).catch(e => {})
       case 'all':
-        const rideReplicate = this.localReplicateRides(userIDs, followerUserIDs).catch(e => {})
-        const userReplicate = this.localReplicateUsers([...userIDs, ...followerUserIDs]).catch(e => {})
-        const horsesReplicate = this.localReplicateHorses([...userIDs, ...followerUserIDs]).catch(e => {})
+        const rideReplicate = this.localReplicateRides(userIDs, followerUserIDs)
+        const userReplicate = this.localReplicateUsers([...userIDs, ...followerUserIDs])
+        const horsesReplicate = this.localReplicateHorses([...userIDs, ...followerUserIDs])
         return Promise.all([rideReplicate, horsesReplicate, userReplicate])
       default:
         throw('Local DB not found')
@@ -121,6 +120,7 @@ export default class PouchCouch {
       ).on('complete', () => {
         resolve()
       }).on('error', (e) => {
+        logError('localReplicateRides')
         logError(e)
         reject()
       })
@@ -138,6 +138,7 @@ export default class PouchCouch {
       ).on('complete', () => {
           resolve()
       }).on('error', (e) => {
+        logError('localReplicateUsers')
         logError(e)
         reject()
       })
@@ -169,14 +170,17 @@ export default class PouchCouch {
         ).on('complete', () => {
           resolve()
         }).on('error', (e) => {
+          logError('localReplicateHorses')
           logError(e)
           reject()
         })
+      }).catch((e) => {
+        logError('localReplicateHorses allJoins error')
+        logError(e)
+        reject()
       })
     })
   }
-
-
 
   async deleteLocalDBs () {
     await this.localHorsesDB.destroy()
@@ -203,6 +207,7 @@ export default class PouchCouch {
       follows: userDocs.filter(u => u.type === 'follow'),
       rideCarrots: rideDocs.filter(r => r.type === 'carrot'),
       rideComments: rideDocs.filter(r => r.type === 'comment'),
+      rideElevations: rideDocs.filter(r => r.type === 'rideElevations'),
       rides: rideDocs.filter(r => r.type === 'ride'),
       users: userDocs.filter(u => u.type === 'user')
     }

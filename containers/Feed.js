@@ -13,6 +13,7 @@ import Feed from '../components/Feed/Feed'
 import { logRender } from '../helpers'
 import {
   FIND_PEOPLE,
+  FIRST_START,
   HORSE_PROFILE,
   PROFILE,
   RIDE_COMMENTS,
@@ -53,7 +54,8 @@ class FeedContainer extends PureComponent {
     super(props)
     this.state = {
       refreshing: false,
-      lastFullSync: null
+      lastFullSync: null,
+      firstStartPopped: false,
     }
     this.clearFeedMessage = this.clearFeedMessage.bind(this)
     this.filteredHorses = this.filteredHorses.bind(this)
@@ -94,7 +96,7 @@ class FeedContainer extends PureComponent {
   static getDerivedStateFromProps (nextProps, prevState) {
     const nextState = {}
     nextState.lastFullSync = nextProps.lastFullSync
-    if (prevState.lastFullSync !== nextProps.lastFullSync) {
+    if (prevState.lastFullSync !== nextProps.lastFullSync || nextProps.fullSyncFail) {
       nextState.refreshing = false
     }
     return nextState
@@ -105,9 +107,21 @@ class FeedContainer extends PureComponent {
   }
 
   componentDidUpdate () {
-    if (this.props.popShowRide) {
-      this.showRide(this.props.rides.get(this.props.popShowRide))
+    if (this.props.popShowRideNow && !this.props.awaitingFullSync) {
+      const showRide = this.props.rides.get(this.props.popShowRide)
+      if (showRide) {
+        // PushNotification.showNotification gets called when it shouldn't if the app reboots unexpectedly.
+        // This makes popShowRideNow get set when it shouldn't, so make sure we have a ride to show here.
+        this.showRide(showRide)
+
+      }
       this.props.dispatch(popShowRideShown())
+    }
+    if (this.props.user && (!this.state.firstStartPopped && !this.props.user.get('finishedFirstStart'))) {
+      this.showFirstStart()
+      this.setState({
+        firstStartPopped: true
+      })
     }
   }
 
@@ -136,6 +150,14 @@ class FeedContainer extends PureComponent {
     })
   }
 
+  showFirstStart () {
+     Navigation.push(this.props.componentId, {
+       component: {
+         name: FIRST_START,
+       }
+     })
+  }
+
   showProfile (user) {
     Navigation.push(this.props.componentId, {
       component: {
@@ -160,7 +182,7 @@ class FeedContainer extends PureComponent {
     this.setState({
       refreshing: true
     })
-    this.props.dispatch(syncDBPull('all'))
+    this.props.dispatch(syncDBPull())
   }
 
   toggleCarrot (rideID) {
@@ -249,18 +271,22 @@ function mapStateToProps (state) {
   const localState = mainState.get('localState')
   const userID = localState.get('userID')
   return {
+    awaitingFullSync: localState.get('awaitingFullSync'),
     feedMessage: localState.get('feedMessage'),
     follows: mainState.get('follows'),
+    fullSyncFail: localState.get('fullSyncFail'),
     horses: mainState.get('horses'),
     horseUsers: mainState.get('horseUsers'),
     justFinishedRide: localState.get('justFinishedRide'),
     lastFullSync: localState.get('lastFullSync'),
     popShowRide: localState.get('popShowRide'),
+    popShowRideNow: localState.get('popShowRideNow'),
     rides: mainState.get('rides'),
     rideCarrots: mainState.get('rideCarrots'),
     rideComments: mainState.get('rideComments'),
     users: mainState.get('users'),
     userID,
+    user: mainState.getIn(['users', localState.get('userID')])
   }
 }
 

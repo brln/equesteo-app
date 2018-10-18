@@ -10,7 +10,7 @@ class PhotoLightboxContainer extends PureComponent {
     return {
       topBar: {
         background: {
-          color: brand,
+          color: 'black',
         },
         backButton: {
           color: 'white'

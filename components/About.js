@@ -1,13 +1,15 @@
 import React, { PureComponent } from 'react'
+import { RELEASE } from 'react-native-dotenv'
+
 import {
-  Image,
   StyleSheet,
   Text,
   View
 } from 'react-native';
 
 import { brand, lightGrey } from '../colors'
-import { RELEASE } from 'react-native-dotenv'
+import BuildImage from './BuildImage'
+
 
 export default class About extends PureComponent {
   static options() {
@@ -47,8 +49,8 @@ export default class About extends PureComponent {
           justifyContent: 'center',
           flexDirection: 'column',
         }}>
-          <Image
-            source={require('../img/logo250.png')}
+          <BuildImage
+            require={'../img/logo250.png'}
             style={{
               width: 120,
               height: 120,

@@ -6,7 +6,6 @@ import {
   View
 } from 'react-native';
 
-
 export default class Map extends PureComponent {
   constructor (props) {
     super(props)
@@ -18,7 +17,7 @@ export default class Map extends PureComponent {
     this.map.fitToCoordinates(
       this.props.rideCoords,
       {
-        animated: true,
+        animated: false,
         edgePadding: {
           top: 50,
           right: 50,
@@ -33,6 +32,7 @@ export default class Map extends PureComponent {
     const lastIndex = this.props.rideCoords.length - 1
     const firstCoord = this.props.rideCoords[0]
     const lastCoord = this.props.rideCoords[lastIndex]
+
     return (
       <View style={styles.container}>
         <MapView
@@ -44,7 +44,7 @@ export default class Map extends PureComponent {
         >
           <MapView.Polyline
             coordinates={this.props.rideCoords}
-            strokeColor="#dc0202"
+            strokeColor={"#dc0202"}
             strokeWidth={5}
           />
           <MapView.Marker

@@ -6,19 +6,25 @@ import { Navigation } from 'react-native-navigation'
 import PushNotification from 'react-native-push-notification'
 import { fromJS, Map, List } from 'immutable'
 import { Sentry } from 'react-native-sentry'
+import kalmanFilter from './services/Kalman'
+import { simplifyLine } from './services/DouglasPeucker'
 
 import {
+  appStates,
   haversine,
   logError,
   logInfo,
   unixTimeNow,
   generateUUID,
-  staticMap
+  staticMap,
+  toElevationKey,
 } from "./helpers"
+import { danger, green, warning } from './colors'
 import { DRAWER, FEED, SIGNUP_LOGIN } from './screens'
 import { LocalStorage, PouchCouch, UserAPI } from './services'
 import {BadRequestError, NotConnectedError, UnauthorizedError} from "./errors"
 import {
+  AWAIT_FULL_SYNC,
   CLEAR_FEED_MESSAGE,
   CLEAR_LAST_LOCATION,
   CLEAR_PAUSED_LOCATIONS,
@@ -41,8 +47,6 @@ import {
   NEW_LOCATION,
   NEW_APP_STATE,
   NEW_NETWORK_STATE,
-  NOT_MOVING,
-  NOW_MOVING,
   PAUSE_LOCATION_TRACKING,
   POP_SHOW_RIDE_SHOWN,
   RECEIVE_JWT,
@@ -54,9 +58,14 @@ import {
   RIDE_CARROT_SAVED,
   RIDE_COMMENT_CREATED,
   RIDE_CREATED,
+  RIDE_ELEVATIONS_CREATED,
   RIDE_SAVED,
   SAVE_USER_ID,
   SET_ACTIVE_COMPONENT,
+  SET_FEED_MESSAGE,
+  SET_FULL_SYNC_FAIL,
+  SET_POP_SHOW_RIDE,
+  SHOW_POP_SHOW_RIDE,
   START_RIDE,
   SYNC_COMPLETE,
   TOGGLE_AWAITING_PW_CHANGE,
@@ -65,6 +74,12 @@ import {
   USER_UPDATED,
   USER_SEARCH_RETURNED,
 } from './constants'
+
+export function awaitFullSync () {
+  return {
+    type: AWAIT_FULL_SYNC
+  }
+}
 
 export function clearFeedMessage () {
   return {
@@ -149,6 +164,21 @@ export function followUpdated (follow) {
   }
 }
 
+export function setFeedMessage (message) {
+  return {
+    type: SET_FEED_MESSAGE,
+    message
+  }
+}
+
+export function setFullSyncFail (status) {
+  return {
+    type: SET_FULL_SYNC_FAIL,
+    status,
+    logData: ['status']
+  }
+}
+
 function horseCreated (horse) {
   return {
     type: HORSE_CREATED,
@@ -183,7 +213,7 @@ export function mergePausedLocations () {
   }
 }
 
-export function needsRemotePersist (database) {
+export function setRemotePersistDB (database) {
   return {
     type: NEEDS_REMOTE_PERSIST,
     database
@@ -198,10 +228,11 @@ function newAppState (newState) {
   }
 }
 
-function newLocation (location) {
+export function newLocation (location, elevation) {
   return {
     type: NEW_LOCATION,
-    location
+    location,
+    elevation,
   }
 }
 
@@ -211,18 +242,6 @@ function newNetworkState (connectionType, effectiveConnectionType) {
     connectionType,
     effectiveConnectionType,
     logData: ['connectionType', 'effectiveConnectionType'],
-  }
-}
-
-function notMoving () {
-  return {
-    type: NOT_MOVING
-  }
-}
-
-function nowMoving () {
-  return {
-    type: NOW_MOVING
   }
 }
 
@@ -245,27 +264,42 @@ function receiveJWT (token) {
   }
 }
 
-export function remotePersistStarted () {
+export function setPopShowRide (rideID, showRideNow) {
+  return {
+    type: SET_POP_SHOW_RIDE,
+    rideID,
+    showRideNow,
+  }
+}
+
+export function showPopShowRide () {
+  return {
+    type: SHOW_POP_SHOW_RIDE,
+  }
+}
+
+export function setRemotePersistStarted () {
   return {
     type: REMOTE_PERSIST_STARTED
   }
 }
 
-export function replaceLastLocation (newLocation) {
+export function replaceLastLocation (newLocation, newElevation) {
   return {
     type: REPLACE_LAST_LOCATION,
-    newLocation
+    newLocation,
+    newElevation,
   }
 }
 
-export function remotePersistComplete (database) {
+export function setRemotePersistComplete (database) {
   return {
     type: REMOTE_PERSIST_COMPLETE,
     database
   }
 }
 
-export function remotePersistError () {
+export function setRemotePersistError () {
   return {
     type: REMOTE_PERSIST_ERROR,
   }
@@ -299,6 +333,13 @@ function rideCreated (ride) {
   }
 }
 
+function rideElevationsCreated (elevationData) {
+  return {
+    type: RIDE_ELEVATIONS_CREATED,
+    elevationData
+  }
+}
+
 function rideSaved (ride) {
   return {
     type: RIDE_SAVED,
@@ -321,18 +362,27 @@ function setActiveComponent (componentID) {
   }
 }
 
-export function startRide(firstCoord) {
+export function startRide(firstCoord, firstElevation, startTime) {
   const coords = []
+  let elevations = Map()
   if (firstCoord) {
     coords.push(firstCoord)
+    elevations = elevations.setIn([
+      toElevationKey(firstElevation.get('latitude')),
+      toElevationKey(firstElevation.get('longitude'))
+    ], firstElevation.get('elevation'))
   }
   return {
     type: START_RIDE,
     currentRide: Map({
       rideCoordinates: List(coords),
       distance: 0,
-      startTime: unixTimeNow()
+      startTime
     }),
+    currentElevations: Map({
+      elevationGain: 0,
+      elevations
+    })
   }
 }
 
@@ -408,8 +458,8 @@ export function appInitialized () {
     await dispatch(tryToLoadLocalState())
     dispatch(startActiveComponentListener())
     dispatch(dismissError())
-    dispatch(findLocalToken())
     dispatch(checkFCMPermission())
+    dispatch(findLocalToken())
     dispatch(startNetworkTracking())
     dispatch(startAppStateTracking())
   }
@@ -438,23 +488,15 @@ export function getPWCode (email) {
 }
 
 export function getFCMToken () {
-  return async (dispatch, getState) => {
+  return async (dispatch) => {
     let fcmToken
     try {
       fcmToken = await firebase.messaging().getToken();
     } catch (e) {
-      logError(e)
+      logInfo('no token available')
     }
-    const currentUserID = getState().getIn(['main', 'localState', 'userID'])
-    const localUser = getState().getIn(['main', 'users', currentUserID])
-    if (fcmToken && localUser) {
-      if (fcmToken !== localUser.get('fcmToken')) {
-        dispatch(updateUser(localUser.set('fcmToken', fcmToken)))
-      } else {
-        logInfo('Token unchanged')
-      }
-    } else {
-      logError('cant get FCM token or user for some reason')
+    if (fcmToken) {
+      dispatch(setFCMTokenOnServer(fcmToken))
     }
   }
 }
@@ -474,33 +516,7 @@ export function checkFCMPermission () {
   }
 }
 
-export function exchangePWCode (email, code) {
-  return async (dispatch) => {
-    let userAPI = new UserAPI()
-    try {
-      const resp = await userAPI.exchangePWCodeForToken(email, code)
-      dispatch(dismissError())
-      const token = resp.token
-      const userID = resp.id
-      const following = resp.following
-      const followers = resp.followers
-      const pouchCouch = new PouchCouch(token)
-      dispatch(toggleAwaitingPasswordChange())
-      await pouchCouch.localReplicateDB('all', [...following, userID], followers)
-      dispatch(receiveJWT(resp.token))
-      dispatch(saveUserID(resp.id))
-      dispatch(setSentryUserContext())
-      await dispatch(loadLocalData())
-      dispatch(getFCMToken())
-      await LocalStorage.saveToken(resp.token, resp.id);
-    } catch (e) {
-      logError(e)
-      if (e instanceof UnauthorizedError) {
-        dispatch(errorOccurred(e.message))
-      }
-    }
-  }
-}
+
 
 export function changeRidePhotoData(rideID, photoID, uri) {
   return async (dispatch, getState) => {
@@ -530,6 +546,21 @@ export function changeUserPhotoData (photoID, uri) {
     }
     user = user.setIn(['photosByID', photoID], Map({timestamp, uri}))
     dispatch(updateUser(user))
+  }
+}
+
+function configureBackgroundGeolocation () {
+  return async () => {
+    logInfo('configuring geolocation')
+    BackgroundGeolocation.configure({
+      desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
+      locationProvider: BackgroundGeolocation.RAW_PROVIDER,
+      distanceFilter: 0,
+      maxLocations: 10,
+      interval: 0,
+      notificationTitle: 'You\'re out on a ride.',
+      notificationText: 'Tap here to see your progress.',
+    });
   }
 }
 
@@ -583,9 +614,14 @@ export function createHorse (horse) {
 
 export function createRide (rideData) {
   return async (dispatch, getState) => {
+    const TEN_FEET_AS_DEG_LATITUDE = 0.0000274
     const jwt = getState().getIn(['main', 'localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
     const currentRide = getState().getIn(['main', 'localState', 'currentRide'])
+    const currentRideElevations = getState().getIn(['main', 'localState', 'currentRideElevations'])
+    const simplifiedCoords = simplifyLine(
+      TEN_FEET_AS_DEG_LATITUDE,
+      currentRide.get('rideCoordinates'))
     const theRide = {
       _id: rideData.get('_id'),
       coverPhotoID: rideData.get('coverPhotoID'),
@@ -596,14 +632,28 @@ export function createRide (rideData) {
       name: rideData.get('name'),
       notes: rideData.get('notes'),
       photosByID: rideData.get('photosByID'),
-      rideCoordinates: currentRide.get('rideCoordinates'),
+      rideCoordinates: simplifiedCoords,
       startTime: currentRide.get('startTime'),
       type: 'ride',
       userID: rideData.get('userID'),
     }
     theRide.mapURL = staticMap(theRide)
-    const doc = await pouchCouch.saveRide(theRide)
-    dispatch(rideCreated(Map({...theRide, _rev: doc.rev})))
+
+    const elevationData = {
+      _id: theRide._id + '_elevations',
+      rideID: theRide._id,
+      elevationGain: currentRideElevations.get('elevationGain'),
+      elevations: currentRideElevations.get('elevations'),
+      type: 'rideElevations',
+      userID: rideData.get('userID'),
+    }
+
+    const rideDoc = await pouchCouch.saveRide(theRide)
+    const elevationDoc = await pouchCouch.saveRide(elevationData)
+
+    dispatch(rideElevationsCreated(Map({...elevationData, _rev: elevationDoc.rev})))
+    dispatch(rideCreated(Map({...theRide, _rev: rideDoc.rev})))
+    dispatch(setPopShowRide(theRide._id, true))
     dispatch(needsRemotePersist('rides'))
   }
 }
@@ -650,7 +700,7 @@ export function createFollow (followingID) {
     const doc = await pouchCouch.saveUser(found.toJS())
     await dispatch(followUpdated(found.set('_rev', doc.rev)))
     dispatch(needsRemotePersist('users'))
-    dispatch(syncDBPull('all'))
+    dispatch(syncDBPull())
   }
 }
 
@@ -684,6 +734,47 @@ export function deleteHorseUser (horseID, userID) {
     await dispatch(horseUserUpdated(theHorseUser.set('_rev', doc.rev)))
     dispatch(needsRemotePersist('horses'))
 
+  }
+}
+
+export function exchangePWCode (email, code) {
+  return async (dispatch) => {
+    let userAPI = new UserAPI()
+    try {
+      const resp = await userAPI.exchangePWCodeForToken(email, code)
+      dispatch(dismissError())
+      const token = resp.token
+      const userID = resp.id
+      const following = resp.following
+      const followers = resp.followers
+      const pouchCouch = new PouchCouch(token)
+      dispatch(toggleAwaitingPasswordChange())
+      await pouchCouch.localReplicateDB('all', [...following, userID], followers)
+      dispatch(receiveJWT(resp.token))
+      dispatch(saveUserID(resp.id))
+      dispatch(setSentryUserContext())
+      await dispatch(loadLocalData())
+      dispatch(startListeningFCMTokenRefresh())
+      dispatch(getFCMToken())
+      dispatch(startListeningFCM())
+      await LocalStorage.saveToken(resp.token, resp.id);
+    } catch (e) {
+      logError(e)
+      if (e instanceof UnauthorizedError) {
+        dispatch(errorOccurred(e.message))
+      }
+    }
+  }
+}
+
+export function needsRemotePersist(db) {
+  return async (dispatch) => {
+    dispatch(setFeedMessage(Map({
+      message: 'Data Needs to Upload',
+      color: warning,
+      timeout: false
+    })))
+    dispatch(setRemotePersistDB(db))
   }
 }
 
@@ -739,6 +830,8 @@ function findLocalToken () {
       dispatch(setSentryUserContext())
       dispatch(switchRoot(FEED))
       await dispatch(loadLocalData())
+      dispatch(startListeningFCMTokenRefresh())
+      dispatch(getFCMToken())
       dispatch(startListeningFCM())
       dispatch(syncDBPull('all'))
     } else {
@@ -771,6 +864,39 @@ export function newPassword (password) {
     } catch (e) {
       logError(e)
     }
+  }
+}
+
+export function remotePersistComplete (db) {
+  return async (dispatch) => {
+    dispatch(setRemotePersistComplete(db))
+    dispatch(setFeedMessage(Map({
+      message: 'All Data Uploaded',
+      color: green,
+      timeout: 3000
+    })))
+  }
+}
+
+export function remotePersistError () {
+  return async (dispatch) => {
+    dispatch(setRemotePersistError())
+    dispatch(setFeedMessage(Map({
+      message: 'Can\'t Upload Data',
+      color: danger,
+      timeout: false
+    })))
+  }
+}
+
+export function remotePersistStarted () {
+  return async (dispatch) => {
+    dispatch(setRemotePersistStarted())
+    dispatch(setFeedMessage(Map({
+      message: 'Data Uploading',
+      color: warning,
+      timeout: false
+    })))
   }
 }
 
@@ -814,6 +940,19 @@ export function saveHorse (horse) {
   }
 }
 
+export function setFCMTokenOnServer (token) {
+  return async (_, getState) => {
+    try {
+      const jwt = getState().getIn(['main', 'localState', 'jwt'])
+      const userAPI = new UserAPI(jwt)
+      const currentUserID = getState().getIn(['main', 'localState', 'userID'])
+      await userAPI.setFCMToken(currentUserID, token)
+    } catch (e) {
+      logError('Could not set FCM token')
+    }
+  }
+}
+
 export function signOut () {
   return async(dispatch) => {
     await LocalStorage.deleteToken()
@@ -831,41 +970,61 @@ export function startLocationTracking () {
   return async (dispatch, getState) => {
     logInfo('action: startLocationTracking')
     await configureBackgroundGeolocation()()
-    const METERS_TO_MILES = 0.0006213712
+    const KALMAN_FILTER_Q = 6
     BackgroundGeolocation.on('location', (location) => {
-
-      const refiningLocation = getState().getIn(['main', 'localState', 'refiningLocation'])
-      let parsedLocation = Map({
-        accuracy: location.accuracy,
-        latitude: location.latitude,
-        longitude: location.longitude,
-        provider: location.provider,
-        timestamp: location.time,
-      })
-
-      let replaced = false
-      if (refiningLocation) {
-        let distance = haversine(
-          refiningLocation.get('latitude'),
-          refiningLocation.get('longitude'),
-          location.latitude,
-          location.longitude
-        )
-        let refiningAccuracy = refiningLocation.get('accuracy')
-        console.log('distance: ' + distance)
-        console.log('refining accuracy: ' + refiningAccuracy * METERS_TO_MILES)
-        if (distance < (refiningAccuracy * METERS_TO_MILES) && location.accuracy <= refiningAccuracy) {
-          dispatch(replaceLastLocation(parsedLocation))
-          replaced = true
-        }
-        console.log(distance)
-        if (distance < (25 / 5280)) {
-          dispatch(notMoving())
-        }
+      const lastLocation = getState().getIn(['main', 'localState', 'lastLocation'])
+      let timeDiff = 0
+      if (lastLocation) {
+        timeDiff = (location.time / 1000) - (lastLocation.get('timestamp') / 1000)
       }
-      if (!replaced) {
-        dispatch(nowMoving())
-        dispatch(newLocation(parsedLocation))
+
+      if (!lastLocation || timeDiff > 5) {
+        const refiningLocation = getState().getIn(['main', 'localState', 'refiningLocation'])
+
+        let parsedLocation = Map({
+          accuracy: location.accuracy,
+          latitude: location.latitude,
+          longitude: location.longitude,
+          provider: location.provider,
+          timestamp: location.time,
+          speed: location.speed,
+        })
+
+        let parsedElevation = Map({
+          latitude: location.latitude,
+          longitude: location.longitude,
+          elevation: location.altitude,
+        })
+
+        let replaced = false
+        if (refiningLocation && lastLocation) {
+          parsedLocation = kalmanFilter(
+            parsedLocation,
+            lastLocation,
+            KALMAN_FILTER_Q
+          )
+          parsedElevation = parsedElevation.set(
+            'latitude', parsedLocation.get('latitude')
+          ).set(
+            'longitude', parsedLocation.get('longitude')
+          ).set(
+            'accuracy', parsedLocation.get('accuracy')
+          )
+
+          let distance = haversine(
+            refiningLocation.get('latitude'),
+            refiningLocation.get('longitude'),
+            parsedLocation.get('latitude'),
+            parsedLocation.get('longitude')
+          )
+          if (distance < (30 / 5280)) {
+            dispatch(replaceLastLocation(parsedLocation, parsedElevation))
+            replaced = true
+          }
+        }
+        if (!replaced) {
+          dispatch(newLocation(parsedLocation, parsedElevation))
+        }
       }
     })
 
@@ -878,20 +1037,7 @@ export function startLocationTracking () {
   }
 }
 
-function configureBackgroundGeolocation () {
-  return async () => {
-    logInfo('configuring geolocation')
-    BackgroundGeolocation.configure({
-      desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
-      locationProvider: BackgroundGeolocation.RAW_PROVIDER,
-      distanceFilter: 1,
-      maxLocations: 10,
-      interval: 3000,
-      notificationTitle: 'You\'re out on a ride.',
-      notificationText: 'Tap here to see your progress.',
-    });
-  }
-}
+
 
 function startNetworkTracking () {
   return async (dispatch) => {
@@ -910,27 +1056,32 @@ function startNetworkTracking () {
 function startListeningFCM () {
   return async (dispatch, getState) => {
     PushNotification.configure({
-      onNotification: (notification) => {
-        alert('clicked')
+      onNotification: async () => {
+        await dispatch(syncDBPull())
+        dispatch(showPopShowRide())
       }
     })
-    firebase.messaging().onTokenRefresh((m) => {
-      logInfo('token refresh handler')
-      logInfo(m)
-    })
+
     firebase.messaging().onMessage(async (m) => {
       const userID = m._data.userID
       const distance = parseFloat(m._data.distance)
+      const rideID = m._data.rideID
       const user = getState().getIn(['main', 'users']).get(userID)
       const message = `${user.get('firstName')} went for a ${distance.toFixed(1)} mile ride!`
-      await dispatch(syncDBPull('rides'))
+      dispatch(awaitFullSync())
+      dispatch(setPopShowRide(rideID, false))
+      await dispatch(syncDBPull())
       PushNotification.localNotification({
         message: message,
       })
     })
-    firebase.notifications().onNotificationOpened((m) => {
-      logInfo('notification opened')
-      logInfo(m)
+  }
+}
+
+function startListeningFCMTokenRefresh () {
+  return async (dispatch, getState) => {
+    firebase.messaging().onTokenRefresh(async (newToken) => {
+      dispatch(setFCMTokenOnServer(newToken))
     })
   }
 }
@@ -955,7 +1106,9 @@ export function stopLocationTracking () {
 
 function stopListeningFCM () {
   return async () => {
+    // maybe delete token on server here?
     await firebase.iid().deleteToken('373350399276', 'GCM')
+    firebase.messaging().onTokenRefresh(() => {})
   }
 }
 
@@ -986,7 +1139,9 @@ export function submitLogin (email, password) {
       dispatch(saveUserID(resp.id))
       dispatch(setSentryUserContext())
       await dispatch(loadLocalData())
+      dispatch(startListeningFCMTokenRefresh())
       dispatch(getFCMToken())
+      dispatch(startListeningFCM())
       await LocalStorage.saveToken(resp.token, resp.id);
     } catch (e) {
       if (e instanceof UnauthorizedError) {
@@ -1016,7 +1171,9 @@ export function submitSignup (email, password) {
       dispatch(saveUserID(resp.id))
       dispatch(setSentryUserContext())
       await dispatch(loadLocalData())
+      dispatch(startListeningFCMTokenRefresh())
       dispatch(getFCMToken())
+      dispatch(startListeningFCM())
     } catch (e) {
       if (e instanceof BadRequestError) {
         dispatch(errorOccurred(e.message))
@@ -1025,8 +1182,14 @@ export function submitSignup (email, password) {
   }
 }
 
-export function syncDBPull (db) {
+export function syncDBPull () {
   return async (dispatch, getState) => {
+    logInfo('action syncDBPull')
+    dispatch(setFeedMessage(Map({
+      message: 'Loading New Rides',
+      color: warning,
+      timeout: null
+    })))
     const jwt = getState().getIn(['main', 'localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
     const userID = getState().getIn(['main', 'localState', 'userID'])
@@ -1043,9 +1206,24 @@ export function syncDBPull (db) {
       f => f.get('followerID')
     ).toJS()
     following.push(userID)
-    await pouchCouch.localReplicateDB(db, following, followers)
-    await dispatch(loadLocalData())
-    dispatch(syncComplete())
+    try {
+      dispatch(setFullSyncFail(false))
+      await pouchCouch.localReplicateDB('all', following, followers)
+      await dispatch(loadLocalData())
+      dispatch(syncComplete())
+      dispatch(setFeedMessage(Map({
+        message: 'All Rides Loaded!',
+        color: green,
+        timeout: 3000
+      })))
+    } catch (e) {
+      dispatch(setFeedMessage(Map({
+        message: 'Error Fetching Data',
+        color: warning,
+        timeout: 3000
+      })))
+      dispatch(setFullSyncFail(true))
+    }
   }
 }
 
