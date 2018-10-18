@@ -22,14 +22,6 @@ class HorseProfileContainer extends PureComponent {
         title: {
           color: 'white',
         },
-        // @TODO: THIS SHOULD ONLY SHOW IF THE USER IS A RIDER OF THIS HORSE
-        rightButtons: [
-          {
-            id: 'archive',
-            text: 'Archive',
-            color: 'white'
-          },
-        ]
       },
       layout: {
         orientation: ['portrait']
@@ -73,6 +65,16 @@ class HorseProfileContainer extends PureComponent {
           ]
         }
       })
+    } else if (this.thisHorsesRiders().indexOf(props.user) >= 0) {
+      Navigation.mergeOptions(props.componentId, {
+        topBar: {
+          rightButtons: [{
+            id: 'archive',
+            text: 'Archive',
+            color: 'white'
+          }]
+        }
+      })
     }
   }
 
@@ -94,6 +96,15 @@ class HorseProfileContainer extends PureComponent {
 
   addRider () {
     this.props.dispatch(addHorseUser(this.props.horse, this.props.user))
+    Navigation.mergeOptions(this.props.componentId, {
+      topBar: {
+        rightButtons: [{
+          id: 'archive',
+          text: 'Archive',
+          color: 'white'
+        }]
+      }
+    })
   }
 
   closeDeleteModal () {

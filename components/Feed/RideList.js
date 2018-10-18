@@ -99,7 +99,7 @@ export default class RideList extends PureComponent {
       if (!horse) {
         throw Error("Should have a horse here.")
       }
-      if (horse.get('deleted') !== true
+      if (horseUser.get('deleted') !== true
         && (
           !this.props.ownRideList ||
           (this.props.ownRideList && horseUser.get('userID') === this.props.userID)
