@@ -156,31 +156,24 @@ export default class HorseCard extends PureComponent {
   render() {
     let headline = (
       <Text>
-        <Text
-          style={{fontSize: 20, fontWeight: 'normal'}}
-        >
+        <Text style={{fontSize: 20, fontWeight: 'normal'}}>
           {`A new horse in the barn for ${this.props.rider.get('firstName')}: `}
-        </Text>
-        <Text
-          style={{fontSize: 20, fontWeight: 'bold'}}
-        >
-          {this.props.horse.get('name')}!
+          <Text style={{fontSize: 20, fontWeight: 'bold'}}>
+            {this.props.horse.get('name')}!
+          </Text>
         </Text>
       </Text>
     )
     if (this.props.rider.get('_id') !== this.props.ownerID) {
       headline = (
         <View style={{flex: 1, flexDirection: 'row'}}>
-          <Text
-            style={{fontSize: 20, fontWeight: 'normal'}}
-          >
+          <Text style={{fontSize: 20, fontWeight: 'normal'}}>
             { `${this.props.rider.get('firstName')} now rides `}
+            <Text style={{fontSize: 20, fontWeight: 'bold'}}>
+              {this.props.horse.get('name')}!
+            </Text>
           </Text>
-          <Text
-            style={{fontSize: 20, fontWeight: 'bold'}}
-          >
-            {this.props.horse.get('name')}!
-          </Text>
+
         </View>
       )
     }
