@@ -5,8 +5,8 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { Thumbnail } from 'native-base'
 
+import URIImage from './URIImage'
 import { orange } from '../colors'
 
 const { width } = Dimensions.get('window')
@@ -31,11 +31,11 @@ export default class PhotosByTimestamp extends Component {
         style={styles.photoThumbnail}
         onPress={this.changeProfilePhoto(photoID)}
       >
-        <Thumbnail
-          style={style}
-          square
+        <URIImage
+          style={{width: '100%', height: '100%'}}
           source={source}
-
+          onError={e => logError("Can't load Profile image")}
+          showSource={true}
         />
       </TouchableOpacity>
     )
