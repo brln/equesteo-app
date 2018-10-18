@@ -60,6 +60,15 @@ class SignupLoginContainer extends PureComponent {
     this.newPassword = this.newPassword.bind(this)
   }
 
+  componentDidUpdate (nextProps) {
+    if (this.props.error) {
+      console.log('setting timeout')
+      setTimeout(() => {
+        this.props.dispatch(dismissError())
+      }, 3000)
+    }
+  }
+
 
   static getDerivedStateFromProps (props, state) {
     let nextState = {...state}
