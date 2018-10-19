@@ -24,7 +24,7 @@ import PhotoFilmstrip from './PhotoFilmstrip'
 import RideImage from '../Feed/RideImage'
 import SpeedChart from './SpeedChart'
 import Stats from './Stats'
-import DeleteModal from '../DeleteModal'
+import DeleteModal from '../Shared/DeleteModal'
 import ElevationChart from './ElevationChart'
 
 const { width } = Dimensions.get('window')

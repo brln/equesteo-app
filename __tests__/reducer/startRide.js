@@ -5,7 +5,7 @@ import React from 'react';
 
 import AppReducer from '../../reducer'
 import { startRide }  from '../../actions'
-import { unixTimeNow } from '../../helpers'
+import { toElevationKey, unixTimeNow } from '../../helpers'
 
 describe('START_RIDE', () => {
   it('starts the ride', () => {
@@ -15,8 +15,16 @@ describe('START_RIDE', () => {
       }),
     })
     const firstCoord = 'ducks'
+    const latitude = 12
+    const longitude = 13
+    const elevation = 134
+    const firstElevation = Map({
+      latitude: latitude,
+      longitude: longitude,
+      elevation
+    })
     const startTime = unixTimeNow()
-    const expectedNewState = Map({
+    let expectedNewState = Map({
       localState: Map({
         currentRide: Map({
           rideCoordinates: List([firstCoord]),
@@ -29,9 +37,13 @@ describe('START_RIDE', () => {
         })
       })
     })
+    expectedNewState = expectedNewState.setIn(
+      ['localState', 'currentRideElevations', 'elevations', toElevationKey(latitude), toElevationKey(longitude)],
+      elevation
+    )
 
 
-    const action = startRide(firstCoord, startTime)
+    const action = startRide(firstCoord, firstElevation, startTime)
 
     expect(AppReducer(initialState, action)).toEqual(expectedNewState)
   })

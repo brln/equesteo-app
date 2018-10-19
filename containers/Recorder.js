@@ -41,9 +41,11 @@ class RecorderContainer extends PureComponent {
     super(props)
     this.state = {
       showGPSBar: !props.currentRide,
+      discardModalOpen: false,
     }
 
     this.backToFeed = this.backToFeed.bind(this)
+    this.closeDiscardModal = this.closeDiscardModal.bind(this)
     this.discardRide = this.discardRide.bind(this)
     this.finishRide = this.finishRide.bind(this)
     this.showRideDetails = this.showRideDetails.bind(this)
@@ -111,6 +113,12 @@ class RecorderContainer extends PureComponent {
     }
   }
 
+  closeDiscardModal () {
+    this.setState({
+      discardModalOpen: false
+    })
+  }
+
   backToFeed () {
     Navigation.popToRoot(this.props.componentId)
   }
@@ -135,8 +143,9 @@ class RecorderContainer extends PureComponent {
     if (this.props.currentRide.get('rideCoordinates').count() > 0) {
       this.showRideDetails()
     } else {
-      alert('Discarding empty ride.')
-      this.discardRide()
+      this.setState({
+        discardModalOpen: true
+      })
     }
   }
 
@@ -161,9 +170,11 @@ class RecorderContainer extends PureComponent {
     return (
       <RideRecorder
         appState={this.props.appState}
+        closeDiscardModal={this.closeDiscardModal}
         currentRide={this.props.currentRide}
         currentRideElevations={this.props.currentRideElevations}
         discardRide={this.discardRide}
+        discardModalOpen={this.state.discardModalOpen}
         lastElevation={this.props.lastElevation}
         lastLocation={this.props.lastLocation}
         moving={this.props.moving}

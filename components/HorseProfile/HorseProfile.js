@@ -17,7 +17,7 @@ import {
 import BuildImage from '../BuildImage'
 import { brand, darkBrand } from '../../colors'
 import { logError } from '../../helpers'
-import DeleteModal from '../DeleteModal'
+import DeleteModal from '../Shared/DeleteModal'
 import RidersCard from './RidersCard'
 import FabImage from '../FabImage'
 import TrainingCard from './TrainingCard'

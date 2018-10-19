@@ -9,6 +9,7 @@ import {
 import { black, brand, green, white } from '../../colors'
 import GPSStatus from './GPSStatus'
 
+import DiscardModal from './DiscardModal'
 import RidingMap from './RidingMap'
 import RideStats from './RideStats'
 
@@ -83,6 +84,12 @@ export default class RideRecorder extends PureComponent {
     }
     return (
       <View style={styles.container}>
+        <DiscardModal
+          modalOpen={this.props.discardModalOpen}
+          closeDiscardModal={this.props.closeDiscardModal}
+          discardFunc={this.props.discardRide}
+          text={"You haven't gone anywhere on this ride yet. Do you want to close it?"}
+        />
         {gpsBar}
         {rideStats}
         {startButton}
