@@ -48,7 +48,8 @@ class FirstStartContainer extends PureComponent {
         _id: `${props.userID.toString()}_${(new Date).getTime().toString()}`,
         userID: props.userID,
         photosByID: Map()
-      })
+      }),
+      horseEdited: false
     }
     this.addHorseProfilePhoto = this.addHorseProfilePhoto.bind(this)
     this.commitUpdateUser = this.commitUpdateUser.bind(this)
@@ -57,6 +58,7 @@ class FirstStartContainer extends PureComponent {
     this.nextPage = this.nextPage.bind(this)
     this.prevPage = this.prevPage.bind(this)
     this.setSkip = this.setSkip.bind(this)
+    this.skipHorsePhoto = this.skipHorsePhoto.bind(this)
     this.updateHorse = this.updateHorse.bind(this)
     this.updateUser = this.updateUser.bind(this)
     this.uploadProfilePhoto = this.uploadProfilePhoto.bind(this)
@@ -95,7 +97,8 @@ class FirstStartContainer extends PureComponent {
 
   updateHorse (newHorse) {
     this.setState({
-      horse: newHorse
+      horse: newHorse,
+      horseEdited: true
     })
   }
 
@@ -128,6 +131,13 @@ class FirstStartContainer extends PureComponent {
     }, then)
   }
 
+  skipHorsePhoto () {
+    this.nextPage()
+    if (this.state.horseEdited) {
+      this.createHorse()
+    }
+  }
+
   nextPage () {
     const currentIndex = this.pages[this.state.currentPage].i
     let nextIndex = currentIndex + 1
@@ -139,6 +149,7 @@ class FirstStartContainer extends PureComponent {
         this.setState({
           currentPage: pageData.name
         })
+        break
       }
     }
   }
@@ -171,6 +182,7 @@ class FirstStartContainer extends PureComponent {
       nextPage={this.nextPage}
       pages={this.pages}
       setSkip={this.setSkip}
+      skipHorsePhoto={this.skipHorsePhoto}
       updateHorse={this.updateHorse.bind(this)}
       updateUser={this.updateUser}
       uploadProfilePhoto={this.uploadProfilePhoto}

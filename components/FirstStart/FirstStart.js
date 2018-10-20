@@ -72,6 +72,7 @@ export default class FirstStart extends PureComponent {
             horse={this.props.horse}
             inputs={this.inputs}
             nextPage={this.props.nextPage}
+            skipHorsePhoto={this.props.skipHorsePhoto}
           />
         )
       case this.props.pages.FINAL_PAGE.name:

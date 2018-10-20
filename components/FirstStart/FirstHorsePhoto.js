@@ -49,7 +49,7 @@ export default class FirstHorsePhoto extends PureComponent {
       />
     )
     let skip = (
-      <TouchableOpacity onPress={this.props.nextPage} style={{paddingTop: 10}}>
+      <TouchableOpacity onPress={this.props.skipHorsePhoto} style={{paddingTop: 10}}>
         <Text style={{textAlign: 'center', textDecorationLine: 'underline', color: "black", fontSize: 10}}>No, thanks.</Text>
       </TouchableOpacity>
     )
