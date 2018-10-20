@@ -62,7 +62,6 @@ class SignupLoginContainer extends PureComponent {
 
   componentDidUpdate (nextProps) {
     if (this.props.error) {
-      console.log('setting timeout')
       setTimeout(() => {
         this.props.dispatch(dismissError())
       }, 3000)

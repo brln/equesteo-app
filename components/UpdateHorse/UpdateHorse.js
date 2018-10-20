@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import {
   Card,
+  CheckBox,
   CardItem,
   Fab,
 } from 'native-base';
@@ -404,7 +405,24 @@ export default class UpdateHorse extends PureComponent {
                 </CardItem>
               </Card>
 
-
+              <Card>
+                <CardItem header>
+                  <Text style={{color: darkBrand }}>Settings:</Text>
+                </CardItem>
+                <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
+                  <View style={{flex: 1, flexDirection: 'row'}}>
+                    <View style={{flex: 1}}>
+                      <CheckBox
+                        checked={this.props.horseUser.get('rideDefault')}
+                        onPress={this.props.setDefaultHorse}
+                      />
+                    </View>
+                    <View style={{flex: 6, justifyContent: 'center'}}>
+                      <Text>This is my default horse for rides.</Text>
+                    </View>
+                  </View>
+                </CardItem>
+              </Card>
             </View>
           </View>
         </ScrollView>

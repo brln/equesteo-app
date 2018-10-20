@@ -564,10 +564,11 @@ function configureBackgroundGeolocation () {
   }
 }
 
-export function createHorse (horse) {
+export function createHorse (horse, isDefault) {
   return async (dispatch, getState) => {
     const jwt = getState().getIn(['main', 'localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
+
     const newHorse = {
       _id: horse.get('_id'),
       breed: horse.get('breed'),
@@ -584,6 +585,10 @@ export function createHorse (horse) {
       sex: horse.get('sex'),
       type: 'horse'
     }
+
+    let isFirstHorse = getState().getIn(['main', 'horseUsers']).valueSeq().filter((hu) => {
+      return hu.get('userID') === horse.get('userID') && hu.get('deleted') !== true
+    }).count() === 0
     const newHorseUser = {
       _id: `${horse.get('userID')}_${newHorse._id}`,
       type: 'horseUser',
@@ -592,6 +597,7 @@ export function createHorse (horse) {
       owner: true,
       createTime: unixTimeNow(),
       deleted: false,
+      rideDefault: isFirstHorse ? isFirstHorse : isDefault,
     }
     const horseDoc = await pouchCouch.saveHorse(newHorse)
     const joinDoc = await pouchCouch.saveHorse(newHorseUser)
@@ -728,12 +734,18 @@ export function deleteHorseUser (horseID, userID) {
     }
     let theHorseUser = filterHorseUser.get(0)
     theHorseUser = theHorseUser.set('deleted', true)
+    dispatch(updateHorseUser(theHorseUser))
+  }
+}
+
+export function updateHorseUser (horseUser) {
+  return async (dispatch, getState) => {
     const jwt = getState().getIn(['main', 'localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
-    const doc = await pouchCouch.saveHorse(theHorseUser.toJS())
-    await dispatch(horseUserUpdated(theHorseUser.set('_rev', doc.rev)))
+    const asJS = horseUser.toJS()
+    const doc = await pouchCouch.saveHorse(asJS)
+    await dispatch(horseUserUpdated(horseUser.set('_rev', doc.rev)))
     dispatch(needsRemotePersist('horses'))
-
   }
 }
 
@@ -1272,7 +1284,8 @@ export function updateHorse (horseDetails) {
   return async (dispatch, getState) => {
     const jwt = getState().getIn(['main', 'localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
-    const doc = await pouchCouch.saveHorse(horseDetails.toJS())
+    const asJS = horseDetails.toJS()
+    const doc = await pouchCouch.saveHorse(asJS)
     dispatch(horseSaved(horseDetails.set('_rev', doc.rev)))
     dispatch(needsRemotePersist('horses'))
   }

@@ -180,6 +180,12 @@ export function logInfo (info) {
   console.log(info)
 }
 
+export function logDebug (title, info) {
+  console.log(`======================= ${title} ===========================`)
+  console.log(info)
+  console.log(`=================== end ${title} ===========================`)
+}
+
 export function logRender (componentName) {
   logInfo('rendering: ' + componentName)
 }

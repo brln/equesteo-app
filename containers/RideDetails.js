@@ -2,6 +2,7 @@ import { Map } from 'immutable'
 import { Navigation } from 'react-native-navigation'
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
+import memoizeOne from 'memoize-one';
 
 
 import {
@@ -76,6 +77,8 @@ class RideDetailsContainer extends PureComponent {
     this.horses = this.horses.bind(this)
     this.uploadNewPhotos = this.uploadNewPhotos.bind(this)
 
+    this.memoizedHorses = memoizeOne(this.horses)
+
     Navigation.events().bindComponent(this);
 
     if (props.newRide) {
@@ -114,11 +117,19 @@ class RideDetailsContainer extends PureComponent {
     if (!state.ride && props.newRide) {
       const name = newRideName(props.currentRide)
       const _id = `${props.userID.toString()}_${(new Date).getTime().toString()}`
+
+      let defaultID = null
+      props.horseUsers.valueSeq().forEach((hu) => {
+        if (hu.get('rideDefault')) {
+          defaultID = hu.get('horseID')
+        }
+      })
+
       nextState = {
         ride: Map({
           _id,
           elapsedTimeSecs: props.elapsedTime,
-          horseID: null,
+          horseID: defaultID,
           name,
           userID: props.userID,
           photosByID: Map({}),
@@ -243,7 +254,7 @@ class RideDetailsContainer extends PureComponent {
         changeHorseID={this.changeHorseID}
         changePublic={this.changePublic}
         deletePhoto={this.deletePhoto}
-        horses={this.horses()}
+        horses={this.memoizedHorses()}
         horseSelected={this.state.horseSelected}
         ride={this.state.ride}
         uploadPhoto={this.uploadPhoto}

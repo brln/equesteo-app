@@ -9,6 +9,7 @@ import { combineReducers } from 'redux-immutable';
 
 
 import { appInitialized } from "./actions"
+import { logDebug } from './helpers'
 import logger from './middleware/logger'
 import storeToCouch from './middleware/couch'
 import uploadPhotos from './middleware/photos'
@@ -27,6 +28,8 @@ const store = createStore(
     storeLocalState,
   )
 )
+
+global.logDebug = logDebug
 
 if (ENV !== 'local') {
   Sentry.config(SENTRY_DSN, {
