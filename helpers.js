@@ -180,7 +180,7 @@ export function logInfo (info) {
   console.log(info)
 }
 
-export function logDebug (title, info) {
+export function logDebug (info, title) {
   console.log(`======================= ${title} ===========================`)
   console.log(info)
   console.log(`=================== end ${title} ===========================`)

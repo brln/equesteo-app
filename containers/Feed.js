@@ -1,3 +1,4 @@
+import memoizeOne from 'memoize-one';
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import { Navigation } from 'react-native-navigation'
@@ -58,18 +59,26 @@ class FeedContainer extends PureComponent {
       firstStartPopped: false,
     }
     this.clearFeedMessage = this.clearFeedMessage.bind(this)
-    this.filteredHorses = this.filteredHorses.bind(this)
-    this.filteredHorseUsers = this.filteredHorseUsers.bind(this)
-    this.followIDs = this.followIDs.bind(this)
-    this.followingRides = this.followingRides.bind(this)
-    this.horseOwnerIDs = this.horseOwnerIDs.bind(this)
     this.toggleCarrot = this.toggleCarrot.bind(this)
     this.showComments = this.showComments.bind(this)
     this.showProfile = this.showProfile.bind(this)
     this.showRide = this.showRide.bind(this)
     this.showHorseProfile = this.showHorseProfile.bind(this)
     this.syncDBPull = this.syncDBPull.bind(this)
+
+    this.followIDs = this.followIDs.bind(this)
+    this.followingRides = this.followingRides.bind(this)
+    this.horseOwnerIDs = this.horseOwnerIDs.bind(this)
+    this.filteredHorses = this.filteredHorses.bind(this)
+    this.filteredHorseUsers = this.filteredHorseUsers.bind(this)
     this.yourRides = this.yourRides.bind(this)
+
+    this.memoizeFollowIDs = memoizeOne(this.followIDs)
+    this.memoizeFollowingRides = memoizeOne(this.followingRides)
+    this.memoizeHorseOwnerIDs = memoizeOne(this.horseOwnerIDs)
+    this.memoizeFilteredHorses = memoizeOne(this.filteredHorses)
+    this.memoizeFilteredHorseUsers = memoizeOne(this.filteredHorseUsers)
+    this.memoizeYourRides = memoizeOne(this.yourRides)
 
     Navigation.events().bindComponent(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
@@ -189,49 +198,49 @@ class FeedContainer extends PureComponent {
     this.props.dispatch(toggleRideCarrot(rideID))
   }
 
-  yourRides () {
-    return this.props.rides.valueSeq().filter(
-      (r) => r.get('userID') === this.props.userID && r.get('deleted') !== true
+  yourRides (rides, userID) {
+    return rides.valueSeq().filter(
+      (r) => r.get('userID') === userID && r.get('deleted') !== true
     ).sort((a, b) =>
       b.get('startTime') - a.get('startTime')
     ).toList()
   }
 
-  followIDs () {
-    return this.props.follows.valueSeq().filter(
-      f => f.get('deleted') !== true && f.get('followerID') === this.props.userID
+  followIDs (follows, userID) {
+    return follows.valueSeq().filter(
+      f => f.get('deleted') !== true && f.get('followerID') === userID
     ).map(
       f => f.get('followingID')
     ).toList()
   }
 
-  followingRides () {
-    return this.props.rides.valueSeq().filter(
+  followingRides (follows, userID, rides) {
+    return rides.valueSeq().filter(
       r => r.get('isPublic') === true // is a public ride @TODO: filter this when replicating
         && r.get('deleted') !== true // hasn't been deleted
-        && (r.get('userID') === this.props.userID || this.followIDs().indexOf(r.get('userID')) >= 0) // user hasn't removed follow
+        && (r.get('userID') === userID || this.memoizeFollowIDs(follows, userID).indexOf(r.get('userID')) >= 0) // user hasn't removed follow
     ).sort(
       (a, b) => b.get('startTime') - a.get('startTime')
     ).toList()
   }
 
-  filteredHorses () {
-    return this.props.horseUsers.filter(h => {
-      return this.followIDs().indexOf(h.get('userID')) >= 0 || h.get('userID') === this.props.userID
+  filteredHorses (follows, userID, horseUsers, horses) {
+    return horseUsers.filter(h => {
+      return this.memoizeFollowIDs(follows, userID).indexOf(h.get('userID')) >= 0 || h.get('userID') === userID
     }).mapEntries(([horseUserID, horseUser]) => {
-      return [horseUser.get('horseID'), this.props.horses.get(horseUser.get('horseID'))]
+      return [horseUser.get('horseID'), horses.get(horseUser.get('horseID'))]
     })
   }
 
-  filteredHorseUsers () {
-    return this.props.horseUsers.filter(h => {
-      return this.followIDs().indexOf(h.get('userID')) >= 0 || h.get('userID') === this.props.userID
+  filteredHorseUsers (follows, userID, horseUsers) {
+    return horseUsers.filter(h => {
+      return this.memoizeFollowIDs(follows, userID).indexOf(h.get('userID')) >= 0 || h.get('userID') === userID
     })
   }
 
 
-  horseOwnerIDs () {
-    return this.props.horseUsers.filter(hu => {
+  horseOwnerIDs (horseUsers) {
+    return horseUsers.filter(hu => {
       return hu.get('owner') === true
     }).mapEntries(([horseUserID, horseUser]) => {
       return [horseUser.get('horseID'), horseUser.get('userID')]
@@ -245,10 +254,10 @@ class FeedContainer extends PureComponent {
         clearFeedMessage={this.clearFeedMessage}
         deleteRide={this.deleteRide}
         feedMessage={this.props.feedMessage}
-        followingRides={this.followingRides()}
-        horses={this.filteredHorses()}
-        horseOwnerIDs={this.horseOwnerIDs()}
-        horseUsers={this.filteredHorseUsers()}
+        followingRides={this.memoizeFollowingRides(this.props.follows, this.props.userID, this.props.rides)}
+        horses={this.memoizeFilteredHorses(this.props.follows, this.props.userID, this.props.horseUsers, this.props.horses)}
+        horseOwnerIDs={this.memoizeHorseOwnerIDs(this.props.horseUsers)}
+        horseUsers={this.memoizeFilteredHorseUsers(this.props.follows, this.props.userID, this.props.horseUsers)}
         refreshing={this.state.refreshing}
         rideCarrots={this.props.rideCarrots.toList()}
         rideComments={this.props.rideComments.toList()}
@@ -260,7 +269,7 @@ class FeedContainer extends PureComponent {
         toggleCarrot={this.toggleCarrot}
         userID={this.props.userID}
         users={this.props.users}
-        yourRides={this.yourRides()}
+        yourRides={this.memoizeYourRides(this.props.rides, this.props.userID)}
       />
     )
   }
