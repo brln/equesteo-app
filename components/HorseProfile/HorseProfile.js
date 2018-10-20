@@ -85,7 +85,15 @@ export default class HorseProfile extends PureComponent {
   renderProfileImage () {
     const images = []
     const horse = this.props.horse
+    const nameText = (
+      <View style={{position: 'absolute', bottom: 30, left: 10}}>
+        <Text style={styles.nameText}>
+          {this.props.horse.get('name') || 'No Name'}
+        </Text>
+      </View>
+    )
     if (horse.get('profilePhotoID')) {
+
       const profileSource = {uri: horse.getIn(['photosByID', horse.get('profilePhotoID'), 'uri'])}
       images.push(
         <TouchableOpacity
@@ -99,6 +107,7 @@ export default class HorseProfile extends PureComponent {
             onError={e => logError("Can't load HorseProfile image")}
             showSource={true}
           />
+          { nameText }
         </TouchableOpacity>
       )
     } else {
@@ -109,6 +118,7 @@ export default class HorseProfile extends PureComponent {
             source={require('../../img/emptyHorse.png')}
             onError={e => logError("Can't load Empty Horse Profile image")}
           />
+          { nameText }
         </View>
       )
     }
@@ -247,4 +257,13 @@ export default class HorseProfile extends PureComponent {
   }
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  nameText: {
+    fontSize: 25,
+    color: 'white',
+    fontFamily: 'Montserrat-Regular',
+    textShadowColor: 'black',
+    textShadowRadius: 7,
+    textShadowOffset: {width: 2, height: 1}
+  }
+});
