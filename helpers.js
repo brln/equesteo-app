@@ -75,7 +75,7 @@ export function staticMap (ride) {
   }
   const pathStyle = 'color:0xff0000ff|weight:5'
 
-  let tolerance = 0.00006
+  let tolerance = 0.00025
   let lengthURL = false
   let fullURL
   while (!lengthURL || lengthURL > 6000) {
