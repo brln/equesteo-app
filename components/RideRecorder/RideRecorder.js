@@ -109,7 +109,7 @@ export default class RideRecorder extends PureComponent {
               >
                 <Text>...</Text>
                 { pauseButton }
-                { cameraButton }
+                {/*{ cameraButton }*/}
               </Fab>
             </View>
             {
