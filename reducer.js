@@ -19,7 +19,7 @@ import {
   LOAD_LOCAL_STATE,
   LOCAL_DATA_LOADED,
   MARK_PHOTO_ENQUEUED,
-  MERGE_PAUSED_LOCATIONS,
+  MERGE_STASHED_LOCATIONS,
   NEEDS_REMOTE_PERSIST,
   NEW_APP_STATE,
   NEW_LOCATION,
@@ -45,6 +45,8 @@ import {
   SET_FULL_SYNC_FAIL,
   SET_POP_SHOW_RIDE,
   SHOW_POP_SHOW_RIDE,
+  STASH_NEW_LOCATIONS,
+  STOP_STASH_NEW_LOCATIONS,
   START_RIDE,
   TOGGLE_AWAITING_PW_CHANGE,
   TOGGLE_DOING_INITIAL_LOAD,
@@ -57,7 +59,8 @@ import {
   appStates,
   goodConnection,
   haversine,
-  toElevationKey
+  toElevationKey,
+  unixTimeNow,
 } from './helpers'
 import { FEED, SIGNUP_LOGIN } from './screens'
 
@@ -79,14 +82,14 @@ export const initialState = Map({
     jwt: null,
     lastElevation: null,
     lastLocation: null,
-    locationTrackingPaused: false,
+    locationStashingActive: false,
     moving: false,
     needsRemotePersist: Map({
       horses: false,
       rides: false,
       users: false,
     }),
-    pausedCachedCoordinates: List(),
+    stashedCoordinates: List(),
     photoQueue: Map(),
     popShowRide: null,
     popShowRideNow: null,
@@ -122,7 +125,7 @@ export default function AppReducer(state=initialState, action) {
         null
       )
     case CLEAR_PAUSED_LOCATIONS:
-      return state.setIn(['localState', 'pausedCachedCoordinates'], List())
+      return state.setIn(['localState', 'stashedCoordinates'], List())
     case CLEAR_SEARCH:
       return state.setIn(['localState', 'userSearchResults'], List())
     case CLEAR_STATE:
@@ -153,7 +156,10 @@ export default function AppReducer(state=initialState, action) {
     case HORSE_USER_UPDATED:
       return state.set('horseUsers', state.get('horseUsers').set(action.horseUser.get('_id'), action.horseUser))
     case PAUSE_LOCATION_TRACKING:
-      return state.setIn(['localState', 'locationTrackingPaused'], true)
+      return state.setIn(
+        ['localState', 'currentRide', 'lastPauseStart'],
+        unixTimeNow()
+      )
     case POP_SHOW_RIDE_SHOWN:
       return state.setIn(
         ['localState', 'popShowRide'], null
@@ -221,19 +227,19 @@ export default function AppReducer(state=initialState, action) {
       }))
     case MARK_PHOTO_ENQUEUED:
       return state.setIn(['localState', 'photoQueue', action.queueItemID, 'queueID'], action.queueID)
-    case MERGE_PAUSED_LOCATIONS:
+    case MERGE_STASHED_LOCATIONS:
       const rideCoordinates = state.getIn(
         ['localState', 'currentRide', 'rideCoordinates']
       )
       const pausedCoordinates = state.getIn(
-        ['localState', 'pausedCachedCoordinates']
+        ['localState', 'stashedCoordinates']
       )
       const merged = rideCoordinates.concat(pausedCoordinates)
       return state.setIn(
         ['localState', 'currentRide', 'rideCoordinates'],
         merged
       ).setIn(
-        ['localState', 'pausedCachedCoordinates'],
+        ['localState', 'stashedCoordinates'],
         List()
       )
     case NEEDS_REMOTE_PERSIST:
@@ -256,9 +262,9 @@ export default function AppReducer(state=initialState, action) {
       )
       const currentRide = state.getIn(['localState', 'currentRide'])
       const currentElevations = state.getIn(['localState', 'currentRideElevations'])
-      const currentlyPaused = state.getIn(['localState', 'locationTrackingPaused'])
+      const currentlyStashing = state.getIn(['localState', 'locationStashingActive'])
 
-      if (currentRide && currentElevations && !currentlyPaused) {
+      if (currentRide && currentElevations && !currentRide.get('lastPauseStart') && !currentlyStashing) {
         let newDistance = 0
         let elevationGain = 0
         const lastLocation = state.getIn(['localState', 'lastLocation'])
@@ -303,7 +309,7 @@ export default function AppReducer(state=initialState, action) {
           ['localState', 'currentRideElevations'],
           newRideElevations
         )
-      } else if (currentRide && currentlyPaused) {
+      } else if (currentRide && currentlyStashing) {
         const newRideElevations =
           currentElevations.setIn(
             ['elevations',
@@ -311,16 +317,16 @@ export default function AppReducer(state=initialState, action) {
               toElevationKey(action.elevation.get('longitude')),
             ], action.elevation.get('elevation')
           )
-        const pausedCoordinates = state.getIn(
-          ['localState', 'pausedCachedCoordinates']
+        const stashedCoordinates = state.getIn(
+          ['localState', 'stashedCoordinates']
         ).push(
           action.location
         ).sort((a, b) => {
           return new Date(a.timestamp) - new Date(b.timestamp);
         })
         return newState.setIn(
-          ['localState', 'pausedCachedCoordinates'],
-          pausedCoordinates
+          ['localState', 'stashedCoordinates'],
+          stashedCoordinates
         ).setIn(
           ['localState', 'currentRideElevations'],
           newRideElevations
@@ -374,7 +380,7 @@ export default function AppReducer(state=initialState, action) {
         action.newElevation
       )
       const currentRide1 = state.getIn(['localState', 'currentRide'])
-      if (currentRide1) {
+      if (currentRide1 && !currentRide1.get('lastPauseStart')) {
         const rideCoords = currentRide1.get('rideCoordinates')
         if (rideCoords.count() === 1) {
           return replacedLastLocation.setIn(
@@ -460,7 +466,7 @@ export default function AppReducer(state=initialState, action) {
       }
       return replacedLastLocation
     case RESUME_LOCATION_TRACKING:
-      return state.setIn(['localState', 'locationTrackingPaused'], false)
+      return state.setIn(['localState', 'locationStashingActive'], false)
     case RIDE_CARROT_CREATED:
       return state.setIn(['rideCarrots', action.carrotData.get('_id')], action.carrotData)
     case RIDE_CARROT_SAVED:
@@ -507,6 +513,16 @@ export default function AppReducer(state=initialState, action) {
         ['localState', 'currentRideElevations'],
         action.currentElevations
       )
+    case STASH_NEW_LOCATIONS:
+      return state.setIn(
+        ['localState', 'locationStashingActive'],
+        true
+      )
+    case STOP_STASH_NEW_LOCATIONS:
+      return state.setIn(
+        ['localState', 'locationStashingActive'],
+        false
+      )
     case SYNC_COMPLETE:
       return state.setIn(
         ['localState', 'lastFullSync'], new Date()
@@ -524,7 +540,17 @@ export default function AppReducer(state=initialState, action) {
         !state.getIn(['localState', 'doingInitialLoad'])
       )
     case UNPAUSE_LOCATION_TRACKING:
-      return state.setIn(['localState', 'locationTrackingPaused'], false)
+      const lastPauseStart = state.getIn(['localState', 'currentRide', 'lastPauseStart'])
+      const oldPausedTime = state.getIn(['localState', 'currentRide', 'pausedTime'])
+      const elapsed = (unixTimeNow() / 1000) - (lastPauseStart / 1000)
+      const newPausedTime = oldPausedTime + elapsed
+      return state.setIn(
+        ['localState', 'currentRide', 'lastPauseStart'],
+        null
+      ).setIn(
+        ['localState', 'currentRide', 'pausedTime'],
+        newPausedTime
+      )
     case USER_UPDATED:
       return state.setIn(['users', action.userData.get('_id')], action.userData)
     case USER_SEARCH_RETURNED:

@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react';
 import MapView from 'react-native-maps';
-
 import {
   StyleSheet,
   TouchableOpacity,
@@ -130,6 +129,7 @@ export default class RidingMap extends PureComponent {
             />
           </TouchableOpacity>
         </View>
+
       </View>
     )
   }

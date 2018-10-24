@@ -29,7 +29,9 @@ describe('START_RIDE', () => {
         currentRide: Map({
           rideCoordinates: List([firstCoord]),
           distance: 0,
-          startTime: startTime
+          startTime: startTime,
+          pausedTime: 0,
+          lastPauseStart: null,
         }),
         currentRideElevations: Map({
           elevationGain: 0,

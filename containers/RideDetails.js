@@ -9,10 +9,10 @@ import {
   clearPausedLocations,
   createRide,
   discardRide,
-  mergePausedLocations,
-  pauseLocationTracking,
+  mergeStashedLocations,
+  stashNewLocations,
   stopLocationTracking,
-  unpauseLocationTracking,
+  stopStashNewLocations,
   updateRide,
   uploadRidePhoto
 } from '../actions'
@@ -82,7 +82,7 @@ class RideDetailsContainer extends PureComponent {
     Navigation.events().bindComponent(this);
 
     if (props.newRide) {
-      props.dispatch(pauseLocationTracking())
+      props.dispatch(stashNewLocations())
     }
   }
 
@@ -99,8 +99,8 @@ class RideDetailsContainer extends PureComponent {
         this.props.dispatch(discardRide())
         this.doneOnPage()
       } else if (buttonId === 'back') {
-        this.props.dispatch(unpauseLocationTracking())
-        this.props.dispatch(mergePausedLocations())
+        this.props.dispatch(stopStashNewLocations())
+        this.props.dispatch(mergeStashedLocations())
         Navigation.pop(this.props.componentId)
       }
     } else {

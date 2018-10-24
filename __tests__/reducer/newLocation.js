@@ -194,8 +194,8 @@ describe('NEW_LOCATION', () => {
         }),
         lastElevation: firstElevation,
         lastLocation: firstPoint,
-        locationTrackingPaused: true,
-        pausedCachedCoordinates: List(),
+        locationStashingActive: true,
+        stashedCoordinates: List(),
         refiningLocation: firstPoint,
       })
     })
@@ -227,10 +227,10 @@ describe('NEW_LOCATION', () => {
           elevations: Map()
         }),
         lastLocation: location,
-        locationTrackingPaused: true,
+        locationStashingActive: true,
         refiningLocation: location,
         lastElevation: elevation,
-        pausedCachedCoordinates: List([location])
+        stashedCoordinates: List([location])
       })
     })
     expectedNewState = expectedNewState.setIn(

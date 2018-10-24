@@ -5,14 +5,16 @@ import LocationServicesDialogBox from "react-native-android-location-services-di
 
 import {
   discardRide,
+  pauseLocationTracking,
   startRide,
   startLocationTracking,
   stopLocationTracking,
+  stopStashNewLocations,
   unpauseLocationTracking,
 } from '../actions'
 import { brand } from '../colors'
 import RideRecorder from '../components/RideRecorder/RideRecorder'
-import { isAndroid, logRender, unixTimeNow } from '../helpers'
+import { elapsedTime, isAndroid, logRender, unixTimeNow } from '../helpers'
 import { RIDE_DETAILS } from "../screens"
 
 class RecorderContainer extends PureComponent {
@@ -48,8 +50,10 @@ class RecorderContainer extends PureComponent {
     this.closeDiscardModal = this.closeDiscardModal.bind(this)
     this.discardRide = this.discardRide.bind(this)
     this.finishRide = this.finishRide.bind(this)
+    this.pauseLocationTracking = this.pauseLocationTracking.bind(this)
     this.showRideDetails = this.showRideDetails.bind(this)
     this.startRide = this.startRide.bind(this)
+    this.unpauseLocationTracking = this.unpauseLocationTracking.bind(this)
 
     Navigation.events().bindComponent(this);
 
@@ -135,7 +139,7 @@ class RecorderContainer extends PureComponent {
         ]
       }
     })
-    this.props.dispatch(unpauseLocationTracking())
+    this.props.dispatch(stopStashNewLocations())
     this.props.dispatch(startRide(this.props.lastLocation, this.props.lastElevation, unixTimeNow()))
   }
 
@@ -156,13 +160,28 @@ class RecorderContainer extends PureComponent {
   }
 
   showRideDetails () {
-    const elapsedTime = (unixTimeNow() - this.props.currentRide.get('startTime')) / 1000
+    const startTime = this.props.currentRide.get('startTime')
+    const now = new Date()
+    const elapsed = elapsedTime(
+      startTime,
+      now,
+      this.props.currentRide.get('pausedTime'),
+      this.props.currentRide.get('lastPauseStart')
+    )
     Navigation.push(this.props.componentId, {
       component: {
         name: RIDE_DETAILS,
-        passProps: { elapsedTime }
+        passProps: { elapsedTime: elapsed }
       }
     });
+  }
+
+  pauseLocationTracking () {
+    this.props.dispatch(pauseLocationTracking())
+  }
+
+  unpauseLocationTracking () {
+    this.props.dispatch(unpauseLocationTracking())
   }
 
   render() {
@@ -177,11 +196,12 @@ class RecorderContainer extends PureComponent {
         discardModalOpen={this.state.discardModalOpen}
         lastElevation={this.props.lastElevation}
         lastLocation={this.props.lastLocation}
-        moving={this.props.moving}
         refiningLocation={this.props.refiningLocation}
+        pauseLocationTracking={this.pauseLocationTracking}
         showGPSBar={this.state.showGPSBar}
         showRideDetails={this.showRideDetails}
         startRide={this.startRide}
+        unpauseLocationTracking={this.unpauseLocationTracking}
       />
     )
   }
@@ -197,7 +217,6 @@ function mapStateToProps (state) {
     lastElevation: localState.get('lastElevation'),
     lastLocation: localState.get('lastLocation'),
     refiningLocation: localState.get('refiningLocation'),
-    moving: localState.get('moving')
   }
 }
 

@@ -201,3 +201,29 @@ export function toElevationKey (coord) {
 export function metersToFeet(meters) {
   return meters * 3.28084
 }
+
+export function elapsedTime (startTime, currentTime, pausedTime, lastPauseStart) {
+  let nowPausedTime = 0
+  if (lastPauseStart) {
+    nowPausedTime = moment(currentTime).diff(moment(lastPauseStart), 'seconds', true)
+  }
+  const totalElapsed = moment(currentTime).diff(moment(startTime), 'seconds', true)
+  const withoutOldPauses = totalElapsed - pausedTime
+  return withoutOldPauses - nowPausedTime
+}
+
+function leftPad(num) {
+    const str = num.toString()
+    const pad = "00"
+    return pad.substring(0, pad.length - str.length) + str
+  }
+
+export function timeToString (elapsed) {
+  const asHours = elapsed / 60 / 60
+  const justHours = Math.floor(asHours)
+  const minutes = (asHours - justHours) * 60
+  const justMinutes = Math.floor(minutes)
+  const seconds = (minutes - justMinutes) * 60
+  const roundedSeconds = Math.round(seconds)
+  return `${leftPad(justHours)}:${leftPad(justMinutes)}:${leftPad(roundedSeconds)}`
+}

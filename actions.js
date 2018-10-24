@@ -10,7 +10,6 @@ import kalmanFilter from './services/Kalman'
 import { simplifyLine } from './services/DouglasPeucker'
 
 import {
-  appStates,
   haversine,
   logError,
   logInfo,
@@ -42,7 +41,7 @@ import {
   HORSE_USER_UPDATED,
   LOAD_LOCAL_STATE,
   LOCAL_DATA_LOADED,
-  MERGE_PAUSED_LOCATIONS,
+  MERGE_STASHED_LOCATIONS,
   NEEDS_REMOTE_PERSIST,
   NEW_LOCATION,
   NEW_APP_STATE,
@@ -67,6 +66,8 @@ import {
   SET_POP_SHOW_RIDE,
   SHOW_POP_SHOW_RIDE,
   START_RIDE,
+  STASH_NEW_LOCATIONS,
+  STOP_STASH_NEW_LOCATIONS,
   SYNC_COMPLETE,
   TOGGLE_AWAITING_PW_CHANGE,
   TOGGLE_DOING_INITIAL_LOAD,
@@ -207,9 +208,9 @@ export function localDataLoaded (localData) {
   }
 }
 
-export function mergePausedLocations () {
+export function mergeStashedLocations () {
   return {
-    type: MERGE_PAUSED_LOCATIONS,
+    type: MERGE_STASHED_LOCATIONS,
   }
 }
 
@@ -281,6 +282,18 @@ export function showPopShowRide () {
 export function setRemotePersistStarted () {
   return {
     type: REMOTE_PERSIST_STARTED
+  }
+}
+
+export function stashNewLocations () {
+  return {
+    type: STASH_NEW_LOCATIONS
+  }
+}
+
+export function stopStashNewLocations () {
+  return {
+    type: STOP_STASH_NEW_LOCATIONS
   }
 }
 
@@ -377,7 +390,9 @@ export function startRide(firstCoord, firstElevation, startTime) {
     currentRide: Map({
       rideCoordinates: List(coords),
       distance: 0,
-      startTime
+      startTime,
+      pausedTime: 0,
+      lastPauseStart: null
     }),
     currentElevations: Map({
       elevationGain: 0,

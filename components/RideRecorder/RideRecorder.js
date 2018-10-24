@@ -4,14 +4,16 @@ import {
   Text,
   View
 } from 'react-native';
+import { Button, Fab } from 'native-base'
 
-
-import { black, brand, green, white } from '../../colors'
+import { black, brand, green, white, orange, danger } from '../../colors'
+import FabImage from '../FabImage'
 import GPSStatus from './GPSStatus'
 
 import DiscardModal from './DiscardModal'
 import RidingMap from './RidingMap'
 import RideStats from './RideStats'
+import PlayButton from './PlayButton'
 
 
 export default class RideRecorder extends PureComponent {
@@ -19,9 +21,12 @@ export default class RideRecorder extends PureComponent {
     super(props)
     this.state = {
       gpsTaps: 0,
-      showCircles: false
+      showCircles: false,
+      fabActive: false,
     }
     this.tapGPS = this.tapGPS.bind(this)
+    this.hitPause = this.hitPause.bind(this)
+    this.toggleFab = this.toggleFab.bind(this)
   }
 
   tapGPS () {
@@ -38,9 +43,22 @@ export default class RideRecorder extends PureComponent {
     }
   }
 
+  toggleFab () {
+    this.setState({
+      fabActive: !this.state.fabActive
+    })
+  }
+
+  hitPause () {
+    this.props.pauseLocationTracking()
+    this.toggleFab()
+  }
+
   render() {
-    let rideStats = null
+    let mainView = null
     let gpsBar = null
+    let pauseButton = null
+    let cameraButton = null
     if (this.props.showGPSBar) {
       gpsBar = (
         <GPSStatus
@@ -50,6 +68,20 @@ export default class RideRecorder extends PureComponent {
         />
       )
     }
+    if (this.state.fabActive) {
+      cameraButton = (
+        <Button style={{ backgroundColor: orange }}>
+          <FabImage source={require('../../img/camera.png')} height={30} width={30} />
+        </Button>
+      )
+    }
+    if (this.state.fabActive && !this.props.currentRide.get('lastPauseStart')) {
+      pauseButton = (
+        <Button style={{ backgroundColor: danger }} onPress={this.hitPause}>
+          <FabImage source={require('../../img/pause.png')} height={30} width={30} />
+        </Button>
+      )
+    }
     let startButton = (
       <View style={styles.startButton}>
         <Text onPress={this.props.startRide} style={styles.startText}>Start Ride</Text>
@@ -57,7 +89,7 @@ export default class RideRecorder extends PureComponent {
     )
     if (this.props.currentRide) {
       startButton = null
-      rideStats = (
+      mainView = (
         <View style={{flex: 1}}>
           <View style={{flex: 5}}>
             <RidingMap
@@ -67,16 +99,31 @@ export default class RideRecorder extends PureComponent {
               tapGPS={this.tapGPS}
               lastLocation={this.props.lastLocation}
             />
+            <View>
+              <Fab
+                active={this.state.fabActive}
+                direction="up"
+                style={{ backgroundColor: brand }}
+                position="bottomRight"
+                onPress={this.toggleFab}
+              >
+                <Text>...</Text>
+                { pauseButton }
+                { cameraButton }
+              </Fab>
+            </View>
+            {
+              this.props.currentRide.get('lastPauseStart')
+                ? <PlayButton onPress={this.props.unpauseLocationTracking}/>
+                : null
+            }
           </View>
           <View style={styles.bottomSection}>
             <RideStats
               appState={this.props.appState}
+              currentRide={this.props.currentRide}
               currentRideElevations={this.props.currentRideElevations}
-              distance={this.props.currentRide.get('distance')}
               lastElevation={this.props.lastElevation}
-              moving={this.props.moving}
-              rideCoords={this.props.currentRide.get('rideCoordinates')}
-              startTime={this.props.currentRide.get('startTime')}
             />
           </View>
         </View>
@@ -90,9 +137,9 @@ export default class RideRecorder extends PureComponent {
           discardFunc={this.props.discardRide}
           text={"You haven't gone anywhere on this ride yet. Do you want to close it?"}
         />
-        {gpsBar}
-        {rideStats}
-        {startButton}
+        { gpsBar }
+        { mainView }
+        { startButton }
       </View>
     );
   }
