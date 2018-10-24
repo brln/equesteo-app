@@ -115,12 +115,12 @@ class RideContainer extends PureComponent {
     return this.props.horses.toList()
   }
 
-  showPhotoLightbox (source) {
+  showPhotoLightbox (sources) {
     Navigation.push(this.props.componentId, {
       component: {
         name: PHOTO_LIGHTBOX,
         passProps: {
-          source
+          sources
         }
       },
     })

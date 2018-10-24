@@ -78,12 +78,12 @@ class HorseProfileContainer extends PureComponent {
     }
   }
 
-  showPhotoLightbox (source) {
+  showPhotoLightbox (sources) {
     Navigation.push(this.props.componentId, {
       component: {
         name: PHOTO_LIGHTBOX,
         passProps: {
-          source,
+          sources,
           close: this.closeLightbox
         }
       }

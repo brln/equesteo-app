@@ -31,7 +31,7 @@ export default class PhotosByTimestamp extends Component {
         style={styles.photoThumbnail}
         onPress={this.changeProfilePhoto(photoID)}
       >
-        <View style={{borderColor: darkGrey, borderWidth: 2, width: width / 3.5, height: width / 3.5}}>
+        <View style={style}>
           <URIImage
             source={source}
             style={{width: '100%', height: '100%'}}
@@ -77,11 +77,13 @@ const styles = StyleSheet.create({
   thumbnail: {
     width: width / 4,
     height: width / 4,
+    borderColor: darkGrey,
+    borderWidth: 2
   },
   profilePhoto: {
     width: width / 4,
     height: width / 4,
-    borderWidth: 5,
+    borderWidth: 2,
     borderColor: orange
   }
 })

@@ -44,6 +44,7 @@ export default class Profile extends PureComponent {
     this.horseProfile = this.horseProfile.bind(this)
     this.horsesCard = this.horsesCard.bind(this)
     this.maybeShowID = this.maybeShowID.bind(this)
+    this.photoSources = this.photoSources.bind(this)
     this.renderHorse = this.renderHorse.bind(this)
     this.uploadProfile = this.uploadProfile.bind(this)
   }
@@ -123,15 +124,27 @@ export default class Profile extends PureComponent {
     }
   }
 
+  photoSources (selectedID) {
+    const sources = this.props.profileUser.get('photosByID').keySeq().reduce((accum, photoID) => {
+      if (photoID !== selectedID) {
+        accum.push({url: this.props.profileUser.getIn(['photosByID', photoID, 'uri'])})
+      }
+      return accum
+    }, [])
+    sources.unshift({url: this.props.profileUser.getIn(['photosByID', selectedID, 'uri'])})
+    return sources
+  }
+
   renderProfileImage () {
     const images = []
     const user = this.props.profileUser
     if (user.get('profilePhotoID')) {
       const profileSource = {uri: user.getIn(['photosByID', user.get('profilePhotoID'), 'uri'])}
+      const profileSources = this.photoSources(user.get('profilePhotoID'))
       images.push(
         <TouchableOpacity
           style={styles.slide}
-          onPress={() => {this.props.showPhotoLightbox(profileSource)}}
+          onPress={() => {this.props.showPhotoLightbox(profileSources)}}
           key={"profile"}
         >
           <URIImage

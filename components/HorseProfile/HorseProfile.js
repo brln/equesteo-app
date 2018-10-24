@@ -32,6 +32,7 @@ export default class HorseProfile extends PureComponent {
   constructor (props) {
     super(props)
     this.makeBirthday = this.makeBirthday.bind(this)
+    this.photoSources = this.photoSources.bind(this)
     this.renderOwner = this.renderOwner.bind(this)
     this.renderDeleteModal = this.renderDeleteModal.bind(this)
     this.renderImageSwiper = this.renderImageSwiper.bind(this)
@@ -79,7 +80,17 @@ export default class HorseProfile extends PureComponent {
     } else if (heightHands) {
       return `${heightHands} hh`
     } else return 'unknown'
+  }
 
+  photoSources (selectedID) {
+    const sources = this.props.horse.get('photosByID').keySeq().reduce((accum, photoID) => {
+      if (photoID !== selectedID) {
+        accum.push({url: this.props.horse.getIn(['photosByID', photoID, 'uri'])})
+      }
+      return accum
+    }, [])
+    sources.unshift({url: this.props.horse.getIn(['photosByID', selectedID, 'uri'])})
+    return sources
   }
 
   renderProfileImage () {
@@ -95,11 +106,12 @@ export default class HorseProfile extends PureComponent {
     if (horse.get('profilePhotoID')) {
 
       const profileSource = {uri: horse.getIn(['photosByID', horse.get('profilePhotoID'), 'uri'])}
+      const swiperSources = this.photoSources(horse.get('profilePhotoID'))
       images.push(
         <TouchableOpacity
           key={"profile"}
           style={styles.slide}
-          onPress={() => this.props.showPhotoLightbox(profileSource)}
+          onPress={() => this.props.showPhotoLightbox(swiperSources)}
         >
           <URIImage
             style={{width: '100%', height: '100%'}}
