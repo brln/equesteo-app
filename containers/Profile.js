@@ -215,7 +215,6 @@ function mapStateToProps (state, passedProps) {
   const pouchState = state.get('pouchRecords')
   const localState = state.get('localState')
   const userID = localState.get('userID')
-
   const profileUserID = passedProps.profileUser ? passedProps.profileUser.get('_id') : null
 
   return {

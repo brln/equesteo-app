@@ -1,5 +1,6 @@
 import { Map } from 'immutable'
 import { Navigation } from 'react-native-navigation'
+import { Keyboard } from 'react-native'
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
 import memoizeOne from 'memoize-one';
@@ -7,17 +8,18 @@ import memoizeOne from 'memoize-one';
 
 import {
   clearPausedLocations,
-  createRide,
-  discardRide,
+  deleteUnpersistedRide,
+  discardCurrentRide,
   mergeStashedLocations,
-  stashNewLocations,
+  persistRide,
+  rideUpdated,
+  setPopShowRide,
   stopLocationTracking,
   stopStashNewLocations,
-  updateRide,
   uploadRidePhoto
 } from '../actions'
 import { brand } from '../colors'
-import { generateUUID, logRender, newRideName, unixTimeNow } from '../helpers'
+import { generateUUID, logRender, unixTimeNow } from '../helpers'
 import RideDetails from '../components/RideRecorder/RideDetails'
 
 class RideDetailsContainer extends PureComponent {
@@ -38,18 +40,6 @@ class RideDetailsContainer extends PureComponent {
             color: 'white'
           }
         ],
-        rightButtons: [
-          {
-            id: 'save',
-            text: 'Save',
-            color: 'white'
-          },
-          {
-            id: 'discard',
-            text: 'Discard',
-            color: 'white'
-          },
-        ]
       },
       layout: {
         orientation: ['portrait']
@@ -60,9 +50,7 @@ class RideDetailsContainer extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      ride: null,
-      horseSelected: false,
-      userMadeChanges: false,
+      cachedRide: null,
       newPhotoIDs: []
     }
     this.changeCoverPhoto = this.changeCoverPhoto.bind(this)
@@ -70,9 +58,8 @@ class RideDetailsContainer extends PureComponent {
     this.changePublic = this.changePublic.bind(this)
     this.changeRideName = this.changeRideName.bind(this)
     this.changeRideNotes = this.changeRideNotes.bind(this)
-    this.createRide = this.createRide.bind(this)
     this.deletePhoto = this.deletePhoto.bind(this)
-    this.doneOnPage = this.doneOnPage.bind(this)
+    this.persistRide = this.persistRide.bind(this)
     this.uploadPhoto = this.uploadPhoto.bind(this)
     this.horses = this.horses.bind(this)
     this.uploadNewPhotos = this.uploadNewPhotos.bind(this)
@@ -82,22 +69,63 @@ class RideDetailsContainer extends PureComponent {
     Navigation.events().bindComponent(this);
 
     if (props.newRide) {
-      props.dispatch(stashNewLocations())
+      Navigation.mergeOptions(props.componentId, {
+        topBar: {
+          rightButtons: [
+            {
+              id: 'save',
+              text: 'Save',
+              color: 'white'
+            },
+            {
+              id: 'discard',
+              text: 'Discard',
+              color: 'white'
+            },
+          ]
+        }
+      })
+    } else {
+      Navigation.mergeOptions(props.componentId, {
+        topBar: {
+          rightButtons: [
+            {
+              id: 'save',
+              text: 'Save',
+              color: 'white'
+            },
+          ]
+        }
+      })
     }
+  }
+
+  static getDerivedStateFromProps (props, state) {
+    if (!state.cachedRide && props.ride) {
+      return {
+        ...state,
+        cachedRide: props.ride
+      }
+    }
+    return state
   }
 
   navigationButtonPressed({ buttonId }) {
     if (this.props.newRide) {
       Navigation.mergeOptions(this.props.componentId, {topBar: {rightButtons: []}})
       if (buttonId === 'save') {
+        this.props.dispatch(discardCurrentRide())
+        this.persistRide(this.props.ride.get('_id'))
         this.props.dispatch(clearPausedLocations())
         this.props.dispatch(stopLocationTracking())
-        this.createRide(this.state.ride)
+        Navigation.popToRoot(this.props.componentId)
+        this.props.dispatch(setPopShowRide(this.props.ride.get('_id'), true))
       } else if (buttonId === 'discard') {
         this.props.dispatch(clearPausedLocations())
         this.props.dispatch(stopLocationTracking())
-        this.props.dispatch(discardRide())
-        this.doneOnPage()
+        this.props.dispatch(discardCurrentRide())
+        this.props.dispatch(deleteUnpersistedRide())
+        Navigation.popToRoot(this.props.componentId)
       } else if (buttonId === 'back') {
         this.props.dispatch(stopStashNewLocations())
         this.props.dispatch(mergeStashedLocations())
@@ -105,92 +133,49 @@ class RideDetailsContainer extends PureComponent {
       }
     } else {
       if (buttonId === 'save') {
-        this.uploadNewPhotos()
-        this.props.dispatch(updateRide(this.state.ride))
-      }
-      Navigation.pop(this.props.componentId)
-    }
-  }
-
-  static getDerivedStateFromProps (props, state) {
-    let nextState = null
-    if (!state.ride && props.newRide) {
-      const name = newRideName(props.currentRide)
-      const _id = `${props.userID.toString()}_${(new Date).getTime().toString()}`
-
-      let defaultID = null
-      props.horseUsers.valueSeq().forEach((hu) => {
-        if (hu.get('rideDefault')) {
-          defaultID = hu.get('horseID')
-        }
-      })
-
-      nextState = {
-        ride: Map({
-          _id,
-          elapsedTimeSecs: props.elapsedTime,
-          horseID: defaultID,
-          name,
-          userID: props.userID,
-          photosByID: Map({}),
-          coverPhotoID: null,
-          isPublic: props.user.get('ridesDefaultPublic')
-        }),
-        userMadeChanges: true
-      }
-    } else if (!state.ride) {
-      nextState = {
-        ride: props.currentRide
+        this.persistRide(this.props.ride.get('_id'))
+        Navigation.pop(this.props.componentId)
+      } else if (buttonId === 'back' || buttonId === 'discard') {
+        this.props.dispatch(rideUpdated(this.state.cachedRide))
+        Navigation.pop(this.props.componentId)
       }
     }
-    return nextState
+    Keyboard.dismiss()
   }
 
   deletePhoto (photoID) {
-    const newPhotos = this.state.ride.get('photosByID').delete(photoID)
+    const newPhotos = this.props.ride.get('photosByID').delete(photoID)
     let newDeets = Map({
       photosByID: newPhotos
     })
-    if (photoID === this.state.ride.get('coverPhotoID')) {
+    if (photoID === this.props.ride.get('coverPhotoID')) {
       newDeets = newDeets.set('coverPhotoID', null)
     }
-    this.setState({
-      ride: this.state.ride.merge(newDeets),
-      userMadeChanges: true,
-    })
+    this.props.dispatch(rideUpdated(this.props.ride.merge(newDeets)))
   }
 
   changePublic () {
-    this.setState({
-      ...this.state,
-      ride: this.state.ride.set('isPublic', !this.state.ride.get('isPublic'))
-    })
+    this.props.dispatch(rideUpdated(
+      this.props.ride.set('isPublic', !this.props.ride.get('isPublic'))
+    ))
   }
 
   changeRideName (text) {
-    this.setState({
-      ...this.state,
-      ride: this.state.ride.set('name', text)
-    })
+    this.props.dispatch(rideUpdated(
+      this.props.ride.set('name', text)
+    ))
   }
 
   changeRideNotes (notes) {
-    this.setState({
-      ...this.state,
-      ride: this.state.ride.set('notes', notes)
-    })
+    this.props.dispatch(rideUpdated(
+      this.props.ride.set('notes', notes)
+    ))
   }
 
   changeHorseID (horseID) {
-    this.setState({
-      ...this.state,
-      horseSelected: true,
-      ride: this.state.ride.set('horseID', horseID)
-    })
-  }
-
-  doneOnPage () {
-    Navigation.popToRoot(this.props.componentId)
+    this.props.dispatch(rideUpdated(
+      this.props.ride.set('horseID', horseID)
+    ))
   }
 
   uploadNewPhotos () {
@@ -198,40 +183,37 @@ class RideDetailsContainer extends PureComponent {
       this.props.dispatch(
         uploadRidePhoto(
           photoID,
-          this.state.ride.getIn(['photosByID', photoID, 'uri']),
-          this.state.ride.get('_id')
+          this.props.ride.getIn(['photosByID', photoID, 'uri']),
+          this.props.ride.get('_id')
         )
       )
     }
   }
 
-  createRide () {
+  persistRide () {
+    this.props.dispatch(persistRide(this.props.ride.get('_id')))
     this.uploadNewPhotos()
-    this.props.dispatch(createRide(this.state.ride))
-    this.doneOnPage()
   }
 
   changeCoverPhoto (coverPhotoID) {
-    const newRide = this.state.ride.set('coverPhotoID', coverPhotoID)
-    this.setState({
-      ...this.state,
-      ride: newRide
-    })
+    this.props.dispatch(rideUpdated(
+      this.props.ride.set('coverPhotoID', coverPhotoID)
+    ))
   }
 
   uploadPhoto (photoURI) {
     const photoID = generateUUID()
-    const newPhotosByID = this.state.ride.get(
+    const newPhotosByID = this.props.ride.get(
       'photosByID'
     ).set(
       photoID,
       Map({uri: photoURI, timestamp: unixTimeNow()})
     )
-    const newRide = this.state.ride.set('coverPhotoID', photoID).set('photosByID', newPhotosByID)
+    const newRide = this.props.ride.set('coverPhotoID', photoID).set('photosByID', newPhotosByID)
+    this.props.dispatch(rideUpdated(
+      newRide
+    ))
     this.setState({
-      ...this.state,
-      horseSelected: true,
-      ride: newRide,
       newPhotoIDs: [...this.state.newPhotoIDs, photoID]
     })
   }
@@ -255,8 +237,7 @@ class RideDetailsContainer extends PureComponent {
         changePublic={this.changePublic}
         deletePhoto={this.deletePhoto}
         horses={this.memoizedHorses()}
-        horseSelected={this.state.horseSelected}
-        ride={this.state.ride}
+        ride={this.props.ride}
         uploadPhoto={this.uploadPhoto}
       />
     )
@@ -264,19 +245,16 @@ class RideDetailsContainer extends PureComponent {
 }
 
 function mapStateToProps (state, passedProps) {
-  const newRide = !passedProps.rideID
+  const newRide = passedProps.newRide
   const pouchState = state.get('pouchRecords')
   const localState = state.get('localState')
   const userID = localState.get('userID')
-  let currentRide = state.get('currentRide')
-  if (!newRide) {
-    currentRide = pouchState.getIn(['rides', passedProps.rideID])
-  }
+
   return {
-    currentRide,
     horses: pouchState.get('horses'),
     horseUsers: pouchState.get('horseUsers'),
     newRide,
+    ride: state.getIn(['pouchRecords', 'rides', passedProps.rideID]),
     userID,
     user: pouchState.getIn(['users', localState.get('userID')]),
   }

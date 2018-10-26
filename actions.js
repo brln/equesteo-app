@@ -7,7 +7,6 @@ import PushNotification from 'react-native-push-notification'
 import { fromJS, Map, List } from 'immutable'
 import { Sentry } from 'react-native-sentry'
 import kalmanFilter from './services/Kalman'
-import { simplifyLine } from './services/DouglasPeucker'
 
 import {
   haversine,
@@ -15,7 +14,6 @@ import {
   logInfo,
   unixTimeNow,
   generateUUID,
-  staticMap,
   toElevationKey,
 } from "./helpers"
 import { danger, green, warning } from './colors'
@@ -30,8 +28,10 @@ import {
   CLEAR_SEARCH,
   CLEAR_STATE,
   CLEAR_STATE_AFTER_PERSIST,
+  CREATE_RIDE,
   DEQUEUE_PHOTO,
-  DISCARD_RIDE,
+  DELETE_UNPERSISTED_RIDE,
+  DISCARD_CURRENT_RIDE,
   DISMISS_ERROR,
   ENQUEUE_PHOTO,
   ERROR_OCCURRED,
@@ -39,6 +39,7 @@ import {
   HORSE_CREATED,
   HORSE_SAVED,
   HORSE_USER_UPDATED,
+  LOAD_CURRENT_RIDE_STATE,
   LOAD_LOCAL_STATE,
   LOCAL_DATA_LOADED,
   MERGE_STASHED_LOCATIONS,
@@ -56,9 +57,8 @@ import {
   RIDE_CARROT_CREATED,
   RIDE_CARROT_SAVED,
   RIDE_COMMENT_CREATED,
-  RIDE_CREATED,
-  RIDE_ELEVATIONS_CREATED,
-  RIDE_SAVED,
+  RIDE_ELEVATIONS_UPDATED,
+  RIDE_UPDATED,
   SAVE_USER_ID,
   SET_ACTIVE_COMPONENT,
   SET_FEED_MESSAGE,
@@ -125,9 +125,16 @@ export function dequeuePhoto (photoID) {
   }
 }
 
-export function discardRide ()  {
+export function deleteUnpersistedRide (rideID) {
   return {
-    type: DISCARD_RIDE
+    type: DELETE_UNPERSISTED_RIDE,
+    rideID
+  }
+}
+
+export function discardCurrentRide ()  {
+  return {
+    type: DISCARD_CURRENT_RIDE
   }
 }
 
@@ -191,6 +198,13 @@ function horseUserUpdated (horseUser) {
   return {
     type: HORSE_USER_UPDATED,
     horseUser
+  }
+}
+
+export function loadCurrentRideState (currentRideState) {
+  return {
+    type: LOAD_CURRENT_RIDE_STATE,
+    currentRideState
   }
 }
 
@@ -339,24 +353,17 @@ function rideCommentCreated (rideComment) {
   }
 }
 
-function rideCreated (ride) {
+export function rideUpdated (ride) {
   return {
-    type: RIDE_CREATED,
-    ride,
-  }
-}
-
-function rideElevationsCreated (elevationData) {
-  return {
-    type: RIDE_ELEVATIONS_CREATED,
-    elevationData
-  }
-}
-
-function rideSaved (ride) {
-  return {
-    type: RIDE_SAVED,
+    type: RIDE_UPDATED,
     ride
+  }
+}
+
+function rideElevationsUpdated (rideElevations) {
+  return {
+    type: RIDE_ELEVATIONS_UPDATED,
+    rideElevations
   }
 }
 
@@ -470,7 +477,7 @@ export function addHorseUser (horse, user) {
 
 export function appInitialized () {
   return async (dispatch) => {
-    await dispatch(tryToLoadLocalState())
+    await dispatch(tryToLoadStateFromDisk())
     dispatch(startActiveComponentListener())
     dispatch(dismissError())
     dispatch(checkFCMPermission())
@@ -544,7 +551,8 @@ export function changeRidePhotoData(rideID, photoID, uri) {
       ride = ride.set('profilePhotoID', photoID)
     }
     ride = ride.setIn(['photosByID', photoID], Map({timestamp, uri}))
-    dispatch(saveRide(ride))
+    dispatch(rideUpdated(ride))
+    dispatch(persistRide(ride.get('_id')))
   }
 }
 
@@ -633,48 +641,26 @@ export function createHorse (horse, isDefault) {
   }
 }
 
-export function createRide (rideData) {
+export function createRide (rideID, userID, currentRide, currentRideElevations) {
+  return {
+    type: CREATE_RIDE,
+    currentRide,
+    currentRideElevations,
+    rideID,
+    userID
+  }
+}
+
+export function persistRide (rideID) {
   return async (dispatch, getState) => {
-    const TEN_FEET_AS_DEG_LATITUDE = 0.0000274
+    const theRide = getState().getIn(['pouchRecords', 'rides', rideID])
+    const theElevations = getState().getIn(['pouchRecords', 'rideElevations', rideID + '_elevations'])
     const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
-    const currentRide = getState().getIn(['currentRide', 'currentRide'])
-    const currentRideElevations = getState().getIn(['currentRide', 'currentRideElevations'])
-    const simplifiedCoords = simplifyLine(
-      TEN_FEET_AS_DEG_LATITUDE,
-      currentRide.get('rideCoordinates'))
-    const theRide = {
-      _id: rideData.get('_id'),
-      coverPhotoID: rideData.get('coverPhotoID'),
-      distance: currentRide.get('distance'),
-      elapsedTimeSecs: rideData.get('elapsedTimeSecs'),
-      horseID: rideData.get('horseID'),
-      isPublic: rideData.get('isPublic'),
-      name: rideData.get('name'),
-      notes: rideData.get('notes'),
-      photosByID: rideData.get('photosByID'),
-      rideCoordinates: simplifiedCoords,
-      startTime: currentRide.get('startTime'),
-      type: 'ride',
-      userID: rideData.get('userID'),
-    }
-    theRide.mapURL = staticMap(theRide)
-
-    const elevationData = {
-      _id: theRide._id + '_elevations',
-      rideID: theRide._id,
-      elevationGain: currentRideElevations.get('elevationGain'),
-      elevations: currentRideElevations.get('elevations'),
-      type: 'rideElevations',
-      userID: rideData.get('userID'),
-    }
-
-    const rideDoc = await pouchCouch.saveRide(theRide)
-    const elevationDoc = await pouchCouch.saveRide(elevationData)
-
-    dispatch(rideElevationsCreated(Map({...elevationData, _rev: elevationDoc.rev})))
-    dispatch(rideCreated(Map({...theRide, _rev: rideDoc.rev})))
-    dispatch(setPopShowRide(theRide._id, true))
+    const rideDoc = await pouchCouch.saveRide(theRide.toJS())
+    const elevationDoc = await pouchCouch.saveRide(theElevations.toJS())
+    dispatch(rideElevationsUpdated(theElevations.set('_rev', elevationDoc.rev)))
+    dispatch(rideUpdated(theRide.set('_rev', rideDoc.rev)))
     dispatch(needsRemotePersist('rides'))
   }
 }
@@ -946,15 +932,6 @@ export function setSentryUserContext () {
     Sentry.setUserContext({
       userID,
     });
-  }
-}
-
-export function saveRide (rideData) {
-  return async (dispatch) => {
-    const pouchCouch = new PouchCouch()
-    const doc = await pouchCouch.saveRide(rideData.toJS())
-    dispatch(rideSaved(rideData.set('_rev', doc.rev)))
-    dispatch(needsRemotePersist('rides'))
   }
 }
 
@@ -1284,13 +1261,21 @@ export function toggleRideCarrot (rideID) {
   }
 }
 
-export function tryToLoadLocalState () {
+export function tryToLoadStateFromDisk () {
   return async (dispatch) => {
     const localState = await LocalStorage.loadLocalState()
+    const currentRideState = await LocalStorage.loadCurrentRideState()
     if (localState) {
       dispatch(loadLocalState(localState))
     } else {
       logInfo('no cached local state found')
+    }
+
+    if (currentRideState) {
+      logDebug(currentRideState.toJSON(), 'tryToLoadCurrentRideState')
+      dispatch(loadCurrentRideState(currentRideState))
+    } else {
+      logInfo('no cached current ride state found')
     }
   }
 }
@@ -1303,16 +1288,6 @@ export function updateHorse (horseDetails) {
     const doc = await pouchCouch.saveHorse(asJS)
     dispatch(horseSaved(horseDetails.set('_rev', doc.rev)))
     dispatch(needsRemotePersist('horses'))
-  }
-}
-
-export function updateRide (rideDetails) {
-  return async (dispatch, getState) => {
-    const jwt = getState().getIn(['localState', 'jwt'])
-    const pouchCouch = new PouchCouch(jwt)
-    const doc = await pouchCouch.saveRide(rideDetails.toJS())
-    dispatch(rideSaved(rideDetails.set('_rev', doc.rev)))
-    dispatch(needsRemotePersist('rides'))
   }
 }
 

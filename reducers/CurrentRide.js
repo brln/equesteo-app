@@ -3,7 +3,8 @@ import { List, Map } from 'immutable'
 import {
   CLEAR_LAST_LOCATION,
   CLEAR_PAUSED_LOCATIONS,
-  DISCARD_RIDE,
+  DISCARD_CURRENT_RIDE,
+  LOAD_CURRENT_RIDE_STATE,
   MERGE_STASHED_LOCATIONS,
   NEW_LOCATION,
   PAUSE_LOCATION_TRACKING,
@@ -34,8 +35,10 @@ export default function CurrentRideReducer(state=initialState, action) {
       return state.set('lastLocation', null).set('refiningLocation', null)
     case CLEAR_PAUSED_LOCATIONS:
       return state.set('stashedCoordinates', List())
-    case DISCARD_RIDE:
+    case DISCARD_CURRENT_RIDE:
       return state.set('currentRide', null)
+    case LOAD_CURRENT_RIDE_STATE:
+      return action.currentRideState
     case PAUSE_LOCATION_TRACKING:
       return state.setIn(
         ['currentRide', 'lastPauseStart'],

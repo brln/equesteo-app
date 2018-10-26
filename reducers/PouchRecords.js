@@ -1,5 +1,8 @@
 import { fromJS, Map } from 'immutable'
 import {
+  CREATE_RIDE,
+  DELETE_UNPERSISTED_RIDE,
+  FOLLOW_UPDATED,
   HORSE_CREATED,
   HORSE_USER_UPDATED,
   HORSE_SAVED,
@@ -7,11 +10,13 @@ import {
   RIDE_COMMENT_CREATED,
   RIDE_CARROT_CREATED,
   RIDE_CARROT_SAVED,
-  RIDE_CREATED,
   RIDE_ELEVATIONS_CREATED,
-  RIDE_SAVED,
+  RIDE_UPDATED,
+  RIDE_ELEVATIONS_UPDATED,
   USER_UPDATED,
 } from '../constants'
+import { elapsedTime, newRideName, staticMap } from '../helpers'
+import { simplifyLine } from '../services/DouglasPeucker'
 
 export const initialState = Map({
   horses: Map(),
@@ -26,6 +31,10 @@ export const initialState = Map({
 
 export default function PouchRecordsReducer(state=initialState, action) {
   switch (action.type) {
+    case DELETE_UNPERSISTED_RIDE:
+      return state.deleteIn(['rides', action.rideID]).deleteIn('rideElevations', action.rideID + '_elevations')
+    case FOLLOW_UPDATED:
+      return state.setIn(['follows', action.follow.get('_id')], action.follow)
     case HORSE_CREATED:
       return state.set('horses', state.get('horses').set(action.horse.get('_id'), action.horse))
     case HORSE_SAVED:
@@ -89,16 +98,67 @@ export default function PouchRecordsReducer(state=initialState, action) {
       return state.setIn(['rideCarrots', action.carrotData.get('_id')], action.carrotData)
     case RIDE_COMMENT_CREATED:
       return state.setIn(['rideComments', action.rideComment.get('_id')], action.rideComment)
-    case RIDE_CREATED:
+    case CREATE_RIDE:
+      const startTime = action.currentRide.get('startTime')
+      const now = new Date()
+      const elapsed = elapsedTime(
+        startTime,
+        now,
+        action.currentRide.get('pausedTime'),
+        action.currentRide.get('lastPauseStart')
+      )
+
+      const name = newRideName(action.currentRide)
+
+      let defaultID = null
+      state.get('horseUsers').valueSeq().forEach((hu) => {
+        if (hu.get('rideDefault')) {
+          defaultID = hu.get('horseID')
+        }
+      })
+
+      const TEN_FEET_AS_DEG_LATITUDE = 0.0000274
+      const simplifiedCoords = simplifyLine(
+        TEN_FEET_AS_DEG_LATITUDE,
+        action.currentRide.get('rideCoordinates')
+      )
+
+      const theRide = {
+        _id: action.rideID,
+        coverPhotoID: null,
+        distance: action.currentRide.get('distance') ,
+        elapsedTimeSecs: elapsed,
+        horseID: defaultID,
+        isPublic: state.getIn(['users', action.userID, 'ridesDefaultPublic']),
+        name,
+        notes: null,
+        photosByID: Map({}),
+        rideCoordinates: simplifiedCoords,
+        startTime: action.currentRide.get('startTime'),
+        type: 'ride',
+        userID: action.userID,
+      }
+      theRide.mapURL = staticMap(theRide)
+
+      const elevationData = {
+        _id: action.rideID + '_elevations',
+        rideID: theRide._id,
+        elevationGain: action.currentRideElevations.get('elevationGain'),
+        elevations: action.currentRideElevations.get('elevations'),
+        type: 'rideElevations',
+        userID: action.userID,
+      }
       return state.setIn(
-        ['rides', action.ride.get('_id')], action.ride
+        ['rides', theRide._id], Map(theRide)
       ).setIn(
-        ['localState', 'currentRide'], null
+        ['rideElevations', elevationData._id], Map(elevationData),
       )
     case RIDE_ELEVATIONS_CREATED:
       return state.setIn(['rideElevations', action.elevationData.get('_id')], action.elevationData)
-    case RIDE_SAVED:
+    case RIDE_UPDATED:
       return state.setIn(['rides', action.ride.get('_id')], action.ride)
+    case RIDE_ELEVATIONS_UPDATED:
+      return state.setIn(['rideElevations', action.rideElevations.get('_id')], action.rideElevations)
     case USER_UPDATED:
       return state.setIn(['users', action.userData.get('_id')], action.userData)
     default:

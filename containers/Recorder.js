@@ -4,17 +4,19 @@ import { connect } from 'react-redux'
 import LocationServicesDialogBox from "react-native-android-location-services-dialog-box";
 
 import {
-  discardRide,
+  createRide,
+  discardCurrentRide,
   pauseLocationTracking,
   startRide,
   startLocationTracking,
+  stashNewLocations,
   stopLocationTracking,
   stopStashNewLocations,
   unpauseLocationTracking,
 } from '../actions'
 import { brand } from '../colors'
 import RideRecorder from '../components/RideRecorder/RideRecorder'
-import { elapsedTime, isAndroid, logRender, unixTimeNow } from '../helpers'
+import { isAndroid, logRender, unixTimeNow } from '../helpers'
 import { RIDE_DETAILS } from "../screens"
 
 class RecorderContainer extends PureComponent {
@@ -145,6 +147,7 @@ class RecorderContainer extends PureComponent {
 
   finishRide () {
     if (this.props.currentRide.get('rideCoordinates').count() > 0) {
+      this.props.dispatch(stashNewLocations())
       this.showRideDetails()
     } else {
       this.setState({
@@ -154,24 +157,23 @@ class RecorderContainer extends PureComponent {
   }
 
   discardRide () {
-    this.props.dispatch(discardRide())
+    this.props.dispatch(discardCurrentRide())
     this.props.dispatch(stopLocationTracking())
     Navigation.popToRoot(this.props.componentId)
   }
 
   showRideDetails () {
-    const startTime = this.props.currentRide.get('startTime')
-    const now = new Date()
-    const elapsed = elapsedTime(
-      startTime,
-      now,
-      this.props.currentRide.get('pausedTime'),
-      this.props.currentRide.get('lastPauseStart')
-    )
+    const rideID = `${this.props.userID.toString()}_${(new Date).getTime().toString()}`
+    this.props.dispatch(createRide(
+      rideID,
+      this.props.userID,
+      this.props.currentRide,
+      this.props.currentRideElevations
+    ))
     Navigation.push(this.props.componentId, {
       component: {
         name: RIDE_DETAILS,
-        passProps: { elapsedTime: elapsed }
+        passProps: { rideID, newRide: true }
       }
     });
   }
@@ -208,8 +210,10 @@ class RecorderContainer extends PureComponent {
 }
 
 function mapStateToProps (state) {
+  const pouchState = state.get('pouchRecords')
   const localState = state.get('localState')
   const currentRideState = state.get('currentRide')
+  const userID = localState.get('userID')
   return {
     appState: localState.get('appState'),
     currentRide: currentRideState.get('currentRide'),
@@ -217,6 +221,8 @@ function mapStateToProps (state) {
     lastElevation: currentRideState.get('lastElevation'),
     lastLocation: currentRideState.get('lastLocation'),
     refiningLocation: currentRideState.get('refiningLocation'),
+    user: pouchState.getIn(['users', userID]),
+    userID,
   }
 }
 

@@ -4,6 +4,7 @@ import { AsyncStorage } from 'react-native'
 export default class LocalStorage {
   static TOKEN_KEY = '@equesteo:jwtToken'
   static LOCAL_STATE_KEY = '@equesteo:localState'
+  static CURRENT_RIDE_STATE_KEY = '@equesteo:currentRide'
 
   static async saveToken (token, userID) {
     return await AsyncStorage.setItem(LocalStorage.TOKEN_KEY, JSON.stringify({
@@ -25,8 +26,20 @@ export default class LocalStorage {
     return AsyncStorage.setItem(LocalStorage.LOCAL_STATE_KEY, JSON.stringify(dataAsObject))
   }
 
+  static async saveCurrentRideState (dataAsObject) {
+    return AsyncStorage.setItem(LocalStorage.CURRENT_RIDE_STATE_KEY, JSON.stringify(dataAsObject))
+  }
+
   static async loadLocalState () {
     const asString = await AsyncStorage.getItem(LocalStorage.LOCAL_STATE_KEY);
+    if (asString) {
+      const asObj = JSON.parse(asString)
+      return fromJS(asObj)
+    }
+  }
+
+  static async loadCurrentRideState () {
+    const asString = await AsyncStorage.getItem(LocalStorage.CURRENT_RIDE_STATE_KEY);
     if (asString) {
       const asObj = JSON.parse(asString)
       return fromJS(asObj)

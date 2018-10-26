@@ -54,7 +54,6 @@ function remotePersist (db, store, pouchCouch) {
       savingRemotely = false
       const clear = store.getState().getIn(['localState', 'clearStateAfterPersist'])
       if (clear) {
-        logDebug('CLEARING STATE', 'CLEARING STATE')
         store.dispatch(clearState())
       }
     }
@@ -63,17 +62,23 @@ function remotePersist (db, store, pouchCouch) {
     if (!knowsAboutError) {
       store.dispatch(remotePersistError())
     }
-    try {
-       Sentry.captureException(new Error(e))
-    } catch (e) { logError(e) }
+    if (e.code !== 'ETIMEDOUT') {
+      try {
+        Sentry.captureException(new Error(e))
+      } catch (e) {
+        logError(e)
+      }
 
 
-    logError('Remote replication error follows ============================')
-    logError(e)
-    logError('=============================================================')
+      logError('Remote replication error follows ============================')
+      logError(e)
+      logError('=============================================================')
 
-    queue = []
-    savingRemotely = false
+      queue = []
+      savingRemotely = false
+    } else {
+      logError('Request timed out')
+    }
   })
 }
 

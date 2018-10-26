@@ -20,7 +20,6 @@ import CurrentRideReducer from './reducers/CurrentRide'
 import LocalStateReducer from './reducers/LocalState'
 import PouchRecordsReducer from './reducers/PouchRecords'
 
-console.log('creating store')
 const store = createStore(
   combineReducers({
     pouchRecords: PouchRecordsReducer,
@@ -36,7 +35,6 @@ const store = createStore(
     storeLocalState,
   )
 )
-console.log('STORE CREATED')
 
 global.logDebug = logDebug
 

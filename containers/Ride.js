@@ -3,7 +3,7 @@ import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
 
 import Ride from '../components/Ride/Ride'
-import { updateRide } from '../actions'
+import { persistRide, rideUpdated } from '../actions'
 import { brand } from '../colors'
 import { logRender } from '../helpers'
 import {
@@ -107,7 +107,8 @@ class RideContainer extends PureComponent {
   }
 
   deleteRide () {
-    this.props.dispatch(updateRide(this.props.ride.set('deleted', true)))
+    this.props.dispatch(rideUpdated(this.props.ride.set('deleted', true)))
+    this.props.dispatch(persistRide(this.props.ride.get('_id')))
     Navigation.pop(this.props.componentId)
   }
 
