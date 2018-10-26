@@ -444,10 +444,10 @@ export function userUpdated (userData) {
 //  =========================================
 export function addHorseUser (horse, user) {
   return async (dispatch, getState) => {
-    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
     const id = `${user.get('_id')}_${horse.get('_id')}`
-    let newHorseUser = getState().getIn(['main', 'horseUsers', id])
+    let newHorseUser = getState().getIn(['pouchRecords', 'horseUsers', id])
     if (newHorseUser) {
       newHorseUser = newHorseUser.set('deleted', false)
     } else {
@@ -482,7 +482,7 @@ export function appInitialized () {
 
 export function changeHorsePhotoData(horseID, photoID, uri) {
   return async (dispatch, getState) => {
-    let horse = getState().getIn(['main', 'horses']).get(horseID)
+    let horse = getState().getIn(['pouchRecords', 'horses']).get(horseID)
 
     let timestamp = unixTimeNow()
     if (horse.getIn(['photosByID', photoID])) {
@@ -535,7 +535,7 @@ export function checkFCMPermission () {
 
 export function changeRidePhotoData(rideID, photoID, uri) {
   return async (dispatch, getState) => {
-    let ride = getState().getIn(['main', 'rides']).get(rideID)
+    let ride = getState().getIn(['pouchRecords', 'rides']).get(rideID)
 
     let timestamp = unixTimeNow()
     if (ride.getIn(['photosByID', photoID])) {
@@ -550,8 +550,8 @@ export function changeRidePhotoData(rideID, photoID, uri) {
 
 export function changeUserPhotoData (photoID, uri) {
   return async (dispatch, getState) => {
-    const currentUserID = getState().getIn(['main', 'localState', 'userID'])
-    let user = getState().getIn(['main', 'users']).get(currentUserID)
+    const currentUserID = getState().getIn(['localState', 'userID'])
+    let user = getState().getIn(['pouchRecords', 'users', currentUserID])
 
     let timestamp = unixTimeNow()
     if (user.getIn(['photosByID', photoID])) {
@@ -581,7 +581,7 @@ function configureBackgroundGeolocation () {
 
 export function createHorse (horse, isDefault) {
   return async (dispatch, getState) => {
-    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
 
     const newHorse = {
@@ -601,7 +601,7 @@ export function createHorse (horse, isDefault) {
       type: 'horse'
     }
 
-    let isFirstHorse = getState().getIn(['main', 'horseUsers']).valueSeq().filter((hu) => {
+    let isFirstHorse = getState().getIn(['pouchRecords', 'horseUsers']).valueSeq().filter((hu) => {
       return hu.get('userID') === horse.get('userID') && hu.get('deleted') !== true
     }).count() === 0
     const newHorseUser = {
@@ -636,10 +636,10 @@ export function createHorse (horse, isDefault) {
 export function createRide (rideData) {
   return async (dispatch, getState) => {
     const TEN_FEET_AS_DEG_LATITUDE = 0.0000274
-    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
-    const currentRide = getState().getIn(['main', 'localState', 'currentRide'])
-    const currentRideElevations = getState().getIn(['main', 'localState', 'currentRideElevations'])
+    const currentRide = getState().getIn(['currentRide', 'currentRide'])
+    const currentRideElevations = getState().getIn(['currentRide', 'currentRideElevations'])
     const simplifiedCoords = simplifyLine(
       TEN_FEET_AS_DEG_LATITUDE,
       currentRide.get('rideCoordinates'))
@@ -681,9 +681,9 @@ export function createRide (rideData) {
 
 export function createRideComment(commentData) {
   return async (dispatch, getState) => {
-    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
-    const currentUserID = getState().getIn(['main', 'localState', 'userID'])
+    const currentUserID = getState().getIn(['localState', 'userID'])
     const commentID = `${currentUserID}_${(new Date).getTime().toString()}`
     const newComment = {
       _id: commentID,
@@ -702,9 +702,9 @@ export function createRideComment(commentData) {
 
 export function createFollow (followingID) {
   return async (dispatch, getState) => {
-    const userID = getState().getIn(['main', 'localState', 'userID'])
+    const userID = getState().getIn(['localState', 'userID'])
     const followID = `${userID}_${followingID}`
-    let found = getState().getIn(['main', 'follows', followID])
+    let found = getState().getIn(['pouchRecords', 'follows', followID])
     if (!found) {
       found = Map({
         _id: followID,
@@ -716,7 +716,7 @@ export function createFollow (followingID) {
     } else {
       found = found.set('deleted', false)
     }
-    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
     const doc = await pouchCouch.saveUser(found.toJS())
     await dispatch(followUpdated(found.set('_rev', doc.rev)))
@@ -727,11 +727,11 @@ export function createFollow (followingID) {
 
 export function deleteFollow (followingID) {
   return async (dispatch, getState) => {
-    const userID = getState().getIn(['main', 'localState', 'userID'])
+    const userID = getState().getIn(['localState', 'userID'])
     const followID = `${userID}_${followingID}`
-    let found = getState().getIn(['main', 'follows', followID]).set('deleted', true)
+    let found = getState().getIn(['pouchRecords', 'follows', followID]).set('deleted', true)
 
-    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
     const doc = await pouchCouch.saveUser(found.toJS())
     await dispatch(followUpdated(found.set('_rev', doc.rev)))
@@ -741,7 +741,7 @@ export function deleteFollow (followingID) {
 
 export function deleteHorseUser (horseID, userID) {
   return async (dispatch, getState) => {
-    const filterHorseUser = getState().getIn(['main', 'horseUsers']).valueSeq().filter(hu => {
+    const filterHorseUser = getState().getIn(['pouchRecords', 'horseUsers']).valueSeq().filter(hu => {
       return hu.get('horseID') === horseID && hu.get('userID') === userID
     })
     if (filterHorseUser.count() !== 1) {
@@ -755,7 +755,7 @@ export function deleteHorseUser (horseID, userID) {
 
 export function updateHorseUser (horseUser) {
   return async (dispatch, getState) => {
-    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
     const asJS = horseUser.toJS()
     const doc = await pouchCouch.saveHorse(asJS)
@@ -869,7 +869,7 @@ function findLocalToken () {
 
 function loadLocalData () {
   return async (dispatch, getState) => {
-    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
     try {
       const localData = await pouchCouch.localLoad()
@@ -883,7 +883,7 @@ function loadLocalData () {
 
 export function newPassword (password) {
   return async (dispatch, getState) => {
-    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const jwt = getState().getIn(['localState', 'jwt'])
     const userAPI = new UserAPI(jwt)
     try {
       await userAPI.changePassword(password)
@@ -929,7 +929,7 @@ export function remotePersistStarted () {
 
 export function searchForFriends (phrase) {
   return async (dispatch, getState) => {
-    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const jwt = getState().getIn(['localState', 'jwt'])
     const userAPI = new UserAPI(jwt)
     try {
       const resp = await userAPI.findUser(phrase)
@@ -942,7 +942,7 @@ export function searchForFriends (phrase) {
 
 export function setSentryUserContext () {
   return async (dispatch, getState) => {
-    const userID = getState().getIn(['main', 'localState', 'userID'])
+    const userID = getState().getIn(['localState', 'userID'])
     Sentry.setUserContext({
       userID,
     });
@@ -970,9 +970,9 @@ export function saveHorse (horse) {
 export function setFCMTokenOnServer (token) {
   return async (_, getState) => {
     try {
-      const jwt = getState().getIn(['main', 'localState', 'jwt'])
+      const jwt = getState().getIn(['localState', 'jwt'])
       const userAPI = new UserAPI(jwt)
-      const currentUserID = getState().getIn(['main', 'localState', 'userID'])
+      const currentUserID = getState().getIn(['localState', 'userID'])
       await userAPI.setFCMToken(currentUserID, token)
     } catch (e) {
       logError('Could not set FCM token')
@@ -999,14 +999,14 @@ export function startLocationTracking () {
     await configureBackgroundGeolocation()()
     const KALMAN_FILTER_Q = 6
     BackgroundGeolocation.on('location', (location) => {
-      const lastLocation = getState().getIn(['main', 'localState', 'lastLocation'])
+      const lastLocation = getState().getIn(['currentRide', 'lastLocation'])
       let timeDiff = 0
       if (lastLocation) {
         timeDiff = (location.time / 1000) - (lastLocation.get('timestamp') / 1000)
       }
 
       if (!lastLocation || timeDiff > 5) {
-        const refiningLocation = getState().getIn(['main', 'localState', 'refiningLocation'])
+        const refiningLocation = getState().getIn(['currentRide', 'refiningLocation'])
 
         let parsedLocation = Map({
           accuracy: location.accuracy,
@@ -1093,7 +1093,7 @@ function startListeningFCM () {
       const userID = m._data.userID
       const distance = parseFloat(m._data.distance)
       const rideID = m._data.rideID
-      const user = getState().getIn(['main', 'users']).get(userID)
+      const user = getState().getIn(['pouchRecords', 'users']).get(userID)
       const message = `${user.get('firstName')} went for a ${distance.toFixed(1)} mile ride!`
       dispatch(awaitFullSync())
       dispatch(setPopShowRide(rideID, false))
@@ -1217,10 +1217,10 @@ export function syncDBPull () {
       color: warning,
       timeout: null
     })))
-    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
-    const userID = getState().getIn(['main', 'localState', 'userID'])
-    const follows = getState().getIn(['main', 'follows'])
+    const userID = getState().getIn(['localState', 'userID'])
+    const follows = getState().getIn(['pouchRecords', 'follows'])
     const following = follows.valueSeq().filter(
       f => !f.get('deleted') && f.get('followerID') === userID
     ).map(
@@ -1256,10 +1256,10 @@ export function syncDBPull () {
 
 export function toggleRideCarrot (rideID) {
   return async (dispatch, getState) => {
-    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
-    const currentUserID = getState().getIn(['main', 'localState', 'userID'])
-    let existing = getState().getIn(['main', 'rideCarrots']).valueSeq().filter((c) => {
+    const currentUserID = getState().getIn(['localState', 'userID'])
+    let existing = getState().getIn(['pouchRecords', 'rideCarrots']).valueSeq().filter((c) => {
       return c.get('rideID') === rideID && c.get('userID') === currentUserID
     })
     existing = existing.count() > 0 ? existing.get(0) : null
@@ -1297,7 +1297,7 @@ export function tryToLoadLocalState () {
 
 export function updateHorse (horseDetails) {
   return async (dispatch, getState) => {
-    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
     const asJS = horseDetails.toJS()
     const doc = await pouchCouch.saveHorse(asJS)
@@ -1308,7 +1308,7 @@ export function updateHorse (horseDetails) {
 
 export function updateRide (rideDetails) {
   return async (dispatch, getState) => {
-    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
     const doc = await pouchCouch.saveRide(rideDetails.toJS())
     dispatch(rideSaved(rideDetails.set('_rev', doc.rev)))
@@ -1318,7 +1318,7 @@ export function updateRide (rideDetails) {
 
 export function updateUser (userDetails) {
   return async (dispatch, getState) => {
-    const jwt = getState().getIn(['main', 'localState', 'jwt'])
+    const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
     const doc = await pouchCouch.saveUser(userDetails.toJS())
     dispatch(userUpdated(userDetails.set('_rev', doc.rev)))

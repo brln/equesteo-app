@@ -178,17 +178,17 @@ class RideContainer extends PureComponent {
 }
 
 function mapStateToProps (state, passedProps) {
-  const mainState = state.get('main')
-  const localState = mainState.get('localState')
-  const ride = mainState.getIn(['rides', passedProps.rideID])
-  const rideElevations = mainState.getIn(['rideElevations', passedProps.rideID + '_elevations'])
+  const pouchState = state.get('pouchRecords')
+  const localState = state.get('localState')
+  const ride = pouchState.getIn(['rides', passedProps.rideID])
+  const rideElevations = pouchState.getIn(['rideElevations', passedProps.rideID + '_elevations'])
   const userID = localState.get('userID')
   return {
-    horses: mainState.get('horses'),
-    horseUsers: mainState.get('horseUsers'),
+    horses: pouchState.get('horses'),
+    horseUsers: pouchState.get('horseUsers'),
     ride,
     rideElevations,
-    rideUser: mainState.getIn(['users', ride.get('userID')]),
+    rideUser: pouchState.getIn(['users', ride.get('userID')]),
     userID
   }
 }

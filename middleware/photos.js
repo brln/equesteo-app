@@ -23,7 +23,7 @@ let currentlySaving = null
 
 export default uploadPhotos = store => dispatch => action => {
   dispatch(action)
-  const localState = store.getState().getIn(['main', 'localState'])
+  const localState = store.getState().get('localState')
   const needsPhotoUploads = localState.get('photoQueue').count() > 0
   const jwt = localState.get('jwt')
   const goodConnection = localState.get('goodConnection')

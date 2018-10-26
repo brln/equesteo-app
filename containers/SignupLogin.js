@@ -210,10 +210,11 @@ const styles = StyleSheet.create({
 });
 
 function mapStateToProps (state) {
+  const localState = state.get('localState')
   return {
-    awaitingPWChange: state.getIn(['main', 'localState', 'awaitingPWChange']),
-    doingInitialLoad: state.getIn(['main', 'localState', 'doingInitialLoad']),
-    error: state.getIn(['main', 'localState', 'error']),
+    awaitingPWChange: localState.get('awaitingPWChange'),
+    doingInitialLoad: localState.get('doingInitialLoad'),
+    error: localState.get('error'),
   }
 }
 

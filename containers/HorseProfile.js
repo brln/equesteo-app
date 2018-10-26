@@ -203,16 +203,16 @@ class HorseProfileContainer extends PureComponent {
 }
 
 function mapStateToProps (state, passedProps) {
-  const mainState = state.get('main')
-  const localState = mainState.get('localState')
+  const pouchState = state.get('pouchRecords')
+  const localState = state.get('localState')
   return {
-    horseUsers: mainState.get('horseUsers'),
-    horses: mainState.get('horses'),
-    horse: mainState.getIn(['horses', passedProps.horse.get('_id')]),
-    rides: mainState.get('rides'),
-    user: mainState.get('users').get(localState.get('userID')),
+    horseUsers: pouchState.get('horseUsers'),
+    horses: pouchState.get('horses'),
+    horse: pouchState.getIn(['horses', passedProps.horse.get('_id')]),
+    rides: pouchState.get('rides'),
+    user: pouchState.get('users').get(localState.get('userID')),
     userID: localState.get('userID'),
-    users: mainState.get('users')
+    users: pouchState.get('users')
   }
 }
 

@@ -71,11 +71,11 @@ class FindPeopleContainer extends PureComponent {
 }
 
 function mapStateToProps (state) {
-  const mainState = state.get('main')
-  const localState = mainState.get('localState')
+  const pouchState = state.get('pouchRecords')
+  const localState = state.get('localState')
   return {
-    allUsers: mainState.get('users'),
-    user: mainState.getIn(['users', localState.get('userID')]),
+    allUsers: pouchState.get('users'),
+    user: pouchState.getIn(['users', localState.get('userID')]),
     userSearchResults: localState.get('userSearchResults')
   }
 }

@@ -265,20 +265,20 @@ class RideDetailsContainer extends PureComponent {
 
 function mapStateToProps (state, passedProps) {
   const newRide = !passedProps.rideID
-  const mainState = state.get('main')
-  const localState = mainState.get('localState')
+  const pouchState = state.get('pouchRecords')
+  const localState = state.get('localState')
   const userID = localState.get('userID')
-  let currentRide = localState.get('currentRide')
+  let currentRide = state.get('currentRide')
   if (!newRide) {
-    currentRide = mainState.getIn(['rides', passedProps.rideID])
+    currentRide = pouchState.getIn(['rides', passedProps.rideID])
   }
   return {
     currentRide,
-    horses: mainState.get('horses'),
-    horseUsers: mainState.get('horseUsers'),
+    horses: pouchState.get('horses'),
+    horseUsers: pouchState.get('horseUsers'),
     newRide,
     userID,
-    user: mainState.getIn(['users', localState.get('userID')]),
+    user: pouchState.getIn(['users', localState.get('userID')]),
   }
 }
 

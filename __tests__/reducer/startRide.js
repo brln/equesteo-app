@@ -3,16 +3,14 @@ import { List, Map } from 'immutable'
 import 'react-native';
 import React from 'react';
 
-import AppReducer from '../../reducer'
+import CurrentRideReducer from '../../reducers/CurrentRide'
 import { startRide }  from '../../actions'
 import { toElevationKey, unixTimeNow } from '../../helpers'
 
 describe('START_RIDE', () => {
   it('starts the ride', () => {
     const initialState = Map({
-      localState: Map({
-        currentRide: null,
-      }),
+      currentRide: null,
     })
     const firstCoord = 'ducks'
     const latitude = 12
@@ -25,29 +23,26 @@ describe('START_RIDE', () => {
     })
     const startTime = unixTimeNow()
     let expectedNewState = Map({
-      localState: Map({
-        currentRide: Map({
-          rideCoordinates: List([firstCoord]),
-          distance: 0,
-          startTime: startTime,
-          pausedTime: 0,
-          lastPauseStart: null,
-        }),
-        currentRideElevations: Map({
-          elevationGain: 0,
-          elevations: Map()
-        })
+      currentRide: Map({
+        rideCoordinates: List([firstCoord]),
+        distance: 0,
+        startTime: startTime,
+        pausedTime: 0,
+        lastPauseStart: null,
+      }),
+      currentRideElevations: Map({
+        elevationGain: 0,
+        elevations: Map()
       })
     })
     expectedNewState = expectedNewState.setIn(
-      ['localState', 'currentRideElevations', 'elevations', toElevationKey(latitude), toElevationKey(longitude)],
+      ['currentRideElevations', 'elevations', toElevationKey(latitude), toElevationKey(longitude)],
       elevation
     )
 
-
     const action = startRide(firstCoord, firstElevation, startTime)
 
-    expect(AppReducer(initialState, action)).toEqual(expectedNewState)
+    expect(CurrentRideReducer(initialState, action)).toEqual(expectedNewState)
   })
 
 })

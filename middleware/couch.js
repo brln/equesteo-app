@@ -13,8 +13,7 @@ let savingRemotely = false
 
 export default storeToCouch = store => dispatch => action => {
   dispatch(action)
-  const currentState = store.getState().get('main')
-  const localState = currentState.get('localState')
+  const localState = store.getState().get('localState')
   const needsPersist = localState.get('needsRemotePersist')
   const needsAnyPersist = needsPersist.valueSeq().filter(x => x).count() > 0
   const jwt = localState.get('jwt')
@@ -42,7 +41,7 @@ function recursiveEmptyQueue (db, store, pouchCouch) {
 }
 
 function remotePersist (db, store, pouchCouch) {
-  const knowsAboutPersist = store.getState().getIn(['main', 'localState', 'remotePersistActive'])
+  const knowsAboutPersist = store.getState().getIn(['localState', 'remotePersistActive'])
   if (!knowsAboutPersist) {
     store.dispatch(remotePersistStarted())
   }
@@ -53,13 +52,14 @@ function remotePersist (db, store, pouchCouch) {
     } else {
       store.dispatch(remotePersistComplete(db))
       savingRemotely = false
-      const clear = store.getState().getIn(['main', 'localState', 'clearStateAfterPersist'])
+      const clear = store.getState().getIn(['localState', 'clearStateAfterPersist'])
       if (clear) {
+        logDebug('CLEARING STATE', 'CLEARING STATE')
         store.dispatch(clearState())
       }
     }
   }).on('error', (e) => {
-    const knowsAboutError = store.getState().getIn(['main', 'localState', 'remotePersistError'])
+    const knowsAboutError = store.getState().getIn(['localState', 'remotePersistError'])
     if (!knowsAboutError) {
       store.dispatch(remotePersistError())
     }

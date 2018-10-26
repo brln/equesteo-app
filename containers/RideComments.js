@@ -81,10 +81,11 @@ class RideCommentsContainer extends PureComponent {
 }
 
 function mapStateToProps (state, passedProps) {
+  const pouchState = state.get('pouchRecords')
   return {
-    ride: state.getIn(['main', 'rides', passedProps.rideID]),
-    rideComments: state.getIn(['main', 'rideComments']),
-    users: state.getIn(['main', 'users'])
+    ride: pouchState.getIn(['rides', passedProps.rideID]),
+    rideComments: pouchState.get('rideComments'),
+    users: pouchState.get('users')
   }
 }
 

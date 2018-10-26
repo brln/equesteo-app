@@ -92,13 +92,13 @@ class BarnContainer extends PureComponent {
 }
 
 function mapStateToProps (state) {
-  const mainState = state.get('main')
-  const localState = mainState.get('localState')
+  const pouchState = state.get('pouchRecords')
+  const localState = state.get('localState')
   return {
-    horseUsers: mainState.get('horseUsers'),
-    horses: mainState.get('horses'),
+    horseUsers: pouchState.get('horseUsers'),
+    horses: pouchState.get('horses'),
     userID: localState.get('userID'),
-    user: state.getIn(['users', localState.get('userID')])
+    user: pouchState.getIn(['users', localState.get('userID')])
   }
 }
 

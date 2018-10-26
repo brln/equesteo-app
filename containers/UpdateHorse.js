@@ -175,18 +175,18 @@ function mapStateToProps (state, passedProps) {
   })
   let horseUser = Map({})
   if (passedProps.horseID) {
-    horse = state.getIn(['main' , 'horses', passedProps.horseID])
+    horse = state.getIn(['pouchRecords' , 'horses', passedProps.horseID])
     horseUser = state.getIn([
-      'main',
+      'pouchRecords',
       'horseUsers',
-      `${state.getIn(['main', 'localState', 'userID'])}_${passedProps.horseID}`
+      `${state.getIn(['localState', 'userID'])}_${passedProps.horseID}`
     ])
   }
   return {
     horse,
     horseUser,
-    horseUsers: state.getIn(['main', 'horseUsers']),
-    userID: state.getIn(['main', 'localState', 'userID']),
+    horseUsers: state.getIn(['pouchRecords', 'horseUsers']),
+    userID: state.getIn(['localState', 'userID']),
     newHorse: passedProps.newHorse
   }
 }

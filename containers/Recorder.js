@@ -208,15 +208,15 @@ class RecorderContainer extends PureComponent {
 }
 
 function mapStateToProps (state) {
-  const mainState = state.get('main')
-  const localState = mainState.get('localState')
+  const localState = state.get('localState')
+  const currentRideState = state.get('currentRide')
   return {
     appState: localState.get('appState'),
-    currentRide: localState.get('currentRide'),
-    currentRideElevations: localState.get('currentRideElevations'),
-    lastElevation: localState.get('lastElevation'),
-    lastLocation: localState.get('lastLocation'),
-    refiningLocation: localState.get('refiningLocation'),
+    currentRide: currentRideState.get('currentRide'),
+    currentRideElevations: currentRideState.get('currentRideElevations'),
+    lastElevation: currentRideState.get('lastElevation'),
+    lastLocation: currentRideState.get('lastLocation'),
+    refiningLocation: currentRideState.get('refiningLocation'),
   }
 }
 

@@ -14,11 +14,19 @@ import logger from './middleware/logger'
 import storeToCouch from './middleware/couch'
 import uploadPhotos from './middleware/photos'
 import storeLocalState from './middleware/localstate'
-import AppReducer from './reducer'
 import { registerScreens } from './screens'
 
+import CurrentRideReducer from './reducers/CurrentRide'
+import LocalStateReducer from './reducers/LocalState'
+import PouchRecordsReducer from './reducers/PouchRecords'
+
+console.log('creating store')
 const store = createStore(
-  combineReducers({main: AppReducer}),
+  combineReducers({
+    pouchRecords: PouchRecordsReducer,
+    localState: LocalStateReducer,
+    currentRide: CurrentRideReducer
+  }),
   undefined,
   applyMiddleware(
     thunkMiddleware,
@@ -28,6 +36,7 @@ const store = createStore(
     storeLocalState,
   )
 )
+console.log('STORE CREATED')
 
 global.logDebug = logDebug
 

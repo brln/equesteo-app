@@ -96,9 +96,9 @@ class UpdateProfileContainer extends PureComponent {
 }
 
 function mapStateToProps (state) {
-  const mainState = state.get('main')
-  const localState = mainState.get('localState')
-  const user = mainState.get('users').get(localState.get('userID'))
+  const pouchState = state.get('pouchRecords')
+  const localState = state.get('localState')
+  const user = pouchState.get('users').get(localState.get('userID'))
   return {
     user
   }

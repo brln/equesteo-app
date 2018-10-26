@@ -276,26 +276,26 @@ class FeedContainer extends PureComponent {
 }
 
 function mapStateToProps (state) {
-  const mainState = state.get('main')
-  const localState = mainState.get('localState')
+  const pouchState = state.get('pouchRecords')
+  const localState = state.get('localState')
   const userID = localState.get('userID')
   return {
     awaitingFullSync: localState.get('awaitingFullSync'),
     feedMessage: localState.get('feedMessage'),
-    follows: mainState.get('follows'),
+    follows: pouchState.get('follows'),
     fullSyncFail: localState.get('fullSyncFail'),
-    horses: mainState.get('horses'),
-    horseUsers: mainState.get('horseUsers'),
+    horses: pouchState.get('horses'),
+    horseUsers: pouchState.get('horseUsers'),
     justFinishedRide: localState.get('justFinishedRide'),
     lastFullSync: localState.get('lastFullSync'),
     popShowRide: localState.get('popShowRide'),
     popShowRideNow: localState.get('popShowRideNow'),
-    rides: mainState.get('rides'),
-    rideCarrots: mainState.get('rideCarrots'),
-    rideComments: mainState.get('rideComments'),
-    users: mainState.get('users'),
+    rides: pouchState.get('rides'),
+    rideCarrots: pouchState.get('rideCarrots'),
+    rideComments: pouchState.get('rideComments'),
+    users: pouchState.get('users'),
     userID,
-    user: mainState.getIn(['users', localState.get('userID')])
+    user: pouchState.getIn(['users', localState.get('userID')])
   }
 }
 

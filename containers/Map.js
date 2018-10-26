@@ -39,7 +39,7 @@ class MapContainer extends PureComponent {
 
 function mapStateToProps (state, passedProps) {
   return {
-    ride: state.getIn(['main', 'rides', passedProps.rideID])
+    ride: state.getIn(['pouchRecords', 'rides', passedProps.rideID])
   }
 }
 

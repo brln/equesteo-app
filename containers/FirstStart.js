@@ -192,10 +192,10 @@ class FirstStartContainer extends PureComponent {
 }
 
 function mapStateToProps (state) {
-  const mainState = state.get('main')
-  const localState = mainState.get('localState')
+  const pouchState = state.get('pouchRecords')
+  const localState = state.get('localState')
   return {
-    user: mainState.getIn(['users', localState.get('userID')]),
+    user: pouchState.getIn(['users', localState.get('userID')]),
     userID: localState.get('userID')
   }
 }

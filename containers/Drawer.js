@@ -192,9 +192,11 @@ const styles = StyleSheet.create({
 });
 
 function mapStateToProps (state) {
-  const users = state.getIn(['main', 'users'])
-  const userID = state.getIn(['main', 'localState', 'userID'])
-  const activeComponent = state.getIn(['main', 'localState', 'activeComponent'])
+  const pouchState = state.get('pouchRecords')
+  const localState = state.get('localState')
+  const users = pouchState.get('users')
+  const userID = localState.get('userID')
+  const activeComponent = localState.get('activeComponent')
   return {
     activeComponent,
     user: users.get(userID)
