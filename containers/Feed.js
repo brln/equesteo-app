@@ -1,5 +1,5 @@
 import memoizeOne from 'memoize-one';
-import React, { PureComponent } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import { Navigation } from 'react-native-navigation'
 
@@ -9,6 +9,7 @@ import {
   syncDBPull,
   toggleRideCarrot
 } from "../actions";
+import BackgroundComponent from '../components/BackgroundComponent'
 import { brand } from '../colors'
 import Feed from '../components/Feed/Feed'
 import { logRender } from '../helpers'
@@ -21,7 +22,7 @@ import {
   RIDE
 } from '../screens'
 
-class FeedContainer extends PureComponent {
+class FeedContainer extends BackgroundComponent {
    static options() {
     return {
       topBar: {
@@ -84,23 +85,23 @@ class FeedContainer extends PureComponent {
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
   }
 
-   navigationButtonPressed({ buttonId }) {
-     if (buttonId === 'sideMenu') {
-       Navigation.mergeOptions(this.props.componentId, {
-         sideMenu: {
-           left: {
-             visible: true,
-           }
-         }
-       });
-     } else if (buttonId === 'findFriends') {
-       Navigation.push(this.props.componentId, {
-         component: {
-           name: FIND_PEOPLE,
-         }
-       })
-     }
-   }
+  navigationButtonPressed({ buttonId }) {
+    if (buttonId === 'sideMenu') {
+      Navigation.mergeOptions(this.props.componentId, {
+        sideMenu: {
+          left: {
+            visible: true,
+          }
+        }
+      });
+    } else if (buttonId === 'findFriends') {
+      Navigation.push(this.props.componentId, {
+        component: {
+          name: FIND_PEOPLE,
+        }
+      })
+    }
+  }
 
   static getDerivedStateFromProps (nextProps, prevState) {
     const nextState = {}
@@ -280,6 +281,7 @@ function mapStateToProps (state) {
   const localState = state.get('localState')
   const userID = localState.get('userID')
   return {
+    activeComponent: localState.get('activeComponent'),
     awaitingFullSync: localState.get('awaitingFullSync'),
     feedMessage: localState.get('feedMessage'),
     follows: pouchState.get('follows'),

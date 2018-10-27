@@ -13,7 +13,6 @@ import {
 } from 'native-base'
 
 import { darkGrey }  from '../colors'
-import { PROFILE } from '../screens'
 
 export default class FollowList extends PureComponent {
   constructor (props) {

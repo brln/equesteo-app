@@ -1,13 +1,15 @@
-import React, { PureComponent } from 'react'
+import React from 'react'
 import { connect } from 'react-redux';
 import { Navigation } from 'react-native-navigation'
 
+import { createHorse } from '../actions'
 import Barn from '../components/Barn/Barn'
+import BackgroundComponent from '../components/BackgroundComponent'
 import { brand } from '../colors'
 import { logRender } from '../helpers'
 import { HORSE_PROFILE, UPDATE_HORSE } from '../screens'
 
-class BarnContainer extends PureComponent {
+class BarnContainer extends BackgroundComponent {
   static options() {
     return {
       topBar: {
@@ -51,12 +53,17 @@ class BarnContainer extends PureComponent {
   }
 
   newHorse () {
+    const horseID = `${this.props.userID.toString()}_${(new Date).getTime().toString()}`
+    const horseUserID = `${this.props.userID}_${horseID}`
+    this.props.dispatch(createHorse(horseID, horseUserID, this.props.userID))
     Navigation.push(this.props.componentId, {
       component: {
         name: UPDATE_HORSE,
         title: 'New Horse',
         passProps: {
-          newHorse: true
+          newHorse: true,
+          horseID,
+          horseUserID,
         }
       }
     })
@@ -95,6 +102,7 @@ function mapStateToProps (state) {
   const pouchState = state.get('pouchRecords')
   const localState = state.get('localState')
   return {
+    activeComponent: localState.get('activeComponent'),
     horseUsers: pouchState.get('horseUsers'),
     horses: pouchState.get('horses'),
     userID: localState.get('userID'),

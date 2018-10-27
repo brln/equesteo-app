@@ -3,7 +3,17 @@ import { Navigation } from 'react-native-navigation'
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
 
-import { createHorse, updateUser, uploadProfilePhoto } from '../actions'
+import {
+  createHorse,
+  deleteUnpersistedHorse,
+  horseUpdated,
+  persistHorse,
+  persistHorseUser,
+  persistUser,
+  setFirstStartHorseID,
+  userUpdated,
+  uploadProfilePhoto
+} from '../actions'
 import { brand } from '../colors'
 import { generateUUID, logRender, unixTimeNow } from '../helpers'
 import FirstStart from '../components/FirstStart/FirstStart'
@@ -40,18 +50,9 @@ class FirstStartContainer extends PureComponent {
       FIRST_HORSE_PHOTO: {name: 'FIRST_HORSE_PHOTO', i: 5},
       FINAL_PAGE: {name: 'FINAL_PAGE', i: 6}
     }
-    this.state = {
-      currentPage: this.pages.INTRO_PAGE.name,
-      skipPages: [],
-      user: props.user,
-      horse: Map({
-        _id: `${props.userID.toString()}_${(new Date).getTime().toString()}`,
-        userID: props.userID,
-        photosByID: Map()
-      }),
-      horseEdited: false
-    }
     this.addHorseProfilePhoto = this.addHorseProfilePhoto.bind(this)
+    this.changeHorseName = this.changeHorseName.bind(this)
+    this.changeHorseBreed = this.changeHorseBreed.bind(this)
     this.commitUpdateUser = this.commitUpdateUser.bind(this)
     this.createHorse = this.createHorse.bind(this)
     this.done = this.done.bind(this)
@@ -59,20 +60,17 @@ class FirstStartContainer extends PureComponent {
     this.prevPage = this.prevPage.bind(this)
     this.setSkip = this.setSkip.bind(this)
     this.skipHorsePhoto = this.skipHorsePhoto.bind(this)
-    this.updateHorse = this.updateHorse.bind(this)
     this.updateUser = this.updateUser.bind(this)
     this.uploadProfilePhoto = this.uploadProfilePhoto.bind(this)
-    Navigation.events().bindComponent(this);
-  }
 
-  static getDerivedStateFromProps (props, state) {
-    let nextState = null
-    if (!state.user || (props.user && props.user.get('_rev') !== state.user.get('_rev'))) {
-      nextState = {
-        user: props.user,
-      }
+    this.state = {
+      currentPage: this.pages.INTRO_PAGE.name,
+      skipPages: [],
+      horseID: null,
+      horseUserID: null,
+      horseUpdated: false,
     }
-    return nextState
+    Navigation.events().bindComponent(this);
   }
 
   navigationButtonPressed ({ buttonId }) {
@@ -85,20 +83,36 @@ class FirstStartContainer extends PureComponent {
     }
   }
 
-  createHorse () {
-    this.props.dispatch(createHorse(this.state.horse))
+  componentDidMount () {
+    this.createHorse()
   }
 
-  updateUser (newUser) {
+  createHorse () {
+    const horseID = `${this.props.userID.toString()}_${(new Date).getTime().toString()}`
+    const horseUserID = `${this.props.userID}_${horseID}`
+    this.props.dispatch(createHorse(horseID, horseUserID, this.props.userID))
+    this.props.dispatch(setFirstStartHorseID(horseID))
     this.setState({
-      user: newUser
+      horseID,
+      horseUserID
     })
   }
 
-  updateHorse (newHorse) {
+  updateUser (newUser) {
+    this.props.dispatch(userUpdated(newUser))
+  }
+
+  changeHorseName (horseName) {
+    this.props.dispatch(horseUpdated(this.props.horse.set('name', horseName)))
     this.setState({
-      horse: newHorse,
-      horseEdited: true
+      horseUpdated: true
+    })
+  }
+
+  changeHorseBreed (horseBreed) {
+    this.props.dispatch(horseUpdated(this.props.horse.set('breed', horseBreed)))
+    this.setState({
+      horseUpdated: true
     })
   }
 
@@ -107,21 +121,30 @@ class FirstStartContainer extends PureComponent {
   }
 
   commitUpdateUser () {
-    this.props.dispatch(updateUser(this.state.user))
+    this.props.dispatch(persistUser(this.props.user.get('_id')))
   }
 
   addHorseProfilePhoto (uri) {
     let timestamp = unixTimeNow()
     let photoID = generateUUID()
-    let horse = this.state.horse.set('profilePhotoID', photoID)
+    let horse = this.props.horse.set('profilePhotoID', photoID)
     horse = horse.setIn(['photosByID', photoID], Map({timestamp, uri}))
+    this.props.dispatch(horseUpdated(horse))
+    this.props.dispatch(persistHorse(horse.get('_id')))
     this.setState({
-      horse
+      horseUpdated: true
     })
   }
 
-  done () {
-    this.props.dispatch(updateUser(this.props.user.set('finishedFirstStart', true)))
+  async done () {
+    this.props.dispatch(userUpdated(this.props.user.set('finishedFirstStart', true)))
+    this.props.dispatch(persistUser(this.props.user.get('_id')))
+    if (this.state.horseUpdated) {
+      await this.props.dispatch(persistHorse(this.state.horseID))
+      this.props.dispatch(persistHorseUser(this.state.horseUserID))
+    } else {
+      this.props.dispatch(deleteUnpersistedHorse(this.state.horseID, this.state.horseUserID))
+    }
     Navigation.pop(this.props.componentId)
   }
 
@@ -133,9 +156,6 @@ class FirstStartContainer extends PureComponent {
 
   skipHorsePhoto () {
     this.nextPage()
-    if (this.state.horseEdited) {
-      this.createHorse()
-    }
   }
 
   nextPage () {
@@ -174,19 +194,21 @@ class FirstStartContainer extends PureComponent {
     logRender('FirstStartContainer')
     return <FirstStart
       addHorseProfilePhoto={this.addHorseProfilePhoto}
+      changeHorseName={this.changeHorseName}
+      changeHorseBreed={this.changeHorseBreed}
       commitUpdateUser={this.commitUpdateUser}
       createHorse={this.createHorse}
       currentPage={this.state.currentPage}
+      deleteHorse={this.deleteHorse}
       done={this.done}
-      horse={this.state.horse}
+      horse={this.props.horse}
       nextPage={this.nextPage}
       pages={this.pages}
       setSkip={this.setSkip}
       skipHorsePhoto={this.skipHorsePhoto}
-      updateHorse={this.updateHorse.bind(this)}
       updateUser={this.updateUser}
       uploadProfilePhoto={this.uploadProfilePhoto}
-      user={this.state.user}
+      user={this.props.user}
     />
   }
 }
@@ -194,7 +216,10 @@ class FirstStartContainer extends PureComponent {
 function mapStateToProps (state) {
   const pouchState = state.get('pouchRecords')
   const localState = state.get('localState')
+  const horseID = localState.get('firstStartHorseID')
+  const horse = horseID ? pouchState.getIn(['horses', horseID]) : null
   return {
+    horse,
     user: pouchState.getIn(['users', localState.get('userID')]),
     userID: localState.get('userID')
   }

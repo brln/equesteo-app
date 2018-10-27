@@ -1,8 +1,7 @@
-import ImagePicker from 'react-native-image-crop-picker'
-
 import React, { PureComponent } from 'react'
 import {
   Dimensions,
+  Keyboard,
   StyleSheet,
   Text,
   TextInput,
@@ -19,18 +18,8 @@ const { height, width } = Dimensions.get('window')
 export default class FirstHorsePage extends PureComponent {
   constructor () {
     super()
-    this.changeHorseBreed = this.changeHorseBreed.bind(this)
-    this.changeHorseName = this.changeHorseName.bind(this)
     this.next = this.next.bind(this)
     this.skipHorse = this.skipHorse.bind(this)
-  }
-
-  changeHorseName (value) {
-    this.props.updateHorse(this.props.horse.set('name', value))
-  }
-
-  changeHorseBreed (value) {
-    this.props.updateHorse(this.props.horse.set('breed', value))
   }
 
   skipHorse () {
@@ -64,7 +53,7 @@ export default class FirstHorsePage extends PureComponent {
               underlineColorAndroid={brand}
               blurOnSubmit={false}
               keyboardType={'email-address'}
-              onChangeText={this.changeHorseName}
+              onChangeText={this.props.changeHorseName}
               onSubmitEditing={() => {this.props.inputs['breed'].focus()}}
               style={{
                 backgroundColor: 'transparent',
@@ -79,8 +68,9 @@ export default class FirstHorsePage extends PureComponent {
               underlineColorAndroid={brand}
               blurOnSubmit={false}
               keyboardType={'email-address'}
-              onChangeText={this.changeHorseBreed}
+              onChangeText={this.props.changeHorseBreed}
               ref={(i) => this.props.inputs['breed'] = i}
+              onSubmitEditing={() => {Keyboard.dismiss()}}
               style={{
                 backgroundColor: 'transparent',
                 height: 50,

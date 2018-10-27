@@ -25,6 +25,7 @@ import {
   SAVE_USER_ID,
   SET_ACTIVE_COMPONENT,
   SET_FEED_MESSAGE,
+  SET_FIRST_START_HORSE_ID,
   SET_FULL_SYNC_FAIL,
   SET_POP_SHOW_RIDE,
   SHOW_POP_SHOW_RIDE,
@@ -44,6 +45,7 @@ export const initialState = Map({
   doingInitialLoad: false,
   error: null,
   feedMessage: null,
+  firstStartHorseID: null,
   fullSyncFail: false,
   goodConnection: false,
   jwt: null,
@@ -128,6 +130,8 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.set('activeComponent', action.componentID)
     case SET_FEED_MESSAGE:
       return state.set('feedMessage', action.message)
+    case SET_FIRST_START_HORSE_ID:
+      return state.set('firstStartHorseID', action.horseID)
     case SET_POP_SHOW_RIDE:
       return state.set(
         'popShowRide', action.rideID

@@ -1,8 +1,9 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
 import { Navigation } from 'react-native-navigation'
+import { Keyboard } from 'react-native'
 
-import { signOut, updateUser, uploadProfilePhoto } from "../actions"
+import { persistUser, signOut, userUpdated, uploadProfilePhoto } from "../actions"
 import { brand } from '../colors'
 import { logRender } from '../helpers'
 import UpdateProfile from '../components/UpdateProfile'
@@ -23,6 +24,13 @@ class UpdateProfileContainer extends PureComponent {
           color: 'white'
         },
         elevation: 0,
+        leftButtons: [
+          {
+            id: 'back',
+            icon: require('../img/back-arrow.png'),
+            color: 'white'
+          }
+        ],
         rightButtons: [
           {
             id: 'save',
@@ -38,21 +46,18 @@ class UpdateProfileContainer extends PureComponent {
   }
 
   static getDerivedStateFromProps (props, state) {
-    let nextState = null
-    if (!state.user || (props.user && props.user.get('_rev') !== state.user.get('_rev'))) {
-      nextState = {
-        user: props.user,
-        userMadeChanges: false
+    if (!state.cachedUser && props.user) {
+      return {
+        cachedUser: props.user,
       }
     }
-    return nextState
+    return state
   }
 
   constructor (props) {
     super(props)
     this.state = {
-      userMadeChanges: false,
-      user: null,
+      cachedUser: null
     }
     this.changeAccountDetails = this.changeAccountDetails.bind(this)
     this.signOut = this.signOut.bind(this)
@@ -62,18 +67,19 @@ class UpdateProfileContainer extends PureComponent {
     Navigation.events().bindComponent(this);
   }
 
-  changeAccountDetails (user) {
-    this.setState({
-      userMadeChanges: true,
-      user
-    })
-  }
-
   navigationButtonPressed ({ buttonId }) {
     if (buttonId === 'save') {
-      this.props.dispatch(updateUser(this.state.user))
-      Navigation.pop(this.props.componentId)
+      this.props.dispatch(persistUser(this.props.user.get('_id')))
+    } else if (buttonId === 'back') {
+      console.log(this.state.cachedUser.toJSON())
+      this.props.dispatch(userUpdated(this.state.cachedUser))
     }
+    Navigation.pop(this.props.componentId)
+    Keyboard.dismiss()
+  }
+
+  changeAccountDetails (user) {
+    this.props.dispatch(userUpdated(user))
   }
 
   signOut () {
@@ -88,7 +94,7 @@ class UpdateProfileContainer extends PureComponent {
     logRender('UpdateProfileContainer')
     return (
       <UpdateProfile
-        user={this.state.userMadeChanges ? this.state.user : this.props.user }
+        user={ this.props.user }
         changeAccountDetails={this.changeAccountDetails}
       />
     )

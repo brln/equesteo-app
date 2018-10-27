@@ -144,7 +144,7 @@ export default class RideCard extends PureComponent {
             style={{flex: 1, alignItems: 'center'}}
             onPress={this.showHorseProfile}
           >
-            <Text style={{color: darkGrey, fontSize: 12}}>{this.props.horse.get('name')}</Text>
+            <Text style={{color: darkGrey, fontSize: 12, textAlign: 'center'}}>{this.props.horse.get('name')}</Text>
             { this.horseAvatar() }
           </TouchableOpacity>
         )

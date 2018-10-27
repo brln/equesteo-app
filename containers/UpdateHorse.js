@@ -1,10 +1,18 @@
 import { Map } from 'immutable'
 import React, { PureComponent } from 'react'
+import { Keyboard } from 'react-native'
 import { connect } from 'react-redux';
 import { Navigation } from 'react-native-navigation'
 
 import UpdateHorse from '../components/UpdateHorse/UpdateHorse'
-import { createHorse, updateHorse, uploadHorsePhoto, updateHorseUser } from '../actions'
+import {
+  deleteUnpersistedHorse,
+  horseUpdated,
+  horseUserUpdated,
+  persistHorse,
+  persistHorseUser,
+  uploadHorsePhoto,
+} from '../actions'
 import { brand } from '../colors'
 import { generateUUID, logRender, unixTimeNow } from '../helpers'
 
@@ -24,6 +32,13 @@ class UpdateHorseContainer extends PureComponent {
           color: 'white'
         },
         elevation: 0,
+        leftButtons: [
+          {
+            id: 'back',
+            icon: require('../img/back-arrow.png'),
+            color: 'white'
+          }
+        ],
         rightButtons: [
           {
             id: 'save',
@@ -41,111 +56,114 @@ class UpdateHorseContainer extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      userChangedHorse: false,
-      horse: null,
-      userChangedDefault: false,
-      horseUser: null,
-      newPhotos: []
+      cachedHorse: null,
+      cachedHorseUser: null,
+      newPhotoIDs: [],
     }
-    this.changeHorseDetails = this.changeHorseDetails.bind(this)
     this.commitDefaultHorse = this.commitDefaultHorse.bind(this)
+    this.horseUpdated = this.horseUpdated.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
     this.setDefaultHorse = this.setDefaultHorse.bind(this)
-    this.uploadPhoto = this.uploadPhoto.bind(this)
+    this.stashPhoto = this.stashPhoto.bind(this)
+    this.uploadNewPhotos = this.uploadNewPhotos.bind(this)
 
     Navigation.events().bindComponent(this);
   }
 
   static getDerivedStateFromProps (props, state) {
-    let nextState = null
-    if (!state.horse && !state.horseUser && props.horse && props.horseUser) {
+    let nextState = state
+    if (!state.cachedHorse && props.horse) {
       nextState = {
         ...state,
-        horse: props.horse,
-        horseUser: props.horseUser
+        cachedHorse: props.horse,
+      }
+    }
+    if (!state.cachedHorseUser && props.horseUser) {
+      nextState = {
+        ...nextState,
+        cachedHorseUser: props.horseUser
       }
     }
     return nextState
   }
 
   async navigationButtonPressed ({ buttonId }) {
+    Keyboard.dismiss()
     if (buttonId === 'save') {
-      if (this.props.newHorse) {
-        const newProps = Map({
-          _id: `${this.props.userID.toString()}_${(new Date).getTime().toString()}`,
-          userID: this.props.userID
-        })
-        const withNewProps = this.state.horse.merge(newProps)
-        this.props.dispatch(createHorse(withNewProps, !!this.state.newDefault))
-      } else {
-        if (this.state.userChangedDefault) {
-          await this.commitDefaultHorse()
-        }
-        if (this.state.userChangedHorse) {
-          // There is some weird race condition here where if you
-          // don't await, and you change a property on the horse and
-          // also update it's default status, then reload, it will
-          // just disappear. When it writes the records to PouchDB
-          // They are losing everything except the id and rev.
-          //
-          // I spent hours and have no idea wtf, but
-          // this solves the problem (until it doesn't. sorry.).
-          //
-          // Probably try to get rid of this when you upgrade
-          // pouchdb-react-native from 6.4.1
-          setTimeout(() => {
-            this.props.dispatch(updateHorse(this.state.horse))
-          }, 300)
-
-
-        }
-      }
-
       Navigation.pop(this.props.componentId)
+      // You have to await these, there is a bug (in pouch?) which will delete
+      // all your horse data if you call these at the same time
+      await this.props.dispatch(persistHorse(this.props.horse.get('_id')))
+      await this.props.dispatch(persistHorseUser(this.props.horseUser.get('_id')))
+      this.uploadNewPhotos()
+      this.commitDefaultHorse()
+    } else if (buttonId === 'back') {
+      if (this.props.newHorse) {
+        await Navigation.pop(this.props.componentId)
+        this.props.dispatch(deleteUnpersistedHorse(
+          this.props.horseID,
+          this.props.horseUserID
+        ))
+      } else {
+        this.props.dispatch(horseUpdated(this.state.cachedHorse))
+        this.props.dispatch(horseUserUpdated(this.state.cachedHorseUser))
+        await Navigation.pop(this.props.componentId)
+      }
     }
+
   }
 
-  changeHorseDetails (newDetails) {
-    const newHorse = this.state.horse.merge(newDetails)
+  horseUpdated (horse) {
+    this.props.dispatch(horseUpdated(horse))
+  }
+
+  stashPhoto (uri) {
+    let horse = this.props.horse
+    let timestamp = unixTimeNow()
+    let photoID = generateUUID()
+    horse = horse.set('profilePhotoID', photoID)
+    this.props.dispatch(
+      horseUpdated(
+        horse.setIn(
+          ['photosByID', photoID],
+          Map({timestamp, uri})
+        )
+      )
+    )
     this.setState({
-      userChangedHorse: true,
-      horse: newHorse
+      newPhotoIDs: [...this.state.newPhotoIDs, photoID]
     })
   }
 
-  uploadPhoto (uri) {
-    if (this.props.newHorse) {
-      let horse = this.state.horse
-      let timestamp = unixTimeNow()
-      let photoID = generateUUID()
-      horse = horse.set('profilePhotoID', photoID)
-      horse = horse.setIn(['photosByID', photoID], Map({timestamp, uri}))
-      this.setState({
-        horse,
-        newPhotos: [...this.state.newPhotos, photoID]
-      })
-    } else {
-      this.props.dispatch(uploadHorsePhoto(uri, this.state.horse.get('_id')))
+  uploadNewPhotos () {
+    for (let photoID of this.state.newPhotoIDs) {
+      this.props.dispatch(
+        uploadHorsePhoto(
+          photoID,
+          this.props.horse.getIn(['photosByID', photoID, 'uri']),
+          this.props.horse.get('_id')
+        )
+      )
     }
   }
 
   setDefaultHorse () {
-    this.setState({
-      horseUser: this.state.horseUser.set('rideDefault', !this.state.horseUser.get('rideDefault')),
-      userChangedDefault: true
-    })
+    const newVal = !this.props.horseUser.get('rideDefault')
+    this.props.dispatch(horseUserUpdated(
+      this.props.horseUser.set('rideDefault', newVal)
+    ))
   }
 
-  async commitDefaultHorse () {
-    await this.props.dispatch(updateHorseUser(this.state.horseUser))
-
-    if (this.state.horseUser.get('rideDefault')) {
-      this.props.horseUsers.valueSeq().forEach(async horseUser => {
+  commitDefaultHorse () {
+    if (this.state.cachedHorseUser.get('rideDefault') !== this.props.horseUser.get('rideDefault')
+      && this.props.horseUser.get('rideDefault') === true) {
+       this.props.horseUsers.valueSeq().forEach(async horseUser => {
         if (horseUser !== this.props.horseUser
           && horseUser.get('userID') === this.props.userID
           && horseUser.get('rideDefault') === true) {
           const withoutDefault = horseUser.set('rideDefault', false)
-          await this.props.dispatch(updateHorseUser(withoutDefault))
+          this.props.dispatch(horseUserUpdated(withoutDefault))
+          this.props.dispatch(persistHorseUser(withoutDefault.get('_id')))
         }
       })
     }
@@ -155,14 +173,14 @@ class UpdateHorseContainer extends PureComponent {
     logRender('UpdateHorseContainer')
     return (
       <UpdateHorse
-        changeHorseDetails={this.changeHorseDetails}
         closeDeleteModal={this.closeDeleteModal}
         deleteHorse={this.deleteHorse}
-        horse={this.state.horse}
-        horseUser={this.state.horseUser}
-        modalOpen={this.state.modalOpen}
+        horse={this.props.horse}
+        horseUpdated={this.horseUpdated}
+        horseUser={this.props.horseUser}
+        newHorse={this.props.newHorse}
         setDefaultHorse={this.setDefaultHorse}
-        uploadPhoto={this.uploadPhoto}
+        stashPhoto={this.stashPhoto}
         userID={this.props.userID}
       />
     )
@@ -170,18 +188,8 @@ class UpdateHorseContainer extends PureComponent {
 }
 
 function mapStateToProps (state, passedProps) {
-  let horse = Map({
-    photosByID: Map()
-  })
-  let horseUser = Map({})
-  if (passedProps.horseID) {
-    horse = state.getIn(['pouchRecords' , 'horses', passedProps.horseID])
-    horseUser = state.getIn([
-      'pouchRecords',
-      'horseUsers',
-      `${state.getIn(['localState', 'userID'])}_${passedProps.horseID}`
-    ])
-  }
+  const horse = state.getIn(['pouchRecords' , 'horses', passedProps.horseID])
+  const horseUser = state.getIn(['pouchRecords', 'horseUsers', passedProps.horseUserID])
   return {
     horse,
     horseUser,

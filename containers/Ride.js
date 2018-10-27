@@ -11,7 +11,7 @@ import {
   MAP,
   PHOTO_LIGHTBOX,
   PROFILE,
-  RIDE_DETAILS
+  UPDATE_RIDE
 } from '../screens'
 
 class RideContainer extends PureComponent {
@@ -52,7 +52,7 @@ class RideContainer extends PureComponent {
     if (buttonId === 'edit') {
       Navigation.push(this.props.componentId, {
         component: {
-          name: RIDE_DETAILS,
+          name: UPDATE_RIDE,
           passProps: {
             rideID: this.props.ride.get('_id')
           },

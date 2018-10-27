@@ -35,7 +35,6 @@ export default class FirstHorsePhoto extends PureComponent {
   }
 
   next () {
-    this.props.createHorse()
     this.props.nextPage()
   }
 

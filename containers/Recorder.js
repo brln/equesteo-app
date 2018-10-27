@@ -17,7 +17,7 @@ import {
 import { brand } from '../colors'
 import RideRecorder from '../components/RideRecorder/RideRecorder'
 import { isAndroid, logRender, unixTimeNow } from '../helpers'
-import { RIDE_DETAILS } from "../screens"
+import { UPDATE_RIDE } from "../screens"
 
 class RecorderContainer extends PureComponent {
   static options() {
@@ -53,7 +53,7 @@ class RecorderContainer extends PureComponent {
     this.discardRide = this.discardRide.bind(this)
     this.finishRide = this.finishRide.bind(this)
     this.pauseLocationTracking = this.pauseLocationTracking.bind(this)
-    this.showRideDetails = this.showRideDetails.bind(this)
+    this.showUpdateRide = this.showUpdateRide.bind(this)
     this.startRide = this.startRide.bind(this)
     this.unpauseLocationTracking = this.unpauseLocationTracking.bind(this)
 
@@ -148,7 +148,7 @@ class RecorderContainer extends PureComponent {
   finishRide () {
     if (this.props.currentRide.get('rideCoordinates').count() > 0) {
       this.props.dispatch(stashNewLocations())
-      this.showRideDetails()
+      this.showUpdateRide()
     } else {
       this.setState({
         discardModalOpen: true
@@ -162,7 +162,7 @@ class RecorderContainer extends PureComponent {
     Navigation.popToRoot(this.props.componentId)
   }
 
-  showRideDetails () {
+  showUpdateRide () {
     const rideID = `${this.props.userID.toString()}_${(new Date).getTime().toString()}`
     this.props.dispatch(createRide(
       rideID,
@@ -172,7 +172,7 @@ class RecorderContainer extends PureComponent {
     ))
     Navigation.push(this.props.componentId, {
       component: {
-        name: RIDE_DETAILS,
+        name: UPDATE_RIDE,
         passProps: { rideID, newRide: true }
       }
     });
@@ -201,7 +201,7 @@ class RecorderContainer extends PureComponent {
         refiningLocation={this.props.refiningLocation}
         pauseLocationTracking={this.pauseLocationTracking}
         showGPSBar={this.state.showGPSBar}
-        showRideDetails={this.showRideDetails}
+        showUpdateRide={this.showUpdateRide}
         startRide={this.startRide}
         unpauseLocationTracking={this.unpauseLocationTracking}
       />

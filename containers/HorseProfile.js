@@ -1,14 +1,23 @@
-import React, { PureComponent } from 'react'
+import { Map } from 'immutable'
+import React from 'react'
 import { connect } from 'react-redux';
 import { Navigation } from 'react-native-navigation'
 
-import { addHorseUser, deleteHorseUser, uploadHorsePhoto } from '../actions'
+import {
+  addHorseUser,
+  deleteHorseUser,
+  horseUpdated,
+  persistHorseUser,
+  uploadHorsePhoto
+} from '../actions'
+import BackgroundComponent from '../components/BackgroundComponent'
 import { brand } from '../colors'
+import { generateUUID, logRender, unixTimeNow } from '../helpers'
 import { PHOTO_LIGHTBOX, PROFILE, UPDATE_HORSE } from '../screens'
 import HorseProfile from '../components/HorseProfile/HorseProfile'
-import { logRender } from '../helpers'
 
-class HorseProfileContainer extends PureComponent {
+
+class HorseProfileContainer extends BackgroundComponent {
   static options() {
     return {
       topBar: {
@@ -121,6 +130,7 @@ class HorseProfileContainer extends PureComponent {
           title: "Update Horse",
           passProps: {
             horseID: this.props.horse.get('_id'),
+            horseUserID: this.horseOwner().ownerHorseUser.get('_id'),
             newHorse: false
           },
         }
@@ -143,11 +153,21 @@ class HorseProfileContainer extends PureComponent {
 
   deleteHorse () {
     this.props.dispatch(deleteHorseUser(this.props.horse.get('_id'), this.props.user.get('_id')))
+    this.props.dispatch(persistHorseUser(this.horseOwner().ownerHorseUser.get('_id')))
     Navigation.pop(this.props.componentId)
   }
 
   uploadPhoto (location) {
-    this.props.dispatch(uploadHorsePhoto(location, this.props.horse.get('_id')))
+    let photoID = generateUUID()
+    this.props.dispatch(
+      horseUpdated(
+        this.props.horse.setIn(
+          ['photosByID', photoID],
+          Map({timestamp: unixTimeNow(), uri: location})
+        ).set('profilePhotoID', photoID)
+      )
+    )
+    this.props.dispatch(uploadHorsePhoto(photoID, location, this.props.horse.get('_id')))
   }
 
   thisHorsesRides () {
@@ -169,15 +189,17 @@ class HorseProfileContainer extends PureComponent {
 
   horseOwner () {
     let user
+    let ownerHorseUser
     this.props.horseUsers.valueSeq().forEach((horseUser) => {
       if (horseUser.get('owner') === true && horseUser.get('horseID') === this.props.horse.get('_id')) {
         user = this.props.users.get(horseUser.get('userID'))
+        ownerHorseUser = horseUser
       }
     })
     if (!user) {
       throw Error('Horse has no owner.')
     }
-    return user
+    return { user, ownerHorseUser }
   }
 
   render() {
@@ -189,7 +211,7 @@ class HorseProfileContainer extends PureComponent {
         componentId={this.props.componentId}
         deleteHorse={this.deleteHorse}
         horse={this.props.horse}
-        horseOwner={this.horseOwner()}
+        horseOwner={this.horseOwner().user}
         modalOpen={this.state.modalOpen}
         rides={this.thisHorsesRides()}
         riders={this.thisHorsesRiders()}
@@ -206,6 +228,7 @@ function mapStateToProps (state, passedProps) {
   const pouchState = state.get('pouchRecords')
   const localState = state.get('localState')
   return {
+    activeComponent: localState.get('activeComponent'),
     horseUsers: pouchState.get('horseUsers'),
     horses: pouchState.get('horses'),
     horse: pouchState.getIn(['horses', passedProps.horse.get('_id')]),

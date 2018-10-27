@@ -1,11 +1,12 @@
 import { fromJS, Map } from 'immutable'
 import {
+  CREATE_HORSE,
   CREATE_RIDE,
+  DELETE_UNPERSISTED_HORSE,
   DELETE_UNPERSISTED_RIDE,
   FOLLOW_UPDATED,
-  HORSE_CREATED,
   HORSE_USER_UPDATED,
-  HORSE_SAVED,
+  HORSE_UPDATED,
   LOCAL_DATA_LOADED,
   RIDE_COMMENT_CREATED,
   RIDE_CARROT_CREATED,
@@ -15,7 +16,7 @@ import {
   RIDE_ELEVATIONS_UPDATED,
   USER_UPDATED,
 } from '../constants'
-import { elapsedTime, newRideName, staticMap } from '../helpers'
+import { elapsedTime, newRideName, staticMap, unixTimeNow } from '../helpers'
 import { simplifyLine } from '../services/DouglasPeucker'
 
 export const initialState = Map({
@@ -31,16 +32,16 @@ export const initialState = Map({
 
 export default function PouchRecordsReducer(state=initialState, action) {
   switch (action.type) {
+    case DELETE_UNPERSISTED_HORSE:
+      return state.deleteIn(['horses', action.horseID]).deleteIn(['horseUsers', action.horseUserID])
     case DELETE_UNPERSISTED_RIDE:
-      return state.deleteIn(['rides', action.rideID]).deleteIn('rideElevations', action.rideID + '_elevations')
+      return state.deleteIn(['rides', action.rideID]).deleteIn(['rideElevations', action.rideID + '_elevations'])
     case FOLLOW_UPDATED:
       return state.setIn(['follows', action.follow.get('_id')], action.follow)
-    case HORSE_CREATED:
-      return state.set('horses', state.get('horses').set(action.horse.get('_id'), action.horse))
-    case HORSE_SAVED:
-      return state.set('horses', state.get('horses').set(action.horse.get('_id'), action.horse))
+    case HORSE_UPDATED:
+      return state.setIn(['horses', action.horse.get('_id')], action.horse)
     case HORSE_USER_UPDATED:
-      return state.set('horseUsers', state.get('horseUsers').set(action.horseUser.get('_id'), action.horseUser))
+      return state.setIn(['horseUsers', action.horseUser.get('_id')], action.horseUser)
     case LOCAL_DATA_LOADED:
       const allUsers = action.localData.users.reduce((accum, user) => {
         accum[user._id] = fromJS(user)
@@ -89,7 +90,9 @@ export default function PouchRecordsReducer(state=initialState, action) {
         rideCarrots: Map(allCarrots),
         rideComments: Map(allComments),
         rideElevations: Map(allRideElevations),
-        horses: Map(allHorses),
+        // First start creates a horse, probably before the finishes,
+        // so keep it from blowing the new horse away
+        horses: state.get('horses').merge(Map(allHorses)),
         horseUsers: Map(allHorseUsers)
       }))
     case RIDE_CARROT_CREATED:
@@ -98,6 +101,44 @@ export default function PouchRecordsReducer(state=initialState, action) {
       return state.setIn(['rideCarrots', action.carrotData.get('_id')], action.carrotData)
     case RIDE_COMMENT_CREATED:
       return state.setIn(['rideComments', action.rideComment.get('_id')], action.rideComment)
+    case CREATE_HORSE:
+      const newHorse = {
+        _id: action.horseID,
+        breed: null,
+        birthDay: null,
+        birthMonth: null,
+        birthYear: null,
+        createTime: unixTimeNow(),
+        description: null,
+        heightHands: null,
+        heightInches: null,
+        name: null,
+        profilePhotoID: null ,
+        photosByID: Map(),
+        sex: null ,
+        type: 'horse',
+      }
+
+      let isFirstHorse = state.get('horseUsers').valueSeq().filter((hu) => {
+        return hu.get('userID') === action.userID && hu.get('deleted') !== true
+      }).count() === 0
+      const newHorseUser = {
+        _id: action.horseUserID,
+        type: 'horseUser',
+        horseID: newHorse._id,
+        userID: action.userID,
+        owner: true,
+        createTime: unixTimeNow(),
+        deleted: false,
+        rideDefault: isFirstHorse,
+      }
+      return state.setIn(
+        ['horses', newHorse._id],
+        Map(newHorse)
+      ).setIn(
+        ['horseUsers', newHorseUser._id],
+        Map(newHorseUser)
+      )
     case CREATE_RIDE:
       const startTime = action.currentRide.get('startTime')
       const now = new Date()

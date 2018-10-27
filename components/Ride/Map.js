@@ -9,7 +9,6 @@ import {
 export default class Map extends PureComponent {
   constructor (props) {
     super(props)
-    this.state = {}
     this.fitToElements = this.fitToElements.bind(this)
   }
 

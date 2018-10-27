@@ -1,7 +1,7 @@
 import { Map } from 'immutable'
 import { Navigation } from 'react-native-navigation'
 import { Keyboard } from 'react-native'
-import React, { PureComponent } from 'react'
+import React from 'react'
 import { connect } from 'react-redux';
 import memoizeOne from 'memoize-one';
 
@@ -18,11 +18,12 @@ import {
   stopStashNewLocations,
   uploadRidePhoto
 } from '../actions'
+import BackgroundComponent from '../components/BackgroundComponent'
 import { brand } from '../colors'
 import { generateUUID, logRender, unixTimeNow } from '../helpers'
-import RideDetails from '../components/RideRecorder/RideDetails'
+import UpdateRide from '../components/UpdateRide/UpdateRide'
 
-class RideDetailsContainer extends PureComponent {
+class UpdateRideContainer extends BackgroundComponent {
   static options() {
     return {
       topBar: {
@@ -227,9 +228,9 @@ class RideDetailsContainer extends PureComponent {
   }
 
   render() {
-    logRender('rendering RideDetailsContainer')
+    logRender('rendering UpdateRideContainer')
     return (
-      <RideDetails
+      <UpdateRide
         changeCoverPhoto={this.changeCoverPhoto}
         changeRideName={this.changeRideName}
         changeRideNotes={this.changeRideNotes}
@@ -251,6 +252,7 @@ function mapStateToProps (state, passedProps) {
   const userID = localState.get('userID')
 
   return {
+    activeComponent: localState.get('activeComponent'),
     horses: pouchState.get('horses'),
     horseUsers: pouchState.get('horseUsers'),
     newRide,
@@ -260,4 +262,4 @@ function mapStateToProps (state, passedProps) {
   }
 }
 
-export default connect(mapStateToProps)(RideDetailsContainer)
+export default connect(mapStateToProps)(UpdateRideContainer)

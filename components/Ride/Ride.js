@@ -78,15 +78,18 @@ export default class Ride extends PureComponent {
           toElevationKey(lastPoint.get('latitude')),
           toElevationKey(lastPoint.get('longitude'))
         ])
-        const elevationChange = elevation - lastElevation
-        totalGain += elevationChange > 0 ? elevationChange : 0
-        points.push({
-          elevation,
-          distance: totalDistance,
-          gain: totalGain
-        })
+        const diff = Math.abs(lastElevation - elevation)
+        const percentDiff = diff / elevation
+        if (diff && percentDiff < 0.15) {
+          const elevationChange = elevation - lastElevation
+          totalGain += elevationChange > 0 ? elevationChange : 0
+          points.push({
+            elevation,
+            distance: totalDistance,
+            gain: totalGain
+          })
+        }
         lastPoint = rideCoord
-        // @TODO: put the gain chart in
       }
     }
     return points

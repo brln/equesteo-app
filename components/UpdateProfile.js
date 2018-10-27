@@ -50,7 +50,15 @@ export default class UpdateProfile extends PureComponent {
       photosByID: newPhotos
     })
     if (this.state.selectedPhotoID === this.props.user.get('profilePhotoID')) {
-      newDeets = newDeets.set('profilePhotoID', null)
+      if (newPhotos.keySeq().count() === 0) {
+        newDeets = newDeets.set('profilePhotoID', null)
+      } else {
+        newDeets = newDeets.set(
+          'profilePhotoID',
+          newPhotos.keySeq().get(0)
+        )
+      }
+
     }
     this.props.changeAccountDetails(this.props.user.merge(newDeets))
     this.setState({

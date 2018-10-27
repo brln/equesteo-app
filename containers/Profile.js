@@ -1,8 +1,8 @@
 import { Map } from 'immutable'
-import React, { PureComponent } from 'react'
+import React from 'react'
 import { connect } from 'react-redux';
 import { Navigation } from 'react-native-navigation'
-
+import BackgroundComponent from '../components/BackgroundComponent'
 import Profile from '../components/Profile/Profile'
 import {
   clearSearch,
@@ -21,7 +21,7 @@ import {
 } from '../screens'
 import { logRender } from '../helpers'
 
-class ProfileContainer extends PureComponent {
+class ProfileContainer extends BackgroundComponent {
   static options() {
     return {
       topBar: {
@@ -218,6 +218,7 @@ function mapStateToProps (state, passedProps) {
   const profileUserID = passedProps.profileUser ? passedProps.profileUser.get('_id') : null
 
   return {
+    activeComponent: localState.get('activeComponent'),
     follows: pouchState.get('follows'),
     horseUsers: pouchState.get('horseUsers'),
     horses: pouchState.get('horses'),

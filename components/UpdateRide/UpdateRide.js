@@ -16,11 +16,11 @@ import ImagePicker from 'react-native-image-crop-picker'
 
 import { brand, darkBrand } from '../../colors'
 import FabImage from '../FabImage'
-import HorseSelector from './HorseSelector'
+import HorseSelector from '../RideRecorder/HorseSelector'
 import PhotosByTimestamp from '../PhotosByTimestamp'
 import PhotoMenu from '../UpdateHorse/PhotoMenu'
 
-export default class RideDetails extends PureComponent {
+export default class UpdateRide extends PureComponent {
   constructor (props) {
     super(props)
     this.uploadPhoto = this.uploadPhoto.bind(this)

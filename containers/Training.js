@@ -85,7 +85,8 @@ class TrainingContainer extends PureComponent {
     logRender('TrainingContainer')
     return (
       <Training
-        horses={this.yourHorses()}
+        horses={this.props.horses}
+        horseUsers={this.props.horseUsers}
         rides={this.allRidesOnYourHorses()}
         riders={this.allRidersButYou()}
         showRide={this.showRide}
