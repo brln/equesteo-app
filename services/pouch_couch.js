@@ -1,3 +1,4 @@
+import { Sentry } from 'react-native-sentry'
 import PouchDB from 'pouchdb-react-native'
 import { API_URL } from 'react-native-dotenv'
 
@@ -25,6 +26,7 @@ export default class PouchCouch {
   catchError (e) {
     logInfo("ERROR TO FOLLOW: ")
     logError(e)
+    Sentry.captureException(new Error(JSON.stringify(e)))
     throw e
   }
 

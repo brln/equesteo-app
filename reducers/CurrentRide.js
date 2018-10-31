@@ -49,7 +49,9 @@ export default function CurrentRideReducer(state=initialState, action) {
         ['currentRide', 'rideCoordinates']
       )
       const pausedCoordinates = state.get('stashedCoordinates')
-      const merged = rideCoordinates.concat(pausedCoordinates)
+      const merged = rideCoordinates.concat(pausedCoordinates).sort((a, b) => {
+        return new Date(a.timestamp) - new Date(b.timestamp);
+      })
       return state.setIn(
         ['currentRide', 'rideCoordinates'],
         merged
