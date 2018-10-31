@@ -53,10 +53,12 @@ export default class FirstHorsePhoto extends PureComponent {
       </TouchableOpacity>
     )
     let horseProfileImage = (
-      <BuildImage
-        style={{width: '100%', height: '100%'}}
-        source={require('../../img/emptyHorse.png')}
-      />
+      <TouchableOpacity onPress={this.uploadHorseProfile} >
+        <BuildImage
+          style={{width: '100%', height: '100%'}}
+          source={require('../../img/emptyHorse.png')}
+        />
+      </TouchableOpacity>
     )
 
     if (this.props.horse.get('profilePhotoID')) {

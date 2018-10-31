@@ -130,7 +130,6 @@ class FirstStartContainer extends PureComponent {
     let horse = this.props.horse.set('profilePhotoID', photoID)
     horse = horse.setIn(['photosByID', photoID], Map({timestamp, uri}))
     this.props.dispatch(horseUpdated(horse))
-    this.props.dispatch(persistHorse(horse.get('_id')))
     this.setState({
       horseUpdated: true
     })

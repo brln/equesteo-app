@@ -14,9 +14,10 @@ import {
 import moment from 'moment'
 import Swiper from 'react-native-swiper';
 
-import URIImage from '../URIImage'
-import { darkGrey } from '../../colors'
-import { logError } from '../../helpers'
+import Headline from './Headline'
+import URIImage from '../../URIImage'
+import { darkGrey } from '../../../colors'
+import { logError } from '../../../helpers'
 
 const { width } = Dimensions.get('window')
 
@@ -76,7 +77,7 @@ export default class HorseCard extends PureComponent {
       if (this.props.userProfilePhotoURL) {
         source = {uri: this.props.userProfilePhotoURL}
       } else {
-        source = require('../../img/empty.png')
+        source = require('../../../img/empty.png')
       }
       avatar = (
         <TouchableOpacity
@@ -154,29 +155,6 @@ export default class HorseCard extends PureComponent {
   }
 
   render() {
-    let headline = (
-      <Text>
-        <Text style={{fontSize: 20, fontWeight: 'normal'}}>
-          {`A new horse in the barn for ${this.props.rider.get('firstName')}: `}
-          <Text style={{fontSize: 20, fontWeight: 'bold'}}>
-            {this.props.horse.get('name')}!
-          </Text>
-        </Text>
-      </Text>
-    )
-    if (this.props.rider.get('_id') !== this.props.ownerID) {
-      headline = (
-        <View style={{flex: 1, flexDirection: 'row'}}>
-          <Text style={{fontSize: 20, fontWeight: 'normal'}}>
-            { `${this.props.rider.get('firstName')} now rides `}
-            <Text style={{fontSize: 20, fontWeight: 'bold'}}>
-              {this.props.horse.get('name')}!
-            </Text>
-          </Text>
-
-        </View>
-      )
-    }
     return (
       <Card>
         <CardItem header>
@@ -193,7 +171,11 @@ export default class HorseCard extends PureComponent {
             </View>
             <TouchableOpacity onPress={this.showHorseProfile}>
               <View style={{flex: 1, flexDirection: 'row', paddingTop: 15, paddingBottom: 15}}>
-                { headline }
+                <Headline
+                  rider={this.props.rider}
+                  horse={this.props.horse}
+                  ownerID={this.props.ownerID}
+                />
               </View>
             </TouchableOpacity>
           </View>

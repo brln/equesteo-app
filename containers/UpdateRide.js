@@ -125,8 +125,9 @@ class UpdateRideContainer extends BackgroundComponent {
         this.props.dispatch(clearPausedLocations())
         this.props.dispatch(stopLocationTracking())
         this.props.dispatch(discardCurrentRide())
-        this.props.dispatch(deleteUnpersistedRide())
-        Navigation.popToRoot(this.props.componentId)
+        Navigation.popToRoot(this.props.componentId).then(() => {
+          this.props.dispatch(deleteUnpersistedRide(this.props.ride.get('_id')))
+        })
       } else if (buttonId === 'back') {
         this.props.dispatch(stopStashNewLocations())
         this.props.dispatch(mergeStashedLocations())

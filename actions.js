@@ -593,6 +593,10 @@ function configureBackgroundGeolocation () {
 export function persistRide (rideID) {
   return async (dispatch, getState) => {
     const theRide = getState().getIn(['pouchRecords', 'rides', rideID])
+    if (!theRide) {
+      throw new Error('no ride with that ID')
+    }
+
     const theElevations = getState().getIn(['pouchRecords', 'rideElevations', rideID + '_elevations'])
     const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
@@ -612,6 +616,9 @@ export function persistRide (rideID) {
 export function persistUser (userID) {
   return async (dispatch, getState) => {
     const theUser = getState().getIn(['pouchRecords', 'users', userID])
+    if (!theUser) {
+      throw new Error('no user with that ID')
+    }
     const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
     const doc = await pouchCouch.saveUser(theUser.toJS())
@@ -625,6 +632,9 @@ export function persistUser (userID) {
 export function persistHorse (horseID) {
   return async (dispatch, getState) => {
     const theHorse = getState().getIn(['pouchRecords', 'horses', horseID])
+    if (!theHorse) {
+      throw new Error('no horse with that ID')
+    }
     const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
     const doc = await pouchCouch.saveHorse(theHorse.toJS())

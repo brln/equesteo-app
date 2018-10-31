@@ -85,7 +85,14 @@ export default class UpdateHorse extends PureComponent {
       photosByID: newPhotos
     })
     if (this.state.selectedPhotoID === this.props.horse.get('profilePhotoID')) {
-      newDeets = newDeets.set('profilePhotoID', null)
+      if (newPhotos.keySeq().count() === 0) {
+        newDeets = newDeets.set('profilePhotoID', null)
+      } else {
+        newDeets = newDeets.set(
+          'profilePhotoID',
+          newPhotos.keySeq().get(0)
+        )
+      }
     }
     this.changeHorseDetails(newDeets)
     this.setState({

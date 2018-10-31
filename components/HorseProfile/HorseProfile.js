@@ -16,7 +16,7 @@ import {
 
 import BuildImage from '../BuildImage'
 import { brand, darkBrand } from '../../colors'
-import { logError } from '../../helpers'
+import { logError, MONTHS } from '../../helpers'
 import DeleteModal from '../Shared/DeleteModal'
 import RidersCard from './RidersCard'
 import FabImage from '../FabImage'
@@ -62,9 +62,11 @@ export default class HorseProfile extends PureComponent {
     const birthDay = horse.get('birthDay')
     const birthYear = horse.get('birthYear')
     if (birthMonth && birthDay && birthYear) {
-      return `${birthMonth}-${birthDay}-${birthYear}`
+      return `${MONTHS[birthMonth]} ${birthDay} ${birthYear}`
     } else if (birthMonth && birthYear) {
-      return `${birthMonth}-${birthYear}`
+      return `${MONTHS[birthMonth]} ${birthYear}`
+    } else if (birthMonth && birthDay) {
+      return `${MONTHS[birthMonth]} ${birthDay}`
     } else if (birthYear) {
       return `${birthYear}`
     }

@@ -6,7 +6,7 @@ import {
 
 
 import { getMonday, logInfo } from '../../helpers'
-import HorseCard from './HorseCard'
+import HorseCard from './HorseCard/HorseCard'
 import RideCard from './RideCard'
 import SectionHeader from './SectionHeader'
 
