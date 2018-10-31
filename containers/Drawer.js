@@ -44,6 +44,7 @@ class DrawerContainer extends Component {
     Navigation.push(this.props.activeComponent, {
       component: {
         name: RECORDER,
+        id: RECORDER
       }
     });
 	}

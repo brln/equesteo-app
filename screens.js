@@ -40,6 +40,8 @@ export const UPDATE_HORSE = 'equesteo.Horse'
 export const UPDATE_PROFILE = 'equesteo.UpdateProfile'
 export const UPDATE_RIDE = 'equesteo.UpdateRide'
 
+export const UPDATE_NEW_RIDE_ID = 'equesteo.UpdateNewRide'
+
 export function registerScreens(store, Provider) {
   Navigation.registerComponent(ABOUT_PAGE, () => About)
   Navigation.registerComponentWithRedux(BARN, () => BarnContainer, Provider, store)

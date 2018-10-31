@@ -17,7 +17,7 @@ import {
 import { brand } from '../colors'
 import RideRecorder from '../components/RideRecorder/RideRecorder'
 import { isAndroid, logRender, unixTimeNow } from '../helpers'
-import { UPDATE_RIDE } from "../screens"
+import { UPDATE_RIDE, UPDATE_NEW_RIDE_ID } from "../screens"
 
 class RecorderContainer extends PureComponent {
   static options() {
@@ -173,6 +173,7 @@ class RecorderContainer extends PureComponent {
     Navigation.push(this.props.componentId, {
       component: {
         name: UPDATE_RIDE,
+        id: UPDATE_NEW_RIDE_ID,
         passProps: { rideID, newRide: true }
       }
     });

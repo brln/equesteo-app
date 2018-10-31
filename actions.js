@@ -17,7 +17,8 @@ import {
   toElevationKey,
 } from "./helpers"
 import { danger, green, warning } from './colors'
-import { DRAWER, FEED, SIGNUP_LOGIN } from './screens'
+import { appStates } from './helpers'
+import { DRAWER, FEED, RECORDER, SIGNUP_LOGIN, UPDATE_NEW_RIDE_ID } from './screens'
 import { LocalStorage, PouchCouch, UserAPI } from './services'
 import {BadRequestError, NotConnectedError, UnauthorizedError} from "./errors"
 import {
@@ -1111,9 +1112,22 @@ function stopListeningFCM () {
 }
 
 function startAppStateTracking () {
-  return (dispatch) => {
+  return (dispatch, getState) => {
     AppState.addEventListener('change', (nextAppState) => {
       dispatch(newAppState(nextAppState))
+      const onRide = Boolean(getState().getIn(['currentRide', 'currentRide']))
+      if (onRide && nextAppState === appStates.active) {
+        const activeComponent = getState().getIn(['localState', 'activeComponent'])
+        logDebug(activeComponent, 'activeComponent')
+        if (activeComponent !== RECORDER && activeComponent !== UPDATE_NEW_RIDE_ID) {
+          Navigation.push(activeComponent, {
+            component: {
+              name: RECORDER,
+              id: RECORDER
+            }
+          });
+        }
+      }
     })
   }
 }
