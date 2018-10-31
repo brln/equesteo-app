@@ -28,9 +28,11 @@ import {
   CLEAR_SEARCH,
   CLEAR_STATE,
   CLEAR_STATE_AFTER_PERSIST,
+  CREATE_FOLLOW,
   CREATE_HORSE,
   CREATE_RIDE,
   DEQUEUE_PHOTO,
+  DELETE_FOLLOW,
   DELETE_UNPERSISTED_HORSE,
   DELETE_UNPERSISTED_RIDE,
   DISCARD_CURRENT_RIDE,
@@ -120,6 +122,15 @@ function clearStateAfterPersist () {
   }
 }
 
+export function createFollow (followID, followingID, followerID) {
+  return {
+    type: CREATE_FOLLOW,
+    followID,
+    followingID,
+    followerID
+  }
+}
+
 export function createHorse (horseID, horseUserID, userID) {
   return {
     type: CREATE_HORSE,
@@ -143,6 +154,13 @@ export function dequeuePhoto (photoID) {
   return {
     type: DEQUEUE_PHOTO,
     photoID
+  }
+}
+
+export function deleteFollow (followID) {
+  return {
+    type: DELETE_FOLLOW,
+    followID
   }
 }
 
@@ -590,6 +608,24 @@ function configureBackgroundGeolocation () {
   }
 }
 
+export function persistFollow (followID) {
+  return async (dispatch, getState) => {
+    const theFollow = getState().getIn(['pouchRecords', 'follows', followID])
+    if (!theFollow) {
+      throw new Error('no follow with that ID')
+    }
+
+    const jwt = getState().getIn(['localState', 'jwt'])
+    const pouchCouch = new PouchCouch(jwt)
+    const doc = await pouchCouch.saveUser(theFollow.toJS())
+
+    let foundAfterSave = getState().getIn(['pouchRecords', 'follows', followID])
+    dispatch(followUpdated(foundAfterSave.set('_rev', doc.rev)))
+    dispatch(needsRemotePersist('users'))
+    dispatch(syncDBPull())
+  }
+}
+
 export function persistRide (rideID) {
   return async (dispatch, getState) => {
     const theRide = getState().getIn(['pouchRecords', 'rides', rideID])
@@ -682,50 +718,6 @@ export function createRideComment(commentData) {
   }
 }
 
-export function createFollow (followingID) {
-  return async (dispatch, getState) => {
-    const userID = getState().getIn(['localState', 'userID'])
-    const followID = `${userID}_${followingID}`
-    let found = getState().getIn(['pouchRecords', 'follows', followID])
-    if (!found) {
-      found = Map({
-        _id: followID,
-        followingID,
-        followerID: userID,
-        deleted: false,
-        type: "follow"
-      })
-    } else {
-      found = found.set('deleted', false)
-    }
-    const jwt = getState().getIn(['localState', 'jwt'])
-    const pouchCouch = new PouchCouch(jwt)
-    const doc = await pouchCouch.saveUser(found.toJS())
-
-    let foundAfterSave = getState().getIn(['pouchRecords', 'follows', followID])
-    dispatch(followUpdated(foundAfterSave.set('_rev', doc.rev)))
-    dispatch(needsRemotePersist('users'))
-    dispatch(syncDBPull())
-  }
-}
-
-export function deleteFollow (followingID) {
-  return async (dispatch, getState) => {
-    const userID = getState().getIn(['localState', 'userID'])
-    const followID = `${userID}_${followingID}`
-    let found = getState().getIn(['pouchRecords', 'follows', followID]).set('deleted', true)
-
-    const jwt = getState().getIn(['localState', 'jwt'])
-    const pouchCouch = new PouchCouch(jwt)
-    const doc = await pouchCouch.saveUser(found.toJS())
-    dispatch(followUpdated(found.set('_rev', doc.rev)))
-
-    let foundAfterSave = getState().getIn(['pouchRecords', 'follows', followID]).set('deleted', true)
-    dispatch(followUpdated(foundAfterSave.set('_rev', doc.rev)))
-    dispatch(needsRemotePersist('users'))
-  }
-}
-
 export function deleteHorseUser (horseID, userID) {
   return async (dispatch, getState) => {
     const filterHorseUser = getState().getIn(['pouchRecords', 'horseUsers']).valueSeq().filter(hu => {
@@ -739,8 +731,6 @@ export function deleteHorseUser (horseID, userID) {
     dispatch(horseUserUpdated(theHorseUser))
   }
 }
-
-
 
 export function exchangePWCode (email, code) {
   return async (dispatch) => {

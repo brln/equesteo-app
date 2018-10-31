@@ -7,7 +7,8 @@ import Profile from '../components/Profile/Profile'
 import {
   clearSearch,
   createFollow,
-  deleteFollow ,
+  deleteFollow,
+  persistFollow,
   signOut,
   uploadProfilePhoto,
 } from "../actions"
@@ -119,12 +120,16 @@ class ProfileContainer extends BackgroundComponent {
   }
 
   createFollow (followingID) {
-    this.props.dispatch(createFollow(followingID))
+    const followID = `${this.props.userID}_${followingID}`
+    this.props.dispatch(createFollow(followID, followingID, this.props.userID))
+    this.props.dispatch(persistFollow(followID))
     this.props.dispatch(clearSearch())
   }
 
   deleteFollow (followingID) {
-    this.props.dispatch(deleteFollow(followingID))
+    const followID = `${this.props.userID}_${followingID}`
+    this.props.dispatch(deleteFollow(followID))
+    this.props.dispatch(persistFollow(followID))
   }
 
   uploadProfilePhoto (location) {
