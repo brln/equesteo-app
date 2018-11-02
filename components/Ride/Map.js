@@ -32,8 +32,8 @@ export default class Map extends PureComponent {
     return rideCoordinates.reduce((accum, coord) => {
       const c = parseRideCoordinate(coord)
       accum.push({
-        latitude: c.latitude,
-        longitude: c.longitude
+        latitude: c.get('latitude'),
+        longitude: c.get('longitude')
       })
       return accum
     }, [])
@@ -41,11 +41,10 @@ export default class Map extends PureComponent {
 
   render() {
     const lastIndex = this.props.rideCoordinates.count() - 1
-    const firstCoord = this.props.rideCoordinates.get(0)
-    const lastCoord = this.props.rideCoordinates.get(lastIndex)
+    const firstCoord = parseRideCoordinate(this.props.rideCoordinates.get(0))
+    const lastCoord = parseRideCoordinate(this.props.rideCoordinates.get(lastIndex))
 
     const mapCoords = this.mapCoordinates(this.props.rideCoordinates)
-    logDebug(mapCoords)
     return (
       <View style={styles.container}>
         <MapView
@@ -58,21 +57,14 @@ export default class Map extends PureComponent {
           <MapView.Polyline
             coordinates={mapCoords}
             strokeColor={"#dc0202"}
-            fillColor={"#000000"}
             strokeWidth={5}
           />
           <MapView.Marker
-            coordinate={{
-              latitude: firstCoord.get('latitude'),
-              longitude: firstCoord.get('longitude')
-            }}
+            coordinate={firstCoord.toJS()}
             pinColor={"#0bc464"}
           />
           <MapView.Marker
-            coordinate={{
-              latitude: lastCoord.get('latitude'),
-              longitude: lastCoord.get('longitude')
-            }}
+            coordinate={lastCoord.toJS()}
             pincolor={"#ea4a3f"}
           />
         </MapView>

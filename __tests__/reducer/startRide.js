@@ -12,7 +12,7 @@ describe('START_RIDE', () => {
     const initialState = Map({
       currentRide: null,
     })
-    const firstCoord = 'ducks'
+    const firstCoord = Map({latitude: 1, longitude: 12, accuracy: 123, timestamp: 4})
     const latitude = 12
     const longitude = 13
     const elevation = 134
@@ -24,16 +24,19 @@ describe('START_RIDE', () => {
     const startTime = unixTimeNow()
     let expectedNewState = Map({
       currentRide: Map({
-        rideCoordinates: List([firstCoord]),
-        distance: 0,
         startTime: startTime,
         pausedTime: 0,
         lastPauseStart: null,
+        distance: 0,
       }),
       currentRideElevations: Map({
         elevationGain: 0,
         elevations: Map()
+      }),
+      currentRideCoordinates: Map({
+        rideCoordinates: List([List([1, 12, 4, 123])]),
       })
+
     })
     expectedNewState = expectedNewState.setIn(
       ['currentRideElevations', 'elevations', toElevationKey(latitude), toElevationKey(longitude)],

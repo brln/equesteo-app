@@ -1,3 +1,4 @@
+import { Map } from 'immutable'
 import moment from 'moment'
 import { Platform } from 'react-native'
 
@@ -82,8 +83,9 @@ export function staticMap (ride) {
     const simplified = simplifyLine(tolerance, ride.rideCoordinates)
     let pathCoords = ''
     for (let coord of simplified) {
-      const parsedLat = coord.get('latitude').toString()
-      const parsedLong = coord.get('longitude').toString()
+      const parsed = parseRideCoordinate(coord)
+      const parsedLat = parsed.get('latitude').toString()
+      const parsedLong = parsed.get('longitude').toString()
       pathCoords += `|${parsedLat},${parsedLong}`
     }
 
@@ -244,10 +246,10 @@ export const MONTHS = {
 }
 
 export function parseRideCoordinate (fromDB) {
-  return {
+  return Map({
     latitude: fromDB.get(0),
     longitude: fromDB.get(1),
     timestamp: fromDB.get(2),
     accuracy: fromDB.get(3)
-  }
+  })
 }

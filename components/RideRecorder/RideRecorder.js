@@ -9,7 +9,6 @@ import { Button, Fab } from 'native-base'
 import { black, brand, green, white, orange, danger } from '../../colors'
 import FabImage from '../FabImage'
 import GPSStatus from './GPSStatus'
-
 import DiscardModal from './DiscardModal'
 import RidingMap from './RidingMap'
 import RideStats from './RideStats'
@@ -93,11 +92,11 @@ export default class RideRecorder extends PureComponent {
         <View style={{flex: 1}}>
           <View style={{flex: 5}}>
             <RidingMap
+              currentRideCoordinates={this.props.currentRideCoordinates.get('rideCoordinates')}
+              lastLocation={this.props.lastLocation}
               refiningLocation={this.props.refiningLocation}
-              rideCoords={this.props.currentRide.get('rideCoordinates')}
               showCircles={this.state.showCircles}
               tapGPS={this.tapGPS}
-              lastLocation={this.props.lastLocation}
             />
             <View>
               <Fab
@@ -122,6 +121,7 @@ export default class RideRecorder extends PureComponent {
             <RideStats
               appState={this.props.appState}
               currentRide={this.props.currentRide}
+              currentRideCoordinates={this.props.currentRideCoordinates}
               currentRideElevations={this.props.currentRideElevations}
               lastElevation={this.props.lastElevation}
             />

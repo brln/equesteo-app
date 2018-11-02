@@ -40,8 +40,7 @@ class MapContainer extends PureComponent {
 function mapStateToProps (state, passedProps) {
   const rideCoordinates = state.getIn([
     'pouchRecords',
-    'rideCoordinates',
-    passedProps.rideID + '_coordinates',
+    'selectedRideCoordinates',
     'rideCoordinates'
   ])
   return {

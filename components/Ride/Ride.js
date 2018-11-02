@@ -3,6 +3,7 @@ import Swiper from 'react-native-swiper';
 import memoizeOne from 'memoize-one';
 import moment from 'moment'
 import {
+  ActivityIndicator,
   Clipboard,
   Dimensions,
   ScrollView,
@@ -35,6 +36,8 @@ export default class Ride extends PureComponent {
     this.state = {
       titleTouchCount: 0
     }
+    this._renderRide = this._renderRide.bind(this)
+    this._renderLoading = this._renderLoading.bind(this)
     this.fullscreenMap = this.fullscreenMap.bind(this)
     this.userAvatar = this.userAvatar.bind(this)
     this.userName = this.userName.bind(this)
@@ -66,18 +69,18 @@ export default class Ride extends PureComponent {
         lastPoint = parsedCoord
       } else {
         totalDistance += haversine(
-          lastPoint.latitude,
-          lastPoint.longitude,
-          parsedCoord.latitude,
-          parsedCoord.longitude
+          lastPoint.get('latitude'),
+          lastPoint.get('longitude'),
+          parsedCoord.get('latitude'),
+          parsedCoord.get('longitude')
         )
         const elevation = rideElevations.getIn([
-          toElevationKey(parsedCoord.latitude),
-          toElevationKey(parsedCoord.longitude)
+          toElevationKey(parsedCoord.get('latitude')),
+          toElevationKey(parsedCoord.get('longitude'))
         ])
         const lastElevation = rideElevations.getIn([
-          toElevationKey(lastPoint.latitude),
-          toElevationKey(lastPoint.longitude)
+          toElevationKey(lastPoint.get('latitude')),
+          toElevationKey(lastPoint.get('longitude'))
         ])
         const diff = Math.abs(lastElevation - elevation)
         const percentDiff = diff / elevation
@@ -112,14 +115,14 @@ export default class Ride extends PureComponent {
         parsedBucket.push({distance: 0, pace: 0})
       } else {
         const distance = haversine(
-          lastPoint.latitude,
-          lastPoint.longitude,
-          parsedCoord.latitude,
-          parsedCoord.longitude
+          lastPoint.get('latitude'),
+          lastPoint.get('longitude'),
+          parsedCoord.get('latitude'),
+          parsedCoord.get('longitude')
         )
         fullDistance += distance
 
-        const timeDiff = (parsedCoord.timestamp / 1000) - (lastPoint.timestamp / 1000)
+        const timeDiff = (parsedCoord.get('timestamp') / 1000) - (lastPoint.get('timestamp') / 1000)
         if (timeDiff === 0) {
           continue
         }
@@ -154,13 +157,13 @@ export default class Ride extends PureComponent {
         lastPoint = parsedCoord
       } else {
         bucketDistance += haversine(
-          lastPoint.latitude,
-          lastPoint.longitude,
-          parsedCoord.latitude,
-          parsedCoord.longitude
+          lastPoint.get('latitude'),
+          lastPoint.get('longitude'),
+          parsedCoord.get('latitude'),
+          parsedCoord.get('longitude')
         )
 
-        bucketTime += (parsedCoord.timestamp / 1000) - (lastPoint.timestamp / 1000)
+        bucketTime += (parsedCoord.get('timestamp') / 1000) - (lastPoint.get('timestamp') / 1000)
 
         if (bucketDistance > minDistance) {
           const bucketSpeed = bucketDistance / (bucketTime / 60 / 60)
@@ -306,7 +309,16 @@ export default class Ride extends PureComponent {
     return elevationProfile
   }
 
-  render () {
+  _renderLoading () {
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <ActivityIndicator size="large" color={darkBrand} />
+        <Text style={{textAlign: 'center', color: darkBrand}}>Loading Ride...</Text>
+      </View>
+    )
+  }
+
+  _renderRide () {
     logRender('Ride.Ride')
     let maxSpeed = this.memoizedMaxSpeed(this.props.rideCoordinates.get('rideCoordinates'))
     const height = (width * 9 / 16) + 54
@@ -371,6 +383,14 @@ export default class Ride extends PureComponent {
         </View>
       </ScrollView>
     )
+  }
+
+  render () {
+    if (this.props.rideCoordinates) {
+      return this._renderRide()
+    } else {
+      return this._renderLoading()
+    }
   }
 }
 

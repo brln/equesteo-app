@@ -104,8 +104,7 @@ export default class RideStats extends PureComponent {
 
   render () {
     const distance = this.props.currentRide.get('distance')
-    const rideCoords = this.props.currentRide.get('rideCoordinates')
-    const pausedTime = this.props.currentRide.get('pausedTime')
+    const rideCoords = this.props.currentRideCoordinates
     return (
       <View style={styles.rideStats}>
         <View style={{flex: 1}}>

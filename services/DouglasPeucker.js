@@ -1,4 +1,5 @@
 import { List } from 'immutable'
+import { parseRideCoordinate} from "../helpers"
 
 export function simplifyLine (tolerance, points) {
   // stolen from https://gist.github.com/adammiller/826148
@@ -13,6 +14,7 @@ export function simplifyLine (tolerance, points) {
 
       distanceToPoint ( point ) {
         // slope
+        point = parseRideCoordinate(point)
         let m = ( this.p2.get('latitude') - this.p1.get('latitude') ) / ( this.p2.get('longitude') - this.p1.get('longitude') ),
           // y offset
           b = this.p1.get('latitude') - ( m * this.p1.get('longitude') ),

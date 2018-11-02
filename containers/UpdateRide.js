@@ -12,6 +12,7 @@ import {
   discardCurrentRide,
   mergeStashedLocations,
   persistRide,
+  persistRideCoordinates,
   rideUpdated,
   setPopShowRide,
   stopLocationTracking,
@@ -116,11 +117,12 @@ class UpdateRideContainer extends BackgroundComponent {
       Navigation.mergeOptions(this.props.componentId, {topBar: {rightButtons: []}})
       if (buttonId === 'save') {
         this.props.dispatch(discardCurrentRide())
-        this.persistRide(this.props.ride.get('_id'))
+        this.persistRide(this.props.ride.get('_id')).then(() => {
+          this.props.dispatch(setPopShowRide(this.props.ride.get('_id'), true))
+        })
         this.props.dispatch(clearPausedLocations())
         this.props.dispatch(stopLocationTracking())
         Navigation.popToRoot(this.props.componentId)
-        this.props.dispatch(setPopShowRide(this.props.ride.get('_id'), true))
       } else if (buttonId === 'discard') {
         this.props.dispatch(clearPausedLocations())
         this.props.dispatch(stopLocationTracking())
@@ -193,8 +195,13 @@ class UpdateRideContainer extends BackgroundComponent {
   }
 
   persistRide () {
-    this.props.dispatch(persistRide(this.props.ride.get('_id')))
-    this.uploadNewPhotos()
+    return new Promise((res, rej) => {
+      this.props.dispatch(persistRideCoordinates()).then(() => {
+        this.props.dispatch(persistRide(this.props.ride.get('_id')))
+        this.uploadNewPhotos()
+        res()
+      })
+    })
   }
 
   changeCoverPhoto (coverPhotoID) {

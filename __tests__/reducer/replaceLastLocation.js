@@ -13,7 +13,7 @@ describe('REPLACE_LAST_LOCATION', () => {
       lastLocation: 'some old location',
       lastElevation: 'some old elevation'
     })
-    const newLocation = Map({'some new': 'location'})
+    const newLocation = Map({latitude: 1, longitude: 1, accuracy: 1, timestamp: 1})
     const newElevation = Map({'some new': 'elevation'})
     const newState = Map({
       lastLocation: newLocation,
@@ -41,9 +41,11 @@ describe('REPLACE_LAST_LOCATION', () => {
     })
     const initialState = Map({
       currentRide: Map({
-        rideCoordinates: List([firstPoint]),
+        startTime: startTime,
         distance: 0,
-        startTime: startTime
+      }),
+      currentRideCoordinates: Map({
+        rideCoordinates: List([firstPoint]),
       }),
       currentRideElevations: Map({
         elevationGain: 0,
@@ -71,9 +73,11 @@ describe('REPLACE_LAST_LOCATION', () => {
     })
     let expectedNewState = Map({
       currentRide: Map({
-        rideCoordinates: List([location]),
+        startTime: startTime,
         distance: 0,
-        startTime: startTime
+      }),
+      currentRideCoordinates: Map({
+        rideCoordinates: List([List([latitude, longitude, 1, 5])]),
       }),
       currentRideElevations: Map({
         elevationGain: 0,
@@ -125,9 +129,11 @@ describe('REPLACE_LAST_LOCATION', () => {
 
     const initialState = Map({
       currentRide: Map({
-        rideCoordinates: List([Map({some: 'point'}), firstPoint, secondPoint]),
+        startTime: startTime,
         distance: 25,
-        startTime: startTime
+      }),
+      currentRideCoordinates: Map({
+        rideCoordinates: List([Map({some: 'point'}), firstPoint, secondPoint]),
       }),
       currentRideElevations: initialElevation,
       lastElevation,
@@ -152,9 +158,11 @@ describe('REPLACE_LAST_LOCATION', () => {
     })
     let expectedNewState = Map({
       currentRide: Map({
-        rideCoordinates: List([Map({some: 'point'}), firstPoint, location]),
+        startTime: startTime,
         distance: 25.470733,
-        startTime: startTime
+      }),
+      currentRideCoordinates: Map({
+        rideCoordinates: List([Map({some: 'point'}), firstPoint, List([latitude, longitude, 1, 5])]),
       }),
       currentRideElevations: Map({
         elevationGain: 4000,
@@ -175,7 +183,7 @@ describe('REPLACE_LAST_LOCATION', () => {
         initialState,
         replaceLastLocation(location, elevation)
       ).getIn(
-        ['currentRide', 'rideCoordinates']
+        ['currentRideCoordinates', 'rideCoordinates']
       ).count()
     ).toEqual(3)
   })

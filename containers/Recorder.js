@@ -146,7 +146,7 @@ class RecorderContainer extends PureComponent {
   }
 
   finishRide () {
-    if (this.props.currentRide.get('rideCoordinates').count() > 0) {
+    if (this.props.currentRideCoordinates.count() > 0) {
       this.props.dispatch(stashNewLocations())
       this.showUpdateRide()
     } else {
@@ -168,7 +168,8 @@ class RecorderContainer extends PureComponent {
       rideID,
       this.props.userID,
       this.props.currentRide,
-      this.props.currentRideElevations
+      this.props.currentRideElevations,
+      this.props.currentRideCoordinates,
     ))
     Navigation.push(this.props.componentId, {
       component: {
@@ -194,6 +195,7 @@ class RecorderContainer extends PureComponent {
         appState={this.props.appState}
         closeDiscardModal={this.closeDiscardModal}
         currentRide={this.props.currentRide}
+        currentRideCoordinates={this.props.currentRideCoordinates}
         currentRideElevations={this.props.currentRideElevations}
         discardRide={this.discardRide}
         discardModalOpen={this.state.discardModalOpen}
@@ -219,6 +221,7 @@ function mapStateToProps (state) {
     appState: localState.get('appState'),
     currentRide: currentRideState.get('currentRide'),
     currentRideElevations: currentRideState.get('currentRideElevations'),
+    currentRideCoordinates: currentRideState.get('currentRideCoordinates'),
     lastElevation: currentRideState.get('lastElevation'),
     lastLocation: currentRideState.get('lastLocation'),
     refiningLocation: currentRideState.get('refiningLocation'),

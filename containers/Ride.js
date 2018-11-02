@@ -3,7 +3,7 @@ import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
 
 import Ride from '../components/Ride/Ride'
-import { persistRide, rideUpdated } from '../actions'
+import { loadRideCoordinates, persistRide, rideUpdated } from '../actions'
 import { brand } from '../colors'
 import { logRender } from '../helpers'
 import {
@@ -106,6 +106,10 @@ class RideContainer extends PureComponent {
     })
   }
 
+  componentDidMount () {
+    this.props.dispatch(loadRideCoordinates(this.props.ride.get('_id')))
+  }
+
   deleteRide () {
     this.props.dispatch(rideUpdated(this.props.ride.set('deleted', true)))
     this.props.dispatch(persistRide(this.props.ride.get('_id')))
@@ -183,7 +187,7 @@ function mapStateToProps (state, passedProps) {
   const pouchState = state.get('pouchRecords')
   const localState = state.get('localState')
   const ride = pouchState.getIn(['rides', passedProps.rideID])
-  const rideCoordinates = pouchState.getIn(['rideCoordinates', passedProps.rideID + '_coordinates'])
+  const rideCoordinates = pouchState.getIn(['selectedRideCoordinates'])
   const rideElevations = pouchState.getIn(['rideElevations', passedProps.rideID + '_elevations'])
   const userID = localState.get('userID')
   return {
@@ -195,7 +199,6 @@ function mapStateToProps (state, passedProps) {
     rideUser: pouchState.getIn(['users', ride.get('userID')]),
     userID
   }
-  //@TODO get coords from new records
 }
 
 export default  connect(mapStateToProps)(RideContainer)

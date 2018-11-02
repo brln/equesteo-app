@@ -250,6 +250,7 @@ class FeedContainer extends BackgroundComponent {
 
   render() {
     logRender('feedContainer')
+    logDebug(this.props.rides.count(), 'numRides')
     return (
       <Feed
         clearFeedMessage={this.clearFeedMessage}

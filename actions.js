@@ -61,6 +61,7 @@ import {
   RIDE_CARROT_CREATED,
   RIDE_CARROT_SAVED,
   RIDE_COMMENT_CREATED,
+  RIDE_COORDINATES_LOADED,
   RIDE_ELEVATIONS_UPDATED,
   RIDE_UPDATED,
   SAVE_USER_ID,
@@ -141,10 +142,11 @@ export function createHorse (horseID, horseUserID, userID) {
   }
 }
 
-export function createRide (rideID, userID, currentRide, currentRideElevations) {
+export function createRide (rideID, userID, currentRide, currentRideElevations, currentRideCoordinates) {
   return {
     type: CREATE_RIDE,
     currentRide,
+    currentRideCoordinates,
     currentRideElevations,
     rideID,
     userID
@@ -320,6 +322,13 @@ function receiveJWT (token) {
   }
 }
 
+function rideCoordinatesLoaded (rideCoordinates) {
+  return {
+    type: RIDE_COORDINATES_LOADED,
+    rideCoordinates
+  }
+}
+
 export function setPopShowRide (rideID, showRideNow) {
   return {
     type: SET_POP_SHOW_RIDE,
@@ -431,28 +440,11 @@ export function setFirstStartHorseID (horseID) {
 }
 
 export function startRide(firstCoord, firstElevation, startTime) {
-  const coords = []
-  let elevations = Map()
-  if (firstCoord) {
-    coords.push(firstCoord)
-    elevations = elevations.setIn([
-      toElevationKey(firstElevation.get('latitude')),
-      toElevationKey(firstElevation.get('longitude'))
-    ], firstElevation.get('elevation'))
-  }
   return {
     type: START_RIDE,
-    currentRide: Map({
-      rideCoordinates: List(coords),
-      distance: 0,
-      startTime,
-      pausedTime: 0,
-      lastPauseStart: null
-    }),
-    currentElevations: Map({
-      elevationGain: 0,
-      elevations
-    })
+    firstCoord,
+    firstElevation,
+    startTime
   }
 }
 
@@ -646,6 +638,16 @@ export function persistRide (rideID) {
     const theElevationsAfterSave = getState().getIn(['pouchRecords', 'rideElevations', rideID + '_elevations'])
     dispatch(rideElevationsUpdated(theElevationsAfterSave.set('_rev', elevationDoc.rev)))
     dispatch(rideUpdated(theRideAfterSave.set('_rev', rideDoc.rev)))
+    dispatch(needsRemotePersist('rides'))
+  }
+}
+
+export function persistRideCoordinates () {
+  return async (dispatch, getState) => {
+    const theCoordinates = getState().getIn(['pouchRecords', 'newRideCoordinates'])
+    const pouchCouch = new PouchCouch()
+    const coordinateDoc = await pouchCouch.saveRide(theCoordinates.toJS())
+    dispatch(rideCoordinatesLoaded(theCoordinates.set('_rev', coordinateDoc)))
     dispatch(needsRemotePersist('rides'))
   }
 }
@@ -868,6 +870,17 @@ function loadLocalData () {
       logError(e)
       throw e
     }
+  }
+}
+
+export function loadRideCoordinates (rideID) {
+  return (dispatch) => {
+    const pouchCouch = new PouchCouch()
+    console.log('LOADING')
+    pouchCouch.loadRideCoordinates(rideID).then((coords) => {
+      console.log('LOADED')
+      dispatch(rideCoordinatesLoaded(coords))
+    })
   }
 }
 
@@ -1118,7 +1131,6 @@ function startAppStateTracking () {
       const onRide = Boolean(getState().getIn(['currentRide', 'currentRide']))
       if (onRide && nextAppState === appStates.active) {
         const activeComponent = getState().getIn(['localState', 'activeComponent'])
-        logDebug(activeComponent, 'activeComponent')
         if (activeComponent !== RECORDER && activeComponent !== UPDATE_NEW_RIDE_ID) {
           Navigation.push(activeComponent, {
             component: {

@@ -38,6 +38,7 @@ export default class PouchCouch {
   }
 
   saveRide (rideData) {
+    logDebug(rideData, 'ridedata')
     return this.localRidesDB.put(rideData).catch((e) => {
       logInfo('error saving ride')
       this.catchError(e)
@@ -214,5 +215,9 @@ export default class PouchCouch {
       rides: rideDocs.filter(r => r.type === 'ride'),
       users: userDocs.filter(u => u.type === 'user')
     }
+  }
+
+  async loadRideCoordinates (rideID) {
+    return this.localRidesDB.get(`${rideID}_coordinates`)
   }
 }

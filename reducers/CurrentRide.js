@@ -21,6 +21,7 @@ import { haversine, toElevationKey, unixTimeNow } from '../helpers'
 export const initialState = Map({
   currentRide: null,
   currentRideElevations: null,
+  currentRideCoordinates: null,
   lastElevation: null,
   lastLocation: null,
   locationStashingActive: false,
@@ -50,7 +51,7 @@ export default function CurrentRideReducer(state=initialState, action) {
       )
       const pausedCoordinates = state.get('stashedCoordinates')
       const merged = rideCoordinates.concat(pausedCoordinates).sort((a, b) => {
-        return new Date(a.timestamp) - new Date(b.timestamp);
+        return new Date(a.get(2)) - new Date(b.get(2));
       })
       return state.setIn(
         ['currentRide', 'rideCoordinates'],
@@ -68,9 +69,21 @@ export default function CurrentRideReducer(state=initialState, action) {
       )
       const currentRide = state.get('currentRide')
       const currentElevations = state.get('currentRideElevations')
+      const currentCoordinates = state.get('currentRideCoordinates')
       const currentlyStashing = state.get('locationStashingActive')
+      const permaCoord = List([
+        Number(action.location.get('latitude').toFixed(6)),
+        Number(action.location.get('longitude').toFixed(6)),
+        action.location.get('timestamp'),
+        Number(action.location.get('accuracy').toFixed(2))
+      ])
 
-      if (currentRide && currentElevations && !currentRide.get('lastPauseStart') && !currentlyStashing) {
+      if (currentRide
+        && currentCoordinates
+        && currentElevations
+        && !currentRide.get('lastPauseStart')
+        && !currentlyStashing
+      ) {
         let newDistance = 0
         let elevationGain = 0
         const lastLocation = state.get('lastLocation')
@@ -85,19 +98,17 @@ export default function CurrentRideReducer(state=initialState, action) {
           const elevationChange = action.elevation.get('elevation') - lastElevation.get('elevation')
           elevationGain = elevationChange >= 0 ? elevationChange : 0
         }
-        const rideCoordinates = state.getIn(
-          ['currentRide', 'rideCoordinates']
+        const rideCoordinates = currentCoordinates.get(
+          'rideCoordinates'
         ).push(
-          action.location
+          permaCoord
         ).sort((a, b) => {
-          return new Date(a.timestamp) - new Date(b.timestamp);
+          return new Date(a.get(2)) - new Date(b.get(2));
         })
         const totalDistance = currentRide.get('distance') + newDistance
         const totalElevationGain = currentElevations.get('elevationGain') + elevationGain
-        const newCurrentRide = currentRide.merge(Map({
-          rideCoordinates,
-          distance: totalDistance,
-        }))
+        const newCurrentCoordinates = currentCoordinates.set('rideCoordinates', rideCoordinates)
+        const newCurrentRide = currentRide.set('distance', totalDistance)
         const newRideElevations =
           currentElevations.set(
             'elevationGain',
@@ -114,6 +125,9 @@ export default function CurrentRideReducer(state=initialState, action) {
         ).set(
           'currentRideElevations',
           newRideElevations
+        ).set(
+          'currentRideCoordinates',
+          newCurrentCoordinates
         )
       } else if (currentRide && currentlyStashing) {
         const newRideElevations =
@@ -126,9 +140,9 @@ export default function CurrentRideReducer(state=initialState, action) {
         const stashedCoordinates = state.get(
           'stashedCoordinates'
         ).push(
-          action.location
+          permaCoord
         ).sort((a, b) => {
-          return new Date(a.timestamp) - new Date(b.timestamp);
+          return new Date(a.get(2)) - new Date(b.get(2));
         })
         return newState.set(
           'stashedCoordinates',
@@ -150,8 +164,17 @@ export default function CurrentRideReducer(state=initialState, action) {
         action.newElevation
       )
       const currentRide1 = state.get('currentRide')
+      const currentRideCoordinates1 = state.get('currentRideCoordinates')
+
+      const permanentCoord = List([
+        Number(action.newLocation.get('latitude').toFixed(6)),
+        Number(action.newLocation.get('longitude').toFixed(6)),
+        action.newLocation.get('timestamp'),
+        Number(action.newLocation.get('accuracy').toFixed(2))
+      ])
+
       if (currentRide1 && !currentRide1.get('lastPauseStart')) {
-        const rideCoords = currentRide1.get('rideCoordinates')
+        const rideCoords = currentRideCoordinates1.get('rideCoordinates')
         if (rideCoords.count() === 1) {
           return replacedLastLocation.setIn(
             ['currentRideElevations', 'elevationGain'],
@@ -166,8 +189,8 @@ export default function CurrentRideReducer(state=initialState, action) {
               toElevationKey(action.newElevation.get('longitude'))
             ], action.newElevation.get('elevation')
           ).setIn(
-            ['currentRide', 'rideCoordinates'],
-            List().push(action.newLocation)
+            ['currentRideCoordinates', 'rideCoordinates'],
+            List().push(permanentCoord)
           )
         } else if (rideCoords.count() > 1 && oldLastLocation) {
           const rideElevations = state.getIn(['currentRideElevations', 'elevations'])
@@ -201,11 +224,11 @@ export default function CurrentRideReducer(state=initialState, action) {
           const newElevationChange = action.newElevation.get('elevation') - lastElevation
           const newElevationGain = newElevationChange >= 0 ? newElevationChange : 0
           const newRideCoordinates = replacedLastLocation.getIn(
-            ['currentRide', 'rideCoordinates']
+            ['currentRideCoordinates', 'rideCoordinates']
           ).pop().push(
-            action.newLocation
+            permanentCoord
           ).sort((a, b) => {
-            return new Date(a.timestamp) - new Date(b.timestamp);
+            return new Date(a.get(2)) - new Date(b.get(2));
           })
 
           const totalDistance = currentRide1.get('distance')
@@ -216,7 +239,7 @@ export default function CurrentRideReducer(state=initialState, action) {
             ['currentRide', 'distance'],
             totalDistance
           ).setIn(
-            ['currentRide', 'rideCoordinates'],
+            ['currentRideCoordinates', 'rideCoordinates'],
             newRideCoordinates
           ).setIn(
             ['currentRideElevations', 'elevationGain'],
@@ -238,12 +261,40 @@ export default function CurrentRideReducer(state=initialState, action) {
     case RIDE_CREATED:
       return state.set('currentRide', null)
     case START_RIDE:
+      const coords = []
+      let elevations = Map()
+      if (action.firstCoord) {
+        const permanentCoord = List([
+          Number(action.firstCoord.get('latitude').toFixed(6)),
+          Number(action.firstCoord.get('longitude').toFixed(6)),
+          action.firstCoord.get('timestamp'),
+          Number(action.firstCoord.get('accuracy').toFixed(2))
+        ])
+        coords.push(permanentCoord)
+        elevations = elevations.setIn([
+          toElevationKey(action.firstElevation.get('latitude')),
+          toElevationKey(action.firstElevation.get('longitude'))
+        ], action.firstElevation.get('elevation'))
+      }
       return state.set(
         'currentRide',
-        action.currentRide
+        Map({
+          startTime: action.startTime,
+          pausedTime: 0,
+          lastPauseStart: null,
+          distance: 0
+        })
       ).set(
         'currentRideElevations',
-        action.currentElevations
+        Map({
+          elevationGain: 0,
+          elevations
+        })
+      ).set(
+        'currentRideCoordinates',
+        Map({
+          rideCoordinates: List(coords),
+        })
       )
     case STASH_NEW_LOCATIONS:
       return state.set('locationStashingActive', true)

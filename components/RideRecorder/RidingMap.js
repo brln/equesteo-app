@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 
 import BuildImage from '../BuildImage'
-import { bearing, logError, logRender } from '../../helpers'
+import { bearing, logError, logRender, parseRideCoordinate } from '../../helpers'
 
 export default class RidingMap extends PureComponent {
   constructor (props) {
@@ -18,16 +18,20 @@ export default class RidingMap extends PureComponent {
     this.gpsStatusImage = this.gpsStatusImage.bind(this)
   }
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.rideCoords.count() === 0 && this.props.rideCoords.count() === 1) {
-      this.map.animateToRegion(this.fitToElements())
-    }
-    this.changeBearing()
-  }
+  // componentDidUpdate(prevProps) {
+  //   if (prevProps.currentRideCoordinates.count() === 0 && this.props.currentRideCoordinates.count() === 1) {
+  //     this.map.animateToRegion(this.fitToElements())
+  //   }
+  //   this.changeBearing()
+  // }
 
   fitToElements() {
-    const lats = this.props.rideCoords.map(c => c.get('latitude'))
-    const longs = this.props.rideCoords.map(c => c.get('longitude'))
+    const { lats, longs } = this.props.currentRideCoordinates.reduce((accum, coord) => {
+      const parsedCoord = parseRideCoordinate(coord)
+      accum.lats.push(parsedCoord.get('latitude'))
+      accum.longs.push(parsedCoord.get('longitude'))
+      return accum
+    }, {lats: [], longs: []})
     const maxLat = Math.max(...lats)
     const minLat = Math.min(...lats)
     const maxLong = Math.max(...longs)
@@ -46,16 +50,17 @@ export default class RidingMap extends PureComponent {
 
   changeBearing () {
     let newBearing = 0
-    let coordinates = this.props.rideCoords.toJS()
-    const lastCoord = coordinates[coordinates.length -1]
-    if (coordinates.length > 1 && lastCoord.speed > 0) {
+    let secondToLast = parseRideCoordinate(
+      this.props.currentRideCoordinates.get(this.props.currentRideCoordinates.count() - 2)
+    )
+    if (this.props.currentRideCoordinates.count() > 1 && this.props.lastLocation.get('speed') > 0) {
       newBearing = bearing(
-        coordinates[coordinates.length - 2].latitude,
-        coordinates[coordinates.length - 2].longitude,
-        lastCoord.latitude,
-        lastCoord.longitude
+        secondToLast.get('latitude'),
+        secondToLast.get('longitude'),
+        this.props.lastLocation.get('latitude'),
+        this.props.lastLocation.get('longitude')
       )
-      this.map.animateToNavigation(lastCoord, newBearing, 45)
+      this.map.animateToNavigation(this.props.lastLocation.toJS(), newBearing, 45)
     }
   }
 
@@ -78,8 +83,20 @@ export default class RidingMap extends PureComponent {
     }
   }
 
+  mapCoordinates (rideCoordinates) {
+    return rideCoordinates.reduce((accum, coord) => {
+      const c = parseRideCoordinate(coord)
+      accum.push({
+        latitude: c.get('latitude'),
+        longitude: c.get('longitude')
+      })
+      return accum
+    }, [])
+  }
+
   render() {
     logRender('RideRecorder.RidingMap')
+    const mapCoords = this.mapCoordinates(this.props.currentRideCoordinates)
     let lastLocAccuracy
     let refiningLocationLimit
     if (this.props.showCircles && this.props.refiningLocation) {
@@ -112,7 +129,7 @@ export default class RidingMap extends PureComponent {
             provider={"google"}
           >
             <MapView.Polyline
-              coordinates={this.props.rideCoords.toJS()}
+              coordinates={mapCoords}
               strokeColor="#dc0202"
               strokeWidth={5}
             />
