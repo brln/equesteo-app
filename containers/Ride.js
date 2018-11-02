@@ -3,7 +3,7 @@ import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
 
 import Ride from '../components/Ride/Ride'
-import { loadRideCoordinates, persistRide, rideUpdated } from '../actions'
+import { clearSelectedRideCoordinates, loadRideCoordinates, persistRide, rideUpdated } from '../actions'
 import { brand } from '../colors'
 import { logRender } from '../helpers'
 import {
@@ -22,13 +22,17 @@ class RideContainer extends PureComponent {
           color: brand,
         },
         elevation: 0,
-        backButton: {
-          color: 'white'
-        },
         title: {
           color: 'white',
           fontSize: 20
         },
+        leftButtons: [
+          {
+            id: 'back',
+            icon: require('../img/back-arrow.png'),
+            color: 'white'
+          }
+        ],
         rightButtons: [
           {
             id: 'edit',
@@ -60,6 +64,9 @@ class RideContainer extends PureComponent {
       })
     } else if (buttonId === 'delete') {
       this.setState({modalOpen: true})
+    } else if (buttonId === 'back') {
+      this.props.dispatch(clearSelectedRideCoordinates())
+      Navigation.pop(this.props.componentId)
     }
   }
 

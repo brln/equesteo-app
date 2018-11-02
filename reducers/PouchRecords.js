@@ -1,5 +1,6 @@
 import { fromJS, Map } from 'immutable'
 import {
+  CLEAR_SELECTED_RIDE_COORDINATES,
   CREATE_FOLLOW,
   CREATE_HORSE,
   CREATE_RIDE,
@@ -37,6 +38,8 @@ export const initialState = Map({
 
 export default function PouchRecordsReducer(state=initialState, action) {
   switch (action.type) {
+    case CLEAR_SELECTED_RIDE_COORDINATES:
+      return state.set('selectedRideCoordinates', null)
     case CREATE_FOLLOW:
       let found = state.getIn(['follows', action.followID])
       if (!found) {
@@ -106,7 +109,7 @@ export default function PouchRecordsReducer(state=initialState, action) {
 
       let defaultID = null
       state.get('horseUsers').valueSeq().forEach((hu) => {
-        if (hu.userID === action.userID && hu.get('rideDefault')) {
+        if (hu.get('userID') === action.userID && hu.get('rideDefault')) {
           defaultID = hu.get('horseID')
         }
       })

@@ -14,7 +14,6 @@ import {
   logInfo,
   unixTimeNow,
   generateUUID,
-  toElevationKey,
 } from "./helpers"
 import { danger, green, warning } from './colors'
 import { appStates } from './helpers'
@@ -27,6 +26,7 @@ import {
   CLEAR_LAST_LOCATION,
   CLEAR_PAUSED_LOCATIONS,
   CLEAR_SEARCH,
+  CLEAR_SELECTED_RIDE_COORDINATES,
   CLEAR_STATE,
   CLEAR_STATE_AFTER_PERSIST,
   CREATE_FOLLOW,
@@ -109,6 +109,12 @@ export function clearPausedLocations () {
 export function clearSearch () {
   return {
     type: CLEAR_SEARCH
+  }
+}
+
+export function clearSelectedRideCoordinates () {
+  return {
+    type: CLEAR_SELECTED_RIDE_COORDINATES
   }
 }
 
@@ -876,9 +882,7 @@ function loadLocalData () {
 export function loadRideCoordinates (rideID) {
   return (dispatch) => {
     const pouchCouch = new PouchCouch()
-    console.log('LOADING')
     pouchCouch.loadRideCoordinates(rideID).then((coords) => {
-      console.log('LOADED')
       dispatch(rideCoordinatesLoaded(coords))
     })
   }

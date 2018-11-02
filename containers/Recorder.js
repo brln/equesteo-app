@@ -146,7 +146,7 @@ class RecorderContainer extends PureComponent {
   }
 
   finishRide () {
-    if (this.props.currentRideCoordinates.count() > 0) {
+    if (this.props.currentRideCoordinates.get('rideCoordinates').count() > 0) {
       this.props.dispatch(stashNewLocations())
       this.showUpdateRide()
     } else {
