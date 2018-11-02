@@ -242,3 +242,12 @@ export const MONTHS = {
   11: 'Nov',
   12: 'Dec',
 }
+
+export function parseRideCoordinate (fromDB) {
+  return {
+    latitude: fromDB.get(0),
+    longitude: fromDB.get(1),
+    timestamp: fromDB.get(2),
+    accuracy: fromDB.get(3)
+  }
+}

@@ -71,7 +71,6 @@ class UpdateProfileContainer extends PureComponent {
     if (buttonId === 'save') {
       this.props.dispatch(persistUser(this.props.user.get('_id')))
     } else if (buttonId === 'back') {
-      console.log(this.state.cachedUser.toJSON())
       this.props.dispatch(userUpdated(this.state.cachedUser))
     }
     Navigation.pop(this.props.componentId)

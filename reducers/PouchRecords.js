@@ -27,6 +27,7 @@ export const initialState = Map({
   follows: Map(),
   rides: Map(),
   rideCarrots: Map(),
+  rideCoordinates: Map(),
   rideComments: Map(),
   rideElevations: Map(),
   users: Map(),
@@ -162,57 +163,36 @@ export default function PouchRecordsReducer(state=initialState, action) {
     case HORSE_USER_UPDATED:
       return state.setIn(['horseUsers', action.horseUser.get('_id')], action.horseUser)
     case LOCAL_DATA_LOADED:
-      const allUsers = action.localData.users.reduce((accum, user) => {
-        accum[user._id] = fromJS(user)
-        return accum
-      }, {})
+      const actionRecords = {
+        'users': {},
+        'follows': {},
+        'horses': {},
+        'horseUsers': {},
+        'rides': {},
+        'rideCarrots': {},
+        'rideComments': {},
+        'rideCoordinates': {},
+        'rideElevations': {},
+      }
 
-      const allFollows = action.localData.follows.reduce((accum, follow) => {
-        accum[follow._id] = fromJS(follow)
-        return accum
-      }, {})
-
-      const allHorses = action.localData.horses.reduce((accum, horse) => {
-        accum[horse._id] = fromJS(horse)
-        return accum
-      }, {})
-
-      const allHorseUsers = action.localData.horseUsers.reduce((accum, horseUser) => {
-        accum[horseUser._id] = fromJS(horseUser)
-        return accum
-      }, {})
-
-      const allRides = action.localData.rides.reduce((accum, ride) => {
-        accum[ride._id] = fromJS(ride)
-        return accum
-      }, {})
-
-      const allCarrots = action.localData.rideCarrots.reduce((accum, carrot) => {
-        accum[carrot._id] = fromJS(carrot)
-        return accum
-      }, {})
-
-      const allComments = action.localData.rideComments.reduce((accum, comment) => {
-        accum[comment._id] = fromJS(comment)
-        return accum
-      }, {})
-
-      const allRideElevations = action.localData.rideElevations.reduce((accum, elevation) => {
-        accum[elevation._id] = fromJS(elevation)
-        return accum
-      }, {})
-
+      for (let recordType of Object.keys(actionRecords)) {
+        action.localData[recordType].reduce((accum, record) => {
+          accum[record._id] = record
+          return accum
+        }, actionRecords[recordType])
+      }
       return state.merge(Map({
-        users: Map(allUsers),
-        follows: Map(allFollows),
-        rides: Map(allRides),
-        rideCarrots: Map(allCarrots),
-        rideComments: Map(allComments),
-        rideElevations: Map(allRideElevations),
+        users: fromJS(actionRecords.users),
+        follows: fromJS(actionRecords.follows),
+        rides:  fromJS(actionRecords.rides),
+        rideCarrots:  fromJS(actionRecords.rideCarrots),
+        rideComments:  fromJS(actionRecords.rideComments),
+        rideCoordinates:  fromJS(actionRecords.rideCoordinates),
+        rideElevations:  fromJS(actionRecords.rideElevations),
         // First start creates a horse, probably before the finishes,
         // so keep it from blowing the new horse away
-        horses: state.get('horses').merge(Map(allHorses)),
-        horseUsers: Map(allHorseUsers)
+        horses: state.get('horses').merge(fromJS(actionRecords.horses)),
+        horseUsers:  fromJS(actionRecords.horseUsers)
       }))
     case RIDE_CARROT_CREATED:
       return state.setIn(['rideCarrots', action.carrotData.get('_id')], action.carrotData)
@@ -220,7 +200,6 @@ export default function PouchRecordsReducer(state=initialState, action) {
       return state.setIn(['rideCarrots', action.carrotData.get('_id')], action.carrotData)
     case RIDE_COMMENT_CREATED:
       return state.setIn(['rideComments', action.rideComment.get('_id')], action.rideComment)
-
     case RIDE_ELEVATIONS_CREATED:
       return state.setIn(['rideElevations', action.elevationData.get('_id')], action.elevationData)
     case RIDE_UPDATED:

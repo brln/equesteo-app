@@ -122,7 +122,7 @@ export default class Training extends PureComponent {
           onValueChange={this.pickHorse}
           style={{inputIOS: {fontSize: 20, fontWeight: 'bold', textAlign: 'center', paddingTop: 10}, underline: { borderTopWidth: 0 }}}
           placeholder={{
-            label: 'All Horses',
+            label: 'All Rides',
             value: this.TYPES.SHOW_ALL_HORSES,
           }}
         />

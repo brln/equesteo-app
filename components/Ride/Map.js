@@ -1,10 +1,11 @@
 import React, { PureComponent } from 'react';
 import MapView from 'react-native-maps';
-
 import {
   StyleSheet,
   View
 } from 'react-native';
+
+import { parseRideCoordinate } from '../../helpers'
 
 export default class Map extends PureComponent {
   constructor (props) {
@@ -14,7 +15,7 @@ export default class Map extends PureComponent {
 
   fitToElements() {
     this.map.fitToCoordinates(
-      this.props.rideCoords,
+      this.mapCoordinates(this.props.rideCoordinates),
       {
         animated: false,
         edgePadding: {
@@ -27,11 +28,24 @@ export default class Map extends PureComponent {
     )
   }
 
-  render() {
-    const lastIndex = this.props.rideCoords.length - 1
-    const firstCoord = this.props.rideCoords[0]
-    const lastCoord = this.props.rideCoords[lastIndex]
+  mapCoordinates (rideCoordinates) {
+    return rideCoordinates.reduce((accum, coord) => {
+      const c = parseRideCoordinate(coord)
+      accum.push({
+        latitude: c.latitude,
+        longitude: c.longitude
+      })
+      return accum
+    }, [])
+  }
 
+  render() {
+    const lastIndex = this.props.rideCoordinates.count() - 1
+    const firstCoord = this.props.rideCoordinates.get(0)
+    const lastCoord = this.props.rideCoordinates.get(lastIndex)
+
+    const mapCoords = this.mapCoordinates(this.props.rideCoordinates)
+    logDebug(mapCoords)
     return (
       <View style={styles.container}>
         <MapView
@@ -42,21 +56,22 @@ export default class Map extends PureComponent {
           provider={"google"}
         >
           <MapView.Polyline
-            coordinates={this.props.rideCoords}
+            coordinates={mapCoords}
             strokeColor={"#dc0202"}
+            fillColor={"#000000"}
             strokeWidth={5}
           />
           <MapView.Marker
             coordinate={{
-              latitude: firstCoord.latitude,
-              longitude: firstCoord.longitude
+              latitude: firstCoord.get('latitude'),
+              longitude: firstCoord.get('longitude')
             }}
             pinColor={"#0bc464"}
           />
           <MapView.Marker
             coordinate={{
-              latitude: lastCoord.latitude,
-              longitude: lastCoord.longitude
+              latitude: lastCoord.get('latitude'),
+              longitude: lastCoord.get('longitude')
             }}
             pincolor={"#ea4a3f"}
           />

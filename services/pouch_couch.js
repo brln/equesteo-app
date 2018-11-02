@@ -208,6 +208,7 @@ export default class PouchCouch {
       horseUsers: horseDocs.filter(h => h.type === 'horseUser'),
       follows: userDocs.filter(u => u.type === 'follow'),
       rideCarrots: rideDocs.filter(r => r.type === 'carrot'),
+      rideCoordinates: rideDocs.filter(r => r.type === 'rideCoordinates'),
       rideComments: rideDocs.filter(r => r.type === 'comment'),
       rideElevations: rideDocs.filter(r => r.type === 'rideElevations'),
       rides: rideDocs.filter(r => r.type === 'ride'),

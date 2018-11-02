@@ -167,6 +167,7 @@ class RideContainer extends PureComponent {
         ride={this.props.ride}
         rideHorseOwnerID={this.rideHorseOwnerID()}
         rideUser={this.props.rideUser}
+        rideCoordinates={this.props.rideCoordinates}
         rideElevations={this.props.rideElevations}
         showFullscreenMap={this.showFullscreenMap}
         showHorseProfile={this.showHorseProfile}
@@ -182,16 +183,19 @@ function mapStateToProps (state, passedProps) {
   const pouchState = state.get('pouchRecords')
   const localState = state.get('localState')
   const ride = pouchState.getIn(['rides', passedProps.rideID])
+  const rideCoordinates = pouchState.getIn(['rideCoordinates', passedProps.rideID + '_coordinates'])
   const rideElevations = pouchState.getIn(['rideElevations', passedProps.rideID + '_elevations'])
   const userID = localState.get('userID')
   return {
     horses: pouchState.get('horses'),
     horseUsers: pouchState.get('horseUsers'),
     ride,
+    rideCoordinates,
     rideElevations,
     rideUser: pouchState.getIn(['users', ride.get('userID')]),
     userID
   }
+  //@TODO get coords from new records
 }
 
 export default  connect(mapStateToProps)(RideContainer)

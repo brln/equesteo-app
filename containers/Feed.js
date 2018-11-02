@@ -217,7 +217,7 @@ class FeedContainer extends BackgroundComponent {
 
   followingRides (follows, userID, rides) {
     return rides.valueSeq().filter(
-      r => r.get('isPublic') === true // is a public ride @TODO: filter this when replicating
+      r => r.get('isPublic') === true // is a public ride
         && r.get('deleted') !== true // hasn't been deleted
         && (r.get('userID') === userID || this.memoizeFollowIDs(follows, userID).indexOf(r.get('userID')) >= 0) // user hasn't removed follow
     ).sort(

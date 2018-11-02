@@ -31,15 +31,22 @@ class MapContainer extends PureComponent {
     logRender('MapContainer')
     return (
       <Map
-        rideCoords={this.props.ride.get('rideCoordinates').toJS()}
+        rideCoordinates={this.props.rideCoordinates}
       />
     )
   }
 }
 
 function mapStateToProps (state, passedProps) {
+  const rideCoordinates = state.getIn([
+    'pouchRecords',
+    'rideCoordinates',
+    passedProps.rideID + '_coordinates',
+    'rideCoordinates'
+  ])
   return {
-    ride: state.getIn(['pouchRecords', 'rides', passedProps.rideID])
+    ride: state.getIn(['pouchRecords', 'rides', passedProps.rideID]),
+    rideCoordinates,
   }
 }
 

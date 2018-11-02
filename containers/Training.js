@@ -61,7 +61,7 @@ class TrainingContainer extends PureComponent {
     return this.props.rides.valueSeq().filter((ride) => {
       return (
         yourHorseIDs.indexOf(ride.get('horseID')) >= 0
-          || (ride.get('userID') === this.props.userID && ride.get('horseID') === null)
+          || (ride.get('userID') === this.props.userID && !ride.get('horseID'))
         ) && ride.get('deleted') !== true
     })
   }

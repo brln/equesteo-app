@@ -110,7 +110,9 @@ export default class HorseCard extends PureComponent {
 
   createTime () {
     const t = this.props.horse.get('createTime')
-    return `${moment(t).format('MMMM Do YYYY')} at ${moment(t).format('h:mm a')}`
+    if (t) {
+      return `${moment(t).format('MMMM Do YYYY')} at ${moment(t).format('h:mm a')}`
+    }
   }
 
   renderSwiper () {
