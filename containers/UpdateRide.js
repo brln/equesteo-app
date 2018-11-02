@@ -196,11 +196,13 @@ class UpdateRideContainer extends BackgroundComponent {
 
   persistRide () {
     return new Promise((res, rej) => {
-      this.props.dispatch(persistRideCoordinates()).then(() => {
-        this.props.dispatch(persistRide(this.props.ride.get('_id')))
+      this.props.dispatch(persistRide(this.props.ride.get('_id'))).then(() => {
+        if (this.props.newRide) {
+          this.props.dispatch(persistRideCoordinates())
+        }
         this.uploadNewPhotos()
         res()
-      })
+      }).catch(() => { rej() })
     })
   }
 

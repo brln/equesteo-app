@@ -16,7 +16,7 @@ import ImagePicker from 'react-native-image-crop-picker'
 
 import { brand, darkBrand } from '../../colors'
 import FabImage from '../FabImage'
-import HorseSelector from '../RideRecorder/HorseSelector'
+import HorseSelector from './HorseSelector'
 import PhotosByTimestamp from '../PhotosByTimestamp'
 import PhotoMenu from '../UpdateHorse/PhotoMenu'
 

@@ -16,7 +16,7 @@ import {
   START_RIDE,
   UNPAUSE_LOCATION_TRACKING,
 } from '../constants'
-import { haversine, toElevationKey, unixTimeNow } from '../helpers'
+import { haversine, parseRideCoordinate, toElevationKey, unixTimeNow } from '../helpers'
 
 export const initialState = Map({
   currentRide: null,
@@ -46,15 +46,13 @@ export default function CurrentRideReducer(state=initialState, action) {
         unixTimeNow()
       )
     case MERGE_STASHED_LOCATIONS:
-      const rideCoordinates = state.getIn(
-        ['currentRide', 'rideCoordinates']
-      )
+      const rideCoordinates = state.getIn(['currentRideCoordinates', 'rideCoordinates'])
       const pausedCoordinates = state.get('stashedCoordinates')
       const merged = rideCoordinates.concat(pausedCoordinates).sort((a, b) => {
         return new Date(a.get(2)) - new Date(b.get(2));
       })
       return state.setIn(
-        ['currentRide', 'rideCoordinates'],
+        ['currentRideCoordinates', 'rideCoordinates'],
         merged
       ).set('stashedCoordinates', List())
     case NEW_LOCATION:
@@ -195,7 +193,7 @@ export default function CurrentRideReducer(state=initialState, action) {
         } else if (rideCoords.count() > 1 && oldLastLocation) {
           const rideElevations = state.getIn(['currentRideElevations', 'elevations'])
           const oldElevationTotalGain = state.getIn(['currentRideElevations', 'elevationGain'])
-          const lastCoord = rideCoords.get(-2)
+          const lastCoord = parseRideCoordinate(rideCoords.get(-2))
           const oldDistance = haversine(
             oldLastLocation.get('latitude'),
             oldLastLocation.get('longitude'),
