@@ -363,7 +363,7 @@ export default class Ride extends PureComponent {
           </View>
 
           <PhotoFilmstrip
-            photosByID={this.props.ride.get('photosByID')}
+            photosByID={this.props.ridePhotos}
             showPhotoLightbox={this.props.showPhotoLightbox}
             exclude={[]}
           />

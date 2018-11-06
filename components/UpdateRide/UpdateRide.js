@@ -23,11 +23,11 @@ import PhotoMenu from '../UpdateHorse/PhotoMenu'
 export default class UpdateRide extends PureComponent {
   constructor (props) {
     super(props)
-    this.uploadPhoto = this.uploadPhoto.bind(this)
     this.changeCoverPhoto = this.changeCoverPhoto.bind(this)
     this.changeRideName = this.changeRideName.bind(this)
     this.changeRideNotes = this.changeRideNotes.bind(this)
     this.clearPhotoMenu = this.clearPhotoMenu.bind(this)
+    this.createPhoto = this.createPhoto.bind(this)
     this.deletePhoto = this.deletePhoto.bind(this)
     this.openPhotoMenu = this.openPhotoMenu.bind(this)
     this.state = {
@@ -37,7 +37,7 @@ export default class UpdateRide extends PureComponent {
   }
 
   deletePhoto () {
-    this.props.deletePhoto(this.state.selectedPhotoID)
+    this.props.markPhotoDeleted(this.state.selectedPhotoID)
     this.setState({
       showPhotoMenu: false,
       selectedPhotoID: null
@@ -74,13 +74,13 @@ export default class UpdateRide extends PureComponent {
     this.props.changeRideNotes(notes)
   }
 
-  uploadPhoto() {
+  createPhoto() {
     ImagePicker.openPicker({
       width: 1080,
       height: 1080,
       cropping: true
     }).then(image => {
-      this.props.uploadPhoto(image.path)
+      this.props.createPhoto(image.path)
     }).catch((e) => {})
   }
 
@@ -109,7 +109,7 @@ export default class UpdateRide extends PureComponent {
 
               <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20}}>
                 <PhotosByTimestamp
-                  photosByID={this.props.ride.get('photosByID')}
+                  photosByID={this.props.ridePhotos}
                   profilePhotoID={this.props.ride.get('coverPhotoID')}
                   changeProfilePhoto={this.openPhotoMenu}
                 />
@@ -120,7 +120,7 @@ export default class UpdateRide extends PureComponent {
                   direction="up"
                   style={{ backgroundColor: brand }}
                   position="bottomRight"
-                  onPress={this.uploadPhoto}>
+                  onPress={this.createPhoto}>
                   <FabImage source={require('../../img/addphoto.png')} height={30} width={30} />
                 </Fab>
               </View>

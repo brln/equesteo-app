@@ -1,3 +1,4 @@
+import memoizeOne from 'memoize-one';
 import { Navigation } from 'react-native-navigation'
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
@@ -65,8 +66,9 @@ class RideContainer extends PureComponent {
     } else if (buttonId === 'delete') {
       this.setState({modalOpen: true})
     } else if (buttonId === 'back') {
-      this.props.dispatch(clearSelectedRideCoordinates())
-      Navigation.pop(this.props.componentId)
+      Navigation.pop(this.props.componentId).then(() => {
+        this.props.dispatch(clearSelectedRideCoordinates())
+      })
     }
   }
 
@@ -84,6 +86,7 @@ class RideContainer extends PureComponent {
     this.showHorseProfile = this.showHorseProfile.bind(this)
     this.showPhotoLightbox = this.showPhotoLightbox.bind(this)
     this.showProfile = this.showProfile.bind(this)
+    this.thisRidesPhotos = this.thisRidesPhotos.bind(this)
 
     Navigation.events().bindComponent(this);
 
@@ -94,6 +97,8 @@ class RideContainer extends PureComponent {
         }
       })
     }
+
+    this.memoThisRidesPhotos = memoizeOne(this.thisRidesPhotos)
   }
 
   showProfile (user) {
@@ -167,6 +172,12 @@ class RideContainer extends PureComponent {
     return rideHorseOwnerID
   }
 
+  thisRidesPhotos (ridePhotos) {
+    return ridePhotos.filter((rp) => {
+      return rp.get('rideID') === this.props.ride.get('_id') && rp.get('deleted') !== true
+    })
+  }
+
   render() {
     logRender('RideContainer')
     return (
@@ -181,6 +192,7 @@ class RideContainer extends PureComponent {
         rideUser={this.props.rideUser}
         rideCoordinates={this.props.rideCoordinates}
         rideElevations={this.props.rideElevations}
+        ridePhotos={this.memoThisRidesPhotos(this.props.ridePhotos)}
         showFullscreenMap={this.showFullscreenMap}
         showHorseProfile={this.showHorseProfile}
         showPhotoLightbox={this.showPhotoLightbox}
@@ -205,6 +217,7 @@ function mapStateToProps (state, passedProps) {
     ride,
     rideCoordinates,
     rideElevations,
+    ridePhotos: pouchState.get('ridePhotos'),
     rideUser: pouchState.getIn(['users', ride.get('userID')]),
     userID
   }

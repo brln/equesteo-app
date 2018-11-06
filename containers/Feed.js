@@ -263,6 +263,7 @@ class FeedContainer extends BackgroundComponent {
         refreshing={this.state.refreshing}
         rideCarrots={this.props.rideCarrots.toList()}
         rideComments={this.props.rideComments.toList()}
+        ridePhotos={this.props.ridePhotos}
         showHorseProfile={this.showHorseProfile}
         showComments={this.showComments}
         showProfile={this.showProfile}
@@ -297,6 +298,7 @@ function mapStateToProps (state) {
     rides: pouchState.get('rides'),
     rideCarrots: pouchState.get('rideCarrots'),
     rideComments: pouchState.get('rideComments'),
+    ridePhotos: pouchState.get('ridePhotos'),
     users: pouchState.get('users'),
     userID,
     user: pouchState.getIn(['users', localState.get('userID')])

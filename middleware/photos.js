@@ -2,11 +2,12 @@ import ImagePicker from 'react-native-image-crop-picker'
 import { Sentry } from 'react-native-sentry'
 
 import {
-  changeRidePhotoData,
   changeUserPhotoData,
   dequeuePhoto,
   horsePhotoUpdated,
   persistHorsePhoto,
+  persistRidePhoto,
+  ridePhotoUpdated,
 } from '../actions'
 import {
   generateUUID,
@@ -55,15 +56,15 @@ function remotePersist (item, store, userAPI) {
     switch (item.get('type')) {
       case 'horse':
         const uploadedHorseURI = horsePhotoURL(photoID)
-        logDebug(uploadedHorseURI, 'new URI')
         const horsePhoto = store.getState().getIn(['pouchRecords', 'horsePhotos', photoID]).set('uri', uploadedHorseURI)
         store.dispatch(horsePhotoUpdated(horsePhoto))
-        console.log('remotePersist')
         store.dispatch(persistHorsePhoto(horsePhoto.get('_id')))
         break
       case 'ride':
         const uploadedRideURI = ridePhotoURL(photoID)
-        store.dispatch(changeRidePhotoData(item.get('rideID'), photoID, uploadedRideURI))
+        const ridePhoto = store.getState().getIn(['pouchRecords', 'ridePhotos', photoID]).set('uri', uploadedRideURI)
+        store.dispatch(ridePhotoUpdated(ridePhoto))
+        store.dispatch(persistRidePhoto(ridePhoto.get('_id')))
         break
       case 'profile':
         const uploadedProfilePhotoURI = profilePhotoURL(photoID)

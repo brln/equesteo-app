@@ -5,6 +5,7 @@ import {
   CREATE_HORSE,
   CREATE_HORSE_PHOTO,
   CREATE_RIDE,
+  CREATE_RIDE_PHOTO,
   DELETE_FOLLOW,
   DELETE_UNPERSISTED_HORSE,
   DELETE_UNPERSISTED_RIDE,
@@ -18,6 +19,7 @@ import {
   RIDE_CARROT_SAVED,
   RIDE_COORDINATES_LOADED,
   RIDE_ELEVATIONS_CREATED,
+  RIDE_PHOTO_UPDATED,
   RIDE_UPDATED,
   RIDE_ELEVATIONS_UPDATED,
   USER_UPDATED,
@@ -36,6 +38,7 @@ export const initialState = Map({
   selectedRideCoordinates: null,
   rideComments: Map(),
   rideElevations: Map(),
+  ridePhotos: Map(),
   users: Map(),
 })
 
@@ -143,12 +146,10 @@ export default function PouchRecordsReducer(state=initialState, action) {
         name,
         notes: null,
         photosByID: Map({}),
-        rideCoordinates: simplifiedCoords,
         startTime: action.currentRide.get('startTime'),
         type: 'ride',
         userID: action.userID,
       }
-      theRide.mapURL = staticMap(theRide)
 
       const elevationData = {
         _id: action.rideID + '_elevations',
@@ -166,6 +167,7 @@ export default function PouchRecordsReducer(state=initialState, action) {
         type: 'rideCoordinates',
         rideCoordinates: simplifiedCoords,
       }
+      theRide.mapURL = staticMap(theRide, coordinateData.rideCoordinates)
 
       return state.setIn(
         ['rides', theRide._id], Map(theRide)
@@ -175,6 +177,16 @@ export default function PouchRecordsReducer(state=initialState, action) {
         'newRideCoordinates',
         Map(coordinateData)
       )
+    case CREATE_RIDE_PHOTO:
+      const newRidePhoto = {
+        _id: action.photoData._id,
+        rideID: action.rideID,
+        timestamp: action.photoData.timestamp,
+        type: 'ridePhoto',
+        uri: action.photoData.uri,
+        userID: action.userID,
+      }
+      return state.setIn(['ridePhotos', action.photoData._id], Map(newRidePhoto))
     case DELETE_FOLLOW:
       let toBeDeleted = state.getIn(['follows', action.followID])
       toBeDeleted = toBeDeleted.set('deleted', true)
@@ -204,6 +216,7 @@ export default function PouchRecordsReducer(state=initialState, action) {
         rides: {},
         rideCarrots: {},
         rideComments: {},
+        ridePhotos: {},
         rideElevations: {},
       }
 
@@ -220,6 +233,7 @@ export default function PouchRecordsReducer(state=initialState, action) {
         rideCarrots:  fromJS(actionRecords.rideCarrots),
         rideComments:  fromJS(actionRecords.rideComments),
         rideElevations:  fromJS(actionRecords.rideElevations),
+        ridePhotos: fromJS(actionRecords.ridePhotos),
         // First start creates a horse, probably before the finishes,
         // so keep it from blowing the new horse away
         horses: state.get('horses').merge(fromJS(actionRecords.horses)),
@@ -236,6 +250,8 @@ export default function PouchRecordsReducer(state=initialState, action) {
       return state.set('selectedRideCoordinates', fromJS(action.rideCoordinates))
     case RIDE_ELEVATIONS_CREATED:
       return state.setIn(['rideElevations', action.elevationData.get('_id')], action.elevationData)
+    case RIDE_PHOTO_UPDATED:
+      return state.setIn(['ridePhotos', action.ridePhoto.get('_id')], action.ridePhoto)
     case RIDE_UPDATED:
       return state.setIn(['rides', action.ride.get('_id')], action.ride)
     case RIDE_ELEVATIONS_UPDATED:

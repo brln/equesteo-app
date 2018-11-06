@@ -31,6 +31,7 @@ export default class Feed extends PureComponent {
         rides={rides}
         rideCarrots={this.props.rideCarrots}
         rideComments={this.props.rideComments}
+        ridePhotos={this.props.ridePhotos}
         showComments={this.props.showComments}
         showHorseProfile={this.props.showHorseProfile}
         showProfile={this.props.showProfile}

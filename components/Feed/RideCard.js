@@ -172,11 +172,10 @@ export default class RideCard extends PureComponent {
         />
       </TouchableOpacity>
     )
-    if (this.props.ride.get('photosByID').keySeq().count() > 0) {
+    if (this.props.ridePhotos.keySeq().count() > 0) {
       const images = []
       let coverImage = null
-      this.props.ride.get('photosByID').keySeq().reduce((accum, id) => {
-        const photo = this.props.ride.getIn(['photosByID', id])
+      this.props.ridePhotos.reduce((accum, photo) => {
         const thisImage = (
           <TouchableOpacity onPress={this.showRide} style={{flex: 1}} key="map">
             <URIImage
@@ -188,7 +187,7 @@ export default class RideCard extends PureComponent {
             />
           </TouchableOpacity>
         )
-        if (id !== this.props.ride.get('coverPhotoID')) {
+        if (photo.get('_id') !== this.props.ride.get('coverPhotoID')) {
           accum.push(thisImage)
         } else {
           coverImage = thisImage

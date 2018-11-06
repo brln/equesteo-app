@@ -51,7 +51,7 @@ export default class RideList extends PureComponent {
     if (item.type === 'ride') {
       const childFilter = (item) => {
         return (r) => {
-          return r.get('rideID') === item.get('_id') && r.get('deleted') === false
+          return r.get('rideID') === item.get('_id') && r.get('deleted') !== true
         }
       }
       const horse = this.getHorse(item.childData)
@@ -65,6 +65,7 @@ export default class RideList extends PureComponent {
           ride={item.childData}
           rideCarrots={this.props.rideCarrots.filter(childFilter(item.childData))}
           rideComments={this.props.rideComments.filter(childFilter(item.childData))}
+          ridePhotos={this.props.ridePhotos.filter(childFilter(item.childData))}
           showComments={this.props.showComments}
           showHorseProfile={this.props.showHorseProfile}
           showProfile={this.props.showProfile}

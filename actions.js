@@ -33,6 +33,7 @@ import {
   CREATE_HORSE,
   CREATE_HORSE_PHOTO,
   CREATE_RIDE,
+  CREATE_RIDE_PHOTO,
   DEQUEUE_PHOTO,
   DELETE_FOLLOW,
   DELETE_UNPERSISTED_HORSE,
@@ -65,6 +66,7 @@ import {
   RIDE_COMMENT_CREATED,
   RIDE_COORDINATES_LOADED,
   RIDE_ELEVATIONS_UPDATED,
+  RIDE_PHOTO_UPDATED,
   RIDE_UPDATED,
   SAVE_USER_ID,
   SET_ACTIVE_COMPONENT,
@@ -170,6 +172,15 @@ export function createRide (rideID, userID, currentRide, currentRideElevations, 
   }
 }
 
+export function createRidePhoto (rideID, userID, photoData) {
+  return {
+    type: CREATE_RIDE_PHOTO,
+    rideID,
+    userID,
+    photoData
+  }
+}
+
 export function dequeuePhoto (photoID) {
   return {
     type: DEQUEUE_PHOTO,
@@ -246,21 +257,6 @@ export function followUpdated (follow) {
   }
 }
 
-export function setFeedMessage (message) {
-  return {
-    type: SET_FEED_MESSAGE,
-    message
-  }
-}
-
-export function setFullSyncFail (status) {
-  return {
-    type: SET_FULL_SYNC_FAIL,
-    status,
-    logData: ['status']
-  }
-}
-
 export function horseUserUpdated (horseUser) {
   return {
     type: HORSE_USER_UPDATED,
@@ -295,12 +291,7 @@ export function mergeStashedLocations () {
   }
 }
 
-export function setRemotePersistDB (database) {
-  return {
-    type: NEEDS_REMOTE_PERSIST,
-    database
-  }
-}
+
 
 function newAppState (newState) {
   return {
@@ -358,6 +349,28 @@ export function setPopShowRide (rideID, showRideNow) {
     type: SET_POP_SHOW_RIDE,
     rideID,
     showRideNow,
+  }
+}
+
+export function setRemotePersistDB (database) {
+  return {
+    type: NEEDS_REMOTE_PERSIST,
+    database
+  }
+}
+
+export function setFeedMessage (message) {
+  return {
+    type: SET_FEED_MESSAGE,
+    message
+  }
+}
+
+export function setFullSyncFail (status) {
+  return {
+    type: SET_FULL_SYNC_FAIL,
+    status,
+    logData: ['status']
   }
 }
 
@@ -438,6 +451,13 @@ function rideElevationsUpdated (rideElevations) {
   return {
     type: RIDE_ELEVATIONS_UPDATED,
     rideElevations
+  }
+}
+
+export function ridePhotoUpdated (ridePhoto) {
+  return {
+    type: RIDE_PHOTO_UPDATED,
+    ridePhoto
   }
 }
 
@@ -561,22 +581,6 @@ export function checkFCMPermission () {
   }
 }
 
-export function changeRidePhotoData(rideID, photoID, uri) {
-  return async (dispatch, getState) => {
-    let ride = getState().getIn(['pouchRecords', 'rides']).get(rideID)
-
-    let timestamp = unixTimeNow()
-    if (ride.getIn(['photosByID', photoID])) {
-      timestamp = ride.getIn(['photosByID', photoID, 'timestamp'])
-    } else {
-      ride = ride.set('profilePhotoID', photoID)
-    }
-    ride = ride.setIn(['photosByID', photoID], Map({timestamp, uri}))
-    dispatch(rideUpdated(ride))
-    dispatch(persistRide(ride.get('_id')))
-  }
-}
-
 export function changeUserPhotoData (photoID, uri) {
   return async (dispatch, getState) => {
     const currentUserID = getState().getIn(['localState', 'userID'])
@@ -661,6 +665,22 @@ export function persistRideCoordinates () {
   }
 }
 
+export function persistRidePhoto (ridePhotoID) {
+  return async (dispatch, getState) => {
+    const theRidePhoto = getState().getIn(['pouchRecords', 'ridePhotos', ridePhotoID])
+    if (!theRidePhoto) {
+      throw new Error('no photo with that ID')
+    }
+    const jwt = getState().getIn(['localState', 'jwt'])
+    const pouchCouch = new PouchCouch(jwt)
+    const doc = await pouchCouch.saveRide(theRidePhoto.toJS())
+
+    const theRidePhotoAfterSave = getState().getIn(['pouchRecords', 'ridePhotos', ridePhotoID])
+    dispatch(ridePhotoUpdated(theRidePhotoAfterSave.set('_rev', doc.rev)))
+    dispatch(needsRemotePersist('rides'))
+  }
+}
+
 export function persistUser (userID) {
   return async (dispatch, getState) => {
     const theUser = getState().getIn(['pouchRecords', 'users', userID])
@@ -701,7 +721,6 @@ export function persistHorsePhoto (horsePhotoID) {
     }
     const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
-    logDebug(theHorsePhoto.toJS(), 'persistHorsePhoto')
     const doc = await pouchCouch.saveHorse(theHorsePhoto.toJS())
 
     const theHorsePhotoAfterSave = getState().getIn(['pouchRecords', 'horsePhotos', horsePhotoID])

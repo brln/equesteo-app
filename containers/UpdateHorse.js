@@ -156,7 +156,6 @@ class UpdateHorseContainer extends PureComponent {
 
   uploadNewPhotos () {
     for (let photoID of this.state.newPhotoIDs) {
-      console.log('uploadNewPhoto')
       this.props.dispatch(persistHorsePhoto(photoID))
       this.props.dispatch(
         uploadHorsePhoto(

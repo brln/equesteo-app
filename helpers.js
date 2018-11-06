@@ -67,7 +67,7 @@ function urlParams (params) {
   return Object.keys(params).map(k => k + '=' + encodeURIComponent(params[k])).join('&')
 }
 
-export function staticMap (ride) {
+export function staticMap (ride, coordinateData) {
   const ROOT_URL = 'https://maps.googleapis.com/maps/api/staticmap?'
   const queryStringParams = {
       size: '600x400',
@@ -80,7 +80,7 @@ export function staticMap (ride) {
   let lengthURL = false
   let fullURL
   while (!lengthURL || lengthURL > 6000) {
-    const simplified = simplifyLine(tolerance, ride.rideCoordinates)
+    const simplified = simplifyLine(tolerance, coordinateData)
     let pathCoords = ''
     for (let coord of simplified) {
       const parsed = parseRideCoordinate(coord)

@@ -213,6 +213,7 @@ export default class PouchCouch {
       rideCoordinates: rideDocs.filter(r => r.type === 'rideCoordinates'),
       rideComments: rideDocs.filter(r => r.type === 'comment'),
       rideElevations: rideDocs.filter(r => r.type === 'rideElevations'),
+      ridePhotos: rideDocs.filter(r => r.type === 'ridePhoto'),
       rides: rideDocs.filter(r => r.type === 'ride'),
       users: userDocs.filter(u => u.type === 'user')
     }
