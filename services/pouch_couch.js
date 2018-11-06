@@ -33,6 +33,7 @@ export default class PouchCouch {
   saveHorse (horseData) {
     return this.localHorsesDB.put(horseData).catch((e) => {
       logInfo('error saving horse')
+      logInfo(horseData)
       this.catchError(e)
     })
   }
@@ -205,6 +206,7 @@ export default class PouchCouch {
     const horseDocs = horsesResp.rows.map(h => h.doc)
     return {
       horses: horseDocs.filter(h => h.type === 'horse'),
+      horsePhotos: horseDocs.filter(h => h.type === 'horsePhoto'),
       horseUsers: horseDocs.filter(h => h.type === 'horseUser'),
       follows: userDocs.filter(u => u.type === 'follow'),
       rideCarrots: rideDocs.filter(r => r.type === 'carrot'),

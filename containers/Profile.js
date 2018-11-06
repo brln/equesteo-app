@@ -198,8 +198,9 @@ class ProfileContainer extends BackgroundComponent {
           deleteFollow={this.deleteFollow}
           followings={this.followings()}
           followers={this.followers()}
-          horseOwnerIDs={this.horseOwnerIDs()}
           horses={this.profileUserHorses()}
+          horseOwnerIDs={this.horseOwnerIDs()}
+          horsePhotos={this.props.horsePhotos}
           profileUser={this.props.profileUser}
           showAboutPage={this.showAboutPage}
           showHorseProfile={this.showHorseProfile}
@@ -227,6 +228,7 @@ function mapStateToProps (state, passedProps) {
     follows: pouchState.get('follows'),
     horseUsers: pouchState.get('horseUsers'),
     horses: pouchState.get('horses'),
+    horsePhotos: pouchState.get('horsePhotos'),
     profileUser: pouchState.getIn(['users', profileUserID]) || passedProps.profileUser || new Map(),
     users: pouchState.get('users'),
     userID

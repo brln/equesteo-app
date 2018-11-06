@@ -59,6 +59,7 @@ export default class RideList extends PureComponent {
       return (
         <RideCard
           horse={horse}
+          horsePhotos={this.props.horsePhotos}
           ownRideList={this.props.ownRideList}
           ownerID={ownerID}
           ride={item.childData}
@@ -79,6 +80,7 @@ export default class RideList extends PureComponent {
       return (
         <HorseCard
           horse={item.childData}
+          horsePhotos={this.props.horsePhotos.filter(hp => hp.get('horseID') === item.childData.get('_id'))}
           ownerID={this.props.horseOwnerIDs.get(item.childData.get('_id'))}
           rider={item.itemUser}
           showHorseProfile={this.props.showHorseProfile}

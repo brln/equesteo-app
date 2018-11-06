@@ -12,12 +12,10 @@ import {
   Card,
   CheckBox,
   CardItem,
-  Fab,
 } from 'native-base';
 import RNPickerSelect from 'react-native-picker-select';
 
 import { brand, darkBrand } from '../../colors'
-import FabImage from '../FabImage'
 import PhotoFab from './PhotoFab'
 import PhotosByTimestamp from '../PhotosByTimestamp'
 import PhotoMenu from './PhotoMenu'
@@ -80,21 +78,22 @@ export default class UpdateHorse extends PureComponent {
   }
 
   deletePhoto () {
-    const newPhotos = this.props.horse.get('photosByID').delete(this.state.selectedPhotoID)
-    let newDeets = Map({
-      photosByID: newPhotos
-    })
-    if (this.state.selectedPhotoID === this.props.horse.get('profilePhotoID')) {
-      if (newPhotos.keySeq().count() === 0) {
-        newDeets = newDeets.set('profilePhotoID', null)
-      } else {
-        newDeets = newDeets.set(
-          'profilePhotoID',
-          newPhotos.keySeq().get(0)
-        )
-      }
-    }
-    this.changeHorseDetails(newDeets)
+  //   const newPhotos = this.props.horse.get('photosByID').delete(this.state.selectedPhotoID)
+  //   let newDeets = Map({
+  //     photosByID: newPhotos
+  //   })
+  //   if (this.state.selectedPhotoID === this.props.horse.get('profilePhotoID')) {
+  //     if (newPhotos.keySeq().count() === 0) {
+  //       newDeets = newDeets.set('profilePhotoID', null)
+  //     } else {
+  //       newDeets = newDeets.set(
+  //         'profilePhotoID',
+  //         newPhotos.keySeq().get(0)
+  //       )
+  //     }
+  //   }
+  //   this.changeHorseDetails(newDeets)
+    this.props.markPhotoDeleted(this.state.selectedPhotoID)
     this.setState({
       showPhotoMenu: false,
       selectedPhotoID: null
@@ -320,7 +319,7 @@ export default class UpdateHorse extends PureComponent {
                 <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
                   <PhotosByTimestamp
                     changeProfilePhoto={this.openPhotoMenu}
-                    photosByID={this.props.horse.get('photosByID')}
+                    photosByID={this.props.horsePhotos}
                     profilePhotoID={this.props.horse.get('profilePhotoID')}
                   />
                 </CardItem>

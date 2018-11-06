@@ -3,11 +3,13 @@ import {
   CLEAR_SELECTED_RIDE_COORDINATES,
   CREATE_FOLLOW,
   CREATE_HORSE,
+  CREATE_HORSE_PHOTO,
   CREATE_RIDE,
   DELETE_FOLLOW,
   DELETE_UNPERSISTED_HORSE,
   DELETE_UNPERSISTED_RIDE,
   FOLLOW_UPDATED,
+  HORSE_PHOTO_UPDATED,
   HORSE_USER_UPDATED,
   HORSE_UPDATED,
   LOCAL_DATA_LOADED,
@@ -25,6 +27,7 @@ import { simplifyLine } from '../services/DouglasPeucker'
 
 export const initialState = Map({
   horses: Map(),
+  horsePhotos: Map(),
   horseUsers: Map(),
   follows: Map(),
   newRideCoordinates: null,
@@ -95,6 +98,16 @@ export default function PouchRecordsReducer(state=initialState, action) {
         ['horseUsers', newHorseUser._id],
         Map(newHorseUser)
       )
+    case CREATE_HORSE_PHOTO:
+      const newPhoto = {
+        _id: action.photoData._id,
+        horseID: action.horseID,
+        timestamp: action.photoData.timestamp,
+        type: 'horsePhoto',
+        uri: action.photoData.uri,
+        userID: action.userID,
+      }
+      return state.setIn(['horsePhotos', action.photoData._id], Map(newPhoto))
     case CREATE_RIDE:
       const startTime = action.currentRide.get('startTime')
       const now = new Date()
@@ -179,16 +192,19 @@ export default function PouchRecordsReducer(state=initialState, action) {
       return state.setIn(['horses', action.horse.get('_id')], action.horse)
     case HORSE_USER_UPDATED:
       return state.setIn(['horseUsers', action.horseUser.get('_id')], action.horseUser)
+    case HORSE_PHOTO_UPDATED:
+      return state.setIn(['horsePhotos', action.horsePhoto.get('_id')], action.horsePhoto)
     case LOCAL_DATA_LOADED:
       const actionRecords = {
-        'users': {},
-        'follows': {},
-        'horses': {},
-        'horseUsers': {},
-        'rides': {},
-        'rideCarrots': {},
-        'rideComments': {},
-        'rideElevations': {},
+        users: {},
+        follows: {},
+        horses: {},
+        horsePhotos: {},
+        horseUsers: {},
+        rides: {},
+        rideCarrots: {},
+        rideComments: {},
+        rideElevations: {},
       }
 
       for (let recordType of Object.keys(actionRecords)) {
@@ -207,6 +223,7 @@ export default function PouchRecordsReducer(state=initialState, action) {
         // First start creates a horse, probably before the finishes,
         // so keep it from blowing the new horse away
         horses: state.get('horses').merge(fromJS(actionRecords.horses)),
+        horsePhotos: fromJS(actionRecords.horsePhotos),
         horseUsers:  fromJS(actionRecords.horseUsers)
       }))
     case RIDE_CARROT_CREATED:

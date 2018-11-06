@@ -248,6 +248,7 @@ class UpdateRideContainer extends BackgroundComponent {
         changePublic={this.changePublic}
         deletePhoto={this.deletePhoto}
         horses={this.memoizedHorses()}
+        horsePhotos={this.props.horsePhotos}
         ride={this.props.ride}
         uploadPhoto={this.uploadPhoto}
       />
@@ -264,6 +265,7 @@ function mapStateToProps (state, passedProps) {
   return {
     activeComponent: localState.get('activeComponent'),
     horses: pouchState.get('horses'),
+    horsePhotos: pouchState.get('horsePhotos'),
     horseUsers: pouchState.get('horseUsers'),
     newRide,
     ride: state.getIn(['pouchRecords', 'rides', passedProps.rideID]),

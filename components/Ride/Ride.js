@@ -370,6 +370,7 @@ export default class Ride extends PureComponent {
 
           <View style={{flex: 1}}>
             <Stats
+              horsePhotos={this.props.horsePhotos}
               horses={this.props.horses}
               maxSpeed={maxSpeed}
               ride={this.props.ride}

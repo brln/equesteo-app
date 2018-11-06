@@ -155,6 +155,7 @@ export default class UpdateRide extends PureComponent {
                   changeHorseID={this.props.changeHorseID}
                   horseID={this.props.ride.get('horseID')}
                   horses={this.props.horses}
+                  horsePhotos={this.props.horsePhotos}
                 />
               </View>
             </Card>

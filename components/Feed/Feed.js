@@ -23,6 +23,7 @@ export default class Feed extends PureComponent {
     return (
       <RideList
         horses={this.props.horses}
+        horsePhotos={this.props.horsePhotos}
         horseUsers={this.props.horseUsers}
         horseOwnerIDs={this.props.horseOwnerIDs}
         ownRideList={ownRideList}

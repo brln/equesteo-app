@@ -174,6 +174,7 @@ class RideContainer extends PureComponent {
         closeDeleteModal={this.closeDeleteModal}
         deleteRide={this.deleteRide}
         horses={this.horses()}
+        horsePhotos={this.props.horsePhotos}
         modalOpen={this.state.modalOpen}
         ride={this.props.ride}
         rideHorseOwnerID={this.rideHorseOwnerID()}
@@ -199,6 +200,7 @@ function mapStateToProps (state, passedProps) {
   const userID = localState.get('userID')
   return {
     horses: pouchState.get('horses'),
+    horsePhotos: pouchState.get('horsePhotos'),
     horseUsers: pouchState.get('horseUsers'),
     ride,
     rideCoordinates,

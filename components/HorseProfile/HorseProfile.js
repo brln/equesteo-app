@@ -85,13 +85,16 @@ export default class HorseProfile extends PureComponent {
   }
 
   photoSources (selectedID) {
-    const sources = this.props.horse.get('photosByID').keySeq().reduce((accum, photoID) => {
+    let selectedSource = null
+    const sources = this.props.horsePhotos.reduce((accum, photo, photoID) => {
       if (photoID !== selectedID) {
-        accum.push({url: this.props.horse.getIn(['photosByID', photoID, 'uri'])})
+        accum.push({url: photo.get('uri')})
+      } else {
+        selectedSource = {url: photo.get('uri')}
       }
       return accum
     }, [])
-    sources.unshift({url: this.props.horse.getIn(['photosByID', selectedID, 'uri'])})
+    sources.unshift(selectedSource)
     return sources
   }
 
@@ -106,8 +109,7 @@ export default class HorseProfile extends PureComponent {
       </View>
     )
     if (horse.get('profilePhotoID')) {
-
-      const profileSource = {uri: horse.getIn(['photosByID', horse.get('profilePhotoID'), 'uri'])}
+      const profileSource = {uri: this.props.horsePhotos.getIn([horse.get('profilePhotoID'), 'uri'])}
       const swiperSources = this.photoSources(horse.get('profilePhotoID'))
       images.push(
         <TouchableOpacity
@@ -159,7 +161,7 @@ export default class HorseProfile extends PureComponent {
           { fab }
         </View>
         <PhotoFilmstrip
-          photosByID={this.props.horse.get('photosByID')}
+          photosByID={this.props.horsePhotos}
           showPhotoLightbox={this.props.showPhotoLightbox}
           exclude={[this.props.horse.get('profilePhotoID')]}
         />

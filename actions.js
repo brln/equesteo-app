@@ -31,6 +31,7 @@ import {
   CLEAR_STATE_AFTER_PERSIST,
   CREATE_FOLLOW,
   CREATE_HORSE,
+  CREATE_HORSE_PHOTO,
   CREATE_RIDE,
   DEQUEUE_PHOTO,
   DELETE_FOLLOW,
@@ -42,6 +43,7 @@ import {
   ERROR_OCCURRED,
   FOLLOW_UPDATED,
   HORSE_UPDATED,
+  HORSE_PHOTO_UPDATED,
   HORSE_USER_UPDATED,
   LOAD_CURRENT_RIDE_STATE,
   LOAD_LOCAL_STATE,
@@ -79,7 +81,7 @@ import {
   TOGGLE_DOING_INITIAL_LOAD,
   UNPAUSE_LOCATION_TRACKING,
   USER_UPDATED,
-  USER_SEARCH_RETURNED,
+  USER_SEARCH_RETURNED
 } from './constants'
 
 export function awaitFullSync () {
@@ -148,6 +150,15 @@ export function createHorse (horseID, horseUserID, userID) {
   }
 }
 
+export function createHorsePhoto (horseID, userID, photoData) {
+  return {
+    type: CREATE_HORSE_PHOTO,
+    horseID,
+    userID,
+    photoData,
+  }
+}
+
 export function createRide (rideID, userID, currentRide, currentRideElevations, currentRideCoordinates) {
   return {
     type: CREATE_RIDE,
@@ -204,6 +215,13 @@ export function enqueuePhoto (queueItem) {
   return {
     type: ENQUEUE_PHOTO,
     queueItem
+  }
+}
+
+export function horsePhotoUpdated (horsePhoto) {
+  return {
+    type: HORSE_PHOTO_UPDATED,
+    horsePhoto
   }
 }
 
@@ -543,21 +561,6 @@ export function checkFCMPermission () {
   }
 }
 
-export function changeHorsePhotoData(horseID, photoID, uri) {
-  return async (dispatch, getState) => {
-    let horse = getState().getIn(['pouchRecords', 'horses', horseID])
-    let timestamp = unixTimeNow()
-    if (horse.getIn(['photosByID', photoID])) {
-      timestamp = horse.getIn(['photosByID', photoID, 'timestamp'])
-    } else {
-      horse = horse.set('profilePhotoID', photoID)
-    }
-    horse = horse.setIn(['photosByID', photoID], Map({timestamp, uri}))
-    dispatch(horseUpdated(horse))
-    dispatch(persistHorse(horse.get('_id')))
-  }
-}
-
 export function changeRidePhotoData(rideID, photoID, uri) {
   return async (dispatch, getState) => {
     let ride = getState().getIn(['pouchRecords', 'rides']).get(rideID)
@@ -686,6 +689,23 @@ export function persistHorse (horseID) {
 
     const theHorseAfterSave = getState().getIn(['pouchRecords', 'horses', horseID])
     dispatch(horseUpdated(theHorseAfterSave.set('_rev', doc.rev)))
+    dispatch(needsRemotePersist('horses'))
+  }
+}
+
+export function persistHorsePhoto (horsePhotoID) {
+  return async (dispatch, getState) => {
+    const theHorsePhoto = getState().getIn(['pouchRecords', 'horsePhotos', horsePhotoID])
+    if (!theHorsePhoto) {
+      throw new Error('no photo with that ID')
+    }
+    const jwt = getState().getIn(['localState', 'jwt'])
+    const pouchCouch = new PouchCouch(jwt)
+    logDebug(theHorsePhoto.toJS(), 'persistHorsePhoto')
+    const doc = await pouchCouch.saveHorse(theHorsePhoto.toJS())
+
+    const theHorsePhotoAfterSave = getState().getIn(['pouchRecords', 'horsePhotos', horsePhotoID])
+    dispatch(horsePhotoUpdated(theHorsePhotoAfterSave.set('_rev', doc.rev)))
     dispatch(needsRemotePersist('horses'))
   }
 }

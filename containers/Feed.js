@@ -257,6 +257,7 @@ class FeedContainer extends BackgroundComponent {
         feedMessage={this.props.feedMessage}
         followingRides={this.memoizeFollowingRides(this.props.follows, this.props.userID, this.props.rides)}
         horses={this.memoizeFilteredHorses(this.props.follows, this.props.userID, this.props.horseUsers, this.props.horses)}
+        horsePhotos={this.props.horsePhotos}
         horseOwnerIDs={this.memoizeHorseOwnerIDs(this.props.horseUsers)}
         horseUsers={this.memoizeFilteredHorseUsers(this.props.follows, this.props.userID, this.props.horseUsers)}
         refreshing={this.state.refreshing}
@@ -287,6 +288,7 @@ function mapStateToProps (state) {
     follows: pouchState.get('follows'),
     fullSyncFail: localState.get('fullSyncFail'),
     horses: pouchState.get('horses'),
+    horsePhotos: pouchState.get('horsePhotos'),
     horseUsers: pouchState.get('horseUsers'),
     justFinishedRide: localState.get('justFinishedRide'),
     lastFullSync: localState.get('lastFullSync'),

@@ -90,6 +90,7 @@ class BarnContainer extends BackgroundComponent {
     return (
       <Barn
         horses={this.yourHorses()}
+        horsePhotos={this.props.horsePhotos}
         horseProfile={this.horseProfile}
         horseOwnerIDs={this.horseOwnerIDs()}
         newHorse={this.newHorse}
@@ -105,6 +106,7 @@ function mapStateToProps (state) {
     activeComponent: localState.get('activeComponent'),
     horseUsers: pouchState.get('horseUsers'),
     horses: pouchState.get('horses'),
+    horsePhotos: pouchState.get('horsePhotos'),
     userID: localState.get('userID'),
     user: pouchState.getIn(['users', localState.get('userID')])
   }

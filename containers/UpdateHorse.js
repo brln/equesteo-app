@@ -1,4 +1,5 @@
 import { Map } from 'immutable'
+import memoizeOne from 'memoize-one';
 import React, { PureComponent } from 'react'
 import { Keyboard } from 'react-native'
 import { connect } from 'react-redux';
@@ -6,10 +7,13 @@ import { Navigation } from 'react-native-navigation'
 
 import UpdateHorse from '../components/UpdateHorse/UpdateHorse'
 import {
+  createHorsePhoto,
   deleteUnpersistedHorse,
+  horsePhotoUpdated,
   horseUpdated,
   horseUserUpdated,
   persistHorse,
+  persistHorsePhoto,
   persistHorseUser,
   uploadHorsePhoto,
 } from '../actions'
@@ -59,15 +63,21 @@ class UpdateHorseContainer extends PureComponent {
       cachedHorse: null,
       cachedHorseUser: null,
       newPhotoIDs: [],
+      deletedPhotoIDs: [],
     }
+    this.actuallyDeletePhotos = this.actuallyDeletePhotos.bind(this)
     this.commitDefaultHorse = this.commitDefaultHorse.bind(this)
     this.horseUpdated = this.horseUpdated.bind(this)
+    this.markPhotoDeleted = this.markPhotoDeleted.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
     this.setDefaultHorse = this.setDefaultHorse.bind(this)
     this.stashPhoto = this.stashPhoto.bind(this)
+    this.thisHorsesPhotos = this.thisHorsesPhotos.bind(this)
     this.uploadNewPhotos = this.uploadNewPhotos.bind(this)
 
     Navigation.events().bindComponent(this);
+
+    this.memoThisHorsesPhotos = memoizeOne(this.thisHorsesPhotos)
   }
 
   static getDerivedStateFromProps (props, state) {
@@ -95,6 +105,7 @@ class UpdateHorseContainer extends PureComponent {
       // all your horse data if you call these at the same time
       await this.props.dispatch(persistHorse(this.props.horse.get('_id')))
       await this.props.dispatch(persistHorseUser(this.props.horseUser.get('_id')))
+      this.actuallyDeletePhotos()
       this.uploadNewPhotos()
       this.commitDefaultHorse()
     } else if (buttonId === 'back') {
@@ -113,6 +124,14 @@ class UpdateHorseContainer extends PureComponent {
 
   }
 
+  actuallyDeletePhotos () {
+    for (let photoID of this.state.deletedPhotoIDs) {
+      const deleted = this.props.horsePhotos.get(photoID).set('deleted', true)
+      this.props.dispatch(horsePhotoUpdated(deleted))
+      this.props.dispatch(persistHorsePhoto(deleted.get('_id')))
+    }
+  }
+
   horseUpdated (horse) {
     this.props.dispatch(horseUpdated(horse))
   }
@@ -120,27 +139,29 @@ class UpdateHorseContainer extends PureComponent {
   stashPhoto (uri) {
     let horse = this.props.horse
     let timestamp = unixTimeNow()
-    let photoID = generateUUID()
-    horse = horse.set('profilePhotoID', photoID)
+    let _id = generateUUID()
+    horse = horse.set('profilePhotoID', _id)
+    this.props.dispatch(horseUpdated(horse))
     this.props.dispatch(
-      horseUpdated(
-        horse.setIn(
-          ['photosByID', photoID],
-          Map({timestamp, uri})
-        )
+      createHorsePhoto(
+        horse.get('_id'),
+        this.props.userID,
+        { _id, timestamp, uri }
       )
     )
     this.setState({
-      newPhotoIDs: [...this.state.newPhotoIDs, photoID]
+      newPhotoIDs: [...this.state.newPhotoIDs, _id]
     })
   }
 
   uploadNewPhotos () {
     for (let photoID of this.state.newPhotoIDs) {
+      console.log('uploadNewPhoto')
+      this.props.dispatch(persistHorsePhoto(photoID))
       this.props.dispatch(
         uploadHorsePhoto(
           photoID,
-          this.props.horse.getIn(['photosByID', photoID, 'uri']),
+          this.props.horsePhotos.getIn([photoID, 'uri']),
           this.props.horse.get('_id')
         )
       )
@@ -169,15 +190,32 @@ class UpdateHorseContainer extends PureComponent {
     }
   }
 
+  thisHorsesPhotos (horsePhotos, deletedPhotoIDs) {
+    return horsePhotos.filter((hp) => {
+      return hp.get('deleted') !== true
+        && hp.get('horseID') === this.props.horse.get('_id')
+        && deletedPhotoIDs.indexOf(hp.get('_id')) < 0
+    })
+  }
+
+  markPhotoDeleted (photoID) {
+    this.setState({
+      deletedPhotoIDs: [...this.state.deletedPhotoIDs, photoID]
+    })
+  }
+
   render() {
     logRender('UpdateHorseContainer')
+    const horsePhotos = this.memoThisHorsesPhotos(this.props.horsePhotos, this.state.deletedPhotoIDs)
     return (
       <UpdateHorse
         closeDeleteModal={this.closeDeleteModal}
         deleteHorse={this.deleteHorse}
         horse={this.props.horse}
+        horsePhotos={horsePhotos}
         horseUpdated={this.horseUpdated}
         horseUser={this.props.horseUser}
+        markPhotoDeleted={this.markPhotoDeleted}
         newHorse={this.props.newHorse}
         setDefaultHorse={this.setDefaultHorse}
         stashPhoto={this.stashPhoto}
@@ -188,10 +226,11 @@ class UpdateHorseContainer extends PureComponent {
 }
 
 function mapStateToProps (state, passedProps) {
-  const horse = state.getIn(['pouchRecords' , 'horses', passedProps.horseID])
-  const horseUser = state.getIn(['pouchRecords', 'horseUsers', passedProps.horseUserID])
+  const pouchState = state.get('pouchRecords')
+  const horseUser = pouchState.getIn(['horseUsers', passedProps.horseUserID])
   return {
-    horse,
+    horse: pouchState.getIn(['horses', passedProps.horseID]),
+    horsePhotos: pouchState.get('horsePhotos'),
     horseUser,
     horseUsers: state.getIn(['pouchRecords', 'horseUsers']),
     userID: state.getIn(['localState', 'userID']),

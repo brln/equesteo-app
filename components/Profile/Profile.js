@@ -91,8 +91,8 @@ export default class Profile extends PureComponent {
 
   renderHorse ({item}) {
     let uri = 'https://s3.us-west-1.amazonaws.com/equesteo-horse-photos/empty.png'
-    if (item.profilePhotoID && item.photosByID[item.profilePhotoID]) {
-      uri = item.photosByID[item.profilePhotoID].uri
+    if (item.profilePhotoID) {
+      uri = this.props.horsePhotos.getIn([item.profilePhotoID, 'uri'])
     }
     return (
       <ListItem

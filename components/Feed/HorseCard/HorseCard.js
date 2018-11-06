@@ -117,7 +117,7 @@ export default class HorseCard extends PureComponent {
 
   renderSwiper () {
     const swiperHeight = width * (2/3)
-    const photos = this.props.horse.get('photosByID')
+    const photos = this.props.horsePhotos
     if (photos.valueSeq().count() > 0) {
       const images = []
       let coverImage = null

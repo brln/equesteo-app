@@ -62,9 +62,8 @@ export default class RideCard extends PureComponent {
 
   horseProfileURL () {
     const profilePhotoID = this.props.horse.get('profilePhotoID')
-    if (this.props.horse && profilePhotoID &&
-      this.props.horse.getIn(['photosByID', profilePhotoID])) {
-      return this.props.horse.getIn(['photosByID', profilePhotoID, 'uri'])
+    if (this.props.horse && profilePhotoID && this.props.horsePhotos.get(profilePhotoID)) {
+      return this.props.horsePhotos.getIn([profilePhotoID, 'uri'])
     }
   }
 

@@ -34,7 +34,7 @@ export default class HorseBarnCard extends PureComponent {
     if (horse.get('profilePhotoID')) {
       horseImage = (
         <URIImage
-          source={{uri: horse.getIn(['photosByID', horse.get('profilePhotoID'), 'uri'])}}
+          source={{uri: this.props.horsePhotos.getIn([horse.get('profilePhotoID'), 'uri'])}}
           style={horseImageStyle}
           onError={e => logError("Can't load HorseBarnCard image")}
           showSource={false}

@@ -1,12 +1,13 @@
-import { Map } from 'immutable'
 import React from 'react'
 import { connect } from 'react-redux';
 import { Navigation } from 'react-native-navigation'
 
 import {
   addHorseUser,
+  createHorsePhoto,
   deleteHorseUser,
   horseUpdated,
+  persistHorse,
   persistHorseUser,
   uploadHorsePhoto
 } from '../actions'
@@ -51,6 +52,7 @@ class HorseProfileContainer extends BackgroundComponent {
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
     this.showPhotoLightbox = this.showPhotoLightbox.bind(this)
     this.showRiderProfile = this.showRiderProfile.bind(this)
+    this.thisHorsesPhotos = this.thisHorsesPhotos.bind(this)
     this.thisHorsesRides = this.thisHorsesRides.bind(this)
     this.thisHorsesRiders = this.thisHorsesRiders.bind(this)
     this.uploadPhoto = this.uploadPhoto.bind(this)
@@ -157,26 +159,32 @@ class HorseProfileContainer extends BackgroundComponent {
     Navigation.pop(this.props.componentId)
   }
 
-  uploadPhoto (location) {
+  async uploadPhoto (location) {
     let photoID = generateUUID()
-    this.props.dispatch(
-      horseUpdated(
-        this.props.horse.setIn(
-          ['photosByID', photoID],
-          Map({timestamp: unixTimeNow(), uri: location})
-        ).set('profilePhotoID', photoID)
-      )
-    )
+    this.props.dispatch(horseUpdated(this.props.horse.set('profilePhotoID', photoID)))
+    this.props.dispatch(createHorsePhoto(
+      this.props.horse.get('_id'),
+      this.props.userID, {
+        _id: photoID,
+        timestamp: unixTimeNow(),
+        uri: location
+      }
+    ))
+
+    await this.props.dispatch(persistHorse(this.props.horse.get('_id')))
     this.props.dispatch(uploadHorsePhoto(photoID, location, this.props.horse.get('_id')))
   }
 
+  thisHorsesPhotos () {
+    return this.props.horsePhotos.filter((photo) => {
+      return photo.get('deleted') !== true && photo.get('horseID') === this.props.horse.get('_id')
+    })
+  }
+
   thisHorsesRides () {
-    return this.props.rides.valueSeq().reduce((accum, r) => {
-      if (r.get('horseID') === this.props.horse.get('_id')) {
-        accum.push(r)
-      }
-      return accum
-    }, [])
+    return this.props.rides.valueSeq().filter((r) => {
+      return r.get('horseID') === this.props.horse.get('_id')
+    }).toList()
   }
 
   thisHorsesRiders () {
@@ -212,6 +220,7 @@ class HorseProfileContainer extends BackgroundComponent {
         deleteHorse={this.deleteHorse}
         horse={this.props.horse}
         horseOwner={this.horseOwner().user}
+        horsePhotos={this.thisHorsesPhotos()}
         modalOpen={this.state.modalOpen}
         rides={this.thisHorsesRides()}
         riders={this.thisHorsesRiders()}
@@ -231,6 +240,7 @@ function mapStateToProps (state, passedProps) {
     activeComponent: localState.get('activeComponent'),
     horseUsers: pouchState.get('horseUsers'),
     horses: pouchState.get('horses'),
+    horsePhotos: pouchState.get('horsePhotos'),
     horse: pouchState.getIn(['horses', passedProps.horse.get('_id')]),
     rides: pouchState.get('rides'),
     user: pouchState.get('users').get(localState.get('userID')),
