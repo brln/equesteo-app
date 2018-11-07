@@ -40,6 +40,7 @@ export const initialState = Map({
   rideElevations: Map(),
   ridePhotos: Map(),
   users: Map(),
+  userPhotos: Map(),
 })
 
 export default function PouchRecordsReducer(state=initialState, action) {
@@ -208,7 +209,6 @@ export default function PouchRecordsReducer(state=initialState, action) {
       return state.setIn(['horsePhotos', action.horsePhoto.get('_id')], action.horsePhoto)
     case LOCAL_DATA_LOADED:
       const actionRecords = {
-        users: {},
         follows: {},
         horses: {},
         horsePhotos: {},
@@ -218,6 +218,8 @@ export default function PouchRecordsReducer(state=initialState, action) {
         rideComments: {},
         ridePhotos: {},
         rideElevations: {},
+        users: {},
+        userPhotos: {},
       }
 
       for (let recordType of Object.keys(actionRecords)) {
@@ -227,18 +229,19 @@ export default function PouchRecordsReducer(state=initialState, action) {
         }, actionRecords[recordType])
       }
       return state.merge(Map({
-        users: fromJS(actionRecords.users),
         follows: fromJS(actionRecords.follows),
+        // First start creates a horse, probably before the finishes,
+        // so keep it from blowing the new horse away
+        horses: state.get('horses').merge(fromJS(actionRecords.horses)),
+        horsePhotos: fromJS(actionRecords.horsePhotos),
+        horseUsers:  fromJS(actionRecords.horseUsers),
         rides:  fromJS(actionRecords.rides),
         rideCarrots:  fromJS(actionRecords.rideCarrots),
         rideComments:  fromJS(actionRecords.rideComments),
         rideElevations:  fromJS(actionRecords.rideElevations),
         ridePhotos: fromJS(actionRecords.ridePhotos),
-        // First start creates a horse, probably before the finishes,
-        // so keep it from blowing the new horse away
-        horses: state.get('horses').merge(fromJS(actionRecords.horses)),
-        horsePhotos: fromJS(actionRecords.horsePhotos),
-        horseUsers:  fromJS(actionRecords.horseUsers)
+        users: fromJS(actionRecords.users),
+        userPhotos: fromJS(actionRecords.userPhotos)
       }))
     case RIDE_CARROT_CREATED:
       return state.setIn(['rideCarrots', action.carrotData.get('_id')], action.carrotData)

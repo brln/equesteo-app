@@ -301,7 +301,8 @@ function mapStateToProps (state) {
     ridePhotos: pouchState.get('ridePhotos'),
     users: pouchState.get('users'),
     userID,
-    user: pouchState.getIn(['users', localState.get('userID')])
+    user: pouchState.getIn(['users', localState.get('userID')]),
+    userPhotos: pouchState.get('userPhotos')
   }
 }
 
