@@ -38,7 +38,7 @@ export default class RideList extends PureComponent {
     const profilePhotoID = user.get('profilePhotoID')
     let profilePhotoURL = null
     if (profilePhotoID) {
-      profilePhotoURL = user.getIn(['photosByID', profilePhotoID, 'uri'])
+      profilePhotoURL = this.props.userPhotos.getIn([profilePhotoID, 'uri'])
     }
     return profilePhotoURL
   }

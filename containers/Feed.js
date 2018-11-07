@@ -272,6 +272,7 @@ class FeedContainer extends BackgroundComponent {
         toggleCarrot={this.toggleCarrot}
         userID={this.props.userID}
         users={this.props.users}
+        userPhotos={this.props.userPhotos}
         yourRides={this.memoizeYourRides(this.props.rides, this.props.userID)}
       />
     )

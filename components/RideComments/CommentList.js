@@ -13,9 +13,6 @@ import {
 import moment from 'moment'
 import { darkGrey } from '../../colors'
 
-
-const { height } = Dimensions.get('window')
-
 export default class CommentList extends PureComponent {
   constructor (props) {
     super(props)
@@ -26,7 +23,7 @@ export default class CommentList extends PureComponent {
     const profilePhotoID = user.get('profilePhotoID')
     let profilePhotoURL = null
     if (profilePhotoID) {
-      profilePhotoURL = user.getIn(['photosByID', profilePhotoID, 'uri'])
+      profilePhotoURL = this.props.userPhotos.getIn([profilePhotoID, 'uri'])
     }
     return profilePhotoURL
   }

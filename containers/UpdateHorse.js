@@ -1,7 +1,6 @@
-import { Map } from 'immutable'
 import memoizeOne from 'memoize-one';
 import React, { PureComponent } from 'react'
-import { Keyboard } from 'react-native'
+import { BackHandler, Keyboard } from 'react-native'
 import { connect } from 'react-redux';
 import { Navigation } from 'react-native-navigation'
 
@@ -67,6 +66,7 @@ class UpdateHorseContainer extends PureComponent {
     }
     this.actuallyDeletePhotos = this.actuallyDeletePhotos.bind(this)
     this.commitDefaultHorse = this.commitDefaultHorse.bind(this)
+    this.goBack = this.goBack.bind(this)
     this.horseUpdated = this.horseUpdated.bind(this)
     this.markPhotoDeleted = this.markPhotoDeleted.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
@@ -109,22 +109,33 @@ class UpdateHorseContainer extends PureComponent {
       this.uploadNewPhotos()
       this.commitDefaultHorse()
     } else if (buttonId === 'back') {
-      if (this.props.newHorse) {
-        await Navigation.pop(this.props.componentId)
-        this.props.dispatch(deleteUnpersistedHorse(
-          this.props.horseID,
-          this.props.horseUserID
-        ))
-      } else {
-        this.props.dispatch(horseUpdated(this.state.cachedHorse))
-        this.props.dispatch(horseUserUpdated(this.state.cachedHorseUser))
-        await Navigation.pop(this.props.componentId)
-      }
+      this.goBack()
     }
-
   }
 
-  actuallyDeletePhotos () {
+  async goBack () {
+    if (this.props.newHorse) {
+      await Navigation.pop(this.props.componentId)
+      this.props.dispatch(deleteUnpersistedHorse(
+        this.props.horseID,
+        this.props.horseUserID
+      ))
+    } else {
+      this.props.dispatch(horseUpdated(this.state.cachedHorse))
+      this.props.dispatch(horseUserUpdated(this.state.cachedHorseUser))
+      await Navigation.pop(this.props.componentId)
+    }
+  }
+
+  componentDidAppear() {
+    BackHandler.addEventListener('hardwareBackPress', this.goBack)
+  }
+
+  componentDidDisappear() {
+    BackHandler.removeEventListener('hardwareBackPress', this.goBack)
+  }
+
+  async actuallyDeletePhotos () {
     for (let photoID of this.state.deletedPhotoIDs) {
       const deleted = this.props.horsePhotos.get(photoID).set('deleted', true)
       this.props.dispatch(horsePhotoUpdated(deleted))
@@ -198,6 +209,15 @@ class UpdateHorseContainer extends PureComponent {
   }
 
   markPhotoDeleted (photoID) {
+    if (photoID === this.props.horse.get('profilePhotoID')) {
+      const allPhotos = this.memoThisHorsesPhotos(this.props.horsePhotos, this.state.deletedPhotoIDs)
+      for (let otherPhoto of allPhotos.valueSeq()) {
+        const id = otherPhoto.get('_id')
+        if (id !== photoID && this.state.deletedPhotoIDs.indexOf(id) < 0) {
+          this.props.dispatch(horseUpdated(this.props.horse.set('profilePhotoID', id)))
+        }
+      }
+    }
     this.setState({
       deletedPhotoIDs: [...this.state.deletedPhotoIDs, photoID]
     })

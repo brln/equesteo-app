@@ -266,6 +266,7 @@ export default class HorseProfile extends PureComponent {
             riders={this.props.riders}
             showRiderProfile={this.showRiderProfile}
             user={this.props.user}
+            userPhotos={this.props.userPhotos}
           />
         </View>
       </ScrollView>

@@ -9,6 +9,7 @@ import {
   horseUpdated,
   persistHorse,
   persistHorseUser,
+  persistHorsePhoto,
   uploadHorsePhoto
 } from '../actions'
 import BackgroundComponent from '../components/BackgroundComponent'
@@ -173,6 +174,7 @@ class HorseProfileContainer extends BackgroundComponent {
 
     await this.props.dispatch(persistHorse(this.props.horse.get('_id')))
     this.props.dispatch(uploadHorsePhoto(photoID, location, this.props.horse.get('_id')))
+    this.props.dispatch(persistHorsePhoto(photoID))
   }
 
   thisHorsesPhotos () {
@@ -228,6 +230,7 @@ class HorseProfileContainer extends BackgroundComponent {
         showPhotoLightbox={this.showPhotoLightbox}
         uploadPhoto={this.uploadPhoto}
         user={this.props.user}
+        userPhotos={this.props.userPhotos}
       />
     )
   }
@@ -245,7 +248,8 @@ function mapStateToProps (state, passedProps) {
     rides: pouchState.get('rides'),
     user: pouchState.get('users').get(localState.get('userID')),
     userID: localState.get('userID'),
-    users: pouchState.get('users')
+    users: pouchState.get('users'),
+    userPhotos: pouchState.get('userPhotos'),
   }
 }
 

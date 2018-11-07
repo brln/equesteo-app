@@ -18,12 +18,12 @@ export default class RidingMap extends PureComponent {
     this.gpsStatusImage = this.gpsStatusImage.bind(this)
   }
 
-  // componentDidUpdate(prevProps) {
-  //   if (prevProps.currentRideCoordinates.count() === 0 && this.props.currentRideCoordinates.count() === 1) {
-  //     this.map.animateToRegion(this.fitToElements())
-  //   }
-  //   this.changeBearing()
-  // }
+  componentDidUpdate(prevProps) {
+    if (prevProps.currentRideCoordinates.count() === 0 && this.props.currentRideCoordinates.count() === 1) {
+      this.map.animateToRegion(this.fitToElements())
+    }
+    this.changeBearing()
+  }
 
   fitToElements() {
     const { lats, longs } = this.props.currentRideCoordinates.reduce((accum, coord) => {

@@ -40,6 +40,7 @@ export default class Feed extends PureComponent {
         toggleCarrot={this.props.toggleCarrot}
         userID={this.props.userID}
         users={this.props.users}
+        userPhotos={this.props.userPhotos}
       />
     )
   }

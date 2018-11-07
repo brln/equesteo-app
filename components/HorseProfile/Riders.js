@@ -32,7 +32,7 @@ export default class Riders extends PureComponent {
       profileThumb = (
         <URIImage
           style={styles.thumbnail}
-          source={{uri: rider.getIn(['photosByID', rider.get('profilePhotoID'), 'uri'])}}
+          source={{uri: this.props.userPhotos.getIn([rider.get('profilePhotoID'), 'uri'])}}
           onError={e => { logError('there was an error loading Riders image') }}
         />
       )

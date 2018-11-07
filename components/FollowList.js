@@ -29,8 +29,8 @@ export default class FollowList extends PureComponent {
 
   renderResult ({item}) {
     let avatar
-    if (item.photosByID[item.profilePhotoID]) {
-      avatar = <Thumbnail size={30} source={{uri: item.photosByID[item.profilePhotoID]}.uri} />
+    if (this.props.userPhotos.get(item.profilePhotoID)) {
+      avatar = <Thumbnail size={30} source={{uri: this.props.userPhotos.getIn([item.profilePhotoID, 'uri'])}} />
     } else {
       avatar = <Thumbnail size={30} source={require('../img/emptyProfile.png')} />
     }
@@ -49,7 +49,6 @@ export default class FollowList extends PureComponent {
               <Text>{`${item.firstName || ''} ${item.lastName || ''}`}</Text>
             </View>
           </View>
-
         </TouchableOpacity>
       </View>
     )

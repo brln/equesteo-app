@@ -45,22 +45,7 @@ export default class UpdateProfile extends PureComponent {
   }
 
   deletePhoto () {
-    const newPhotos = this.props.user.get('photosByID').delete(this.state.selectedPhotoID)
-    let newDeets = Map({
-      photosByID: newPhotos
-    })
-    if (this.state.selectedPhotoID === this.props.user.get('profilePhotoID')) {
-      if (newPhotos.keySeq().count() === 0) {
-        newDeets = newDeets.set('profilePhotoID', null)
-      } else {
-        newDeets = newDeets.set(
-          'profilePhotoID',
-          newPhotos.keySeq().get(0)
-        )
-      }
-
-    }
-    this.props.changeAccountDetails(this.props.user.merge(newDeets))
+    this.props.markPhotoDeleted(this.state.selectedPhotoID)
     this.setState({
       showPhotoMenu: false,
       selectedPhotoID: null
@@ -107,7 +92,7 @@ export default class UpdateProfile extends PureComponent {
   }
 
   render() {
-    const hasPictures = this.props.user.get('photosByID').count() > 0
+    const hasPictures = this.props.userPhotos.count() > 0
     let photoMenu = null
     if (this.state.showPhotoMenu) {
       photoMenu = (
@@ -131,7 +116,7 @@ export default class UpdateProfile extends PureComponent {
                 <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
                   <PhotosByTimestamp
                     changeProfilePhoto={this.openPhotoMenu}
-                    photosByID={this.props.user.get('photosByID')}
+                    photosByID={this.props.userPhotos}
                     profilePhotoID={this.props.user.get('profilePhotoID')}
                   />
                 </CardItem>

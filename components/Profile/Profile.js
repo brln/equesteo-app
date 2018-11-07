@@ -71,7 +71,7 @@ export default class Profile extends PureComponent {
       height: 1080,
       cropping: true
     }).then(image => {
-      this.props.uploadProfilePhoto(image.path)
+      this.props.uploadPhoto(image.path)
     }).catch(() => {})
   }
 
@@ -125,13 +125,13 @@ export default class Profile extends PureComponent {
   }
 
   photoSources (selectedID) {
-    const sources = this.props.profileUser.get('photosByID').keySeq().reduce((accum, photoID) => {
+    const sources = this.props.userPhotos.reduce((accum, photo, photoID) => {
       if (photoID !== selectedID) {
-        accum.push({url: this.props.profileUser.getIn(['photosByID', photoID, 'uri'])})
+        accum.push({url: photo.get('uri')})
       }
       return accum
     }, [])
-    sources.unshift({url: this.props.profileUser.getIn(['photosByID', selectedID, 'uri'])})
+    sources.unshift({url: this.props.userPhotos.getIn([selectedID, 'uri'])})
     return sources
   }
 
@@ -139,7 +139,7 @@ export default class Profile extends PureComponent {
     const images = []
     const user = this.props.profileUser
     if (user.get('profilePhotoID')) {
-      const profileSource = {uri: user.getIn(['photosByID', user.get('profilePhotoID'), 'uri'])}
+      const profileSource = {uri: this.props.userPhotos.getIn([user.get('profilePhotoID'), 'uri'])}
       const profileSources = this.photoSources(user.get('profilePhotoID'))
       images.push(
         <TouchableOpacity
@@ -221,7 +221,7 @@ export default class Profile extends PureComponent {
           </View>
         </View>
         <PhotoFilmstrip
-          photosByID={this.props.profileUser.get('photosByID')}
+          photosByID={this.props.userPhotos}
           showPhotoLightbox={this.props.showPhotoLightbox}
           exclude={[this.props.profileUser.get('profilePhotoID')]}
         />

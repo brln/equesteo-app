@@ -91,6 +91,7 @@ class RideCommentsContainer extends PureComponent {
         submitComment={this.submitComment}
         updateNewComment={this.updateNewComment}
         users={this.props.users}
+        userPhotos={this.props.userPhotos}
       />
     )
   }
@@ -101,7 +102,8 @@ function mapStateToProps (state, passedProps) {
   return {
     ride: pouchState.getIn(['rides', passedProps.rideID]),
     rideComments: pouchState.get('rideComments'),
-    users: pouchState.get('users')
+    users: pouchState.get('users'),
+    userPhotos: pouchState.get('userPhotos')
   }
 }
 

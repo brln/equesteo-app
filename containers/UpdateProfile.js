@@ -1,9 +1,16 @@
+import memoizeOne from 'memoize-one';
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
 import { Navigation } from 'react-native-navigation'
-import { Keyboard } from 'react-native'
+import { BackHandler, Keyboard } from 'react-native'
 
-import { persistUser, signOut, userUpdated, uploadProfilePhoto } from "../actions"
+import {
+  persistUser,
+  persistUserPhoto,
+  signOut,
+  userUpdated,
+  userPhotoUpdated
+} from "../actions"
 import { brand } from '../colors'
 import { logRender } from '../helpers'
 import UpdateProfile from '../components/UpdateProfile'
@@ -57,44 +64,92 @@ class UpdateProfileContainer extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      cachedUser: null
+      cachedUser: null,
+      deletedPhotoIDs: [],
     }
+    this.actuallyDeletePhotos = this.actuallyDeletePhotos.bind(this)
     this.changeAccountDetails = this.changeAccountDetails.bind(this)
+    this.goBack = this.goBack.bind(this)
     this.signOut = this.signOut.bind(this)
-    this.uploadProfilePhoto = this.uploadProfilePhoto.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
+    this.thisUsersPhotos = this.thisUsersPhotos.bind(this)
+    this.markPhotoDeleted = this.markPhotoDeleted.bind(this)
+    this.memoThisUsersPhotos = memoizeOne(this.thisUsersPhotos)
 
     Navigation.events().bindComponent(this);
   }
 
-  navigationButtonPressed ({ buttonId }) {
-    if (buttonId === 'save') {
-      this.props.dispatch(persistUser(this.props.user.get('_id')))
-    } else if (buttonId === 'back') {
-      this.props.dispatch(userUpdated(this.state.cachedUser))
-    }
-    Navigation.pop(this.props.componentId)
+  async navigationButtonPressed ({ buttonId }) {
     Keyboard.dismiss()
+    if (buttonId === 'save') {
+      Navigation.pop(this.props.componentId)
+      await this.props.dispatch(persistUser(this.props.user.get('_id')))
+      this.actuallyDeletePhotos()
+    } else if (buttonId === 'back') {
+      this.goBack()
+    }
+  }
+
+  async goBack () {
+    this.props.dispatch(userUpdated(this.state.cachedUser))
+    Navigation.pop(this.props.componentId)
+  }
+
+  componentDidAppear() {
+    BackHandler.addEventListener('hardwareBackPress', this.goBack)
+  }
+
+  componentDidDisappear() {
+    BackHandler.removeEventListener('hardwareBackPress', this.goBack)
   }
 
   changeAccountDetails (user) {
     this.props.dispatch(userUpdated(user))
   }
 
+  markPhotoDeleted (photoID) {
+    if (photoID === this.props.user.get('profilePhotoID')) {
+      const allPhotos = this.memoThisUsersPhotos(this.props.userPhotos, this.state.deletedPhotoIDs)
+      for (let otherPhoto of allPhotos.valueSeq()) {
+        const id = otherPhoto.get('_id')
+        if (id !== photoID && this.state.deletedPhotoIDs.indexOf(id) < 0) {
+          this.props.dispatch(userUpdated(this.props.user.set('profilePhotoID', id)))
+        }
+      }
+    }
+    this.setState({
+      deletedPhotoIDs: [...this.state.deletedPhotoIDs, photoID]
+    })
+  }
+
+  actuallyDeletePhotos () {
+    for (let photoID of this.state.deletedPhotoIDs) {
+      const deleted = this.props.userPhotos.get(photoID).set('deleted', true)
+      this.props.dispatch(userPhotoUpdated(deleted))
+      this.props.dispatch(persistUserPhoto(deleted.get('_id')))
+    }
+  }
+
   signOut () {
     this.props.dispatch(signOut())
   }
 
-  uploadProfilePhoto (location) {
-    this.props.dispatch(uploadProfilePhoto(location))
+  thisUsersPhotos (userPhotos, deletedPhotoIDs) {
+    return userPhotos.filter((photo) => {
+      return photo.get('deleted') !== true
+        && photo.get('userID') === this.props.user.get('_id')
+        && deletedPhotoIDs.indexOf(photo.get('_id')) < 0
+    })
   }
 
   render() {
     logRender('UpdateProfileContainer')
     return (
       <UpdateProfile
-        user={ this.props.user }
         changeAccountDetails={this.changeAccountDetails}
+        markPhotoDeleted={this.markPhotoDeleted}
+        user={this.props.user}
+        userPhotos={this.memoThisUsersPhotos(this.props.userPhotos, this.state.deletedPhotoIDs)}
       />
     )
   }
@@ -105,7 +160,8 @@ function mapStateToProps (state) {
   const localState = state.get('localState')
   const user = pouchState.get('users').get(localState.get('userID'))
   return {
-    user
+    user,
+    userPhotos: pouchState.get('userPhotos'),
   }
 }
 

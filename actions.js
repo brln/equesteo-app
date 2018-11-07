@@ -13,7 +13,6 @@ import {
   logError,
   logInfo,
   unixTimeNow,
-  generateUUID,
 } from "./helpers"
 import { danger, green, warning } from './colors'
 import { appStates } from './helpers'
@@ -34,6 +33,7 @@ import {
   CREATE_HORSE_PHOTO,
   CREATE_RIDE,
   CREATE_RIDE_PHOTO,
+  CREATE_USER_PHOTO,
   DEQUEUE_PHOTO,
   DELETE_FOLLOW,
   DELETE_UNPERSISTED_HORSE,
@@ -82,8 +82,9 @@ import {
   TOGGLE_AWAITING_PW_CHANGE,
   TOGGLE_DOING_INITIAL_LOAD,
   UNPAUSE_LOCATION_TRACKING,
+  USER_PHOTO_UPDATED,
+  USER_SEARCH_RETURNED,
   USER_UPDATED,
-  USER_SEARCH_RETURNED
 } from './constants'
 
 export function awaitFullSync () {
@@ -176,6 +177,14 @@ export function createRidePhoto (rideID, userID, photoData) {
   return {
     type: CREATE_RIDE_PHOTO,
     rideID,
+    userID,
+    photoData
+  }
+}
+
+export function createUserPhoto (userID, photoData) {
+  return {
+    type: CREATE_USER_PHOTO,
     userID,
     photoData
   }
@@ -516,6 +525,13 @@ export function unpauseLocationTracking () {
   }
 }
 
+export function userPhotoUpdated (userPhoto) {
+  return {
+    type: USER_PHOTO_UPDATED,
+    userPhoto
+  }
+}
+
 export function userSearchReturned (userSearchResults) {
   return {
     type: USER_SEARCH_RETURNED,
@@ -578,23 +594,6 @@ export function checkFCMPermission () {
         throw error
       }
     }
-  }
-}
-
-export function changeUserPhotoData (photoID, uri) {
-  return async (dispatch, getState) => {
-    const currentUserID = getState().getIn(['localState', 'userID'])
-    let user = getState().getIn(['pouchRecords', 'users', currentUserID])
-
-    let timestamp = unixTimeNow()
-    if (user.getIn(['photosByID', photoID])) {
-      timestamp = user.getIn(['photosByID', photoID, 'timestamp'])
-    } else {
-      user = user.set('profilePhotoID', photoID)
-    }
-    user = user.setIn(['photosByID', photoID], Map({timestamp, uri}))
-    dispatch(userUpdated(user))
-    dispatch(persistUser(user.get('_id')))
   }
 }
 
@@ -693,6 +692,22 @@ export function persistUser (userID) {
 
     const theUserAfterSave = getState().getIn(['pouchRecords', 'users', userID])
     dispatch(userUpdated(theUserAfterSave.set('_rev', doc.rev)))
+    dispatch(needsRemotePersist('users'))
+  }
+}
+
+export function persistUserPhoto (userPhotoID) {
+  return async (dispatch, getState) => {
+    const theUserPhoto = getState().getIn(['pouchRecords', 'userPhotos', userPhotoID])
+    if (!theUserPhoto) {
+      throw new Error('no photo with that ID: ' + userPhotoID)
+    }
+    const jwt = getState().getIn(['localState', 'jwt'])
+    const pouchCouch = new PouchCouch(jwt)
+    const doc = await pouchCouch.saveUser(theUserPhoto.toJS())
+
+    const theUserPhotoAfterSave = getState().getIn(['pouchRecords', 'userPhotos', userPhotoID])
+    dispatch(userPhotoUpdated(theUserPhotoAfterSave.set('_rev', doc.rev)))
     dispatch(needsRemotePersist('users'))
   }
 }
@@ -1344,17 +1359,16 @@ export function tryToLoadStateFromDisk () {
   }
 }
 
+// @TODO: you can remove the horseID here, it's not used in the photos middleware?
 export function uploadHorsePhoto (photoID, photoLocation, horseID) {
-  return async (dispatch) => {
+  return (dispatch) => {
     dispatch(enqueuePhoto(Map({type: 'horse', photoLocation, photoID, horseID})))
   }
 }
 
-export function uploadProfilePhoto (photoLocation) {
-  return async (dispatch) => {
-    const photoID = generateUUID()
-    dispatch(changeUserPhotoData(photoID, photoLocation))
-    dispatch(enqueuePhoto(Map({type: 'profile', photoLocation, photoID})))
+export function uploadUserPhoto (photoID, photoLocation) {
+  return (dispatch) => {
+    dispatch(enqueuePhoto(Map({type: 'user', photoLocation, photoID})))
   }
 }
 

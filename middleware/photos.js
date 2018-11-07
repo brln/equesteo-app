@@ -2,12 +2,13 @@ import ImagePicker from 'react-native-image-crop-picker'
 import { Sentry } from 'react-native-sentry'
 
 import {
-  changeUserPhotoData,
   dequeuePhoto,
   horsePhotoUpdated,
   persistHorsePhoto,
   persistRidePhoto,
+  persistUserPhoto,
   ridePhotoUpdated,
+  userPhotoUpdated,
 } from '../actions'
 import {
   generateUUID,
@@ -66,9 +67,11 @@ function remotePersist (item, store, userAPI) {
         store.dispatch(ridePhotoUpdated(ridePhoto))
         store.dispatch(persistRidePhoto(ridePhoto.get('_id')))
         break
-      case 'profile':
-        const uploadedProfilePhotoURI = profilePhotoURL(photoID)
-        store.dispatch(changeUserPhotoData(photoID, uploadedProfilePhotoURI))
+      case 'user':
+        const uploadedUserPhotoURI = profilePhotoURL(photoID)
+        const userPhoto = store.getState().getIn(['pouchRecords', 'userPhotos', photoID]).set('uri', uploadedUserPhotoURI)
+        store.dispatch(userPhotoUpdated(userPhoto))
+        store.dispatch(persistUserPhoto(userPhoto.get('_id')))
         break
       default:
         throw Error('cant persist type I don\'t know about')

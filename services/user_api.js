@@ -56,7 +56,7 @@ export default class UserAPI {
     switch (type) {
       case 'horse':
         return this._uploadHorsePhoto(imageLocation, photoID)
-      case 'profile':
+      case 'user':
         return this._uploadProfilePhoto(imageLocation, photoID)
       case 'ride':
         return this._uploadRidePhoto(imageLocation, photoID)

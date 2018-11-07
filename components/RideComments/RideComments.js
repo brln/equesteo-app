@@ -54,6 +54,7 @@ export default class RideComments extends MultiPlatform {
             <CommentList
               rideComments={this.props.rideComments}
               users={this.props.users}
+              userPhotos={this.props.userPhotos}
             />
           </ScrollView>
         </View>

@@ -7,10 +7,14 @@ import Profile from '../components/Profile/Profile'
 import {
   clearSearch,
   createFollow,
+  createUserPhoto,
   deleteFollow,
   persistFollow,
+  persistUser,
+  persistUserPhoto,
   signOut,
-  uploadProfilePhoto,
+  uploadUserPhoto,
+  userUpdated,
 } from "../actions"
 import { brand } from '../colors'
 import {
@@ -20,7 +24,7 @@ import {
   PHOTO_LIGHTBOX,
   UPDATE_PROFILE
 } from '../screens'
-import { logRender } from '../helpers'
+import { generateUUID, logRender, unixTimeNow } from '../helpers'
 
 class ProfileContainer extends BackgroundComponent {
   static options() {
@@ -57,7 +61,8 @@ class ProfileContainer extends BackgroundComponent {
     this.showHorseProfile = this.showHorseProfile.bind(this)
     this.showPhotoLightbox = this.showPhotoLightbox.bind(this)
     this.showUserList = this.showUserList.bind(this)
-    this.uploadProfilePhoto = this.uploadProfilePhoto.bind(this)
+    this.thisUsersPhotos = this.thisUsersPhotos.bind(this)
+    this.uploadPhoto = this.uploadPhoto.bind(this)
 
     Navigation.events().bindComponent(this);
 
@@ -132,8 +137,22 @@ class ProfileContainer extends BackgroundComponent {
     this.props.dispatch(persistFollow(followID))
   }
 
-  uploadProfilePhoto (location) {
-    this.props.dispatch(uploadProfilePhoto(location))
+  async uploadPhoto (location) {
+    let photoID = generateUUID()
+    let userID = this.props.profileUser.get('_id')
+    this.props.dispatch(userUpdated(this.props.profileUser.set('profilePhotoID', photoID)))
+    this.props.dispatch(createUserPhoto(
+      userID,
+      {
+        _id: photoID,
+        timestamp: unixTimeNow(),
+        uri: location
+      }
+    ))
+
+    await this.props.dispatch(persistUser(userID))
+    this.props.dispatch(persistUserPhoto(photoID))
+    this.props.dispatch(uploadUserPhoto(photoID, location))
   }
 
   showUserList (followRecords, followingOrFollower) {
@@ -189,6 +208,12 @@ class ProfileContainer extends BackgroundComponent {
     })
   }
 
+  thisUsersPhotos () {
+    return this.props.userPhotos.filter((photo) => {
+      return photo.get('deleted') !== true && photo.get('userID') === this.props.profileUser.get('_id')
+    })
+  }
+
   render() {
     logRender('ProfileContainer')
     if (this.props.profileUser.get('_id')) {
@@ -206,9 +231,10 @@ class ProfileContainer extends BackgroundComponent {
           showHorseProfile={this.showHorseProfile}
           showPhotoLightbox={this.showPhotoLightbox}
           showUserList={this.showUserList}
-          uploadProfilePhoto={this.uploadProfilePhoto}
+          uploadPhoto={this.uploadPhoto}
           userID={this.props.userID}
           users={this.props.users}
+          userPhotos={this.thisUsersPhotos()}
         />
       )
     } else {
@@ -231,7 +257,8 @@ function mapStateToProps (state, passedProps) {
     horsePhotos: pouchState.get('horsePhotos'),
     profileUser: pouchState.getIn(['users', profileUserID]) || passedProps.profileUser || new Map(),
     users: pouchState.get('users'),
-    userID
+    userID,
+    userPhotos: pouchState.get('userPhotos'),
   }
 }
 
