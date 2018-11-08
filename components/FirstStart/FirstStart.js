@@ -48,6 +48,7 @@ export default class FirstStart extends PureComponent {
             nextPage={this.props.nextPage}
             uploadProfilePhoto={this.props.uploadProfilePhoto}
             user={this.props.user}
+            userPhotos={this.props.userPhotos}
           />
         )
       case this.props.pages.FIRST_HORSE.name:
@@ -70,6 +71,7 @@ export default class FirstStart extends PureComponent {
           <FirstHorsePhoto
             addHorseProfilePhoto={this.props.addHorseProfilePhoto}
             horse={this.props.horse}
+            horsePhotos={this.props.horsePhotos}
             inputs={this.inputs}
             nextPage={this.props.nextPage}
             skipHorsePhoto={this.props.skipHorsePhoto}

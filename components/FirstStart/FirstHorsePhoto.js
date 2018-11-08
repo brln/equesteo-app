@@ -72,7 +72,7 @@ export default class FirstHorsePhoto extends PureComponent {
       skip = null
       horseProfileImage = (
         <URIImage
-          source={{uri: this.props.horse.getIn(['photosByID', this.props.horse.get('profilePhotoID'), 'uri'])}}
+          source={{uri: this.props.horsePhotos.getIn([this.props.horse.get('profilePhotoID'), 'uri'])}}
           style={{width: '100%', height: '100%'}}
         />
       )

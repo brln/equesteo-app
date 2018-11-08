@@ -3,13 +3,13 @@ import { parseRideCoordinate} from "../helpers"
 
 export function simplifyLine (tolerance, points) {
   // stolen from https://gist.github.com/adammiller/826148
-  let res = null;
+  let res = List();
 
   if(points.count() > 0){
     class Line {
       constructor(p1, p2) {
-        this.p1 = p1;
-        this.p2 = p2;
+        this.p1 = parseRideCoordinate(p1);
+        this.p2 = parseRideCoordinate(p2);
       }
 
       distanceToPoint ( point ) {
@@ -83,7 +83,9 @@ export function simplifyLine (tolerance, points) {
     };
     res = douglasPeucker( points, tolerance );
     // always have to push the very last point on so it doesn't get left off
-    res = res.push( points.get(points.count() - 1) );
+    if (points.count() > 1) {
+      res = res.push( points.get(points.count() - 1) );
+    }
   }
   return res;
 }

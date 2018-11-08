@@ -5,14 +5,19 @@ import { connect } from 'react-redux';
 
 import {
   createHorse,
+  createHorsePhoto,
+  createUserPhoto,
   deleteUnpersistedHorse,
   horseUpdated,
   persistHorse,
   persistHorseUser,
   persistUser,
+  persistHorsePhoto,
+  persistUserPhoto,
   setFirstStartHorseID,
+  uploadHorsePhoto,
+  uploadUserPhoto,
   userUpdated,
-  uploadProfilePhoto
 } from '../actions'
 import { brand } from '../colors'
 import { generateUUID, logRender, unixTimeNow } from '../helpers'
@@ -66,8 +71,6 @@ class FirstStartContainer extends PureComponent {
     this.state = {
       currentPage: this.pages.INTRO_PAGE.name,
       skipPages: [],
-      horseID: null,
-      horseUserID: null,
       horseUpdated: false,
     }
     Navigation.events().bindComponent(this);
@@ -91,11 +94,7 @@ class FirstStartContainer extends PureComponent {
     const horseID = `${this.props.userID.toString()}_${(new Date).getTime().toString()}`
     const horseUserID = `${this.props.userID}_${horseID}`
     this.props.dispatch(createHorse(horseID, horseUserID, this.props.userID))
-    this.props.dispatch(setFirstStartHorseID(horseID))
-    this.setState({
-      horseID,
-      horseUserID
-    })
+    this.props.dispatch(setFirstStartHorseID(horseID, horseUserID))
   }
 
   updateUser (newUser) {
@@ -116,33 +115,56 @@ class FirstStartContainer extends PureComponent {
     })
   }
 
-  uploadProfilePhoto (location) {
-    this.props.dispatch(uploadProfilePhoto(location))
+  async uploadProfilePhoto (location) {
+    let photoID = generateUUID()
+    let userID = this.props.user.get('_id')
+    this.props.dispatch(createUserPhoto(
+      userID,
+      {
+        _id: photoID,
+        timestamp: unixTimeNow(),
+        uri: location
+      }
+    ))
+    this.props.dispatch(userUpdated(this.props.user.set('profilePhotoID', photoID)))
+
+    await this.props.dispatch(persistUser(userID))
+    this.props.dispatch(persistUserPhoto(photoID))
+    this.props.dispatch(uploadUserPhoto(photoID, location))
+  }
+
+  async addHorseProfilePhoto (location) {
+    let photoID = generateUUID()
+    this.props.dispatch(createHorsePhoto(
+      this.props.horse.get('_id'),
+      this.props.userID,
+      {
+        _id: photoID,
+        timestamp: unixTimeNow(),
+        uri: location
+      }
+    ))
+    this.props.dispatch(horseUpdated(this.props.horse.set('profilePhotoID', photoID)))
+    await this.props.dispatch(persistHorse(this.props.horse.get('_id')))
+    this.props.dispatch(uploadHorsePhoto(photoID, location, this.props.horse.get('_id')))
+    this.props.dispatch(persistHorsePhoto(photoID))
+    this.setState({
+      horseUpdated: true
+    })
   }
 
   commitUpdateUser () {
     this.props.dispatch(persistUser(this.props.user.get('_id')))
   }
 
-  addHorseProfilePhoto (uri) {
-    let timestamp = unixTimeNow()
-    let photoID = generateUUID()
-    let horse = this.props.horse.set('profilePhotoID', photoID)
-    horse = horse.setIn(['photosByID', photoID], Map({timestamp, uri}))
-    this.props.dispatch(horseUpdated(horse))
-    this.setState({
-      horseUpdated: true
-    })
-  }
-
   async done () {
     this.props.dispatch(userUpdated(this.props.user.set('finishedFirstStart', true)))
     this.props.dispatch(persistUser(this.props.user.get('_id')))
     if (this.state.horseUpdated) {
-      await this.props.dispatch(persistHorse(this.state.horseID))
-      this.props.dispatch(persistHorseUser(this.state.horseUserID))
+      await this.props.dispatch(persistHorse(this.props.horse.get('_id')))
+      this.props.dispatch(persistHorseUser(this.props.horseUser.get('_id')))
     } else {
-      this.props.dispatch(deleteUnpersistedHorse(this.state.horseID, this.state.horseUserID))
+      this.props.dispatch(deleteUnpersistedHorse(this.props.horse.get('_id'), this.props.horseUser.get('_id')))
     }
     Navigation.pop(this.props.componentId)
   }
@@ -201,6 +223,7 @@ class FirstStartContainer extends PureComponent {
       deleteHorse={this.deleteHorse}
       done={this.done}
       horse={this.props.horse}
+      horsePhotos={this.props.horsePhotos}
       nextPage={this.nextPage}
       pages={this.pages}
       setSkip={this.setSkip}
@@ -208,6 +231,7 @@ class FirstStartContainer extends PureComponent {
       updateUser={this.updateUser}
       uploadProfilePhoto={this.uploadProfilePhoto}
       user={this.props.user}
+      userPhotos={this.props.userPhotos}
     />
   }
 }
@@ -215,12 +239,16 @@ class FirstStartContainer extends PureComponent {
 function mapStateToProps (state) {
   const pouchState = state.get('pouchRecords')
   const localState = state.get('localState')
-  const horseID = localState.get('firstStartHorseID')
-  const horse = horseID ? pouchState.getIn(['horses', horseID]) : null
+  const horseID = localState.getIn(['firstStartHorseID', 'horseID'])
+  const horseUserID = localState.getIn(['firstStartHorseID', 'horseUserID'])
+
   return {
-    horse,
+    horse: pouchState.getIn(['horses', horseID]),
+    horseUser: pouchState.getIn(['horseUsers', horseUserID]),
+    horsePhotos: pouchState.get('horsePhotos'),
     user: pouchState.getIn(['users', localState.get('userID')]),
-    userID: localState.get('userID')
+    userID: localState.get('userID'),
+    userPhotos: pouchState.get('userPhotos')
   }
 }
 export default connect(mapStateToProps)(FirstStartContainer)

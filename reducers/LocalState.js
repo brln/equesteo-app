@@ -131,7 +131,7 @@ export default function LocalStateReducer(state=initialState, action) {
     case SET_FEED_MESSAGE:
       return state.set('feedMessage', action.message)
     case SET_FIRST_START_HORSE_ID:
-      return state.set('firstStartHorseID', action.horseID)
+      return state.set('firstStartHorseID', Map({ horseID: action.horseID, horseUserID: action.horseUserID }))
     case SET_POP_SHOW_RIDE:
       return state.set(
         'popShowRide', action.rideID

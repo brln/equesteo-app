@@ -485,10 +485,11 @@ function setActiveComponent (componentID) {
   }
 }
 
-export function setFirstStartHorseID (horseID) {
+export function setFirstStartHorseID (horseID, horseUserID) {
   return {
     type: SET_FIRST_START_HORSE_ID,
-    horseID
+    horseID,
+    horseUserID
   }
 }
 
@@ -1025,14 +1026,17 @@ export function setFCMTokenOnServer (token) {
 
 export function signOut () {
   return async(dispatch) => {
-    await LocalStorage.deleteToken()
-    await LocalStorage.deleteLocalState()
-    const pouchCouch = new PouchCouch()
-    await pouchCouch.deleteLocalDBs()
-    dispatch(stopListeningFCM())
     dispatch(stopLocationTracking())
-    dispatch(clearStateAfterPersist())
     dispatch(switchRoot(SIGNUP_LOGIN))
+    dispatch(clearStateAfterPersist())
+
+    const pouchCouch = new PouchCouch()
+    await Promise.all([
+      LocalStorage.deleteToken(),
+      pouchCouch.deleteLocalDBs(),
+      dispatch(stopListeningFCM()),
+      LocalStorage.deleteLocalState()
+    ])
   }
 }
 
@@ -1167,7 +1171,7 @@ function startActiveComponentListener () {
 }
 
 export function stopLocationTracking () {
-  return async (dispatch) => {
+  return (dispatch) => {
     BackgroundGeolocation.stop()
     BackgroundGeolocation.removeAllListeners('location')
     dispatch(clearLastLocation())

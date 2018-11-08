@@ -162,7 +162,6 @@ class HorseProfileContainer extends BackgroundComponent {
 
   async uploadPhoto (location) {
     let photoID = generateUUID()
-    this.props.dispatch(horseUpdated(this.props.horse.set('profilePhotoID', photoID)))
     this.props.dispatch(createHorsePhoto(
       this.props.horse.get('_id'),
       this.props.userID, {
@@ -171,6 +170,7 @@ class HorseProfileContainer extends BackgroundComponent {
         uri: location
       }
     ))
+    this.props.dispatch(horseUpdated(this.props.horse.set('profilePhotoID', photoID)))
 
     await this.props.dispatch(persistHorse(this.props.horse.get('_id')))
     this.props.dispatch(uploadHorsePhoto(photoID, location, this.props.horse.get('_id')))

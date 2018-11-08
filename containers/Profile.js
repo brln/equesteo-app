@@ -140,7 +140,6 @@ class ProfileContainer extends BackgroundComponent {
   async uploadPhoto (location) {
     let photoID = generateUUID()
     let userID = this.props.profileUser.get('_id')
-    this.props.dispatch(userUpdated(this.props.profileUser.set('profilePhotoID', photoID)))
     this.props.dispatch(createUserPhoto(
       userID,
       {
@@ -149,6 +148,7 @@ class ProfileContainer extends BackgroundComponent {
         uri: location
       }
     ))
+    this.props.dispatch(userUpdated(this.props.profileUser.set('profilePhotoID', photoID)))
 
     await this.props.dispatch(persistUser(userID))
     this.props.dispatch(persistUserPhoto(photoID))

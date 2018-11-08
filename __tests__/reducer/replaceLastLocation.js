@@ -133,7 +133,11 @@ describe('REPLACE_LAST_LOCATION', () => {
         distance: 25,
       }),
       currentRideCoordinates: Map({
-        rideCoordinates: List([Map({some: 'point'}), firstPoint, secondPoint]),
+        rideCoordinates: List([
+          Map({some: 'point'}),
+          List([firstPoint.get('latitude'), firstPoint.get('longitude'), firstPoint.get('timestamp'), firstPoint.get('accuracy')]),
+          List([secondPoint.get('latitude'), secondPoint.get('longitude'), secondPoint.get('timestamp'), secondPoint.get('accuracy')]),
+        ]),
       }),
       currentRideElevations: initialElevation,
       lastElevation,
@@ -162,7 +166,10 @@ describe('REPLACE_LAST_LOCATION', () => {
         distance: 25.470733,
       }),
       currentRideCoordinates: Map({
-        rideCoordinates: List([Map({some: 'point'}), firstPoint, List([latitude, longitude, 1, 5])]),
+        rideCoordinates: List([
+          Map({some: 'point'}),
+          List([firstPoint.get('latitude'), firstPoint.get('longitude'), firstPoint.get('timestamp'), firstPoint.get('accuracy')]),
+          List([latitude, longitude, 1, 5])]),
       }),
       currentRideElevations: Map({
         elevationGain: 4000,

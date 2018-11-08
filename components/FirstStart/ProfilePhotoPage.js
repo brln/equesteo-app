@@ -67,11 +67,10 @@ export default class ProfilePhotoPage extends PureComponent {
       skip = null
       profilePhoto = (
         <URIImage
-          source={{uri: this.props.user.getIn(['photosByID', this.props.user.get('profilePhotoID'), 'uri'])}}
+          source={{uri: this.props.userPhotos.getIn([this.props.user.get('profilePhotoID'), 'uri'])}}
           style={{width: '100%', height: '100%'}}
         />
       )
-
     }
 
     return (

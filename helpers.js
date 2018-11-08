@@ -1,8 +1,9 @@
 import { Map } from 'immutable'
 import moment from 'moment'
+import mbxStatic from '@mapbox/mapbox-sdk/services/static'
 import { Platform } from 'react-native'
+import { MAPBOX_TOKEN } from 'react-native-dotenv'
 
-import { simplifyLine } from './services/DouglasPeucker'
 
 const toRad = (deg) => {
   return deg * Math.PI / 180;
@@ -63,41 +64,29 @@ export function generateUUID () { // Public Domain/MIT
     });
 }
 
-function urlParams (params) {
-  return Object.keys(params).map(k => k + '=' + encodeURIComponent(params[k])).join('&')
-}
-
 export function staticMap (ride, coordinateData) {
-  const ROOT_URL = 'https://maps.googleapis.com/maps/api/staticmap?'
-  const queryStringParams = {
-      size: '600x400',
-      format: 'png',
-      maptype: 'terrain',
-  }
-  const pathStyle = 'color:0xff0000ff|weight:5'
-
-  let tolerance = 0.00025
-  let lengthURL = false
-  let fullURL
-  while (!lengthURL || lengthURL > 6000) {
-    const simplified = simplifyLine(tolerance, coordinateData)
-    let pathCoords = ''
-    for (let coord of simplified) {
-      const parsed = parseRideCoordinate(coord)
-      const parsedLat = parsed.get('latitude').toString()
-      const parsedLong = parsed.get('longitude').toString()
-      pathCoords += `|${parsedLat},${parsedLong}`
-    }
-
-    queryStringParams['path'] = pathStyle + pathCoords
-    const queryString = urlParams(queryStringParams)
-    fullURL = ROOT_URL + queryString
-    lengthURL = fullURL.length
-    tolerance += 0.000001
-  }
-  return fullURL
+  const staticService = mbxStatic({accessToken: MAPBOX_TOKEN})
+  const parsed = coordinateData.reduce((accum, coord) => {
+    const decoded = parseRideCoordinate(coord)
+    accum.push([decoded.get('longitude'), decoded.get('latitude')])
+    return accum
+  }, [])
+  const request = staticService.getStaticImage({
+    ownerId: 'equesteo',
+    styleId: 'cjn3zysq408tc2sk1g1gunqmq',
+    width: 600,
+    height: 400,
+    position: 'auto',
+    overlays: [{
+      path: {
+        strokeWidth: 5,
+        strokeColor: 'ea5b60',
+        coordinates: parsed
+      }
+    }]
+  })
+  return request.url()
 }
-
 
 export const connectionType = {
   none: 'none',

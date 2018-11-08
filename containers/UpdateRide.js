@@ -132,10 +132,10 @@ class UpdateRideContainer extends BackgroundComponent {
         this.props.dispatch(stopLocationTracking())
         Navigation.popToRoot(this.props.componentId)
       } else if (buttonId === 'discard') {
-        this.props.dispatch(clearPausedLocations())
-        this.props.dispatch(stopLocationTracking())
-        this.props.dispatch(discardCurrentRide())
         Navigation.popToRoot(this.props.componentId).then(() => {
+          this.props.dispatch(clearPausedLocations())
+          this.props.dispatch(stopLocationTracking())
+          this.props.dispatch(discardCurrentRide())
           this.props.dispatch(deleteUnpersistedRide(this.props.ride.get('_id')))
         })
       } else if (buttonId === 'back') {
@@ -210,6 +210,7 @@ class UpdateRideContainer extends BackgroundComponent {
   async persistRide () {
     await this.props.dispatch(persistRide(this.props.ride.get('_id')))
     if (this.props.newRide) {
+      logDebug('', 'persisting ride coordinates')
       await this.props.dispatch(persistRideCoordinates())
     }
     await this.uploadNewPhotos()

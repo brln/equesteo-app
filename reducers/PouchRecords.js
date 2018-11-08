@@ -170,6 +170,7 @@ export default function PouchRecordsReducer(state=initialState, action) {
         type: 'rideCoordinates',
         rideCoordinates: simplifiedCoords,
       }
+      logDebug(Map(coordinateData).toJSON())
       theRide.mapURL = staticMap(theRide, coordinateData.rideCoordinates)
 
       return state.setIn(
