@@ -3,8 +3,7 @@ import { Provider } from 'react-redux'
 import { createStore, applyMiddleware } from 'redux'
 import thunkMiddleware from 'redux-thunk'
 import { Navigation } from 'react-native-navigation'
-import { Sentry } from 'react-native-sentry'
-import { DISTRIBUTION, ENV, RELEASE, SENTRY_DSN } from 'react-native-dotenv'
+import { configure } from './services/Sentry'
 import { combineReducers } from 'redux-immutable';
 
 
@@ -38,13 +37,7 @@ const store = createStore(
 
 global.logDebug = logDebug
 
-if (ENV !== 'local') {
-  Sentry.config(SENTRY_DSN, {
-    release: RELEASE,
-    handlePromiseRejection: true
-  }).install()
-  Sentry.setDist(DISTRIBUTION)
-}
+configure()
 
 export default function start () {
   registerScreens(store, Provider)

@@ -4,9 +4,9 @@ import {
   remotePersistError,
   remotePersistStarted
 } from '../actions'
-import { logInfo, logError } from '../helpers'
+import { logError } from '../helpers'
 import { PouchCouch } from '../services/index'
-import { Sentry } from 'react-native-sentry'
+import { captureException } from '../services/Sentry'
 
 let queue = []
 let savingRemotely = false
@@ -63,13 +63,7 @@ function remotePersist (db, store, pouchCouch) {
       store.dispatch(remotePersistError())
     }
     if (e.code !== 'ETIMEDOUT') {
-      try {
-        Sentry.captureException(new Error(e))
-      } catch (e) {
-        logError(e)
-      }
-
-
+      captureException(e)
       logError('Remote replication error follows ============================')
       logError(e)
       logError('=============================================================')

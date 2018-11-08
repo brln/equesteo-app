@@ -1,5 +1,5 @@
 import ImagePicker from 'react-native-image-crop-picker'
-import { Sentry } from 'react-native-sentry'
+import { captureException } from '../services/Sentry'
 
 import {
   dequeuePhoto,
@@ -86,9 +86,7 @@ function remotePersist (item, store, userAPI) {
       currentlySaving = null
     }
   }).catch((e) => {
-    try {
-      Sentry.captureException(new Error(e))
-    } catch (e) { logError(e) }
+    captureException(e)
     workingQueue = []
     queueID = generateUUID()
     currentlySaving = null

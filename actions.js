@@ -5,8 +5,8 @@ import firebase from 'react-native-firebase'
 import { Navigation } from 'react-native-navigation'
 import PushNotification from 'react-native-push-notification'
 import { fromJS, Map, List } from 'immutable'
-import { Sentry } from 'react-native-sentry'
 import kalmanFilter from './services/Kalman'
+import { captureException, setUserContext } from "./services/Sentry"
 
 import {
   haversine,
@@ -817,7 +817,7 @@ export function exchangePWCode (email, code) {
       await pouchCouch.localReplicateDB('all', [...following, userID], followers)
       dispatch(receiveJWT(resp.token))
       dispatch(saveUserID(resp.id))
-      dispatch(setSentryUserContext())
+      setUserContext(resp.id)
       await dispatch(loadLocalData())
       dispatch(startListeningFCMTokenRefresh())
       dispatch(getFCMToken())
@@ -892,7 +892,7 @@ function findLocalToken () {
     if (storedToken !== null) {
       dispatch(receiveJWT(storedToken.token))
       dispatch(saveUserID(storedToken.userID))
-      dispatch(setSentryUserContext())
+      setUserContext(storedToken.userID)
       dispatch(switchRoot(FEED))
       await dispatch(loadLocalData())
       dispatch(startListeningFCMTokenRefresh())
@@ -1008,15 +1008,6 @@ export function searchForFriends (phrase) {
   }
 }
 
-export function setSentryUserContext () {
-  return async (dispatch, getState) => {
-    const userID = getState().getIn(['localState', 'userID'])
-    Sentry.setUserContext({
-      userID,
-    });
-  }
-}
-
 export function setFCMTokenOnServer (token) {
   return async (_, getState) => {
     try {
@@ -1110,7 +1101,7 @@ export function startLocationTracking () {
 
     BackgroundGeolocation.on('error', (error) => {
       logError('[ERROR] BackgroundGeolocation error:', error);
-      Sentry.captureException(new Error(JSON.stringify(error)))
+      captureException(error)
     });
 
     BackgroundGeolocation.start()
@@ -1231,7 +1222,7 @@ export function submitLogin (email, password) {
       dispatch(switchRoot(FEED))
       dispatch(toggleDoingInitialLoad())
       dispatch(saveUserID(resp.id))
-      dispatch(setSentryUserContext())
+      dispatch(setUserContext())
       dispatch(startListeningFCMTokenRefresh())
       dispatch(getFCMToken())
       dispatch(startListeningFCM())
@@ -1261,7 +1252,7 @@ export function submitSignup (email, password) {
       dispatch(switchRoot(FEED))
       dispatch(toggleDoingInitialLoad())
       dispatch(saveUserID(resp.id))
-      dispatch(setSentryUserContext())
+      dispatch(setUserContext())
       await dispatch(loadLocalData())
       dispatch(startListeningFCMTokenRefresh())
       dispatch(getFCMToken())

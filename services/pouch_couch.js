@@ -1,6 +1,6 @@
-import { Sentry } from 'react-native-sentry'
 import PouchDB from 'pouchdb-react-native'
 import { API_URL } from 'react-native-dotenv'
+import { captureException } from '../services/Sentry'
 
 import { logInfo, logError } from '../helpers'
 
@@ -26,14 +26,13 @@ export default class PouchCouch {
   catchError (e) {
     logInfo("ERROR TO FOLLOW: ")
     logError(e)
-    Sentry.captureException(new Error(JSON.stringify(e)))
+    captureException(e)
     throw e
   }
 
   saveHorse (horseData) {
     return this.localHorsesDB.put(horseData).catch((e) => {
       logInfo('error saving horse')
-      logInfo(horseData)
       this.catchError(e)
     })
   }
