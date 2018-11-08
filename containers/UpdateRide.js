@@ -11,6 +11,7 @@ import {
   clearPausedLocations,
   createRidePhoto,
   deleteUnpersistedRide,
+  deleteUnpersistedRidePhoto,
   discardCurrentRide,
   mergeStashedLocations,
   persistRide,
@@ -126,7 +127,7 @@ class UpdateRideContainer extends BackgroundComponent {
       if (buttonId === 'save') {
         this.props.dispatch(discardCurrentRide())
         this.actuallyDeletePhotos()
-        this.persistRide(this.props.ride.get('_id'))
+        this.persistRide()
         this.props.dispatch(setPopShowRide(this.props.ride.get('_id'), true))
         this.props.dispatch(clearPausedLocations())
         this.props.dispatch(stopLocationTracking())
@@ -158,15 +159,20 @@ class UpdateRideContainer extends BackgroundComponent {
 
   markPhotoDeleted (photoID) {
     this.setState({
-      deletedPhotoIDs: [...this.state.deletedPhotoIDs, photoID]
+      deletedPhotoIDs: [...this.state.deletedPhotoIDs, photoID],
     })
   }
 
   actuallyDeletePhotos () {
     for (let photoID of this.state.deletedPhotoIDs) {
-      const deleted = this.props.ridePhotos.get(photoID).set('deleted', true)
-      this.props.dispatch(ridePhotoUpdated(deleted))
-      this.props.dispatch(persistRidePhoto(deleted.get('_id')))
+      if (this.state.newPhotoIDs.indexOf(photoID) < 0) {
+        const deleted = this.props.ridePhotos.get(photoID).set('deleted', true)
+        this.props.dispatch(ridePhotoUpdated(deleted))
+        this.props.dispatch(persistRidePhoto(deleted.get('_id')))
+      } else {
+        logDebug(photoID, 'photoID')
+        this.props.dispatch(deleteUnpersistedRidePhoto(photoID))
+      }
     }
   }
 
@@ -196,21 +202,22 @@ class UpdateRideContainer extends BackgroundComponent {
 
   async uploadNewPhotos () {
     for (let photoID of this.state.newPhotoIDs) {
-      await this.props.dispatch(persistRidePhoto(photoID))
-      this.props.dispatch(
-        uploadRidePhoto(
-          photoID,
-          this.props.ridePhotos.getIn([photoID, 'uri']),
-          this.props.ride.get('_id')
+      if (this.state.deletedPhotoIDs.indexOf(photoID) < 0) {
+        await this.props.dispatch(persistRidePhoto(photoID))
+        this.props.dispatch(
+          uploadRidePhoto(
+            photoID,
+            this.props.ridePhotos.getIn([photoID, 'uri']),
+            this.props.ride.get('_id')
+          )
         )
-      )
+      }
     }
   }
 
   async persistRide () {
     await this.props.dispatch(persistRide(this.props.ride.get('_id')))
     if (this.props.newRide) {
-      logDebug('', 'persisting ride coordinates')
       await this.props.dispatch(persistRideCoordinates())
     }
     await this.uploadNewPhotos()

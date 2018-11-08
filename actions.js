@@ -38,6 +38,7 @@ import {
   DELETE_FOLLOW,
   DELETE_UNPERSISTED_HORSE,
   DELETE_UNPERSISTED_RIDE,
+  DELETE_UNPERSISTED_RIDE_PHOTO,
   DISCARD_CURRENT_RIDE,
   DISMISS_ERROR,
   ENQUEUE_PHOTO,
@@ -216,6 +217,13 @@ export function deleteUnpersistedRide (rideID) {
   return {
     type: DELETE_UNPERSISTED_RIDE,
     rideID
+  }
+}
+
+export function deleteUnpersistedRidePhoto (photoID) {
+  return {
+    type: DELETE_UNPERSISTED_RIDE_PHOTO,
+    photoID
   }
 }
 
@@ -667,9 +675,10 @@ export function persistRideCoordinates () {
 
 export function persistRidePhoto (ridePhotoID) {
   return async (dispatch, getState) => {
+    logDebug(ridePhotoID, 'persisting')
     const theRidePhoto = getState().getIn(['pouchRecords', 'ridePhotos', ridePhotoID])
     if (!theRidePhoto) {
-      throw new Error('no photo with that ID')
+      throw new Error('no ride photo with that ID')
     }
     const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
@@ -701,7 +710,7 @@ export function persistUserPhoto (userPhotoID) {
   return async (dispatch, getState) => {
     const theUserPhoto = getState().getIn(['pouchRecords', 'userPhotos', userPhotoID])
     if (!theUserPhoto) {
-      throw new Error('no photo with that ID: ' + userPhotoID)
+      throw new Error('no user photo with that ID: ' + userPhotoID)
     }
     const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
@@ -733,7 +742,7 @@ export function persistHorsePhoto (horsePhotoID) {
   return async (dispatch, getState) => {
     const theHorsePhoto = getState().getIn(['pouchRecords', 'horsePhotos', horsePhotoID])
     if (!theHorsePhoto) {
-      throw new Error('no photo with that ID')
+      throw new Error('no horse photo with that ID')
     }
     const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
