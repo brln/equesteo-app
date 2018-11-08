@@ -71,7 +71,7 @@ class BarnContainer extends BackgroundComponent {
 
   yourHorses () {
     return this.props.horseUsers.valueSeq().filter((hu) => {
-      return (hu.get('userID') === this.props.userID) && hu.get('deleted') !== true
+      return hu.get('userID') === this.props.userID && hu.get('deleted') !== true
     }).map((hu) => {
       return this.props.horses.get(hu.get('horseID'))
     })

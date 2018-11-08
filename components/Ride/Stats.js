@@ -11,7 +11,6 @@ import {
   CardItem,
 } from 'native-base'
 
-import { HORSE_PROFILE } from '../../screens'
 import Stat from '../Stat'
 
 export default class Stats extends PureComponent {

@@ -167,12 +167,12 @@ class ProfileContainer extends BackgroundComponent {
     })
   }
 
-  showHorseProfile (horse) {
+  showHorseProfile (horse, ownerID) {
     Navigation.push(this.props.componentId, {
       component: {
         name: HORSE_PROFILE,
         title: horse.get('name'),
-        passProps: {horse},
+        passProps: {horse, ownerID},
       }
     })
   }

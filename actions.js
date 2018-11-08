@@ -782,15 +782,12 @@ export function createRideComment(commentData) {
   }
 }
 
-export function deleteHorseUser (horseID, userID) {
+export function deleteHorseUser (horseUserID) {
   return async (dispatch, getState) => {
-    const filterHorseUser = getState().getIn(['pouchRecords', 'horseUsers']).valueSeq().filter(hu => {
-      return hu.get('horseID') === horseID && hu.get('userID') === userID
-    })
-    if (filterHorseUser.count() !== 1) {
+    let theHorseUser = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
+    if (!theHorseUser) {
       throw Error('Could not find horseUser')
     }
-    let theHorseUser = filterHorseUser.get(0)
     theHorseUser = theHorseUser.set('deleted', true)
     dispatch(horseUserUpdated(theHorseUser))
   }

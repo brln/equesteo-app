@@ -85,7 +85,8 @@ export default class Profile extends PureComponent {
 
   horseProfile (horse) {
     return () => {
-      this.props.showHorseProfile(horse)
+      const ownerID = this.props.horseOwnerIDs.get(horse.get('_id'))
+      this.props.showHorseProfile(horse, ownerID)
     }
   }
 

@@ -49,7 +49,7 @@ class HorseProfileContainer extends BackgroundComponent {
     this.closeDeleteModal = this.closeDeleteModal.bind(this)
     this.closeLightbox = this.closeLightbox.bind(this)
     this.deleteHorse = this.deleteHorse.bind(this)
-    this.horseOwner = this.horseOwner.bind(this)
+    this.horseUser = this.horseUser.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
     this.showPhotoLightbox = this.showPhotoLightbox.bind(this)
     this.showRiderProfile = this.showRiderProfile.bind(this)
@@ -133,7 +133,7 @@ class HorseProfileContainer extends BackgroundComponent {
           title: "Update Horse",
           passProps: {
             horseID: this.props.horse.get('_id'),
-            horseUserID: this.horseOwner().ownerHorseUser.get('_id'),
+            horseUserID: this.horseUser().get('_id'),
             newHorse: false
           },
         }
@@ -154,9 +154,17 @@ class HorseProfileContainer extends BackgroundComponent {
     })
   }
 
+  horseUser() {
+    return this.props.horseUsers.valueSeq().filter(hu => {
+      return hu.get('horseID') === this.props.horse.get('_id') && hu.get('userID') === this.props.userID
+    }).get(0)
+  }
+
   deleteHorse () {
-    this.props.dispatch(deleteHorseUser(this.props.horse.get('_id'), this.props.user.get('_id')))
-    this.props.dispatch(persistHorseUser(this.horseOwner().ownerHorseUser.get('_id')))
+    const horseUser = this.horseUser()
+    logDebug(horseUser.toJSON(), 'horseUser')
+    this.props.dispatch(deleteHorseUser(horseUser.get('_id')))
+    this.props.dispatch(persistHorseUser(horseUser.get('_id')))
     Navigation.pop(this.props.componentId)
   }
 
@@ -197,21 +205,6 @@ class HorseProfileContainer extends BackgroundComponent {
     })
   }
 
-  horseOwner () {
-    let user
-    let ownerHorseUser
-    this.props.horseUsers.valueSeq().forEach((horseUser) => {
-      if (horseUser.get('owner') === true && horseUser.get('horseID') === this.props.horse.get('_id')) {
-        user = this.props.users.get(horseUser.get('userID'))
-        ownerHorseUser = horseUser
-      }
-    })
-    if (!user) {
-      throw Error('Horse has no owner.')
-    }
-    return { user, ownerHorseUser }
-  }
-
   render() {
     logRender('HorseProfileContainer')
     return (
@@ -221,7 +214,7 @@ class HorseProfileContainer extends BackgroundComponent {
         componentId={this.props.componentId}
         deleteHorse={this.deleteHorse}
         horse={this.props.horse}
-        horseOwner={this.horseOwner().user}
+        horseOwner={this.props.owner}
         horsePhotos={this.thisHorsesPhotos()}
         modalOpen={this.state.modalOpen}
         rides={this.thisHorsesRides()}
@@ -245,8 +238,9 @@ function mapStateToProps (state, passedProps) {
     horses: pouchState.get('horses'),
     horsePhotos: pouchState.get('horsePhotos'),
     horse: pouchState.getIn(['horses', passedProps.horse.get('_id')]),
+    owner: pouchState.getIn(['users', passedProps.ownerID]),
     rides: pouchState.get('rides'),
-    user: pouchState.get('users').get(localState.get('userID')),
+    user: pouchState.getIn(['users', localState.get('userID')]),
     userID: localState.get('userID'),
     users: pouchState.get('users'),
     userPhotos: pouchState.get('userPhotos'),
