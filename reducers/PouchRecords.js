@@ -247,12 +247,13 @@ export default function PouchRecordsReducer(state=initialState, action) {
         // First start creates a horse, probably before the finishes,
         // so keep it from blowing the new horse away
         horses: state.get('horses').merge(fromJS(actionRecords.horses)),
+        horseUsers: state.get('horseUsers').merge(fromJS(actionRecords.horseUsers)),
+
         horsePhotos: fromJS(actionRecords.horsePhotos),
-        horseUsers:  fromJS(actionRecords.horseUsers),
-        rides:  fromJS(actionRecords.rides),
-        rideCarrots:  fromJS(actionRecords.rideCarrots),
-        rideComments:  fromJS(actionRecords.rideComments),
-        rideElevations:  fromJS(actionRecords.rideElevations),
+        rides: fromJS(actionRecords.rides),
+        rideCarrots: fromJS(actionRecords.rideCarrots),
+        rideComments: fromJS(actionRecords.rideComments),
+        rideElevations: fromJS(actionRecords.rideElevations),
         ridePhotos: fromJS(actionRecords.ridePhotos),
         users: fromJS(actionRecords.users),
         userPhotos: fromJS(actionRecords.userPhotos)

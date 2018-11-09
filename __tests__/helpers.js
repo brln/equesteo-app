@@ -1,4 +1,5 @@
-import { elapsedTime, haversine, bearing, timeToString } from '../helpers'
+import { fromJS } from 'immutable'
+import { boundingBox, elapsedTime, haversine, bearing, timeToString } from '../helpers'
 
 describe('haversine', () => {
   it('gives the distance beetween two points in miles', () => {
@@ -70,5 +71,23 @@ describe('timeToString', () => {
     expect(timeToString(10)).toEqual('00:00:10')
     expect(timeToString(110)).toEqual('00:01:50')
     expect(timeToString(3671)).toEqual('01:01:11')
+  })
+})
+
+describe('boundingBox', () => {
+  it ('works', () => {
+    const coordinates = fromJS([
+      [ 66.184963, -15.259356, 1541642126000, 8 ],
+      [ 66.187426, -15.26778, 1541642134000, 7.36 ],
+      [ 66.190478, -15.292057, 1541642140000, 7.19 ],
+      [ 66.192398, -15.322493, 1541642149000, 7.39 ],
+      [ 66.184297, -15.329906, 1541642156000, 7.28 ],
+      [ 66.17285, -15.343081, 1541642162000, 7.19 ],
+      [ 66.159565, -15.35808, 1541642168000, 7.19 ]
+    ])
+    expect(boundingBox(coordinates)).toEqual([
+      [-15.259356, 66.192398],
+      [-15.35808, 66.159565]
+    ])
   })
 })

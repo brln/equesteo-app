@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
 
 import { brand } from '../colors'
-import Map from '../components/Ride/Map'
+import ViewingMap from '../components/Ride/ViewingMap'
 import { logRender } from '../helpers'
 
 class MapContainer extends PureComponent {
@@ -30,7 +30,7 @@ class MapContainer extends PureComponent {
   render() {
     logRender('MapContainer')
     return (
-      <Map
+      <ViewingMap
         rideCoordinates={this.props.rideCoordinates}
       />
     )

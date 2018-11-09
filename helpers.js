@@ -1,4 +1,4 @@
-import { Map } from 'immutable'
+import { List, Map } from 'immutable'
 import moment from 'moment'
 import mbxStatic from '@mapbox/mapbox-sdk/services/static'
 import { Platform } from 'react-native'
@@ -241,4 +241,80 @@ export function parseRideCoordinate (fromDB) {
     timestamp: fromDB.get(2),
     accuracy: fromDB.get(3)
   })
+}
+
+export function boundingBox (rideCoordinates) {
+  const asJS = rideCoordinates.toJS()
+  const firstCoord = asJS[0]
+
+  const initialVal = [[firstCoord[1], firstCoord[0]], [firstCoord[1], firstCoord[0]]]
+  const coordinates = asJS.reduce((accum, coord) => {
+    if (coord[0] > accum[0][1]) {
+      accum[0][1] = coord[0]
+    }
+    if (coord[1] > accum[0][0]) {
+      accum[0][0] = coord[1]
+    }
+    if (coord[0] < accum[1][1]) {
+      accum[1][1] = coord[0]
+    }
+    if (coord[1] < accum[1][0]) {
+      accum[1][0] = coord[1]
+    }
+    return accum
+  }, initialVal)
+  return coordinates
+}
+
+export function speedGradient (speed) {
+  switch (Math.floor(speed)) {
+    case 0:
+      return "#5A35DE"
+    case 1:
+      return "#6432CF"
+    case 2:
+      return "#6E30C0"
+    case 3:
+      return "#782DB2"
+    case 4:
+      return "#822BA3"
+    case 5:
+      return "#8C2895"
+    case 6:
+      return "#962686"
+    case 7:
+      return "#A02378"
+    case 8:
+      return "#AA2169"
+    case 9:
+      return "#B41E5A"
+    case 10:
+      return "#BE1C4C"
+    case 11:
+      return "#C8193D"
+    case 12:
+      return "#D2172F"
+    case 13:
+      return "#DC1420"
+    case 14:
+      return "#E61212"
+    default:
+      return "#E61212"
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
