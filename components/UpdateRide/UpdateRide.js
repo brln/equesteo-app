@@ -65,7 +65,7 @@ export default class UpdateRide extends PureComponent {
         <PhotoMenu
           changeProfilePhotoID={this.changeCoverPhoto}
           deletePhoto={this.deletePhoto}
-          clearPhotoMenu={this.clearPhotoMenu}
+          clearPhotoMenu={this.props.clearPhotoMenu}
           selectedPhotoID={this.props.selectedPhotoID}
         />
       )
