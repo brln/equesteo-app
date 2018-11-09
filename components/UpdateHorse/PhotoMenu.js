@@ -27,13 +27,13 @@ export default class PhotoMenu extends PureComponent {
   }
 
   handleBackPress () {
-    this.props.clearPhotoMenu ()
+    this.props.clearPhotoMenu()
     return true
   }
 
   render() {
     return (
-      <TouchableWithoutFeedback style={{width: '100%', height: '100%'}} onPress={this.props.clearPhotoMenu}>
+      <TouchableWithoutFeedback style={{width: '100%', height: '100%'}}>
         <View style={styles.modalBackground}>
           <View style={{position: 'absolute', bottom: 0, height: 150, width, backgroundColor: 'white', elevation: 20}}>
             <View style={{flex: 1}}>

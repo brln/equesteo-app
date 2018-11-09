@@ -10,7 +10,7 @@ import {
   DELETE_FOLLOW,
   DELETE_UNPERSISTED_HORSE,
   DELETE_UNPERSISTED_RIDE,
-  DELETE_UNPERSISTED_RIDE_PHOTO,
+  DELETE_UNPERSISTED_PHOTO,
   FOLLOW_UPDATED,
   HORSE_PHOTO_UPDATED,
   HORSE_USER_UPDATED,
@@ -171,7 +171,6 @@ export default function PouchRecordsReducer(state=initialState, action) {
         type: 'rideCoordinates',
         rideCoordinates: simplifiedCoords,
       }
-      logDebug(Map(coordinateData).toJSON())
       theRide.mapURL = staticMap(theRide, coordinateData.rideCoordinates)
 
       return state.setIn(
@@ -212,8 +211,8 @@ export default function PouchRecordsReducer(state=initialState, action) {
       return state.deleteIn(['horses', action.horseID]).deleteIn(['horseUsers', action.horseUserID])
     case DELETE_UNPERSISTED_RIDE:
       return state.deleteIn(['rides', action.rideID]).deleteIn(['rideElevations', action.rideID + '_elevations'])
-    case DELETE_UNPERSISTED_RIDE_PHOTO:
-      return state.deleteIn(['ridePhotos', action.photoID])
+    case DELETE_UNPERSISTED_PHOTO:
+      return state.deleteIn([action.photoSection, action.photoID])
     case FOLLOW_UPDATED:
       return state.setIn(['follows', action.follow.get('_id')], action.follow)
     case HORSE_UPDATED:

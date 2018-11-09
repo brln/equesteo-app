@@ -21,42 +21,19 @@ export default class UpdateProfile extends PureComponent {
   constructor (props) {
     super(props)
     this.inputs = {}
-    this.state = {
-      showPhotoMenu: false,
-      selectedPhotoID: null
-    }
     this.changeDefaultPublic = this.changeDefaultPublic.bind(this)
     this.changeFirstName = this.changeFirstName.bind(this)
     this.changeLastName = this.changeLastName.bind(this)
     this.changeAboutMe = this.changeAboutMe.bind(this)
     this.changeProfilePhotoID = this.changeProfilePhotoID.bind(this)
-    this.clearPhotoMenu = this.clearPhotoMenu.bind(this)
     this.deletePhoto = this.deletePhoto.bind(this)
     this.moveToLastName = this.moveToLastName.bind(this)
     this.moveToAboutMe = this.moveToAboutMe.bind(this)
-    this.openPhotoMenu = this.openPhotoMenu.bind(this)
-  }
-
-  openPhotoMenu (profilePhotoID) {
-    this.setState({
-      showPhotoMenu: true,
-      selectedPhotoID: profilePhotoID
-    })
   }
 
   deletePhoto () {
-    this.props.markPhotoDeleted(this.state.selectedPhotoID)
-    this.setState({
-      showPhotoMenu: false,
-      selectedPhotoID: null
-    })
-  }
-
-  clearPhotoMenu () {
-    this.setState({
-      showPhotoMenu: false,
-      selectedPhotoID: null
-    })
+    this.props.markPhotoDeleted(this.props.selectedPhotoID)
+    this.props.clearPhotoMenu()
   }
 
   changeDefaultPublic () {
@@ -80,11 +57,10 @@ export default class UpdateProfile extends PureComponent {
   }
 
   changeProfilePhotoID () {
-    this.props.changeAccountDetails(this.props.user.set('profilePhotoID', this.state.selectedPhotoID))
-    this.setState({
-      showPhotoMenu: false,
-      selectedPhotoID: null
-    })
+    this.props.changeAccountDetails(
+      this.props.user.set('profilePhotoID', this.props.selectedPhotoID)
+    )
+    this.props.clearPhotoMenu()
   }
 
   changeAboutMe (newText) {
@@ -94,13 +70,13 @@ export default class UpdateProfile extends PureComponent {
   render() {
     const hasPictures = this.props.userPhotos.count() > 0
     let photoMenu = null
-    if (this.state.showPhotoMenu) {
+    if (this.props.showPhotoMenu) {
       photoMenu = (
         <PhotoMenu
           changeProfilePhotoID={this.changeProfilePhotoID}
           deletePhoto={this.deletePhoto}
-          clearPhotoMenu={this.clearPhotoMenu}
-          selectedPhotoID={this.state.selectedPhotoID}
+          clearPhotoMenu={this.props.clearPhotoMenu}
+          selectedPhotoID={this.props.selectedPhotoID}
         />
       )
     }
@@ -115,7 +91,7 @@ export default class UpdateProfile extends PureComponent {
                 </CardItem>
                 <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
                   <PhotosByTimestamp
-                    changeProfilePhoto={this.openPhotoMenu}
+                    changeProfilePhoto={this.props.openPhotoMenu}
                     photosByID={this.props.userPhotos}
                     profilePhotoID={this.props.user.get('profilePhotoID')}
                   />

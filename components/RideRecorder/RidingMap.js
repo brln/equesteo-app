@@ -53,7 +53,6 @@ export default class RidingMap extends PureComponent {
     let secondToLast = parseRideCoordinate(
       this.props.currentRideCoordinates.get(this.props.currentRideCoordinates.count() - 2)
     )
-    logDebug(this.props.lastLocation.toJSON())
     if (this.props.currentRideCoordinates.count() > 1
       && (this.props.lastLocation.get('speed') === undefined || this.props.lastLocation.get('speed') > 0)) {
       newBearing = bearing(

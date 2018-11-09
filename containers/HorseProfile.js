@@ -162,7 +162,6 @@ class HorseProfileContainer extends BackgroundComponent {
 
   deleteHorse () {
     const horseUser = this.horseUser()
-    logDebug(horseUser.toJSON(), 'horseUser')
     this.props.dispatch(deleteHorseUser(horseUser.get('_id')))
     this.props.dispatch(persistHorseUser(horseUser.get('_id')))
     Navigation.pop(this.props.componentId)

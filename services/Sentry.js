@@ -1,6 +1,8 @@
 import { Sentry } from 'react-native-sentry'
 import { DISTRIBUTION, ENV, RELEASE, SENTRY_DSN } from 'react-native-dotenv'
 
+import { logError } from '../helpers'
+
 export function setUserContext(userID) {
   if (ENV !== 'local') {
     Sentry.setUserContext({
@@ -14,8 +16,8 @@ export function captureException (e) {
     try {
       Sentry.captureException(e)
     } catch (e) {
-      console.log('not captured by sentry!')
-      logDebug(e)
+      logError('not captured by sentry!')
+      logError(e)
     }
   }
 }

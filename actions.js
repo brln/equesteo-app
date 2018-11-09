@@ -4,7 +4,7 @@ import { ENV } from 'react-native-dotenv'
 import firebase from 'react-native-firebase'
 import { Navigation } from 'react-native-navigation'
 import PushNotification from 'react-native-push-notification'
-import { fromJS, Map, List } from 'immutable'
+import { fromJS, Map  } from 'immutable'
 import kalmanFilter from './services/Kalman'
 import { captureException, setUserContext } from "./services/Sentry"
 
@@ -38,7 +38,7 @@ import {
   DELETE_FOLLOW,
   DELETE_UNPERSISTED_HORSE,
   DELETE_UNPERSISTED_RIDE,
-  DELETE_UNPERSISTED_RIDE_PHOTO,
+  DELETE_UNPERSISTED_PHOTO,
   DISCARD_CURRENT_RIDE,
   DISMISS_ERROR,
   ENQUEUE_PHOTO,
@@ -220,9 +220,10 @@ export function deleteUnpersistedRide (rideID) {
   }
 }
 
-export function deleteUnpersistedRidePhoto (photoID) {
+export function deleteUnpersistedPhoto (photoSection, photoID) {
   return {
-    type: DELETE_UNPERSISTED_RIDE_PHOTO,
+    type: DELETE_UNPERSISTED_PHOTO,
+    photoSection,
     photoID
   }
 }
@@ -675,7 +676,6 @@ export function persistRideCoordinates () {
 
 export function persistRidePhoto (ridePhotoID) {
   return async (dispatch, getState) => {
-    logDebug(ridePhotoID, 'persisting')
     const theRidePhoto = getState().getIn(['pouchRecords', 'ridePhotos', ridePhotoID])
     if (!theRidePhoto) {
       throw new Error('no ride photo with that ID')

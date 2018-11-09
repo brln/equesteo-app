@@ -24,10 +24,6 @@ import PhotoMenu from './PhotoMenu'
 export default class UpdateHorse extends PureComponent {
   constructor (props) {
     super(props)
-    this.state = {
-      showPhotoMenu: false,
-      selectedPhotoID: null
-    }
     this.changeHorseBirthDay = this.changeHorseBirthDay.bind(this)
     this.changeHorseBirthMonth = this.changeHorseBirthMonth.bind(this)
     this.changeHorseBirthYear = this.changeHorseBirthYear.bind(this)
@@ -39,9 +35,7 @@ export default class UpdateHorse extends PureComponent {
     this.changeHorseName = this.changeHorseName.bind(this)
     this.changeHorseSex = this.changeHorseSex.bind(this)
     this.changeProfilePhotoID = this.changeProfilePhotoID.bind(this)
-    this.clearPhotoMenu = this.clearPhotoMenu.bind(this)
     this.deletePhoto = this.deletePhoto.bind(this)
-    this.openPhotoMenu = this.openPhotoMenu.bind(this)
     this.pickPhoto = this.pickPhoto.bind(this)
     this.renderHandsPicker = this.renderHandsPicker.bind(this)
   }
@@ -56,56 +50,31 @@ export default class UpdateHorse extends PureComponent {
     }).catch(() => {})
   }
 
-  openPhotoMenu (profilePhotoID) {
-    this.setState({
-      showPhotoMenu: true,
-      selectedPhotoID: profilePhotoID
-    })
-  }
-
   changeHorseDetails (newDetails) {
     this.props.horseUpdated(this.props.horse.merge(newDetails))
   }
 
   changeProfilePhotoID () {
     this.changeHorseDetails({
-      profilePhotoID: this.state.selectedPhotoID
+      profilePhotoID: this.props.selectedPhotoID
     })
     this.setState({
       showPhotoMenu: false,
       selectedPhotoID: null
     })
+    this.props.clearPhotoMenu()
   }
 
   deletePhoto () {
-  //   const newPhotos = this.props.horse.get('photosByID').delete(this.state.selectedPhotoID)
-  //   let newDeets = Map({
-  //     photosByID: newPhotos
-  //   })
-  //   if (this.state.selectedPhotoID === this.props.horse.get('profilePhotoID')) {
-  //     if (newPhotos.keySeq().count() === 0) {
-  //       newDeets = newDeets.set('profilePhotoID', null)
-  //     } else {
-  //       newDeets = newDeets.set(
-  //         'profilePhotoID',
-  //         newPhotos.keySeq().get(0)
-  //       )
-  //     }
-  //   }
-  //   this.changeHorseDetails(newDeets)
-    this.props.markPhotoDeleted(this.state.selectedPhotoID)
+    this.props.markPhotoDeleted(this.props.selectedPhotoID)
     this.setState({
       showPhotoMenu: false,
       selectedPhotoID: null
     })
+    this.props.clearPhotoMenu()
   }
 
-  clearPhotoMenu () {
-    this.setState({
-      showPhotoMenu: false,
-      selectedPhotoID: null
-    })
-  }
+
 
   changeHorseBirthDay (birthDay) {
     this.changeHorseDetails({ birthDay })
@@ -297,13 +266,13 @@ export default class UpdateHorse extends PureComponent {
 
   render() {
     let photoMenu = null
-    if (this.state.showPhotoMenu) {
+    if (this.props.showPhotoMenu) {
       photoMenu = (
         <PhotoMenu
           changeProfilePhotoID={this.changeProfilePhotoID}
+          clearPhotoMenu={this.props.clearPhotoMenu}
           deletePhoto={this.deletePhoto}
-          clearPhotoMenu={this.clearPhotoMenu}
-          selectedPhotoID={this.state.selectedPhotoID}
+          selectedPhotoID={this.props.selectedPhotoID}
         />
       )
     }
@@ -318,7 +287,7 @@ export default class UpdateHorse extends PureComponent {
                 </CardItem>
                 <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
                   <PhotosByTimestamp
-                    changeProfilePhoto={this.openPhotoMenu}
+                    changeProfilePhoto={this.props.openPhotoMenu}
                     photosByID={this.props.horsePhotos}
                     profilePhotoID={this.props.horse.get('profilePhotoID')}
                   />

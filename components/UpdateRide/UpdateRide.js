@@ -26,44 +26,18 @@ export default class UpdateRide extends PureComponent {
     this.changeCoverPhoto = this.changeCoverPhoto.bind(this)
     this.changeRideName = this.changeRideName.bind(this)
     this.changeRideNotes = this.changeRideNotes.bind(this)
-    this.clearPhotoMenu = this.clearPhotoMenu.bind(this)
     this.createPhoto = this.createPhoto.bind(this)
     this.deletePhoto = this.deletePhoto.bind(this)
-    this.openPhotoMenu = this.openPhotoMenu.bind(this)
-    this.state = {
-      showPhotoMenu: false,
-      selectedPhotoID: null
-    }
   }
 
   deletePhoto () {
-    this.props.markPhotoDeleted(this.state.selectedPhotoID)
-    this.setState({
-      showPhotoMenu: false,
-      selectedPhotoID: null
-    })
-  }
-
-  openPhotoMenu (coverPhotoID) {
-    this.setState({
-      showPhotoMenu: true,
-      selectedPhotoID: coverPhotoID
-    })
-  }
-
-  clearPhotoMenu () {
-    this.setState({
-      showPhotoMenu: false,
-      selectedPhotoID: null
-    })
+    this.props.markPhotoDeleted(this.props.selectedPhotoID)
+    this.props.clearPhotoMenu()
   }
 
   changeCoverPhoto () {
-    this.props.changeCoverPhoto(this.state.selectedPhotoID)
-    this.setState({
-      showPhotoMenu: false,
-      selectedPhotoID: null
-    })
+    this.props.changeCoverPhoto(this.props.selectedPhotoID)
+    this.props.clearPhotoMenu()
   }
 
   changeRideName (name) {
@@ -86,13 +60,13 @@ export default class UpdateRide extends PureComponent {
 
   render() {
     let photoMenu = null
-    if (this.state.showPhotoMenu) {
+    if (this.props.showPhotoMenu) {
       photoMenu = (
         <PhotoMenu
           changeProfilePhotoID={this.changeCoverPhoto}
           deletePhoto={this.deletePhoto}
           clearPhotoMenu={this.clearPhotoMenu}
-          selectedPhotoID={this.state.selectedPhotoID}
+          selectedPhotoID={this.props.selectedPhotoID}
         />
       )
     }
@@ -111,7 +85,7 @@ export default class UpdateRide extends PureComponent {
                 <PhotosByTimestamp
                   photosByID={this.props.ridePhotos}
                   profilePhotoID={this.props.ride.get('coverPhotoID')}
-                  changeProfilePhoto={this.openPhotoMenu}
+                  changeProfilePhoto={this.props.openPhotoMenu}
                 />
               </CardItem>
 

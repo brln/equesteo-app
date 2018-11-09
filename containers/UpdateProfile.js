@@ -66,15 +66,19 @@ class UpdateProfileContainer extends PureComponent {
     this.state = {
       cachedUser: null,
       deletedPhotoIDs: [],
+      showPhotoMenu: false,
+      selectedPhotoID: null
     }
     this.actuallyDeletePhotos = this.actuallyDeletePhotos.bind(this)
     this.changeAccountDetails = this.changeAccountDetails.bind(this)
+    this.clearPhotoMenu = this.clearPhotoMenu.bind(this)
     this.goBack = this.goBack.bind(this)
     this.signOut = this.signOut.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
     this.thisUsersPhotos = this.thisUsersPhotos.bind(this)
     this.markPhotoDeleted = this.markPhotoDeleted.bind(this)
     this.memoThisUsersPhotos = memoizeOne(this.thisUsersPhotos)
+    this.openPhotoMenu = this.openPhotoMenu.bind(this)
 
     Navigation.events().bindComponent(this);
   }
@@ -88,6 +92,44 @@ class UpdateProfileContainer extends PureComponent {
     } else if (buttonId === 'back') {
       this.goBack()
     }
+  }
+
+  clearPhotoMenu () {
+    this.setState({
+      showPhotoMenu: false,
+      selectedPhotoID: null
+    })
+    Navigation.mergeOptions(this.props.componentId, {
+      topBar: {
+        leftButtons: [
+          {
+            id: 'back',
+            icon: require('../img/back-arrow.png'),
+            color: 'white'
+          }
+        ],
+        rightButtons: [
+          {
+            id: 'save',
+            text: 'Save',
+            color: 'white'
+          },
+        ]
+      }
+    })
+  }
+
+  openPhotoMenu (profilePhotoID) {
+    this.setState({
+      showPhotoMenu: true,
+      selectedPhotoID: profilePhotoID
+    })
+    Navigation.mergeOptions(this.props.componentId, {
+      topBar: {
+        rightButtons: [],
+        leftButtons: [],
+      }
+    })
   }
 
   async goBack () {
@@ -147,9 +189,13 @@ class UpdateProfileContainer extends PureComponent {
     return (
       <UpdateProfile
         changeAccountDetails={this.changeAccountDetails}
+        clearPhotoMenu={this.clearPhotoMenu}
         markPhotoDeleted={this.markPhotoDeleted}
+        openPhotoMenu={this.openPhotoMenu}
         user={this.props.user}
         userPhotos={this.memoThisUsersPhotos(this.props.userPhotos, this.state.deletedPhotoIDs)}
+        showPhotoMenu={this.state.showPhotoMenu}
+        selectedPhotoID={this.state.selectedPhotoID}
       />
     )
   }

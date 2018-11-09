@@ -8,6 +8,7 @@ import UpdateHorse from '../components/UpdateHorse/UpdateHorse'
 import {
   createHorsePhoto,
   deleteUnpersistedHorse,
+  deleteUnpersistedPhoto,
   horsePhotoUpdated,
   horseUpdated,
   horseUserUpdated,
@@ -53,7 +54,7 @@ class UpdateHorseContainer extends PureComponent {
       layout: {
         orientation: ['portrait']
       }
-    };
+    }
   }
 
   constructor (props) {
@@ -63,13 +64,17 @@ class UpdateHorseContainer extends PureComponent {
       cachedHorseUser: null,
       newPhotoIDs: [],
       deletedPhotoIDs: [],
+      showPhotoMenu: false,
+      selectedPhotoID: null
     }
     this.actuallyDeletePhotos = this.actuallyDeletePhotos.bind(this)
+    this.clearPhotoMenu = this.clearPhotoMenu.bind(this)
     this.commitDefaultHorse = this.commitDefaultHorse.bind(this)
     this.goBack = this.goBack.bind(this)
     this.horseUpdated = this.horseUpdated.bind(this)
     this.markPhotoDeleted = this.markPhotoDeleted.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
+    this.openPhotoMenu = this.openPhotoMenu.bind(this)
     this.setDefaultHorse = this.setDefaultHorse.bind(this)
     this.stashPhoto = this.stashPhoto.bind(this)
     this.thisHorsesPhotos = this.thisHorsesPhotos.bind(this)
@@ -95,6 +100,44 @@ class UpdateHorseContainer extends PureComponent {
       }
     }
     return nextState
+  }
+
+  openPhotoMenu (profilePhotoID) {
+    this.setState({
+      showPhotoMenu: true,
+      selectedPhotoID: profilePhotoID
+    })
+    Navigation.mergeOptions(this.props.componentId, {
+      topBar: {
+        rightButtons: [],
+        leftButtons: [],
+      }
+    })
+  }
+
+  clearPhotoMenu () {
+    this.setState({
+      showPhotoMenu: false,
+      selectedPhotoID: null
+    })
+    Navigation.mergeOptions(this.props.componentId, {
+      topBar: {
+        leftButtons: [
+          {
+            id: 'back',
+            icon: require('../img/back-arrow.png'),
+            color: 'white'
+          }
+        ],
+        rightButtons: [
+          {
+            id: 'save',
+            text: 'Save',
+            color: 'white'
+          },
+        ]
+      }
+    })
   }
 
   async navigationButtonPressed ({ buttonId }) {
@@ -137,9 +180,13 @@ class UpdateHorseContainer extends PureComponent {
 
   async actuallyDeletePhotos () {
     for (let photoID of this.state.deletedPhotoIDs) {
-      const deleted = this.props.horsePhotos.get(photoID).set('deleted', true)
-      this.props.dispatch(horsePhotoUpdated(deleted))
-      this.props.dispatch(persistHorsePhoto(deleted.get('_id')))
+      if (this.state.newPhotoIDs.indexOf(photoID) < 0) {
+        const deleted = this.props.horsePhotos.get(photoID).set('deleted', true)
+        this.props.dispatch(horsePhotoUpdated(deleted))
+        this.props.dispatch(persistHorsePhoto(deleted.get('_id')))
+      } else {
+        this.props.dispatch(deleteUnpersistedPhoto('horsePhotos', photoID))
+      }
     }
   }
 
@@ -167,14 +214,16 @@ class UpdateHorseContainer extends PureComponent {
 
   uploadNewPhotos () {
     for (let photoID of this.state.newPhotoIDs) {
-      this.props.dispatch(persistHorsePhoto(photoID))
-      this.props.dispatch(
-        uploadHorsePhoto(
-          photoID,
-          this.props.horsePhotos.getIn([photoID, 'uri']),
-          this.props.horse.get('_id')
+      if (this.state.deletedPhotoIDs.indexOf(photoID) < 0) {
+        this.props.dispatch(persistHorsePhoto(photoID))
+        this.props.dispatch(
+          uploadHorsePhoto(
+            photoID,
+            this.props.horsePhotos.getIn([photoID, 'uri']),
+            this.props.horse.get('_id')
+          )
         )
-      )
+      }
     }
   }
 
@@ -228,6 +277,7 @@ class UpdateHorseContainer extends PureComponent {
     const horsePhotos = this.memoThisHorsesPhotos(this.props.horsePhotos, this.state.deletedPhotoIDs)
     return (
       <UpdateHorse
+        clearPhotoMenu={this.clearPhotoMenu}
         closeDeleteModal={this.closeDeleteModal}
         deleteHorse={this.deleteHorse}
         horse={this.props.horse}
@@ -236,7 +286,10 @@ class UpdateHorseContainer extends PureComponent {
         horseUser={this.props.horseUser}
         markPhotoDeleted={this.markPhotoDeleted}
         newHorse={this.props.newHorse}
+        openPhotoMenu={this.openPhotoMenu}
         setDefaultHorse={this.setDefaultHorse}
+        showPhotoMenu={this.state.showPhotoMenu}
+        selectedPhotoID={this.state.selectedPhotoID}
         stashPhoto={this.stashPhoto}
         userID={this.props.userID}
       />

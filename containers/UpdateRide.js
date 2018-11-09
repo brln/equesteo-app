@@ -1,17 +1,13 @@
-import { Map } from 'immutable'
 import memoizeOne from 'memoize-one';
 import { Navigation } from 'react-native-navigation'
 import { Keyboard } from 'react-native'
 import React from 'react'
 import { connect } from 'react-redux';
-
-
-
 import {
   clearPausedLocations,
   createRidePhoto,
   deleteUnpersistedRide,
-  deleteUnpersistedRidePhoto,
+  deleteUnpersistedPhoto,
   discardCurrentRide,
   mergeStashedLocations,
   persistRide,
@@ -40,13 +36,6 @@ class UpdateRideContainer extends BackgroundComponent {
         backButton: {
           color: 'white'
         },
-        leftButtons: [
-          {
-            id: 'back',
-            icon: require('../img/back-arrow.png'),
-            color: 'white'
-          }
-        ],
       },
       layout: {
         orientation: ['portrait']
@@ -59,7 +48,9 @@ class UpdateRideContainer extends BackgroundComponent {
     this.state = {
       cachedRide: null,
       newPhotoIDs: [],
-      deletedPhotoIDs: []
+      deletedPhotoIDs: [],
+      showPhotoMenu: false,
+      selectedPhotoID: null
     }
     this.actuallyDeletePhotos = this.actuallyDeletePhotos.bind(this)
     this.changeCoverPhoto = this.changeCoverPhoto.bind(this)
@@ -67,9 +58,11 @@ class UpdateRideContainer extends BackgroundComponent {
     this.changePublic = this.changePublic.bind(this)
     this.changeRideName = this.changeRideName.bind(this)
     this.changeRideNotes = this.changeRideNotes.bind(this)
+    this.clearPhotoMenu = this.clearPhotoMenu.bind(this)
     this.createPhoto = this.createPhoto.bind(this)
     this.horses = this.horses.bind(this)
     this.markPhotoDeleted = this.markPhotoDeleted.bind(this)
+    this.openPhotoMenu = this.openPhotoMenu.bind(this)
     this.persistRide = this.persistRide.bind(this)
     this.thisRidesPhotos = this.thisRidesPhotos.bind(this)
     this.uploadNewPhotos = this.uploadNewPhotos.bind(this)
@@ -78,10 +71,20 @@ class UpdateRideContainer extends BackgroundComponent {
     this.memoThisRidesPhotos = memoizeOne(this.thisRidesPhotos)
 
     Navigation.events().bindComponent(this);
+    this.setTopbarButtons(props)
+  }
 
+  setTopbarButtons (props) {
     if (props.newRide) {
       Navigation.mergeOptions(props.componentId, {
         topBar: {
+          leftButtons: [
+            {
+              id: 'back',
+              icon: require('../img/back-arrow.png'),
+              color: 'white'
+            }
+          ],
           rightButtons: [
             {
               id: 'save',
@@ -99,6 +102,13 @@ class UpdateRideContainer extends BackgroundComponent {
     } else {
       Navigation.mergeOptions(props.componentId, {
         topBar: {
+          leftButtons: [
+            {
+              id: 'back',
+              icon: require('../img/back-arrow.png'),
+              color: 'white'
+            }
+          ],
           rightButtons: [
             {
               id: 'save',
@@ -157,7 +167,38 @@ class UpdateRideContainer extends BackgroundComponent {
     Keyboard.dismiss()
   }
 
+  openPhotoMenu (coverPhotoID) {
+    this.setState({
+      showPhotoMenu: true,
+      selectedPhotoID: coverPhotoID
+    })
+    Navigation.mergeOptions(this.props.componentId, {
+      topBar: {
+        rightButtons: [],
+        leftButtons: [],
+      }
+    })
+  }
+
+  clearPhotoMenu () {
+    this.setState({
+      showPhotoMenu: false,
+      selectedPhotoID: null
+    })
+    this.setTopbarButtons(this.props)
+  }
+
   markPhotoDeleted (photoID) {
+    if (photoID === this.props.ride.get('coverPhotoID')) {
+      const allPhotos = this.memoThisRidesPhotos(this.props.ridePhotos, this.state.deletedPhotoIDs)
+      for (let otherPhoto of allPhotos.valueSeq()) {
+        const id = otherPhoto.get('_id')
+        if (id !== photoID && this.state.deletedPhotoIDs.indexOf(id) < 0) {
+          this.props.dispatch(rideUpdated(this.props.ride.set('coverPhotoID', id)))
+          break
+        }
+      }
+    }
     this.setState({
       deletedPhotoIDs: [...this.state.deletedPhotoIDs, photoID],
     })
@@ -170,8 +211,7 @@ class UpdateRideContainer extends BackgroundComponent {
         this.props.dispatch(ridePhotoUpdated(deleted))
         this.props.dispatch(persistRidePhoto(deleted.get('_id')))
       } else {
-        logDebug(photoID, 'photoID')
-        this.props.dispatch(deleteUnpersistedRidePhoto(photoID))
+        this.props.dispatch(deleteUnpersistedPhoto('ridePhotos', photoID))
       }
     }
   }
@@ -272,12 +312,16 @@ class UpdateRideContainer extends BackgroundComponent {
         changeRideNotes={this.changeRideNotes}
         changeHorseID={this.changeHorseID}
         changePublic={this.changePublic}
+        clearPhotoMenu={this.clearPhotoMenu}
         createPhoto={this.createPhoto}
         horses={this.memoizedHorses()}
         horsePhotos={this.props.horsePhotos}
         markPhotoDeleted={this.markPhotoDeleted}
+        openPhotoMenu={this.openPhotoMenu}
         ride={this.props.ride}
         ridePhotos={this.memoThisRidesPhotos(this.props.ridePhotos, this.state.deletedPhotoIDs)}
+        selectedPhotoID={this.state.selectedPhotoID}
+        showPhotoMenu={this.state.showPhotoMenu}
       />
     )
   }
