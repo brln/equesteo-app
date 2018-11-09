@@ -1024,7 +1024,6 @@ export function setFCMTokenOnServer (token) {
 export function signOut () {
   return async(dispatch) => {
     dispatch(stopLocationTracking())
-    dispatch(switchRoot(SIGNUP_LOGIN))
     dispatch(clearStateAfterPersist())
 
     const pouchCouch = new PouchCouch()
@@ -1034,6 +1033,7 @@ export function signOut () {
       dispatch(stopListeningFCM()),
       LocalStorage.deleteLocalState()
     ])
+    dispatch(switchRoot(SIGNUP_LOGIN))
   }
 }
 
@@ -1178,6 +1178,7 @@ export function stopLocationTracking () {
 function stopListeningFCM () {
   return async () => {
     // maybe delete token on server here?
+    logInfo('deleting local FCM token')
     await firebase.iid().deleteToken('373350399276', 'GCM')
     firebase.messaging().onTokenRefresh(() => {})
   }

@@ -185,6 +185,7 @@ export default class PouchCouch {
   }
 
   async deleteLocalDBs () {
+    logInfo('deleting all local DBs')
     await this.localHorsesDB.destroy()
     await this.localUsersDB.destroy()
     await this.localRidesDB.destroy()

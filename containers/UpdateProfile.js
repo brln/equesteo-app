@@ -7,7 +7,6 @@ import { BackHandler, Keyboard } from 'react-native'
 import {
   persistUser,
   persistUserPhoto,
-  signOut,
   userUpdated,
   userPhotoUpdated
 } from "../actions"
@@ -73,7 +72,6 @@ class UpdateProfileContainer extends PureComponent {
     this.changeAccountDetails = this.changeAccountDetails.bind(this)
     this.clearPhotoMenu = this.clearPhotoMenu.bind(this)
     this.goBack = this.goBack.bind(this)
-    this.signOut = this.signOut.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
     this.thisUsersPhotos = this.thisUsersPhotos.bind(this)
     this.markPhotoDeleted = this.markPhotoDeleted.bind(this)
@@ -170,10 +168,6 @@ class UpdateProfileContainer extends PureComponent {
       this.props.dispatch(userPhotoUpdated(deleted))
       this.props.dispatch(persistUserPhoto(deleted.get('_id')))
     }
-  }
-
-  signOut () {
-    this.props.dispatch(signOut())
   }
 
   thisUsersPhotos (userPhotos, deletedPhotoIDs) {
