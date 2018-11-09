@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import MapView from 'react-native-maps';
+import Mapbox from '@mapbox/react-native-mapbox-gl';
 import {
   StyleSheet,
   View
@@ -47,27 +48,12 @@ export default class Map extends PureComponent {
     const mapCoords = this.mapCoordinates(this.props.rideCoordinates)
     return (
       <View style={styles.container}>
-        <MapView
-          style={styles.map}
-          ref={ref => this.map = ref}
-          onLayout={this.fitToElements}
-          mapType="standard"
-          provider={"google"}
-        >
-          <MapView.Polyline
-            coordinates={mapCoords}
-            strokeColor={"#dc0202"}
-            strokeWidth={5}
-          />
-          <MapView.Marker
-            coordinate={firstCoord.toJS()}
-            pinColor={"#0bc464"}
-          />
-          <MapView.Marker
-            coordinate={lastCoord.toJS()}
-            pincolor={"#ea4a3f"}
-          />
-        </MapView>
+        <Mapbox.MapView
+          styleURL={"mapbox://styles/equesteo/cjn3zysq408tc2sk1g1gunqmq"}
+          zoomLevel={15}
+          centerCoordinate={[11.256, 43.770]}
+          style={styles.map}>
+        </Mapbox.MapView>
       </View>
     )
   }

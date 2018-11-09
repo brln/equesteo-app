@@ -24,6 +24,8 @@ import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
 import io.invertase.firebase.instanceid.RNFirebaseInstanceIdPackage;
 import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
 import io.sentry.RNSentryPackage;
+import com.mapbox.rctmgl.RCTMGLPackage;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -76,7 +78,8 @@ public class MainApplication extends NavigationApplication {
             new ReactNativePushNotificationPackage(),
             new RNFirebaseInstanceIdPackage(),
             new RNSentryPackage(MainApplication.this),
-            new SvgPackage()
+            new SvgPackage(),
+            new RCTMGLPackage()
         );
     }
 
