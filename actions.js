@@ -931,7 +931,9 @@ function loadLocalData () {
     const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
     try {
+      logInfo('==== Starting local data load ===')
       const localData = await pouchCouch.localLoad()
+      logInfo('==== Local data loaded from pouch complete ===')
       dispatch(localDataLoaded(localData))
     } catch (e) {
       logError(e)
@@ -1223,7 +1225,7 @@ export function submitLogin (email, password) {
       dispatch(switchRoot(FEED))
       dispatch(toggleDoingInitialLoad())
       dispatch(saveUserID(resp.id))
-      dispatch(setUserContext())
+      setUserContext()
       dispatch(startListeningFCMTokenRefresh())
       dispatch(getFCMToken())
       dispatch(startListeningFCM())
@@ -1253,7 +1255,7 @@ export function submitSignup (email, password) {
       dispatch(switchRoot(FEED))
       dispatch(toggleDoingInitialLoad())
       dispatch(saveUserID(resp.id))
-      dispatch(setUserContext())
+      setUserContext()
       await dispatch(loadLocalData())
       dispatch(startListeningFCMTokenRefresh())
       dispatch(getFCMToken())
