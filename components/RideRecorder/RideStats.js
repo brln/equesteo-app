@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import memoizeOne from 'memoize-one';
 
 import { darkGrey, lightGrey } from '../../colors'
-import { elapsedTime, metersToFeet, timeToString } from '../../helpers'
+import { elapsedTime, metersToFeet, speedGradient, timeToString } from '../../helpers'
 
 const initialState = {
   elapsedTime: undefined
@@ -35,32 +35,33 @@ export default class RideStats extends PureComponent {
     }
   }
 
-  currentSpeed (rideCoords) {
-    const last = rideCoords.get(-1)
-    if (last) {
-      const found = last.get('speed')
+  currentSpeed (lastLocation) {
+    let speed = '0.0'
+    if (lastLocation) {
+      const found = lastLocation.get('speed')
       if (found || found === 0) {
-        return (last.get('speed') * 2.236936).toFixed(1)
+        speed = (lastLocation.get('speed') * 2.236936).toFixed(1)
       } else {
-        return '-'
+        speed = '-'
       }
-    } else {
-      return '0.0'
     }
+    return speed
   }
 
-  currentAltitude (rideCoords, last) {
-    if (last) {
-      const found = last.get('elevation')
+
+  currentAltitude (lastElevation) {
+    let elevation = '0'
+    if (lastElevation) {
+      const found = lastElevation.get('elevation')
       if (found) {
-        return Math.round(metersToFeet(last.get('elevation')))
+        elevation = Math.round(metersToFeet(lastElevation.get('elevation')))
       } else {
-        return '-'
+        elevation = '-'
       }
-    } else {
-      return '0'
     }
+    return elevation
   }
+
 
   componentDidMount() {
     const startTime = this.props.currentRide.get('startTime')
@@ -104,7 +105,7 @@ export default class RideStats extends PureComponent {
 
   render () {
     const distance = this.props.currentRide.get('distance')
-    const rideCoords = this.props.currentRideCoordinates
+    const speed = this.memoCurrentSpeed(this.props.lastLocation)
     return (
       <View style={styles.rideStats}>
         <View style={{flex: 1}}>
@@ -116,11 +117,11 @@ export default class RideStats extends PureComponent {
           </View>
           <View style={[styles.statBox, {borderTopWidth: 1, borderBottomWidth: 2, borderRightWidth: 1, borderLeftWidth: 2}]}>
             <Text style={styles.statName}>Current Speed</Text>
-            <Text style={styles.statFont}>{this.memoCurrentSpeed(rideCoords)} <Text style={styles.unitsFont}>mi/h</Text></Text>
+            <Text style={styles.statFont}>{speed} <Text style={styles.unitsFont}>mi/h</Text></Text>
           </View>
           <View style={[styles.statBox, {borderTopWidth: 1, borderBottomWidth: 2, borderRightWidth: 1, borderLeftWidth: 2}]}>
             <Text style={styles.statName}>Altitude</Text>
-            <Text style={styles.statFont}>{this.memoCurrentAltitude(rideCoords, this.props.lastElevation)} <Text style={styles.unitsFont}>ft</Text></Text>
+            <Text style={styles.statFont}>{this.memoCurrentAltitude(this.props.lastElevation)} <Text style={styles.unitsFont}>ft</Text></Text>
           </View>
         </View>
         <View style={{flex: 1}}>

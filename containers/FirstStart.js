@@ -213,7 +213,6 @@ class FirstStartContainer extends PureComponent {
 
   render() {
     logRender('FirstStartContainer')
-    logDebug(this.props.horseUser ? this.props.horseUser.toJSON() : null)
     return <FirstStart
       addHorseProfilePhoto={this.addHorseProfilePhoto}
       changeHorseName={this.changeHorseName}

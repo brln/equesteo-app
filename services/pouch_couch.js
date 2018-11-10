@@ -2,6 +2,7 @@ import PouchDB from 'pouchdb-react-native'
 import { API_URL } from 'react-native-dotenv'
 import { captureException } from '../services/Sentry'
 
+
 import { logInfo, logError } from '../helpers'
 
 export default class PouchCouch {
@@ -221,6 +222,6 @@ export default class PouchCouch {
   }
 
   async loadRideCoordinates (rideID) {
-    return this.localRidesDB.get(`${rideID}_coordinates`)
+    return this.localRidesDB.get(`${rideID}_coordinates`).catch(e => this.catchError(e))
   }
 }

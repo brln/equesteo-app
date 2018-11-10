@@ -123,6 +123,7 @@ export default class RideRecorder extends PureComponent {
               currentRide={this.props.currentRide}
               currentRideCoordinates={this.props.currentRideCoordinates}
               currentRideElevations={this.props.currentRideElevations}
+              lastLocation={this.props.lastLocation}
               lastElevation={this.props.lastElevation}
             />
           </View>

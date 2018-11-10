@@ -14,7 +14,7 @@ export function setUserContext(userID) {
 export function captureException (e) {
   if (ENV !== 'local') {
     try {
-      Sentry.captureException(e)
+      Sentry.captureException(new Error(JSON.stringify(e)))
     } catch (e) {
       logError('not captured by sentry!')
       logError(e)
@@ -26,7 +26,6 @@ export function configure () {
   if (ENV !== 'local') {
     Sentry.config(SENTRY_DSN, {
       release: RELEASE,
-      handlePromiseRejection: true
     }).install()
     Sentry.setDist(DISTRIBUTION)
   }

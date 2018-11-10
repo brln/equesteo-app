@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import MapboxGL from '@mapbox/react-native-mapbox-gl';
+import memoizeOne from 'memoize-one';
 
 import {
   StyleSheet,
@@ -12,6 +13,9 @@ export default class ViewingMap extends PureComponent {
   constructor (props) {
     super(props)
     this.fitToElements = this.fitToElements.bind(this)
+
+    this.memoMapCoordinates = memoizeOne(this.mapCoordinates)
+    this.memoBoundingBox = memoizeOne(boundingBox)
   }
 
   mapCoordinates (rideCoordinates) {
@@ -20,7 +24,7 @@ export default class ViewingMap extends PureComponent {
       features: []
     }
 
-    const coordinates = rideCoordinates.reduce((accum, coord) => {
+    rideCoordinates.reduce((accum, coord) => {
       const c = parseRideCoordinate(coord)
       if (!accum.lastCoord) {
         accum.lastCoord = c
@@ -56,17 +60,12 @@ export default class ViewingMap extends PureComponent {
   }
 
   fitToElements () {
-    const bounds = boundingBox(this.props.rideCoordinates)
-    logDebug(bounds)
+    const bounds = this.memoBoundingBox(this.props.rideCoordinates)
     this.map.fitBounds(bounds[0], bounds[1], 20, 200)
   }
 
   render() {
-    const lastIndex = this.props.rideCoordinates.count() - 1
-    const firstCoord = parseRideCoordinate(this.props.rideCoordinates.get(0))
-    const lastCoord = parseRideCoordinate(this.props.rideCoordinates.get(lastIndex))
-
-    const mapCoords = this.mapCoordinates(this.props.rideCoordinates)
+    const mapCoords = this.memoMapCoordinates(this.props.rideCoordinates)
     return (
       <View style={styles.container}>
         <MapboxGL.MapView
@@ -87,7 +86,7 @@ const layerStyles = MapboxGL.StyleSheet.create({
   routeLine: {
     lineColor: MapboxGL.StyleSheet.identity('stroke'),
     lineWidth: 3,
-    lineCap: 'round'
+    lineCap: 'round',
   },
 });
 

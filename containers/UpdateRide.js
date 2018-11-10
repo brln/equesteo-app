@@ -131,13 +131,13 @@ class UpdateRideContainer extends BackgroundComponent {
     return state
   }
 
-  navigationButtonPressed({ buttonId }) {
+  async navigationButtonPressed({ buttonId }) {
     if (this.props.newRide) {
       Navigation.mergeOptions(this.props.componentId, {topBar: {rightButtons: []}})
       if (buttonId === 'save') {
         this.props.dispatch(discardCurrentRide())
         this.actuallyDeletePhotos()
-        this.persistRide()
+        await this.persistRide()
         this.props.dispatch(setPopShowRide(this.props.ride.get('_id'), true))
         this.props.dispatch(clearPausedLocations())
         this.props.dispatch(stopLocationTracking())

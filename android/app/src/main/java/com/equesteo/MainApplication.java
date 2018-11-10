@@ -1,7 +1,6 @@
 package com.equesteo;
 
 import android.app.Application;
-import com.airbnb.android.react.maps.MapsPackage;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.facebook.react.bridge.ReadableNativeArray;
 import com.facebook.react.bridge.ReadableNativeMap;
@@ -68,7 +67,6 @@ public class MainApplication extends NavigationApplication {
         // Add additional packages you require here
         // No need to add RnnPackage and MainReactPackage
         return Arrays.<ReactPackage>asList(
-            new MapsPackage(),
             new PickerPackage(),
             new BackgroundGeolocationPackage(),
             new LocationServicesDialogBoxPackage(),

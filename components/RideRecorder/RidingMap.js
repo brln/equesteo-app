@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import MapView from 'react-native-maps';
+import MapboxGL from '@mapbox/react-native-mapbox-gl';
 import {
   StyleSheet,
   TouchableOpacity,
@@ -8,6 +8,7 @@ import {
 
 import BuildImage from '../BuildImage'
 import { bearing, logError, logRender, parseRideCoordinate } from '../../helpers'
+import { routeLine } from '../../colors'
 
 export default class RidingMap extends PureComponent {
   constructor (props) {
@@ -16,13 +17,6 @@ export default class RidingMap extends PureComponent {
     this.fitToElements = this.fitToElements.bind(this)
     this.changeBearing = this.changeBearing.bind(this)
     this.gpsStatusImage = this.gpsStatusImage.bind(this)
-  }
-
-  componentDidUpdate(prevProps) {
-    if (prevProps.currentRideCoordinates.count() === 0 && this.props.currentRideCoordinates.count() === 1) {
-      this.map.animateToRegion(this.fitToElements())
-    }
-    this.changeBearing()
   }
 
   fitToElements() {
@@ -50,19 +44,21 @@ export default class RidingMap extends PureComponent {
 
   changeBearing () {
     let newBearing = 0
-    let secondToLast = parseRideCoordinate(
-      this.props.currentRideCoordinates.get(this.props.currentRideCoordinates.count() - 2)
-    )
-    if (this.props.currentRideCoordinates.count() > 1
-      && (this.props.lastLocation.get('speed') === undefined || this.props.lastLocation.get('speed') > 0)) {
-      newBearing = bearing(
-        secondToLast.get('latitude'),
-        secondToLast.get('longitude'),
-        this.props.lastLocation.get('latitude'),
-        this.props.lastLocation.get('longitude')
+    if (this.props.currentRideCoordinates.count() > 1) {
+      let secondToLast = parseRideCoordinate(
+        this.props.currentRideCoordinates.get(this.props.currentRideCoordinates.count() - 2)
       )
-      this.map.animateToNavigation(this.props.lastLocation.toJS(), newBearing, 45)
+      if (this.props.currentRideCoordinates.count() > 1
+        && (this.props.lastLocation.get('speed') === undefined || this.props.lastLocation.get('speed') > 0)) {
+        newBearing = bearing(
+          secondToLast.get('latitude'),
+          secondToLast.get('longitude'),
+          this.props.lastLocation.get('latitude'),
+          this.props.lastLocation.get('longitude')
+        )
+      }
     }
+    return newBearing
   }
 
   gpsStatusImage () {
@@ -85,60 +81,49 @@ export default class RidingMap extends PureComponent {
   }
 
   mapCoordinates (rideCoordinates) {
-    return rideCoordinates.reduce((accum, coord) => {
+    const coordinates = rideCoordinates.reduce((accum, coord) => {
       const c = parseRideCoordinate(coord)
-      accum.push({
-        latitude: c.get('latitude'),
-        longitude: c.get('longitude')
-      })
+      accum.push([c.get('longitude'), c.get('latitude')])
       return accum
     }, [])
+    return {
+      type: "FeatureCollection",
+      features: [{
+        type: 'Feature',
+        geometry: {
+          type: "LineString",
+          coordinates
+        }
+      }]
+    }
   }
 
+
   render() {
+    const centerCoordinate = this.props.lastLocation ? [this.props.lastLocation.get('longitude'), this.props.lastLocation.get('latitude')] : null
     logRender('RideRecorder.RidingMap')
     const mapCoords = this.mapCoordinates(this.props.currentRideCoordinates)
-    let lastLocAccuracy
-    let refiningLocationLimit
-    if (this.props.showCircles && this.props.refiningLocation) {
-      refiningLocationLimit = (
-         <MapView.Circle
-          center={this.props.refiningLocation.toJS()}
-          radius={(25 * 0.3048)}
-          strokeColor={'blue'}
-          strokeWidth={2}
-        />
-      )
-      if (this.props.lastLocation) {
-        lastLocAccuracy = (
-          <MapView.Circle
-            center={this.props.lastLocation.toJS()}
-            radius={(this.props.lastLocation.get('accuracy'))}
-            strokeColor={'purple'}
-            strokeWidth={2}
-          />
-        )
-      }
-    }
     return (
       <View style ={styles.container}>
         <View style={{flex: 1}}>
-          <MapView
+          <MapboxGL.MapView
+            animated={true}
+            centerCoordinate={centerCoordinate}
+            compassEnabled={true}
+            pitch={45}
+            heading={this.changeBearing()}
+            ref={ref => (this.map = ref)}
+            styleURL={"mapbox://styles/equesteo/cjn3zysq408tc2sk1g1gunqmq"}
+            onDidFinishLoadingMap={this.fitToElements}
             style={styles.map}
-            ref={ref => this.map = ref}
-            initialRegion={this.fitToElements()}
-            provider={"google"}
+            zoomLevel={14}
           >
-            <MapView.Polyline
-              coordinates={mapCoords}
-              strokeColor="#dc0202"
-              strokeWidth={5}
-            />
-            { refiningLocationLimit }
-            { lastLocAccuracy }
-          </MapView>
+            <MapboxGL.ShapeSource id="routeSource" shape={mapCoords}>
+              <MapboxGL.LineLayer id="route" sourceID={"routeSource"} style={layerStyles.routeLine}/>
+            </MapboxGL.ShapeSource>
+          </MapboxGL.MapView>
         </View>
-        <View style={{position: 'absolute', right: 0, top: 0}} >
+        <View style={{position: 'absolute', left: 0, top: 0}} >
           <TouchableOpacity onPress={this.props.tapGPS}>
             <BuildImage
               source={this.gpsStatusImage()}
@@ -147,11 +132,18 @@ export default class RidingMap extends PureComponent {
             />
           </TouchableOpacity>
         </View>
-
       </View>
     )
   }
 }
+
+const layerStyles = MapboxGL.StyleSheet.create({
+  routeLine: {
+    lineColor: routeLine,
+    lineWidth: 3,
+    lineCap: 'round',
+  },
+});
 
 const styles = StyleSheet.create({
   container: {
