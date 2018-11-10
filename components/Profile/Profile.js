@@ -44,6 +44,7 @@ export default class Profile extends PureComponent {
     this.horseProfile = this.horseProfile.bind(this)
     this.horsesCard = this.horsesCard.bind(this)
     this.maybeShowID = this.maybeShowID.bind(this)
+    this.photoSources = this.photoSources.bind(this)
     this.renderHorse = this.renderHorse.bind(this)
     this.uploadProfile = this.uploadProfile.bind(this)
   }
@@ -70,7 +71,7 @@ export default class Profile extends PureComponent {
       height: 1080,
       cropping: true
     }).then(image => {
-      this.props.uploadProfilePhoto(image.path)
+      this.props.uploadPhoto(image.path)
     }).catch(() => {})
   }
 
@@ -84,14 +85,15 @@ export default class Profile extends PureComponent {
 
   horseProfile (horse) {
     return () => {
-      this.props.showHorseProfile(horse)
+      const ownerID = this.props.horseOwnerIDs.get(horse.get('_id'))
+      this.props.showHorseProfile(horse, ownerID)
     }
   }
 
   renderHorse ({item}) {
     let uri = 'https://s3.us-west-1.amazonaws.com/equesteo-horse-photos/empty.png'
-    if (item.profilePhotoID && item.photosByID[item.profilePhotoID]) {
-      uri = item.photosByID[item.profilePhotoID].uri
+    if (item.profilePhotoID) {
+      uri = this.props.horsePhotos.getIn([item.profilePhotoID, 'uri'])
     }
     return (
       <ListItem
@@ -123,15 +125,27 @@ export default class Profile extends PureComponent {
     }
   }
 
+  photoSources (selectedID) {
+    const sources = this.props.userPhotos.reduce((accum, photo, photoID) => {
+      if (photoID !== selectedID) {
+        accum.push({url: photo.get('uri')})
+      }
+      return accum
+    }, [])
+    sources.unshift({url: this.props.userPhotos.getIn([selectedID, 'uri'])})
+    return sources
+  }
+
   renderProfileImage () {
     const images = []
     const user = this.props.profileUser
     if (user.get('profilePhotoID')) {
-      const profileSource = {uri: user.getIn(['photosByID', user.get('profilePhotoID'), 'uri'])}
+      const profileSource = {uri: this.props.userPhotos.getIn([user.get('profilePhotoID'), 'uri'])}
+      const profileSources = this.photoSources(user.get('profilePhotoID'))
       images.push(
         <TouchableOpacity
           style={styles.slide}
-          onPress={() => {this.props.showPhotoLightbox(profileSource)}}
+          onPress={() => {this.props.showPhotoLightbox(profileSources)}}
           key={"profile"}
         >
           <URIImage
@@ -208,7 +222,7 @@ export default class Profile extends PureComponent {
           </View>
         </View>
         <PhotoFilmstrip
-          photosByID={this.props.profileUser.get('photosByID')}
+          photosByID={this.props.userPhotos}
           showPhotoLightbox={this.props.showPhotoLightbox}
           exclude={[this.props.profileUser.get('profilePhotoID')]}
         />

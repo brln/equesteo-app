@@ -16,8 +16,8 @@ import {
 
 import BuildImage from '../BuildImage'
 import { brand, darkBrand } from '../../colors'
-import { logError } from '../../helpers'
-import DeleteModal from '../DeleteModal'
+import { logError, MONTHS } from '../../helpers'
+import DeleteModal from '../Shared/DeleteModal'
 import RidersCard from './RidersCard'
 import FabImage from '../FabImage'
 import TrainingCard from './TrainingCard'
@@ -32,6 +32,7 @@ export default class HorseProfile extends PureComponent {
   constructor (props) {
     super(props)
     this.makeBirthday = this.makeBirthday.bind(this)
+    this.photoSources = this.photoSources.bind(this)
     this.renderOwner = this.renderOwner.bind(this)
     this.renderDeleteModal = this.renderDeleteModal.bind(this)
     this.renderImageSwiper = this.renderImageSwiper.bind(this)
@@ -61,9 +62,11 @@ export default class HorseProfile extends PureComponent {
     const birthDay = horse.get('birthDay')
     const birthYear = horse.get('birthYear')
     if (birthMonth && birthDay && birthYear) {
-      return `${birthMonth}-${birthDay}-${birthYear}`
+      return `${MONTHS[birthMonth]} ${birthDay} ${birthYear}`
     } else if (birthMonth && birthYear) {
-      return `${birthMonth}-${birthYear}`
+      return `${MONTHS[birthMonth]} ${birthYear}`
+    } else if (birthMonth && birthDay) {
+      return `${MONTHS[birthMonth]} ${birthDay}`
     } else if (birthYear) {
       return `${birthYear}`
     }
@@ -79,19 +82,40 @@ export default class HorseProfile extends PureComponent {
     } else if (heightHands) {
       return `${heightHands} hh`
     } else return 'unknown'
+  }
 
+  photoSources (selectedID) {
+    let selectedSource = null
+    const sources = this.props.horsePhotos.reduce((accum, photo, photoID) => {
+      if (photoID !== selectedID) {
+        accum.push({url: photo.get('uri')})
+      } else {
+        selectedSource = {url: photo.get('uri')}
+      }
+      return accum
+    }, [])
+    sources.unshift(selectedSource)
+    return sources
   }
 
   renderProfileImage () {
     const images = []
     const horse = this.props.horse
+    const nameText = (
+      <View style={{position: 'absolute', bottom: 30, left: 10}}>
+        <Text style={styles.nameText}>
+          {this.props.horse.get('name') || 'No Name'}
+        </Text>
+      </View>
+    )
     if (horse.get('profilePhotoID')) {
-      const profileSource = {uri: horse.getIn(['photosByID', horse.get('profilePhotoID'), 'uri'])}
+      const profileSource = {uri: this.props.horsePhotos.getIn([horse.get('profilePhotoID'), 'uri'])}
+      const swiperSources = this.photoSources(horse.get('profilePhotoID'))
       images.push(
         <TouchableOpacity
           key={"profile"}
           style={styles.slide}
-          onPress={() => this.props.showPhotoLightbox(profileSource)}
+          onPress={() => this.props.showPhotoLightbox(swiperSources)}
         >
           <URIImage
             style={{width: '100%', height: '100%'}}
@@ -99,6 +123,7 @@ export default class HorseProfile extends PureComponent {
             onError={e => logError("Can't load HorseProfile image")}
             showSource={true}
           />
+          { nameText }
         </TouchableOpacity>
       )
     } else {
@@ -109,6 +134,7 @@ export default class HorseProfile extends PureComponent {
             source={require('../../img/emptyHorse.png')}
             onError={e => logError("Can't load Empty Horse Profile image")}
           />
+          { nameText }
         </View>
       )
     }
@@ -135,7 +161,7 @@ export default class HorseProfile extends PureComponent {
           { fab }
         </View>
         <PhotoFilmstrip
-          photosByID={this.props.horse.get('photosByID')}
+          photosByID={this.props.horsePhotos}
           showPhotoLightbox={this.props.showPhotoLightbox}
           exclude={[this.props.horse.get('profilePhotoID')]}
         />
@@ -240,6 +266,7 @@ export default class HorseProfile extends PureComponent {
             riders={this.props.riders}
             showRiderProfile={this.showRiderProfile}
             user={this.props.user}
+            userPhotos={this.props.userPhotos}
           />
         </View>
       </ScrollView>
@@ -247,4 +274,13 @@ export default class HorseProfile extends PureComponent {
   }
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  nameText: {
+    fontSize: 25,
+    color: 'white',
+    fontFamily: 'Montserrat-Regular',
+    textShadowColor: 'black',
+    textShadowRadius: 7,
+    textShadowOffset: {width: 2, height: 1}
+  }
+});

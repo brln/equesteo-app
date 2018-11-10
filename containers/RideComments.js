@@ -1,6 +1,8 @@
 import memoizeOne from 'memoize-one';
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
+import { Navigation } from 'react-native-navigation'
+import { Keyboard } from 'react-native'
 
 import { createRideComment } from '../actions'
 import { brand } from '../colors'
@@ -16,11 +18,15 @@ class RideCommentsContainer extends PureComponent {
           color: 'white',
           fontSize: 20
         },
+        leftButtons: [
+          {
+            id: 'back',
+            icon: require('../img/back-arrow.png'),
+            color: 'white'
+          }
+        ],
         background: {
           color: brand,
-        },
-        backButton: {
-          color: 'white'
         },
         elevation: 0
       },
@@ -39,6 +45,16 @@ class RideCommentsContainer extends PureComponent {
     this.submitComment = this.submitComment.bind(this)
     this.updateNewComment = this.updateNewComment.bind(this)
     this.memoRideComments = memoizeOne(this.rideComments)
+    this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
+
+    Navigation.events().bindComponent(this);
+  }
+
+  navigationButtonPressed({ buttonId }) {
+    if (buttonId === 'back') {
+      Navigation.pop(this.props.componentId)
+    }
+    Keyboard.dismiss()
   }
 
   updateNewComment (newComment) {
@@ -75,16 +91,19 @@ class RideCommentsContainer extends PureComponent {
         submitComment={this.submitComment}
         updateNewComment={this.updateNewComment}
         users={this.props.users}
+        userPhotos={this.props.userPhotos}
       />
     )
   }
 }
 
 function mapStateToProps (state, passedProps) {
+  const pouchState = state.get('pouchRecords')
   return {
-    ride: state.getIn(['main', 'rides', passedProps.rideID]),
-    rideComments: state.getIn(['main', 'rideComments']),
-    users: state.getIn(['main', 'users'])
+    ride: pouchState.getIn(['rides', passedProps.rideID]),
+    rideComments: pouchState.get('rideComments'),
+    users: pouchState.get('users'),
+    userPhotos: pouchState.get('userPhotos')
   }
 }
 

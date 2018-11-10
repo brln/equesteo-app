@@ -1,7 +1,9 @@
+import { List, Map } from 'immutable'
 import moment from 'moment'
+import mbxStatic from '@mapbox/mapbox-sdk/services/static'
 import { Platform } from 'react-native'
+import { MAPBOX_TOKEN } from 'react-native-dotenv'
 
-import { simplifyLine } from './services/DouglasPeucker'
 
 const toRad = (deg) => {
   return deg * Math.PI / 180;
@@ -62,40 +64,29 @@ export function generateUUID () { // Public Domain/MIT
     });
 }
 
-function urlParams (params) {
-  return Object.keys(params).map(k => k + '=' + encodeURIComponent(params[k])).join('&')
+export function staticMap (ride, coordinateData) {
+  const staticService = mbxStatic({accessToken: MAPBOX_TOKEN})
+  const parsed = coordinateData.reduce((accum, coord) => {
+    const decoded = parseRideCoordinate(coord)
+    accum.push([decoded.get('longitude'), decoded.get('latitude')])
+    return accum
+  }, [])
+  const request = staticService.getStaticImage({
+    ownerId: 'equesteo',
+    styleId: 'cjn3zysq408tc2sk1g1gunqmq',
+    width: 600,
+    height: 400,
+    position: 'auto',
+    overlays: [{
+      path: {
+        strokeWidth: 5,
+        strokeColor: 'ea5b60',
+        coordinates: parsed
+      }
+    }]
+  })
+  return request.url()
 }
-
-export function staticMap (ride) {
-  const ROOT_URL = 'https://maps.googleapis.com/maps/api/staticmap?'
-  const queryStringParams = {
-      size: '600x400',
-      format: 'png',
-      maptype: 'terrain',
-  }
-  const pathStyle = 'color:0xff0000ff|weight:5'
-
-  let tolerance = 0.00006
-  let lengthURL = false
-  let fullURL
-  while (!lengthURL || lengthURL > 6000) {
-    const simplified = simplifyLine(tolerance, ride.rideCoordinates)
-    let pathCoords = ''
-    for (let coord of simplified) {
-      const parsedLat = coord.get('latitude').toString()
-      const parsedLong = coord.get('longitude').toString()
-      pathCoords += `|${parsedLat},${parsedLong}`
-    }
-
-    queryStringParams['path'] = pathStyle + pathCoords
-    const queryString = urlParams(queryStringParams)
-    fullURL = ROOT_URL + queryString
-    lengthURL = fullURL.length
-    tolerance += 0.000001
-  }
-  return fullURL
-}
-
 
 export const connectionType = {
   none: 'none',
@@ -180,6 +171,12 @@ export function logInfo (info) {
   console.log(info)
 }
 
+export function logDebug (info, title) {
+  console.log(`======================= ${title} ===========================`)
+  console.log(info)
+  console.log(`=================== end ${title} ===========================`)
+}
+
 export function logRender (componentName) {
   logInfo('rendering: ' + componentName)
 }
@@ -194,4 +191,130 @@ export function toElevationKey (coord) {
 
 export function metersToFeet(meters) {
   return meters * 3.28084
+}
+
+export function elapsedTime (startTime, currentTime, pausedTime, lastPauseStart) {
+  let nowPausedTime = 0
+  if (lastPauseStart) {
+    nowPausedTime = moment(currentTime).diff(moment(lastPauseStart), 'seconds', true)
+  }
+  const totalElapsed = moment(currentTime).diff(moment(startTime), 'seconds', true)
+  const withoutOldPauses = totalElapsed - pausedTime
+  return withoutOldPauses - nowPausedTime
+}
+
+function leftPad(num) {
+    const str = num.toString()
+    const pad = "00"
+    return pad.substring(0, pad.length - str.length) + str
+  }
+
+export function timeToString (elapsed) {
+  const asHours = elapsed / 60 / 60
+  const justHours = Math.floor(asHours)
+  const minutes = (asHours - justHours) * 60
+  const justMinutes = Math.floor(minutes)
+  const seconds = (minutes - justMinutes) * 60
+  const roundedSeconds = Math.round(seconds)
+  return `${leftPad(justHours)}:${leftPad(justMinutes)}:${leftPad(roundedSeconds)}`
+}
+
+export const MONTHS = {
+  1: 'Jan',
+  2: 'Feb',
+  3: 'Mar',
+  4: 'Apr',
+  5: 'May',
+  6: 'Jun',
+  7: 'Jul',
+  8: 'Aug',
+  9: 'Sep',
+  10: 'Oct',
+  11: 'Nov',
+  12: 'Dec',
+}
+
+export function parseRideCoordinate (fromDB) {
+  return Map({
+    latitude: fromDB.get(0),
+    longitude: fromDB.get(1),
+    timestamp: fromDB.get(2),
+    accuracy: fromDB.get(3)
+  })
+}
+
+export function boundingBox (rideCoordinates) {
+  const asJS = rideCoordinates.toJS()
+  const firstCoord = asJS[0]
+
+  const initialVal = [[firstCoord[1], firstCoord[0]], [firstCoord[1], firstCoord[0]]]
+  const coordinates = asJS.reduce((accum, coord) => {
+    if (coord[0] > accum[0][1]) {
+      accum[0][1] = coord[0]
+    }
+    if (coord[1] > accum[0][0]) {
+      accum[0][0] = coord[1]
+    }
+    if (coord[0] < accum[1][1]) {
+      accum[1][1] = coord[0]
+    }
+    if (coord[1] < accum[1][0]) {
+      accum[1][0] = coord[1]
+    }
+    return accum
+  }, initialVal)
+  return coordinates
+}
+
+export function speedGradient (speed) {
+  switch (Math.floor(speed)) {
+    case 0:
+      return "#5A35DE"
+    case 1:
+      return "#6432CF"
+    case 2:
+      return "#6E30C0"
+    case 3:
+      return "#782DB2"
+    case 4:
+      return "#822BA3"
+    case 5:
+      return "#8C2895"
+    case 6:
+      return "#962686"
+    case 7:
+      return "#A02378"
+    case 8:
+      return "#AA2169"
+    case 9:
+      return "#B41E5A"
+    case 10:
+      return "#BE1C4C"
+    case 11:
+      return "#C8193D"
+    case 12:
+      return "#D2172F"
+    case 13:
+      return "#DC1420"
+    case 14:
+      return "#E61212"
+    default:
+      return "#E61212"
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

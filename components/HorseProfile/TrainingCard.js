@@ -88,7 +88,7 @@ export default class TrainingCard extends PureComponent {
         <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20, flex: 1}}>
           <View style={{flex: 1, paddingTop: 20}}>
             <View style={{flex: 1, flexDirection: 'row', paddingBottom: 10}}>
-              <View style={styles.columnHeader} />
+              <View style={styles.titleCell} />
               <View style={styles.columnHeader}>
                 <Text>Rides</Text>
               </View>
@@ -100,7 +100,7 @@ export default class TrainingCard extends PureComponent {
               </View>
             </View>
             <View style={{flex: 1, flexDirection: 'row'}}>
-              <View style={styles.trainingCell}>
+              <View style={styles.titleCell}>
                 <Text>This Week</Text>
               </View>
               <View style={styles.trainingCell}>
@@ -115,7 +115,7 @@ export default class TrainingCard extends PureComponent {
             </View>
             <View style={{flex: 1, flexDirection: 'row'}}>
               <View style={{flex: 1, flexDirection: 'row'}}>
-                <View style={styles.trainingCell}>
+                <View style={styles.titleCell}>
                   <Text>This Month</Text>
                 </View>
                 <View style={styles.trainingCell}>
@@ -131,7 +131,7 @@ export default class TrainingCard extends PureComponent {
             </View>
             <View style={{flex: 1, flexDirection: 'row'}}>
               <View style={{flex: 1, flexDirection: 'row'}}>
-                <View style={styles.trainingCell}>
+                <View style={styles.titleCell}>
                   <Text>This Year</Text>
                 </View>
                 <View style={styles.trainingCell}>
@@ -147,7 +147,7 @@ export default class TrainingCard extends PureComponent {
             </View>
             <View style={{flex: 1, flexDirection: 'row'}}>
               <View style={{flex: 1, flexDirection: 'row'}}>
-                <View style={styles.trainingCell}>
+                <View style={styles.titleCell}>
                   <Text>All Time</Text>
                 </View>
                 <View style={styles.trainingCell}>
@@ -176,6 +176,11 @@ const styles = StyleSheet.create({
   trainingCell: {
     width: columnWidth,
     alignItems: 'center',
+    justifyContent: 'center'
+  },
+  titleCell: {
+    width: columnWidth + 20,
+    alignItems: 'flex-start',
     justifyContent: 'center'
   },
   statText: {

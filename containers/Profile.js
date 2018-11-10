@@ -1,15 +1,20 @@
 import { Map } from 'immutable'
-import React, { PureComponent } from 'react'
+import React from 'react'
 import { connect } from 'react-redux';
 import { Navigation } from 'react-native-navigation'
-
+import BackgroundComponent from '../components/BackgroundComponent'
 import Profile from '../components/Profile/Profile'
 import {
   clearSearch,
   createFollow,
-  deleteFollow ,
+  createUserPhoto,
+  deleteFollow,
+  persistFollow,
+  persistUser,
+  persistUserPhoto,
   signOut,
-  uploadProfilePhoto,
+  uploadUserPhoto,
+  userUpdated,
 } from "../actions"
 import { brand } from '../colors'
 import {
@@ -19,9 +24,9 @@ import {
   PHOTO_LIGHTBOX,
   UPDATE_PROFILE
 } from '../screens'
-import { logRender } from '../helpers'
+import { generateUUID, logRender, unixTimeNow } from '../helpers'
 
-class ProfileContainer extends PureComponent {
+class ProfileContainer extends BackgroundComponent {
   static options() {
     return {
       topBar: {
@@ -56,7 +61,8 @@ class ProfileContainer extends PureComponent {
     this.showHorseProfile = this.showHorseProfile.bind(this)
     this.showPhotoLightbox = this.showPhotoLightbox.bind(this)
     this.showUserList = this.showUserList.bind(this)
-    this.uploadProfilePhoto = this.uploadProfilePhoto.bind(this)
+    this.thisUsersPhotos = this.thisUsersPhotos.bind(this)
+    this.uploadPhoto = this.uploadPhoto.bind(this)
 
     Navigation.events().bindComponent(this);
 
@@ -80,12 +86,12 @@ class ProfileContainer extends PureComponent {
     }
   }
 
-  showPhotoLightbox (source) {
+  showPhotoLightbox (sources) {
     Navigation.push(this.props.componentId, {
       component: {
         name: PHOTO_LIGHTBOX,
         passProps: {
-          source,
+          sources,
           close: this.closeLightbox
         }
       }
@@ -119,16 +125,34 @@ class ProfileContainer extends PureComponent {
   }
 
   createFollow (followingID) {
-    this.props.dispatch(createFollow(followingID))
+    const followID = `${this.props.userID}_${followingID}`
+    this.props.dispatch(createFollow(followID, followingID, this.props.userID))
+    this.props.dispatch(persistFollow(followID))
     this.props.dispatch(clearSearch())
   }
 
   deleteFollow (followingID) {
-    this.props.dispatch(deleteFollow(followingID))
+    const followID = `${this.props.userID}_${followingID}`
+    this.props.dispatch(deleteFollow(followID))
+    this.props.dispatch(persistFollow(followID))
   }
 
-  uploadProfilePhoto (location) {
-    this.props.dispatch(uploadProfilePhoto(location))
+  async uploadPhoto (location) {
+    let photoID = generateUUID()
+    let userID = this.props.profileUser.get('_id')
+    this.props.dispatch(createUserPhoto(
+      userID,
+      {
+        _id: photoID,
+        timestamp: unixTimeNow(),
+        uri: location
+      }
+    ))
+    this.props.dispatch(userUpdated(this.props.profileUser.set('profilePhotoID', photoID)))
+
+    await this.props.dispatch(persistUser(userID))
+    this.props.dispatch(persistUserPhoto(photoID))
+    this.props.dispatch(uploadUserPhoto(photoID, location))
   }
 
   showUserList (followRecords, followingOrFollower) {
@@ -143,12 +167,12 @@ class ProfileContainer extends PureComponent {
     })
   }
 
-  showHorseProfile (horse) {
+  showHorseProfile (horse, ownerID) {
     Navigation.push(this.props.componentId, {
       component: {
         name: HORSE_PROFILE,
         title: horse.get('name'),
-        passProps: {horse},
+        passProps: {horse, ownerID},
       }
     })
   }
@@ -184,6 +208,12 @@ class ProfileContainer extends PureComponent {
     })
   }
 
+  thisUsersPhotos () {
+    return this.props.userPhotos.filter((photo) => {
+      return photo.get('deleted') !== true && photo.get('userID') === this.props.profileUser.get('_id')
+    })
+  }
+
   render() {
     logRender('ProfileContainer')
     if (this.props.profileUser.get('_id')) {
@@ -193,16 +223,18 @@ class ProfileContainer extends PureComponent {
           deleteFollow={this.deleteFollow}
           followings={this.followings()}
           followers={this.followers()}
-          horseOwnerIDs={this.horseOwnerIDs()}
           horses={this.profileUserHorses()}
+          horseOwnerIDs={this.horseOwnerIDs()}
+          horsePhotos={this.props.horsePhotos}
           profileUser={this.props.profileUser}
           showAboutPage={this.showAboutPage}
           showHorseProfile={this.showHorseProfile}
           showPhotoLightbox={this.showPhotoLightbox}
           showUserList={this.showUserList}
-          uploadProfilePhoto={this.uploadProfilePhoto}
+          uploadPhoto={this.uploadPhoto}
           userID={this.props.userID}
           users={this.props.users}
+          userPhotos={this.thisUsersPhotos()}
         />
       )
     } else {
@@ -212,19 +244,21 @@ class ProfileContainer extends PureComponent {
 }
 
 function mapStateToProps (state, passedProps) {
-  const mainState = state.get('main')
-  const localState = state.getIn(['main', 'localState'])
+  const pouchState = state.get('pouchRecords')
+  const localState = state.get('localState')
   const userID = localState.get('userID')
-
   const profileUserID = passedProps.profileUser ? passedProps.profileUser.get('_id') : null
 
   return {
-    follows: mainState.get('follows'),
-    horseUsers: mainState.get('horseUsers'),
-    horses: mainState.get('horses'),
-    profileUser: mainState.getIn(['users', profileUserID]) || passedProps.profileUser || new Map(),
-    users: mainState.get('users'),
-    userID
+    activeComponent: localState.get('activeComponent'),
+    follows: pouchState.get('follows'),
+    horseUsers: pouchState.get('horseUsers'),
+    horses: pouchState.get('horses'),
+    horsePhotos: pouchState.get('horsePhotos'),
+    profileUser: pouchState.getIn(['users', profileUserID]) || passedProps.profileUser || new Map(),
+    users: pouchState.get('users'),
+    userID,
+    userPhotos: pouchState.get('userPhotos'),
   }
 }
 

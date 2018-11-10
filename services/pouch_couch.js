@@ -1,5 +1,7 @@
 import PouchDB from 'pouchdb-react-native'
 import { API_URL } from 'react-native-dotenv'
+import { captureException } from '../services/Sentry'
+
 
 import { logInfo, logError } from '../helpers'
 
@@ -25,6 +27,7 @@ export default class PouchCouch {
   catchError (e) {
     logInfo("ERROR TO FOLLOW: ")
     logError(e)
+    captureException(e)
     throw e
   }
 
@@ -183,6 +186,7 @@ export default class PouchCouch {
   }
 
   async deleteLocalDBs () {
+    logInfo('deleting all local DBs')
     await this.localHorsesDB.destroy()
     await this.localUsersDB.destroy()
     await this.localRidesDB.destroy()
@@ -203,13 +207,21 @@ export default class PouchCouch {
     const horseDocs = horsesResp.rows.map(h => h.doc)
     return {
       horses: horseDocs.filter(h => h.type === 'horse'),
+      horsePhotos: horseDocs.filter(h => h.type === 'horsePhoto'),
       horseUsers: horseDocs.filter(h => h.type === 'horseUser'),
       follows: userDocs.filter(u => u.type === 'follow'),
       rideCarrots: rideDocs.filter(r => r.type === 'carrot'),
+      rideCoordinates: rideDocs.filter(r => r.type === 'rideCoordinates'),
       rideComments: rideDocs.filter(r => r.type === 'comment'),
       rideElevations: rideDocs.filter(r => r.type === 'rideElevations'),
+      ridePhotos: rideDocs.filter(r => r.type === 'ridePhoto'),
       rides: rideDocs.filter(r => r.type === 'ride'),
-      users: userDocs.filter(u => u.type === 'user')
+      users: userDocs.filter(u => u.type === 'user'),
+      userPhotos: userDocs.filter(u => u.type === 'userPhoto')
     }
+  }
+
+  async loadRideCoordinates (rideID) {
+    return this.localRidesDB.get(`${rideID}_coordinates`).catch(e => this.catchError(e))
   }
 }

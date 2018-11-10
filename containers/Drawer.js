@@ -44,6 +44,7 @@ class DrawerContainer extends Component {
     Navigation.push(this.props.activeComponent, {
       component: {
         name: RECORDER,
+        id: RECORDER
       }
     });
 	}
@@ -108,7 +109,7 @@ class DrawerContainer extends Component {
                 height: 120,
                 alignItems: 'center',
               }}
-          />
+            />
             <Text style={{
               fontFamily: 'Panama-Light',
               fontSize: 30,
@@ -121,6 +122,10 @@ class DrawerContainer extends Component {
               <View style={styles.drawerList}>
                 <TouchableOpacity onPress={this.openRecorder}>
                   <View style={styles.drawerListItem}>
+                    <BuildImage
+                      source={require('../img/runningHorse.png')}
+                      style={styles.icon}
+                    />
                     <Text style={styles.drawerListItemText} onTouch>
                       Go Ride
                     </Text>
@@ -129,6 +134,10 @@ class DrawerContainer extends Component {
 
                 <TouchableOpacity onPress={this.openBarn}>
                   <View style={styles.drawerListItem}>
+                    <BuildImage
+                      source={require('../img/barn.png')}
+                      style={styles.icon}
+                    />
                     <Text style={styles.drawerListItemText}>
                       My Barn
                     </Text>
@@ -137,6 +146,10 @@ class DrawerContainer extends Component {
 
                 <TouchableOpacity onPress={this.openTraining}>
                   <View style={styles.drawerListItem}>
+                    <BuildImage
+                      source={require('../img/diary.png')}
+                      style={styles.icon}
+                    />
                     <Text style={styles.drawerListItemText} onTouch>
                       Training
                     </Text>
@@ -145,6 +158,10 @@ class DrawerContainer extends Component {
 
                 <TouchableOpacity onPress={this.openAccount}>
                   <View style={styles.drawerListItem}>
+                    <BuildImage
+                      source={require('../img/account2.png')}
+                      style={styles.icon}
+                    />
                     <Text style={styles.drawerListItemText}>
                       My Account
                     </Text>
@@ -160,22 +177,20 @@ class DrawerContainer extends Component {
 
 const styles = StyleSheet.create({
 	container: {
-      flex: 2,
-      paddingTop: 30,
-      paddingLeft: 20,
-      justifyContent: 'flex-start',
-      backgroundColor: brand,
+    flex: 2,
+    paddingTop: 30,
+    paddingLeft: 20,
+    justifyContent: 'flex-start',
+    backgroundColor: brand,
 	},
-	drawerList: {
-
-	},
+	drawerList: {},
 	drawerListIcon: {
 		width: 27
 	},
 	drawerListItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: 23
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15
 	},
 	drawerListItemText: {
 		color: 'white',
@@ -185,16 +200,23 @@ const styles = StyleSheet.create({
 		flex: 1
 	},
 	linearGradient: {
-      flex: 1,
-      height: height,
-      width: width * 0.75
+    flex: 1,
+    height: height,
+    width: width * 0.75
 	},
+  icon: {
+    width: 50,
+    height: 50,
+    alignItems: 'center',
+  }
 });
 
 function mapStateToProps (state) {
-  const users = state.getIn(['main', 'users'])
-  const userID = state.getIn(['main', 'localState', 'userID'])
-  const activeComponent = state.getIn(['main', 'localState', 'activeComponent'])
+  const pouchState = state.get('pouchRecords')
+  const localState = state.get('localState')
+  const users = pouchState.get('users')
+  const userID = localState.get('userID')
+  const activeComponent = localState.get('activeComponent')
   return {
     activeComponent,
     user: users.get(userID)

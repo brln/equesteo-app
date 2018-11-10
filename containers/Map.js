@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
 
 import { brand } from '../colors'
-import Map from '../components/Ride/Map'
+import ViewingMap from '../components/Ride/ViewingMap'
 import { logRender } from '../helpers'
 
 class MapContainer extends PureComponent {
@@ -30,16 +30,22 @@ class MapContainer extends PureComponent {
   render() {
     logRender('MapContainer')
     return (
-      <Map
-        rideCoords={this.props.ride.get('rideCoordinates').toJS()}
+      <ViewingMap
+        rideCoordinates={this.props.rideCoordinates}
       />
     )
   }
 }
 
 function mapStateToProps (state, passedProps) {
+  const rideCoordinates = state.getIn([
+    'pouchRecords',
+    'selectedRideCoordinates',
+    'rideCoordinates'
+  ])
   return {
-    ride: state.getIn(['main', 'rides', passedProps.rideID])
+    ride: state.getIn(['pouchRecords', 'rides', passedProps.rideID]),
+    rideCoordinates,
   }
 }
 

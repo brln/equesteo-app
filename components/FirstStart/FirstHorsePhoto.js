@@ -35,7 +35,6 @@ export default class FirstHorsePhoto extends PureComponent {
   }
 
   next () {
-    this.props.createHorse()
     this.props.nextPage()
   }
 
@@ -49,15 +48,17 @@ export default class FirstHorsePhoto extends PureComponent {
       />
     )
     let skip = (
-      <TouchableOpacity onPress={this.props.nextPage} style={{paddingTop: 10}}>
+      <TouchableOpacity onPress={this.props.skipHorsePhoto} style={{paddingTop: 10}}>
         <Text style={{textAlign: 'center', textDecorationLine: 'underline', color: "black", fontSize: 10}}>No, thanks.</Text>
       </TouchableOpacity>
     )
     let horseProfileImage = (
-      <BuildImage
-        style={{width: '100%', height: '100%'}}
-        source={require('../../img/emptyHorse.png')}
-      />
+      <TouchableOpacity onPress={this.uploadHorseProfile} >
+        <BuildImage
+          style={{width: '100%', height: '100%'}}
+          source={require('../../img/emptyHorse.png')}
+        />
+      </TouchableOpacity>
     )
 
     if (this.props.horse.get('profilePhotoID')) {
@@ -71,7 +72,7 @@ export default class FirstHorsePhoto extends PureComponent {
       skip = null
       horseProfileImage = (
         <URIImage
-          source={{uri: this.props.horse.getIn(['photosByID', this.props.horse.get('profilePhotoID'), 'uri'])}}
+          source={{uri: this.props.horsePhotos.getIn([this.props.horse.get('profilePhotoID'), 'uri'])}}
           style={{width: '100%', height: '100%'}}
         />
       )

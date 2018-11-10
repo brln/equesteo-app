@@ -48,6 +48,7 @@ export default class RidersCard extends PureComponent {
           <Riders
             riders={this.props.riders}
             showRiderProfile={this.props.showRiderProfile}
+            userPhotos={this.props.userPhotos}
           />
         </CardItem>
         { fab }

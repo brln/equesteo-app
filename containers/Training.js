@@ -61,7 +61,7 @@ class TrainingContainer extends PureComponent {
     return this.props.rides.valueSeq().filter((ride) => {
       return (
         yourHorseIDs.indexOf(ride.get('horseID')) >= 0
-          || (ride.get('userID') === this.props.userID && ride.get('horseID') === null)
+          || (ride.get('userID') === this.props.userID && !ride.get('horseID'))
         ) && ride.get('deleted') !== true
     })
   }
@@ -82,10 +82,11 @@ class TrainingContainer extends PureComponent {
 
 
   render() {
-    logRender('SignupLoginContainer')
+    logRender('TrainingContainer')
     return (
       <Training
-        horses={this.yourHorses()}
+        horses={this.props.horses}
+        horseUsers={this.props.horseUsers}
         rides={this.allRidesOnYourHorses()}
         riders={this.allRidersButYou()}
         showRide={this.showRide}
@@ -97,15 +98,15 @@ class TrainingContainer extends PureComponent {
 }
 
 function mapStateToProps (state, passedProps) {
-  const mainState = state.get('main')
-  const localState = mainState.get('localState')
+  const pouchState = state.get('pouchRecords')
+  const localState = state.get('localState')
   const userID = localState.get('userID')
   return {
-    horses: mainState.get('horses'),
-    horseUsers: mainState.get('horseUsers'),
-    rides: mainState.get('rides'),
-    user: mainState.getIn(['users', userID]),
-    users: mainState.get('users'),
+    horses: pouchState.get('horses'),
+    horseUsers: pouchState.get('horseUsers'),
+    rides: pouchState.get('rides'),
+    user: pouchState.getIn(['users', userID]),
+    users: pouchState.get('users'),
     userID,
   }
 }

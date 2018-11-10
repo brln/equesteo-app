@@ -32,7 +32,7 @@ class PhotoLightboxContainer extends PureComponent {
     return (
       <PhotoLightbox
         close={this.props.close}
-        source={this.props.source}
+        sources={this.props.sources}
       />
     )
   }
@@ -41,7 +41,7 @@ class PhotoLightboxContainer extends PureComponent {
 function mapStateToProps (state, passedProps) {
   return {
     close: passedProps.close,
-    source: passedProps.source
+    sources: passedProps.sources
   }
 }
 

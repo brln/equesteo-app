@@ -23,6 +23,7 @@ export default class Feed extends PureComponent {
     return (
       <RideList
         horses={this.props.horses}
+        horsePhotos={this.props.horsePhotos}
         horseUsers={this.props.horseUsers}
         horseOwnerIDs={this.props.horseOwnerIDs}
         ownRideList={ownRideList}
@@ -30,6 +31,7 @@ export default class Feed extends PureComponent {
         rides={rides}
         rideCarrots={this.props.rideCarrots}
         rideComments={this.props.rideComments}
+        ridePhotos={this.props.ridePhotos}
         showComments={this.props.showComments}
         showHorseProfile={this.props.showHorseProfile}
         showProfile={this.props.showProfile}
@@ -38,6 +40,7 @@ export default class Feed extends PureComponent {
         toggleCarrot={this.props.toggleCarrot}
         userID={this.props.userID}
         users={this.props.users}
+        userPhotos={this.props.userPhotos}
       />
     )
   }

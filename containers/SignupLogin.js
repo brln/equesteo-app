@@ -60,6 +60,14 @@ class SignupLoginContainer extends PureComponent {
     this.newPassword = this.newPassword.bind(this)
   }
 
+  componentDidUpdate (nextProps) {
+    if (this.props.error) {
+      setTimeout(() => {
+        this.props.dispatch(dismissError())
+      }, 3000)
+    }
+  }
+
 
   static getDerivedStateFromProps (props, state) {
     let nextState = {...state}
@@ -202,10 +210,11 @@ const styles = StyleSheet.create({
 });
 
 function mapStateToProps (state) {
+  const localState = state.get('localState')
   return {
-    awaitingPWChange: state.getIn(['main', 'localState', 'awaitingPWChange']),
-    doingInitialLoad: state.getIn(['main', 'localState', 'doingInitialLoad']),
-    error: state.getIn(['main', 'localState', 'error']),
+    awaitingPWChange: localState.get('awaitingPWChange'),
+    doingInitialLoad: localState.get('doingInitialLoad'),
+    error: localState.get('error'),
   }
 }
 

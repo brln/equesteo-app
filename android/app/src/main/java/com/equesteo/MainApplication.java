@@ -1,7 +1,6 @@
 package com.equesteo;
 
 import android.app.Application;
-import com.airbnb.android.react.maps.MapsPackage;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.facebook.react.bridge.ReadableNativeArray;
 import com.facebook.react.bridge.ReadableNativeMap;
@@ -24,6 +23,8 @@ import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
 import io.invertase.firebase.instanceid.RNFirebaseInstanceIdPackage;
 import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
 import io.sentry.RNSentryPackage;
+import com.mapbox.rctmgl.RCTMGLPackage;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -66,7 +67,6 @@ public class MainApplication extends NavigationApplication {
         // Add additional packages you require here
         // No need to add RnnPackage and MainReactPackage
         return Arrays.<ReactPackage>asList(
-            new MapsPackage(),
             new PickerPackage(),
             new BackgroundGeolocationPackage(),
             new LocationServicesDialogBoxPackage(),
@@ -76,7 +76,8 @@ public class MainApplication extends NavigationApplication {
             new ReactNativePushNotificationPackage(),
             new RNFirebaseInstanceIdPackage(),
             new RNSentryPackage(MainApplication.this),
-            new SvgPackage()
+            new SvgPackage(),
+            new RCTMGLPackage()
         );
     }
 

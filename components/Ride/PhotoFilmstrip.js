@@ -18,9 +18,16 @@ export default class PhotoFilmstrip extends Component {
     this.showPhotoLightbox = this.showPhotoLightbox.bind(this)
   }
 
-  showPhotoLightbox (source) {
+  showPhotoLightbox (selectedID) {
+    const sources = this.props.photosByID.keySeq().reduce((accum, photoID) => {
+      if (photoID !== selectedID) {
+        accum.push({url: this.props.photosByID.getIn([photoID, 'uri'])})
+      }
+      return accum
+    }, [])
+    sources.unshift({url: this.props.photosByID.getIn([selectedID, 'uri'])})
     return () => {
-      this.props.showPhotoLightbox(source)
+      this.props.showPhotoLightbox(sources)
     }
   }
 
@@ -29,7 +36,7 @@ export default class PhotoFilmstrip extends Component {
       <TouchableOpacity
         key={photoID}
         style={styles.photoThumbnail}
-        onPress={this.showPhotoLightbox(source)}
+        onPress={this.showPhotoLightbox(photoID)}
       >
         <View style={{borderColor: darkGrey, borderWidth: 2, width: width / 3.5, height: width / 3.5}}>
           <URIImage

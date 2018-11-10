@@ -62,9 +62,8 @@ export default class RideCard extends PureComponent {
 
   horseProfileURL () {
     const profilePhotoID = this.props.horse.get('profilePhotoID')
-    if (this.props.horse && profilePhotoID &&
-      this.props.horse.getIn(['photosByID', profilePhotoID])) {
-      return this.props.horse.getIn(['photosByID', profilePhotoID, 'uri'])
+    if (this.props.horse && profilePhotoID && this.props.horsePhotos.get(profilePhotoID)) {
+      return this.props.horsePhotos.getIn([profilePhotoID, 'uri'])
     }
   }
 
@@ -144,7 +143,7 @@ export default class RideCard extends PureComponent {
             style={{flex: 1, alignItems: 'center'}}
             onPress={this.showHorseProfile}
           >
-            <Text style={{color: darkGrey, fontSize: 12}}>{this.props.horse.get('name')}</Text>
+            <Text style={{color: darkGrey, fontSize: 12, textAlign: 'center'}}>{this.props.horse.get('name')}</Text>
             { this.horseAvatar() }
           </TouchableOpacity>
         )
@@ -173,11 +172,10 @@ export default class RideCard extends PureComponent {
         />
       </TouchableOpacity>
     )
-    if (this.props.ride.get('photosByID').keySeq().count() > 0) {
+    if (this.props.ridePhotos.keySeq().count() > 0) {
       const images = []
       let coverImage = null
-      this.props.ride.get('photosByID').keySeq().reduce((accum, id) => {
-        const photo = this.props.ride.getIn(['photosByID', id])
+      this.props.ridePhotos.reduce((accum, photo) => {
         const thisImage = (
           <TouchableOpacity onPress={this.showRide} style={{flex: 1}} key="map">
             <URIImage
@@ -189,7 +187,7 @@ export default class RideCard extends PureComponent {
             />
           </TouchableOpacity>
         )
-        if (id !== this.props.ride.get('coverPhotoID')) {
+        if (photo.get('_id') !== this.props.ride.get('coverPhotoID')) {
           accum.push(thisImage)
         } else {
           coverImage = thisImage

@@ -1,13 +1,15 @@
-import React, { PureComponent } from 'react'
+import React from 'react'
 import { connect } from 'react-redux';
 import { Navigation } from 'react-native-navigation'
 
+import { createHorse } from '../actions'
 import Barn from '../components/Barn/Barn'
+import BackgroundComponent from '../components/BackgroundComponent'
 import { brand } from '../colors'
 import { logRender } from '../helpers'
 import { HORSE_PROFILE, UPDATE_HORSE } from '../screens'
 
-class BarnContainer extends PureComponent {
+class BarnContainer extends BackgroundComponent {
   static options() {
     return {
       topBar: {
@@ -51,12 +53,17 @@ class BarnContainer extends PureComponent {
   }
 
   newHorse () {
+    const horseID = `${this.props.userID.toString()}_${(new Date).getTime().toString()}`
+    const horseUserID = `${this.props.userID}_${horseID}`
+    this.props.dispatch(createHorse(horseID, horseUserID, this.props.userID))
     Navigation.push(this.props.componentId, {
       component: {
         name: UPDATE_HORSE,
         title: 'New Horse',
         passProps: {
-          newHorse: true
+          newHorse: true,
+          horseID,
+          horseUserID,
         }
       }
     })
@@ -64,7 +71,7 @@ class BarnContainer extends PureComponent {
 
   yourHorses () {
     return this.props.horseUsers.valueSeq().filter((hu) => {
-      return (hu.get('userID') === this.props.userID) && hu.get('deleted') !== true
+      return hu.get('userID') === this.props.userID && hu.get('deleted') !== true
     }).map((hu) => {
       return this.props.horses.get(hu.get('horseID'))
     })
@@ -83,6 +90,7 @@ class BarnContainer extends PureComponent {
     return (
       <Barn
         horses={this.yourHorses()}
+        horsePhotos={this.props.horsePhotos}
         horseProfile={this.horseProfile}
         horseOwnerIDs={this.horseOwnerIDs()}
         newHorse={this.newHorse}
@@ -92,13 +100,15 @@ class BarnContainer extends PureComponent {
 }
 
 function mapStateToProps (state) {
-  const mainState = state.get('main')
-  const localState = mainState.get('localState')
+  const pouchState = state.get('pouchRecords')
+  const localState = state.get('localState')
   return {
-    horseUsers: mainState.get('horseUsers'),
-    horses: mainState.get('horses'),
+    activeComponent: localState.get('activeComponent'),
+    horseUsers: pouchState.get('horseUsers'),
+    horses: pouchState.get('horses'),
+    horsePhotos: pouchState.get('horsePhotos'),
     userID: localState.get('userID'),
-    user: state.getIn(['users', localState.get('userID')])
+    user: pouchState.getIn(['users', localState.get('userID')])
   }
 }
 

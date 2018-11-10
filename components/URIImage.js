@@ -25,26 +25,28 @@ export default class URIIImage extends PureComponent {
   }
 
   typeImage () {
-    const sourceType = this.props.source.uri.split(':')[0]
-    let typeImage
-    if (this.props.showSource) {
-      if (sourceType === 'https') {
-        typeImage = (
-          <BuildImage
-            source={require('../img/cloud.png')}
-            style={{width: 20, height: 20}}
-          />
-        )
-      } else if (sourceType === 'file') {
-        typeImage = (
-          <BuildImage
-            source={require('../img/onDevice.png')}
-            style={{width: 20, height: 20}}
-          />
-        )
+    try {
+      const sourceType = this.props.source.uri.split(':')[0]
+      let typeImage
+      if (this.props.showSource) {
+        if (sourceType === 'https') {
+          typeImage = (
+            <BuildImage
+              source={require('../img/cloud.png')}
+              style={{width: 20, height: 20}}
+            />
+          )
+        } else if (sourceType === 'file') {
+          typeImage = (
+            <BuildImage
+              source={require('../img/onDevice.png')}
+              style={{width: 20, height: 20}}
+            />
+          )
+        }
       }
-    }
-    return typeImage
+      return typeImage
+    } catch (e) {}
   }
 
   mainImage () {

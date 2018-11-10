@@ -106,8 +106,11 @@ export default class Training extends PureComponent {
   }
 
   horsePicker () {
-    const items = this.props.horses.valueSeq().reduce((a, h) => {
-      a.push({ label: h.get('name'), value: h.get('_id') })
+    const items = this.props.horseUsers.valueSeq().reduce((a, h) => {
+      if (h.get('userID') === this.props.userID && h.get('deleted') !== true) {
+        const horse = this.props.horses.get(h.get('horseID'))
+        a.push({ label: horse.get('name'), value: horse.get('_id') })
+      }
       return a
     }, [])
     items.push({ label: "Rides With No Horse", value: 'NO HORSE' })
@@ -119,7 +122,7 @@ export default class Training extends PureComponent {
           onValueChange={this.pickHorse}
           style={{inputIOS: {fontSize: 20, fontWeight: 'bold', textAlign: 'center', paddingTop: 10}, underline: { borderTopWidth: 0 }}}
           placeholder={{
-            label: 'All Horses',
+            label: 'All Rides',
             value: this.TYPES.SHOW_ALL_HORSES,
           }}
         />

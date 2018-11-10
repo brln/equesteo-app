@@ -5,9 +5,9 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { Thumbnail } from 'native-base'
 
-import { orange } from '../colors'
+import URIImage from './URIImage'
+import { darkGrey, orange } from '../colors'
 
 const { width } = Dimensions.get('window')
 
@@ -31,12 +31,12 @@ export default class PhotosByTimestamp extends Component {
         style={styles.photoThumbnail}
         onPress={this.changeProfilePhoto(photoID)}
       >
-        <Thumbnail
-          style={style}
-          square
-          source={source}
-
-        />
+        <View style={style}>
+          <URIImage
+            source={source}
+            style={{width: '100%', height: '100%'}}
+          />
+        </View>
       </TouchableOpacity>
     )
   }
@@ -77,11 +77,13 @@ const styles = StyleSheet.create({
   thumbnail: {
     width: width / 4,
     height: width / 4,
+    borderColor: darkGrey,
+    borderWidth: 2
   },
   profilePhoto: {
     width: width / 4,
     height: width / 4,
-    borderWidth: 5,
+    borderWidth: 2,
     borderColor: orange
   }
 })

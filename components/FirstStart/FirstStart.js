@@ -45,33 +45,35 @@ export default class FirstStart extends PureComponent {
         return (
           <ProfilePhotoPage
             inputs={this.inputs}
-            changePersonalData={this.changePersonalData}
             nextPage={this.props.nextPage}
             uploadProfilePhoto={this.props.uploadProfilePhoto}
             user={this.props.user}
+            userPhotos={this.props.userPhotos}
           />
         )
       case this.props.pages.FIRST_HORSE.name:
         return (
           <FirstHorsePage
+            changeHorseName={this.props.changeHorseName}
+            changeHorseBreed={this.props.changeHorseBreed}
+            deleteHorse={this.props.deleteHorse}
             horse={this.props.horse}
             inputs={this.inputs}
-            changePersonalData={this.changePersonalData}
             newHorse={this.props.newHorse}
             nextPage={this.props.nextPage}
             pages={this.props.pages}
             setSkip={this.props.setSkip}
-            updateHorse={this.props.updateHorse}
           />
         )
       case this.props.pages.FIRST_HORSE_PHOTO.name:
         return (
           <FirstHorsePhoto
             addHorseProfilePhoto={this.props.addHorseProfilePhoto}
-            createHorse={this.props.createHorse}
             horse={this.props.horse}
+            horsePhotos={this.props.horsePhotos}
             inputs={this.inputs}
             nextPage={this.props.nextPage}
+            skipHorsePhoto={this.props.skipHorsePhoto}
           />
         )
       case this.props.pages.FINAL_PAGE.name:

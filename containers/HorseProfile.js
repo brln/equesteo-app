@@ -1,14 +1,25 @@
-import React, { PureComponent } from 'react'
+import React from 'react'
 import { connect } from 'react-redux';
 import { Navigation } from 'react-native-navigation'
 
-import { addHorseUser, deleteHorseUser, uploadHorsePhoto } from '../actions'
+import {
+  addHorseUser,
+  createHorsePhoto,
+  deleteHorseUser,
+  horseUpdated,
+  persistHorse,
+  persistHorseUser,
+  persistHorsePhoto,
+  uploadHorsePhoto
+} from '../actions'
+import BackgroundComponent from '../components/BackgroundComponent'
 import { brand } from '../colors'
+import { generateUUID, logRender, unixTimeNow } from '../helpers'
 import { PHOTO_LIGHTBOX, PROFILE, UPDATE_HORSE } from '../screens'
 import HorseProfile from '../components/HorseProfile/HorseProfile'
-import { logRender } from '../helpers'
 
-class HorseProfileContainer extends PureComponent {
+
+class HorseProfileContainer extends BackgroundComponent {
   static options() {
     return {
       topBar: {
@@ -22,14 +33,6 @@ class HorseProfileContainer extends PureComponent {
         title: {
           color: 'white',
         },
-        // @TODO: THIS SHOULD ONLY SHOW IF THE USER IS A RIDER OF THIS HORSE
-        rightButtons: [
-          {
-            id: 'archive',
-            text: 'Archive',
-            color: 'white'
-          },
-        ]
       },
       layout: {
         orientation: ['portrait']
@@ -46,10 +49,11 @@ class HorseProfileContainer extends PureComponent {
     this.closeDeleteModal = this.closeDeleteModal.bind(this)
     this.closeLightbox = this.closeLightbox.bind(this)
     this.deleteHorse = this.deleteHorse.bind(this)
-    this.horseOwner = this.horseOwner.bind(this)
+    this.horseUser = this.horseUser.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
     this.showPhotoLightbox = this.showPhotoLightbox.bind(this)
     this.showRiderProfile = this.showRiderProfile.bind(this)
+    this.thisHorsesPhotos = this.thisHorsesPhotos.bind(this)
     this.thisHorsesRides = this.thisHorsesRides.bind(this)
     this.thisHorsesRiders = this.thisHorsesRiders.bind(this)
     this.uploadPhoto = this.uploadPhoto.bind(this)
@@ -73,15 +77,25 @@ class HorseProfileContainer extends PureComponent {
           ]
         }
       })
+    } else if (this.thisHorsesRiders().indexOf(props.user) >= 0) {
+      Navigation.mergeOptions(props.componentId, {
+        topBar: {
+          rightButtons: [{
+            id: 'archive',
+            text: 'Archive',
+            color: 'white'
+          }]
+        }
+      })
     }
   }
 
-  showPhotoLightbox (source) {
+  showPhotoLightbox (sources) {
     Navigation.push(this.props.componentId, {
       component: {
         name: PHOTO_LIGHTBOX,
         passProps: {
-          source,
+          sources,
           close: this.closeLightbox
         }
       }
@@ -94,6 +108,15 @@ class HorseProfileContainer extends PureComponent {
 
   addRider () {
     this.props.dispatch(addHorseUser(this.props.horse, this.props.user))
+    Navigation.mergeOptions(this.props.componentId, {
+      topBar: {
+        rightButtons: [{
+          id: 'archive',
+          text: 'Archive',
+          color: 'white'
+        }]
+      }
+    })
   }
 
   closeDeleteModal () {
@@ -110,6 +133,7 @@ class HorseProfileContainer extends PureComponent {
           title: "Update Horse",
           passProps: {
             horseID: this.props.horse.get('_id'),
+            horseUserID: this.horseUser().get('_id'),
             newHorse: false
           },
         }
@@ -130,22 +154,46 @@ class HorseProfileContainer extends PureComponent {
     })
   }
 
+  horseUser() {
+    return this.props.horseUsers.valueSeq().filter(hu => {
+      return hu.get('horseID') === this.props.horse.get('_id') && hu.get('userID') === this.props.userID
+    }).get(0)
+  }
+
   deleteHorse () {
-    this.props.dispatch(deleteHorseUser(this.props.horse.get('_id'), this.props.user.get('_id')))
+    const horseUser = this.horseUser()
+    this.props.dispatch(deleteHorseUser(horseUser.get('_id')))
+    this.props.dispatch(persistHorseUser(horseUser.get('_id')))
     Navigation.pop(this.props.componentId)
   }
 
-  uploadPhoto (location) {
-    this.props.dispatch(uploadHorsePhoto(location, this.props.horse.get('_id')))
+  async uploadPhoto (location) {
+    let photoID = generateUUID()
+    this.props.dispatch(createHorsePhoto(
+      this.props.horse.get('_id'),
+      this.props.userID, {
+        _id: photoID,
+        timestamp: unixTimeNow(),
+        uri: location
+      }
+    ))
+    this.props.dispatch(horseUpdated(this.props.horse.set('profilePhotoID', photoID)))
+
+    await this.props.dispatch(persistHorse(this.props.horse.get('_id')))
+    this.props.dispatch(uploadHorsePhoto(photoID, location, this.props.horse.get('_id')))
+    this.props.dispatch(persistHorsePhoto(photoID))
+  }
+
+  thisHorsesPhotos () {
+    return this.props.horsePhotos.filter((photo) => {
+      return photo.get('deleted') !== true && photo.get('horseID') === this.props.horse.get('_id')
+    })
   }
 
   thisHorsesRides () {
-    return this.props.rides.valueSeq().reduce((accum, r) => {
-      if (r.get('horseID') === this.props.horse.get('_id')) {
-        accum.push(r)
-      }
-      return accum
-    }, [])
+    return this.props.rides.valueSeq().filter((r) => {
+      return r.get('horseID') === this.props.horse.get('_id')
+    }).toList()
   }
 
   thisHorsesRiders () {
@@ -154,19 +202,6 @@ class HorseProfileContainer extends PureComponent {
     }).map((hu) => {
       return this.props.users.get(hu.get('userID'))
     })
-  }
-
-  horseOwner () {
-    let user
-    this.props.horseUsers.valueSeq().forEach((horseUser) => {
-      if (horseUser.get('owner') === true && horseUser.get('horseID') === this.props.horse.get('_id')) {
-        user = this.props.users.get(horseUser.get('userID'))
-      }
-    })
-    if (!user) {
-      throw Error('Horse has no owner.')
-    }
-    return user
   }
 
   render() {
@@ -178,7 +213,8 @@ class HorseProfileContainer extends PureComponent {
         componentId={this.props.componentId}
         deleteHorse={this.deleteHorse}
         horse={this.props.horse}
-        horseOwner={this.horseOwner()}
+        horseOwner={this.props.owner}
+        horsePhotos={this.thisHorsesPhotos()}
         modalOpen={this.state.modalOpen}
         rides={this.thisHorsesRides()}
         riders={this.thisHorsesRiders()}
@@ -186,22 +222,27 @@ class HorseProfileContainer extends PureComponent {
         showPhotoLightbox={this.showPhotoLightbox}
         uploadPhoto={this.uploadPhoto}
         user={this.props.user}
+        userPhotos={this.props.userPhotos}
       />
     )
   }
 }
 
 function mapStateToProps (state, passedProps) {
-  const mainState = state.get('main')
-  const localState = mainState.get('localState')
+  const pouchState = state.get('pouchRecords')
+  const localState = state.get('localState')
   return {
-    horseUsers: mainState.get('horseUsers'),
-    horses: mainState.get('horses'),
-    horse: mainState.getIn(['horses', passedProps.horse.get('_id')]),
-    rides: mainState.get('rides'),
-    user: mainState.get('users').get(localState.get('userID')),
+    activeComponent: localState.get('activeComponent'),
+    horseUsers: pouchState.get('horseUsers'),
+    horses: pouchState.get('horses'),
+    horsePhotos: pouchState.get('horsePhotos'),
+    horse: pouchState.getIn(['horses', passedProps.horse.get('_id')]),
+    owner: pouchState.getIn(['users', passedProps.ownerID]),
+    rides: pouchState.get('rides'),
+    user: pouchState.getIn(['users', localState.get('userID')]),
     userID: localState.get('userID'),
-    users: mainState.get('users')
+    users: pouchState.get('users'),
+    userPhotos: pouchState.get('userPhotos'),
   }
 }
 

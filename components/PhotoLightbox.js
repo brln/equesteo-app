@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react'
 import ImageViewer from 'react-native-image-zoom-viewer'
 import {
   StyleSheet,
-  View
 } from 'react-native';
 
 export default class PhotoLightbox extends PureComponent {
@@ -17,7 +16,10 @@ export default class PhotoLightbox extends PureComponent {
 
   render() {
     return (
-      <ImageViewer renderIndicator={() => {}} imageUrls={[{url: this.props.source.uri}]}/>
+      <ImageViewer
+        renderIndicator={() => {}}
+        imageUrls={this.props.sources}
+      />
     )
   }
 }

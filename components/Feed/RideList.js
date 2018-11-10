@@ -6,7 +6,7 @@ import {
 
 
 import { getMonday, logInfo } from '../../helpers'
-import HorseCard from './HorseCard'
+import HorseCard from './HorseCard/HorseCard'
 import RideCard from './RideCard'
 import SectionHeader from './SectionHeader'
 
@@ -38,7 +38,7 @@ export default class RideList extends PureComponent {
     const profilePhotoID = user.get('profilePhotoID')
     let profilePhotoURL = null
     if (profilePhotoID) {
-      profilePhotoURL = user.getIn(['photosByID', profilePhotoID, 'uri'])
+      profilePhotoURL = this.props.userPhotos.getIn([profilePhotoID, 'uri'])
     }
     return profilePhotoURL
   }
@@ -51,7 +51,7 @@ export default class RideList extends PureComponent {
     if (item.type === 'ride') {
       const childFilter = (item) => {
         return (r) => {
-          return r.get('rideID') === item.get('_id') && r.get('deleted') === false
+          return r.get('rideID') === item.get('_id') && r.get('deleted') !== true
         }
       }
       const horse = this.getHorse(item.childData)
@@ -59,11 +59,13 @@ export default class RideList extends PureComponent {
       return (
         <RideCard
           horse={horse}
+          horsePhotos={this.props.horsePhotos}
           ownRideList={this.props.ownRideList}
           ownerID={ownerID}
           ride={item.childData}
           rideCarrots={this.props.rideCarrots.filter(childFilter(item.childData))}
           rideComments={this.props.rideComments.filter(childFilter(item.childData))}
+          ridePhotos={this.props.ridePhotos.filter(childFilter(item.childData))}
           showComments={this.props.showComments}
           showHorseProfile={this.props.showHorseProfile}
           showProfile={this.props.showProfile}
@@ -79,6 +81,7 @@ export default class RideList extends PureComponent {
       return (
         <HorseCard
           horse={item.childData}
+          horsePhotos={this.props.horsePhotos.filter(hp => hp.get('horseID') === item.childData.get('_id'))}
           ownerID={this.props.horseOwnerIDs.get(item.childData.get('_id'))}
           rider={item.itemUser}
           showHorseProfile={this.props.showHorseProfile}
@@ -99,7 +102,7 @@ export default class RideList extends PureComponent {
       if (!horse) {
         throw Error("Should have a horse here.")
       }
-      if (horse.get('deleted') !== true
+      if (horseUser.get('deleted') !== true
         && (
           !this.props.ownRideList ||
           (this.props.ownRideList && horseUser.get('userID') === this.props.userID)

@@ -38,7 +38,7 @@ export default class HorseSelector extends PureComponent {
     if (horse.get('profilePhotoID')) {
       horseThumb = (
         <URIImage
-          source={{uri: horse.getIn(['photosByID', horse.get('profilePhotoID'), 'uri'])}}
+          source={{uri: this.props.horsePhotos.getIn([horse.get('profilePhotoID'), 'uri'])}}
           style={styles.thumbnail}
           onError={(e) => { logError('there was an error loading HorseSelector avatar') }}
         />

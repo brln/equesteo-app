@@ -51,6 +51,7 @@ class FollowListContainer extends PureComponent {
       <FollowList
         showProfile={this.showProfile}
         users={this.props.users}
+        userPhotos={this.props.userPhotos}
       />
     )
   }
@@ -58,9 +59,10 @@ class FollowListContainer extends PureComponent {
 
 function mapStateToProps (state, passedProps) {
   const userIDs = passedProps.userIDs
-  const mainState = state.get('main')
+  const pouchState = state.get('pouchRecords')
   return {
-    users: List(userIDs.map(userID => mainState.getIn(['users', userID])))
+    users: List(userIDs.map(userID => pouchState.getIn(['users', userID]))),
+    userPhotos: pouchState.get('userPhotos'),
   }
 }
 

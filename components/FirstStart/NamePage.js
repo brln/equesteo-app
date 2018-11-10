@@ -68,6 +68,7 @@ export default class NamePage extends PureComponent {
                 backgroundColor: 'transparent',
                 height: 50,
               }}
+              maxLength={200}
             />
 
             <Text style={{fontSize: 12}}>Last</Text>
@@ -84,6 +85,7 @@ export default class NamePage extends PureComponent {
                 backgroundColor: 'transparent',
                 height: 50,
               }}
+              maxLength={200}
             />
           </View>
           <View style={{paddingTop: 20}}>

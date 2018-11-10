@@ -13,22 +13,13 @@ export default class Barn extends PureComponent {
     return (
       <View style={{flex: 1}}>
         <ScrollView>
-          <View style={{
-            flex: 1,
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            alignItems: 'flex-start',
-            justifyContent: 'space-between',
-            marginTop: 30,
-            marginBottom: 30,
-            marginLeft: 10,
-            marginRight: 10,
-          }}>
+          <View style={styles.main}>
             {
               this.props.horses.map((horse) => {
                 return <HorseBarnCard
                   key={horse.get('_id')}
                   horse={horse}
+                  horsePhotos={this.props.horsePhotos}
                   horseProfile={this.props.horseProfile}
                   ownerID={this.props.horseOwnerIDs.get(horse.get('_id'))}
                 />
@@ -47,6 +38,17 @@ export default class Barn extends PureComponent {
 }
 
 const styles = StyleSheet.create({
+  main: {
+    flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    marginTop: 30,
+    marginBottom: 30,
+    marginLeft: 10,
+    marginRight: 10,
+  },
   container: {
     flex: 1,
     justifyContent: 'flex-start',

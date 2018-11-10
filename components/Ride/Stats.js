@@ -11,7 +11,6 @@ import {
   CardItem,
 } from 'native-base'
 
-import { HORSE_PROFILE } from '../../screens'
 import Stat from '../Stat'
 
 export default class Stats extends PureComponent {
@@ -31,8 +30,8 @@ export default class Stats extends PureComponent {
     if (horse) {
       const profilePhotoID = horse.get('profilePhotoID')
       if (horse && profilePhotoID &&
-        horse.getIn(['photosByID', profilePhotoID])) {
-        return horse.getIn(['photosByID', profilePhotoID, 'uri'])
+        this.props.horsePhotos.get(profilePhotoID)) {
+        return this.props.horsePhotos.getIn([profilePhotoID, 'uri'])
       }
     }
   }

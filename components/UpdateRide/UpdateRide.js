@@ -20,50 +20,24 @@ import HorseSelector from './HorseSelector'
 import PhotosByTimestamp from '../PhotosByTimestamp'
 import PhotoMenu from '../UpdateHorse/PhotoMenu'
 
-export default class RideDetails extends PureComponent {
+export default class UpdateRide extends PureComponent {
   constructor (props) {
     super(props)
-    this.uploadPhoto = this.uploadPhoto.bind(this)
     this.changeCoverPhoto = this.changeCoverPhoto.bind(this)
     this.changeRideName = this.changeRideName.bind(this)
     this.changeRideNotes = this.changeRideNotes.bind(this)
-    this.clearPhotoMenu = this.clearPhotoMenu.bind(this)
+    this.createPhoto = this.createPhoto.bind(this)
     this.deletePhoto = this.deletePhoto.bind(this)
-    this.openPhotoMenu = this.openPhotoMenu.bind(this)
-    this.state = {
-      showPhotoMenu: false,
-      selectedPhotoID: null
-    }
   }
 
   deletePhoto () {
-    this.props.deletePhoto(this.state.selectedPhotoID)
-    this.setState({
-      showPhotoMenu: false,
-      selectedPhotoID: null
-    })
-  }
-
-  openPhotoMenu (coverPhotoID) {
-    this.setState({
-      showPhotoMenu: true,
-      selectedPhotoID: coverPhotoID
-    })
-  }
-
-  clearPhotoMenu () {
-    this.setState({
-      showPhotoMenu: false,
-      selectedPhotoID: null
-    })
+    this.props.markPhotoDeleted(this.props.selectedPhotoID)
+    this.props.clearPhotoMenu()
   }
 
   changeCoverPhoto () {
-    this.props.changeCoverPhoto(this.state.selectedPhotoID)
-    this.setState({
-      showPhotoMenu: false,
-      selectedPhotoID: null
-    })
+    this.props.changeCoverPhoto(this.props.selectedPhotoID)
+    this.props.clearPhotoMenu()
   }
 
   changeRideName (name) {
@@ -74,25 +48,25 @@ export default class RideDetails extends PureComponent {
     this.props.changeRideNotes(notes)
   }
 
-  uploadPhoto() {
+  createPhoto() {
     ImagePicker.openPicker({
       width: 1080,
       height: 1080,
       cropping: true
     }).then(image => {
-      this.props.uploadPhoto(image.path)
+      this.props.createPhoto(image.path)
     }).catch((e) => {})
   }
 
   render() {
     let photoMenu = null
-    if (this.state.showPhotoMenu) {
+    if (this.props.showPhotoMenu) {
       photoMenu = (
         <PhotoMenu
           changeProfilePhotoID={this.changeCoverPhoto}
           deletePhoto={this.deletePhoto}
-          clearPhotoMenu={this.clearPhotoMenu}
-          selectedPhotoID={this.state.selectedPhotoID}
+          clearPhotoMenu={this.props.clearPhotoMenu}
+          selectedPhotoID={this.props.selectedPhotoID}
         />
       )
     }
@@ -109,9 +83,9 @@ export default class RideDetails extends PureComponent {
 
               <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20}}>
                 <PhotosByTimestamp
-                  photosByID={this.props.ride.get('photosByID')}
+                  photosByID={this.props.ridePhotos}
                   profilePhotoID={this.props.ride.get('coverPhotoID')}
-                  changeProfilePhoto={this.openPhotoMenu}
+                  changeProfilePhoto={this.props.openPhotoMenu}
                 />
               </CardItem>
 
@@ -120,7 +94,7 @@ export default class RideDetails extends PureComponent {
                   direction="up"
                   style={{ backgroundColor: brand }}
                   position="bottomRight"
-                  onPress={this.uploadPhoto}>
+                  onPress={this.createPhoto}>
                   <FabImage source={require('../../img/addphoto.png')} height={30} width={30} />
                 </Fab>
               </View>
@@ -139,6 +113,7 @@ export default class RideDetails extends PureComponent {
                   value={this.props.ride.get('name')}
                   onChangeText={this.changeRideName}
                   underlineColorAndroid={'transparent'}
+                  maxLength={500}
                 />
               </CardItem>
             </Card>
@@ -154,6 +129,7 @@ export default class RideDetails extends PureComponent {
                   changeHorseID={this.props.changeHorseID}
                   horseID={this.props.ride.get('horseID')}
                   horses={this.props.horses}
+                  horsePhotos={this.props.horsePhotos}
                 />
               </View>
             </Card>
@@ -177,6 +153,7 @@ export default class RideDetails extends PureComponent {
                   multiline={true}
                   numberOfLines={3}
                   underlineColorAndroid="transparent"
+                  maxLength={5000}
                 />
               </CardItem>
             </Card>

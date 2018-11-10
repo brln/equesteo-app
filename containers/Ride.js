@@ -1,9 +1,10 @@
+import memoizeOne from 'memoize-one';
 import { Navigation } from 'react-native-navigation'
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
 
 import Ride from '../components/Ride/Ride'
-import { updateRide } from '../actions'
+import { clearSelectedRideCoordinates, loadRideCoordinates, persistRide, rideUpdated } from '../actions'
 import { brand } from '../colors'
 import { logRender } from '../helpers'
 import {
@@ -11,7 +12,7 @@ import {
   MAP,
   PHOTO_LIGHTBOX,
   PROFILE,
-  RIDE_DETAILS
+  UPDATE_RIDE
 } from '../screens'
 
 class RideContainer extends PureComponent {
@@ -22,13 +23,17 @@ class RideContainer extends PureComponent {
           color: brand,
         },
         elevation: 0,
-        backButton: {
-          color: 'white'
-        },
         title: {
           color: 'white',
           fontSize: 20
         },
+        leftButtons: [
+          {
+            id: 'back',
+            icon: require('../img/back-arrow.png'),
+            color: 'white'
+          }
+        ],
         rightButtons: [
           {
             id: 'edit',
@@ -52,7 +57,7 @@ class RideContainer extends PureComponent {
     if (buttonId === 'edit') {
       Navigation.push(this.props.componentId, {
         component: {
-          name: RIDE_DETAILS,
+          name: UPDATE_RIDE,
           passProps: {
             rideID: this.props.ride.get('_id')
           },
@@ -60,6 +65,10 @@ class RideContainer extends PureComponent {
       })
     } else if (buttonId === 'delete') {
       this.setState({modalOpen: true})
+    } else if (buttonId === 'back') {
+      Navigation.pop(this.props.componentId).then(() => {
+        this.props.dispatch(clearSelectedRideCoordinates())
+      })
     }
   }
 
@@ -77,6 +86,7 @@ class RideContainer extends PureComponent {
     this.showHorseProfile = this.showHorseProfile.bind(this)
     this.showPhotoLightbox = this.showPhotoLightbox.bind(this)
     this.showProfile = this.showProfile.bind(this)
+    this.thisRidesPhotos = this.thisRidesPhotos.bind(this)
 
     Navigation.events().bindComponent(this);
 
@@ -87,6 +97,8 @@ class RideContainer extends PureComponent {
         }
       })
     }
+
+    this.memoThisRidesPhotos = memoizeOne(this.thisRidesPhotos)
   }
 
   showProfile (user) {
@@ -106,8 +118,13 @@ class RideContainer extends PureComponent {
     })
   }
 
+  componentDidMount () {
+    this.props.dispatch(loadRideCoordinates(this.props.ride.get('_id')))
+  }
+
   deleteRide () {
-    this.props.dispatch(updateRide(this.props.ride.set('deleted', true)))
+    this.props.dispatch(rideUpdated(this.props.ride.set('deleted', true)))
+    this.props.dispatch(persistRide(this.props.ride.get('_id')))
     Navigation.pop(this.props.componentId)
   }
 
@@ -115,12 +132,12 @@ class RideContainer extends PureComponent {
     return this.props.horses.toList()
   }
 
-  showPhotoLightbox (source) {
+  showPhotoLightbox (sources) {
     Navigation.push(this.props.componentId, {
       component: {
         name: PHOTO_LIGHTBOX,
         passProps: {
-          source
+          sources
         }
       },
     })
@@ -155,6 +172,12 @@ class RideContainer extends PureComponent {
     return rideHorseOwnerID
   }
 
+  thisRidesPhotos (ridePhotos) {
+    return ridePhotos.filter((rp) => {
+      return rp.get('rideID') === this.props.ride.get('_id') && rp.get('deleted') !== true
+    })
+  }
+
   render() {
     logRender('RideContainer')
     return (
@@ -162,11 +185,14 @@ class RideContainer extends PureComponent {
         closeDeleteModal={this.closeDeleteModal}
         deleteRide={this.deleteRide}
         horses={this.horses()}
+        horsePhotos={this.props.horsePhotos}
         modalOpen={this.state.modalOpen}
         ride={this.props.ride}
         rideHorseOwnerID={this.rideHorseOwnerID()}
         rideUser={this.props.rideUser}
+        rideCoordinates={this.props.rideCoordinates}
         rideElevations={this.props.rideElevations}
+        ridePhotos={this.memoThisRidesPhotos(this.props.ridePhotos)}
         showFullscreenMap={this.showFullscreenMap}
         showHorseProfile={this.showHorseProfile}
         showPhotoLightbox={this.showPhotoLightbox}
@@ -178,17 +204,21 @@ class RideContainer extends PureComponent {
 }
 
 function mapStateToProps (state, passedProps) {
-  const mainState = state.get('main')
-  const localState = mainState.get('localState')
-  const ride = mainState.getIn(['rides', passedProps.rideID])
-  const rideElevations = mainState.getIn(['rideElevations', passedProps.rideID + '_elevations'])
+  const pouchState = state.get('pouchRecords')
+  const localState = state.get('localState')
+  const ride = pouchState.getIn(['rides', passedProps.rideID])
+  const rideCoordinates = pouchState.getIn(['selectedRideCoordinates'])
+  const rideElevations = pouchState.getIn(['rideElevations', passedProps.rideID + '_elevations'])
   const userID = localState.get('userID')
   return {
-    horses: mainState.get('horses'),
-    horseUsers: mainState.get('horseUsers'),
+    horses: pouchState.get('horses'),
+    horsePhotos: pouchState.get('horsePhotos'),
+    horseUsers: pouchState.get('horseUsers'),
     ride,
+    rideCoordinates,
     rideElevations,
-    rideUser: mainState.getIn(['users', ride.get('userID')]),
+    ridePhotos: pouchState.get('ridePhotos'),
+    rideUser: pouchState.getIn(['users', ride.get('userID')]),
     userID
   }
 }

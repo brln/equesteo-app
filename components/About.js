@@ -50,7 +50,7 @@ export default class About extends PureComponent {
           flexDirection: 'column',
         }}>
           <BuildImage
-            require={'../img/logo250.png'}
+            source={require('../img/logo250.png')}
             style={{
               width: 120,
               height: 120,

@@ -4,16 +4,20 @@ import { connect } from 'react-redux'
 import LocationServicesDialogBox from "react-native-android-location-services-dialog-box";
 
 import {
-  discardRide,
+  createRide,
+  discardCurrentRide,
+  pauseLocationTracking,
   startRide,
   startLocationTracking,
+  stashNewLocations,
   stopLocationTracking,
+  stopStashNewLocations,
   unpauseLocationTracking,
 } from '../actions'
 import { brand } from '../colors'
 import RideRecorder from '../components/RideRecorder/RideRecorder'
 import { isAndroid, logRender, unixTimeNow } from '../helpers'
-import { RIDE_DETAILS } from "../screens"
+import { UPDATE_RIDE, UPDATE_NEW_RIDE_ID } from "../screens"
 
 class RecorderContainer extends PureComponent {
   static options() {
@@ -41,13 +45,17 @@ class RecorderContainer extends PureComponent {
     super(props)
     this.state = {
       showGPSBar: !props.currentRide,
+      discardModalOpen: false,
     }
 
     this.backToFeed = this.backToFeed.bind(this)
+    this.closeDiscardModal = this.closeDiscardModal.bind(this)
     this.discardRide = this.discardRide.bind(this)
     this.finishRide = this.finishRide.bind(this)
-    this.showRideDetails = this.showRideDetails.bind(this)
+    this.pauseLocationTracking = this.pauseLocationTracking.bind(this)
+    this.showUpdateRide = this.showUpdateRide.bind(this)
     this.startRide = this.startRide.bind(this)
+    this.unpauseLocationTracking = this.unpauseLocationTracking.bind(this)
 
     Navigation.events().bindComponent(this);
 
@@ -111,6 +119,12 @@ class RecorderContainer extends PureComponent {
     }
   }
 
+  closeDiscardModal () {
+    this.setState({
+      discardModalOpen: false
+    })
+  }
+
   backToFeed () {
     Navigation.popToRoot(this.props.componentId)
   }
@@ -127,33 +141,51 @@ class RecorderContainer extends PureComponent {
         ]
       }
     })
-    this.props.dispatch(unpauseLocationTracking())
+    this.props.dispatch(stopStashNewLocations())
     this.props.dispatch(startRide(this.props.lastLocation, this.props.lastElevation, unixTimeNow()))
   }
 
   finishRide () {
-    if (this.props.currentRide.get('rideCoordinates').count() > 0) {
-      this.showRideDetails()
+    if (this.props.currentRideCoordinates.get('rideCoordinates').count() > 0) {
+      this.props.dispatch(stashNewLocations())
+      this.showUpdateRide()
     } else {
-      alert('Discarding empty ride.')
-      this.discardRide()
+      this.setState({
+        discardModalOpen: true
+      })
     }
   }
 
   discardRide () {
-    this.props.dispatch(discardRide())
+    this.props.dispatch(discardCurrentRide())
     this.props.dispatch(stopLocationTracking())
     Navigation.popToRoot(this.props.componentId)
   }
 
-  showRideDetails () {
-    const elapsedTime = (unixTimeNow() - this.props.currentRide.get('startTime')) / 1000
+  showUpdateRide () {
+    const rideID = `${this.props.userID.toString()}_${(new Date).getTime().toString()}`
+    this.props.dispatch(createRide(
+      rideID,
+      this.props.userID,
+      this.props.currentRide,
+      this.props.currentRideElevations,
+      this.props.currentRideCoordinates,
+    ))
     Navigation.push(this.props.componentId, {
       component: {
-        name: RIDE_DETAILS,
-        passProps: { elapsedTime }
+        name: UPDATE_RIDE,
+        id: UPDATE_NEW_RIDE_ID,
+        passProps: { rideID, newRide: true }
       }
     });
+  }
+
+  pauseLocationTracking () {
+    this.props.dispatch(pauseLocationTracking())
+  }
+
+  unpauseLocationTracking () {
+    this.props.dispatch(unpauseLocationTracking())
   }
 
   render() {
@@ -161,32 +193,40 @@ class RecorderContainer extends PureComponent {
     return (
       <RideRecorder
         appState={this.props.appState}
+        closeDiscardModal={this.closeDiscardModal}
         currentRide={this.props.currentRide}
+        currentRideCoordinates={this.props.currentRideCoordinates}
         currentRideElevations={this.props.currentRideElevations}
         discardRide={this.discardRide}
+        discardModalOpen={this.state.discardModalOpen}
         lastElevation={this.props.lastElevation}
         lastLocation={this.props.lastLocation}
-        moving={this.props.moving}
         refiningLocation={this.props.refiningLocation}
+        pauseLocationTracking={this.pauseLocationTracking}
         showGPSBar={this.state.showGPSBar}
-        showRideDetails={this.showRideDetails}
+        showUpdateRide={this.showUpdateRide}
         startRide={this.startRide}
+        unpauseLocationTracking={this.unpauseLocationTracking}
       />
     )
   }
 }
 
 function mapStateToProps (state) {
-  const mainState = state.get('main')
-  const localState = mainState.get('localState')
+  const pouchState = state.get('pouchRecords')
+  const localState = state.get('localState')
+  const currentRideState = state.get('currentRide')
+  const userID = localState.get('userID')
   return {
     appState: localState.get('appState'),
-    currentRide: localState.get('currentRide'),
-    currentRideElevations: localState.get('currentRideElevations'),
-    lastElevation: localState.get('lastElevation'),
-    lastLocation: localState.get('lastLocation'),
-    refiningLocation: localState.get('refiningLocation'),
-    moving: localState.get('moving')
+    currentRide: currentRideState.get('currentRide'),
+    currentRideElevations: currentRideState.get('currentRideElevations'),
+    currentRideCoordinates: currentRideState.get('currentRideCoordinates'),
+    lastElevation: currentRideState.get('lastElevation'),
+    lastLocation: currentRideState.get('lastLocation'),
+    refiningLocation: currentRideState.get('refiningLocation'),
+    user: pouchState.getIn(['users', userID]),
+    userID,
   }
 }
 

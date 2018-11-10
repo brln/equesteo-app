@@ -18,3 +18,6 @@ svgexport ~/Downloads/noun_Hamburger_564924.svg hamburger@3x.png 120:120
 
 # generate splashscreen images
 yo rn-toolbox:assets --splash splashscreen.svg --android
+
+# install an apk
+adb install android/app/build/outputs/apk/release/app-release.apk

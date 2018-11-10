@@ -1,11 +1,14 @@
 import ImagePicker from 'react-native-image-crop-picker'
-import { Sentry } from 'react-native-sentry'
+import { captureException } from '../services/Sentry'
 
 import {
-  changeHorsePhotoData,
-  changeRidePhotoData,
-  changeUserPhotoData,
   dequeuePhoto,
+  horsePhotoUpdated,
+  persistHorsePhoto,
+  persistRidePhoto,
+  persistUserPhoto,
+  ridePhotoUpdated,
+  userPhotoUpdated,
 } from '../actions'
 import {
   generateUUID,
@@ -23,7 +26,7 @@ let currentlySaving = null
 
 export default uploadPhotos = store => dispatch => action => {
   dispatch(action)
-  const localState = store.getState().getIn(['main', 'localState'])
+  const localState = store.getState().get('localState')
   const needsPhotoUploads = localState.get('photoQueue').count() > 0
   const jwt = localState.get('jwt')
   const goodConnection = localState.get('goodConnection')
@@ -54,15 +57,21 @@ function remotePersist (item, store, userAPI) {
     switch (item.get('type')) {
       case 'horse':
         const uploadedHorseURI = horsePhotoURL(photoID)
-        store.dispatch(changeHorsePhotoData(item.get('horseID'), photoID, uploadedHorseURI))
+        const horsePhoto = store.getState().getIn(['pouchRecords', 'horsePhotos', photoID]).set('uri', uploadedHorseURI)
+        store.dispatch(horsePhotoUpdated(horsePhoto))
+        store.dispatch(persistHorsePhoto(horsePhoto.get('_id')))
         break
       case 'ride':
         const uploadedRideURI = ridePhotoURL(photoID)
-        store.dispatch(changeRidePhotoData(item.get('rideID'), photoID, uploadedRideURI))
+        const ridePhoto = store.getState().getIn(['pouchRecords', 'ridePhotos', photoID]).set('uri', uploadedRideURI)
+        store.dispatch(ridePhotoUpdated(ridePhoto))
+        store.dispatch(persistRidePhoto(ridePhoto.get('_id')))
         break
-      case 'profile':
-        const uploadedProfilePhotoURI = profilePhotoURL(photoID)
-        store.dispatch(changeUserPhotoData(photoID, uploadedProfilePhotoURI))
+      case 'user':
+        const uploadedUserPhotoURI = profilePhotoURL(photoID)
+        const userPhoto = store.getState().getIn(['pouchRecords', 'userPhotos', photoID]).set('uri', uploadedUserPhotoURI)
+        store.dispatch(userPhotoUpdated(userPhoto))
+        store.dispatch(persistUserPhoto(userPhoto.get('_id')))
         break
       default:
         throw Error('cant persist type I don\'t know about')
@@ -77,9 +86,7 @@ function remotePersist (item, store, userAPI) {
       currentlySaving = null
     }
   }).catch((e) => {
-    try {
-      Sentry.captureException(new Error(e))
-    } catch (e) { logError(e) }
+    captureException(e)
     workingQueue = []
     queueID = generateUUID()
     currentlySaving = null

@@ -10,13 +10,13 @@ import {
 } from 'react-native';
 import {
   Card,
+  CheckBox,
   CardItem,
-  Fab,
 } from 'native-base';
 import RNPickerSelect from 'react-native-picker-select';
 
 import { brand, darkBrand } from '../../colors'
-import FabImage from '../FabImage'
+import PhotoFab from './PhotoFab'
 import PhotosByTimestamp from '../PhotosByTimestamp'
 import PhotoMenu from './PhotoMenu'
 
@@ -24,23 +24,18 @@ import PhotoMenu from './PhotoMenu'
 export default class UpdateHorse extends PureComponent {
   constructor (props) {
     super(props)
-    this.state = {
-      showPhotoMenu: false,
-      selectedPhotoID: null
-    }
     this.changeHorseBirthDay = this.changeHorseBirthDay.bind(this)
     this.changeHorseBirthMonth = this.changeHorseBirthMonth.bind(this)
     this.changeHorseBirthYear = this.changeHorseBirthYear.bind(this)
     this.changeHorseBreed = this.changeHorseBreed.bind(this)
     this.changeHorseDescription = this.changeHorseDescription.bind(this)
+    this.changeHorseDetails = this.changeHorseDetails.bind(this)
     this.changeHorseHeightInches = this.changeHorseHeightInches.bind(this)
     this.changeHorseHeightHands = this.changeHorseHeightHands.bind(this)
     this.changeHorseName = this.changeHorseName.bind(this)
     this.changeHorseSex = this.changeHorseSex.bind(this)
     this.changeProfilePhotoID = this.changeProfilePhotoID.bind(this)
-    this.clearPhotoMenu = this.clearPhotoMenu.bind(this)
     this.deletePhoto = this.deletePhoto.bind(this)
-    this.openPhotoMenu = this.openPhotoMenu.bind(this)
     this.pickPhoto = this.pickPhoto.bind(this)
     this.renderHandsPicker = this.renderHandsPicker.bind(this)
   }
@@ -51,89 +46,76 @@ export default class UpdateHorse extends PureComponent {
       height: 1080,
       cropping: true
     }).then(image => {
-      this.props.uploadPhoto(image.path)
+      this.props.stashPhoto(image.path)
     }).catch(() => {})
   }
 
-  openPhotoMenu (profilePhotoID) {
-    this.setState({
-      showPhotoMenu: true,
-      selectedPhotoID: profilePhotoID
-    })
+  changeHorseDetails (newDetails) {
+    this.props.horseUpdated(this.props.horse.merge(newDetails))
   }
 
   changeProfilePhotoID () {
-    this.props.changeHorseDetails({
-      profilePhotoID: this.state.selectedPhotoID
+    this.changeHorseDetails({
+      profilePhotoID: this.props.selectedPhotoID
     })
     this.setState({
       showPhotoMenu: false,
       selectedPhotoID: null
     })
+    this.props.clearPhotoMenu()
   }
 
   deletePhoto () {
-    const newPhotos = this.props.horse.get('photosByID').delete(this.state.selectedPhotoID)
-    let newDeets = Map({
-      photosByID: newPhotos
-    })
-    if (this.state.selectedPhotoID === this.props.horse.get('profilePhotoID')) {
-      newDeets = newDeets.set('profilePhotoID', null)
-    }
-    this.props.changeHorseDetails(newDeets)
+    this.props.markPhotoDeleted(this.props.selectedPhotoID)
     this.setState({
       showPhotoMenu: false,
       selectedPhotoID: null
     })
+    this.props.clearPhotoMenu()
   }
 
-  clearPhotoMenu () {
-    this.setState({
-      showPhotoMenu: false,
-      selectedPhotoID: null
-    })
-  }
+
 
   changeHorseBirthDay (birthDay) {
-    this.props.changeHorseDetails({ birthDay })
+    this.changeHorseDetails({ birthDay })
   }
 
   changeHorseSex (sex) {
-    this.props.changeHorseDetails({ sex })
+    this.changeHorseDetails({ sex })
   }
 
   changeHorseBirthMonth (birthMonth) {
-    this.props.changeHorseDetails({ birthMonth })
+    this.changeHorseDetails({ birthMonth })
   }
 
   changeHorseBirthYear (birthYear) {
-    this.props.changeHorseDetails({ birthYear })
+    this.changeHorseDetails({ birthYear })
   }
 
   changeHorseDescription (newDesc) {
-    this.props.changeHorseDetails({
+    this.changeHorseDetails({
       description: newDesc
     })
   }
 
   changeHorseName (newName) {
-    this.props.changeHorseDetails({
+    this.changeHorseDetails({
       name: newName
     })
   }
 
   changeHorseBreed (breed) {
-    this.props.changeHorseDetails({ breed })
+    this.changeHorseDetails({ breed })
   }
 
   changeHorseHeightHands (newHands) {
-    this.props.changeHorseDetails({
+    this.changeHorseDetails({
       heightHands: newHands
     })
   }
 
   changeHorseHeightInches (newInches) {
-    this.props.changeHorseDetails({
+    this.changeHorseDetails({
       heightInches: newInches
     })
   }
@@ -161,7 +143,7 @@ export default class UpdateHorse extends PureComponent {
           onValueChange={onValueChange}
           style={{inputIOS: {fontSize: 25, fontWeight: 'bold', textAlign: 'center', paddingTop: 10}}}
           placeholder={{
-            label: 'Month',
+            label: 'MM',
             value: null,
           }}
         />
@@ -175,14 +157,14 @@ export default class UpdateHorse extends PureComponent {
       allDays.push({ label: i.toString(), value: i.toString() })
     }
     return (
-      <View style={{flex: 2, height: 50, borderColor: darkBrand, borderWidth: 1, marginRight: 10}}>
+      <View style={{flex: 2.5, height: 50, borderColor: darkBrand, borderWidth: 1, marginRight: 10}}>
         <RNPickerSelect
           value={this.props.horse.get('birthDay')}
           items={allDays}
           style={{inputIOS: {fontSize: 25, fontWeight: 'bold', textAlign: 'center', paddingTop: 10}}}
           onValueChange={onValueChange}
           placeholder={{
-            label: 'Day',
+            label: 'DD',
             value: null,
           }}
         />
@@ -204,7 +186,7 @@ export default class UpdateHorse extends PureComponent {
           style={{inputIOS: {fontSize: 25, fontWeight: 'bold', textAlign: 'center', paddingTop: 10}}}
           onValueChange={onValueChange}
           placeholder={{
-            label: 'Year',
+            label: 'YYYY',
             value: null,
           }}
         />
@@ -284,13 +266,13 @@ export default class UpdateHorse extends PureComponent {
 
   render() {
     let photoMenu = null
-    if (this.state.showPhotoMenu) {
+    if (this.props.showPhotoMenu) {
       photoMenu = (
         <PhotoMenu
           changeProfilePhotoID={this.changeProfilePhotoID}
+          clearPhotoMenu={this.props.clearPhotoMenu}
           deletePhoto={this.deletePhoto}
-          clearPhotoMenu={this.clearPhotoMenu}
-          selectedPhotoID={this.state.selectedPhotoID}
+          selectedPhotoID={this.props.selectedPhotoID}
         />
       )
     }
@@ -305,21 +287,12 @@ export default class UpdateHorse extends PureComponent {
                 </CardItem>
                 <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
                   <PhotosByTimestamp
-                    changeProfilePhoto={this.openPhotoMenu}
-                    photosByID={this.props.horse.get('photosByID')}
+                    changeProfilePhoto={this.props.openPhotoMenu}
+                    photosByID={this.props.horsePhotos}
                     profilePhotoID={this.props.horse.get('profilePhotoID')}
                   />
                 </CardItem>
-
-                <View style={{paddingTop: 15}}>
-                  <Fab
-                    direction="up"
-                    style={{ backgroundColor: brand }}
-                    position="bottomRight"
-                    onPress={this.pickPhoto}>
-                    <FabImage source={require('../../img/addphoto.png')} height={30} width={30} />
-                  </Fab>
-                </View>
+                { this.props.newHorse ? <PhotoFab pickPhoto={this.pickPhoto} /> : null }
               </Card>
 
 
@@ -333,6 +306,7 @@ export default class UpdateHorse extends PureComponent {
                     value={this.props.horse.get('name')}
                     onChangeText={this.changeHorseName}
                     underlineColorAndroid={'transparent'}
+                    maxLength={200}
                   />
                 </CardItem>
 
@@ -354,6 +328,7 @@ export default class UpdateHorse extends PureComponent {
                     multiline={true}
                     numberOfLines={3}
                     underlineColorAndroid="transparent"
+                    maxLength={5000}
                   />
                 </CardItem>
               </Card>
@@ -387,6 +362,7 @@ export default class UpdateHorse extends PureComponent {
                     value={this.props.horse.get('breed')}
                     onChangeText={this.changeHorseBreed}
                     underlineColorAndroid={'transparent'}
+                    maxLength={500}
                   />
                 </CardItem>
 
@@ -401,7 +377,24 @@ export default class UpdateHorse extends PureComponent {
                 </CardItem>
               </Card>
 
-
+              <Card>
+                <CardItem header>
+                  <Text style={{color: darkBrand }}>Settings:</Text>
+                </CardItem>
+                <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
+                  <View style={{flex: 1, flexDirection: 'row'}}>
+                    <View style={{flex: 1}}>
+                      <CheckBox
+                        checked={this.props.horseUser.get('rideDefault')}
+                        onPress={this.props.setDefaultHorse}
+                      />
+                    </View>
+                    <View style={{flex: 6, justifyContent: 'center'}}>
+                      <Text>This is my default horse for rides.</Text>
+                    </View>
+                  </View>
+                </CardItem>
+              </Card>
             </View>
           </View>
         </ScrollView>

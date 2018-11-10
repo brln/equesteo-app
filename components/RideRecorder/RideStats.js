@@ -3,10 +3,9 @@ import { StyleSheet, Text, View } from 'react-native';
 import memoizeOne from 'memoize-one';
 
 import { darkGrey, lightGrey } from '../../colors'
-import { metersToFeet } from '../../helpers'
+import { elapsedTime, metersToFeet, speedGradient, timeToString } from '../../helpers'
 
 const initialState = {
-  starting: null,
   elapsedTime: undefined
 }
 
@@ -18,25 +17,17 @@ export default class RideStats extends PureComponent {
     this.elapsedAsString = this.elapsedAsString.bind(this)
     this.currentAltitude = this.currentAltitude.bind(this)
     this.currentSpeed = this.currentSpeed.bind(this)
-    this.timeToString = this.timeToString.bind(this)
 
     this.memoAvgSpeed = memoizeOne(this.avgSpeed)
     this.memoCurrentAltitude = memoizeOne(this.currentAltitude)
     this.memoCurrentSpeed = memoizeOne(this.currentSpeed)
-    this.memoTimeToString = memoizeOne(this.timeToString)
+    this.memoTimeToString = memoizeOne(timeToString)
   }
 
   avgSpeed (time, distance) {
     const elapsed = time
-    let hours = 0
-    let minutes = 0
-    let seconds = 0
-    if (elapsed > 0 && this.props.distance) {
-      hours = elapsed.getUTCHours()
-      minutes = elapsed.getUTCMinutes()
-      seconds = elapsed.getUTCSeconds()
-
-      const totalHours = hours + (minutes / 60) + (seconds / 60 / 60)
+    if (elapsed > 0 && distance) {
+      const totalHours = time / 60 / 60
       const milesPerHour = distance / totalHours
       return milesPerHour.toFixed(1).toString()
     } else {
@@ -44,42 +35,57 @@ export default class RideStats extends PureComponent {
     }
   }
 
-  currentSpeed (rideCoords) {
-    const last = rideCoords.get(-1)
-    if (last) {
-      const found = last.get('speed')
+  currentSpeed (lastLocation) {
+    let speed = '0.0'
+    if (lastLocation) {
+      const found = lastLocation.get('speed')
       if (found || found === 0) {
-        return (last.get('speed') * 2.236936).toFixed(1)
+        speed = (lastLocation.get('speed') * 2.236936).toFixed(1)
       } else {
-        return '-'
+        speed = '-'
       }
-    } else {
-      return '0.0'
     }
+    return speed
   }
 
-  currentAltitude (rideCoords, last) {
-    if (last) {
-      const found = last.get('elevation')
+
+  currentAltitude (lastElevation) {
+    let elevation = '0'
+    if (lastElevation) {
+      const found = lastElevation.get('elevation')
       if (found) {
-        return Math.round(metersToFeet(last.get('elevation')))
+        elevation = Math.round(metersToFeet(lastElevation.get('elevation')))
       } else {
-        return '-'
+        elevation = '-'
       }
-    } else {
-      return '0'
     }
+    return elevation
   }
+
 
   componentDidMount() {
-    if (this.props.startTime && !this.state.startTime) {
+    const startTime = this.props.currentRide.get('startTime')
+    const now = new Date()
+    const nowElapsed = elapsedTime(
+      startTime,
+      now,
+      this.props.currentRide.get('pausedTime'),
+      this.props.currentRide.get('lastPauseStart')
+    )
+    if (startTime && !this.state.startTime) {
       this.setState({
-        startTime: this.props.startTime,
-        elapsedTime: new Date(new Date() - this.props.startTime)
+        elapsedTime: nowElapsed,
       })
       this.renderTimer = setInterval(() => {
+        const now = new Date()
+        const newElapsedTime = elapsedTime(
+          startTime,
+          now,
+          this.props.currentRide.get('pausedTime'),
+          this.props.currentRide.get('lastPauseStart')
+        )
         this.setState({
-          elapsedTime: new Date(new Date() - this.state.startTime)
+          elapsedTime: newElapsedTime
         })
       }, 100)
     }
@@ -90,43 +96,32 @@ export default class RideStats extends PureComponent {
     clearInterval(this.renderTimer)
   }
 
-  leftpad(num) {
-    const str = num.toString()
-    const pad = "00"
-    return pad.substring(0, pad.length - str.length) + str
-  }
-
-  timeToString (elapsed, elapsedSeconds) {
-    const hours = this.leftpad(elapsed.getUTCHours())
-    const minutes = this.leftpad(elapsed.getUTCMinutes())
-    const seconds = this.leftpad(elapsedSeconds)
-    return `${hours}:${minutes}:${seconds}`
-  }
-
   elapsedAsString () {
     const elapsed = this.state.elapsedTime
     if (elapsed) {
-      return this.memoTimeToString(elapsed, elapsed.getUTCSeconds())
+      return this.memoTimeToString(elapsed)
     }
   }
 
   render () {
+    const distance = this.props.currentRide.get('distance')
+    const speed = this.memoCurrentSpeed(this.props.lastLocation)
     return (
       <View style={styles.rideStats}>
         <View style={{flex: 1}}>
           <View style={[styles.statBox, {borderTopWidth: 2, borderBottomWidth: 1, borderRightWidth: 1, borderLeftWidth: 2}]}>
             <Text style={styles.statName}>Distance</Text>
             <Text style={styles.statFont}>
-              {this.props.distance.toFixed(2)} <Text style={styles.unitsFont}>mi</Text>
+              {distance.toFixed(2)} <Text style={styles.unitsFont}>mi</Text>
             </Text>
           </View>
           <View style={[styles.statBox, {borderTopWidth: 1, borderBottomWidth: 2, borderRightWidth: 1, borderLeftWidth: 2}]}>
             <Text style={styles.statName}>Current Speed</Text>
-            <Text style={styles.statFont}>{this.memoCurrentSpeed(this.props.rideCoords)} <Text style={styles.unitsFont}>mi/h</Text></Text>
+            <Text style={styles.statFont}>{speed} <Text style={styles.unitsFont}>mi/h</Text></Text>
           </View>
           <View style={[styles.statBox, {borderTopWidth: 1, borderBottomWidth: 2, borderRightWidth: 1, borderLeftWidth: 2}]}>
             <Text style={styles.statName}>Altitude</Text>
-            <Text style={styles.statFont}>{this.memoCurrentAltitude(this.props.rideCoords, this.props.lastElevation)} <Text style={styles.unitsFont}>ft</Text></Text>
+            <Text style={styles.statFont}>{this.memoCurrentAltitude(this.props.lastElevation)} <Text style={styles.unitsFont}>ft</Text></Text>
           </View>
         </View>
         <View style={{flex: 1}}>
@@ -137,7 +132,7 @@ export default class RideStats extends PureComponent {
           <View style={[styles.statBox, {borderTopWidth: 1, borderBottomWidth: 2, borderRightWidth: 2, borderLeftWidth: 1}]}>
             <Text style={styles.statName}>Avg. Speed</Text>
             <Text style={styles.statFont}>
-              {this.memoAvgSpeed(this.state.elapsedTime, this.props.distance)} <Text style={styles.unitsFont}>mi/h</Text>
+              {this.memoAvgSpeed(this.state.elapsedTime, distance)} <Text style={styles.unitsFont}>mi/h</Text>
             </Text>
           </View>
           <View style={[styles.statBox, {borderTopWidth: 1, borderBottomWidth: 2, borderRightWidth: 2, borderLeftWidth: 1}]}>

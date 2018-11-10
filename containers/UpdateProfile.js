@@ -1,8 +1,15 @@
+import memoizeOne from 'memoize-one';
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
 import { Navigation } from 'react-native-navigation'
+import { BackHandler, Keyboard } from 'react-native'
 
-import { signOut, updateUser, uploadProfilePhoto } from "../actions"
+import {
+  persistUser,
+  persistUserPhoto,
+  userUpdated,
+  userPhotoUpdated
+} from "../actions"
 import { brand } from '../colors'
 import { logRender } from '../helpers'
 import UpdateProfile from '../components/UpdateProfile'
@@ -23,6 +30,13 @@ class UpdateProfileContainer extends PureComponent {
           color: 'white'
         },
         elevation: 0,
+        leftButtons: [
+          {
+            id: 'back',
+            icon: require('../img/back-arrow.png'),
+            color: 'white'
+          }
+        ],
         rightButtons: [
           {
             id: 'save',
@@ -38,69 +52,156 @@ class UpdateProfileContainer extends PureComponent {
   }
 
   static getDerivedStateFromProps (props, state) {
-    let nextState = null
-    if (!state.user || (props.user && props.user.get('_rev') !== state.user.get('_rev'))) {
-      nextState = {
-        user: props.user,
-        userMadeChanges: false
+    if (!state.cachedUser && props.user) {
+      return {
+        cachedUser: props.user,
       }
     }
-    return nextState
+    return state
   }
 
   constructor (props) {
     super(props)
     this.state = {
-      userMadeChanges: false,
-      user: null,
+      cachedUser: null,
+      deletedPhotoIDs: [],
+      showPhotoMenu: false,
+      selectedPhotoID: null
     }
+    this.actuallyDeletePhotos = this.actuallyDeletePhotos.bind(this)
     this.changeAccountDetails = this.changeAccountDetails.bind(this)
-    this.signOut = this.signOut.bind(this)
-    this.uploadProfilePhoto = this.uploadProfilePhoto.bind(this)
+    this.clearPhotoMenu = this.clearPhotoMenu.bind(this)
+    this.goBack = this.goBack.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
+    this.thisUsersPhotos = this.thisUsersPhotos.bind(this)
+    this.markPhotoDeleted = this.markPhotoDeleted.bind(this)
+    this.memoThisUsersPhotos = memoizeOne(this.thisUsersPhotos)
+    this.openPhotoMenu = this.openPhotoMenu.bind(this)
 
     Navigation.events().bindComponent(this);
   }
 
-  changeAccountDetails (user) {
-    this.setState({
-      userMadeChanges: true,
-      user
-    })
-  }
-
-  navigationButtonPressed ({ buttonId }) {
+  async navigationButtonPressed ({ buttonId }) {
+    Keyboard.dismiss()
     if (buttonId === 'save') {
-      this.props.dispatch(updateUser(this.state.user))
       Navigation.pop(this.props.componentId)
+      await this.props.dispatch(persistUser(this.props.user.get('_id')))
+      this.actuallyDeletePhotos()
+    } else if (buttonId === 'back') {
+      this.goBack()
     }
   }
 
-  signOut () {
-    this.props.dispatch(signOut())
+  clearPhotoMenu () {
+    this.setState({
+      showPhotoMenu: false,
+      selectedPhotoID: null
+    })
+    Navigation.mergeOptions(this.props.componentId, {
+      topBar: {
+        leftButtons: [
+          {
+            id: 'back',
+            icon: require('../img/back-arrow.png'),
+            color: 'white'
+          }
+        ],
+        rightButtons: [
+          {
+            id: 'save',
+            text: 'Save',
+            color: 'white'
+          },
+        ]
+      }
+    })
   }
 
-  uploadProfilePhoto (location) {
-    this.props.dispatch(uploadProfilePhoto(location))
+  openPhotoMenu (profilePhotoID) {
+    this.setState({
+      showPhotoMenu: true,
+      selectedPhotoID: profilePhotoID
+    })
+    Navigation.mergeOptions(this.props.componentId, {
+      topBar: {
+        rightButtons: [],
+        leftButtons: [],
+      }
+    })
+  }
+
+  async goBack () {
+    this.props.dispatch(userUpdated(this.state.cachedUser))
+    Navigation.pop(this.props.componentId)
+  }
+
+  componentDidAppear() {
+    BackHandler.addEventListener('hardwareBackPress', this.goBack)
+  }
+
+  componentDidDisappear() {
+    BackHandler.removeEventListener('hardwareBackPress', this.goBack)
+  }
+
+  changeAccountDetails (user) {
+    this.props.dispatch(userUpdated(user))
+  }
+
+  markPhotoDeleted (photoID) {
+    if (photoID === this.props.user.get('profilePhotoID')) {
+      const allPhotos = this.memoThisUsersPhotos(this.props.userPhotos, this.state.deletedPhotoIDs)
+      for (let otherPhoto of allPhotos.valueSeq()) {
+        const id = otherPhoto.get('_id')
+        if (id !== photoID && this.state.deletedPhotoIDs.indexOf(id) < 0) {
+          this.props.dispatch(userUpdated(this.props.user.set('profilePhotoID', id)))
+        }
+      }
+    }
+    this.setState({
+      deletedPhotoIDs: [...this.state.deletedPhotoIDs, photoID]
+    })
+  }
+
+  actuallyDeletePhotos () {
+    for (let photoID of this.state.deletedPhotoIDs) {
+      const deleted = this.props.userPhotos.get(photoID).set('deleted', true)
+      this.props.dispatch(userPhotoUpdated(deleted))
+      this.props.dispatch(persistUserPhoto(deleted.get('_id')))
+    }
+  }
+
+  thisUsersPhotos (userPhotos, deletedPhotoIDs) {
+    return userPhotos.filter((photo) => {
+      return photo.get('deleted') !== true
+        && photo.get('userID') === this.props.user.get('_id')
+        && deletedPhotoIDs.indexOf(photo.get('_id')) < 0
+    })
   }
 
   render() {
     logRender('UpdateProfileContainer')
     return (
       <UpdateProfile
-        user={this.state.userMadeChanges ? this.state.user : this.props.user }
         changeAccountDetails={this.changeAccountDetails}
+        clearPhotoMenu={this.clearPhotoMenu}
+        markPhotoDeleted={this.markPhotoDeleted}
+        openPhotoMenu={this.openPhotoMenu}
+        user={this.props.user}
+        userPhotos={this.memoThisUsersPhotos(this.props.userPhotos, this.state.deletedPhotoIDs)}
+        showPhotoMenu={this.state.showPhotoMenu}
+        selectedPhotoID={this.state.selectedPhotoID}
       />
     )
   }
 }
 
 function mapStateToProps (state) {
-  const mainState = state.get('main')
-  const localState = mainState.get('localState')
-  const user = mainState.get('users').get(localState.get('userID'))
+  const pouchState = state.get('pouchRecords')
+  const localState = state.get('localState')
+  const user = pouchState.get('users').get(localState.get('userID'))
   return {
-    user
+    user,
+    userPhotos: pouchState.get('userPhotos'),
   }
 }
 
