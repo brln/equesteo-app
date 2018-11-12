@@ -1,12 +1,19 @@
 import memoizeOne from 'memoize-one';
 import { Navigation } from 'react-native-navigation'
 import React, { PureComponent } from 'react'
+import { Keyboard } from 'react-native'
 import { connect } from 'react-redux';
 
 import Ride from '../components/Ride/Ride'
-import { clearSelectedRideCoordinates, loadRideCoordinates, persistRide, rideUpdated } from '../actions'
+import {
+  clearSelectedRideCoordinates,
+  createRideComment,
+  loadRideCoordinates,
+  persistRide,
+  rideUpdated
+} from '../actions'
 import { brand } from '../colors'
-import { logRender } from '../helpers'
+import { logRender, unixTimeNow } from '../helpers'
 import {
   HORSE_PROFILE,
   MAP,
@@ -66,6 +73,7 @@ class RideContainer extends PureComponent {
     } else if (buttonId === 'delete') {
       this.setState({modalOpen: true})
     } else if (buttonId === 'back') {
+      Keyboard.dismiss()
       Navigation.pop(this.props.componentId).then(() => {
         this.props.dispatch(clearSelectedRideCoordinates())
       })
@@ -76,17 +84,21 @@ class RideContainer extends PureComponent {
     super(props)
     this.state = {
       modalOpen: false,
-      titleTouchCount: 0
+      titleTouchCount: 0,
+      newComment: null
     }
     this.closeDeleteModal = this.closeDeleteModal.bind(this)
     this.deleteRide = this.deleteRide.bind(this)
     this.horses = this.horses.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
+    this.rideComments = this.rideComments.bind(this)
     this.showFullscreenMap = this.showFullscreenMap.bind(this)
     this.showHorseProfile = this.showHorseProfile.bind(this)
     this.showPhotoLightbox = this.showPhotoLightbox.bind(this)
     this.showProfile = this.showProfile.bind(this)
+    this.submitComment = this.submitComment.bind(this)
     this.thisRidesPhotos = this.thisRidesPhotos.bind(this)
+    this.updateNewComment = this.updateNewComment.bind(this)
 
     Navigation.events().bindComponent(this);
 
@@ -98,7 +110,26 @@ class RideContainer extends PureComponent {
       })
     }
 
+    this.memoRideComments = memoizeOne(this.rideComments)
     this.memoThisRidesPhotos = memoizeOne(this.thisRidesPhotos)
+  }
+
+  updateNewComment (newComment) {
+    this.setState({newComment})
+    if (newComment.slice(-1) === '\n') {
+      this.submitComment()
+    }
+  }
+
+  submitComment () {
+    if (!!this.state.newComment === true) {
+      this.props.dispatch(createRideComment({
+        comment: this.state.newComment,
+        rideID: this.props.ride.get('_id'),
+        timestamp: unixTimeNow()
+      }))
+      this.setState({newComment: null})
+    }
   }
 
   showProfile (user) {
@@ -178,6 +209,14 @@ class RideContainer extends PureComponent {
     })
   }
 
+  rideComments (rideComments) {
+    return rideComments.valueSeq().filter(
+      (rc) => rc.get('rideID') === this.props.ride.get('_id')
+    ).sort(
+      (a, b) => a.get('timestamp') - b.get('timestamp')
+    ).toList()
+  }
+
   render() {
     logRender('RideContainer')
     return (
@@ -187,9 +226,11 @@ class RideContainer extends PureComponent {
         horses={this.horses()}
         horsePhotos={this.props.horsePhotos}
         modalOpen={this.state.modalOpen}
+        newComment={this.state.newComment}
         ride={this.props.ride}
         rideHorseOwnerID={this.rideHorseOwnerID()}
         rideUser={this.props.rideUser}
+        rideComments={this.memoRideComments(this.props.rideComments)}
         rideCoordinates={this.props.rideCoordinates}
         rideElevations={this.props.rideElevations}
         ridePhotos={this.memoThisRidesPhotos(this.props.ridePhotos)}
@@ -197,7 +238,12 @@ class RideContainer extends PureComponent {
         showHorseProfile={this.showHorseProfile}
         showPhotoLightbox={this.showPhotoLightbox}
         showProfile={this.showProfile}
+        skipToComments={this.props.skipToComments}
+        submitComment={this.submitComment}
+        updateNewComment={this.updateNewComment}
         userID={this.props.userID}
+        userPhotos={this.props.userPhotos}
+        users={this.props.users}
       />
     )
   }
@@ -215,11 +261,15 @@ function mapStateToProps (state, passedProps) {
     horsePhotos: pouchState.get('horsePhotos'),
     horseUsers: pouchState.get('horseUsers'),
     ride,
+    rideComments: pouchState.get('rideComments'),
     rideCoordinates,
     rideElevations,
     ridePhotos: pouchState.get('ridePhotos'),
     rideUser: pouchState.getIn(['users', ride.get('userID')]),
-    userID
+    skipToComments: passedProps.skipToComments,
+    userID,
+    users: pouchState.get('users'),
+    userPhotos: pouchState.get('userPhotos')
   }
 }
 

@@ -279,18 +279,20 @@ export default class Profile extends PureComponent {
             <CardItem>
               <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
                 <View style={{flex: 1}} />
-                <View style={{flex: 2, paddingLeft: 5, flexDirection: 'row', alignItems: 'center'}}>
-                  <Text style={{color: darkBrand, paddingRight: 10}}>Followers:</Text>
-                  <TouchableOpacity onPress={this.showUserList(this.props.followers, 'followerID')}>
+                  <TouchableOpacity
+                    onPress={this.showUserList(this.props.followers, 'followerID')}
+                    style={{flex: 2, paddingLeft: 5, flexDirection: 'row', alignItems: 'center'}}
+                  >
+                    <Text style={{color: darkBrand, paddingRight: 10}}>Followers:</Text>
                     <Text style={{fontSize: 24}}>{this.props.followers.count()}</Text>
                   </TouchableOpacity>
-                </View>
-                <View style={{flex: 2, paddingLeft: 5, flexDirection: 'row', alignItems: 'center'}}>
-                  <Text style={{color: darkBrand, paddingRight: 10}}>Following:</Text>
-                  <TouchableOpacity onPress={this.showUserList(this.props.followings, 'followingID')}>
+                  <TouchableOpacity
+                    onPress={this.showUserList(this.props.followings, 'followingID')}
+                    style={{flex: 2, paddingLeft: 5, flexDirection: 'row', alignItems: 'center'}}
+                  >
+                    <Text style={{color: darkBrand, paddingRight: 10}}>Following:</Text>
                     <Text style={{fontSize: 24}}>{this.props.followings.count()}</Text>
                   </TouchableOpacity>
-                </View>
                 <View style={{flex: 1}} />
               </View>
             </CardItem>

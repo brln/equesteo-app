@@ -74,13 +74,6 @@ export default class RideRecorder extends PureComponent {
         </Button>
       )
     }
-    if (this.state.fabActive && !this.props.currentRide.get('lastPauseStart')) {
-      pauseButton = (
-        <Button style={{ backgroundColor: danger }} onPress={this.hitPause}>
-          <FabImage source={require('../../img/pause.png')} height={30} width={30} />
-        </Button>
-      )
-    }
     let startButton = (
       <View style={styles.startButton}>
         <Text onPress={this.props.startRide} style={styles.startText}>Start Ride</Text>
@@ -88,6 +81,13 @@ export default class RideRecorder extends PureComponent {
     )
     if (this.props.currentRide) {
       startButton = null
+      if (this.state.fabActive && !this.props.currentRide.get('lastPauseStart')) {
+        pauseButton = (
+          <Button style={{ backgroundColor: danger }} onPress={this.hitPause}>
+            <FabImage source={require('../../img/pause.png')} height={30} width={30} />
+          </Button>
+        )
+      }
       mainView = (
         <View style={{flex: 1}}>
           <View style={{flex: 5}}>
