@@ -29,8 +29,8 @@ import {
   SET_FULL_SYNC_FAIL,
   SET_POP_SHOW_RIDE,
   SHOW_POP_SHOW_RIDE,
-  TOGGLE_AWAITING_PW_CHANGE,
-  TOGGLE_DOING_INITIAL_LOAD,
+  SET_AWAITING_PW_CHANGE,
+  SET_DOING_INITIAL_LOAD,
   SYNC_COMPLETE,
   USER_SEARCH_RETURNED,
 } from '../constants'
@@ -146,11 +146,10 @@ export default function LocalStateReducer(state=initialState, action) {
       ).set(
         'awaitingFullSync', false
       )
-    case TOGGLE_AWAITING_PW_CHANGE:
-      return state.set('awaitingPWChange', !state.get('awaitingPWChange'))
-    case TOGGLE_DOING_INITIAL_LOAD:
-      return state.set('doingInitialLoad', !state.get('doingInitialLoad')
-      )
+    case SET_AWAITING_PW_CHANGE:
+      return state.set('awaitingPWChange', action.newVal)
+    case SET_DOING_INITIAL_LOAD:
+      return state.set('doingInitialLoad', action.newVal)
     case USER_SEARCH_RETURNED:
       return state.set('userSearchResults', action.userSearchResults)
     default:

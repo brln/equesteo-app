@@ -7,7 +7,8 @@ import {
   View
 } from 'react-native';
 
-import { darkBrand } from '../../colors'
+import Button from '../Button'
+import { brand, darkBrand } from '../../colors'
 import LoginForm from './LoginForm'
 
 export default class LoginPage extends PureComponent {
@@ -58,6 +59,7 @@ export default class LoginPage extends PureComponent {
           inputs={this.inputs}
         />
         <View>
+          <Button text={'Submit'} color={brand} onPress={this.submitLogin}/>
           <TouchableOpacity onPress={this.props.showSignup}>
             <View style={styles.switchup} >
               <Text style={styles.switchupText} >Or, <Text style={styles.underlineText}>Sign Up</Text>.</Text>
@@ -104,10 +106,11 @@ const styles = StyleSheet.create({
   },
   switchup: {
     paddingTop: 10,
-    paddingBottom: 20,
+    paddingBottom: 10,
   },
   switchupText: {
     textAlign: 'center',
+    fontSize: 10,
   },
   underlineText: {
     textDecorationLine: 'underline',

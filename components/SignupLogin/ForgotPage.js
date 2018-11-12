@@ -9,7 +9,8 @@ import {
   View
 } from 'react-native';
 
-import { darkBrand } from '../../colors'
+import { brand, darkBrand } from '../../colors'
+import Button from '../Button'
 
 export default class ForgotPage extends PureComponent {
   constructor (props) {
@@ -48,7 +49,6 @@ export default class ForgotPage extends PureComponent {
       pw1: text
     })
   }
-
 
   changePassword2 (text) {
     this.setState({
@@ -89,6 +89,7 @@ export default class ForgotPage extends PureComponent {
           value={this.state.email}
           maxLength={200}
         />
+        <Button text={'Submit'} color={brand} onPress={this.getPWCode}/>
       </View>
     )
   }
@@ -110,6 +111,7 @@ export default class ForgotPage extends PureComponent {
           value={this.state.resetCode}
           maxLength={30}
         />
+        <Button text={'Submit'} color={brand} onPress={this.submitResetCode}/>
       </View>
     )
   }
@@ -145,6 +147,7 @@ export default class ForgotPage extends PureComponent {
           value={this.state.pw2}
           maxLength={200}
         />
+        <Button text={'Change Password'} color={brand} onPress={this.submitNewPassword}/>
       </View>
     )
   }
@@ -197,14 +200,15 @@ const styles = StyleSheet.create({
     padding: 30,
   },
   switchup: {
-    paddingTop: 20,
-    paddingBottom: 20,
+    paddingTop: 10,
+    paddingBottom: 10,
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'center'
   },
   switchupText: {
     textAlign: 'center',
+    fontSize: 10,
   },
   underlineText: {
     textDecorationLine: 'underline',

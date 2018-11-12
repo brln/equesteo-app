@@ -80,8 +80,8 @@ import {
   STASH_NEW_LOCATIONS,
   STOP_STASH_NEW_LOCATIONS,
   SYNC_COMPLETE,
-  TOGGLE_AWAITING_PW_CHANGE,
-  TOGGLE_DOING_INITIAL_LOAD,
+  SET_AWAITING_PW_CHANGE,
+  SET_DOING_INITIAL_LOAD,
   UNPAUSE_LOCATION_TRACKING,
   USER_PHOTO_UPDATED,
   USER_SEARCH_RETURNED,
@@ -517,15 +517,17 @@ export function syncComplete () {
   }
 }
 
-function toggleAwaitingPasswordChange () {
+export function setAwaitingPasswordChange (newVal) {
   return {
-    type: TOGGLE_AWAITING_PW_CHANGE
+    type: SET_AWAITING_PW_CHANGE,
+    newVal
   }
 }
 
-function toggleDoingInitialLoad () {
+function setDoingInitialLoad (newVal) {
   return {
-    type: TOGGLE_DOING_INITIAL_LOAD
+    type: SET_DOING_INITIAL_LOAD,
+    newVal
   }
 }
 
@@ -813,7 +815,7 @@ export function exchangePWCode (email, code) {
       const following = resp.following
       const followers = resp.followers
       const pouchCouch = new PouchCouch(token)
-      dispatch(toggleAwaitingPasswordChange())
+      dispatch(setAwaitingPasswordChange(true))
       await pouchCouch.localReplicateDB('all', [...following, userID], followers)
       dispatch(receiveJWT(resp.token))
       dispatch(saveUserID(resp.id))
@@ -1213,7 +1215,7 @@ export function submitLogin (email, password) {
       const resp = await userAPI.login(email, password)
       await LocalStorage.saveToken(resp.token, resp.id);
       dispatch(dismissError())
-      dispatch(toggleDoingInitialLoad())
+      dispatch(setDoingInitialLoad(true))
       const token = resp.token
       const userID = resp.id
       const following = resp.following
@@ -1223,7 +1225,7 @@ export function submitLogin (email, password) {
       await dispatch(loadLocalData())
       dispatch(receiveJWT(resp.token))
       dispatch(switchRoot(FEED))
-      dispatch(toggleDoingInitialLoad())
+      dispatch(setDoingInitialLoad(false))
       dispatch(saveUserID(resp.id))
       setUserContext()
       dispatch(startListeningFCMTokenRefresh())
@@ -1245,7 +1247,7 @@ export function submitSignup (email, password) {
     try {
       const resp = await userAPI.signup(email, password)
       dispatch(dismissError())
-      dispatch(toggleDoingInitialLoad())
+      dispatch(setDoingInitialLoad(true))
       await LocalStorage.saveToken(resp.token, resp.id);
       const following = resp.following
       const userID = resp.id
@@ -1253,7 +1255,7 @@ export function submitSignup (email, password) {
       await pouchCouch.localReplicateDB('all', [...following, userID], [])
       dispatch(receiveJWT(resp.token))
       dispatch(switchRoot(FEED))
-      dispatch(toggleDoingInitialLoad())
+      dispatch(setDoingInitialLoad(false))
       dispatch(saveUserID(resp.id))
       setUserContext()
       await dispatch(loadLocalData())

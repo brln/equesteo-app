@@ -9,7 +9,8 @@ import {
   View
 } from 'react-native';
 
-import { darkBrand } from '../../colors'
+import Button from '../Button'
+import { brand, darkBrand } from '../../colors'
 
 export default class SignupPage extends PureComponent {
   constructor (props) {
@@ -109,6 +110,7 @@ export default class SignupPage extends PureComponent {
           maxLength={200}
         />
         <View style={styles.switchup}>
+          <Button text={'Submit'} color={brand} onPress={this.submitSignup}/>
           <TouchableOpacity onPress={this.props.showLogin}>
             <Text style={styles.switchupText}>Or, <Text style={styles.underlineText}>Log In</Text>.</Text>
           </TouchableOpacity>
@@ -146,11 +148,12 @@ const styles = StyleSheet.create({
     padding: 30,
   },
   switchup: {
-    paddingTop: 20,
-    paddingBottom: 20,
+    paddingTop: 10,
+    paddingBottom: 10,
   },
   switchupText: {
     textAlign: 'center',
+    fontSize: 10,
   },
   underlineText: {
     textDecorationLine: 'underline',

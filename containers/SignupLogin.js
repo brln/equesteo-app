@@ -17,6 +17,7 @@ import {
   exchangePWCode,
   getPWCode,
   newPassword,
+  setAwaitingPasswordChange,
   submitLogin,
   submitSignup
 } from '../actions'
@@ -52,6 +53,7 @@ class SignupLoginContainer extends PureComponent {
     this.errorOccurred = this.errorOccurred.bind(this)
     this.exchangePWCode = this.exchangePWCode.bind(this)
     this.getPWCode = this.getPWCode.bind(this)
+    this.handleURL = this.handleURL.bind(this)
     this.submitSignup = this.submitSignup.bind(this)
     this.showForgot = this.showForgot.bind(this)
     this.submitLogin = this.submitLogin.bind(this)
@@ -72,17 +74,31 @@ class SignupLoginContainer extends PureComponent {
   static getDerivedStateFromProps (props, state) {
     let nextState = {...state}
     if (props.error) {
-      nextState.forgotSubmitted = true
+      nextState.forgotSubmitted = false
       nextState.resetCodeSubmitted = false
     }
     return nextState
   }
 
   componentDidMount() {
-    Linking.addEventListener('url', ({ url }) => {
-      const parsedURL = URI(url)
-      const token = parsedURL.search(true).token
-    })
+    Linking.addEventListener('url', this.handleURL)
+  }
+
+  componentWillUnmount () {
+    Linking.removeEventListener('url', this.handleURL)
+  }
+
+  handleURL ({ url }) {
+    const parsedURL = URI(url)
+    const token = parsedURL.search(true).t
+    const email = atob(parsedURL.search(true).e)
+    if (email && token) {
+      this.setState({
+        forgot: true,
+        forgotSubmitted: true,
+      })
+      this.exchangePWCode(email, token)
+    }
   }
 
   errorOccurred (errorText) {
@@ -91,6 +107,7 @@ class SignupLoginContainer extends PureComponent {
 
   newPassword (password) {
     this.props.dispatch(newPassword(password))
+    this.props.dispatch(setAwaitingPasswordChange(false))
   }
 
   submitSignup (email, password) {
