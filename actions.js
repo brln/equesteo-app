@@ -901,7 +901,7 @@ export function exchangePWCode (email, code) {
 }
 
 export function needsRemotePersist(db) {
-  return async (dispatch) => {
+  return (dispatch) => {
     dispatch(setFeedMessage(Map({
       message: 'Data Needs to Upload',
       color: warning,
