@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   KeyboardAvoidingView,
-  ScrollView,
   StyleSheet,
   TextInput,
   TouchableOpacity,
@@ -9,6 +8,7 @@ import {
 } from 'react-native';
 
 import BuildImage from '../BuildImage'
+import { lightGrey } from '../../colors'
 import { logError } from '../../helpers'
 import MultiPlatform from '../../components/MultiPlatform'
 import CommentList from './CommentList'
@@ -16,7 +16,6 @@ import CommentList from './CommentList'
 export default class RideComments extends MultiPlatform {
   constructor (props) {
     super(props)
-    this.scrollable = null
   }
 
   renderIOS () {
@@ -37,7 +36,7 @@ export default class RideComments extends MultiPlatform {
 
   renderChildren() {
     return (
-      <View style={{flex: 1}}>
+      <View style={{flex: 1, borderTopWidth: 2, borderTopColor: lightGrey}}>
         <CommentList
           rideComments={this.props.rideComments}
           users={this.props.users}

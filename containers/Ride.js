@@ -10,7 +10,9 @@ import {
   createRideComment,
   loadRideCoordinates,
   persistRide,
-  rideUpdated
+  popShowRideShown,
+  rideUpdated,
+  setShowingRide,
 } from '../actions'
 import { brand } from '../colors'
 import { logRender, unixTimeNow } from '../helpers'
@@ -117,6 +119,7 @@ class RideContainer extends PureComponent {
   updateNewComment (newComment) {
     this.setState({newComment})
     if (newComment.slice(-1) === '\n') {
+      Keyboard.dismiss()
       this.submitComment()
     }
   }
@@ -153,6 +156,16 @@ class RideContainer extends PureComponent {
     if(!this.props.rideCoordinates || this.props.rideCoordinates.get('rideID') !== this.props.ride.get('_id')) {
       this.props.dispatch(loadRideCoordinates(this.props.ride.get('_id')))
     }
+    this.props.dispatch(setShowingRide(this.props.ride.get('_id')))
+    if (this.props.isPopShow) {
+      this.props.dispatch(popShowRideShown())
+    }
+    this.props.dispatch(loadRideCoordinates(this.props.ride.get('_id')))
+
+  }
+
+  componentWillUnmount () {
+    this.props.dispatch(setShowingRide(null))
   }
 
   deleteRide () {
@@ -262,6 +275,7 @@ function mapStateToProps (state, passedProps) {
     horses: pouchState.get('horses'),
     horsePhotos: pouchState.get('horsePhotos'),
     horseUsers: pouchState.get('horseUsers'),
+    isPopShow: passedProps.isPopShow,
     ride,
     rideComments: pouchState.get('rideComments'),
     rideCoordinates,

@@ -28,6 +28,7 @@ import {
   SET_FIRST_START_HORSE_ID,
   SET_FULL_SYNC_FAIL,
   SET_POP_SHOW_RIDE,
+  SET_SHOWING_RIDE,
   SHOW_POP_SHOW_RIDE,
   SET_AWAITING_PW_CHANGE,
   SET_DOING_INITIAL_LOAD,
@@ -63,6 +64,7 @@ export const initialState = Map({
   popShowRideNow: null,
   remotePersistActive: false,
   root: SIGNUP_LOGIN,
+  showingRideID: null,
   userID: null,
   userSearchResults: List(),
 })
@@ -93,7 +95,7 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.set('popShowRide', null).set('popShowRideNow', null)
     case LOAD_LOCAL_STATE:
       const loadedState = action.localState
-      return loadedState.set('feedMessage', null).set('doingInitialLoad', false)
+      return loadedState.set('feedMessage', null).set('doingInitialLoad', false).set('showingRideID', null)
     case NEEDS_REMOTE_PERSIST:
       return state.setIn(['needsRemotePersist', action.database], true)
     case NEW_APP_STATE:
@@ -134,12 +136,14 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.set('firstStartHorseID', Map({ horseID: action.horseID, horseUserID: action.horseUserID }))
     case SET_POP_SHOW_RIDE:
       return state.set(
-        'popShowRide', action.rideID
+        'popShowRide', Map({rideID: action.rideID, scrollToComments: action.scrollToComments})
       ).set(
         'popShowRideNow', action.showRideNow
       )
     case SHOW_POP_SHOW_RIDE:
       return state.set('popShowRideNow', true)
+    case SET_SHOWING_RIDE:
+      return state.set('showingRideID', action.rideID)
     case SYNC_COMPLETE:
       return state.set(
         'lastFullSync', new Date()

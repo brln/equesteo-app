@@ -18,7 +18,6 @@ import {
   FIRST_START,
   HORSE_PROFILE,
   PROFILE,
-  RIDE_COMMENTS,
   RIDE
 } from '../screens'
 
@@ -61,7 +60,6 @@ class FeedContainer extends BackgroundComponent {
     }
     this.clearFeedMessage = this.clearFeedMessage.bind(this)
     this.toggleCarrot = this.toggleCarrot.bind(this)
-    this.showComments = this.showComments.bind(this)
     this.showProfile = this.showProfile.bind(this)
     this.showRide = this.showRide.bind(this)
     this.showHorseProfile = this.showHorseProfile.bind(this)
@@ -118,14 +116,12 @@ class FeedContainer extends BackgroundComponent {
 
   componentDidUpdate () {
     if (this.props.popShowRideNow && !this.props.awaitingFullSync) {
-      const showRide = this.props.rides.get(this.props.popShowRide)
+      const showRide = this.props.rides.get(this.props.popShowRide.get('rideID'))
       if (showRide) {
         // PushNotification.showNotification gets called when it shouldn't if the app reboots unexpectedly.
         // This makes popShowRideNow get set when it shouldn't, so make sure we have a ride to show here.
-        this.showRide(showRide)
-
+        this.showRide(showRide, this.props.popShowRide.get('scrollToComments'), true)
       }
-      this.props.dispatch(popShowRideShown())
     }
     if (this.props.user && (!this.state.firstStartPopped && !this.props.user.get('finishedFirstStart'))) {
       this.showFirstStart()
@@ -143,18 +139,6 @@ class FeedContainer extends BackgroundComponent {
         passProps: {
           horse,
           ownerID
-        }
-      }
-    })
-  }
-
-  showComments (ride) {
-    Navigation.push(this.props.componentId, {
-      component: {
-        title: 'Comments',
-        name: RIDE_COMMENTS,
-        passProps: {
-         rideID: ride.get('_id')
         }
       }
     })
@@ -179,13 +163,14 @@ class FeedContainer extends BackgroundComponent {
     })
   }
 
-  showRide (ride, skipToComments) {
+  showRide (ride, skipToComments, isPopShow) {
     Navigation.push(this.props.componentId, {
       component: {
         name: RIDE,
         passProps: {
           rideID: ride.get('_id'),
           skipToComments,
+          isPopShow,
         }
       }
     });

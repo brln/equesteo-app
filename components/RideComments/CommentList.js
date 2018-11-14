@@ -64,7 +64,7 @@ export default class CommentList extends PureComponent {
               {commentUser.get('firstName') || ''} {commentUser.get('lastName') || ''}
             </Text>
             </View>
-            <View style={{flex: 1}}>
+            <View style={{flex: 1, alignItems: 'flex-end'}}>
               <Text>{moment(rideComment.timestamp).format('MM/DD h:mm a')}</Text>
             </View>
           </View>

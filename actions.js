@@ -7,6 +7,7 @@ import PushNotification from 'react-native-push-notification'
 import { fromJS, Map  } from 'immutable'
 import kalmanFilter from './services/Kalman'
 import { captureException, setUserContext } from "./services/Sentry"
+import { handleNotification } from './services/PushNotificationHandler'
 
 import {
   haversine,
@@ -82,6 +83,7 @@ import {
   SYNC_COMPLETE,
   SET_AWAITING_PW_CHANGE,
   SET_DOING_INITIAL_LOAD,
+  SET_SHOWING_RIDE,
   UNPAUSE_LOCATION_TRACKING,
   USER_PHOTO_UPDATED,
   USER_SEARCH_RETURNED,
@@ -370,11 +372,12 @@ function rideCoordinatesLoaded (rideCoordinates) {
   }
 }
 
-export function setPopShowRide (rideID, showRideNow) {
+export function setPopShowRide (rideID, showRideNow, scrollToComments) {
   return {
     type: SET_POP_SHOW_RIDE,
     rideID,
     showRideNow,
+    scrollToComments,
   }
 }
 
@@ -442,6 +445,13 @@ export function setRemotePersistComplete (database) {
 export function setRemotePersistError () {
   return {
     type: REMOTE_PERSIST_ERROR,
+  }
+}
+
+export function setShowingRide (rideID) {
+  return {
+    type: SET_SHOWING_RIDE,
+    rideID,
   }
 }
 
@@ -1097,6 +1107,35 @@ export function signOut () {
   }
 }
 
+export function showLocalNotification (message, background, rideID, scrollToComments) {
+  return (dispatch, getState) => {
+    PushNotification.configure({
+      onNotification: () => {
+        const activeComponent = getState().getIn(['localState', 'activeComponent'])
+        if (activeComponent !== FEED) {
+          Navigation.popToRoot(activeComponent)
+        }
+        dispatch(showPopShowRide())
+      }
+    })
+    dispatch(awaitFullSync())
+    dispatch(syncDBPull()).then(() => {
+      const showingRideID = getState().getIn(['localState', 'showingRideID'])
+      logDebug(showingRideID, 'showingRideID')
+      logDebug(rideID, 'rideID')
+      logDebug(background, 'background')
+
+      if (background || showingRideID !== rideID) {
+        dispatch(setPopShowRide(rideID, false, scrollToComments))
+        PushNotification.localNotification({
+          message: message,
+        })
+      }
+    })
+
+  }
+}
+
 export function startLocationTracking () {
   return async (dispatch, getState) => {
     logInfo('action: startLocationTracking')
@@ -1168,8 +1207,6 @@ export function startLocationTracking () {
   }
 }
 
-
-
 function startNetworkTracking () {
   return (dispatch) => {
     NetInfo.getConnectionInfo().then((connectionInfo) => {
@@ -1185,26 +1222,9 @@ function startNetworkTracking () {
 }
 
 function startListeningFCM () {
-  return async (dispatch, getState) => {
-    PushNotification.configure({
-      onNotification: async () => {
-        await dispatch(syncDBPull())
-        dispatch(showPopShowRide())
-      }
-    })
-
+  return async (dispatch) => {
     firebase.messaging().onMessage(async (m) => {
-      const userID = m._data.userID
-      const distance = parseFloat(m._data.distance)
-      const rideID = m._data.rideID
-      const user = getState().getIn(['pouchRecords', 'users']).get(userID)
-      const message = `${user.get('firstName')} went for a ${distance.toFixed(1)} mile ride!`
-      dispatch(awaitFullSync())
-      dispatch(setPopShowRide(rideID, false))
-      await dispatch(syncDBPull())
-      PushNotification.localNotification({
-        message: message,
-      })
+      handleNotification(dispatch, m._data, false)
     })
   }
 }
@@ -1251,7 +1271,8 @@ function startAppStateTracking () {
       const onRide = Boolean(getState().getIn(['currentRide', 'currentRide']))
       if (onRide && nextAppState === appStates.active) {
         const activeComponent = getState().getIn(['localState', 'activeComponent'])
-        if (activeComponent !== RECORDER && activeComponent !== UPDATE_NEW_RIDE_ID) {
+        const popShowRideActive = getState().getIn(['localState', 'popShowRide'])
+        if (activeComponent !== RECORDER && activeComponent !== UPDATE_NEW_RIDE_ID && !popShowRideActive) {
           Navigation.push(activeComponent, {
             component: {
               name: RECORDER,
@@ -1330,7 +1351,7 @@ export function syncDBPull () {
   return async (dispatch, getState) => {
     logInfo('action syncDBPull')
     dispatch(setFeedMessage(Map({
-      message: 'Loading New Rides',
+      message: 'Loading...',
       color: warning,
       timeout: null
     })))
@@ -1356,7 +1377,7 @@ export function syncDBPull () {
       await dispatch(loadLocalData())
       dispatch(syncComplete())
       dispatch(setFeedMessage(Map({
-        message: 'All Rides Loaded!',
+        message: 'Data Loaded',
         color: green,
         timeout: 3000
       })))

@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   Clipboard,
   Dimensions,
+  Keyboard,
   ScrollView,
   StyleSheet,
   Text,
@@ -35,6 +36,7 @@ export default class Ride extends PureComponent {
   constructor (props) {
     super(props)
     this.scrollable = null
+    this.scrollTimeout = null
     this.state = {
       titleTouchCount: 0,
       scrolled: false
@@ -54,6 +56,19 @@ export default class Ride extends PureComponent {
     this.memoizedParse = memoizeOne(this.parseSpeedData)
     this.memoizedMaxSpeed = memoizeOne(this.maxSpeed)
     this.memoizedParseElevation = memoizeOne(this.parseElevationData)
+  }
+
+  componentDidMount () {
+    Keyboard.addListener('keyboardDidShow', () => {
+      this.scrollTimeout = setTimeout(() => {
+        this.scrollable.scrollToEnd({animated: false})
+      }, 300)
+    })
+  }
+
+  componentWillUnmount () {
+    clearInterval(this.scrollTimeout)
+    Keyboard.removeAllListeners('keyboardDidShow')
   }
 
   componentDidUpdate (nextProps) {
@@ -337,7 +352,11 @@ export default class Ride extends PureComponent {
     let maxSpeed = this.memoizedMaxSpeed(this.props.rideCoordinates.get('rideCoordinates'))
     const height = (width * 9 / 16) + 54
     return (
-      <ScrollView ref={(i) => this.scrollable = i} style={{flex: 1}}>
+      <ScrollView
+        keyboardShouldPersistTaps={'always'}
+        ref={(i) => this.scrollable = i}
+        style={{flex: 1}}
+      >
         <DeleteModal
           modalOpen={this.props.modalOpen}
           closeDeleteModal={this.props.closeDeleteModal}
