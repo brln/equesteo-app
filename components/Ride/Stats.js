@@ -93,50 +93,46 @@ export default class Stats extends PureComponent {
   render () {
     const horse = this.whichHorse()
     return (
-      <Card style={{flex: 1}}>
-        <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20, flex: 1}}>
-          <View style={{flex: 1, paddingTop: 20}}>
-            <View style={{flex: 1, flexDirection: 'row', paddingBottom: 10}}>
-              <TouchableOpacity style={{flex: 1}} onPress={this.showHorseProfile(horse)}>
-                <Stat
-                  imgSrc={this.horseAvatar(horse)}
-                  text={'Horse'}
-                  value={ horse ? horse.get('name') : 'none'}
-                />
-              </TouchableOpacity>
-              <Stat
-                imgSrc={require('../../img/clock.png')}
-                text={'Start Time'}
-                value={this.makeStartTime()}
-              />
-            </View>
-            <View style={{flex: 1, flexDirection: 'row', paddingBottom: 10}}>
-              <Stat
-                imgSrc={require('../../img/stopwatch.png')}
-                text={'Total Time Riding'}
-                value={this.makeTimeRiding()}
-              />
-              <Stat
-                imgSrc={require('../../img/distance.png')}
-                text={'Distance'}
-                value={this.makeDistance()}
-              />
-            </View>
-            <View style={{flex: 1, flexDirection: 'row', paddingBottom: 10}}>
-              <Stat
-                imgSrc={require('../../img/speedometer.png')}
-                text={'Average Speed'}
-                value={this.makeAvgSpeed()}
-              />
-              <Stat
-                imgSrc={require('../../img/maxSpeed.png')}
-                text={'Max Speed'}
-                value={this.makeMaxSpeed()}
-              />
-            </View>
-          </View>
-        </CardItem>
-      </Card>
+      <View style={{flex: 1, paddingTop: 20}}>
+        <View style={{flex: 1, flexDirection: 'row', paddingBottom: 10}}>
+          <TouchableOpacity style={{flex: 1}} onPress={this.showHorseProfile(horse)}>
+            <Stat
+              imgSrc={this.horseAvatar(horse)}
+              text={'Horse'}
+              value={ horse ? horse.get('name') : 'none'}
+            />
+          </TouchableOpacity>
+          <Stat
+            imgSrc={require('../../img/clock.png')}
+            text={'Start Time'}
+            value={this.makeStartTime()}
+          />
+        </View>
+        <View style={{flex: 1, flexDirection: 'row', paddingBottom: 10}}>
+          <Stat
+            imgSrc={require('../../img/stopwatch.png')}
+            text={'Total Time Riding'}
+            value={this.makeTimeRiding()}
+          />
+          <Stat
+            imgSrc={require('../../img/distance.png')}
+            text={'Distance'}
+            value={this.makeDistance()}
+          />
+        </View>
+        <View style={{flex: 1, flexDirection: 'row', paddingBottom: 10}}>
+          <Stat
+            imgSrc={require('../../img/speedometer.png')}
+            text={'Average Speed'}
+            value={this.makeAvgSpeed()}
+          />
+          <Stat
+            imgSrc={require('../../img/maxSpeed.png')}
+            text={'Max Speed'}
+            value={this.makeMaxSpeed()}
+          />
+        </View>
+      </View>
     )
   }
 }

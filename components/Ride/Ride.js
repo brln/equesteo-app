@@ -27,14 +27,17 @@ import SpeedChart from './SpeedChart'
 import Stats from './Stats'
 import DeleteModal from '../Shared/DeleteModal'
 import ElevationChart from './ElevationChart'
+import RideComments from '../RideComments/RideComments'
 
 const { width } = Dimensions.get('window')
 
 export default class Ride extends PureComponent {
   constructor (props) {
     super(props)
+    this.scrollable = null
     this.state = {
-      titleTouchCount: 0
+      titleTouchCount: 0,
+      scrolled: false
     }
     this._renderRide = this._renderRide.bind(this)
     this._renderLoading = this._renderLoading.bind(this)
@@ -51,6 +54,17 @@ export default class Ride extends PureComponent {
     this.memoizedParse = memoizeOne(this.parseSpeedData)
     this.memoizedMaxSpeed = memoizeOne(this.maxSpeed)
     this.memoizedParseElevation = memoizeOne(this.parseElevationData)
+  }
+
+  componentDidUpdate (nextProps) {
+    if (this.props.rideComments !== nextProps.rideComments || (nextProps.skipToComments && !this.state.scrolled)) {
+      setTimeout(() => {
+        this.scrollable.scrollToEnd({animated: true})
+        this.setState({
+          scrolled: true
+        })
+      }, 300)
+    }
   }
 
   showProfile () {
@@ -323,7 +337,7 @@ export default class Ride extends PureComponent {
     let maxSpeed = this.memoizedMaxSpeed(this.props.rideCoordinates.get('rideCoordinates'))
     const height = (width * 9 / 16) + 54
     return (
-      <ScrollView style={{flex: 1}}>
+      <ScrollView ref={(i) => this.scrollable = i} style={{flex: 1}}>
         <DeleteModal
           modalOpen={this.props.modalOpen}
           closeDeleteModal={this.props.closeDeleteModal}
@@ -369,17 +383,41 @@ export default class Ride extends PureComponent {
           />
 
           <View style={{flex: 1}}>
-            <Stats
-              horsePhotos={this.props.horsePhotos}
-              horses={this.props.horses}
-              maxSpeed={maxSpeed}
-              ride={this.props.ride}
-              rideHorseOwnerID={this.props.rideHorseOwnerID}
-              rideUser={this.props.rideUser}
-              showHorseProfile={this.props.showHorseProfile}
-              userID={this.props.userID}
-            />
+            <Card style={{flex: 1}}>
+              <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20, flex: 1}}>
+                <Stats
+                  horsePhotos={this.props.horsePhotos}
+                  horses={this.props.horses}
+                  maxSpeed={maxSpeed}
+                  ride={this.props.ride}
+                  rideHorseOwnerID={this.props.rideHorseOwnerID}
+                  rideUser={this.props.rideUser}
+                  showHorseProfile={this.props.showHorseProfile}
+                  userID={this.props.userID}
+                />
+
+              </CardItem>
+            </Card>
+
             { this.rideNotes() }
+
+            <Card style={{flex: 1}}>
+              <CardItem header style={{padding: 5}}>
+                <View style={{paddingLeft: 5}}>
+                  <Text style={{color: darkBrand}}>Comments</Text>
+                </View>
+              </CardItem>
+              <CardItem cardBody style={{ flex: 1}}>
+                <RideComments
+                  newComment={this.props.newComment}
+                  rideComments={this.props.rideComments}
+                  submitComment={this.props.submitComment}
+                  updateNewComment={this.props.updateNewComment}
+                  users={this.props.users}
+                  userPhotos={this.props.userPhotos}
+                />
+              </CardItem>
+            </Card>
           </View>
         </View>
       </ScrollView>

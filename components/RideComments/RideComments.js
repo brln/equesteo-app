@@ -19,14 +19,6 @@ export default class RideComments extends MultiPlatform {
     this.scrollable = null
   }
 
-  componentDidUpdate (nextProps) {
-    if (this.props.rideComments !== nextProps.rideComments) {
-      setTimeout(() => {
-        this.scrollable.scrollToEnd({animated: true})
-      }, 300)
-    }
-  }
-
   renderIOS () {
     return (
       <KeyboardAvoidingView keyboardVerticalOffset={54} behavior={'height'} style={styles.container}>
@@ -46,18 +38,11 @@ export default class RideComments extends MultiPlatform {
   renderChildren() {
     return (
       <View style={{flex: 1}}>
-        <View style={{flex: 5}}>
-          <ScrollView
-            style={{flex: 1}}
-            ref={(i) => this.scrollable = i}
-          >
-            <CommentList
-              rideComments={this.props.rideComments}
-              users={this.props.users}
-              userPhotos={this.props.userPhotos}
-            />
-          </ScrollView>
-        </View>
+        <CommentList
+          rideComments={this.props.rideComments}
+          users={this.props.users}
+          userPhotos={this.props.userPhotos}
+        />
         <View style={{flex: 1, backgroundColor: 'white', width: '100%', elevation: 20, minHeight: 100}}>
           <View style={{flex: 1, flexDirection: 'row'}}>
             <View style={{flex: 5, paddingLeft: 20, paddingRight: 20, paddingTop: 5, paddingBottom: 5}}>
@@ -65,7 +50,6 @@ export default class RideComments extends MultiPlatform {
                 style={{
                   textAlignVertical: "top"
                 }}
-                autoFocus={true}
                 multiline={true}
                 placeholder={"Add a comment"}
                 onChangeText={this.props.updateNewComment}

@@ -39,12 +39,8 @@ class RideCommentsContainer extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      newComment: null
     }
 
-    this.submitComment = this.submitComment.bind(this)
-    this.updateNewComment = this.updateNewComment.bind(this)
-    this.memoRideComments = memoizeOne(this.rideComments)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
 
     Navigation.events().bindComponent(this);
@@ -75,14 +71,6 @@ class RideCommentsContainer extends PureComponent {
     }
   }
 
-  rideComments (rideComments) {
-    return rideComments.valueSeq().filter(
-      (rc) => rc.get('rideID') === this.props.ride.get('_id')
-    ).sort(
-      (a, b) => a.get('timestamp') - b.get('timestamp')
-    ).toList()
-  }
-
   render() {
     return (
       <RideComments
@@ -97,14 +85,3 @@ class RideCommentsContainer extends PureComponent {
   }
 }
 
-function mapStateToProps (state, passedProps) {
-  const pouchState = state.get('pouchRecords')
-  return {
-    ride: pouchState.getIn(['rides', passedProps.rideID]),
-    rideComments: pouchState.get('rideComments'),
-    users: pouchState.get('users'),
-    userPhotos: pouchState.get('userPhotos')
-  }
-}
-
-export default  connect(mapStateToProps)(RideCommentsContainer)

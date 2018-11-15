@@ -35,7 +35,6 @@ export default class RideCard extends PureComponent {
     this.horseSection = this.horseSection.bind(this)
     this.renderSwiper = this.renderSwiper.bind(this)
     this.rideTime = this.rideTime.bind(this)
-    this.showComments = this.showComments.bind(this)
     this.showRide = this.showRide.bind(this)
     this.showHorseProfile = this.showHorseProfile.bind(this)
     this.showProfile = this.showProfile.bind(this)
@@ -48,12 +47,8 @@ export default class RideCard extends PureComponent {
     this.props.toggleCarrot(this.props.ride.get('_id'))
   }
 
-  showComments () {
-    this.props.showComments(this.props.ride)
-  }
-
-  showRide () {
-    this.props.showRide(this.props.ride)
+  showRide (skipToComments) {
+    this.props.showRide(this.props.ride, skipToComments)
   }
 
   showHorseProfile () {
@@ -165,7 +160,7 @@ export default class RideCard extends PureComponent {
   renderSwiper () {
     const swiperHeight = width * (2/3)
     const mapImage = (
-      <TouchableOpacity onPress={this.showRide} style={{flex: 1}} key="map">
+      <TouchableOpacity onPress={() => {this.showRide(false)}} style={{flex: 1}} key="map">
         <RideImage
           uri={this.props.ride.get('mapURL')}
           style={{height: swiperHeight, width: null, flex: 1}}
@@ -177,7 +172,7 @@ export default class RideCard extends PureComponent {
       let coverImage = null
       this.props.ridePhotos.reduce((accum, photo) => {
         const thisImage = (
-          <TouchableOpacity onPress={this.showRide} style={{flex: 1}} key="map">
+          <TouchableOpacity onPress={() => {this.showRide(false)}} style={{flex: 1}} key="map">
             <URIImage
               style={{height: swiperHeight, width: null}}
               key={photo.get('uri')}
@@ -224,7 +219,7 @@ export default class RideCard extends PureComponent {
                 </View>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity onPress={this.showRide}>
+            <TouchableOpacity onPress={() => {this.showRide(false)}}>
               <View style={{flex: 1, paddingTop: 15, paddingBottom: 15}}>
                 <Text style={{fontSize: 20}}>{this.props.ride.get('name') || 'No Name'}</Text>
               </View>
@@ -268,7 +263,7 @@ export default class RideCard extends PureComponent {
             </Button>
           </Left>
           <Right>
-            <Button transparent onPress={this.showComments}>
+            <Button transparent onPress={() => {this.showRide(true)}}>
               <BuildImage
                 source={require('../../img/comment.png')}
                 style={{height: 20, width: 20}}

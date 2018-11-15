@@ -16,7 +16,7 @@ import {
   HORSE_USER_UPDATED,
   HORSE_UPDATED,
   LOCAL_DATA_LOADED,
-  RIDE_COMMENT_CREATED,
+  RIDE_COMMENT_UPDATED,
   RIDE_CARROT_CREATED,
   RIDE_CARROT_SAVED,
   RIDE_COORDINATES_LOADED,
@@ -180,6 +180,9 @@ export default function PouchRecordsReducer(state=initialState, action) {
       ).set(
         'newRideCoordinates',
         Map(coordinateData)
+      ).set(
+        'selectedRideCoordinates',
+        Map(coordinateData)
       )
     case CREATE_RIDE_PHOTO:
       const newRidePhoto = {
@@ -262,7 +265,7 @@ export default function PouchRecordsReducer(state=initialState, action) {
       return state.setIn(['rideCarrots', action.carrotData.get('_id')], action.carrotData)
     case RIDE_CARROT_SAVED:
       return state.setIn(['rideCarrots', action.carrotData.get('_id')], action.carrotData)
-    case RIDE_COMMENT_CREATED:
+    case RIDE_COMMENT_UPDATED:
       return state.setIn(['rideComments', action.rideComment.get('_id')], action.rideComment)
     case RIDE_COORDINATES_LOADED:
       return state.set('selectedRideCoordinates', fromJS(action.rideCoordinates))

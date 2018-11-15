@@ -76,13 +76,11 @@ export default class CommentList extends PureComponent {
 
   render() {
     return (
-      <ScrollView>
-        <FlatList
-          data={this.props.rideComments.toJS()}
-          keyExtractor={(i) => i._id}
-          renderItem={this.singleComment}
-        />
-      </ScrollView>
+      <FlatList
+        data={this.props.rideComments.toJS()}
+        keyExtractor={(i) => i._id}
+        renderItem={this.singleComment}
+      />
     )
   }
 }

@@ -179,11 +179,14 @@ class FeedContainer extends BackgroundComponent {
     })
   }
 
-  showRide (ride) {
+  showRide (ride, skipToComments) {
     Navigation.push(this.props.componentId, {
       component: {
         name: RIDE,
-        passProps: {rideID: ride.get('_id')}
+        passProps: {
+          rideID: ride.get('_id'),
+          skipToComments,
+        }
       }
     });
   }

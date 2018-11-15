@@ -165,6 +165,9 @@ export function newRideName (currentRide) {
 
 export function logError (error) {
   console.log(error)
+  console.log('*****************************************')
+  console.log(error.stack)
+  console.log('*****************************************')
 }
 
 export function logInfo (info) {
