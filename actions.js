@@ -1,4 +1,5 @@
 import { AppState, NetInfo } from 'react-native'
+import { DISTRIBUTION } from 'react-native-dotenv'
 import BackgroundGeolocation from 'react-native-mauron85-background-geolocation'
 import { ENV } from 'react-native-dotenv'
 import firebase from 'react-native-firebase'
@@ -699,7 +700,8 @@ export function persistRide (rideID, newRide, newRidePhotoIDs, deletedPhotoIDs) 
             rideID,
           })))
           return pouchCouch.saveRide(theRidePhoto.toJS()).then(rideDoc => {
-            dispatch(ridePhotoUpdated(theRidePhoto.set('_rev', rideDoc.rev)))
+            const photo = getState().getIn(['pouchRecords', 'ridePhotos', ridePhotoID])
+            dispatch(ridePhotoUpdated(photo.set('_rev', rideDoc.rev)))
           })
         })
       }
@@ -713,7 +715,8 @@ export function persistRide (rideID, newRide, newRidePhotoIDs, deletedPhotoIDs) 
         rideSaves.then(() => {
           const theRidePhoto = getState().getIn(['pouchRecords', 'ridePhotos', deletedPhotoID])
           return pouchCouch.saveRide(theRidePhoto.toJS()).then(rideDoc => {
-            dispatch(ridePhotoUpdated(theRidePhoto.set('_rev', rideDoc.rev)))
+            const photo = getState().getIn(['pouchRecords', 'ridePhotos', deletedPhotoID])
+            dispatch(ridePhotoUpdated(photo.set('_rev', rideDoc.rev)))
           })
         })
       } else {
@@ -889,6 +892,7 @@ export function exchangePWCode (email, code) {
       await dispatch(loadLocalData())
       dispatch(startListeningFCMTokenRefresh())
       dispatch(getFCMToken())
+      dispatch(setDistributionOnServer())
       dispatch(startListeningFCM())
       await LocalStorage.saveToken(resp.token, resp.id);
     } catch (e) {
@@ -966,6 +970,7 @@ function findLocalToken () {
       dispatch(startListeningFCMTokenRefresh())
       dispatch(getFCMToken())
       dispatch(startListeningFCM())
+      dispatch(setDistributionOnServer())
       dispatch(syncDBPull('all'))
     } else {
       dispatch(switchRoot(SIGNUP_LOGIN))
@@ -1088,6 +1093,15 @@ export function setFCMTokenOnServer (token) {
     } catch (e) {
       logError('Could not set FCM token')
     }
+  }
+}
+
+export function setDistributionOnServer () {
+  return (_, getState) => {
+    const jwt = getState().getIn(['localState', 'jwt'])
+    const userAPI = new UserAPI(jwt)
+    const currentUserID = getState().getIn(['localState', 'userID'])
+    userAPI.setDistribution(currentUserID, DISTRIBUTION).catch(() => {})
   }
 }
 
@@ -1307,6 +1321,7 @@ export function submitLogin (email, password) {
       setUserContext()
       dispatch(startListeningFCMTokenRefresh())
       dispatch(getFCMToken())
+      dispatch(setDistributionOnServer())
       dispatch(startListeningFCM())
     } catch (e) {
       if (e instanceof UnauthorizedError) {
@@ -1338,6 +1353,7 @@ export function submitSignup (email, password) {
       await dispatch(loadLocalData())
       dispatch(startListeningFCMTokenRefresh())
       dispatch(getFCMToken())
+      dispatch(setDistributionOnServer())
       dispatch(startListeningFCM())
     } catch (e) {
       if (e instanceof BadRequestError) {

@@ -5,7 +5,6 @@ import { Navigation } from 'react-native-navigation'
 
 import {
   clearFeedMessage,
-  popShowRideShown,
   syncDBPull,
   toggleRideCarrot
 } from "../actions";
@@ -57,6 +56,7 @@ class FeedContainer extends BackgroundComponent {
       refreshing: false,
       lastFullSync: null,
       firstStartPopped: false,
+      ridePopped: false,
     }
     this.clearFeedMessage = this.clearFeedMessage.bind(this)
     this.toggleCarrot = this.toggleCarrot.bind(this)
@@ -117,12 +117,21 @@ class FeedContainer extends BackgroundComponent {
   componentDidUpdate () {
     if (this.props.popShowRideNow && !this.props.awaitingFullSync) {
       const showRide = this.props.rides.get(this.props.popShowRide.get('rideID'))
-      if (showRide) {
+      if (showRide && !this.state.ridePopped) {
         // PushNotification.showNotification gets called when it shouldn't if the app reboots unexpectedly.
         // This makes popShowRideNow get set when it shouldn't, so make sure we have a ride to show here.
         this.showRide(showRide, this.props.popShowRide.get('scrollToComments'), true)
+        this.setState({
+          ridePopped: true
+        })
       }
+    } else if (this.state.ridePopped) {
+      logDebug('clearing ride popped')
+      this.setState({
+        ridePopped: false
+      })
     }
+
     if (this.props.user && (!this.state.firstStartPopped && !this.props.user.get('finishedFirstStart'))) {
       this.showFirstStart()
       this.setState({
