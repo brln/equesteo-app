@@ -7,18 +7,13 @@ import {
   clearPausedLocations,
   createRidePhoto,
   deleteUnpersistedRide,
-  deleteUnpersistedPhoto,
   discardCurrentRide,
   mergeStashedLocations,
   persistRide,
-  persistRideCoordinates,
-  persistRidePhoto,
-  ridePhotoUpdated,
   rideUpdated,
   setPopShowRide,
   stopLocationTracking,
   stopStashNewLocations,
-  uploadRidePhoto
 } from '../actions'
 import BackgroundComponent from '../components/BackgroundComponent'
 import { brand } from '../colors'
@@ -52,7 +47,6 @@ class UpdateRideContainer extends BackgroundComponent {
       showPhotoMenu: false,
       selectedPhotoID: null
     }
-    this.actuallyDeletePhotos = this.actuallyDeletePhotos.bind(this)
     this.changeCoverPhoto = this.changeCoverPhoto.bind(this)
     this.changeHorseID = this.changeHorseID.bind(this)
     this.changePublic = this.changePublic.bind(this)
@@ -63,9 +57,7 @@ class UpdateRideContainer extends BackgroundComponent {
     this.horses = this.horses.bind(this)
     this.markPhotoDeleted = this.markPhotoDeleted.bind(this)
     this.openPhotoMenu = this.openPhotoMenu.bind(this)
-    this.persistRide = this.persistRide.bind(this)
     this.thisRidesPhotos = this.thisRidesPhotos.bind(this)
-    this.uploadNewPhotos = this.uploadNewPhotos.bind(this)
 
     this.memoizedHorses = memoizeOne(this.horses)
     this.memoThisRidesPhotos = memoizeOne(this.thisRidesPhotos)
@@ -131,17 +123,22 @@ class UpdateRideContainer extends BackgroundComponent {
     return state
   }
 
-  async navigationButtonPressed({ buttonId }) {
+  navigationButtonPressed({ buttonId }) {
     if (this.props.newRide) {
       Navigation.mergeOptions(this.props.componentId, {topBar: {rightButtons: []}})
       if (buttonId === 'save') {
-        this.props.dispatch(discardCurrentRide())
-        this.actuallyDeletePhotos()
-        await this.persistRide()
+        this.props.dispatch(persistRide(
+          this.props.ride.get('_id'),
+          true,
+          this.state.newPhotoIDs,
+          this.state.deletedPhotoIDs
+        ))
         this.props.dispatch(setPopShowRide(this.props.ride.get('_id'), true))
-        this.props.dispatch(clearPausedLocations())
-        this.props.dispatch(stopLocationTracking())
-        Navigation.popToRoot(this.props.componentId)
+        Navigation.popToRoot(this.props.componentId).then(() => {
+          this.props.dispatch(clearPausedLocations())
+          this.props.dispatch(stopLocationTracking())
+          this.props.dispatch(discardCurrentRide())
+        })
       } else if (buttonId === 'discard') {
         Navigation.popToRoot(this.props.componentId).then(() => {
           this.props.dispatch(clearPausedLocations())
@@ -156,8 +153,12 @@ class UpdateRideContainer extends BackgroundComponent {
       }
     } else {
       if (buttonId === 'save') {
-        this.persistRide(this.props.ride.get('_id'))
-        this.actuallyDeletePhotos()
+        this.props.dispatch(persistRide(
+          this.props.ride.get('_id'),
+          false,
+          this.state.newPhotoIDs,
+          this.state.deletedPhotoIDs
+        ))
         Navigation.pop(this.props.componentId)
       } else if (buttonId === 'back' || buttonId === 'discard') {
         this.props.dispatch(rideUpdated(this.state.cachedRide))
@@ -204,18 +205,6 @@ class UpdateRideContainer extends BackgroundComponent {
     })
   }
 
-  actuallyDeletePhotos () {
-    for (let photoID of this.state.deletedPhotoIDs) {
-      if (this.state.newPhotoIDs.indexOf(photoID) < 0) {
-        const deleted = this.props.ridePhotos.get(photoID).set('deleted', true)
-        this.props.dispatch(ridePhotoUpdated(deleted))
-        this.props.dispatch(persistRidePhoto(deleted.get('_id')))
-      } else {
-        this.props.dispatch(deleteUnpersistedPhoto('ridePhotos', photoID))
-      }
-    }
-  }
-
   changePublic () {
     this.props.dispatch(rideUpdated(
       this.props.ride.set('isPublic', !this.props.ride.get('isPublic'))
@@ -238,29 +227,6 @@ class UpdateRideContainer extends BackgroundComponent {
     this.props.dispatch(rideUpdated(
       this.props.ride.set('horseID', horseID)
     ))
-  }
-
-  async uploadNewPhotos () {
-    for (let photoID of this.state.newPhotoIDs) {
-      if (this.state.deletedPhotoIDs.indexOf(photoID) < 0) {
-        await this.props.dispatch(persistRidePhoto(photoID))
-        this.props.dispatch(
-          uploadRidePhoto(
-            photoID,
-            this.props.ridePhotos.getIn([photoID, 'uri']),
-            this.props.ride.get('_id')
-          )
-        )
-      }
-    }
-  }
-
-  async persistRide () {
-    await this.props.dispatch(persistRide(this.props.ride.get('_id')))
-    if (this.props.newRide) {
-      await this.props.dispatch(persistRideCoordinates())
-    }
-    await this.uploadNewPhotos()
   }
 
   changeCoverPhoto (coverPhotoID) {

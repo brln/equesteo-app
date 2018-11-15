@@ -37,7 +37,13 @@ export default function CurrentRideReducer(state=initialState, action) {
     case CLEAR_PAUSED_LOCATIONS:
       return state.set('stashedCoordinates', List())
     case DISCARD_CURRENT_RIDE:
-      return state.set('currentRide', null)
+      return state.set(
+        'currentRide', null
+      ).set(
+        'currentRideCoordinates', null
+      ).set(
+        'currentRideElevations', null
+      )
     case LOAD_CURRENT_RIDE_STATE:
       return action.currentRideState
     case PAUSE_LOCATION_TRACKING:

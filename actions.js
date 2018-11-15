@@ -64,7 +64,7 @@ import {
   REPLACE_LAST_LOCATION,
   RIDE_CARROT_CREATED,
   RIDE_CARROT_SAVED,
-  RIDE_COMMENT_CREATED,
+  RIDE_COMMENT_UPDATED,
   RIDE_COORDINATES_LOADED,
   RIDE_ELEVATIONS_UPDATED,
   RIDE_PHOTO_UPDATED,
@@ -87,6 +87,14 @@ import {
   USER_SEARCH_RETURNED,
   USER_UPDATED,
 } from './constants'
+
+function catchAsyncError (e) {
+  logError(e)
+  captureException(e)
+  setTimeout(() => {
+    throw Error('Async error')
+  }, 0)
+}
 
 export function awaitFullSync () {
   return {
@@ -451,9 +459,9 @@ export function rideCarrotSaved (carrotData) {
   }
 }
 
-function rideCommentCreated (rideComment) {
+function rideCommentUpdated (rideComment) {
   return {
-    type: RIDE_COMMENT_CREATED,
+    type: RIDE_COMMENT_UPDATED,
     rideComment
   }
 }
@@ -643,52 +651,96 @@ export function persistFollow (followID) {
   }
 }
 
-export function persistRide (rideID) {
-  return async (dispatch, getState) => {
+export function persistRide (rideID, newRide, newRidePhotoIDs, deletedPhotoIDs) {
+  return (dispatch, getState) => {
     const theRide = getState().getIn(['pouchRecords', 'rides', rideID])
-    if (!theRide) {
-      throw new Error('no ride with that ID')
-    }
 
-    const theElevations = getState().getIn(['pouchRecords', 'rideElevations', rideID + '_elevations'])
     const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
-    const [rideDoc, elevationDoc] = await Promise.all([
-      pouchCouch.saveRide(theRide.toJS()),
-      pouchCouch.saveRide(theElevations.toJS())
-    ])
 
-    const theRideAfterSave = getState().getIn(['pouchRecords', 'rides', rideID])
-    const theElevationsAfterSave = getState().getIn(['pouchRecords', 'rideElevations', rideID + '_elevations'])
-    dispatch(rideElevationsUpdated(theElevationsAfterSave.set('_rev', elevationDoc.rev)))
-    dispatch(rideUpdated(theRideAfterSave.set('_rev', rideDoc.rev)))
-    dispatch(needsRemotePersist('rides'))
-  }
-}
+    let rideRev
+    let elevationRev
+    let coordinateRev
+    const rideSaves = pouchCouch.saveRide(theRide.toJS()).then((rideDoc) => {
+      rideRev = rideDoc.rev
+    })
 
-export function persistRideCoordinates () {
-  return async (dispatch, getState) => {
-    const theCoordinates = getState().getIn(['pouchRecords', 'newRideCoordinates'])
-    const pouchCouch = new PouchCouch()
-    const coordinateDoc = await pouchCouch.saveRide(theCoordinates.toJS())
-    dispatch(rideCoordinatesLoaded(theCoordinates.set('_rev', coordinateDoc)))
-    dispatch(needsRemotePersist('rides'))
+    if (newRide) {
+      rideSaves.then(() => {
+        const theElevations = getState().getIn(['pouchRecords', 'rideElevations', rideID + '_elevations'])
+        return pouchCouch.saveRide(theElevations.toJS())
+      }).then(rideElevationDoc => {
+        elevationRev = rideElevationDoc.rev
+        const theCoordinates = getState().getIn(['pouchRecords', 'newRideCoordinates'])
+        return pouchCouch.saveRide(theCoordinates.toJS())
+      }).then(rideCoordinateDoc => {
+        coordinateRev = rideCoordinateDoc.rev
+      })
+    }
+
+    for (let ridePhotoID of newRidePhotoIDs) {
+      if (deletedPhotoIDs.indexOf(ridePhotoID) < 0) {
+        rideSaves.then(() => {
+          const theRidePhoto = getState().getIn(['pouchRecords', 'ridePhotos', ridePhotoID])
+          dispatch(enqueuePhoto(Map({
+            type: 'ride',
+            photoLocation: theRidePhoto.get('uri'),
+            photoID: ridePhotoID,
+            rideID,
+          })))
+          return pouchCouch.saveRide(theRidePhoto.toJS()).then(rideDoc => {
+            dispatch(ridePhotoUpdated(theRidePhoto.set('_rev', rideDoc.rev)))
+          })
+        })
+      }
+    }
+
+    for (let deletedPhotoID of deletedPhotoIDs) {
+      if (newRidePhotoIDs.indexOf(deletedPhotoID) < 0) {
+        const theRidePhoto = getState().getIn(['pouchRecords', 'ridePhotos', deletedPhotoID])
+        const deleted = theRidePhoto.set('deleted', true)
+        dispatch(ridePhotoUpdated(deleted))
+        rideSaves.then(() => {
+          const theRidePhoto = getState().getIn(['pouchRecords', 'ridePhotos', deletedPhotoID])
+          return pouchCouch.saveRide(theRidePhoto.toJS()).then(rideDoc => {
+            dispatch(ridePhotoUpdated(theRidePhoto.set('_rev', rideDoc.rev)))
+          })
+        })
+      } else {
+        dispatch(deleteUnpersistedPhoto('ridePhotos', deletedPhotoID))
+      }
+    }
+
+    rideSaves.then(() => {
+      console.log('after save')
+      const theRide = getState().getIn(['pouchRecords', 'rides', rideID])
+      dispatch(rideUpdated(theRide.set('_rev', rideRev)))
+
+
+      if (newRide) {
+        const theElevations = getState().getIn(['pouchRecords', 'rideElevations', rideID + '_elevations'])
+        const theCoordinates = getState().getIn(['pouchRecords', 'newRideCoordinates'])
+        dispatch(rideElevationsUpdated(theElevations.set('_rev', elevationRev)))
+        dispatch(rideCoordinatesLoaded(theCoordinates.set('_rev', coordinateRev)))
+      }
+      dispatch(needsRemotePersist('rides'))
+    }).catch(catchAsyncError)
   }
 }
 
 export function persistRidePhoto (ridePhotoID) {
-  return async (dispatch, getState) => {
+  return (dispatch, getState) => {
     const theRidePhoto = getState().getIn(['pouchRecords', 'ridePhotos', ridePhotoID])
     if (!theRidePhoto) {
       throw new Error('no ride photo with that ID')
     }
     const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
-    const doc = await pouchCouch.saveRide(theRidePhoto.toJS())
-
-    const theRidePhotoAfterSave = getState().getIn(['pouchRecords', 'ridePhotos', ridePhotoID])
-    dispatch(ridePhotoUpdated(theRidePhotoAfterSave.set('_rev', doc.rev)))
-    dispatch(needsRemotePersist('rides'))
+    pouchCouch.saveRide(theRidePhoto.toJS()).then((doc) => {
+      const theRidePhotoAfterSave = getState().getIn(['pouchRecords', 'ridePhotos', ridePhotoID])
+      dispatch(ridePhotoUpdated(theRidePhotoAfterSave.set('_rev', doc.rev)))
+      dispatch(needsRemotePersist('rides'))
+    }).catch(catchAsyncError)
   }
 }
 
@@ -773,12 +825,12 @@ export function persistHorseUser (horseUserID) {
 }
 
 export function createRideComment(commentData) {
-  return async (dispatch, getState) => {
+  return (dispatch, getState) => {
     const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
     const currentUserID = getState().getIn(['localState', 'userID'])
     const commentID = `${currentUserID}_${(new Date).getTime().toString()}`
-    const newComment = {
+    const newComment = Map({
       _id: commentID,
       rideID: commentData.rideID,
       userID: currentUserID,
@@ -786,15 +838,19 @@ export function createRideComment(commentData) {
       type: 'comment',
       comment: commentData.comment,
       timestamp: commentData.timestamp
-    }
-    const doc = await pouchCouch.saveRide(newComment)
-    dispatch(rideCommentCreated(Map(newComment).set('_rev', doc.rev)))
-    dispatch(needsRemotePersist('rides'))
+    })
+    dispatch(rideCommentUpdated(newComment))
+    pouchCouch.saveRide(newComment.toJS()).then((doc) => {
+      const afterSave = getState().getIn(['pouchRecords', 'rideComments', commentID])
+      dispatch(rideCommentUpdated(afterSave.set('_rev', doc.rev)))
+      dispatch(needsRemotePersist('rides'))
+    }).catch(catchAsyncError)
+
   }
 }
 
 export function deleteHorseUser (horseUserID) {
-  return async (dispatch, getState) => {
+  return (dispatch, getState) => {
     let theHorseUser = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
     if (!theHorseUser) {
       throw Error('Could not find horseUser')
@@ -949,7 +1005,7 @@ export function loadRideCoordinates (rideID) {
     const pouchCouch = new PouchCouch()
     pouchCouch.loadRideCoordinates(rideID).then((coords) => {
       dispatch(rideCoordinatesLoaded(coords))
-    })
+    }).catch(catchAsyncError)
   }
 }
 
@@ -1316,7 +1372,7 @@ export function syncDBPull () {
 }
 
 export function toggleRideCarrot (rideID) {
-  return async (dispatch, getState) => {
+  return (dispatch, getState) => {
     const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
     const currentUserID = getState().getIn(['localState', 'userID'])
@@ -1324,24 +1380,33 @@ export function toggleRideCarrot (rideID) {
       return c.get('rideID') === rideID && c.get('userID') === currentUserID
     })
     existing = existing.count() > 0 ? existing.get(0) : null
+
+    let save
     if (existing) {
       let toggled = existing.set('deleted', !existing.get('deleted'))
-      const doc = await pouchCouch.saveRide(toggled.toJS())
-      dispatch(rideCarrotSaved(toggled.set('_rev', doc.rev)))
+      dispatch(rideCarrotSaved(toggled))
+      save = pouchCouch.saveRide(toggled.toJS()).then((doc) => {
+        let afterSave = getState().getIn(['pouchRecords', 'rideCarrots', toggled.get('_id')])
+        dispatch(rideCarrotSaved(afterSave.set('_rev', doc.rev)))
+      })
     } else {
       const carrotID = `${currentUserID}_${(new Date).getTime().toString()}`
-      const newCarrot = {
+      const newCarrot = Map({
         _id: carrotID,
         rideID,
         userID: currentUserID,
         deleted: false,
         type: 'carrot'
-      }
-
-      const doc = await pouchCouch.saveRide(newCarrot)
-      dispatch(rideCarrotCreated(Map(newCarrot).set('_rev', doc.rev)))
+      })
+      dispatch(rideCarrotCreated(newCarrot))
+      save = pouchCouch.saveRide(newCarrot.toJS()).then(doc => {
+        let afterSave = getState().getIn(['pouchRecords', 'rideCarrots', carrotID])
+        dispatch(rideCarrotSaved(afterSave.set('_rev', doc.rev)))
+      })
     }
-    dispatch(needsRemotePersist('rides'))
+    save.then(() => {
+      dispatch(needsRemotePersist('rides'))
+    }).catch(catchAsyncError)
   }
 }
 
@@ -1377,11 +1442,4 @@ export function uploadUserPhoto (photoID, photoLocation) {
     dispatch(enqueuePhoto(Map({type: 'user', photoLocation, photoID})))
   }
 }
-
-export function uploadRidePhoto (photoID, photoLocation, rideID) {
-  return (dispatch) => {
-    dispatch(enqueuePhoto(Map({type: 'ride', photoLocation, photoID, rideID})))
-  }
-}
-
 

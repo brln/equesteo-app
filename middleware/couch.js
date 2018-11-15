@@ -4,12 +4,19 @@ import {
   remotePersistError,
   remotePersistStarted
 } from '../actions'
-import { logError } from '../helpers'
+import { logInfo, logError } from '../helpers'
 import { PouchCouch } from '../services/index'
 import { captureException } from '../services/Sentry'
 
 let queue = []
 let savingRemotely = false
+let currentlySavingDB = null
+
+function addToQueue (db) {
+  if (currentlySavingDB !== db && queue.indexOf(db) < 0) {
+    queue.push(db)
+  }
+}
 
 export default storeToCouch = store => dispatch => action => {
   dispatch(action)
@@ -24,7 +31,7 @@ export default storeToCouch = store => dispatch => action => {
     for (let db of needsPersist.keySeq()) {
       if (needsPersist.get(db)) {
         if (savingRemotely) {
-          queue.push(db)
+          addToQueue(db)
         } else {
           recursiveEmptyQueue(db, store, pouchCouch)
         }
@@ -45,7 +52,9 @@ function remotePersist (db, store, pouchCouch) {
   if (!knowsAboutPersist) {
     store.dispatch(remotePersistStarted())
   }
+  currentlySavingDB = db
   pouchCouch.remoteReplicateDB(db).on('complete', () => {
+    currentlySavingDB = null
     if (queue.length) {
       const db = queue.shift()
       recursiveEmptyQueue(db, store, pouchCouch)
@@ -58,6 +67,7 @@ function remotePersist (db, store, pouchCouch) {
       }
     }
   }).on('error', (e) => {
+    currentlySavingDB = null
     const knowsAboutError = store.getState().getIn(['localState', 'remotePersistError'])
     if (!knowsAboutError) {
       store.dispatch(remotePersistError())

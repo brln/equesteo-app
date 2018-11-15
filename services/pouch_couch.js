@@ -39,11 +39,9 @@ export default class PouchCouch {
   }
 
   saveRide (rideData) {
-    return this.localRidesDB.put(rideData).catch((e) => {
-      logInfo('error saving ride')
-      this.catchError(e)
-    })
+    return this.localRidesDB.put(rideData)
   }
+
 
   saveUser (userData) {
     return this.localUsersDB.put(userData).catch((e) => {

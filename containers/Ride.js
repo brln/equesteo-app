@@ -150,12 +150,14 @@ class RideContainer extends PureComponent {
   }
 
   componentDidMount () {
-    this.props.dispatch(loadRideCoordinates(this.props.ride.get('_id')))
+    if(!this.props.rideCoordinates || this.props.rideCoordinates.get('rideID') !== this.props.ride.get('_id')) {
+      this.props.dispatch(loadRideCoordinates(this.props.ride.get('_id')))
+    }
   }
 
   deleteRide () {
     this.props.dispatch(rideUpdated(this.props.ride.set('deleted', true)))
-    this.props.dispatch(persistRide(this.props.ride.get('_id')))
+    this.props.dispatch(persistRide(this.props.ride.get('_id'), false, [], []))
     Navigation.pop(this.props.componentId)
   }
 

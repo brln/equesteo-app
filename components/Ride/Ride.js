@@ -395,10 +395,11 @@ export default class Ride extends PureComponent {
                   showHorseProfile={this.props.showHorseProfile}
                   userID={this.props.userID}
                 />
-                { this.rideNotes() }
+
               </CardItem>
             </Card>
 
+            { this.rideNotes() }
 
             <Card style={{flex: 1}}>
               <CardItem header style={{padding: 5}}>
