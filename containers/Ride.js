@@ -160,8 +160,6 @@ class RideContainer extends PureComponent {
     if (this.props.isPopShow) {
       this.props.dispatch(popShowRideShown())
     }
-    this.props.dispatch(loadRideCoordinates(this.props.ride.get('_id')))
-
   }
 
   componentWillUnmount () {
