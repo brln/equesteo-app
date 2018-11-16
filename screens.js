@@ -2,6 +2,7 @@ import { Navigation } from 'react-native-navigation';
 
 import About from './components/About'
 import BarnContainer from './containers/Barn'
+import Camera from './components/Camera'
 import DrawerContainer from './containers/Drawer'
 import FeedContainer from './containers/Feed'
 import FindPeopleContainer from './containers/FindPeople'
@@ -21,6 +22,7 @@ import UpdateProfileContainer from './containers/UpdateProfile'
 
 export const ABOUT_PAGE = 'equesteo.About'
 export const BARN = 'equesteo.Barn'
+export const CAMERA = 'equesteo.Camera'
 export const DRAWER = 'equesteo.Drawer'
 export const FEED = 'equesteo.Feed'
 export const FIRST_START = 'equesteo.FirstStart'
@@ -42,6 +44,7 @@ export const UPDATE_NEW_RIDE_ID = 'equesteo.UpdateNewRide'
 
 export function registerScreens(store, Provider) {
   Navigation.registerComponent(ABOUT_PAGE, () => About)
+  Navigation.registerComponent(CAMERA, () => Camera)
   Navigation.registerComponentWithRedux(BARN, () => BarnContainer, Provider, store)
   Navigation.registerComponentWithRedux(DRAWER, () => DrawerContainer, Provider, store)
   Navigation.registerComponentWithRedux(FEED, () => FeedContainer, Provider, store)

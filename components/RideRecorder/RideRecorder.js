@@ -25,6 +25,7 @@ export default class RideRecorder extends PureComponent {
     }
     this.tapGPS = this.tapGPS.bind(this)
     this.hitPause = this.hitPause.bind(this)
+    this.showCamera = this.showCamera.bind(this)
     this.toggleFab = this.toggleFab.bind(this)
   }
 
@@ -53,6 +54,11 @@ export default class RideRecorder extends PureComponent {
     this.toggleFab()
   }
 
+  showCamera () {
+    this.props.showCamera()
+    this.toggleFab()
+  }
+
   render() {
     let mainView = null
     let gpsBar = null
@@ -69,7 +75,7 @@ export default class RideRecorder extends PureComponent {
     }
     if (this.state.fabActive) {
       cameraButton = (
-        <Button style={{ backgroundColor: orange }}>
+        <Button style={{ backgroundColor: orange }} onPress={this.showCamera}>
           <FabImage source={require('../../img/camera.png')} height={30} width={30} />
         </Button>
       )
@@ -108,7 +114,7 @@ export default class RideRecorder extends PureComponent {
               >
                 <Text>...</Text>
                 { pauseButton }
-                {/*{ cameraButton }*/}
+                { cameraButton }
               </Fab>
             </View>
             {

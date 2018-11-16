@@ -17,7 +17,7 @@ import {
 import { brand } from '../colors'
 import RideRecorder from '../components/RideRecorder/RideRecorder'
 import { isAndroid, logRender, unixTimeNow } from '../helpers'
-import { UPDATE_RIDE, UPDATE_NEW_RIDE_ID } from "../screens"
+import { CAMERA, UPDATE_RIDE, UPDATE_NEW_RIDE_ID } from "../screens"
 
 class RecorderContainer extends PureComponent {
   static options() {
@@ -53,6 +53,7 @@ class RecorderContainer extends PureComponent {
     this.discardRide = this.discardRide.bind(this)
     this.finishRide = this.finishRide.bind(this)
     this.pauseLocationTracking = this.pauseLocationTracking.bind(this)
+    this.showCamera = this.showCamera.bind(this)
     this.showUpdateRide = this.showUpdateRide.bind(this)
     this.startRide = this.startRide.bind(this)
     this.unpauseLocationTracking = this.unpauseLocationTracking.bind(this)
@@ -145,6 +146,15 @@ class RecorderContainer extends PureComponent {
     this.props.dispatch(startRide(this.props.lastLocation, this.props.lastElevation, unixTimeNow()))
   }
 
+  showCamera () {
+    Navigation.push(this.props.componentId, {
+      component: {
+        name: CAMERA,
+        id: CAMERA,
+      }
+    })
+  }
+
   finishRide () {
     if (this.props.currentRideCoordinates.get('rideCoordinates').count() > 0) {
       this.props.dispatch(stashNewLocations())
@@ -203,6 +213,7 @@ class RecorderContainer extends PureComponent {
         lastLocation={this.props.lastLocation}
         refiningLocation={this.props.refiningLocation}
         pauseLocationTracking={this.pauseLocationTracking}
+        showCamera={this.showCamera}
         showGPSBar={this.state.showGPSBar}
         showUpdateRide={this.showUpdateRide}
         startRide={this.startRide}

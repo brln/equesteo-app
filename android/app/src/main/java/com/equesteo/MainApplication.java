@@ -24,6 +24,7 @@ import io.invertase.firebase.instanceid.RNFirebaseInstanceIdPackage;
 import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
 import io.sentry.RNSentryPackage;
 import com.mapbox.rctmgl.RCTMGLPackage;
+import com.wix.RNCameraKit.RNCameraKitPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -77,7 +78,8 @@ public class MainApplication extends NavigationApplication {
             new RNFirebaseInstanceIdPackage(),
             new RNSentryPackage(MainApplication.this),
             new SvgPackage(),
-            new RCTMGLPackage()
+            new RCTMGLPackage(),
+            new RNCameraKitPackage()
         );
     }
 

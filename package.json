@@ -20,6 +20,7 @@
     "react": "16.2.0",
     "react-native": "^0.55.4",
     "react-native-android-location-services-dialog-box": "^2.5.1",
+    "react-native-camera-kit": "^6.3.0",
     "react-native-firebase": "^4.3.6",
     "react-native-image-crop-picker": "^0.20.0",
     "react-native-image-zoom-viewer": "^2.2.13",
