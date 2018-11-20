@@ -126,7 +126,6 @@ class FeedContainer extends BackgroundComponent {
         })
       }
     } else if (this.state.ridePopped) {
-      logDebug('clearing ride popped')
       this.setState({
         ridePopped: false
       })

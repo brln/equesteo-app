@@ -10,18 +10,31 @@ export default class URIIImage extends PureComponent {
   constructor () {
     super()
     this.state = {
-      error: false
+      error: false,
+      nextRetry: 4000
     }
     this.mainImage = this.mainImage.bind(this)
     this.typeImage = this.typeImage.bind(this)
     this.onError = this.onError.bind(this)
   }
 
+  componentWillUnmount () {
+    clearTimeout(this.retryTimeout)
+  }
+
   onError () {
     this.props.onError ? this.props.onError() : null
     this.setState({
-      error: true
+      error: true,
     })
+    if (this.state.nextRetry <= 32000) {
+      this.retryTimeout = setTimeout(() => {
+        this.setState({
+          error: false,
+          nextRetry: this.state.nextRetry * 2
+        })
+      }, this.state.nextRetry)
+    }
   }
 
   typeImage () {
@@ -68,6 +81,7 @@ export default class URIIImage extends PureComponent {
           source={this.props.source}
           style={this.props.style}
           onError={this.onError}
+          resizeMode={this.props.resizeMode}
         />
       )
     }

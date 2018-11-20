@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { VictoryArea, VictoryAxis, VictoryChart, VictoryLine } from "victory-native"
+import { VictoryArea, VictoryAxis, VictoryChart } from "victory-native"
 import {
   Dimensions,
   StyleSheet,
@@ -9,28 +9,27 @@ import {
 import { brand, darkBrand, lightGrey } from '../../colors'
 import { logRender } from '../../helpers'
 
-const { height, width } = Dimensions.get('window')
+const { width } = Dimensions.get('window')
 
-export default class SpeedChart extends PureComponent {
+export default class ElevationGain extends PureComponent {
   constructor (props) {
     super(props)
   }
 
   render () {
-    logRender('rendering SpeedChart')
+    logRender('rendering ElevationProfile')
     return (
       <View style={styles.container}>
         <VictoryChart
-          width={width}
-          height={(width * 9 / 16) + 54}
-          padding={{ top: 50, bottom: 50, left: 55, right: 10 }}
+          padding={{ top: 50, bottom: 50, left: 80, right: 10 }}
         >
           <VictoryAxis
             label={'mi'}
           />
           <VictoryAxis
+            crossAxis={false}
             dependentAxis
-            label={'mph'}
+            label={'ft'}
             style={{
               axisLabel: {padding: 40},
               grid: {stroke: lightGrey},
@@ -38,19 +37,10 @@ export default class SpeedChart extends PureComponent {
 
           />
           <VictoryArea
-            data={this.props.speedData}
-            style={{ data: { fill: brand, fillOpacity: 0.7 }}}
+            data={this.props.elevationData}
+            style={{ data: { fill: darkBrand, fillOpacity: 0.7 }}}
             x="distance"
-            y="max"
-            y0="min"
-          />
-          <VictoryLine
-            data={this.props.speedData}
-            x="distance"
-            y="pace"
-           style={{
-             data: {stroke: darkBrand, strokeWidth: 1}
-           }}
+            y="gain"
           />
         </VictoryChart>
         <View // Workaround for making swipe/scroll work.
@@ -71,6 +61,5 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f5fcff"
   }
 });

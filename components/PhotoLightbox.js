@@ -7,11 +7,6 @@ import {
 export default class PhotoLightbox extends PureComponent {
   constructor (props) {
     super(props)
-    this.close = this.close.bind(this)
-  }
-
-  close () {
-    this.props.close()
   }
 
   render() {

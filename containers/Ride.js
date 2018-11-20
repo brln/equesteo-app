@@ -21,6 +21,7 @@ import {
   MAP,
   PHOTO_LIGHTBOX,
   PROFILE,
+  RIDE_CHARTS,
   UPDATE_RIDE
 } from '../screens'
 
@@ -101,6 +102,7 @@ class RideContainer extends PureComponent {
     this.submitComment = this.submitComment.bind(this)
     this.thisRidesPhotos = this.thisRidesPhotos.bind(this)
     this.updateNewComment = this.updateNewComment.bind(this)
+    this.viewRideCharts = this.viewRideCharts.bind(this)
 
     Navigation.events().bindComponent(this);
 
@@ -114,6 +116,17 @@ class RideContainer extends PureComponent {
 
     this.memoRideComments = memoizeOne(this.rideComments)
     this.memoThisRidesPhotos = memoizeOne(this.thisRidesPhotos)
+  }
+
+  viewRideCharts () {
+    Navigation.push(this.props.componentId, {
+      component: {
+        name: RIDE_CHARTS,
+        passProps: {
+          rideID: this.props.ride.get('_id'),
+        }
+      }
+    })
   }
 
   updateNewComment (newComment) {
@@ -257,6 +270,7 @@ class RideContainer extends PureComponent {
         userID={this.props.userID}
         userPhotos={this.props.userPhotos}
         users={this.props.users}
+        viewRideCharts={this.viewRideCharts}
       />
     )
   }

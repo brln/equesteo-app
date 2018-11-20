@@ -1,9 +1,11 @@
+import { Navigation } from 'react-native-navigation'
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
 
 import { brand } from '../colors'
 import ViewingMap from '../components/Ride/ViewingMap'
 import { logRender } from '../helpers'
+import { PHOTO_LIGHTBOX } from '../screens'
 
 class MapContainer extends PureComponent {
   static options() {
@@ -25,6 +27,24 @@ class MapContainer extends PureComponent {
 
   constructor (props) {
     super(props)
+    this.showPhotoLightbox = this.showPhotoLightbox.bind(this)
+  }
+
+  showPhotoLightbox (sources) {
+    Navigation.push(this.props.componentId, {
+      component: {
+        name: PHOTO_LIGHTBOX,
+        passProps: {
+          sources
+        }
+      },
+    })
+  }
+
+  thisRidesPhotos (ridePhotos) {
+    return ridePhotos.filter((rp) => {
+      return rp.get('rideID') === this.props.ride.get('_id') && rp.get('deleted') !== true
+    })
   }
 
   render() {
@@ -32,6 +52,8 @@ class MapContainer extends PureComponent {
     return (
       <ViewingMap
         rideCoordinates={this.props.rideCoordinates}
+        ridePhotos={this.thisRidesPhotos(this.props.ridePhotos)}
+        showPhotoLightbox={this.showPhotoLightbox}
       />
     )
   }
@@ -45,6 +67,7 @@ function mapStateToProps (state, passedProps) {
   ])
   return {
     ride: state.getIn(['pouchRecords', 'rides', passedProps.rideID]),
+    ridePhotos: state.getIn(['pouchRecords', 'ridePhotos']),
     rideCoordinates,
   }
 }

@@ -1,8 +1,9 @@
 import React, { PureComponent } from 'react'
-import { VictoryArea, VictoryAxis, VictoryChart, VictoryLine } from "victory-native"
+import { VictoryArea, VictoryAxis, VictoryChart, VictoryLabel, VictoryLine } from "victory-native"
 import {
   Dimensions,
   StyleSheet,
+  Text,
   View,
 } from 'react-native'
 
@@ -11,24 +12,23 @@ import { logRender } from '../../helpers'
 
 const { width } = Dimensions.get('window')
 
-export default class ElevationChart extends PureComponent {
+export default class ElevationProfile extends PureComponent {
   constructor (props) {
     super(props)
   }
 
   render () {
-    logRender('rendering SpeedChart')
+    logRender('rendering ElevationProfile')
     return (
       <View style={styles.container}>
         <VictoryChart
-          width={width}
-          height={(width * 9 / 16) + 54}
-          padding={{ top: 50, bottom: 50, left: 55, right: 10 }}
+          padding={{ top: 50, bottom: 50, left: 80, right: 10 }}
         >
           <VictoryAxis
             label={'mi'}
           />
           <VictoryAxis
+            crossAxis={false}
             dependentAxis
             label={'ft'}
             style={{
@@ -39,16 +39,9 @@ export default class ElevationChart extends PureComponent {
           />
           <VictoryArea
             data={this.props.elevationData}
-            style={{ data: { fill: brand, fillOpacity: 0.7 }}}
-            x="distance"
-            y0="gain"
-            y="elevation"
-          />
-          <VictoryArea
-            data={this.props.elevationData}
             style={{ data: { fill: darkBrand, fillOpacity: 0.7 }}}
             x="distance"
-            y="gain"
+            y="elevation"
           />
         </VictoryChart>
         <View // Workaround for making swipe/scroll work.
@@ -69,6 +62,5 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f5fcff"
   }
 });

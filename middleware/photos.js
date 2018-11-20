@@ -76,7 +76,7 @@ function remotePersist (item, store, userAPI) {
       default:
         throw Error('cant persist type I don\'t know about')
     }
-    ImagePicker.cleanSingle(item.get('photoLocation'))
+    ImagePicker.cleanSingle(item.get('photoLocation')).catch(e => logError(e))
 
     if (workingQueue.length) {
       const item = workingQueue.shift()

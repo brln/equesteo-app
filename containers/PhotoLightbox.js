@@ -1,8 +1,8 @@
+import { Navigation } from 'react-native-navigation'
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
 import PhotoLightbox from '../components/PhotoLightbox'
 
-import { brand } from '../colors'
 import { logRender } from '../helpers'
 
 class PhotoLightboxContainer extends PureComponent {
@@ -15,6 +15,13 @@ class PhotoLightboxContainer extends PureComponent {
         backButton: {
           color: 'white'
         },
+        leftButtons: [
+          {
+            id: 'back',
+            icon: require('../img/back-arrow.png'),
+            color: 'white'
+          }
+        ],
         elevation: 0
       },
       layout: {
@@ -25,13 +32,23 @@ class PhotoLightboxContainer extends PureComponent {
 
   constructor (props) {
     super(props)
+    this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
+    Navigation.events().bindComponent(this);
+  }
+
+  navigationButtonPressed ({ buttonId }) {
+    if (buttonId === 'back') {
+      Navigation.pop(this.props.componentId)
+      if (this.props.onClose) {
+        this.props.onClose()
+      }
+    }
   }
 
   render() {
     logRender('PhotoLightboxContainer')
     return (
       <PhotoLightbox
-        close={this.props.close}
         sources={this.props.sources}
       />
     )
@@ -40,7 +57,7 @@ class PhotoLightboxContainer extends PureComponent {
 
 function mapStateToProps (state, passedProps) {
   return {
-    close: passedProps.close,
+    onClose: passedProps.onClose,
     sources: passedProps.sources
   }
 }
