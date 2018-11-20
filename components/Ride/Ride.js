@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react'
-import Swiper from 'react-native-swiper';
 import memoizeOne from 'memoize-one';
 import moment from 'moment'
 import {
@@ -20,15 +19,15 @@ import {
   Thumbnail
 } from 'native-base'
 
-import { darkBrand, darkGrey } from '../../colors'
-import { haversine, logRender, logInfo, parseRideCoordinate, toElevationKey } from '../../helpers'
+import BuildImage from '../BuildImage'
+import Button from '../Button'
+import { brand, darkBrand, darkGrey } from '../../colors'
+import { haversine, logRender, logInfo, parseRideCoordinate } from '../../helpers'
 import PhotoFilmstrip from './PhotoFilmstrip'
-import RideImage from '../Feed/RideImage'
-import SpeedChart from './SpeedChart'
 import Stats from './Stats'
 import DeleteModal from '../Shared/DeleteModal'
-import ElevationChart from './ElevationChart'
 import RideComments from '../RideComments/RideComments'
+import ViewingMap from './ViewingMap'
 
 const { width } = Dimensions.get('window')
 
@@ -49,13 +48,9 @@ export default class Ride extends PureComponent {
     this.rideNotes = this.rideNotes.bind(this)
     this.rideTime = this.rideTime.bind(this)
     this.maybeShowID = this.maybeShowID.bind(this)
-    this.parseElevationData = this.parseElevationData.bind(this)
     this.showProfile = this.showProfile.bind(this)
-    this.speedChart = this.speedChart.bind(this)
 
-    this.memoizedParse = memoizeOne(this.parseSpeedData)
     this.memoizedMaxSpeed = memoizeOne(this.maxSpeed)
-    this.memoizedParseElevation = memoizeOne(this.parseElevationData)
   }
 
   componentDidMount () {
@@ -84,93 +79,6 @@ export default class Ride extends PureComponent {
 
   showProfile () {
     this.props.showProfile(this.props.rideUser)
-  }
-
-  parseElevationData (rideCoordinates, rideElevations) {
-    let totalDistance = 0
-    let totalGain = 0
-    let lastPoint = null
-    let points = []
-
-    for (let rideCoord of rideCoordinates) {
-      const parsedCoord = parseRideCoordinate(rideCoord)
-      if (!lastPoint) {
-        lastPoint = parsedCoord
-      } else {
-        totalDistance += haversine(
-          lastPoint.get('latitude'),
-          lastPoint.get('longitude'),
-          parsedCoord.get('latitude'),
-          parsedCoord.get('longitude')
-        )
-        const elevation = rideElevations.getIn([
-          toElevationKey(parsedCoord.get('latitude')),
-          toElevationKey(parsedCoord.get('longitude'))
-        ])
-        const lastElevation = rideElevations.getIn([
-          toElevationKey(lastPoint.get('latitude')),
-          toElevationKey(lastPoint.get('longitude'))
-        ])
-        const diff = Math.abs(lastElevation - elevation)
-        const percentDiff = diff / elevation
-        if (diff && percentDiff < 0.15) {
-          const elevationChange = elevation - lastElevation
-          totalGain += elevationChange > 0 ? elevationChange : 0
-          points.push({
-            elevation,
-            distance: totalDistance,
-            gain: totalGain
-          })
-        }
-        lastPoint = parsedCoord
-      }
-    }
-    return points
-  }
-
-  parseSpeedData (rideCoordinates) {
-    const parsedData = []
-    let parsedBucket = []
-    let lastPoint = null
-    let fullDistance = 0
-
-    const desiredNumCoords = 300
-    const actualNumCoords = rideCoordinates.count()
-    const bucketSize = Math.ceil(actualNumCoords / desiredNumCoords)
-
-    for (let rideCoord of rideCoordinates) {
-      const parsedCoord = parseRideCoordinate(rideCoord)
-      if (!lastPoint) {
-        parsedBucket.push({distance: 0, pace: 0})
-      } else {
-        const distance = haversine(
-          lastPoint.get('latitude'),
-          lastPoint.get('longitude'),
-          parsedCoord.get('latitude'),
-          parsedCoord.get('longitude')
-        )
-        fullDistance += distance
-
-        const timeDiff = (parsedCoord.get('timestamp') / 1000) - (lastPoint.get('timestamp') / 1000)
-        if (timeDiff === 0) {
-          continue
-        }
-        const mpSecond = distance / timeDiff
-        const mph = mpSecond * 60 * 60
-        parsedBucket.push({ pace: mph })
-      }
-      lastPoint = parsedCoord
-
-      if (parsedBucket.length === bucketSize) {
-        const pace = parsedBucket.reduce((acc, val) => acc + val.pace, 0) / bucketSize
-        const paces = parsedBucket.map(val => val.pace)
-        const max = Math.max(...paces)
-        const min = Math.min(...paces)
-        parsedData.push({ distance: fullDistance, pace, max, min })
-        parsedBucket = []
-      }
-    }
-    return parsedData
   }
 
   maxSpeed(rideCoordinates) {
@@ -295,49 +203,6 @@ export default class Ride extends PureComponent {
     }
   }
 
-  speedChart () {
-    let speedChart = (
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <Text>Not enough points for Speed Chart</Text>
-      </View>
-    )
-    let speedData = this.memoizedParse(this.props.rideCoordinates.get('rideCoordinates'))
-    if (speedData.length >= 2) {
-      speedChart = (
-        <View style={styles.slide}>
-          <SpeedChart
-            speedData={speedData}
-          />
-        </View>
-      )
-    }
-    return speedChart
-  }
-
-  elevationProfile () {
-    let elevationProfile = (
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <Text>Not enough points for an Elevation Profile</Text>
-      </View>
-    )
-    if (this.props.rideElevations) {
-      let elevationData = this.memoizedParseElevation(
-        this.props.rideCoordinates.get('rideCoordinates'),
-        this.props.rideElevations.get('elevations')
-      )
-      if (elevationData.length >= 2) {
-        elevationProfile = (
-          <View style={styles.slide}>
-            <ElevationChart
-              elevationData={elevationData}
-            />
-          </View>
-        )
-      }
-    }
-    return elevationProfile
-  }
-
   _renderLoading () {
     return (
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -379,20 +244,16 @@ export default class Ride extends PureComponent {
 
         <View style={{flex: 1}}>
           <View style={{height}}>
-            <Swiper
-              loop={false}
-            >
-              <TouchableOpacity style={styles.slide}
-                onPress={this.fullscreenMap}
-              >
-                <RideImage
-                  style={styles.image}
-                  uri={this.props.ride.get('mapURL') }
-                />
+            <ViewingMap
+              rideCoordinates={this.props.rideCoordinates.get('rideCoordinates')}
+              ridePhotos={this.props.ridePhotos}
+              showPhotoLightbox={this.props.showPhotoLightbox}
+            />
+            <View style={{position: 'absolute', right: 10, bottom: 10}}>
+              <TouchableOpacity onPress={this.fullscreenMap}>
+                <BuildImage source={require('../../img/fullscreen.png')} style={{width: 35, height: 35}} />
               </TouchableOpacity>
-              { this.speedChart() }
-              { this.elevationProfile() }
-            </Swiper>
+            </View>
           </View>
 
           <PhotoFilmstrip
@@ -404,17 +265,19 @@ export default class Ride extends PureComponent {
           <View style={{flex: 1}}>
             <Card style={{flex: 1}}>
               <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20, flex: 1}}>
-                <Stats
-                  horsePhotos={this.props.horsePhotos}
-                  horses={this.props.horses}
-                  maxSpeed={maxSpeed}
-                  ride={this.props.ride}
-                  rideHorseOwnerID={this.props.rideHorseOwnerID}
-                  rideUser={this.props.rideUser}
-                  showHorseProfile={this.props.showHorseProfile}
-                  userID={this.props.userID}
-                />
-
+                <View style={{flex: 1}}>
+                  <Stats
+                    horsePhotos={this.props.horsePhotos}
+                    horses={this.props.horses}
+                    maxSpeed={maxSpeed}
+                    ride={this.props.ride}
+                    rideHorseOwnerID={this.props.rideHorseOwnerID}
+                    rideUser={this.props.rideUser}
+                    showHorseProfile={this.props.showHorseProfile}
+                    userID={this.props.userID}
+                  />
+                  <Button text={"View Ride Charts"} color={brand} onPress={this.props.viewRideCharts}/>
+                </View>
               </CardItem>
             </Card>
 
@@ -456,11 +319,6 @@ const styles = StyleSheet.create({
   wrapper: {
     width,
     flex: 1
-  },
-  slide: {
-    flex: 1,
-    justifyContent: 'center',
-    backgroundColor: 'transparent'
   },
   text: {
     color: '#fff',

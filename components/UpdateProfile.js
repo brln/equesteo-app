@@ -1,4 +1,3 @@
-import { Map } from 'immutable'
 import React, { PureComponent } from 'react'
 import {
   Card,

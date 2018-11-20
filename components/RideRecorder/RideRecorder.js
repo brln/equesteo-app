@@ -73,7 +73,7 @@ export default class RideRecorder extends PureComponent {
         />
       )
     }
-    if (this.state.fabActive) {
+    if (this.state.fabActive && this.props.lastLocation) {
       cameraButton = (
         <Button style={{ backgroundColor: orange }} onPress={this.showCamera}>
           <FabImage source={require('../../img/camera.png')} height={30} width={30} />

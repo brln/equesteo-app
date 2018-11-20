@@ -5,6 +5,7 @@ import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.facebook.react.bridge.ReadableNativeArray;
 import com.facebook.react.bridge.ReadableNativeMap;
 import com.facebook.react.ReactApplication;
+import org.reactnative.camera.RNCameraPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
@@ -24,7 +25,6 @@ import io.invertase.firebase.instanceid.RNFirebaseInstanceIdPackage;
 import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
 import io.sentry.RNSentryPackage;
 import com.mapbox.rctmgl.RCTMGLPackage;
-import com.wix.RNCameraKit.RNCameraKitPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -79,7 +79,7 @@ public class MainApplication extends NavigationApplication {
             new RNSentryPackage(MainApplication.this),
             new SvgPackage(),
             new RCTMGLPackage(),
-            new RNCameraKitPackage()
+            new RNCameraPackage()
         );
     }
 

@@ -1,3 +1,4 @@
+import { Map } from 'immutable'
 import memoizeOne from 'memoize-one';
 import { Navigation } from 'react-native-navigation'
 import { Keyboard } from 'react-native'
@@ -5,11 +6,12 @@ import React from 'react'
 import { connect } from 'react-redux';
 import {
   clearPausedLocations,
-  createRidePhoto,
+  stashRidePhoto,
   deleteUnpersistedRide,
   discardCurrentRide,
   mergeStashedLocations,
   persistRide,
+  removeStashedRidePhoto,
   rideUpdated,
   setPopShowRide,
   stopLocationTracking,
@@ -42,7 +44,6 @@ class UpdateRideContainer extends BackgroundComponent {
     super(props)
     this.state = {
       cachedRide: null,
-      newPhotoIDs: [],
       deletedPhotoIDs: [],
       showPhotoMenu: false,
       selectedPhotoID: null
@@ -57,10 +58,11 @@ class UpdateRideContainer extends BackgroundComponent {
     this.horses = this.horses.bind(this)
     this.markPhotoDeleted = this.markPhotoDeleted.bind(this)
     this.openPhotoMenu = this.openPhotoMenu.bind(this)
-    this.thisRidesPhotos = this.thisRidesPhotos.bind(this)
+    this.stashedRidePhotoKey = this.stashedRidePhotoKey.bind(this)
+    this.allPhotos = this.allPhotos.bind(this)
 
     this.memoizedHorses = memoizeOne(this.horses)
-    this.memoThisRidesPhotos = memoizeOne(this.thisRidesPhotos)
+    this.memoizedAllPhotos = memoizeOne(this.allPhotos)
 
     Navigation.events().bindComponent(this);
     this.setTopbarButtons(props)
@@ -130,7 +132,7 @@ class UpdateRideContainer extends BackgroundComponent {
         this.props.dispatch(persistRide(
           this.props.ride.get('_id'),
           true,
-          this.state.newPhotoIDs,
+          this.props.stashedRidePhotos,
           this.state.deletedPhotoIDs
         ))
         this.props.dispatch(setPopShowRide(this.props.ride.get('_id'), true))
@@ -147,22 +149,24 @@ class UpdateRideContainer extends BackgroundComponent {
           this.props.dispatch(deleteUnpersistedRide(this.props.ride.get('_id')))
         })
       } else if (buttonId === 'back') {
-        this.props.dispatch(stopStashNewLocations())
-        this.props.dispatch(mergeStashedLocations())
-        Navigation.pop(this.props.componentId)
+        Navigation.pop(this.props.componentId).then(() => {
+          this.props.dispatch(stopStashNewLocations())
+          this.props.dispatch(mergeStashedLocations())
+        })
       }
     } else {
       if (buttonId === 'save') {
         this.props.dispatch(persistRide(
           this.props.ride.get('_id'),
           false,
-          this.state.newPhotoIDs,
+          this.props.stashedRidePhotos,
           this.state.deletedPhotoIDs
         ))
         Navigation.pop(this.props.componentId)
       } else if (buttonId === 'back' || buttonId === 'discard') {
-        this.props.dispatch(rideUpdated(this.state.cachedRide))
-        Navigation.pop(this.props.componentId)
+        Navigation.pop(this.props.componentId).then(() => {
+          this.props.dispatch(rideUpdated(this.state.cachedRide))
+        })
       }
     }
     Keyboard.dismiss()
@@ -191,7 +195,11 @@ class UpdateRideContainer extends BackgroundComponent {
 
   markPhotoDeleted (photoID) {
     if (photoID === this.props.ride.get('coverPhotoID')) {
-      const allPhotos = this.memoThisRidesPhotos(this.props.ridePhotos, this.state.deletedPhotoIDs)
+      const allPhotos = this.memoizedAllPhotos(
+        this.props.ridePhotos,
+        this.props.stashedRidePhotos,
+        this.state.deletedPhotoIDs
+      )
       for (let otherPhoto of allPhotos.valueSeq()) {
         const id = otherPhoto.get('_id')
         if (id !== photoID && this.state.deletedPhotoIDs.indexOf(id) < 0) {
@@ -200,9 +208,17 @@ class UpdateRideContainer extends BackgroundComponent {
         }
       }
     }
-    this.setState({
-      deletedPhotoIDs: [...this.state.deletedPhotoIDs, photoID],
-    })
+    if (this.props.stashedRidePhotos.get(photoID)) {
+      this.props.dispatch(removeStashedRidePhoto(
+        photoID,
+        this.stashedRidePhotoKey(),
+      ))
+    } else {
+      this.setState({
+        deletedPhotoIDs: [...this.state.deletedPhotoIDs, photoID],
+      })
+    }
+
   }
 
   changePublic () {
@@ -235,6 +251,10 @@ class UpdateRideContainer extends BackgroundComponent {
     ))
   }
 
+  stashedRidePhotoKey () {
+    return this.props.newRide ? 'currentRidePhotoStash' : this.props.ride.get('_id')
+  }
+
   createPhoto (uri) {
     let ride = this.props.ride
     let timestamp = unixTimeNow()
@@ -242,15 +262,11 @@ class UpdateRideContainer extends BackgroundComponent {
     ride = ride.set('coverPhotoID', _id)
     this.props.dispatch(rideUpdated(ride))
     this.props.dispatch(
-      createRidePhoto(
-        ride.get('_id'),
-        this.props.userID,
-        { _id, timestamp, uri }
+      stashRidePhoto(
+        Map({ _id, timestamp, uri, userID: this.props.userID }),
+        this.stashedRidePhotoKey()
       )
     )
-    this.setState({
-      newPhotoIDs: [...this.state.newPhotoIDs, _id]
-    })
   }
 
   horses () {
@@ -261,16 +277,23 @@ class UpdateRideContainer extends BackgroundComponent {
     })
   }
 
-  thisRidesPhotos (ridePhotos, deletedPhotoIDs) {
-    return ridePhotos.filter((rp) => {
+  allPhotos (ridePhotos, stashedRidePhotos, deletedPhotoIDs) {
+    const existing = ridePhotos.filter((rp) => {
       return rp.get('rideID') === this.props.ride.get('_id')
         && rp.get('deleted') !== true
-        && deletedPhotoIDs.indexOf(rp.get('_id')) < 0
     })
+
+    logDebug(stashedRidePhotos, 'in here')
+    const withNew = stashedRidePhotos.valueSeq().reduce((a, stashed) => {
+      return a.set(stashed.get('_id'), stashed)
+    }, existing)
+
+    return withNew.filter(rp => deletedPhotoIDs.indexOf(rp.get('_id')) < 0)
   }
 
   render() {
     logRender('rendering UpdateRideContainer')
+    logDebug(this.props.stashedRidePhotos, 'out here')
     return (
       <UpdateRide
         changeCoverPhoto={this.changeCoverPhoto}
@@ -285,7 +308,11 @@ class UpdateRideContainer extends BackgroundComponent {
         markPhotoDeleted={this.markPhotoDeleted}
         openPhotoMenu={this.openPhotoMenu}
         ride={this.props.ride}
-        ridePhotos={this.memoThisRidesPhotos(this.props.ridePhotos, this.state.deletedPhotoIDs)}
+        ridePhotos={this.memoizedAllPhotos(
+          this.props.ridePhotos,
+          this.props.stashedRidePhotos,
+          this.state.deletedPhotoIDs)
+        }
         selectedPhotoID={this.state.selectedPhotoID}
         showPhotoMenu={this.state.showPhotoMenu}
       />
@@ -298,9 +325,11 @@ function mapStateToProps (state, passedProps) {
   const pouchState = state.get('pouchRecords')
   const localState = state.get('localState')
   const userID = localState.get('userID')
+  const ridePhotoStashIndex = newRide ? 'currentRidePhotoStash' : passedProps.rideID
 
   return {
     activeComponent: localState.get('activeComponent'),
+    stashedRidePhotos: localState.getIn(['ridePhotoStash', ridePhotoStashIndex]) || Map(),
     horses: pouchState.get('horses'),
     horsePhotos: pouchState.get('horsePhotos'),
     horseUsers: pouchState.get('horseUsers'),

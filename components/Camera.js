@@ -1,90 +1,115 @@
 import React, { Component } from 'react';
+import ImagePicker from 'react-native-image-crop-picker'
 import {
-  PermissionsAndroid,
+  Dimensions,
+  ImageEditor,
   StyleSheet,
-  Text,
+  TouchableOpacity,
   View
 } from 'react-native';
-import { CameraKitCameraScreen } from 'react-native-camera-kit';
-import { Navigation } from 'react-native-navigation'
+import { RNCamera } from 'react-native-camera';
+
+import BuildImage from './BuildImage'
+import URIImage from './URIImage'
+import { logError } from '../helpers'
+
+const { width } = Dimensions.get('window');
 
 
 export default class Camera extends Component {
-  static options() {
-    return {
-      topBar: {
-        visible: false,
-        drawBehind: true
-      },
-      layout: {
-        orientation: ['portrait']
-      }
-    };
-  }
-
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.state = {
-      cameraPermission: false
+      backCamera: true
     }
+    this.changeCameraType = this.changeCameraType.bind(this)
+    this.takePicture = this.takePicture.bind(this)
   }
 
-  componentDidMount () {
-    PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.CAMERA).then((hasPermission) => {
-      if (hasPermission) {
-        this.setState({
-          cameraPermission: true
-        })
-      } else {
-        this.requestCameraPermission().then((granted) => {
-          logDebug('here')
-          this.setState({
-            cameraPermission: granted
-          })
-        }).catch(e => logDebug(e, 'permissions error'))
-      }
+  changeCameraType () {
+    this.setState({
+      backCamera: !this.state.backCamera
     })
   }
 
-  requestCameraPermission() {
-    return new PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.CAMERA
-    ).then((granted) => {
-      return granted === PermissionsAndroid.RESULTS.GRANTED
-    })
-  }
+  takePicture () {
+    if (this.camera) {
+      this.camera.takePictureAsync({pauseAfterCapture: true}).then((data) => {
+        const cropData = {
+          offset: {
+            x: 0,
+            y: 0,
+          },
+          size: {
+            width: data.width,
+            height: data.width,
+          },
+        };
+        ImageEditor.cropImage(
+          data.uri,
+          cropData,
+          (successURI) => {
+            ImagePicker.cleanSingle(data.uri).catch(e => logError(e))
+            this.camera.resumePreview() // not working?
+            this.props.stashNewRidePhoto(successURI)
+          },
+          (error) => {
+            console.log(error.message);
+          },
+        );
 
-  close () {
-    Navigation.pop(this.props.componentId)
-  }
-
-  onBottomButtonPressed(event) {
-    const captureImages = JSON.stringify(event.captureImages);
-    if (event.type === 'left') {
-      this.close()
+      }).catch((e) => { logError(e) })
     }
   }
 
   render() {
-    if (this.state.cameraPermission) {
-      return (
-        <View style={styles.container}>
-          <CameraKitCameraScreen
-            actions={{rightButtonText: 'Done', leftButtonText: 'Cancel'}}
-            onBottomButtonPressed={(event) => this.onBottomButtonPressed(event)}
-            flashImages={{
-              on: require('../img/camera/flashOn.png'),
-              off: require('../img/camera/flashOff.png'),
-              auto: require('../img/camera/flashAuto.png')
-            }}
-            cameraFlipImage={require('../img/camera/cameraFlipIcon.png')}
-            captureButtonImage={require('../img/camera/cameraButton.png')}
+    let lastPhoto = null
+    if (this.props.mostRecentPhoto) {
+      lastPhoto = (
+        <View style={{margin: 15}}>
+          <URIImage
+            resizeMode={'center'}
+            source={{uri: this.props.mostRecentPhoto.get('uri')}}
+            style={{height: '100%', borderRadius: 10}}
           />
         </View>
-      );
-    } else {
-      return <View><Text>No permission</Text></View>
+      )
     }
+    return (
+      <View style={styles.container}>
+        <View style={{width, height: width}}>
+          { this.props.showCam ? <RNCamera
+            ref={ref => { this.camera = ref }}
+            style = {styles.preview}
+            type={this.state.backCamera ? RNCamera.Constants.Type.back : RNCamera.Constants.Type.front}
+            flashMode={RNCamera.Constants.FlashMode.off}
+          /> : null}
+        </View>
+        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+          <View style={{flex: 1, aspectRatio: 1}}>
+            <TouchableOpacity onPress={this.props.showRecentPhoto}>
+              { lastPhoto }
+            </TouchableOpacity>
+          </View>
+          <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+            <TouchableOpacity
+              onPress={this.takePicture}
+              style = {styles.capture}
+            >
+              <BuildImage source={require('../img/camera/cameraButton.png')}/>
+            </TouchableOpacity>
+          </View>
+          <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+            <TouchableOpacity
+              onPress={this.changeCameraType}
+            >
+              <BuildImage source={require('../img/camera/cameraFlipIcon.png')}/>
+            </TouchableOpacity>
+          </View>
+
+        </View>
+      </View>
+    );
   }
 }
 
@@ -92,6 +117,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: '#050e1b',
+  },
+  preview: {
+    flex: 1,
+    alignItems: 'center',
   },
 })

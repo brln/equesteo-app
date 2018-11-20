@@ -50,6 +50,8 @@ target 'equesteo' do
   pod 'react-native-google-maps', path: rn_maps_path  # Remove this line if you don't want to support GoogleMaps on iOS
   pod 'GoogleMaps'  # Remove this line if you don't want to support GoogleMaps on iOS
   pod 'Google-Maps-iOS-Utils' # Remove this line if you don't want to support GoogleMaps on iOS
+  pod 'react-native-camera', :path => '../node_modules/react-native-camera'
+
 end
 
 # also from https://github.com/ivpusic/react-native-image-crop-picker

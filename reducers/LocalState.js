@@ -10,6 +10,7 @@ import {
   CLEAR_STATE,
   CLEAR_STATE_AFTER_PERSIST,
   DEQUEUE_PHOTO,
+  DISCARD_CURRENT_RIDE,
   DISMISS_ERROR,
   ENQUEUE_PHOTO,
   ERROR_OCCURRED,
@@ -22,6 +23,7 @@ import {
   REMOTE_PERSIST_COMPLETE,
   REMOTE_PERSIST_ERROR,
   REMOTE_PERSIST_STARTED,
+  REMOVE_STASHED_RIDE_PHOTO,
   SAVE_USER_ID,
   SET_ACTIVE_COMPONENT,
   SET_FEED_MESSAGE,
@@ -32,6 +34,7 @@ import {
   SHOW_POP_SHOW_RIDE,
   SET_AWAITING_PW_CHANGE,
   SET_DOING_INITIAL_LOAD,
+  STASH_RIDE_PHOTO,
   SYNC_COMPLETE,
   USER_SEARCH_RETURNED,
 } from '../constants'
@@ -63,6 +66,7 @@ export const initialState = Map({
   popShowRide: null,
   popShowRideNow: null,
   remotePersistActive: false,
+  ridePhotoStash: Map(),
   root: SIGNUP_LOGIN,
   showingRideID: null,
   userID: null,
@@ -83,6 +87,8 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.set('clearStateAfterPersist', true)
     case DEQUEUE_PHOTO:
       return state.deleteIn(['photoQueue', action.photoID])
+    case DISCARD_CURRENT_RIDE:
+      return state.setIn(['ridePhotoStash', 'currentRidePhotoStash'], Map())
     case DISMISS_ERROR:
       return state.set('error', null)
     case ENQUEUE_PHOTO:
@@ -126,6 +132,8 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.set('remotePersistActive', false)
     case REMOTE_PERSIST_STARTED:
       return state.set('remotePersistActive', true)
+    case REMOVE_STASHED_RIDE_PHOTO:
+      return state.deleteIn(['ridePhotoStash', action.stashKey, action.photoID])
     case SAVE_USER_ID:
       return state.set('userID', action.userID)
     case SET_ACTIVE_COMPONENT:
@@ -154,6 +162,12 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.set('awaitingPWChange', action.newVal)
     case SET_DOING_INITIAL_LOAD:
       return state.set('doingInitialLoad', action.newVal)
+    case STASH_RIDE_PHOTO:
+      let newState = state
+      if (!state.getIn(['ridePhotoStash', action.stashKey])) {
+        newState = newState.setIn(['ridePhotoStash', action.stashKey], Map())
+      }
+      return newState.setIn(['ridePhotoStash', action.stashKey, action.photoData.get('_id')], action.photoData)
     case USER_SEARCH_RETURNED:
       return state.set('userSearchResults', action.userSearchResults)
     default:

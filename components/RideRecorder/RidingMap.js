@@ -113,7 +113,7 @@ export default class RidingMap extends PureComponent {
             pitch={45}
             heading={this.changeBearing()}
             ref={ref => (this.map = ref)}
-            styleURL={"mapbox://styles/equesteo/cjn3zysq408tc2sk1g1gunqmq"}
+            styleURL={"mapbox://styles/equesteo/cjopu37k3fm442smn4ncz3x9m"}
             onDidFinishLoadingMap={this.fitToElements}
             style={styles.map}
             zoomLevel={14}

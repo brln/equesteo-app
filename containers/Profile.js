@@ -50,7 +50,6 @@ class ProfileContainer extends BackgroundComponent {
 
   constructor (props) {
     super(props)
-    this.closeLightbox = this.closeLightbox.bind(this)
     this.createFollow = this.createFollow.bind(this)
     this.deleteFollow = this.deleteFollow.bind(this)
     this.followings = this.followings.bind(this)
@@ -92,7 +91,6 @@ class ProfileContainer extends BackgroundComponent {
         name: PHOTO_LIGHTBOX,
         passProps: {
           sources,
-          close: this.closeLightbox
         }
       }
     })
@@ -104,10 +102,6 @@ class ProfileContainer extends BackgroundComponent {
         name: ABOUT_PAGE,
       }
     })
-  }
-
-  closeLightbox () {
-    Navigation.pop(this.props.componentId)
   }
 
   navigationButtonPressed ({ buttonId }) {

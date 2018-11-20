@@ -1,6 +1,7 @@
 import { List, Map } from 'immutable'
 
 import {
+  CLEAR_STATE,
   CLEAR_LAST_LOCATION,
   CLEAR_PAUSED_LOCATIONS,
   DISCARD_CURRENT_RIDE,
@@ -20,8 +21,8 @@ import { haversine, parseRideCoordinate, toElevationKey, unixTimeNow } from '../
 
 export const initialState = Map({
   currentRide: null,
-  currentRideElevations: null,
   currentRideCoordinates: null,
+  currentRideElevations: null,
   lastElevation: null,
   lastLocation: null,
   locationStashingActive: false,
@@ -32,6 +33,8 @@ export const initialState = Map({
 
 export default function CurrentRideReducer(state=initialState, action) {
   switch (action.type) {
+    case CLEAR_STATE:
+      return initialState
     case CLEAR_LAST_LOCATION:
       return state.set('lastLocation', null).set('refiningLocation', null)
     case CLEAR_PAUSED_LOCATIONS:

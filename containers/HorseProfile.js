@@ -47,7 +47,6 @@ class HorseProfileContainer extends BackgroundComponent {
     }
     this.addRider = this.addRider.bind(this)
     this.closeDeleteModal = this.closeDeleteModal.bind(this)
-    this.closeLightbox = this.closeLightbox.bind(this)
     this.deleteHorse = this.deleteHorse.bind(this)
     this.horseUser = this.horseUser.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
@@ -96,14 +95,9 @@ class HorseProfileContainer extends BackgroundComponent {
         name: PHOTO_LIGHTBOX,
         passProps: {
           sources,
-          close: this.closeLightbox
         }
       }
     })
-  }
-
-  closeLightbox () {
-    Navigation.pop(this.props.componentId)
   }
 
   addRider () {

@@ -1,3 +1,4 @@
+import { Map } from 'immutable'
 import { Navigation } from 'react-native-navigation'
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
@@ -180,12 +181,17 @@ class RecorderContainer extends PureComponent {
       this.props.currentRide,
       this.props.currentRideElevations,
       this.props.currentRideCoordinates,
+      this.props.currentRidePhotos
     ))
     Navigation.push(this.props.componentId, {
       component: {
         name: UPDATE_RIDE,
         id: UPDATE_NEW_RIDE_ID,
-        passProps: { rideID, newRide: true }
+        passProps: {
+          rideID,
+          newRide: true,
+          currentRidePhotos: this.props.currentRidePhotos.keySeq().toList(),
+        }
       }
     });
   }
@@ -233,6 +239,7 @@ function mapStateToProps (state) {
     currentRide: currentRideState.get('currentRide'),
     currentRideElevations: currentRideState.get('currentRideElevations'),
     currentRideCoordinates: currentRideState.get('currentRideCoordinates'),
+    currentRidePhotos: localState.getIn(['ridePhotoStash', 'currentRide']) || Map(),
     lastElevation: currentRideState.get('lastElevation'),
     lastLocation: currentRideState.get('lastLocation'),
     refiningLocation: currentRideState.get('refiningLocation'),

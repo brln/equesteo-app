@@ -1,6 +1,7 @@
 import { fromJS, Map } from 'immutable'
 import {
   CLEAR_SELECTED_RIDE_COORDINATES,
+  CLEAR_STATE,
   CREATE_FOLLOW,
   CREATE_HORSE,
   CREATE_HORSE_PHOTO,
@@ -50,6 +51,8 @@ export default function PouchRecordsReducer(state=initialState, action) {
   switch (action.type) {
     case CLEAR_SELECTED_RIDE_COORDINATES:
       return state.set('selectedRideCoordinates', null)
+    case CLEAR_STATE:
+      return initialState
     case CREATE_FOLLOW:
       let found = state.getIn(['follows', action.followID])
       if (!found) {
@@ -213,7 +216,11 @@ export default function PouchRecordsReducer(state=initialState, action) {
     case DELETE_UNPERSISTED_HORSE:
       return state.deleteIn(['horses', action.horseID]).deleteIn(['horseUsers', action.horseUserID])
     case DELETE_UNPERSISTED_RIDE:
-      return state.deleteIn(['rides', action.rideID]).deleteIn(['rideElevations', action.rideID + '_elevations'])
+      return state.deleteIn(
+        ['rides', action.rideID]
+      ).deleteIn(
+        ['rideElevations', action.rideID + '_elevations']
+      )
     case DELETE_UNPERSISTED_PHOTO:
       return state.deleteIn([action.photoSection, action.photoID])
     case FOLLOW_UPDATED:
