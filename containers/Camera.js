@@ -2,9 +2,10 @@ import { Map } from 'immutable'
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import { Navigation } from 'react-native-navigation'
-import Camera from '../components/Camera'
+
 
 import { stashRidePhoto } from '../actions'
+import Camera from '../components/Camera'
 import { brand } from '../colors'
 import { generateUUID, unixTimeNow } from '../helpers'
 import { PHOTO_LIGHTBOX } from '../screens'
@@ -115,6 +116,7 @@ class CameraContainer extends Component {
   render() {
     return (
       <Camera
+        close={this.close}
         mostRecentPhoto={this.mostRecentPhoto()}
         showCam={this.state.showCam}
         showRecentPhoto={this.showRecentPhoto}

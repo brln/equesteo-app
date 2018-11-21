@@ -283,7 +283,6 @@ class UpdateRideContainer extends BackgroundComponent {
         && rp.get('deleted') !== true
     })
 
-    logDebug(stashedRidePhotos, 'in here')
     const withNew = stashedRidePhotos.valueSeq().reduce((a, stashed) => {
       return a.set(stashed.get('_id'), stashed)
     }, existing)
@@ -293,7 +292,6 @@ class UpdateRideContainer extends BackgroundComponent {
 
   render() {
     logRender('rendering UpdateRideContainer')
-    logDebug(this.props.stashedRidePhotos, 'out here')
     return (
       <UpdateRide
         changeCoverPhoto={this.changeCoverPhoto}

@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import {
+  PermissionsAndroid,
   StyleSheet,
   Text,
   View
@@ -53,8 +54,28 @@ export default class RideRecorder extends PureComponent {
   }
 
   showCamera () {
-    this.props.showCamera()
     this.toggleFab()
+
+    let show = true
+    const needed = [
+      PermissionsAndroid.PERMISSIONS.CAMERA,
+      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+    ]
+    logDebug('asking')
+    PermissionsAndroid.requestMultiple(
+      needed,
+    ).then((granted) => {
+      for (let permission of Object.keys(granted)) {
+        if (granted[permission] !== PermissionsAndroid.RESULTS.GRANTED) {
+          show = false
+        }
+      }
+      if (show) {
+        this.props.showCamera()
+      } else {
+        alert("Sorry, without those permissions you can't take pictures.")
+      }
+    })
   }
 
   render() {

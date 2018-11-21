@@ -135,7 +135,6 @@ export default class RidingMap extends PureComponent {
   }
 
   mapRegionChanged (e) {
-    logDebug(e)
     if (e.properties.isUserInteraction) {
       this.setState({
         heading: e.properties.heading,
@@ -174,7 +173,6 @@ export default class RidingMap extends PureComponent {
 
   render() {
     logRender('RideRecorder.RidingMap')
-    logDebug(this.state.heading, 'heading')
     const mapCoords = this.mapCoordinates(this.props.currentRideCoordinates)
     return (
       <View style ={styles.container}>
