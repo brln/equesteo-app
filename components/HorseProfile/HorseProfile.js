@@ -263,6 +263,7 @@ export default class HorseProfile extends PureComponent {
           />
           <RidersCard
             addRider={this.props.addRider}
+            deleteHorse={this.props.deleteHorse}
             riders={this.props.riders}
             showRiderProfile={this.showRiderProfile}
             user={this.props.user}

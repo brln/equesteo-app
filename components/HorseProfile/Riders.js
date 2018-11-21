@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 
 import BuildImage from '../BuildImage'
-import { orange } from '../../colors'
+import { brand, darkGrey, orange } from '../../colors'
 import { logError } from '../../helpers'
 import URIImage from '../URIImage'
 
@@ -17,6 +17,7 @@ const { width } = Dimensions.get('window')
 export default class Riders extends PureComponent {
   constructor (props) {
     super(props)
+    this.addNew = this.addNew.bind(this)
     this.thumbnail = this.thumbnail.bind(this)
   }
 
@@ -44,28 +45,48 @@ export default class Riders extends PureComponent {
         onPress={this.props.showRiderProfile(rider)}
       >
         { profileThumb }
-        <View style={{
-          position: 'absolute',
-          alignItems: 'center',
-          justifyContent: 'center',
-          left: 5,
-          right: 5,
-          top: 5,
-          bottom: 5,
-          padding: 5
-        }}>
-          <Text style={{
-            textAlign: 'center',
-            color: 'white',
-            textShadowColor: 'black',
-            textShadowRadius: 5,
-            textShadowOffset: {
-              width: -1,
-              height: 1
-            }}}>{rider.get('firstName')} {rider.get('lastName')}</Text>
+        <View style={styles.nameView}>
+          <Text style={styles.nameText}>{rider.get('firstName')} {rider.get('lastName')}</Text>
         </View>
       </TouchableOpacity>
     )
+  }
+
+  addNew () {
+    let add = null
+    if (this.props.riders.indexOf(this.props.user) < 0) {
+      add = (
+        <TouchableOpacity
+          style={[styles.thumbnail, {
+            marginRight: 5,
+            backgroundColor: brand,
+          }]}
+          onPress={this.props.addRider}
+        >
+          <View style={styles.nameView}>
+            <Text style={styles.nameText}>I Ride This Horse</Text>
+            <BuildImage source={require('../../img/addUser.png')} style={{width: width / 12, height: width / 12}}/>
+          </View>
+        </TouchableOpacity>
+      )
+    } else {
+
+      add = (
+        <TouchableOpacity
+          style={[styles.thumbnail, {
+            marginRight: 5,
+            backgroundColor: brand,
+          }]}
+          onPress={this.props.deleteHorse}
+        >
+          <View style={styles.nameView}>
+            <Text style={styles.nameText}>I Don't Ride This Horse</Text>
+            <BuildImage source={require('../../img/deleteUser.png')} style={{width: width / 12, height: width / 12}}/>
+          </View>
+        </TouchableOpacity>
+      )
+    }
+    return add
   }
 
   render () {
@@ -76,6 +97,7 @@ export default class Riders extends PureComponent {
     return (
       <View style={styles.photoContainer}>
         {thumbnails}
+        {this.addNew()}
       </View>
     )
   }
@@ -94,5 +116,25 @@ const styles = StyleSheet.create({
   chosenThumb: {
     borderWidth: 5,
     borderColor: orange
+  },
+  nameView: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    left: 5,
+    right: 5,
+    top: 5,
+    bottom: 5,
+    padding: 5
+  },
+  nameText: {
+    textAlign: 'center',
+    color: 'white',
+    textShadowColor: 'black',
+    textShadowRadius: 5,
+    textShadowOffset: {
+      width: -1,
+      height: 1
+    }
   }
 });
