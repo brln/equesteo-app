@@ -11,7 +11,7 @@ import {
   CardItem,
 } from 'native-base'
 
-import { haversine, parseRideCoordinate, toElevationKey } from '../../helpers'
+import { haversine, parseRideCoordinate, toElevationKey, speedGradient } from '../../helpers'
 import ElevationGain from './ElevationGain'
 import ElevationProfile from './ElevationProfile'
 import SpeedChart from './SpeedChart'
@@ -106,7 +106,7 @@ export default class RideCharts extends PureComponent {
         const paces = parsedBucket.map(val => val.pace)
         const max = Math.max(...paces)
         const min = Math.min(...paces)
-        parsedData.push({ distance: fullDistance, pace, max, min })
+        parsedData.push({ distance: fullDistance, pace, max, min, color: speedGradient(pace) })
         parsedBucket = []
       }
     }

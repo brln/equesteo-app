@@ -6,7 +6,7 @@ import {
 } from 'react-native'
 
 import { brand, darkBrand, lightGrey } from '../../colors'
-import { logRender } from '../../helpers'
+import { logRender, speedGradient } from '../../helpers'
 
 export default class SpeedChart extends PureComponent {
   constructor (props) {
@@ -28,7 +28,7 @@ export default class SpeedChart extends PureComponent {
             label={'mph'}
             style={{
               axisLabel: {padding: 40},
-              grid: {stroke: lightGrey},
+              grid: {stroke: (t) => speedGradient(t), opacity: 0.5},
             }}
 
           />
