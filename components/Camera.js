@@ -54,7 +54,7 @@ export default class Camera extends Component {
             this.props.stashNewRidePhoto(successURI)
           },
           (error) => {
-            console.log(error.message);
+            logError(error.message);
           },
         );
 

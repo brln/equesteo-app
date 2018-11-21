@@ -8,6 +8,7 @@ import {
 import { Button, Fab } from 'native-base'
 
 import { black, brand, green, white, orange, danger } from '../../colors'
+import { heading, parseRideCoordinate } from '../../helpers'
 import FabImage from '../FabImage'
 import GPSStatus from './GPSStatus'
 import DiscardModal from './DiscardModal'
@@ -22,24 +23,77 @@ export default class RideRecorder extends PureComponent {
     this.state = {
       fabActive: false,
       userControlledMap: false,
+      heading: 0,
+      centerCoordinate: null,
+      zoomLevel: 14,
     }
     this.hitPause = this.hitPause.bind(this)
-    this.mapAutoControl = this.mapAutoControl.bind(this)
-    this.mapUnderUserControl = this.mapUnderUserControl.bind(this)
+    this.mapRegionChanged = this.mapRegionChanged.bind(this)
+    this.recenter = this.recenter.bind(this)
     this.showCamera = this.showCamera.bind(this)
     this.toggleFab = this.toggleFab.bind(this)
   }
 
-  mapUnderUserControl () {
+  static getDerivedStateFromProps (props, state) {
+    const newState = {...state}
+    if (!state.userControlledMap) {
+      newState.centerCoordinate = RideRecorder.centerCoordinate(props.lastLocation)
+      newState.heading = RideRecorder.currentHeading(
+        props.currentRideCoordinates.get('rideCoordinates'),
+        props.lastLocation
+      )
+    }
+    logDebug(newState)
+    return newState
+  }
+
+  static currentHeading (currentRideCoordinates, lastLocation) {
+    let newHeading = 0
+    if (currentRideCoordinates.count() > 1) {
+      let secondToLast = parseRideCoordinate(
+        currentRideCoordinates.get(currentRideCoordinates.count() - 2)
+      )
+      if (currentRideCoordinates.count() > 1
+        && (lastLocation.get('speed') === undefined || lastLocation.get('speed') > 0)) {
+        newHeading = heading(
+          secondToLast.get('latitude'),
+          secondToLast.get('longitude'),
+          lastLocation.get('latitude'),
+          lastLocation.get('longitude')
+        )
+      }
+    }
+    return newHeading
+  }
+
+  static centerCoordinate (lastLocation) {
+     return  lastLocation
+       ? [lastLocation.get('longitude'), lastLocation.get('latitude')]
+       : null
+  }
+
+  recenter () {
     this.setState({
-      userControlledMap: true
+      centerCoordinate: RideRecorder.centerCoordinate(this.props.lastLocation),
+      heading: RideRecorder.currentHeading(
+        this.props.currentRideCoordinates.get('rideCoordinates'),
+        this.props.lastLocation
+      ),
+      userControlledMap: false,
+      zoomLevel: 14,
     })
   }
 
-  mapAutoControl () {
-    this.setState({
-      userControlledMap: false
-    })
+  mapRegionChanged (e) {
+    console.log(e)
+    if (e.properties.isUserInteraction) {
+      this.setState({
+        heading: e.properties.heading,
+        userControlledMap: true,
+        centerCoordinate: e.geometry.coordinates,
+        zoomLevel: e.properties.zoomLevel
+      })
+    }
   }
 
   toggleFab () {
@@ -61,7 +115,6 @@ export default class RideRecorder extends PureComponent {
       PermissionsAndroid.PERMISSIONS.CAMERA,
       PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
     ]
-    logDebug('asking')
     PermissionsAndroid.requestMultiple(
       needed,
     ).then((granted) => {
@@ -109,11 +162,14 @@ export default class RideRecorder extends PureComponent {
           <View style={{flex: 5}}>
             <RidingMap
               currentRideCoordinates={this.props.currentRideCoordinates.get('rideCoordinates')}
+              heading={this.state.heading}
+              centerCoordinate={this.state.centerCoordinate}
               lastLocation={this.props.lastLocation}
-              mapAutoControl={this.mapAutoControl}
-              mapUnderUserControl={this.mapUnderUserControl}
+              mapRegionChanged={this.mapRegionChanged}
+              recenter={this.recenter}
               refiningLocation={this.props.refiningLocation}
-              showCircles={this.state.showCircles}
+              userControlledMap={this.state.userControlledMap}
+              zoomLevel={this.state.zoomLevel}
             />
             <View>
               <Fab

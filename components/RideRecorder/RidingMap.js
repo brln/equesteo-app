@@ -9,69 +9,60 @@ import {
 } from 'react-native';
 
 import BuildImage from '../BuildImage'
-import { heading, logError, logRender, parseRideCoordinate } from '../../helpers'
-import { brand, routeLine } from '../../colors'
+import { haversine, heading, logError, logRender, parseRideCoordinate, unixTimeNow } from '../../helpers'
+import { brand } from '../../colors'
+import { rainbow } from '../../services/Rainbow'
 
 const { width } = Dimensions.get('window')
+
+const allColors = rainbow()
 
 export default class RidingMap extends PureComponent {
   constructor (props) {
     super(props)
-    this.state = {
-      heading: 0,
-      centerCoordinate: null,
-      userRecentered: false,
-      zoomLevel: 14
-    }
     this.fitToElements = this.fitToElements.bind(this)
     this.gpsStatusImage = this.gpsStatusImage.bind(this)
-    this.mapRegionChanged = this.mapRegionChanged.bind(this)
-    this.recenter = this.recenter.bind(this)
     this.recenterButton = this.recenterButton.bind(this)
   }
 
-  static getDerivedStateFromProps (props, state) {
-    const newState = {...state}
-    if (!state.userRecentered) {
-      newState.centerCoordinate = RidingMap.centerCoordinate(props.lastLocation)
-      newState.heading = RidingMap.changeHeading(props.currentRideCoordinates, props.lastLocation)
+  static mapCoordinates (rideCoordinates) {
+    const featureCollection = {
+      type: "FeatureCollection",
+      features: []
     }
-    return newState
-  }
 
-  static centerCoordinate (lastLocation) {
-     return  lastLocation
-       ? [lastLocation.get('longitude'), lastLocation.get('latitude')]
-       : null
-  }
-
-  recenter () {
-    this.setState({
-      centerCoordinate: RidingMap.centerCoordinate(this.props.lastLocation),
-      heading: RidingMap.changeHeading(this.props.currentRideCoordinates, this.props.lastLocation),
-      userRecentered: false,
-      zoomLevel: 14,
-    })
-    this.props.mapAutoControl()
-  }
-
-  static changeHeading (currentRideCoordinates, lastLocation) {
-    let newHeading = 0
-    if (currentRideCoordinates.count() > 1) {
-      let secondToLast = parseRideCoordinate(
-        currentRideCoordinates.get(currentRideCoordinates.count() - 2)
-      )
-      if (currentRideCoordinates.count() > 1
-        && (lastLocation.get('speed') === undefined || lastLocation.get('speed') > 0)) {
-        newHeading = heading(
-          secondToLast.get('latitude'),
-          secondToLast.get('longitude'),
-          lastLocation.get('latitude'),
-          lastLocation.get('longitude')
+    let totalDistance = 0
+    rideCoordinates.reduce((accum, coord) => {
+      const c = parseRideCoordinate(coord)
+      if (!accum.lastCoord) {
+        accum.lastCoord = c
+      } else {
+        totalDistance += haversine(
+          accum.lastCoord.get('latitude'),
+          accum.lastCoord.get('longitude'),
+          c.get('latitude'),
+          c.get('longitude')
         )
+        const mile = Math.floor(totalDistance) % 100
+        const feature = {
+          type: 'Feature',
+          properties: {
+            stroke: `#${allColors[mile]}`,
+          },
+          geometry: {
+            type: "LineString",
+            coordinates: [
+              [accum.lastCoord.get('longitude'), accum.lastCoord.get('latitude')],
+              [c.get('longitude'), c.get('latitude')]
+            ]
+          }
+        }
+        accum.featureCollection.features.push(feature)
+        accum.lastCoord = c
       }
-    }
-    return newHeading
+      return accum
+    }, {lastCoord: null, featureCollection})
+    return featureCollection
   }
 
   fitToElements() {
@@ -116,58 +107,31 @@ export default class RidingMap extends PureComponent {
     }
   }
 
-  mapCoordinates (rideCoordinates) {
-    const coordinates = rideCoordinates.reduce((accum, coord) => {
-      const c = parseRideCoordinate(coord)
-      accum.push([c.get('longitude'), c.get('latitude')])
-      return accum
-    }, [])
-    return {
-      type: "FeatureCollection",
-      features: [{
-        type: 'Feature',
-        geometry: {
-          type: "LineString",
-          coordinates
-        }
-      }]
-    }
-  }
-
   currentLocation (lastLocation) {
+    let coords = []
+    if (lastLocation) {
+      coords = [lastLocation.get('longitude'), lastLocation.get('latitude')]
+    }
     return {
       type: "FeatureCollection",
       features: [{
         type: 'Feature',
         "geometry": {
           "type": "Point",
-          "coordinates": [lastLocation.get('longitude'), lastLocation.get('latitude')]
+          "coordinates": coords
         },
         id: 'currentLocation'
       }]
     }
   }
 
-  mapRegionChanged (e) {
-    if (e.properties.isUserInteraction) {
-      this.setState({
-        heading: e.properties.heading,
-        userRecentered: true,
-        centerCoordinate: e.geometry.coordinates,
-        zoomLevel: e.properties.zoomLevel
-
-      })
-      this.props.mapUnderUserControl()
-    }
-  }
-
   recenterButton () {
-    if (this.state.userRecentered) {
+    if (this.props.userControlledMap) {
       return (
         <View style={{position: 'absolute', left: 20, bottom: 35}}>
           <TouchableOpacity
             style={{backgroundColor: 'white', height: width / 8, width: width / 3, borderRadius: 3}}
-            onPress={this.recenter}
+            onPress={this.props.recenter}
           >
             <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
               <View style={{flex: 1}}>
@@ -187,22 +151,23 @@ export default class RidingMap extends PureComponent {
 
   render() {
     logRender('RideRecorder.RidingMap')
-    const mapCoords = this.mapCoordinates(this.props.currentRideCoordinates)
+    const mapCoords = RidingMap.mapCoordinates(this.props.currentRideCoordinates)
+    logDebug(this.props.zoomLevel, 'zoomlevel')
     return (
       <View style ={styles.container}>
         <View style={{flex: 1}}>
           <MapboxGL.MapView
             animated={true}
-            centerCoordinate={this.state.centerCoordinate}
+            centerCoordinate={this.props.centerCoordinate}
             compassEnabled={true}
-            onRegionDidChange={this.mapRegionChanged}
+            onRegionDidChange={this.props.mapRegionChanged}
             pitch={45}
-            heading={this.state.heading}
+            heading={this.props.heading}
             ref={ref => (this.map = ref)}
             styleURL={"mapbox://styles/equesteo/cjopu37k3fm442smn4ncz3x9m"}
             onDidFinishLoadingMap={this.fitToElements}
             style={styles.map}
-            zoomLevel={this.state.zoomLevel}
+            zoomLevel={this.props.zoomLevel}
           >
             <MapboxGL.ShapeSource id="routeSource" shape={mapCoords}>
               <MapboxGL.LineLayer id="route" sourceID={"routeSource"} style={layerStyles.routeLine}/>
@@ -234,7 +199,7 @@ export default class RidingMap extends PureComponent {
 
 const layerStyles = MapboxGL.StyleSheet.create({
   routeLine: {
-    lineColor: routeLine,
+    lineColor: MapboxGL.StyleSheet.identity('stroke'),
     lineWidth: 3,
     lineCap: 'round',
   },
