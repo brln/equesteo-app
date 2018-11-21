@@ -19,28 +19,26 @@ export default class RideRecorder extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      gpsTaps: 0,
-      showCircles: false,
       fabActive: false,
+      userControlledMap: false,
     }
-    this.tapGPS = this.tapGPS.bind(this)
     this.hitPause = this.hitPause.bind(this)
+    this.mapAutoControl = this.mapAutoControl.bind(this)
+    this.mapUnderUserControl = this.mapUnderUserControl.bind(this)
     this.showCamera = this.showCamera.bind(this)
     this.toggleFab = this.toggleFab.bind(this)
   }
 
-  tapGPS () {
-    if (this.state.gpsTaps === 5) {
-      this.setState({
-        gpsTaps: 0,
-        showCircles: true
-      })
-    } else {
-      this.setState({
-        gpsTaps: this.state.gpsTaps + 1,
-        showCircles: false
-      })
-    }
+  mapUnderUserControl () {
+    this.setState({
+      userControlledMap: true
+    })
+  }
+
+  mapAutoControl () {
+    this.setState({
+      userControlledMap: false
+    })
   }
 
   toggleFab () {
@@ -61,18 +59,8 @@ export default class RideRecorder extends PureComponent {
 
   render() {
     let mainView = null
-    let gpsBar = null
     let pauseButton = null
     let cameraButton = null
-    if (this.props.showGPSBar) {
-      gpsBar = (
-        <GPSStatus
-          style={styles.gpsBar}
-          lastLocation={this.props.lastLocation}
-          tapGPS={this.tapGPS}
-        />
-      )
-    }
     if (this.state.fabActive && this.props.lastLocation) {
       cameraButton = (
         <Button style={{ backgroundColor: orange }} onPress={this.showCamera}>
@@ -94,15 +82,17 @@ export default class RideRecorder extends PureComponent {
           </Button>
         )
       }
+
       mainView = (
         <View style={{flex: 1}}>
           <View style={{flex: 5}}>
             <RidingMap
               currentRideCoordinates={this.props.currentRideCoordinates.get('rideCoordinates')}
               lastLocation={this.props.lastLocation}
+              mapAutoControl={this.mapAutoControl}
+              mapUnderUserControl={this.mapUnderUserControl}
               refiningLocation={this.props.refiningLocation}
               showCircles={this.state.showCircles}
-              tapGPS={this.tapGPS}
             />
             <View>
               <Fab
@@ -117,22 +107,20 @@ export default class RideRecorder extends PureComponent {
                 { cameraButton }
               </Fab>
             </View>
-            {
-              this.props.currentRide.get('lastPauseStart')
-                ? <PlayButton onPress={this.props.unpauseLocationTracking}/>
-                : null
-            }
-          </View>
-          <View style={styles.bottomSection}>
-            <RideStats
-              appState={this.props.appState}
-              currentRide={this.props.currentRide}
-              currentRideCoordinates={this.props.currentRideCoordinates}
-              currentRideElevations={this.props.currentRideElevations}
-              lastLocation={this.props.lastLocation}
-              lastElevation={this.props.lastElevation}
+            <PlayButton
+              visible={Boolean(this.props.currentRide.get('lastPauseStart'))}
+              onPress={this.props.unpauseLocationTracking}
             />
           </View>
+          <RideStats
+            appState={this.props.appState}
+            currentRide={this.props.currentRide}
+            currentRideCoordinates={this.props.currentRideCoordinates}
+            currentRideElevations={this.props.currentRideElevations}
+            lastLocation={this.props.lastLocation}
+            lastElevation={this.props.lastElevation}
+            visible={!this.state.userControlledMap}
+          />
         </View>
       )
     }
@@ -144,7 +132,11 @@ export default class RideRecorder extends PureComponent {
           discardFunc={this.props.discardRide}
           text={"You haven't gone anywhere on this ride yet. Do you want to close it?"}
         />
-        { gpsBar }
+        <GPSStatus
+          shown={this.props.showGPSBar}
+          style={styles.gpsBar}
+          lastLocation={this.props.lastLocation}
+        />
         { mainView }
         { startButton }
       </View>

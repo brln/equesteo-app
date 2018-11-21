@@ -104,52 +104,88 @@ export default class RideStats extends PureComponent {
   }
 
   render () {
-    const distance = this.props.currentRide.get('distance')
-    const speed = this.memoCurrentSpeed(this.props.lastLocation)
-    return (
-      <View style={styles.rideStats}>
-        <View style={{flex: 1}}>
-          <View style={[styles.statBox, {borderTopWidth: 2, borderBottomWidth: 1, borderRightWidth: 1, borderLeftWidth: 2}]}>
-            <Text style={styles.statName}>Distance</Text>
-            <Text style={styles.statFont}>
-              {distance.toFixed(2)} <Text style={styles.unitsFont}>mi</Text>
-            </Text>
+    if (this.props.visible) {
+      const distance = this.props.currentRide.get('distance')
+      const speed = this.memoCurrentSpeed(this.props.lastLocation)
+      return (
+        <View style={styles.rideStats}>
+          <View style={{flex: 1}}>
+            <View style={[styles.statBox, {
+              borderTopWidth: 2,
+              borderBottomWidth: 1,
+              borderRightWidth: 1,
+              borderLeftWidth: 2
+            }]}>
+              <Text style={styles.statName}>Distance</Text>
+              <Text style={styles.statFont}>
+                {distance.toFixed(2)} <Text style={styles.unitsFont}>mi</Text>
+              </Text>
+            </View>
+            <View style={[styles.statBox, {
+              borderTopWidth: 1,
+              borderBottomWidth: 2,
+              borderRightWidth: 1,
+              borderLeftWidth: 2
+            }]}>
+              <Text style={styles.statName}>Current Speed</Text>
+              <Text style={styles.statFont}>{speed} <Text style={styles.unitsFont}>mi/h</Text></Text>
+            </View>
+            <View style={[styles.statBox, {
+              borderTopWidth: 1,
+              borderBottomWidth: 2,
+              borderRightWidth: 1,
+              borderLeftWidth: 2
+            }]}>
+              <Text style={styles.statName}>Altitude</Text>
+              <Text style={styles.statFont}>{this.memoCurrentAltitude(this.props.lastElevation)} <Text
+                style={styles.unitsFont}>ft</Text></Text>
+            </View>
           </View>
-          <View style={[styles.statBox, {borderTopWidth: 1, borderBottomWidth: 2, borderRightWidth: 1, borderLeftWidth: 2}]}>
-            <Text style={styles.statName}>Current Speed</Text>
-            <Text style={styles.statFont}>{speed} <Text style={styles.unitsFont}>mi/h</Text></Text>
-          </View>
-          <View style={[styles.statBox, {borderTopWidth: 1, borderBottomWidth: 2, borderRightWidth: 1, borderLeftWidth: 2}]}>
-            <Text style={styles.statName}>Altitude</Text>
-            <Text style={styles.statFont}>{this.memoCurrentAltitude(this.props.lastElevation)} <Text style={styles.unitsFont}>ft</Text></Text>
+          <View style={{flex: 1}}>
+            <View style={[styles.statBox, {
+              borderTopWidth: 2,
+              borderBottomWidth: 1,
+              borderRightWidth: 2,
+              borderLeftWidth: 1
+            }]}>
+              <Text style={styles.statName}>Total Time</Text>
+              <Text style={styles.statFont}>{this.elapsedAsString()}</Text>
+            </View>
+            <View style={[styles.statBox, {
+              borderTopWidth: 1,
+              borderBottomWidth: 2,
+              borderRightWidth: 2,
+              borderLeftWidth: 1
+            }]}>
+              <Text style={styles.statName}>Avg. Speed</Text>
+              <Text style={styles.statFont}>
+                {this.memoAvgSpeed(this.state.elapsedTime, distance)} <Text style={styles.unitsFont}>mi/h</Text>
+              </Text>
+            </View>
+            <View style={[styles.statBox, {
+              borderTopWidth: 1,
+              borderBottomWidth: 2,
+              borderRightWidth: 2,
+              borderLeftWidth: 1
+            }]}>
+              <Text style={styles.statName}>Elevation Gain</Text>
+              <Text style={styles.statFont}>
+                {Math.round(metersToFeet(this.props.currentRideElevations.get('elevationGain')))} <Text
+                style={styles.unitsFont}>ft</Text>
+              </Text>
+            </View>
           </View>
         </View>
-        <View style={{flex: 1}}>
-          <View style={[styles.statBox, {borderTopWidth: 2, borderBottomWidth: 1, borderRightWidth: 2, borderLeftWidth: 1}]}>
-            <Text style={styles.statName}>Total Time</Text>
-            <Text style={styles.statFont}>{this.elapsedAsString()}</Text>
-          </View>
-          <View style={[styles.statBox, {borderTopWidth: 1, borderBottomWidth: 2, borderRightWidth: 2, borderLeftWidth: 1}]}>
-            <Text style={styles.statName}>Avg. Speed</Text>
-            <Text style={styles.statFont}>
-              {this.memoAvgSpeed(this.state.elapsedTime, distance)} <Text style={styles.unitsFont}>mi/h</Text>
-            </Text>
-          </View>
-          <View style={[styles.statBox, {borderTopWidth: 1, borderBottomWidth: 2, borderRightWidth: 2, borderLeftWidth: 1}]}>
-            <Text style={styles.statName}>Elevation Gain</Text>
-            <Text style={styles.statFont}>
-              {Math.round(metersToFeet(this.props.currentRideElevations.get('elevationGain')))} <Text style={styles.unitsFont}>ft</Text>
-            </Text>
-          </View>
-        </View>
-      </View>
-    )
+      )
+    } else {
+      return null
+    }
   }
 }
 
 const styles = StyleSheet.create({
   rideStats: {
-    flex: 1,
+    flex: 3,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

@@ -1,5 +1,5 @@
 import { fromJS } from 'immutable'
-import { boundingBox, elapsedTime, haversine, bearing, timeToString } from '../helpers'
+import { boundingBox, elapsedTime, haversine, heading, timeToString } from '../helpers'
 
 describe('haversine', () => {
   it('gives the distance beetween two points in miles', () => {
@@ -7,9 +7,9 @@ describe('haversine', () => {
   })
 })
 
-describe('bearing', () => {
-  it('gives the bearing between two points in degrees', () => {
-    expect(Math.round(bearing(0, 0, 1, 1))).toEqual(45)
+describe('heading', () => {
+  it('gives the heading between two points in degrees', () => {
+    expect(Math.round(heading(0, 0, 1, 1))).toEqual(45)
   })
 })
 

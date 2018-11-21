@@ -5,15 +5,19 @@ import { green, danger } from '../../colors'
 
 export default class GPSStatus extends PureComponent {
   render () {
-    let positionFound = <Text style={styles.locationNotFound}>Location Not Found</Text>
-    if (this.props.lastLocation) {
-      positionFound = <Text style={styles.locationFound}>Location Found!</Text>
+    if (this.props.show) {
+      let positionFound = <Text style={styles.locationNotFound}>Location Not Found</Text>
+      if (this.props.lastLocation) {
+        positionFound = <Text style={styles.locationFound}>Location Found!</Text>
+      }
+      return (
+        <View>
+          {positionFound}
+        </View>
+      )
+    } else {
+      return null
     }
-    return (
-      <View>
-        {positionFound}
-      </View>
-    )
   }
 }
 

@@ -1,22 +1,77 @@
 import React, { PureComponent } from 'react';
 import MapboxGL from '@mapbox/react-native-mapbox-gl';
 import {
+  Dimensions,
   StyleSheet,
+  Text,
   TouchableOpacity,
   View
 } from 'react-native';
 
 import BuildImage from '../BuildImage'
-import { bearing, logError, logRender, parseRideCoordinate } from '../../helpers'
-import { routeLine } from '../../colors'
+import { heading, logError, logRender, parseRideCoordinate } from '../../helpers'
+import { brand, routeLine } from '../../colors'
+
+const { width } = Dimensions.get('window')
 
 export default class RidingMap extends PureComponent {
   constructor (props) {
     super(props)
-    this.state = {}
+    this.state = {
+      heading: 0,
+      centerCoordinate: null,
+      userRecentered: false,
+      zoomLevel: 14
+    }
     this.fitToElements = this.fitToElements.bind(this)
-    this.changeBearing = this.changeBearing.bind(this)
     this.gpsStatusImage = this.gpsStatusImage.bind(this)
+    this.mapRegionChanged = this.mapRegionChanged.bind(this)
+    this.recenter = this.recenter.bind(this)
+    this.recenterButton = this.recenterButton.bind(this)
+  }
+
+  static getDerivedStateFromProps (props, state) {
+    const newState = {...state}
+    if (!state.userRecentered) {
+      newState.centerCoordinate = RidingMap.centerCoordinate(props.lastLocation)
+      newState.heading = RidingMap.changeHeading(props.currentRideCoordinates, props.lastLocation)
+    }
+    return newState
+  }
+
+  static centerCoordinate (lastLocation) {
+     return  lastLocation
+       ? [lastLocation.get('longitude'), lastLocation.get('latitude')]
+       : null
+  }
+
+  recenter () {
+    this.setState({
+      centerCoordinate: RidingMap.centerCoordinate(this.props.lastLocation),
+      heading: RidingMap.changeHeading(this.props.currentRideCoordinates, this.props.lastLocation),
+      userRecentered: false,
+      zoomLevel: 14,
+    })
+    this.props.mapAutoControl()
+  }
+
+  static changeHeading (currentRideCoordinates, lastLocation) {
+    let newHeading = 0
+    if (currentRideCoordinates.count() > 1) {
+      let secondToLast = parseRideCoordinate(
+        currentRideCoordinates.get(currentRideCoordinates.count() - 2)
+      )
+      if (currentRideCoordinates.count() > 1
+        && (lastLocation.get('speed') === undefined || lastLocation.get('speed') > 0)) {
+        newHeading = heading(
+          secondToLast.get('latitude'),
+          secondToLast.get('longitude'),
+          lastLocation.get('latitude'),
+          lastLocation.get('longitude')
+        )
+      }
+    }
+    return newHeading
   }
 
   fitToElements() {
@@ -40,25 +95,6 @@ export default class RidingMap extends PureComponent {
       latitudeDelta,
       longitudeDelta,
     }
-  }
-
-  changeBearing () {
-    let newBearing = 0
-    if (this.props.currentRideCoordinates.count() > 1) {
-      let secondToLast = parseRideCoordinate(
-        this.props.currentRideCoordinates.get(this.props.currentRideCoordinates.count() - 2)
-      )
-      if (this.props.currentRideCoordinates.count() > 1
-        && (this.props.lastLocation.get('speed') === undefined || this.props.lastLocation.get('speed') > 0)) {
-        newBearing = bearing(
-          secondToLast.get('latitude'),
-          secondToLast.get('longitude'),
-          this.props.lastLocation.get('latitude'),
-          this.props.lastLocation.get('longitude')
-        )
-      }
-    }
-    return newBearing
   }
 
   gpsStatusImage () {
@@ -98,25 +134,63 @@ export default class RidingMap extends PureComponent {
     }
   }
 
+  mapRegionChanged (e) {
+    logDebug(e)
+    if (e.properties.isUserInteraction) {
+      this.setState({
+        heading: e.properties.heading,
+        userRecentered: true,
+        centerCoordinate: e.geometry.coordinates,
+        zoomLevel: e.properties.zoomLevel
+
+      })
+      this.props.mapUnderUserControl()
+    }
+  }
+
+  recenterButton () {
+    if (this.state.userRecentered) {
+      return (
+        <View style={{position: 'absolute', left: 20, bottom: 35}}>
+          <TouchableOpacity
+            style={{backgroundColor: 'white', height: width / 8, width: width / 3, borderRadius: 3}}
+            onPress={this.recenter}
+          >
+            <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+              <View style={{flex: 1}}>
+                <BuildImage style={{height: width / 9, width: width / 9}} source={require('../../img/recenter.png')} resizeMode={"contain"}/>
+              </View>
+              <View style={{flex: 3}}>
+                <Text style={styles.text}>Re-center</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
+      )
+    } else {
+      return null
+    }
+  }
 
   render() {
-    const centerCoordinate = this.props.lastLocation ? [this.props.lastLocation.get('longitude'), this.props.lastLocation.get('latitude')] : null
     logRender('RideRecorder.RidingMap')
+    logDebug(this.state.heading, 'heading')
     const mapCoords = this.mapCoordinates(this.props.currentRideCoordinates)
     return (
       <View style ={styles.container}>
         <View style={{flex: 1}}>
           <MapboxGL.MapView
             animated={true}
-            centerCoordinate={centerCoordinate}
+            centerCoordinate={this.state.centerCoordinate}
             compassEnabled={true}
+            onRegionDidChange={this.mapRegionChanged}
             pitch={45}
-            heading={this.changeBearing()}
+            heading={this.state.heading}
             ref={ref => (this.map = ref)}
             styleURL={"mapbox://styles/equesteo/cjopu37k3fm442smn4ncz3x9m"}
             onDidFinishLoadingMap={this.fitToElements}
             style={styles.map}
-            zoomLevel={14}
+            zoomLevel={this.state.zoomLevel}
           >
             <MapboxGL.ShapeSource id="routeSource" shape={mapCoords}>
               <MapboxGL.LineLayer id="route" sourceID={"routeSource"} style={layerStyles.routeLine}/>
@@ -124,14 +198,13 @@ export default class RidingMap extends PureComponent {
           </MapboxGL.MapView>
         </View>
         <View style={{position: 'absolute', left: 0, top: 0}} >
-          <TouchableOpacity onPress={this.props.tapGPS}>
-            <BuildImage
-              source={this.gpsStatusImage()}
-              style={{width: 50, height: 50}}
-              onError={(e) => { logError('there was an error loading RidingMap image') }}
-            />
-          </TouchableOpacity>
+          <BuildImage
+            source={this.gpsStatusImage()}
+            style={{width: 50, height: 50}}
+            onError={(e) => { logError('there was an error loading RidingMap image') }}
+          />
         </View>
+        { this.recenterButton() }
       </View>
     )
   }
@@ -152,5 +225,11 @@ const styles = StyleSheet.create({
   map: {
     ...StyleSheet.absoluteFillObject,
   },
+  text: {
+    color: brand,
+    textAlign:'left',
+    paddingLeft : 10,
+    paddingRight : 10,
+    fontSize: 15
+  },
 });
-
