@@ -134,6 +134,20 @@ export default class RidingMap extends PureComponent {
     }
   }
 
+  currentLocation (lastLocation) {
+    return {
+      type: "FeatureCollection",
+      features: [{
+        type: 'Feature',
+        "geometry": {
+          "type": "Point",
+          "coordinates": [lastLocation.get('longitude'), lastLocation.get('latitude')]
+        },
+        id: 'currentLocation'
+      }]
+    }
+  }
+
   mapRegionChanged (e) {
     if (e.properties.isUserInteraction) {
       this.setState({
@@ -193,6 +207,16 @@ export default class RidingMap extends PureComponent {
             <MapboxGL.ShapeSource id="routeSource" shape={mapCoords}>
               <MapboxGL.LineLayer id="route" sourceID={"routeSource"} style={layerStyles.routeLine}/>
             </MapboxGL.ShapeSource>
+            <MapboxGL.ShapeSource
+              id="currentLocationSource"
+              shape={this.currentLocation(this.props.lastLocation)}
+            >
+              <MapboxGL.SymbolLayer
+                id="currentLocation"
+                sourceID={"currentLocationSource"}
+                style={layerStyles.icon}
+              />
+            </MapboxGL.ShapeSource>
           </MapboxGL.MapView>
         </View>
         <View style={{position: 'absolute', left: 0, top: 0}} >
@@ -214,7 +238,12 @@ const layerStyles = MapboxGL.StyleSheet.create({
     lineWidth: 3,
     lineCap: 'round',
   },
-});
+  icon: {
+    iconImage: require('../../img/logo.png'),
+    iconIgnorePlacement: true,
+    iconSize: 1.5,
+  }
+})
 
 const styles = StyleSheet.create({
   container: {
