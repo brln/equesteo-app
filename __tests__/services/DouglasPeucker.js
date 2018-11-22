@@ -22,10 +22,10 @@ describe('simplifyLine', () => {
         List([3, 3, 3, 1]),
       ])
     )).toEqual(
-      List(
+      List([
         List([1, 1, 1, 1]),
         List([3, 3, 3, 1]),
-      )
+      ])
     )
   })
 

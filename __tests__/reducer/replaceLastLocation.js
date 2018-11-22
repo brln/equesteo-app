@@ -115,15 +115,15 @@ describe('REPLACE_LAST_LOCATION', () => {
       speed: 1,
     })
     const lastElevation = Map({
-      latitude: 45.230014,
-      longitude: 27.300012,
+      latitude: 45.230098,
+      longitude: 27.300023,
       elevation: 2000
     })
     const initialElevation = Map({
       elevationGain: 1000,
       elevations: Map({
         '45.2200': Map({'27.2900': 1000}),
-        '45.2300': Map({'27.3000': 2000})
+        '45.2301': Map({'27.3000': 2000})
       })
     })
 
@@ -141,7 +141,7 @@ describe('REPLACE_LAST_LOCATION', () => {
       }),
       currentRideElevations: initialElevation,
       lastElevation,
-      lastLocation: firstPoint,
+      lastLocation: secondPoint,
       refiningLocation: firstPoint,
     })
     let latitude = 45.21323
@@ -163,7 +163,7 @@ describe('REPLACE_LAST_LOCATION', () => {
     let expectedNewState = Map({
       currentRide: Map({
         startTime: startTime,
-        distance: 25.470733,
+        distance: 24.62141,
       }),
       currentRideCoordinates: Map({
         rideCoordinates: List([
@@ -172,10 +172,10 @@ describe('REPLACE_LAST_LOCATION', () => {
           List([latitude, longitude, 1, 5])]),
       }),
       currentRideElevations: Map({
-        elevationGain: 4000,
+        elevationGain: 3000,
         elevations: Map({
           '45.2200': Map({'27.2900': 1000}),
-          '45.2300': Map({'27.3000': 2000}),
+          '45.2301': Map({'27.3000': 2000}),
           '45.2132': Map({'27.2892': elevationPoint})
         })
       }),

@@ -162,7 +162,6 @@ export default function CurrentRideReducer(state=initialState, action) {
         return newState
       }
     case REPLACE_LAST_LOCATION:
-      const oldLastLocation = state.get('lastLocation')
       let replacedLastLocation = state.set(
        'lastLocation',
         action.newLocation
@@ -199,9 +198,10 @@ export default function CurrentRideReducer(state=initialState, action) {
             ['currentRideCoordinates', 'rideCoordinates'],
             List().push(permanentCoord)
           )
-        } else if (rideCoords.count() > 1 && oldLastLocation) {
+        } else if (rideCoords.count() > 1) {
           const rideElevations = state.getIn(['currentRideElevations', 'elevations'])
           const oldElevationTotalGain = state.getIn(['currentRideElevations', 'elevationGain'])
+          const oldLastLocation = parseRideCoordinate(rideCoords.get(-1))
           const lastCoord = parseRideCoordinate(rideCoords.get(-2))
           const oldDistance = haversine(
             oldLastLocation.get('latitude'),
