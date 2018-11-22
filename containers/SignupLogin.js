@@ -14,13 +14,15 @@ import {
 import {
   dismissError,
   errorOccurred,
+  setAwaitingPasswordChange,
+} from '../actions/standard'
+import {
   exchangePWCode,
   getPWCode,
   newPassword,
-  setAwaitingPasswordChange,
   submitLogin,
   submitSignup
-} from '../actions'
+} from '../actions/functional'
 import BuildImage from '../components/BuildImage'
 import ForgotPage from '../components/SignupLogin/ForgotPage'
 import SignupPage from '../components/SignupLogin/SignupPage'

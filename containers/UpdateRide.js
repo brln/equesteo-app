@@ -10,13 +10,15 @@ import {
   deleteUnpersistedRide,
   discardCurrentRide,
   mergeStashedLocations,
-  persistRide,
   removeStashedRidePhoto,
   rideUpdated,
   setPopShowRide,
-  stopLocationTracking,
   stopStashNewLocations,
-} from '../actions'
+} from '../actions/standard'
+import {
+  persistRide,
+  stopLocationTracking,
+} from '../actions/functional'
 import BackgroundComponent from '../components/BackgroundComponent'
 import { brand } from '../colors'
 import { generateUUID, logRender, unixTimeNow } from '../helpers'

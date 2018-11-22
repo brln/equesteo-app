@@ -5,11 +5,13 @@ import { Navigation } from 'react-native-navigation'
 import { BackHandler, Keyboard } from 'react-native'
 
 import {
-  persistUser,
-  persistUserPhoto,
   userUpdated,
   userPhotoUpdated
-} from "../actions"
+} from "../actions/standard"
+import {
+  persistUser,
+  persistUserPhoto,
+} from "../actions/functional"
 import { brand } from '../colors'
 import { logRender } from '../helpers'
 import UpdateProfile from '../components/UpdateProfile'

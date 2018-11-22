@@ -4,7 +4,7 @@ import 'react-native';
 import React from 'react';
 
 import CurrentRideReducer from '../../reducers/CurrentRide'
-import { startRide }  from '../../actions'
+import { startRide }  from '../../actions/standard'
 import { toElevationKey, unixTimeNow } from '../../helpers'
 
 describe('START_RIDE', () => {

@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux';
 import { Navigation } from 'react-native-navigation'
 
-import { createHorse } from '../actions'
+import { createHorse } from '../actions/standard'
 import Barn from '../components/Barn/Barn'
 import BackgroundComponent from '../components/BackgroundComponent'
 import { brand } from '../colors'

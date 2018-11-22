@@ -2,7 +2,7 @@ import { Navigation } from 'react-native-navigation'
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
 
-import { searchForFriends } from "../actions"
+import { searchForFriends } from "../actions/functional"
 import { brand } from '../colors'
 import { logRender } from '../helpers'
 import { PROFILE } from '../screens'

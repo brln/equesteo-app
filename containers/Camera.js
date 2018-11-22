@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { Navigation } from 'react-native-navigation'
 
 
-import { stashRidePhoto } from '../actions'
+import { stashRidePhoto } from '../actions/standard'
 import Camera from '../components/Camera'
 import { brand } from '../colors'
 import { generateUUID, unixTimeNow } from '../helpers'

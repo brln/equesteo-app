@@ -8,7 +8,7 @@ import { combineReducers } from 'redux-immutable';
 import Mapbox from '@mapbox/react-native-mapbox-gl';
 import { MAPBOX_TOKEN } from 'react-native-dotenv'
 
-import { appInitialized } from "./actions"
+import { appInitialized } from "./actions/functional"
 import { logDebug } from './helpers'
 import logger from './middleware/logger'
 import storeToCouch from './middleware/couch'

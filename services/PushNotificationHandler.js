@@ -1,4 +1,4 @@
-import { awaitFullSync, setPopShowRide, showLocalNotification } from '../actions'
+import { showLocalNotification } from '../actions/functional'
 
 export function handleNotification (dispatch, messageData, background) {
   switch (messageData.type) {

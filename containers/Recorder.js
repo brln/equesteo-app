@@ -9,12 +9,14 @@ import {
   discardCurrentRide,
   pauseLocationTracking,
   startRide,
-  startLocationTracking,
   stashNewLocations,
-  stopLocationTracking,
   stopStashNewLocations,
   unpauseLocationTracking,
-} from '../actions'
+} from '../actions/standard'
+import {
+  startLocationTracking,
+  stopLocationTracking,
+} from '../actions/functional'
 import { brand } from '../colors'
 import RideRecorder from '../components/RideRecorder/RideRecorder'
 import { isAndroid, logRender, unixTimeNow } from '../helpers'

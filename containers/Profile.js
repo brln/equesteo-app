@@ -9,13 +9,15 @@ import {
   createFollow,
   createUserPhoto,
   deleteFollow,
+  userUpdated,
+} from "../actions/standard"
+import {
   persistFollow,
   persistUser,
   persistUserPhoto,
   signOut,
   uploadUserPhoto,
-  userUpdated,
-} from "../actions"
+} from "../actions/functional"
 import { brand } from '../colors'
 import {
   ABOUT_PAGE,

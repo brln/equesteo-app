@@ -1,10 +1,12 @@
 import {
-  clearState,
   remotePersistComplete,
   remotePersistError,
   remotePersistStarted
-} from '../actions'
-import { logInfo, logError } from '../helpers'
+} from '../actions/functional'
+import {
+  clearState,
+} from '../actions/standard'
+import { logError } from '../helpers'
 import { PouchCouch } from '../services/index'
 import { captureException } from '../services/Sentry'
 

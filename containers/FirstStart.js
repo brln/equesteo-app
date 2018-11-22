@@ -9,16 +9,18 @@ import {
   createUserPhoto,
   deleteUnpersistedHorse,
   horseUpdated,
+  setFirstStartHorseID,
+  userUpdated,
+} from '../actions/standard'
+import {
   persistHorse,
   persistHorseUser,
   persistUser,
   persistHorsePhoto,
   persistUserPhoto,
-  setFirstStartHorseID,
   uploadHorsePhoto,
   uploadUserPhoto,
-  userUpdated,
-} from '../actions'
+} from '../actions/functional'
 import { brand } from '../colors'
 import { generateUUID, logRender, unixTimeNow } from '../helpers'
 import FirstStart from '../components/FirstStart/FirstStart'

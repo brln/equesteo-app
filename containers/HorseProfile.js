@@ -3,15 +3,17 @@ import { connect } from 'react-redux';
 import { Navigation } from 'react-native-navigation'
 
 import {
-  addHorseUser,
   createHorsePhoto,
-  deleteHorseUser,
   horseUpdated,
+} from '../actions/standard'
+import {
+  addHorseUser,
+  deleteHorseUser,
   persistHorse,
   persistHorseUser,
   persistHorsePhoto,
   uploadHorsePhoto
-} from '../actions'
+} from '../actions/functional'
 import BackgroundComponent from '../components/BackgroundComponent'
 import { brand } from '../colors'
 import { generateUUID, logRender, unixTimeNow } from '../helpers'

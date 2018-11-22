@@ -1,3 +1,4 @@
+import { fromJS, Map  } from 'immutable'
 import { AppState, NetInfo } from 'react-native'
 import { DISTRIBUTION } from 'react-native-dotenv'
 import BackgroundGeolocation from 'react-native-mauron85-background-geolocation'
@@ -5,93 +6,66 @@ import { ENV } from 'react-native-dotenv'
 import firebase from 'react-native-firebase'
 import { Navigation } from 'react-native-navigation'
 import PushNotification from 'react-native-push-notification'
-import { fromJS, Map  } from 'immutable'
-import kalmanFilter from './services/Kalman'
-import { captureException, setUserContext } from "./services/Sentry"
-import { handleNotification } from './services/PushNotificationHandler'
+
+import kalmanFilter from '../services/Kalman'
+import { captureException, setUserContext } from "../services/Sentry"
+import { handleNotification } from '../services/PushNotificationHandler'
 
 import {
   haversine,
   logError,
   logInfo,
   unixTimeNow,
-} from "./helpers"
-import { danger, green, warning } from './colors'
-import { appStates } from './helpers'
-import { CAMERA, DRAWER, FEED, RECORDER, SIGNUP_LOGIN, UPDATE_NEW_RIDE_ID } from './screens'
-import { LocalStorage, PouchCouch, UserAPI } from './services'
-import {BadRequestError, NotConnectedError, UnauthorizedError} from "./errors"
+} from "../helpers"
+import { danger, green, warning } from '../colors'
+import { appStates } from '../helpers'
+import { CAMERA, DRAWER, FEED, RECORDER, SIGNUP_LOGIN, UPDATE_NEW_RIDE_ID } from '../screens'
+import { LocalStorage, PouchCouch, UserAPI } from '../services'
+import {BadRequestError, NotConnectedError, UnauthorizedError} from "../errors"
+
 import {
-  AWAIT_FULL_SYNC,
-  CLEAR_FEED_MESSAGE,
-  CLEAR_LAST_LOCATION,
-  CLEAR_PAUSED_LOCATIONS,
-  CLEAR_SEARCH,
-  CLEAR_SELECTED_RIDE_COORDINATES,
-  CLEAR_STATE,
-  CLEAR_STATE_AFTER_PERSIST,
-  CREATE_FOLLOW,
-  CREATE_HORSE,
-  CREATE_HORSE_PHOTO,
-  CREATE_RIDE,
-  CREATE_RIDE_PHOTO,
-  CREATE_USER_PHOTO,
-  DEQUEUE_PHOTO,
-  DELETE_FOLLOW,
-  DELETE_UNPERSISTED_HORSE,
-  DELETE_UNPERSISTED_RIDE,
-  DELETE_UNPERSISTED_PHOTO,
-  DISCARD_CURRENT_RIDE,
-  DISMISS_ERROR,
-  ENQUEUE_PHOTO,
-  ERROR_OCCURRED,
-  FOLLOW_UPDATED,
-  HORSE_UPDATED,
-  HORSE_PHOTO_UPDATED,
-  HORSE_USER_UPDATED,
-  LOAD_CURRENT_RIDE_STATE,
-  LOAD_LOCAL_STATE,
-  LOCAL_DATA_LOADED,
-  MERGE_STASHED_LOCATIONS,
-  NEEDS_REMOTE_PERSIST,
-  NEW_LOCATION,
-  NEW_APP_STATE,
-  NEW_NETWORK_STATE,
-  PAUSE_LOCATION_TRACKING,
-  POP_SHOW_RIDE_SHOWN,
-  RECEIVE_JWT,
-  REMOTE_PERSIST_COMPLETE,
-  REMOTE_PERSIST_ERROR,
-  REMOTE_PERSIST_STARTED,
-  REMOVE_STASHED_RIDE_PHOTO,
-  REPLACE_LAST_LOCATION,
-  RIDE_CARROT_CREATED,
-  RIDE_CARROT_SAVED,
-  RIDE_COMMENT_UPDATED,
-  RIDE_COORDINATES_LOADED,
-  RIDE_ELEVATIONS_UPDATED,
-  RIDE_PHOTO_UPDATED,
-  RIDE_UPDATED,
-  SAVE_USER_ID,
-  SET_ACTIVE_COMPONENT,
-  SET_FEED_MESSAGE,
-  SET_FIRST_START_HORSE_ID,
-  SET_FULL_SYNC_FAIL,
-  SET_POP_SHOW_RIDE,
-  SHOW_POP_SHOW_RIDE,
-  START_RIDE,
-  STASH_NEW_LOCATIONS,
-  STASH_RIDE_PHOTO,
-  STOP_STASH_NEW_LOCATIONS,
-  SYNC_COMPLETE,
-  SET_AWAITING_PW_CHANGE,
-  SET_DOING_INITIAL_LOAD,
-  SET_SHOWING_RIDE,
-  UNPAUSE_LOCATION_TRACKING,
-  USER_PHOTO_UPDATED,
-  USER_SEARCH_RETURNED,
-  USER_UPDATED,
-} from './constants'
+  awaitFullSync,
+  clearLastLocation,
+  clearStateAfterPersist,
+  dismissError,
+  enqueuePhoto,
+  errorOccurred,
+  horsePhotoUpdated,
+  horseUpdated,
+  followUpdated,
+  horseUserUpdated,
+  loadCurrentRideState,
+  loadLocalState,
+  localDataLoaded,
+  newAppState,
+  newLocation,
+  newNetworkState,
+  receiveJWT,
+  replaceLastLocation,
+  rideCoordinatesLoaded,
+  rideCarrotCreated,
+  rideCarrotSaved,
+  rideCommentUpdated,
+  rideUpdated,
+  rideElevationsUpdated,
+  ridePhotoUpdated,
+  setPopShowRide,
+  setRemotePersistDB,
+  setFeedMessage,
+  setFullSyncFail,
+  setRemotePersistStarted,
+  setRemotePersistComplete,
+  setRemotePersistError,
+  showPopShowRide,
+  saveUserID,
+  setActiveComponent,
+  syncComplete,
+  setAwaitingPasswordChange,
+  setDoingInitialLoad,
+  userPhotoUpdated,
+  userSearchReturned,
+  userUpdated,
+} from './standard'
 
 function catchAsyncError (e) {
   logError(e)
@@ -101,511 +75,7 @@ function catchAsyncError (e) {
   }, 0)
 }
 
-export function awaitFullSync () {
-  return {
-    type: AWAIT_FULL_SYNC
-  }
-}
 
-export function clearFeedMessage () {
-  return {
-    type: CLEAR_FEED_MESSAGE
-  }
-}
-
-export function clearLastLocation () {
-  return {
-    type: CLEAR_LAST_LOCATION,
-  }
-}
-
-export function clearPausedLocations () {
-  return {
-    type: CLEAR_PAUSED_LOCATIONS
-  }
-}
-
-export function clearSearch () {
-  return {
-    type: CLEAR_SEARCH
-  }
-}
-
-export function clearSelectedRideCoordinates () {
-  return {
-    type: CLEAR_SELECTED_RIDE_COORDINATES
-  }
-}
-
-export function clearState () {
-  return {
-    type: CLEAR_STATE,
-  }
-}
-
-function clearStateAfterPersist () {
-  return {
-    type: CLEAR_STATE_AFTER_PERSIST,
-  }
-}
-
-export function createFollow (followID, followingID, followerID) {
-  return {
-    type: CREATE_FOLLOW,
-    followID,
-    followingID,
-    followerID
-  }
-}
-
-export function createHorse (horseID, horseUserID, userID) {
-  return {
-    type: CREATE_HORSE,
-    horseID,
-    horseUserID,
-    userID
-  }
-}
-
-export function createHorsePhoto (horseID, userID, photoData) {
-  return {
-    type: CREATE_HORSE_PHOTO,
-    horseID,
-    userID,
-    photoData,
-  }
-}
-
-export function createRide (
-  rideID,
-  userID,
-  currentRide,
-  currentRideElevations,
-  currentRideCoordinates,
-  currentRidePhotos
-) {
-  return {
-    type: CREATE_RIDE,
-    currentRide,
-    currentRideCoordinates,
-    currentRideElevations,
-    currentRidePhotos,
-    rideID,
-    userID
-  }
-}
-
-export function createRidePhoto (rideID, userID, photoData) {
-  return {
-    type: CREATE_RIDE_PHOTO,
-    rideID,
-    userID,
-    photoData
-  }
-}
-
-export function createUserPhoto (userID, photoData) {
-  return {
-    type: CREATE_USER_PHOTO,
-    userID,
-    photoData
-  }
-}
-
-export function dequeuePhoto (photoID) {
-  return {
-    type: DEQUEUE_PHOTO,
-    photoID
-  }
-}
-
-export function deleteFollow (followID) {
-  return {
-    type: DELETE_FOLLOW,
-    followID
-  }
-}
-
-export function deleteUnpersistedHorse (horseID, horseUserID) {
-  return {
-    type: DELETE_UNPERSISTED_HORSE,
-    horseID,
-    horseUserID,
-  }
-}
-
-export function deleteUnpersistedRide (rideID) {
-  return {
-    type: DELETE_UNPERSISTED_RIDE,
-    rideID
-  }
-}
-
-export function deleteUnpersistedPhoto (photoSection, photoID) {
-  return {
-    type: DELETE_UNPERSISTED_PHOTO,
-    photoSection,
-    photoID
-  }
-}
-
-export function discardCurrentRide ()  {
-  return {
-    type: DISCARD_CURRENT_RIDE
-  }
-}
-
-export function dismissError () {
-  return {
-    type: DISMISS_ERROR
-  }
-}
-
-export function enqueuePhoto (queueItem) {
-  return {
-    type: ENQUEUE_PHOTO,
-    queueItem
-  }
-}
-
-export function horsePhotoUpdated (horsePhoto) {
-  return {
-    type: HORSE_PHOTO_UPDATED,
-    horsePhoto
-  }
-}
-
-export function horseUpdated (horse) {
-  return {
-    type: HORSE_UPDATED,
-    horse
-  }
-}
-
-export function errorOccurred (message) {
-  return {
-    type: ERROR_OCCURRED,
-    message
-  }
-}
-
-export function followUpdated (follow) {
-  return {
-    type: FOLLOW_UPDATED,
-    follow
-  }
-}
-
-export function horseUserUpdated (horseUser) {
-  return {
-    type: HORSE_USER_UPDATED,
-    horseUser
-  }
-}
-
-export function loadCurrentRideState (currentRideState) {
-  return {
-    type: LOAD_CURRENT_RIDE_STATE,
-    currentRideState
-  }
-}
-
-export function loadLocalState (localState) {
-  return {
-    type: LOAD_LOCAL_STATE,
-    localState
-  }
-}
-
-export function localDataLoaded (localData) {
-  return {
-    type: LOCAL_DATA_LOADED,
-    localData
-  }
-}
-
-export function mergeStashedLocations () {
-  return {
-    type: MERGE_STASHED_LOCATIONS,
-  }
-}
-
-
-
-function newAppState (newState) {
-  return {
-    logData: ['newState'],
-    type: NEW_APP_STATE,
-    newState,
-  }
-}
-
-export function newLocation (location, elevation) {
-  return {
-    type: NEW_LOCATION,
-    location,
-    elevation,
-  }
-}
-
-function newNetworkState (connectionType, effectiveConnectionType) {
-  return {
-    type: NEW_NETWORK_STATE,
-    connectionType,
-    effectiveConnectionType,
-    logData: ['connectionType', 'effectiveConnectionType'],
-  }
-}
-
-export function pauseLocationTracking () {
-  return {
-    type: PAUSE_LOCATION_TRACKING
-  }
-}
-
-export function popShowRideShown () {
-  return {
-    type: POP_SHOW_RIDE_SHOWN
-  }
-}
-
-function receiveJWT (token) {
-  return {
-    type: RECEIVE_JWT,
-    token
-  }
-}
-
-export function removeStashedRidePhoto (photoID, stashKey) {
-  return {
-    type: REMOVE_STASHED_RIDE_PHOTO,
-    photoID,
-    stashKey
-  }
-}
-
-function rideCoordinatesLoaded (rideCoordinates) {
-  return {
-    type: RIDE_COORDINATES_LOADED,
-    rideCoordinates
-  }
-}
-
-export function setPopShowRide (rideID, showRideNow, scrollToComments) {
-  return {
-    type: SET_POP_SHOW_RIDE,
-    rideID,
-    showRideNow,
-    scrollToComments,
-  }
-}
-
-export function setRemotePersistDB (database) {
-  return {
-    type: NEEDS_REMOTE_PERSIST,
-    database
-  }
-}
-
-export function setFeedMessage (message) {
-  return {
-    type: SET_FEED_MESSAGE,
-    message
-  }
-}
-
-export function setFullSyncFail (status) {
-  return {
-    type: SET_FULL_SYNC_FAIL,
-    status,
-    logData: ['status']
-  }
-}
-
-export function showPopShowRide () {
-  return {
-    type: SHOW_POP_SHOW_RIDE,
-  }
-}
-
-export function setRemotePersistStarted () {
-  return {
-    type: REMOTE_PERSIST_STARTED
-  }
-}
-
-export function stashNewLocations () {
-  return {
-    type: STASH_NEW_LOCATIONS
-  }
-}
-
-export function stashRidePhoto (photoData, stashKey) {
-  return {
-    type: STASH_RIDE_PHOTO,
-    photoData,
-    stashKey
-  }
-}
-
-export function stopStashNewLocations () {
-  return {
-    type: STOP_STASH_NEW_LOCATIONS
-  }
-}
-
-export function replaceLastLocation (newLocation, newElevation) {
-  return {
-    type: REPLACE_LAST_LOCATION,
-    newLocation,
-    newElevation,
-  }
-}
-
-export function setRemotePersistComplete (database) {
-  return {
-    type: REMOTE_PERSIST_COMPLETE,
-    database
-  }
-}
-
-export function setRemotePersistError () {
-  return {
-    type: REMOTE_PERSIST_ERROR,
-  }
-}
-
-export function setShowingRide (rideID) {
-  return {
-    type: SET_SHOWING_RIDE,
-    rideID,
-  }
-}
-
-export function rideCarrotCreated (carrotData) {
-  return {
-    type: RIDE_CARROT_CREATED,
-    carrotData
-  }
-}
-
-export function rideCarrotSaved (carrotData) {
-  return {
-    type: RIDE_CARROT_SAVED,
-    carrotData
-  }
-}
-
-function rideCommentUpdated (rideComment) {
-  return {
-    type: RIDE_COMMENT_UPDATED,
-    rideComment
-  }
-}
-
-export function rideUpdated (ride) {
-  return {
-    type: RIDE_UPDATED,
-    ride
-  }
-}
-
-function rideElevationsUpdated (rideElevations) {
-  return {
-    type: RIDE_ELEVATIONS_UPDATED,
-    rideElevations
-  }
-}
-
-export function ridePhotoUpdated (ridePhoto) {
-  return {
-    type: RIDE_PHOTO_UPDATED,
-    ridePhoto
-  }
-}
-
-export function saveUserID(userID) {
-  return {
-    type: SAVE_USER_ID,
-    userID
-  }
-}
-
-function setActiveComponent (componentID) {
-  return {
-    logData: ['componentID'],
-    type: SET_ACTIVE_COMPONENT,
-    componentID
-  }
-}
-
-export function setFirstStartHorseID (horseID, horseUserID) {
-  return {
-    type: SET_FIRST_START_HORSE_ID,
-    horseID,
-    horseUserID
-  }
-}
-
-export function startRide(firstCoord, firstElevation, startTime) {
-  return {
-    type: START_RIDE,
-    firstCoord,
-    firstElevation,
-    startTime
-  }
-}
-
-export function syncComplete () {
-  return {
-    type: SYNC_COMPLETE,
-  }
-}
-
-export function setAwaitingPasswordChange (newVal) {
-  return {
-    type: SET_AWAITING_PW_CHANGE,
-    newVal
-  }
-}
-
-function setDoingInitialLoad (newVal) {
-  return {
-    type: SET_DOING_INITIAL_LOAD,
-    newVal
-  }
-}
-
-export function unpauseLocationTracking () {
-  return {
-    type: UNPAUSE_LOCATION_TRACKING
-  }
-}
-
-export function userPhotoUpdated (userPhoto) {
-  return {
-    type: USER_PHOTO_UPDATED,
-    userPhoto
-  }
-}
-
-export function userSearchReturned (userSearchResults) {
-  return {
-    type: USER_SEARCH_RETURNED,
-    userSearchResults,
-  }
-}
-
-export function userUpdated (userData) {
-  return {
-    type: USER_UPDATED,
-    userData,
-  }
-}
-
-//  =========================================
-// |<  FUNCTIONAL ACTIONS                |||>>
-//  =========================================
 export function addHorseUser (horse, user) {
   return (dispatch, getState) => {
     const id = `${user.get('_id')}_${horse.get('_id')}`
@@ -667,6 +137,165 @@ function configureBackgroundGeolocation () {
       notificationTitle: 'You\'re out on a ride.',
       notificationText: 'Tap here to see your progress.',
     });
+  }
+}
+
+export function createRideComment(commentData) {
+  return (dispatch, getState) => {
+    const jwt = getState().getIn(['localState', 'jwt'])
+    const pouchCouch = new PouchCouch(jwt)
+    const currentUserID = getState().getIn(['localState', 'userID'])
+    const commentID = `${currentUserID}_${(new Date).getTime().toString()}`
+    const newComment = Map({
+      _id: commentID,
+      rideID: commentData.rideID,
+      userID: currentUserID,
+      deleted: false,
+      type: 'comment',
+      comment: commentData.comment,
+      timestamp: commentData.timestamp
+    })
+    dispatch(rideCommentUpdated(newComment))
+    pouchCouch.saveRide(newComment.toJS()).then((doc) => {
+      const afterSave = getState().getIn(['pouchRecords', 'rideComments', commentID])
+      dispatch(rideCommentUpdated(afterSave.set('_rev', doc.rev)))
+      dispatch(needsRemotePersist('rides'))
+    }).catch(catchAsyncError)
+
+  }
+}
+
+export function deleteHorseUser (horseUserID) {
+  return (dispatch, getState) => {
+    let theHorseUser = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
+    if (!theHorseUser) {
+      throw Error('Could not find horseUser')
+    }
+    theHorseUser = theHorseUser.set('deleted', true)
+    dispatch(horseUserUpdated(theHorseUser))
+  }
+}
+
+export function exchangePWCode (email, code) {
+  return async (dispatch) => {
+    let userAPI = new UserAPI()
+    try {
+      const resp = await userAPI.exchangePWCodeForToken(email, code)
+      dispatch(dismissError())
+      const token = resp.token
+      const userID = resp.id
+      const following = resp.following
+      const followers = resp.followers
+      const pouchCouch = new PouchCouch(token)
+      dispatch(setAwaitingPasswordChange(true))
+      await pouchCouch.localReplicateDB('all', [...following, userID], followers)
+      dispatch(receiveJWT(resp.token))
+      dispatch(saveUserID(resp.id))
+      setUserContext(resp.id)
+      await dispatch(loadLocalData())
+      dispatch(startListeningFCMTokenRefresh())
+      dispatch(getFCMToken())
+      dispatch(setDistributionOnServer())
+      dispatch(startListeningFCM())
+      await LocalStorage.saveToken(resp.token, resp.id);
+    } catch (e) {
+      logError(e)
+      if (e instanceof UnauthorizedError) {
+        dispatch(errorOccurred(e.message))
+      }
+    }
+  }
+}
+
+
+
+function findLocalToken () {
+  return async (dispatch) => {
+    const storedToken = await LocalStorage.loadToken()
+    if (storedToken !== null) {
+      dispatch(receiveJWT(storedToken.token))
+      dispatch(saveUserID(storedToken.userID))
+      setUserContext(storedToken.userID)
+      dispatch(switchRoot(FEED))
+      await dispatch(loadLocalData())
+      dispatch(startListeningFCMTokenRefresh())
+      dispatch(getFCMToken())
+      dispatch(startListeningFCM())
+      dispatch(setDistributionOnServer())
+      dispatch(syncDBPull('all'))
+    } else {
+      dispatch(switchRoot(SIGNUP_LOGIN))
+    }
+  }
+}
+
+export function getPWCode (email) {
+  return async () => {
+    let userAPI = new UserAPI()
+    await userAPI.getPWCode(email)
+  }
+}
+
+export function getFCMToken () {
+  return async (dispatch) => {
+    let fcmToken
+    try {
+      fcmToken = await firebase.messaging().getToken();
+    } catch (e) {
+      logInfo('no token available')
+    }
+    if (fcmToken) {
+      dispatch(setFCMTokenOnServer(fcmToken))
+    }
+  }
+}
+
+function loadLocalData () {
+  return async (dispatch, getState) => {
+    const jwt = getState().getIn(['localState', 'jwt'])
+    const pouchCouch = new PouchCouch(jwt)
+    try {
+      logInfo('==== Starting local data load ===')
+      const localData = await pouchCouch.localLoad()
+      logInfo('==== Local data loaded from pouch complete ===')
+      dispatch(localDataLoaded(localData))
+    } catch (e) {
+      logError(e)
+      throw e
+    }
+  }
+}
+
+export function loadRideCoordinates (rideID) {
+  return (dispatch) => {
+    const pouchCouch = new PouchCouch()
+    pouchCouch.loadRideCoordinates(rideID).then((coords) => {
+      dispatch(rideCoordinatesLoaded(coords))
+    }).catch(catchAsyncError)
+  }
+}
+
+export function newPassword (password) {
+  return async (dispatch, getState) => {
+    const jwt = getState().getIn(['localState', 'jwt'])
+    const userAPI = new UserAPI(jwt)
+    try {
+      await userAPI.changePassword(password)
+      dispatch(switchRoot(FEED))
+    } catch (e) {
+      logError(e)
+    }
+  }
+}
+
+export function needsRemotePersist(db) {
+  return (dispatch) => {
+    dispatch(setFeedMessage(Map({
+      message: 'Data Needs to Upload',
+      color: warning,
+      timeout: false
+    })))
+    dispatch(setRemotePersistDB(db))
   }
 }
 
@@ -858,206 +487,6 @@ export function persistHorseUser (horseUserID) {
     const theHorseUserAfterSave = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
     await dispatch(horseUserUpdated(theHorseUserAfterSave.set('_rev', doc.rev)))
     dispatch(needsRemotePersist('horses'))
-  }
-}
-
-export function createRideComment(commentData) {
-  return (dispatch, getState) => {
-    const jwt = getState().getIn(['localState', 'jwt'])
-    const pouchCouch = new PouchCouch(jwt)
-    const currentUserID = getState().getIn(['localState', 'userID'])
-    const commentID = `${currentUserID}_${(new Date).getTime().toString()}`
-    const newComment = Map({
-      _id: commentID,
-      rideID: commentData.rideID,
-      userID: currentUserID,
-      deleted: false,
-      type: 'comment',
-      comment: commentData.comment,
-      timestamp: commentData.timestamp
-    })
-    dispatch(rideCommentUpdated(newComment))
-    pouchCouch.saveRide(newComment.toJS()).then((doc) => {
-      const afterSave = getState().getIn(['pouchRecords', 'rideComments', commentID])
-      dispatch(rideCommentUpdated(afterSave.set('_rev', doc.rev)))
-      dispatch(needsRemotePersist('rides'))
-    }).catch(catchAsyncError)
-
-  }
-}
-
-export function deleteHorseUser (horseUserID) {
-  return (dispatch, getState) => {
-    let theHorseUser = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
-    if (!theHorseUser) {
-      throw Error('Could not find horseUser')
-    }
-    theHorseUser = theHorseUser.set('deleted', true)
-    dispatch(horseUserUpdated(theHorseUser))
-  }
-}
-
-export function exchangePWCode (email, code) {
-  return async (dispatch) => {
-    let userAPI = new UserAPI()
-    try {
-      const resp = await userAPI.exchangePWCodeForToken(email, code)
-      dispatch(dismissError())
-      const token = resp.token
-      const userID = resp.id
-      const following = resp.following
-      const followers = resp.followers
-      const pouchCouch = new PouchCouch(token)
-      dispatch(setAwaitingPasswordChange(true))
-      await pouchCouch.localReplicateDB('all', [...following, userID], followers)
-      dispatch(receiveJWT(resp.token))
-      dispatch(saveUserID(resp.id))
-      setUserContext(resp.id)
-      await dispatch(loadLocalData())
-      dispatch(startListeningFCMTokenRefresh())
-      dispatch(getFCMToken())
-      dispatch(setDistributionOnServer())
-      dispatch(startListeningFCM())
-      await LocalStorage.saveToken(resp.token, resp.id);
-    } catch (e) {
-      logError(e)
-      if (e instanceof UnauthorizedError) {
-        dispatch(errorOccurred(e.message))
-      }
-    }
-  }
-}
-
-export function needsRemotePersist(db) {
-  return (dispatch) => {
-    dispatch(setFeedMessage(Map({
-      message: 'Data Needs to Upload',
-      color: warning,
-      timeout: false
-    })))
-    dispatch(setRemotePersistDB(db))
-  }
-}
-
-function switchRoot (newRoot) {
-  return async () => {
-    if (newRoot === FEED) {
-      Navigation.setRoot({
-        root: {
-          sideMenu: {
-            left: {
-              visible: true,
-              component: {name: DRAWER, id: DRAWER}
-            },
-            center: {
-              stack: {
-                children: [{
-                  component: {
-                    name: FEED,
-                    id: FEED,
-                    options: {
-                      topBar: {
-                        elevation: 0
-                      }
-                    }
-                  },
-                }]
-              }
-            },
-          }
-        }
-      });
-    } else if (newRoot === SIGNUP_LOGIN) {
-      Navigation.setRoot({
-        root: {
-          component: {
-            name: SIGNUP_LOGIN,
-            id: SIGNUP_LOGIN
-          },
-        }
-      });
-    } else {
-      throw Error('That\'s a bad route, jerk.')
-    }
-  }
-}
-
-function findLocalToken () {
-  return async (dispatch) => {
-    const storedToken = await LocalStorage.loadToken()
-    if (storedToken !== null) {
-      dispatch(receiveJWT(storedToken.token))
-      dispatch(saveUserID(storedToken.userID))
-      setUserContext(storedToken.userID)
-      dispatch(switchRoot(FEED))
-      await dispatch(loadLocalData())
-      dispatch(startListeningFCMTokenRefresh())
-      dispatch(getFCMToken())
-      dispatch(startListeningFCM())
-      dispatch(setDistributionOnServer())
-      dispatch(syncDBPull('all'))
-    } else {
-      dispatch(switchRoot(SIGNUP_LOGIN))
-    }
-  }
-}
-
-export function getPWCode (email) {
-  return async () => {
-    let userAPI = new UserAPI()
-    await userAPI.getPWCode(email)
-  }
-}
-
-export function getFCMToken () {
-  return async (dispatch) => {
-    let fcmToken
-    try {
-      fcmToken = await firebase.messaging().getToken();
-    } catch (e) {
-      logInfo('no token available')
-    }
-    if (fcmToken) {
-      dispatch(setFCMTokenOnServer(fcmToken))
-    }
-  }
-}
-
-function loadLocalData () {
-  return async (dispatch, getState) => {
-    const jwt = getState().getIn(['localState', 'jwt'])
-    const pouchCouch = new PouchCouch(jwt)
-    try {
-      logInfo('==== Starting local data load ===')
-      const localData = await pouchCouch.localLoad()
-      logInfo('==== Local data loaded from pouch complete ===')
-      dispatch(localDataLoaded(localData))
-    } catch (e) {
-      logError(e)
-      throw e
-    }
-  }
-}
-
-export function loadRideCoordinates (rideID) {
-  return (dispatch) => {
-    const pouchCouch = new PouchCouch()
-    pouchCouch.loadRideCoordinates(rideID).then((coords) => {
-      dispatch(rideCoordinatesLoaded(coords))
-    }).catch(catchAsyncError)
-  }
-}
-
-export function newPassword (password) {
-  return async (dispatch, getState) => {
-    const jwt = getState().getIn(['localState', 'jwt'])
-    const userAPI = new UserAPI(jwt)
-    try {
-      await userAPI.changePassword(password)
-      dispatch(switchRoot(FEED))
-    } catch (e) {
-      logError(e)
-    }
   }
 }
 
@@ -1435,6 +864,49 @@ export function syncDBPull () {
   }
 }
 
+function switchRoot (newRoot) {
+  return async () => {
+    if (newRoot === FEED) {
+      Navigation.setRoot({
+        root: {
+          sideMenu: {
+            left: {
+              visible: true,
+              component: {name: DRAWER, id: DRAWER}
+            },
+            center: {
+              stack: {
+                children: [{
+                  component: {
+                    name: FEED,
+                    id: FEED,
+                    options: {
+                      topBar: {
+                        elevation: 0
+                      }
+                    }
+                  },
+                }]
+              }
+            },
+          }
+        }
+      });
+    } else if (newRoot === SIGNUP_LOGIN) {
+      Navigation.setRoot({
+        root: {
+          component: {
+            name: SIGNUP_LOGIN,
+            id: SIGNUP_LOGIN
+          },
+        }
+      });
+    } else {
+      throw Error('That\'s a bad route, jerk.')
+    }
+  }
+}
+
 export function toggleRideCarrot (rideID) {
   return (dispatch, getState) => {
     const jwt = getState().getIn(['localState', 'jwt'])
@@ -1506,4 +978,3 @@ export function uploadUserPhoto (photoID, photoLocation) {
     dispatch(enqueuePhoto(Map({type: 'user', photoLocation, photoID})))
   }
 }
-

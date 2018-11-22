@@ -12,11 +12,13 @@ import {
   horsePhotoUpdated,
   horseUpdated,
   horseUserUpdated,
+} from '../actions/standard'
+import {
   persistHorse,
   persistHorsePhoto,
   persistHorseUser,
   uploadHorsePhoto,
-} from '../actions'
+} from '../actions/functional'
 import { brand } from '../colors'
 import { generateUUID, logRender, unixTimeNow } from '../helpers'
 

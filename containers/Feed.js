@@ -3,11 +3,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Navigation } from 'react-native-navigation'
 
-import {
-  clearFeedMessage,
-  syncDBPull,
-  toggleRideCarrot
-} from "../actions";
+import { clearFeedMessage } from "../actions/standard";
+import { syncDBPull, toggleRideCarrot } from "../actions/functional";
 import BackgroundComponent from '../components/BackgroundComponent'
 import { brand } from '../colors'
 import Feed from '../components/Feed/Feed'

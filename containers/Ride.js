@@ -7,13 +7,15 @@ import { connect } from 'react-redux';
 import Ride from '../components/Ride/Ride'
 import {
   clearSelectedRideCoordinates,
-  createRideComment,
-  loadRideCoordinates,
-  persistRide,
   popShowRideShown,
   rideUpdated,
   setShowingRide,
-} from '../actions'
+} from '../actions/standard'
+import {
+  createRideComment,
+  loadRideCoordinates,
+  persistRide,
+} from '../actions/functional'
 import { brand } from '../colors'
 import { logRender, unixTimeNow } from '../helpers'
 import {

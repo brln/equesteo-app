@@ -4,12 +4,14 @@ import { captureException } from '../services/Sentry'
 import {
   dequeuePhoto,
   horsePhotoUpdated,
+  ridePhotoUpdated,
+  userPhotoUpdated,
+} from '../actions/standard'
+import {
   persistHorsePhoto,
   persistRidePhoto,
   persistUserPhoto,
-  ridePhotoUpdated,
-  userPhotoUpdated,
-} from '../actions'
+} from '../actions/functional'
 import {
   generateUUID,
   horsePhotoURL,
