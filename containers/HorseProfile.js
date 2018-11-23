@@ -9,10 +9,8 @@ import {
 import {
   addHorseUser,
   deleteHorseUser,
-  persistHorse,
+  persistHorseWithPhoto,
   persistHorseUser,
-  persistHorsePhoto,
-  uploadHorsePhoto
 } from '../actions/functional'
 import BackgroundComponent from '../components/BackgroundComponent'
 import { brand } from '../colors'
@@ -174,10 +172,7 @@ class HorseProfileContainer extends BackgroundComponent {
       }
     ))
     this.props.dispatch(horseUpdated(this.props.horse.set('profilePhotoID', photoID)))
-
-    await this.props.dispatch(persistHorse(this.props.horse.get('_id')))
-    this.props.dispatch(uploadHorsePhoto(photoID, location, this.props.horse.get('_id')))
-    this.props.dispatch(persistHorsePhoto(photoID))
+    this.props.dispatch(persistHorseWithPhoto(this.props.horse.get('_id'), photoID))
   }
 
   thisHorsesPhotos () {

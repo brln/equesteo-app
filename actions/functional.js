@@ -27,6 +27,7 @@ import {
   awaitFullSync,
   clearLastLocation,
   clearStateAfterPersist,
+  deleteUnpersistedPhoto,
   dismissError,
   enqueuePhoto,
   errorOccurred,
@@ -442,19 +443,33 @@ export function persistUserPhoto (userPhotoID) {
   }
 }
 
-export function persistHorse (horseID) {
-  return async (dispatch, getState) => {
-    const theHorse = getState().getIn(['pouchRecords', 'horses', horseID])
-    if (!theHorse) {
-      throw new Error('no horse with that ID')
+export function persistHorseWithPhoto (horseID, horsePhotoID) {
+  return (dispatch, getState) => {
+    const theHorsePhoto = getState().getIn(['pouchRecords', 'horsePhotos', horsePhotoID])
+    if (!theHorsePhoto) {
+      throw new Error('no horse photo with that ID')
     }
     const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
-    const doc = await pouchCouch.saveHorse(theHorse.toJS())
 
-    const theHorseAfterSave = getState().getIn(['pouchRecords', 'horses', horseID])
-    dispatch(horseUpdated(theHorseAfterSave.set('_rev', doc.rev)))
-    dispatch(needsRemotePersist('horses'))
+    pouchCouch.saveHorse(theHorsePhoto.toJS()).then((doc) => {
+      const theHorsePhotoAfterSave = getState().getIn(['pouchRecords', 'horsePhotos', horsePhotoID])
+      dispatch(horsePhotoUpdated(theHorsePhotoAfterSave.set('_rev', doc.rev)))
+      dispatch(enqueuePhoto(Map({
+        type: 'horse',
+        photoLocation: theHorsePhoto.get('uri'),
+        photoID: horsePhotoID
+      })))
+      const theHorse = getState().getIn(['pouchRecords', 'horses', horseID])
+      if (!theHorse) {
+        throw new Error('no horse with that ID')
+      }
+      return pouchCouch.saveHorse(theHorse.toJS())
+    }).then((doc) => {
+      const theHorseAfterSave = getState().getIn(['pouchRecords', 'horses', horseID])
+      dispatch(horseUpdated(theHorseAfterSave.set('_rev', doc.rev)))
+      dispatch(needsRemotePersist('horses'))
+    })
   }
 }
 
@@ -471,6 +486,89 @@ export function persistHorsePhoto (horsePhotoID) {
     const theHorsePhotoAfterSave = getState().getIn(['pouchRecords', 'horsePhotos', horsePhotoID])
     dispatch(horsePhotoUpdated(theHorsePhotoAfterSave.set('_rev', doc.rev)))
     dispatch(needsRemotePersist('horses'))
+  }
+}
+
+export function persistHorseUpdate (horseID, horseUserID, deletedPhotoIDs, newPhotoIDs, previousDefaultValue) {
+  return (dispatch, getState) => {
+    const theHorse = getState().getIn(['pouchRecords', 'horses', horseID])
+    if (!theHorse) {
+      throw new Error('no horse with that ID')
+    }
+    const theHorseUser = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
+    if (!theHorseUser) {
+      throw new Error('no horse user with that ID')
+    }
+
+    const jwt = getState().getIn(['localState', 'jwt'])
+    const pouchCouch = new PouchCouch(jwt)
+    const horseSaves = pouchCouch.saveHorse(theHorse.toJS()).then((doc) => {
+      const theHorseAfterSave = getState().getIn(['pouchRecords', 'horses', horseID])
+      dispatch(horseUpdated(theHorseAfterSave.set('_rev', doc.rev)))
+
+      const theHorseUser = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
+      return pouchCouch.saveHorse(theHorseUser.toJS()).then((doc) => {
+        const theHorseUserAfterSave = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
+        dispatch(horseUserUpdated(theHorseUserAfterSave.set('_rev', doc.rev)))
+      })
+    })
+
+    for (let photoID of deletedPhotoIDs) {
+      if (newPhotoIDs.indexOf(photoID) < 0) {
+        horseSaves.then(() => {
+          const theHorsePhoto = getState().getIn(['pouchRecords', 'horsePhotos', photoID])
+          const deleted = theHorsePhoto.set('deleted', true)
+          dispatch(horsePhotoUpdated(deleted))
+          return pouchCouch.saveHorse(deleted.toJS()).then((doc) => {
+            const theHorsePhotoAfterSave = getState().getIn(['pouchRecords', 'horsePhotos', photoID])
+            dispatch(horsePhotoUpdated(theHorsePhotoAfterSave.set('_rev', doc.rev)))
+          })
+        })
+      } else {
+        dispatch(deleteUnpersistedPhoto('horsePhotos', photoID))
+      }
+    }
+
+    for (let photoID of newPhotoIDs) {
+      if (deletedPhotoIDs.indexOf(photoID) < 0) {
+        horseSaves.then(() => {
+          const theHorsePhoto = getState().getIn(['pouchRecords', 'horsePhotos', photoID])
+          return pouchCouch.saveHorse(theHorsePhoto.toJS()).then((doc) => {
+            const theHorsePhotoAfterSave = getState().getIn(['pouchRecords', 'horsePhotos', photoID])
+            dispatch(horsePhotoUpdated(theHorsePhotoAfterSave.set('_rev', doc.rev)))
+            const photoLocation = theHorsePhotoAfterSave.get('uri')
+            dispatch(enqueuePhoto(Map({
+              type: 'horse',
+              photoLocation,
+              photoID
+            })))
+          })
+        })
+      }
+    }
+
+    const userID = getState().getIn(['pouchRecords', 'localState', 'userID'])
+    const horseUsers = getState().getIn(['pouchRecords', 'horseUsers']).filter(hu => hu.userID === userID)
+    if (previousDefaultValue !== theHorseUser.get('rideDefault')
+      && theHorseUser.get('rideDefault') === true) {
+      horseUsers.valueSeq().forEach(horseUser => {
+        if (horseUser.get('_id') !== theHorseUser.get('_id') && horseUser.get('rideDefault') === true) {
+          horseSaves.then(() => {
+            const theHorseUser = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
+            const withoutDefault = theHorseUser.set('rideDefault', false)
+            dispatch(horseUserUpdated(withoutDefault))
+            return pouchCouch.saveHorse(withoutDefault.toJS()).then((doc) => {
+              const theHorseUserAfterSave = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
+              dispatch(horseUserUpdated(theHorseUserAfterSave.set('_rev', doc.rev)))
+            })
+          })
+        }
+      })
+    }
+
+    horseSaves.then(() => {
+      dispatch(needsRemotePersist('horses'))
+    })
   }
 }
 
@@ -963,13 +1061,6 @@ export function tryToLoadStateFromDisk () {
     } else {
       logInfo('no cached current ride state found')
     }
-  }
-}
-
-// @TODO: you can remove the horseID here, it's not used in the photos middleware?
-export function uploadHorsePhoto (photoID, photoLocation, horseID) {
-  return (dispatch) => {
-    dispatch(enqueuePhoto(Map({type: 'horse', photoLocation, photoID, horseID})))
   }
 }
 

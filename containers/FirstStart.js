@@ -1,4 +1,3 @@
-import { Map } from 'immutable'
 import { Navigation } from 'react-native-navigation'
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
@@ -13,12 +12,9 @@ import {
   userUpdated,
 } from '../actions/standard'
 import {
-  persistHorse,
-  persistHorseUser,
+  persistHorseUpdate,
   persistUser,
-  persistHorsePhoto,
   persistUserPhoto,
-  uploadHorsePhoto,
   uploadUserPhoto,
 } from '../actions/functional'
 import { brand } from '../colors'
@@ -72,6 +68,7 @@ class FirstStartContainer extends PureComponent {
 
     this.state = {
       currentPage: this.pages.INTRO_PAGE.name,
+      horsePhoto: [],
       skipPages: [],
       horseUpdated: false,
     }
@@ -135,7 +132,7 @@ class FirstStartContainer extends PureComponent {
     this.props.dispatch(uploadUserPhoto(photoID, location))
   }
 
-  async addHorseProfilePhoto (location) {
+  addHorseProfilePhoto (location) {
     let photoID = generateUUID()
     this.props.dispatch(createHorsePhoto(
       this.props.horse.get('_id'),
@@ -146,11 +143,10 @@ class FirstStartContainer extends PureComponent {
         uri: location
       }
     ))
+
     this.props.dispatch(horseUpdated(this.props.horse.set('profilePhotoID', photoID)))
-    await this.props.dispatch(persistHorse(this.props.horse.get('_id')))
-    this.props.dispatch(uploadHorsePhoto(photoID, location, this.props.horse.get('_id')))
-    this.props.dispatch(persistHorsePhoto(photoID))
     this.setState({
+      horsePhoto: [photoID],
       horseUpdated: true
     })
   }
@@ -159,12 +155,17 @@ class FirstStartContainer extends PureComponent {
     this.props.dispatch(persistUser(this.props.user.get('_id')))
   }
 
-  async done () {
+  done () {
     this.props.dispatch(userUpdated(this.props.user.set('finishedFirstStart', true)))
     this.props.dispatch(persistUser(this.props.user.get('_id')))
     if (this.state.horseUpdated) {
-      await this.props.dispatch(persistHorse(this.props.horse.get('_id')))
-      this.props.dispatch(persistHorseUser(this.props.horseUser.get('_id')))
+      this.props.dispatch(persistHorseUpdate(
+        this.props.horse.get('_id'),
+        this.props.horseUser.get('_id'),
+        [],
+        this.state.horsePhoto,
+        this.props.horseUser.get('rideDefault')
+      ))
     } else {
       this.props.dispatch(deleteUnpersistedHorse(this.props.horse.get('_id'), this.props.horseUser.get('_id')))
     }

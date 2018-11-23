@@ -78,10 +78,14 @@ export default class RideList extends PureComponent {
         />
       )
     } else if (item.type === 'horse') {
+      const horsePhotos = this.props.horsePhotos.filter(hp => {
+        return hp.get('horseID') === item.childData.get('_id')
+          && hp.get('deleted') !== true
+      })
       return (
         <HorseCard
           horse={item.childData}
-          horsePhotos={this.props.horsePhotos.filter(hp => hp.get('horseID') === item.childData.get('_id'))}
+          horsePhotos={horsePhotos}
           ownerID={this.props.horseOwnerIDs.get(item.childData.get('_id'))}
           rider={item.itemUser}
           showHorseProfile={this.props.showHorseProfile}
