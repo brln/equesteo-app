@@ -142,23 +142,17 @@ export default class HorseProfile extends PureComponent {
   }
 
   renderImageSwiper () {
-    let fab
-    if (this.props.horseOwner === this.props.user) {
-      fab = (
-        <Fab
-          direction="up"
-          style={{ backgroundColor: brand }}
-          position="bottomRight"
-          onPress={this.uploadPhoto}>
-            <FabImage source={require('../../img/addphoto.png')} height={30} width={30} />
-        </Fab>
-      )
-    }
     return (
       <View>
         <View style={{height: ((height / 2) - 20)}}>
           {this.renderProfileImage()}
-          { fab }
+          <Fab
+            direction="up"
+            style={{ backgroundColor: brand }}
+            position="bottomRight"
+            onPress={this.uploadPhoto}>
+            <FabImage source={require('../../img/addphoto.png')} height={30} width={30} />
+          </Fab>
         </View>
         <PhotoFilmstrip
           photosByID={this.props.horsePhotos}
