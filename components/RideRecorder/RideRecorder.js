@@ -43,7 +43,6 @@ export default class RideRecorder extends PureComponent {
         props.lastLocation
       )
     }
-    logDebug(newState)
     return newState
   }
 

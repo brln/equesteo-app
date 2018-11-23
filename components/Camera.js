@@ -34,7 +34,10 @@ export default class Camera extends Component {
 
   takePicture () {
     if (this.camera) {
-      this.camera.takePictureAsync({pauseAfterCapture: true}).then((data) => {
+      this.camera.takePictureAsync({
+        fixOrientation: true,
+        pauseAfterCapture: true,
+      }).then((data) => {
         const cropData = {
           offset: {
             x: 0,

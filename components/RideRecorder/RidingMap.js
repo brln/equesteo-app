@@ -152,7 +152,6 @@ export default class RidingMap extends PureComponent {
   render() {
     logRender('RideRecorder.RidingMap')
     const mapCoords = RidingMap.mapCoordinates(this.props.currentRideCoordinates)
-    logDebug(this.props.zoomLevel, 'zoomlevel')
     return (
       <View style ={styles.container}>
         <View style={{flex: 1}}>
