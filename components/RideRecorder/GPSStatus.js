@@ -5,7 +5,7 @@ import { green, danger } from '../../colors'
 
 export default class GPSStatus extends PureComponent {
   render () {
-    if (this.props.show) {
+    if (this.props.shown) {
       let positionFound = <Text style={styles.locationNotFound}>Location Not Found</Text>
       if (this.props.lastLocation) {
         positionFound = <Text style={styles.locationFound}>Location Found!</Text>
