@@ -84,6 +84,7 @@ export default function CurrentRideReducer(state=initialState, action) {
         action.location.get('timestamp'),
         Number(action.location.get('accuracy').toFixed(2))
       ])
+      const usablePermaCoord = parseRideCoordinate(permaCoord)
 
       if (currentRide
         && currentCoordinates
@@ -99,8 +100,8 @@ export default function CurrentRideReducer(state=initialState, action) {
           newDistance = haversine(
             lastLocation.get('latitude'),
             lastLocation.get('longitude'),
-            action.location.get('latitude'),
-            action.location.get('longitude')
+            usablePermaCoord.get('latitude'),
+            usablePermaCoord.get('longitude')
           )
           const elevationChange = action.elevation.get('elevation') - lastElevation.get('elevation')
           elevationGain = elevationChange >= 0 ? elevationChange : 0
@@ -122,8 +123,8 @@ export default function CurrentRideReducer(state=initialState, action) {
             totalElevationGain
           ).setIn([
               'elevations',
-              toElevationKey(action.elevation.get('latitude')),
-              toElevationKey(action.elevation.get('longitude')),
+              toElevationKey(usablePermaCoord.get('latitude')),
+              toElevationKey(usablePermaCoord.get('longitude')),
             ], action.elevation.get('elevation')
           )
         return newState.set(
@@ -178,6 +179,7 @@ export default function CurrentRideReducer(state=initialState, action) {
         action.newLocation.get('timestamp'),
         Number(action.newLocation.get('accuracy').toFixed(2))
       ])
+      const usablePermanentCoord = parseRideCoordinate(permanentCoord)
 
       if (currentRide1 && !currentRide1.get('lastPauseStart')) {
         const rideCoords = currentRideCoordinates1.get('rideCoordinates')
@@ -191,8 +193,8 @@ export default function CurrentRideReducer(state=initialState, action) {
           ).setIn([
               'currentRideElevations',
               'elevations',
-              toElevationKey(action.newElevation.get('latitude')),
-              toElevationKey(action.newElevation.get('longitude'))
+              toElevationKey(usablePermanentCoord.get('latitude')),
+              toElevationKey(usablePermanentCoord.get('longitude'))
             ], action.newElevation.get('elevation')
           ).setIn(
             ['currentRideCoordinates', 'rideCoordinates'],
@@ -222,8 +224,8 @@ export default function CurrentRideReducer(state=initialState, action) {
           const newDistance = haversine(
             lastCoord.get('latitude'),
             lastCoord.get('longitude'),
-            action.newLocation.get('latitude'),
-            action.newLocation.get('longitude')
+            usablePermanentCoord.get('latitude'),
+            usablePermanentCoord.get('longitude')
           )
           const oldElevationChange = oldLastElevation - lastElevation
           const oldElevationGain = oldElevationChange >= 0 ? oldElevationChange : 0
@@ -255,8 +257,8 @@ export default function CurrentRideReducer(state=initialState, action) {
             [
               'currentRideElevations',
               'elevations',
-              toElevationKey(action.newElevation.get('latitude')),
-              toElevationKey(action.newElevation.get('longitude')),
+              toElevationKey(usablePermanentCoord.get('latitude')),
+              toElevationKey(usablePermanentCoord.get('longitude')),
             ],
             action.newElevation.get('elevation')
           )

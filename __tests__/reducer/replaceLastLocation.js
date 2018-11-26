@@ -1,4 +1,4 @@
-import { List, Map } from 'immutable'
+import { fromJS, List, Map } from 'immutable'
 
 import 'react-native';
 import React from 'react';
@@ -195,95 +195,6 @@ describe('REPLACE_LAST_LOCATION', () => {
     ).toEqual(3)
   })
 
-  it('should not screw up if theres rounding', () => {
-    let state1 = null
-    let state2 = null
-    let state3 = null
-
-    while (true) {
-      try {
-        const startTime = unixTimeNow()
-        const initialState = Map({
-          currentRide: Map({
-            startTime: startTime,
-            distance: 0,
-          }),
-          currentRideElevations: Map({
-            elevationGain: 0,
-            elevations: Map()
-          }),
-          currentRideCoordinates: Map({
-            rideCoordinates: List(),
-          }),
-          lastElevation: null,
-          lastLocation: null,
-          refiningLocation: null,
-        })
-
-        let latitude = Math.random() * 90
-        let longitude = Math.random() * 180
-        let elevationPoint = 1
-        let location = Map({
-          accuracy: 5,
-          latitude: latitude,
-          longitude: longitude,
-          provider: 'gps',
-          timestamp: 1,
-          speed: 1,
-        })
-        let elevation = Map({
-          latitude: latitude,
-          longitude: longitude,
-          elevation: elevationPoint,
-        })
-        state1 = CurrentRideReducer(initialState, newLocation(location, elevation))
-
-        latitude = Math.random() * 90
-        longitude = Math.random() * 180
-        elevationPoint = 2
-        location = Map({
-          accuracy: 5,
-          latitude: latitude,
-          longitude: longitude,
-          provider: 'gps',
-          timestamp: 1,
-          speed: 1,
-        })
-        elevation = Map({
-          latitude: latitude,
-          longitude: longitude,
-          elevation: elevationPoint,
-        })
-        state2 = CurrentRideReducer(state1, newLocation(location, elevation))
-
-        latitude = 45.111111999
-        longitude = 27.28923333
-        elevationPoint = 2
-        location = Map({
-          accuracy: 5,
-          latitude: latitude,
-          longitude: longitude,
-          provider: 'gps',
-          timestamp: 1,
-          speed: 1,
-        })
-        elevation = Map({
-          latitude: latitude,
-          longitude: longitude,
-          elevation: elevationPoint,
-        })
-        state3 = CurrentRideReducer(state2, replaceLastLocation(location, elevation))
-      } catch (e) {
-        console.log(e)
-        console.log('BINGO!')
-        console.log(state1)
-        console.log(state2)
-        console.log(state3)
-        throw e
-      }
-    }
-  })
-
   it('should not screw up if theres rounding!', () => {
     const startTime = unixTimeNow()
     const initialState = Map({
@@ -320,7 +231,6 @@ describe('REPLACE_LAST_LOCATION', () => {
       elevation: elevationPoint,
     })
     let newState = CurrentRideReducer(initialState, newLocation(location, elevation))
-    console.log(newState.toJSON())
 
     latitude = 5.242249617518764
     longitude = 156.67569432673565
@@ -339,7 +249,6 @@ describe('REPLACE_LAST_LOCATION', () => {
       elevation: elevationPoint,
     })
     newState = CurrentRideReducer(newState, newLocation(location, elevation))
-    console.log(newState.toJSON())
 
     latitude = 45.111111999
     longitude = 27.28923333
@@ -358,6 +267,32 @@ describe('REPLACE_LAST_LOCATION', () => {
       elevation: elevationPoint,
     })
     newState = CurrentRideReducer(newState, replaceLastLocation(location, elevation))
-    console.log(newState.toJSON())
+
+    const expectedState = fromJS({
+      currentRide: {
+        startTime: startTime, distance: 4232.586925
+      },
+      currentRideElevations:
+       { elevationGain: 1,
+         elevations: { '57.2805': {'134.8588': 1}, '5.2423': {'156.6757': 2}, '45.1111': {'27.2892': 2} } },
+      currentRideCoordinates: { rideCoordinates: [ [57.280466, 134.858762, 1, 5], [45.111112, 27.289233, 1, 5] ] },
+      lastElevation: { latitude: 45.111111999, longitude: 27.28923333, elevation: 2 },
+      lastLocation:
+       { accuracy: 5,
+         latitude: 45.111111999,
+         longitude: 27.28923333,
+         provider: 'gps',
+         timestamp: 1,
+         speed: 1 },
+      refiningLocation:
+       { accuracy: 5,
+         latitude: 5.242249617518764,
+         longitude: 156.67569432673565,
+         provider: 'gps',
+         timestamp: 1,
+         speed: 1 }
+    })
+
+    expect(newState).toEqual(expectedState)
   })
 })

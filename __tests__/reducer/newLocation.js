@@ -139,7 +139,7 @@ describe('NEW_LOCATION', () => {
     let expectedNewState = Map({
       currentRide: Map({
         startTime: startTime,
-        distance: 0.468572,
+        distance: 0.46857,
       }),
       currentRideElevations: Map({
         elevationGain: 4280,
