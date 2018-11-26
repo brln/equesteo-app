@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ImagePicker from 'react-native-image-crop-picker'
 import {
+  CameraRoll,
   Dimensions,
   ImageEditor,
   StyleSheet,
@@ -53,8 +54,11 @@ export default class Camera extends Component {
           cropData,
           (successURI) => {
             ImagePicker.cleanSingle(data.uri).catch(e => logError(e))
-            this.camera.resumePreview() // not working?
-            this.props.stashNewRidePhoto(successURI)
+            CameraRoll.saveToCameraRoll(successURI).then((newURI) => {
+              ImagePicker.cleanSingle(successURI).catch(e => logError(e))
+              this.camera.resumePreview()
+              this.props.stashNewRidePhoto(newURI)
+            })
           },
           (error) => {
             logError(error.message);

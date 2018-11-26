@@ -49,13 +49,15 @@ export default class URIIImage extends PureComponent {
               style={{width: 20, height: 20}}
             />
           )
-        } else if (sourceType === 'file') {
+        } else if (sourceType === 'file' || sourceType === 'content') {
           typeImage = (
             <BuildImage
               source={require('../img/onDevice.png')}
               style={{width: 20, height: 20}}
             />
           )
+        } else {
+          logDebug(this.props.source.uri)
         }
       }
       return typeImage

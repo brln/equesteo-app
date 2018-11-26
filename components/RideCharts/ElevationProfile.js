@@ -22,7 +22,6 @@ export default class ElevationProfile extends PureComponent {
     const minDomainY = this.props.elevationData.sort((a, b) => {
       return a.elevation < b.elevation
     })[0].elevation
-    logDebug(minDomainY)
     return (
       <View style={styles.container}>
         <VictoryChart

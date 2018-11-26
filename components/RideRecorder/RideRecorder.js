@@ -84,7 +84,6 @@ export default class RideRecorder extends PureComponent {
   }
 
   mapRegionChanged (e) {
-    console.log(e)
     if (e.properties.isUserInteraction) {
       this.setState({
         heading: e.properties.heading,
