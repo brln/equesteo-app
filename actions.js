@@ -1202,6 +1202,8 @@ export function startLocationTracking () {
 
         let replaced = false
         if (refiningLocation && lastLocation) {
+          // If you have at least one point already recorded, run the Kalman filter
+          // on the new location coming in using the one you already have
           parsedLocation = kalmanFilter(
             parsedLocation,
             lastLocation,
@@ -1222,6 +1224,8 @@ export function startLocationTracking () {
             parsedLocation.get('longitude')
           )
           if (distance < (30 / 5280)) {
+            // If you're within a 30' radius of the last place you were, don't
+            // just add the point on, replace the old one.
             dispatch(replaceLastLocation(parsedLocation, parsedElevation))
             replaced = true
           }

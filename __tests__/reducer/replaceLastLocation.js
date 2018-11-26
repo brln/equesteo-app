@@ -4,7 +4,7 @@ import 'react-native';
 import React from 'react';
 
 import CurrentRideReducer from '../../reducers/CurrentRide'
-import { replaceLastLocation }  from '../../actions'
+import { newLocation, replaceLastLocation }  from '../../actions'
 import { unixTimeNow } from '../../helpers'
 
 describe('REPLACE_LAST_LOCATION', () => {
@@ -193,5 +193,171 @@ describe('REPLACE_LAST_LOCATION', () => {
         ['currentRideCoordinates', 'rideCoordinates']
       ).count()
     ).toEqual(3)
+  })
+
+  it('should not screw up if theres rounding', () => {
+    let state1 = null
+    let state2 = null
+    let state3 = null
+
+    while (true) {
+      try {
+        const startTime = unixTimeNow()
+        const initialState = Map({
+          currentRide: Map({
+            startTime: startTime,
+            distance: 0,
+          }),
+          currentRideElevations: Map({
+            elevationGain: 0,
+            elevations: Map()
+          }),
+          currentRideCoordinates: Map({
+            rideCoordinates: List(),
+          }),
+          lastElevation: null,
+          lastLocation: null,
+          refiningLocation: null,
+        })
+
+        let latitude = Math.random() * 90
+        let longitude = Math.random() * 180
+        let elevationPoint = 1
+        let location = Map({
+          accuracy: 5,
+          latitude: latitude,
+          longitude: longitude,
+          provider: 'gps',
+          timestamp: 1,
+          speed: 1,
+        })
+        let elevation = Map({
+          latitude: latitude,
+          longitude: longitude,
+          elevation: elevationPoint,
+        })
+        state1 = CurrentRideReducer(initialState, newLocation(location, elevation))
+
+        latitude = Math.random() * 90
+        longitude = Math.random() * 180
+        elevationPoint = 2
+        location = Map({
+          accuracy: 5,
+          latitude: latitude,
+          longitude: longitude,
+          provider: 'gps',
+          timestamp: 1,
+          speed: 1,
+        })
+        elevation = Map({
+          latitude: latitude,
+          longitude: longitude,
+          elevation: elevationPoint,
+        })
+        state2 = CurrentRideReducer(state1, newLocation(location, elevation))
+
+        latitude = 45.111111999
+        longitude = 27.28923333
+        elevationPoint = 2
+        location = Map({
+          accuracy: 5,
+          latitude: latitude,
+          longitude: longitude,
+          provider: 'gps',
+          timestamp: 1,
+          speed: 1,
+        })
+        elevation = Map({
+          latitude: latitude,
+          longitude: longitude,
+          elevation: elevationPoint,
+        })
+        state3 = CurrentRideReducer(state2, replaceLastLocation(location, elevation))
+      } catch (e) {
+        console.log(e)
+        console.log('BINGO!')
+        console.log(state1)
+        console.log(state2)
+        console.log(state3)
+        throw e
+      }
+    }
+  })
+
+  it('should not screw up if theres rounding!', () => {
+    const startTime = unixTimeNow()
+    const initialState = Map({
+      currentRide: Map({
+        startTime: startTime,
+        distance: 0,
+      }),
+      currentRideElevations: Map({
+        elevationGain: 0,
+        elevations: Map()
+      }),
+      currentRideCoordinates: Map({
+        rideCoordinates: List(),
+      }),
+      lastElevation: null,
+      lastLocation: null,
+      refiningLocation: null,
+    })
+
+    let latitude = 57.28046553791769
+    let longitude = 134.85876184837394
+    let elevationPoint = 1
+    let location = Map({
+      accuracy: 5,
+      latitude: latitude,
+      longitude: longitude,
+      provider: 'gps',
+      timestamp: 1,
+      speed: 1,
+    })
+    let elevation = Map({
+      latitude: latitude,
+      longitude: longitude,
+      elevation: elevationPoint,
+    })
+    let newState = CurrentRideReducer(initialState, newLocation(location, elevation))
+    console.log(newState.toJSON())
+
+    latitude = 5.242249617518764
+    longitude = 156.67569432673565
+    elevationPoint = 2
+    location = Map({
+      accuracy: 5,
+      latitude: latitude,
+      longitude: longitude,
+      provider: 'gps',
+      timestamp: 1,
+      speed: 1,
+    })
+    elevation = Map({
+      latitude: latitude,
+      longitude: longitude,
+      elevation: elevationPoint,
+    })
+    newState = CurrentRideReducer(newState, newLocation(location, elevation))
+    console.log(newState.toJSON())
+
+    latitude = 45.111111999
+    longitude = 27.28923333
+    elevationPoint = 2
+    location = Map({
+      accuracy: 5,
+      latitude: latitude,
+      longitude: longitude,
+      provider: 'gps',
+      timestamp: 1,
+      speed: 1,
+    })
+    elevation = Map({
+      latitude: latitude,
+      longitude: longitude,
+      elevation: elevationPoint,
+    })
+    newState = CurrentRideReducer(newState, replaceLastLocation(location, elevation))
+    console.log(newState.toJSON())
   })
 })

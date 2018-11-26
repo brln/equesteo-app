@@ -19,16 +19,21 @@ export default class ElevationProfile extends PureComponent {
 
   render () {
     logRender('rendering ElevationProfile')
+    const minDomainY = this.props.elevationData.sort((a, b) => {
+      return a.elevation < b.elevation
+    })[0].elevation
+    logDebug(minDomainY)
     return (
       <View style={styles.container}>
         <VictoryChart
           padding={{ top: 50, bottom: 50, left: 80, right: 10 }}
+          minDomain={{y: minDomainY - 100}}
         >
           <VictoryAxis
             label={'mi'}
           />
           <VictoryAxis
-            crossAxis={false}
+            crossAxis={true}
             dependentAxis
             label={'ft'}
             style={{
@@ -44,14 +49,6 @@ export default class ElevationProfile extends PureComponent {
             y="elevation"
           />
         </VictoryChart>
-        <View // Workaround for making swipe/scroll work.
-          style={{
-            zIndex: 9999,
-            position: "absolute",
-            width: "100%",
-            height: "100%"
-          }}
-        />
       </View>
     )
   }
