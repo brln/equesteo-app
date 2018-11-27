@@ -19,7 +19,6 @@ export default class SignupPage extends PureComponent {
       email: null,
       password1: null,
       password2: null,
-      showMismatch: false,
     }
     this._renderSignupForm = this._renderSignupForm.bind(this)
     this._renderLoading = this._renderLoading.bind(this)
@@ -59,20 +58,18 @@ export default class SignupPage extends PureComponent {
   }
 
   submitSignup () {
-    if (this.state.password1 === this.state.password2) {
+    if (!this.state.password1) {
+      this.props.errorOccurred('Yeah, gonna need a password.')
+    } else if (this.state.password1 === this.state.password2) {
       this.props.submitSignup(this.state.email, this.state.password2)
     } else {
-      this.setState({
-        showMismatch: true
-      })
+      this.props.errorOccurred('Passwords do not match')
     }
   }
 
   _renderSignupForm () {
-    let dontMatchMessage = <Text>The passwords do not match</Text>
     return (
       <View>
-        { this.state.showMismatch ? dontMatchMessage : null }
         <Text>Email:</Text>
         <TextInput
           autoCapitalize={'none'}

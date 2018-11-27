@@ -9,8 +9,8 @@ import {
 } from 'react-native';
 
 import BuildImage from '../BuildImage'
-import { haversine, heading, logError, logRender, parseRideCoordinate, unixTimeNow } from '../../helpers'
-import { brand } from '../../colors'
+import { haversine, logError, logRender, parseRideCoordinate } from '../../helpers'
+import { brand, darkGrey, lightGrey } from '../../colors'
 import { rainbow } from '../../services/Rainbow'
 
 const { width } = Dimensions.get('window')
@@ -20,9 +20,17 @@ const allColors = rainbow()
 export default class RidingMap extends PureComponent {
   constructor (props) {
     super(props)
+    this.state = {
+      showingMaptypes: false,
+      mapType: 'map'
+    }
     this.fitToElements = this.fitToElements.bind(this)
     this.gpsStatusImage = this.gpsStatusImage.bind(this)
+    this.mapTypeMap = this.mapTypeMap.bind(this)
+    this.mapTypePhoto = this.mapTypePhoto.bind(this)
+    this.renderMaptypeButtons = this.renderMaptypeButtons.bind(this)
     this.recenterButton = this.recenterButton.bind(this)
+    this.showMaptypeButtons = this.showMaptypeButtons.bind(this)
   }
 
   static mapCoordinates (rideCoordinates) {
@@ -63,6 +71,20 @@ export default class RidingMap extends PureComponent {
       return accum
     }, {lastCoord: null, featureCollection})
     return featureCollection
+  }
+
+  mapTypeMap () {
+    this.setState({
+      mapType: 'map',
+      showingMaptypes: false
+    })
+  }
+
+  mapTypePhoto () {
+    this.setState({
+      mapType: 'photo',
+      showingMaptypes: false
+    })
   }
 
   fitToElements() {
@@ -149,9 +171,55 @@ export default class RidingMap extends PureComponent {
     }
   }
 
+  renderMaptypeButtons () {
+    if (this.state.showingMaptypes) {
+      const chosenColor = '#aaa3a2'
+      const notChosenColor = '#ffffff'
+      return [
+          <TouchableOpacity key="map" style={{
+            flex: 2,
+            borderRightWidth: 1,
+            borderRightColor: darkGrey,
+            borderLeftWidth: 2,
+            borderLeftColor: darkGrey,
+            height: '100%',
+            justifyContent: 'center',
+            backgroundColor: this.state.mapType === 'map' ? chosenColor : notChosenColor
+          }}
+          onPress={this.mapTypeMap}
+          >
+            <Text style={{textAlign: 'center'}}>Map</Text>
+          </TouchableOpacity>,
+          <TouchableOpacity key="photo" style={{
+            flex: 2,
+            borderLeftWidth: 1,
+            borderLeftColor: darkGrey,
+            height: '100%',
+            justifyContent: 'center',
+            borderTopRightRadius: 4,
+            backgroundColor: this.state.mapType === 'photo' ? chosenColor : notChosenColor,
+            borderBottomRightRadius: 4}}
+            onPress={this.mapTypePhoto}
+          >
+            <Text style={{textAlign: 'center'}}>Photo</Text>
+          </TouchableOpacity>
+        ]
+    } else {
+      return null
+    }
+  }
+
+  showMaptypeButtons () {
+    this.setState({
+      showingMaptypes: !this.state.showingMaptypes
+    })
+  }
+
   render() {
     logRender('RideRecorder.RidingMap')
+    const buttonWidth = this.state.showingMaptypes ? width / 2 : 40
     const mapCoords = RidingMap.mapCoordinates(this.props.currentRideCoordinates)
+    const mapStyleURL = this.state.mapType === 'map' ? "mapbox://styles/equesteo/cjopu37k3fm442smn4ncz3x9m" : "mapbox://styles/equesteo/cjoug4j877tc82ro2l2p3n1q2"
     return (
       <View style ={styles.container}>
         <View style={{flex: 1}}>
@@ -163,7 +231,7 @@ export default class RidingMap extends PureComponent {
             pitch={45}
             heading={this.props.heading}
             ref={ref => (this.map = ref)}
-            styleURL={"mapbox://styles/equesteo/cjopu37k3fm442smn4ncz3x9m"}
+            styleURL={mapStyleURL}
             onDidFinishLoadingMap={this.fitToElements}
             style={styles.map}
             zoomLevel={this.props.zoomLevel}
@@ -183,12 +251,22 @@ export default class RidingMap extends PureComponent {
             </MapboxGL.ShapeSource>
           </MapboxGL.MapView>
         </View>
-        <View style={{position: 'absolute', left: 0, top: 0}} >
-          <BuildImage
-            source={this.gpsStatusImage()}
-            style={{width: 50, height: 50}}
-            onError={(e) => { logError('there was an error loading RidingMap image') }}
-          />
+        <View style={{
+          position: 'absolute',
+          left: 10,
+          top: 10,
+          width: buttonWidth,
+        }}>
+          <View style={{flex: 1, flexDirection: 'row', backgroundColor: 'white', borderRadius: 4, alignItems: 'center', justifyContent: 'center'}}>
+            <TouchableOpacity style={{flex: 1}} onPress={this.showMaptypeButtons}>
+              <BuildImage
+                source={this.gpsStatusImage()}
+                style={{width: 40, height: 40, marginRight: 5}}
+                onError={(e) => { logError('there was an error loading RidingMap image') }}
+              />
+            </TouchableOpacity>
+            { this.renderMaptypeButtons() }
+          </View>
         </View>
         { this.recenterButton() }
       </View>
