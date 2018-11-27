@@ -12,6 +12,7 @@ import {
 
 import {
   haversine,
+  metersToFeet,
   newElevationGain,
   parseRideCoordinate,
   toElevationKey,
@@ -58,14 +59,12 @@ export default class RideCharts extends PureComponent {
           toElevationKey(lastPoint.get('longitude'))
         ])
         totalGain = newElevationGain(newDistance, lastElevation, elevation, totalGain)
-        if (totalGain !== oldTotalGain) {
-          points.push({
-            elevation,
-            distance: totalDistance,
-            gain: totalGain
-          })
-          oldTotalGain = totalGain
-        }
+        points.push({
+          elevation: metersToFeet(elevation),
+          distance: totalDistance,
+          gain: metersToFeet(totalGain)
+        })
+        oldTotalGain = totalGain
         lastPoint = parsedCoord
       }
     }

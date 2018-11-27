@@ -308,7 +308,7 @@ export function speedGradient (speed) {
 
 export function newElevationGain (distance, lastElevation, newElevation, oldTotal) {
   let newTotal = oldTotal
-  const diff = Math.abs(lastElevation - newElevation)
+  const diff = Math.abs(newElevation - lastElevation)
   if (diff) {
     const grade = diff / (distance * 5280)
     if (grade < 0.35) {

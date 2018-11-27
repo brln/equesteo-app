@@ -22,6 +22,7 @@ import {
 import BuildImage from '../BuildImage'
 import Button from '../Button'
 import { brand, darkBrand, darkGrey } from '../../colors'
+import HorseCard from './HorseCard'
 import {
   haversine,
   logRender,
@@ -34,7 +35,6 @@ import PhotoFilmstrip from './PhotoFilmstrip'
 import Stats from './Stats'
 import DeleteModal from '../Shared/DeleteModal'
 import RideComments from '../RideComments/RideComments'
-import Stat from '../Stat'
 import ViewingMap from './ViewingMap'
 
 const { width } = Dimensions.get('window')
@@ -65,7 +65,9 @@ export default class Ride extends PureComponent {
   componentDidMount () {
     Keyboard.addListener('keyboardDidShow', () => {
       this.scrollTimeout = setTimeout(() => {
-        this.scrollable.scrollToEnd({animated: false})
+        if (this.scrollable) {
+          this.scrollable.scrollToEnd({animated: false})
+        }
       }, 300)
     })
   }
@@ -78,10 +80,12 @@ export default class Ride extends PureComponent {
   componentDidUpdate (nextProps) {
     if (this.props.rideComments !== nextProps.rideComments || (nextProps.skipToComments && !this.state.scrolled)) {
       setTimeout(() => {
-        this.scrollable.scrollToEnd({animated: true})
-        this.setState({
-          scrolled: true
-        })
+        if (this.scrollable) {
+          this.scrollable.scrollToEnd({animated: true})
+          this.setState({
+            scrolled: true
+          })
+        }
       }, 300)
     }
   }
@@ -243,38 +247,6 @@ export default class Ride extends PureComponent {
     }
   }
 
-  horseProfileURL (horse) {
-    if (horse) {
-      const profilePhotoID = horse.get('profilePhotoID')
-      if (horse && profilePhotoID &&
-        this.props.horsePhotos.get(profilePhotoID)) {
-        return this.props.horsePhotos.getIn([profilePhotoID, 'uri'])
-      }
-    }
-  }
-
-  horseAvatar (horse) {
-    const horseProfileURL = this.horseProfileURL(horse)
-    let source
-    if (horseProfileURL) {
-      source = { uri: horseProfileURL }
-    } else {
-      source = require('../../img/breed.png')
-    }
-    return source
-  }
-
-  whichHorse () {
-    let found = null
-    for (let horse of this.props.horses) {
-      if (horse.get('_id') === this.props.ride.get('horseID')) {
-        found = horse
-        break
-      }
-    }
-    return found
-  }
-
   _renderLoading () {
     return (
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -289,7 +261,6 @@ export default class Ride extends PureComponent {
     let maxSpeed = this.memoizedMaxSpeed(this.props.rideCoordinates.get('rideCoordinates'))
     let elevationGain = this.memoizedElevationGain(this.props.rideCoordinates.get('rideCoordinates'), this.props.rideElevations.get('elevations'))
     const height = (width * 9 / 16) + 54
-    const horse = this.whichHorse()
     return (
       <ScrollView
         keyboardShouldPersistTaps={'always'}
@@ -336,15 +307,11 @@ export default class Ride extends PureComponent {
             exclude={[]}
           />
 
-          <Card style={{flex: 1}}>
-            <CardItem cardBody style={{ flex: 1, paddingBottom: 20, paddingTop: 20}}>
-              <Stat
-                imgSrc={this.horseAvatar(horse)}
-                text={'Ridden'}
-                value={ horse ? horse.get('name') : 'none'}
-              />
-            </CardItem>
-          </Card>
+          <HorseCard
+            horses={this.props.horses}
+            horsePhotos={this.props.horsePhotos}
+            ride={this.props.ride}
+          />
 
           <View style={{flex: 1}}>
             <Card style={{flex: 1}}>

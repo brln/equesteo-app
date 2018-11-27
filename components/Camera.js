@@ -56,7 +56,9 @@ export default class Camera extends Component {
             ImagePicker.cleanSingle(data.uri).catch(e => logError(e))
             CameraRoll.saveToCameraRoll(successURI).then((newURI) => {
               ImagePicker.cleanSingle(successURI).catch(e => logError(e))
-              this.camera.resumePreview()
+              if (this.camera) {
+                this.camera.resumePreview()
+              }
               this.props.stashNewRidePhoto(newURI)
             })
           },

@@ -3,14 +3,10 @@ import React, { PureComponent } from 'react'
 import { StyleSheet } from 'react-native'
 
 import {
-  TouchableOpacity,
   View,
 } from 'react-native';
-import {
-  Card,
-  CardItem,
-} from 'native-base'
 
+import { metersToFeet } from '../../helpers'
 import Stat from '../Stat'
 
 export default class Stats extends PureComponent {
@@ -64,7 +60,7 @@ export default class Stats extends PureComponent {
           <Stat
             imgSrc={require('../../img/elevationGain.png')}
             text={'Elevation Gain'}
-            value={`${Math.round(this.props.elevationGain)} ft`}
+            value={`${Math.round(metersToFeet(this.props.elevationGain))} ft`}
           />
           <Stat
             imgSrc={require('../../img/stopwatch.png')}
