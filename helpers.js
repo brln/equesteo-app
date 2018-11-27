@@ -304,20 +304,17 @@ export function speedGradient (speed) {
     default:
       return "#E61212"
   }
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+export function newElevationGain (distance, lastElevation, newElevation, oldTotal) {
+  let newTotal = oldTotal
+  const diff = Math.abs(lastElevation - newElevation)
+  if (diff) {
+    const grade = diff / (distance * 5280)
+    if (grade < 0.35) {
+      const elevationChange = newElevation - lastElevation
+      newTotal = oldTotal + (elevationChange > 0 ? elevationChange : 0)
+    }
+  }
+  return newTotal
 }

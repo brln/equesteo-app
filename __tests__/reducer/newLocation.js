@@ -122,7 +122,7 @@ describe('NEW_LOCATION', () => {
     })
     let latitude = 45.21323998
     let longitude = 27.2892378923
-    let elevationPoint = 5280
+    let elevationPoint = 1005
     let location = Map({
       accuracy: 5,
       latitude: latitude,
@@ -142,8 +142,8 @@ describe('NEW_LOCATION', () => {
         distance: 0.46857,
       }),
       currentRideElevations: Map({
-        elevationGain: 4280,
-        elevations: Map({45.2200: Map({26.2900: 1000}), 45.2132: Map({27.2892: 5280})})
+        elevationGain: 5,
+        elevations: Map({45.2200: Map({26.2900: 1000}), 45.2132: Map({27.2892: 1005})})
       }),
       currentRideCoordinates: Map({
         rideCoordinates: List([
