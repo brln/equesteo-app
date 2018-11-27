@@ -22,11 +22,19 @@ import {
 import BuildImage from '../BuildImage'
 import Button from '../Button'
 import { brand, darkBrand, darkGrey } from '../../colors'
-import { haversine, logRender, logInfo, parseRideCoordinate } from '../../helpers'
+import {
+  haversine,
+  logRender,
+  logInfo,
+  newElevationGain,
+  parseRideCoordinate,
+  toElevationKey
+} from '../../helpers'
 import PhotoFilmstrip from './PhotoFilmstrip'
 import Stats from './Stats'
 import DeleteModal from '../Shared/DeleteModal'
 import RideComments from '../RideComments/RideComments'
+import Stat from '../Stat'
 import ViewingMap from './ViewingMap'
 
 const { width } = Dimensions.get('window')
@@ -51,6 +59,7 @@ export default class Ride extends PureComponent {
     this.showProfile = this.showProfile.bind(this)
 
     this.memoizedMaxSpeed = memoizeOne(this.maxSpeed)
+    this.memoizedElevationGain = memoizeOne(this.elevationGain.bind(this))
   }
 
   componentDidMount () {
@@ -79,6 +88,37 @@ export default class Ride extends PureComponent {
 
   showProfile () {
     this.props.showProfile(this.props.rideUser)
+  }
+
+  elevationGain (rideCoordinates, rideElevations) {
+    let totalDistance = 0
+    let totalGain = 0
+    let lastPoint = null
+    for (let rideCoord of rideCoordinates) {
+      const parsedCoord = parseRideCoordinate(rideCoord)
+      if (!lastPoint) {
+        lastPoint = parsedCoord
+      } else {
+        const newDistance = haversine(
+          lastPoint.get('latitude'),
+          lastPoint.get('longitude'),
+          parsedCoord.get('latitude'),
+          parsedCoord.get('longitude')
+        )
+        totalDistance += newDistance
+        const elevation = rideElevations.getIn([
+          toElevationKey(parsedCoord.get('latitude')),
+          toElevationKey(parsedCoord.get('longitude'))
+        ])
+        const lastElevation = rideElevations.getIn([
+          toElevationKey(lastPoint.get('latitude')),
+          toElevationKey(lastPoint.get('longitude'))
+        ])
+        totalGain = newElevationGain(newDistance, lastElevation, elevation, totalGain)
+        lastPoint = parsedCoord
+      }
+    }
+    return totalGain
   }
 
   maxSpeed(rideCoordinates) {
@@ -203,6 +243,38 @@ export default class Ride extends PureComponent {
     }
   }
 
+  horseProfileURL (horse) {
+    if (horse) {
+      const profilePhotoID = horse.get('profilePhotoID')
+      if (horse && profilePhotoID &&
+        this.props.horsePhotos.get(profilePhotoID)) {
+        return this.props.horsePhotos.getIn([profilePhotoID, 'uri'])
+      }
+    }
+  }
+
+  horseAvatar (horse) {
+    const horseProfileURL = this.horseProfileURL(horse)
+    let source
+    if (horseProfileURL) {
+      source = { uri: horseProfileURL }
+    } else {
+      source = require('../../img/breed.png')
+    }
+    return source
+  }
+
+  whichHorse () {
+    let found = null
+    for (let horse of this.props.horses) {
+      if (horse.get('_id') === this.props.ride.get('horseID')) {
+        found = horse
+        break
+      }
+    }
+    return found
+  }
+
   _renderLoading () {
     return (
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -215,7 +287,9 @@ export default class Ride extends PureComponent {
   _renderRide () {
     logRender('Ride.Ride')
     let maxSpeed = this.memoizedMaxSpeed(this.props.rideCoordinates.get('rideCoordinates'))
+    let elevationGain = this.memoizedElevationGain(this.props.rideCoordinates.get('rideCoordinates'), this.props.rideElevations.get('elevations'))
     const height = (width * 9 / 16) + 54
+    const horse = this.whichHorse()
     return (
       <ScrollView
         keyboardShouldPersistTaps={'always'}
@@ -262,11 +336,22 @@ export default class Ride extends PureComponent {
             exclude={[]}
           />
 
+          <Card style={{flex: 1}}>
+            <CardItem cardBody style={{ flex: 1, paddingBottom: 20, paddingTop: 20}}>
+              <Stat
+                imgSrc={this.horseAvatar(horse)}
+                text={'Ridden'}
+                value={ horse ? horse.get('name') : 'none'}
+              />
+            </CardItem>
+          </Card>
+
           <View style={{flex: 1}}>
             <Card style={{flex: 1}}>
               <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20, flex: 1}}>
                 <View style={{flex: 1}}>
                   <Stats
+                    elevationGain={elevationGain}
                     horsePhotos={this.props.horsePhotos}
                     horses={this.props.horses}
                     maxSpeed={maxSpeed}

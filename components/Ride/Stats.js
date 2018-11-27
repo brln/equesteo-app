@@ -16,56 +16,11 @@ import Stat from '../Stat'
 export default class Stats extends PureComponent {
   constructor (props) {
     super(props)
-    this.horseAvatar = this.horseAvatar.bind(this)
-    this.horseProfileURL = this.horseProfileURL.bind(this)
     this.makeTimeRiding = this.makeTimeRiding.bind(this)
     this.makeStartTime = this.makeStartTime.bind(this)
     this.makeDistance = this.makeDistance.bind(this)
     this.makeAvgSpeed = this.makeAvgSpeed.bind(this)
     this.makeMaxSpeed = this.makeMaxSpeed.bind(this)
-    this.whichHorse = this.whichHorse.bind(this)
-  }
-
-  horseProfileURL (horse) {
-    if (horse) {
-      const profilePhotoID = horse.get('profilePhotoID')
-      if (horse && profilePhotoID &&
-        this.props.horsePhotos.get(profilePhotoID)) {
-        return this.props.horsePhotos.getIn([profilePhotoID, 'uri'])
-      }
-    }
-  }
-
-  horseAvatar (horse) {
-    const horseProfileURL = this.horseProfileURL(horse)
-    let source
-    if (horseProfileURL) {
-      source = { uri: horseProfileURL }
-    } else {
-      source = require('../../img/breed.png')
-    }
-    return source
-  }
-
-  whichHorse () {
-    let found = null
-    for (let horse of this.props.horses) {
-      if (horse.get('_id') === this.props.ride.get('horseID')) {
-        found = horse
-        break
-      }
-    }
-    return found
-  }
-
-  showHorseProfile (horse) {
-    if (horse) {
-      return () => {
-        this.props.showHorseProfile(horse, this.props.rideHorseOwnerID)
-      }
-    } else {
-      return () => {}
-    }
   }
 
   makeTimeRiding () {
@@ -91,17 +46,14 @@ export default class Stats extends PureComponent {
   }
 
   render () {
-    const horse = this.whichHorse()
     return (
       <View style={{flex: 1, paddingTop: 20}}>
         <View style={{flex: 1, flexDirection: 'row', paddingBottom: 10}}>
-          <TouchableOpacity style={{flex: 1}} onPress={this.showHorseProfile(horse)}>
-            <Stat
-              imgSrc={this.horseAvatar(horse)}
-              text={'Horse'}
-              value={ horse ? horse.get('name') : 'none'}
-            />
-          </TouchableOpacity>
+          <Stat
+            imgSrc={require('../../img/distance.png')}
+            text={'Distance'}
+            value={this.makeDistance()}
+          />
           <Stat
             imgSrc={require('../../img/clock.png')}
             text={'Start Time'}
@@ -110,14 +62,14 @@ export default class Stats extends PureComponent {
         </View>
         <View style={{flex: 1, flexDirection: 'row', paddingBottom: 10}}>
           <Stat
+            imgSrc={require('../../img/elevationGain.png')}
+            text={'Elevation Gain'}
+            value={`${Math.round(this.props.elevationGain)} ft`}
+          />
+          <Stat
             imgSrc={require('../../img/stopwatch.png')}
             text={'Total Time Riding'}
             value={this.makeTimeRiding()}
-          />
-          <Stat
-            imgSrc={require('../../img/distance.png')}
-            text={'Distance'}
-            value={this.makeDistance()}
           />
         </View>
         <View style={{flex: 1, flexDirection: 'row', paddingBottom: 10}}>
