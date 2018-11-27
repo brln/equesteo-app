@@ -117,13 +117,13 @@ describe('REPLACE_LAST_LOCATION', () => {
     const lastElevation = Map({
       latitude: 45.230098,
       longitude: 27.300023,
-      elevation: 2000
+      elevation: 110
     })
     const initialElevation = Map({
-      elevationGain: 1000,
+      elevationGain: 10,
       elevations: Map({
-        '45.2200': Map({'27.2900': 1000}),
-        '45.2301': Map({'27.3000': 2000})
+        '45.2200': Map({'27.2900': 100}),
+        '45.2301': Map({'27.3000': 110})
       })
     })
 
@@ -146,7 +146,7 @@ describe('REPLACE_LAST_LOCATION', () => {
     })
     let latitude = 45.21323
     let longitude = 27.28923
-    let elevationPoint = 4000
+    let elevationPoint = 120
     let location = Map({
       accuracy: 5,
       latitude: latitude,
@@ -172,10 +172,10 @@ describe('REPLACE_LAST_LOCATION', () => {
           List([latitude, longitude, 1, 5])]),
       }),
       currentRideElevations: Map({
-        elevationGain: 3000,
+        elevationGain: 20,
         elevations: Map({
-          '45.2200': Map({'27.2900': 1000}),
-          '45.2301': Map({'27.3000': 2000}),
+          '45.2200': Map({'27.2900': 100}),
+          '45.2301': Map({'27.3000': 110}),
           '45.2132': Map({'27.2892': elevationPoint})
         })
       }),
@@ -216,7 +216,7 @@ describe('REPLACE_LAST_LOCATION', () => {
 
     let latitude = 57.28046553791769
     let longitude = 134.85876184837394
-    let elevationPoint = 1
+    let elevationPoint = 100
     let location = Map({
       accuracy: 5,
       latitude: latitude,
@@ -234,7 +234,7 @@ describe('REPLACE_LAST_LOCATION', () => {
 
     latitude = 5.242249617518764
     longitude = 156.67569432673565
-    elevationPoint = 2
+    elevationPoint = 105
     location = Map({
       accuracy: 5,
       latitude: latitude,
@@ -252,7 +252,7 @@ describe('REPLACE_LAST_LOCATION', () => {
 
     latitude = 45.111111999
     longitude = 27.28923333
-    elevationPoint = 2
+    elevationPoint = 110
     location = Map({
       accuracy: 5,
       latitude: latitude,
@@ -273,10 +273,10 @@ describe('REPLACE_LAST_LOCATION', () => {
         startTime: startTime, distance: 4232.586925
       },
       currentRideElevations:
-       { elevationGain: 1,
-         elevations: { '57.2805': {'134.8588': 1}, '5.2423': {'156.6757': 2}, '45.1111': {'27.2892': 2} } },
+       { elevationGain: 10,
+         elevations: { '57.2805': {'134.8588': 100}, '5.2423': {'156.6757': 105}, '45.1111': {'27.2892': 110} } },
       currentRideCoordinates: { rideCoordinates: [ [57.280466, 134.858762, 1, 5], [45.111112, 27.289233, 1, 5] ] },
-      lastElevation: { latitude: 45.111111999, longitude: 27.28923333, elevation: 2 },
+      lastElevation: { latitude: 45.111111999, longitude: 27.28923333, elevation: 110 },
       lastLocation:
        { accuracy: 5,
          latitude: 45.111111999,

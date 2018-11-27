@@ -1,32 +1,34 @@
+import memoizeOne from 'memoize-one';
 import React, { PureComponent } from 'react'
-import { VictoryArea, VictoryAxis, VictoryChart, VictoryLabel, VictoryLine } from "victory-native"
+import { VictoryArea, VictoryAxis, VictoryChart } from "victory-native"
 import {
-  Dimensions,
   StyleSheet,
-  Text,
   View,
 } from 'react-native'
 
-import { brand, darkBrand, lightGrey } from '../../colors'
+import { darkBrand, lightGrey } from '../../colors'
 import { logRender } from '../../helpers'
-
-const { width } = Dimensions.get('window')
 
 export default class ElevationProfile extends PureComponent {
   constructor (props) {
     super(props)
+    this.memoMinDomain = memoizeOne(this.minDomain.bind(this))
+  }
+
+  minDomain (elevationData) {
+    const minElevation = elevationData.reduce((a, e) => {
+      return a < e.elevation ? a : e.elevation
+    }, elevationData[0].elevation)
+    return minElevation - 10
   }
 
   render () {
     logRender('rendering ElevationProfile')
-    const minDomainY = this.props.elevationData.sort((a, b) => {
-      return a.elevation < b.elevation
-    })[0].elevation
     return (
       <View style={styles.container}>
         <VictoryChart
           padding={{ top: 50, bottom: 50, left: 80, right: 10 }}
-          minDomain={{y: minDomainY - 100}}
+          minDomain={{y: this.memoMinDomain(this.props.elevationData)}}
         >
           <VictoryAxis
             label={'mi'}

@@ -1,7 +1,6 @@
 import memoizeOne from 'memoize-one';
 import React, { PureComponent } from 'react';
 import {
-  Dimensions,
   ScrollView,
   Text,
   View,
@@ -11,12 +10,16 @@ import {
   CardItem,
 } from 'native-base'
 
-import { haversine, parseRideCoordinate, toElevationKey, speedGradient } from '../../helpers'
+import {
+  haversine,
+  newElevationGain,
+  parseRideCoordinate,
+  toElevationKey,
+  speedGradient
+} from '../../helpers'
 import ElevationGain from './ElevationGain'
 import ElevationProfile from './ElevationProfile'
 import SpeedChart from './SpeedChart'
-
-const { height, width } = Dimensions.get('window')
 
 export default class RideCharts extends PureComponent {
   constructor (props) {
@@ -27,22 +30,25 @@ export default class RideCharts extends PureComponent {
   }
 
   parseElevationData (rideCoordinates, rideElevations) {
+    logDebug('parsing elevation data')
     let totalDistance = 0
     let totalGain = 0
     let lastPoint = null
     let points = []
+    let oldTotalGain = null
 
     for (let rideCoord of rideCoordinates) {
       const parsedCoord = parseRideCoordinate(rideCoord)
       if (!lastPoint) {
         lastPoint = parsedCoord
       } else {
-        totalDistance += haversine(
+        const newDistance = haversine(
           lastPoint.get('latitude'),
           lastPoint.get('longitude'),
           parsedCoord.get('latitude'),
           parsedCoord.get('longitude')
         )
+        totalDistance += newDistance
         const elevation = rideElevations.getIn([
           toElevationKey(parsedCoord.get('latitude')),
           toElevationKey(parsedCoord.get('longitude'))
@@ -51,16 +57,14 @@ export default class RideCharts extends PureComponent {
           toElevationKey(lastPoint.get('latitude')),
           toElevationKey(lastPoint.get('longitude'))
         ])
-        const diff = Math.abs(lastElevation - elevation)
-        const percentDiff = diff / elevation
-        if (diff && percentDiff < 0.15) {
-          const elevationChange = elevation - lastElevation
-          totalGain += elevationChange > 0 ? elevationChange : 0
+        totalGain = newElevationGain(newDistance, lastElevation, elevation, totalGain)
+        if (totalGain !== oldTotalGain) {
           points.push({
             elevation,
             distance: totalDistance,
             gain: totalGain
           })
+          oldTotalGain = totalGain
         }
         lastPoint = parsedCoord
       }
@@ -69,6 +73,7 @@ export default class RideCharts extends PureComponent {
   }
 
   parseSpeedData (rideCoordinates) {
+    logDebug('parsing speed data')
     const parsedData = []
     let parsedBucket = []
     let lastPoint = null

@@ -17,7 +17,13 @@ import {
   START_RIDE,
   UNPAUSE_LOCATION_TRACKING,
 } from '../constants'
-import { haversine, parseRideCoordinate, toElevationKey, unixTimeNow } from '../helpers'
+import {
+  haversine,
+  newElevationGain,
+  parseRideCoordinate,
+  toElevationKey,
+  unixTimeNow
+} from '../helpers'
 
 export const initialState = Map({
   currentRide: null,
@@ -103,8 +109,12 @@ export default function CurrentRideReducer(state=initialState, action) {
             usablePermaCoord.get('latitude'),
             usablePermaCoord.get('longitude')
           )
-          const elevationChange = action.elevation.get('elevation') - lastElevation.get('elevation')
-          elevationGain = elevationChange >= 0 ? elevationChange : 0
+          elevationGain = newElevationGain(
+            newDistance,
+            lastElevation.get('elevation'),
+            action.elevation.get('elevation'),
+            currentElevations.get('elevationGain')
+          )
         }
         const rideCoordinates = currentCoordinates.get(
           'rideCoordinates'
@@ -114,13 +124,12 @@ export default function CurrentRideReducer(state=initialState, action) {
           return new Date(a.get(2)) - new Date(b.get(2));
         })
         const totalDistance = currentRide.get('distance') + newDistance
-        const totalElevationGain = currentElevations.get('elevationGain') + elevationGain
         const newCurrentCoordinates = currentCoordinates.set('rideCoordinates', rideCoordinates)
         const newCurrentRide = currentRide.set('distance', totalDistance)
         const newRideElevations =
           currentElevations.set(
             'elevationGain',
-            totalElevationGain
+            elevationGain
           ).setIn([
               'elevations',
               toElevationKey(usablePermaCoord.get('latitude')),
@@ -230,8 +239,12 @@ export default function CurrentRideReducer(state=initialState, action) {
           const oldElevationChange = oldLastElevation - lastElevation
           const oldElevationGain = oldElevationChange >= 0 ? oldElevationChange : 0
 
-          const newElevationChange = action.newElevation.get('elevation') - lastElevation
-          const newElevationGain = newElevationChange >= 0 ? newElevationChange : 0
+          const totalGain = newElevationGain(
+            newDistance,
+            lastElevation,
+            action.newElevation.get('elevation'),
+            oldElevationTotalGain
+          ) - oldElevationGain
           const newRideCoordinates = replacedLastLocation.getIn(
             ['currentRideCoordinates', 'rideCoordinates']
           ).pop().push(
@@ -243,7 +256,6 @@ export default function CurrentRideReducer(state=initialState, action) {
           const totalDistance = currentRide1.get('distance')
             - oldDistance
             + newDistance
-          const totalChange = oldElevationTotalGain - oldElevationGain + newElevationGain
           return replacedLastLocation.setIn(
             ['currentRide', 'distance'],
             totalDistance
@@ -252,7 +264,7 @@ export default function CurrentRideReducer(state=initialState, action) {
             newRideCoordinates
           ).setIn(
             ['currentRideElevations', 'elevationGain'],
-            totalChange
+            totalGain
           ).setIn(
             [
               'currentRideElevations',
