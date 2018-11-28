@@ -1,3 +1,4 @@
+import { List } from 'immutable'
 import React, { PureComponent } from 'react';
 import {
   Dimensions,
@@ -5,20 +6,18 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View
 } from 'react-native';
 import {
   Card,
   CardItem,
   CheckBox,
-
   Fab,
 } from 'native-base'
 import ImagePicker from 'react-native-image-crop-picker'
+import MultiSlider from '@ptomasroos/react-native-multi-slider'
 
-import BuildImage from '../BuildImage'
-import { brand, darkBrand } from '../../colors'
+import { brand, darkBrand, darkGrey } from '../../colors'
 import FabImage from '../FabImage'
 import HorseSelector from './HorseSelector'
 import PhotosByTimestamp from '../PhotosByTimestamp'
@@ -30,11 +29,15 @@ const { width } = Dimensions.get('window')
 export default class UpdateRide extends PureComponent {
   constructor (props) {
     super(props)
+    this.state = {
+      trimming: false
+    }
     this.changeCoverPhoto = this.changeCoverPhoto.bind(this)
     this.changeRideName = this.changeRideName.bind(this)
     this.changeRideNotes = this.changeRideNotes.bind(this)
     this.createPhoto = this.createPhoto.bind(this)
     this.deletePhoto = this.deletePhoto.bind(this)
+    this.startTrim = this.startTrim.bind(this)
   }
 
   deletePhoto () {
@@ -65,24 +68,104 @@ export default class UpdateRide extends PureComponent {
     }).catch((e) => {})
   }
 
+  startTrim () {
+    this.setState({
+      trimming: true
+    })
+  }
+
+  showCoords (rideCoords, trimValues) {
+    if (trimValues) {
+      return rideCoords.reduce((a, rideCoord, i) => {
+        if (i >= trimValues[0] && i <= trimValues[1]) {
+          return a.push(rideCoord)
+        } else {
+          return a
+        }
+      }, List())
+    } else {
+      return rideCoords
+    }
+  }
+
   render() {
     const height = (width * 9 / 16) + 54
+    const numCoords = this.props.rideCoordinates.get('rideCoordinates').count()
+
+    let trimButton = (
+      <Fab
+        direction="up"
+        style={{ backgroundColor: brand }}
+        position="bottomRight"
+        onPress={this.startTrim}>
+        <FabImage source={require('../../img/trim.png')} height={30} width={30} />
+      </Fab>
+    )
+    let trimmer = null
+    if (this.state.trimming) {
+      trimButton = null
+      trimmer = (
+        <CardItem header style={{padding: 5}}>
+          <View style={{paddingLeft: 5}}>
+            <MultiSlider
+              sliderLength={width - 40}
+              values={[0, numCoords]}
+              min={0}
+              max={numCoords}
+              onValuesChange={this.props.trimRide}
+              trackStyle={{
+                backgroundColor: darkGrey
+              }}
+              selectedStyle={{
+                backgroundColor: brand
+              }}
+              markerStyle={{
+                backgroundColor: brand
+              }}
+            />
+          </View>
+        </CardItem>
+      )
+    }
+
     return (
       <View>
         <ScrollView>
           <View style={styles.container}>
-            <View style={{height}}>
-              <ViewingMap
-                rideCoordinates={this.props.rideCoordinates.get('rideCoordinates')}
-                ridePhotos={this.props.ridePhotos}
-                showPhotoLightbox={this.props.showPhotoLightbox}
-              />
-              <View style={{position: 'absolute', right: 10, bottom: 10}}>
-                <TouchableOpacity onPress={this.fullscreenMap}>
-                  <BuildImage source={require('../../img/fullscreen.png')} style={{width: 35, height: 35}} />
-                </TouchableOpacity>
+            <Card style={{flex: 1}}>
+              <CardItem header style={{padding: 5}}>
+                <View style={{paddingLeft: 5}}>
+                  <Text style={{color: darkBrand}}>Map</Text>
+                </View>
+              </CardItem>
+
+              <View style={{height}}>
+                <ViewingMap
+                  rideCoordinates={this.showCoords(this.props.rideCoordinates.get('rideCoordinates'), this.props.trimValues)}
+                  ridePhotos={this.props.ridePhotos}
+                  showPhotoLightbox={this.props.showPhotoLightbox}
+                />
               </View>
-            </View>
+              { trimButton }
+              { trimmer }
+            </Card>
+
+            {/*<Card>*/}
+              {/*<CardItem header style={{padding: 5}}>*/}
+                {/*<View style={{paddingLeft: 5}}>*/}
+                  {/*<Text style={{color: darkBrand}}>Trim Ride</Text>*/}
+                {/*</View>*/}
+              {/*</CardItem>*/}
+              {/*<CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20}}>*/}
+                  {/*<MultiSlider*/}
+                    {/*sliderLength={width - 40}*/}
+                    {/*values={[0, numCoords]}*/}
+                    {/*min={0}*/}
+                    {/*max={numCoords}*/}
+                    {/*onValuesChange={this.props.trimRide}*/}
+                  {/*/>*/}
+              {/*</CardItem>*/}
+            {/*</Card>*/}
 
             <Card>
               <CardItem header style={{padding: 5}}>

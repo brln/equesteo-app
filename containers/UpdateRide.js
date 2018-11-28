@@ -1,4 +1,4 @@
-import { Map } from 'immutable'
+import { fromJS, Map } from 'immutable'
 import memoizeOne from 'memoize-one';
 import { Navigation } from 'react-native-navigation'
 import { Keyboard } from 'react-native'
@@ -11,9 +11,11 @@ import {
   discardCurrentRide,
   mergeStashedLocations,
   removeStashedRidePhoto,
+  rideCoordinatesLoaded,
   rideUpdated,
   setPopShowRide,
   stopStashNewLocations,
+  updateNewRideCoords,
 } from '../actions/standard'
 import {
   loadRideCoordinates,
@@ -22,7 +24,16 @@ import {
 } from '../actions/functional'
 import BackgroundComponent from '../components/BackgroundComponent'
 import { brand } from '../colors'
-import { generateUUID, logRender, unixTimeNow } from '../helpers'
+import {
+  coordSplice,
+  elapsedTime,
+  generateUUID,
+  haversine,
+  logRender,
+  parseRideCoordinate,
+  staticMap,
+  unixTimeNow
+} from '../helpers'
 import UpdateRide from '../components/UpdateRide/UpdateRide'
 
 class UpdateRideContainer extends BackgroundComponent {
@@ -49,8 +60,10 @@ class UpdateRideContainer extends BackgroundComponent {
       cachedRide: null,
       deletedPhotoIDs: [],
       showPhotoMenu: false,
-      selectedPhotoID: null
+      selectedPhotoID: null,
+      trimValues: null,
     }
+    this.allPhotos = this.allPhotos.bind(this)
     this.changeCoverPhoto = this.changeCoverPhoto.bind(this)
     this.changeHorseID = this.changeHorseID.bind(this)
     this.changePublic = this.changePublic.bind(this)
@@ -62,7 +75,8 @@ class UpdateRideContainer extends BackgroundComponent {
     this.markPhotoDeleted = this.markPhotoDeleted.bind(this)
     this.openPhotoMenu = this.openPhotoMenu.bind(this)
     this.stashedRidePhotoKey = this.stashedRidePhotoKey.bind(this)
-    this.allPhotos = this.allPhotos.bind(this)
+    this.trimRide = this.trimRide.bind(this)
+    this.updateLocalRideCoords = this.updateLocalRideCoords.bind(this)
 
     this.memoizedHorses = memoizeOne(this.horses)
     this.memoizedAllPhotos = memoizeOne(this.allPhotos)
@@ -132,11 +146,13 @@ class UpdateRideContainer extends BackgroundComponent {
     if (this.props.newRide) {
       Navigation.mergeOptions(this.props.componentId, {topBar: {rightButtons: []}})
       if (buttonId === 'save') {
+        this.updateLocalRideCoords(updateNewRideCoords)
         this.props.dispatch(persistRide(
           this.props.ride.get('_id'),
           true,
           this.props.stashedRidePhotos,
-          this.state.deletedPhotoIDs
+          this.state.deletedPhotoIDs,
+          this.state.trimValues
         ))
         this.props.dispatch(setPopShowRide(this.props.ride.get('_id'), true))
         Navigation.popToRoot(this.props.componentId).then(() => {
@@ -159,11 +175,13 @@ class UpdateRideContainer extends BackgroundComponent {
       }
     } else {
       if (buttonId === 'save') {
+        this.updateLocalRideCoords(rideCoordinatesLoaded)
         this.props.dispatch(persistRide(
           this.props.ride.get('_id'),
           false,
           this.props.stashedRidePhotos,
-          this.state.deletedPhotoIDs
+          this.state.deletedPhotoIDs,
+          this.state.trimValues,
         ))
         Navigation.pop(this.props.componentId)
       } else if (buttonId === 'back' || buttonId === 'discard') {
@@ -173,6 +191,53 @@ class UpdateRideContainer extends BackgroundComponent {
       }
     }
     Keyboard.dismiss()
+  }
+
+  updateLocalRideCoords (toDispatch) {
+    if (this.state.trimValues) {
+      const rideCoords = this.props.rideCoordinates.get('rideCoordinates').toJS()
+      const spliced = coordSplice(rideCoords, this.state.trimValues)
+      const updatedCoords = this.props.rideCoordinates.set('rideCoordinates', fromJS(spliced))
+      this.props.dispatch(toDispatch(updatedCoords))
+
+      const justCoords = updatedCoords.get('rideCoordinates')
+      const firstCoord = parseRideCoordinate(justCoords.get(0))
+      const lastCoord = parseRideCoordinate(justCoords.get(justCoords.count() - 1))
+      // @TODO: fuck. if you pause the ride then remove the portion where it was paused, it will still reduce the
+      // @TODO: ride time by that number. someday when you have time, you'll need to record the timestamp of all
+      // @TODO: pauses and factor that into trimming. urgh.
+
+      const newTime = elapsedTime(
+        new Date(firstCoord.get('timestamp')),
+        new Date(lastCoord.get('timestamp')),
+        this.props.ride.get('pausedTime') || 0,
+        null
+      )
+
+      const newDistance = justCoords.reduce((accum, coord) => {
+        const c = parseRideCoordinate(coord)
+        if (accum.lastCoord) {
+          accum.total += haversine(
+            accum.lastCoord.get('latitude'),
+            accum.lastCoord.get('longitude'),
+            c.get('latitude'),
+            c.get('longitude')
+          )
+        }
+        accum.lastCoord = c
+        return accum
+      }, {total: 0, lastCoord: null}).total
+
+      const updatedRide = this.props.ride.set(
+        'mapURL', staticMap(this.props.ride, updatedCoords.get('rideCoordinates'))
+      ).set(
+        'elapsedTimeSecs', newTime
+      ).set(
+        'distance', newDistance
+      )
+
+      this.props.dispatch(rideUpdated(updatedRide))
+    }
   }
 
   componentDidMount () {
@@ -299,6 +364,12 @@ class UpdateRideContainer extends BackgroundComponent {
     return withNew.filter(rp => deletedPhotoIDs.indexOf(rp.get('_id')) < 0)
   }
 
+  trimRide(values) {
+    this.setState({
+      trimValues: values,
+    })
+  }
+
   render() {
     logRender('rendering UpdateRideContainer')
     return (
@@ -323,6 +394,8 @@ class UpdateRideContainer extends BackgroundComponent {
         }
         selectedPhotoID={this.state.selectedPhotoID}
         showPhotoMenu={this.state.showPhotoMenu}
+        trimRide={this.trimRide}
+        trimValues={this.state.trimValues}
       />
     )
   }

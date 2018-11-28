@@ -183,7 +183,7 @@ class RideContainer extends PureComponent {
 
   deleteRide () {
     this.props.dispatch(rideUpdated(this.props.ride.set('deleted', true)))
-    this.props.dispatch(persistRide(this.props.ride.get('_id'), false, [], []))
+    this.props.dispatch(persistRide(this.props.ride.get('_id'), false, [], [], null))
     Navigation.pop(this.props.componentId)
   }
 

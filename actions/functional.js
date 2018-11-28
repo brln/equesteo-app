@@ -15,10 +15,11 @@ import {
   haversine,
   logError,
   logInfo,
+  staticMap,
   unixTimeNow,
 } from "../helpers"
 import { danger, green, warning } from '../colors'
-import { appStates } from '../helpers'
+import { appStates, coordSplice } from '../helpers'
 import { CAMERA, DRAWER, FEED, RECORDER, SIGNUP_LOGIN, UPDATE_NEW_RIDE_ID } from '../screens'
 import { LocalStorage, PouchCouch, UserAPI } from '../services'
 import {BadRequestError, NotConnectedError, UnauthorizedError} from "../errors"
@@ -318,18 +319,16 @@ export function persistFollow (followID) {
   }
 }
 
-export function persistRide (rideID, newRide, stashedPhotos, deletedPhotoIDs) {
+export function persistRide (rideID, newRide, stashedPhotos, deletedPhotoIDs, trimValues) {
   return (dispatch, getState) => {
     const theRide = getState().getIn(['pouchRecords', 'rides', rideID])
 
     const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
 
-    let rideRev
-    let elevationRev
-    let coordinateRev
     const rideSaves = pouchCouch.saveRide(theRide.toJS()).then((rideDoc) => {
-      rideRev = rideDoc.rev
+      const theRide = getState().getIn(['pouchRecords', 'rides', rideID])
+      dispatch(rideUpdated(theRide.set('_rev', rideDoc.rev)))
     })
 
     if (newRide) {
@@ -337,11 +336,31 @@ export function persistRide (rideID, newRide, stashedPhotos, deletedPhotoIDs) {
         const theElevations = getState().getIn(['pouchRecords', 'rideElevations', rideID + '_elevations'])
         return pouchCouch.saveRide(theElevations.toJS())
       }).then(rideElevationDoc => {
-        elevationRev = rideElevationDoc.rev
-        const theCoordinates = getState().getIn(['pouchRecords', 'newRideCoordinates'])
-        return pouchCouch.saveRide(theCoordinates.toJS())
-      }).then(rideCoordinateDoc => {
-        coordinateRev = rideCoordinateDoc.rev
+        const theElevations = getState().getIn(['pouchRecords', 'rideElevations', rideID + '_elevations'])
+        dispatch(rideElevationsUpdated(theElevations.set('_rev', rideElevationDoc.rev)))
+        let theCoordinates = getState().getIn(['pouchRecords', 'newRideCoordinates']).toJS()
+        if (trimValues) {
+          theCoordinates.rideCoordinates = coordSplice(theCoordinates.rideCoordinates, trimValues)
+        }
+        return pouchCouch.saveRide(theCoordinates).then((coordinateDoc) => {
+          const theCoordinates = getState().getIn(['pouchRecords', 'newRideCoordinates'])
+          dispatch(rideCoordinatesLoaded(theCoordinates.set('_rev', coordinateDoc.rev)))
+        })
+      })
+    } else if (trimValues) {
+      rideSaves.then(() => {
+        return pouchCouch.loadRideCoordinates(rideID)
+      }).then((theCoordinates) => {
+        theCoordinates.rideCoordinates = coordSplice(theCoordinates.rideCoordinates, trimValues)
+        const asImmutable = fromJS(theCoordinates)
+        return pouchCouch.saveRide(theCoordinates).then(rideCoordinateDoc => {
+          dispatch(rideCoordinatesLoaded(asImmutable.set('_rev', rideCoordinateDoc.rev)))
+          const theRide = getState().getIn(['pouchRecords', 'rides', rideID])
+          return pouchCouch.saveRide(theRide.toJS())
+        }).then((rideDoc) => {
+          const theRide = getState().getIn(['pouchRecords', 'rides', rideID])
+          dispatch(rideUpdated(theRide.set('_rev', rideDoc.rev)))
+        })
       })
     }
 
@@ -379,17 +398,6 @@ export function persistRide (rideID, newRide, stashedPhotos, deletedPhotoIDs) {
     }
 
     rideSaves.then(() => {
-      console.log('after save')
-      const theRide = getState().getIn(['pouchRecords', 'rides', rideID])
-      dispatch(rideUpdated(theRide.set('_rev', rideRev)))
-
-
-      if (newRide) {
-        const theElevations = getState().getIn(['pouchRecords', 'rideElevations', rideID + '_elevations'])
-        const theCoordinates = getState().getIn(['pouchRecords', 'newRideCoordinates'])
-        dispatch(rideElevationsUpdated(theElevations.set('_rev', elevationRev)))
-        dispatch(rideCoordinatesLoaded(theCoordinates.set('_rev', coordinateRev)))
-      }
       dispatch(needsRemotePersist('rides'))
     }).catch(catchAsyncError)
   }

@@ -31,7 +31,6 @@ export default class RideCharts extends PureComponent {
   }
 
   parseElevationData (rideCoordinates, rideElevations) {
-    logDebug('parsing elevation data')
     let totalDistance = 0
     let totalGain = 0
     let lastPoint = null
@@ -72,7 +71,6 @@ export default class RideCharts extends PureComponent {
   }
 
   parseSpeedData (rideCoordinates) {
-    logDebug('parsing speed data')
     const parsedData = []
     let parsedBucket = []
     let lastPoint = null

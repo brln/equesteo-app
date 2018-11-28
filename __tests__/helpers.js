@@ -1,5 +1,12 @@
 import { fromJS } from 'immutable'
-import { boundingBox, elapsedTime, haversine, heading, timeToString } from '../helpers'
+import {
+  boundingBox,
+  coordSplice,
+  elapsedTime,
+  haversine,
+  heading,
+  timeToString
+} from '../helpers'
 
 describe('haversine', () => {
   it('gives the distance beetween two points in miles', () => {
@@ -89,5 +96,31 @@ describe('boundingBox', () => {
       [-15.259356, 66.192398],
       [-15.35808, 66.159565]
     ])
+  })
+})
+
+describe('coordSplice', () => {
+  it ('works on the front end', () => {
+    const coordinates = [
+      [ 39.7347, -106.062, 1543377693000, 0 ],
+      [ 39.734783, -106.064575, 1543377701000, 0 ],
+      [ 39.735773, -106.063051, 1543377708000, 0 ],
+      [ 39.737571, -106.065498, 1543377717000, 0 ],
+    ]
+    expect(coordSplice(coordinates, [0, 2])).toEqual([
+      [ 39.7347, -106.062, 1543377693000, 0 ],
+      [ 39.734783, -106.064575, 1543377701000, 0 ],
+      [ 39.735773, -106.063051, 1543377708000, 0 ],
+    ])
+  })
+
+  it ('works on the back end', () => {
+    const coordinates = [1, 2, 3, 4]
+    expect(coordSplice(coordinates, [1, 4])).toEqual([2, 3, 4])
+  })
+
+  it ('works to do both ends', () => {
+    const coordinates = [1, 2, 3, 4]
+    expect(coordSplice(coordinates, [1, 2])).toEqual([2, 3])
   })
 })

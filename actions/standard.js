@@ -11,7 +11,6 @@ import {
   CREATE_HORSE,
   CREATE_HORSE_PHOTO,
   CREATE_RIDE,
-  CREATE_RIDE_PHOTO,
   CREATE_USER_PHOTO,
   DEQUEUE_PHOTO,
   DELETE_FOLLOW,
@@ -65,6 +64,7 @@ import {
   SET_DOING_INITIAL_LOAD,
   SET_SHOWING_RIDE,
   UNPAUSE_LOCATION_TRACKING,
+  UPDATE_NEW_RIDE_COORDS,
   USER_PHOTO_UPDATED,
   USER_SEARCH_RETURNED,
   USER_UPDATED,
@@ -161,15 +161,6 @@ export function createRide (
     currentRidePhotos,
     rideID,
     userID
-  }
-}
-
-export function createRidePhoto (rideID, userID, photoData) {
-  return {
-    type: CREATE_RIDE_PHOTO,
-    rideID,
-    userID,
-    photoData
   }
 }
 
@@ -547,6 +538,13 @@ export function setDoingInitialLoad (newVal) {
 export function unpauseLocationTracking () {
   return {
     type: UNPAUSE_LOCATION_TRACKING
+  }
+}
+
+export function updateNewRideCoords (newCoords) {
+  return {
+    type: UPDATE_NEW_RIDE_COORDS,
+    newCoords
   }
 }
 

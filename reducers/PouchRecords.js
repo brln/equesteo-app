@@ -6,7 +6,6 @@ import {
   CREATE_HORSE,
   CREATE_HORSE_PHOTO,
   CREATE_RIDE,
-  CREATE_RIDE_PHOTO,
   CREATE_USER_PHOTO,
   DELETE_FOLLOW,
   DELETE_UNPERSISTED_HORSE,
@@ -25,6 +24,7 @@ import {
   RIDE_PHOTO_UPDATED,
   RIDE_UPDATED,
   RIDE_ELEVATIONS_UPDATED,
+  UPDATE_NEW_RIDE_COORDS,
   USER_PHOTO_UPDATED,
   USER_UPDATED,
 } from '../constants'
@@ -187,16 +187,6 @@ export default function PouchRecordsReducer(state=initialState, action) {
         'selectedRideCoordinates',
         Map(coordinateData)
       )
-    case CREATE_RIDE_PHOTO:
-      const newRidePhoto = {
-        _id: action.photoData._id,
-        rideID: action.rideID,
-        timestamp: action.photoData.timestamp,
-        type: 'ridePhoto',
-        uri: action.photoData.uri,
-        userID: action.userID,
-      }
-      return state.setIn(['ridePhotos', action.photoData._id], Map(newRidePhoto))
     case CREATE_USER_PHOTO:
       const newUserPhoto = {
         _id: action.photoData._id,
@@ -284,6 +274,8 @@ export default function PouchRecordsReducer(state=initialState, action) {
       return state.setIn(['rides', action.ride.get('_id')], action.ride)
     case RIDE_ELEVATIONS_UPDATED:
       return state.setIn(['rideElevations', action.rideElevations.get('_id')], action.rideElevations)
+    case UPDATE_NEW_RIDE_COORDS:
+      return state.set('newRideCoordinates', action.newCoords)
     case USER_PHOTO_UPDATED:
       return state.setIn(['userPhotos', action.userPhoto.get('_id')], action.userPhoto)
     case USER_UPDATED:

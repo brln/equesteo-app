@@ -56,8 +56,6 @@ export default class URIIImage extends PureComponent {
               style={{width: 20, height: 20}}
             />
           )
-        } else {
-          logDebug(this.props.source.uri)
         }
       }
       return typeImage

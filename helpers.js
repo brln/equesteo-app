@@ -318,3 +318,12 @@ export function newElevationGain (distance, lastElevation, newElevation, oldTota
   }
   return newTotal
 }
+
+export function coordSplice (rideCoords, trimValues) {
+  const cloned = [...rideCoords]
+  const lengthFirstSplice = trimValues[0]
+  const lengthSecondSplice = rideCoords.length - trimValues[1] - 1
+  cloned.splice(0, lengthFirstSplice)
+  cloned.splice(trimValues[1] - lengthFirstSplice + 1, lengthSecondSplice)
+  return cloned
+}
