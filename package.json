@@ -12,6 +12,7 @@
   "dependencies": {
     "@mapbox/mapbox-sdk": "^0.4.1",
     "@mapbox/react-native-mapbox-gl": "mapbox/react-native-mapbox-gl#937977ef573c7bd4ae69972720eb1ec9fd8b6be9",
+    "@ptomasroos/react-native-multi-slider": "^1.0.0",
     "immutable": "^3.8.2",
     "memoize-one": "^3.1.1",
     "moment": "^2.21.0",
@@ -47,7 +48,7 @@
     "babel-preset-react-native": "^4.0.0",
     "jest": "^23.6.0",
     "react-native-dotenv": "^0.1.1",
-    "react-test-renderer": "16.2.0",
+    "react-test-renderer": "16.3.2",
     "regenerator-runtime": "^0.12.1"
   },
   "assets": [

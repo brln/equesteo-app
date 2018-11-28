@@ -4,7 +4,7 @@ import 'react-native';
 import React from 'react';
 
 import CurrentRideReducer from '../../reducers/CurrentRide'
-import { newLocation, replaceLastLocation }  from '../../actions'
+import { newLocation, replaceLastLocation }  from '../../actions/standard'
 import { unixTimeNow } from '../../helpers'
 
 describe('REPLACE_LAST_LOCATION', () => {

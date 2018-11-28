@@ -18,7 +18,7 @@ import RNPickerSelect from 'react-native-picker-select';
 import { brand, darkBrand } from '../../colors'
 import PhotoFab from './PhotoFab'
 import PhotosByTimestamp from '../PhotosByTimestamp'
-import PhotoMenu from './PhotoMenu'
+import PhotoMenu from '../PhotoMenu'
 
 
 export default class UpdateHorse extends PureComponent {
@@ -265,17 +265,6 @@ export default class UpdateHorse extends PureComponent {
   }
 
   render() {
-    let photoMenu = null
-    if (this.props.showPhotoMenu) {
-      photoMenu = (
-        <PhotoMenu
-          changeProfilePhotoID={this.changeProfilePhotoID}
-          clearPhotoMenu={this.props.clearPhotoMenu}
-          deletePhoto={this.deletePhoto}
-          selectedPhotoID={this.props.selectedPhotoID}
-        />
-      )
-    }
     return (
       <View>
         <ScrollView keyboardShouldPersistTaps={'always'}>
@@ -398,7 +387,13 @@ export default class UpdateHorse extends PureComponent {
             </View>
           </View>
         </ScrollView>
-        { photoMenu }
+        <PhotoMenu
+          changeProfilePhotoID={this.changeProfilePhotoID}
+          clearPhotoMenu={this.props.clearPhotoMenu}
+          deletePhoto={this.deletePhoto}
+          selectedPhotoID={this.props.selectedPhotoID}
+          visible={this.props.showPhotoMenu}
+        />
       </View>
     )
   }

@@ -5,6 +5,7 @@ import {
   StyleSheet
 } from 'react-native'
 import Modal from 'react-native-modalbox';
+import PropTypes from 'prop-types'
 
 import {
   Text,
@@ -39,6 +40,13 @@ export default class DiscardModal extends PureComponent {
       </Modal>
     )
   }
+}
+
+DiscardModal.propTypes = {
+  modalOpen: PropTypes.bool.isRequired,
+  closeDiscardModal: PropTypes.func.isRequired,
+  discardFunc: PropTypes.func.isRequired,
+  text: PropTypes.string.isRequired
 }
 
 const styles = StyleSheet.create({

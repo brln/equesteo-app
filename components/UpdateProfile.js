@@ -14,7 +14,7 @@ import {
 
 import { darkBrand } from "../colors"
 import PhotosByTimestamp from './PhotosByTimestamp'
-import PhotoMenu from './UpdateHorse/PhotoMenu'
+import PhotoMenu from './PhotoMenu'
 
 export default class UpdateProfile extends PureComponent {
   constructor (props) {

@@ -16,6 +16,7 @@ import {
   stopStashNewLocations,
 } from '../actions/standard'
 import {
+  loadRideCoordinates,
   persistRide,
   stopLocationTracking,
 } from '../actions/functional'
@@ -174,6 +175,12 @@ class UpdateRideContainer extends BackgroundComponent {
     Keyboard.dismiss()
   }
 
+  componentDidMount () {
+    if(!this.props.rideCoordinates || this.props.rideCoordinates.get('rideID') !== this.props.ride.get('_id')) {
+      this.props.dispatch(loadRideCoordinates(this.props.ride.get('_id')))
+    }
+  }
+
   openPhotoMenu (coverPhotoID) {
     this.setState({
       showPhotoMenu: true,
@@ -306,6 +313,7 @@ class UpdateRideContainer extends BackgroundComponent {
         horses={this.memoizedHorses()}
         horsePhotos={this.props.horsePhotos}
         markPhotoDeleted={this.markPhotoDeleted}
+        rideCoordinates={this.props.rideCoordinates}
         openPhotoMenu={this.openPhotoMenu}
         ride={this.props.ride}
         ridePhotos={this.memoizedAllPhotos(
@@ -335,6 +343,7 @@ function mapStateToProps (state, passedProps) {
     horseUsers: pouchState.get('horseUsers'),
     newRide,
     ride: state.getIn(['pouchRecords', 'rides', passedProps.rideID]),
+    rideCoordinates: pouchState.get('selectedRideCoordinates'),
     ridePhotos: pouchState.get('ridePhotos'),
     userID,
     user: pouchState.getIn(['users', localState.get('userID')]),

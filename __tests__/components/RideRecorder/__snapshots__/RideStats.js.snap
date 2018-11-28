@@ -1,0 +1,369 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders 1`] = `
+<View
+  style={
+    Object {
+      "alignItems": "center",
+      "flex": 3,
+      "flexDirection": "row",
+      "justifyContent": "space-between",
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "flex": 1,
+      }
+    }
+  >
+    <View
+      style={
+        Array [
+          Object {
+            "borderColor": "#e8eae8",
+            "flex": 1,
+          },
+          Object {
+            "borderBottomWidth": 1,
+            "borderLeftWidth": 2,
+            "borderRightWidth": 1,
+            "borderTopWidth": 2,
+          },
+        ]
+      }
+    >
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "color": "#9b9d9b",
+            "fontSize": 14,
+            "paddingLeft": 5,
+          }
+        }
+      >
+        Distance
+      </Text>
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "color": "black",
+            "fontSize": 35,
+            "textAlign": "center",
+          }
+        }
+      >
+        32.00
+         
+        <Text
+          accessible={true}
+          allowFontScaling={true}
+          ellipsizeMode="tail"
+          style={
+            Object {
+              "color": "black",
+              "fontSize": 25,
+            }
+          }
+        >
+          mi
+        </Text>
+      </Text>
+    </View>
+    <View
+      style={
+        Array [
+          Object {
+            "borderColor": "#e8eae8",
+            "flex": 1,
+          },
+          Object {
+            "borderBottomWidth": 2,
+            "borderLeftWidth": 2,
+            "borderRightWidth": 1,
+            "borderTopWidth": 1,
+          },
+        ]
+      }
+    >
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "color": "#9b9d9b",
+            "fontSize": 14,
+            "paddingLeft": 5,
+          }
+        }
+      >
+        Current Speed
+      </Text>
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "color": "black",
+            "fontSize": 35,
+            "textAlign": "center",
+          }
+        }
+      >
+        0.0
+         
+        <Text
+          accessible={true}
+          allowFontScaling={true}
+          ellipsizeMode="tail"
+          style={
+            Object {
+              "color": "black",
+              "fontSize": 25,
+            }
+          }
+        >
+          mi/h
+        </Text>
+      </Text>
+    </View>
+    <View
+      style={
+        Array [
+          Object {
+            "borderColor": "#e8eae8",
+            "flex": 1,
+          },
+          Object {
+            "borderBottomWidth": 2,
+            "borderLeftWidth": 2,
+            "borderRightWidth": 1,
+            "borderTopWidth": 1,
+          },
+        ]
+      }
+    >
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "color": "#9b9d9b",
+            "fontSize": 14,
+            "paddingLeft": 5,
+          }
+        }
+      >
+        Altitude
+      </Text>
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "color": "black",
+            "fontSize": 35,
+            "textAlign": "center",
+          }
+        }
+      >
+        0
+         
+        <Text
+          accessible={true}
+          allowFontScaling={true}
+          ellipsizeMode="tail"
+          style={
+            Object {
+              "color": "black",
+              "fontSize": 25,
+            }
+          }
+        >
+          ft
+        </Text>
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
+      Object {
+        "flex": 1,
+      }
+    }
+  >
+    <View
+      style={
+        Array [
+          Object {
+            "borderColor": "#e8eae8",
+            "flex": 1,
+          },
+          Object {
+            "borderBottomWidth": 1,
+            "borderLeftWidth": 1,
+            "borderRightWidth": 2,
+            "borderTopWidth": 2,
+          },
+        ]
+      }
+    >
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "color": "#9b9d9b",
+            "fontSize": 14,
+            "paddingLeft": 5,
+          }
+        }
+      >
+        Total Time
+      </Text>
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "color": "black",
+            "fontSize": 35,
+            "textAlign": "center",
+          }
+        }
+      />
+    </View>
+    <View
+      style={
+        Array [
+          Object {
+            "borderColor": "#e8eae8",
+            "flex": 1,
+          },
+          Object {
+            "borderBottomWidth": 2,
+            "borderLeftWidth": 1,
+            "borderRightWidth": 2,
+            "borderTopWidth": 1,
+          },
+        ]
+      }
+    >
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "color": "#9b9d9b",
+            "fontSize": 14,
+            "paddingLeft": 5,
+          }
+        }
+      >
+        Avg. Speed
+      </Text>
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "color": "black",
+            "fontSize": 35,
+            "textAlign": "center",
+          }
+        }
+      >
+        0.0
+         
+        <Text
+          accessible={true}
+          allowFontScaling={true}
+          ellipsizeMode="tail"
+          style={
+            Object {
+              "color": "black",
+              "fontSize": 25,
+            }
+          }
+        >
+          mi/h
+        </Text>
+      </Text>
+    </View>
+    <View
+      style={
+        Array [
+          Object {
+            "borderColor": "#e8eae8",
+            "flex": 1,
+          },
+          Object {
+            "borderBottomWidth": 2,
+            "borderLeftWidth": 1,
+            "borderRightWidth": 2,
+            "borderTopWidth": 1,
+          },
+        ]
+      }
+    >
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "color": "#9b9d9b",
+            "fontSize": 14,
+            "paddingLeft": 5,
+          }
+        }
+      >
+        Elevation Gain
+      </Text>
+      <Text
+        accessible={true}
+        allowFontScaling={true}
+        ellipsizeMode="tail"
+        style={
+          Object {
+            "color": "black",
+            "fontSize": 35,
+            "textAlign": "center",
+          }
+        }
+      >
+        66
+         
+        <Text
+          accessible={true}
+          allowFontScaling={true}
+          ellipsizeMode="tail"
+          style={
+            Object {
+              "color": "black",
+              "fontSize": 25,
+            }
+          }
+        >
+          ft
+        </Text>
+      </Text>
+    </View>
+  </View>
+</View>
+`;

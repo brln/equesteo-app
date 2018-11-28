@@ -1,24 +1,31 @@
 import React, { PureComponent } from 'react';
 import {
+  Dimensions,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View
 } from 'react-native';
 import {
   Card,
   CardItem,
   CheckBox,
+
   Fab,
 } from 'native-base'
 import ImagePicker from 'react-native-image-crop-picker'
 
+import BuildImage from '../BuildImage'
 import { brand, darkBrand } from '../../colors'
 import FabImage from '../FabImage'
 import HorseSelector from './HorseSelector'
 import PhotosByTimestamp from '../PhotosByTimestamp'
-import PhotoMenu from '../UpdateHorse/PhotoMenu'
+import PhotoMenu from '../PhotoMenu'
+import ViewingMap from '../Ride/ViewingMap'
+
+const { width } = Dimensions.get('window')
 
 export default class UpdateRide extends PureComponent {
   constructor (props) {
@@ -59,21 +66,24 @@ export default class UpdateRide extends PureComponent {
   }
 
   render() {
-    let photoMenu = null
-    if (this.props.showPhotoMenu) {
-      photoMenu = (
-        <PhotoMenu
-          changeProfilePhotoID={this.changeCoverPhoto}
-          deletePhoto={this.deletePhoto}
-          clearPhotoMenu={this.props.clearPhotoMenu}
-          selectedPhotoID={this.props.selectedPhotoID}
-        />
-      )
-    }
+    const height = (width * 9 / 16) + 54
     return (
       <View>
         <ScrollView>
           <View style={styles.container}>
+            <View style={{height}}>
+              <ViewingMap
+                rideCoordinates={this.props.rideCoordinates.get('rideCoordinates')}
+                ridePhotos={this.props.ridePhotos}
+                showPhotoLightbox={this.props.showPhotoLightbox}
+              />
+              <View style={{position: 'absolute', right: 10, bottom: 10}}>
+                <TouchableOpacity onPress={this.fullscreenMap}>
+                  <BuildImage source={require('../../img/fullscreen.png')} style={{width: 35, height: 35}} />
+                </TouchableOpacity>
+              </View>
+            </View>
+
             <Card>
               <CardItem header style={{padding: 5}}>
                 <View style={{paddingLeft: 5}}>
@@ -181,7 +191,13 @@ export default class UpdateRide extends PureComponent {
             </Card>
           </View>
         </ScrollView>
-        { photoMenu }
+        <PhotoMenu
+          changeProfilePhotoID={this.changeCoverPhoto}
+          deletePhoto={this.deletePhoto}
+          clearPhotoMenu={this.props.clearPhotoMenu}
+          selectedPhotoID={this.props.selectedPhotoID}
+          visible={this.props.showPhotoMenu}
+        />
       </View>
     )
   }

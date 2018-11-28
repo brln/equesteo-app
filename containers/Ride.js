@@ -282,7 +282,7 @@ function mapStateToProps (state, passedProps) {
   const pouchState = state.get('pouchRecords')
   const localState = state.get('localState')
   const ride = pouchState.getIn(['rides', passedProps.rideID])
-  const rideCoordinates = pouchState.getIn(['selectedRideCoordinates'])
+  const rideCoordinates = pouchState.get('selectedRideCoordinates')
   const rideElevations = pouchState.getIn(['rideElevations', passedProps.rideID + '_elevations'])
   const userID = localState.get('userID')
   return {
