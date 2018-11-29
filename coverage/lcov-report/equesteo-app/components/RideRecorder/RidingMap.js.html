@@ -1,0 +1,1016 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for equesteo-app/components/RideRecorder/RidingMap.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../../index.html">All files</a> / <a href="index.html">equesteo-app/components/RideRecorder</a> RidingMap.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">54.93% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>39/71</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">29.63% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>8/27</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">60% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>9/15</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">54.93% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>39/71</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line medium'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { List, Map } from 'immutable'
+import React, { PureComponent } from 'react';
+import MapboxGL from '@mapbox/react-native-mapbox-gl';
+import PropTypes from 'prop-types'
+import {
+  Dimensions,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
+&nbsp;
+import BuildImage from '../BuildImage'
+import { haversine, logError, logRender, parseRideCoordinate } from '../../helpers'
+import { brand, darkGrey } from '../../colors'
+import { rainbow } from '../../services/Rainbow'
+&nbsp;
+const { width } = Dimensions.get('window')
+&nbsp;
+const allColors = rainbow()
+&nbsp;
+export default class RidingMap extends PureComponent {
+  constructor (props) {
+    super(props)
+    this.state = {
+      showingMaptypes: false,
+      mapType: 'map'
+    }
+    this.fitToElements = this.fitToElements.bind(this)
+    this.gpsStatusImage = this.gpsStatusImage.bind(this)
+    this.mapTypeMap = this.mapTypeMap.bind(this)
+    this.mapTypePhoto = this.mapTypePhoto.bind(this)
+    this.renderMaptypeButtons = this.renderMaptypeButtons.bind(this)
+    this.recenterButton = this.recenterButton.bind(this)
+    this.showMaptypeButtons = this.showMaptypeButtons.bind(this)
+  }
+&nbsp;
+  static mapCoordinates (rideCoordinates) {
+    const featureCollection = {
+      type: "FeatureCollection",
+      features: []
+    }
+&nbsp;
+    let totalDistance = 0
+    rideCoordinates.reduce((accum, coord) =&gt; {
+      const c = parseRideCoordinate(coord)
+      <span class="missing-if-branch" title="else path not taken" >E</span>if (!accum.lastCoord) {
+        accum.lastCoord = c
+      } else {
+<span class="cstat-no" title="statement not covered" >        totalDistance += haversine(</span>
+          accum.lastCoord.get('latitude'),
+          accum.lastCoord.get('longitude'),
+          c.get('latitude'),
+          c.get('longitude')
+        )
+        const mile = <span class="cstat-no" title="statement not covered" >Math.floor(totalDistance) % 100</span>
+        const feature = <span class="cstat-no" title="statement not covered" >{</span>
+          type: 'Feature',
+          properties: {
+            stroke: `#${allColors[mile]}`,
+          },
+          geometry: {
+            type: "LineString",
+            coordinates: [
+              [accum.lastCoord.get('longitude'), accum.lastCoord.get('latitude')],
+              [c.get('longitude'), c.get('latitude')]
+            ]
+          }
+        }
+<span class="cstat-no" title="statement not covered" >        accum.featureCollection.features.push(feature)</span>
+<span class="cstat-no" title="statement not covered" >        accum.lastCoord = c</span>
+      }
+      return accum
+    }, {lastCoord: null, featureCollection})
+    return featureCollection
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  ma</span>pTypeMap () {
+<span class="cstat-no" title="statement not covered" >    this.setState({</span>
+      mapType: 'map',
+      showingMaptypes: false
+    })
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  ma</span>pTypePhoto () {
+<span class="cstat-no" title="statement not covered" >    this.setState({</span>
+      mapType: 'photo',
+      showingMaptypes: false
+    })
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  fi</span>tToElements() {
+    const { lats, longs } = <span class="cstat-no" title="statement not covered" >this.props.currentRideCoordinates.reduce(<span class="fstat-no" title="function not covered" >(a</span>ccum, coord) =&gt; {</span>
+      const parsedCoord = <span class="cstat-no" title="statement not covered" >parseRideCoordinate(coord)</span>
+<span class="cstat-no" title="statement not covered" >      accum.lats.push(parsedCoord.get('latitude'))</span>
+<span class="cstat-no" title="statement not covered" >      accum.longs.push(parsedCoord.get('longitude'))</span>
+<span class="cstat-no" title="statement not covered" >      return accum</span>
+    }, {lats: [], longs: []})
+    const maxLat = <span class="cstat-no" title="statement not covered" >Math.max(...lats)</span>
+    const minLat = <span class="cstat-no" title="statement not covered" >Math.min(...lats)</span>
+    const maxLong = <span class="cstat-no" title="statement not covered" >Math.max(...longs)</span>
+    const minLong = <span class="cstat-no" title="statement not covered" >Math.min(...longs)</span>
+    const latitude = <span class="cstat-no" title="statement not covered" >((maxLat - minLat) / 2) + minLat || 0</span>
+    const longitude = <span class="cstat-no" title="statement not covered" >((maxLong - minLong) / 2) + minLong || 0</span>
+    const latitudeDelta = <span class="cstat-no" title="statement not covered" >Math.max((maxLat - minLat) * 1.2, 0.01)</span>
+    const longitudeDelta = <span class="cstat-no" title="statement not covered" >Math.max((maxLong - minLong) * 1.2, 0.01)</span>
+<span class="cstat-no" title="statement not covered" >    return {</span>
+      latitude,
+      longitude,
+      latitudeDelta,
+      longitudeDelta,
+    }
+  }
+&nbsp;
+  gpsStatusImage () {
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (this.props.lastLocation) {
+      switch (true) {
+<span class="branch-0 cbranch-no" title="branch not covered" >        case this.props.lastLocation.get('accuracy') &lt; 10:</span>
+<span class="cstat-no" title="statement not covered" >          return require('../../img/gps/gps5.png')</span>
+<span class="branch-1 cbranch-no" title="branch not covered" >        case this.props.lastLocation.get('accuracy') &lt; 20:</span>
+<span class="cstat-no" title="statement not covered" >          return require('../../img/gps/gps4.png')</span>
+<span class="branch-2 cbranch-no" title="branch not covered" >        case this.props.lastLocation.get('accuracy') &lt; 30:</span>
+<span class="cstat-no" title="statement not covered" >          return require('../../img/gps/gps3.png')</span>
+<span class="branch-3 cbranch-no" title="branch not covered" >        case this.props.lastLocation.get('accuracy') &lt; 40:</span>
+<span class="cstat-no" title="statement not covered" >          return require('../../img/gps/gps2.png')</span>
+        default:
+          return require('../../img/gps/gps1.png')
+      }
+    } else {
+<span class="cstat-no" title="statement not covered" >      return null</span>
+    }
+  }
+&nbsp;
+  currentLocation (lastLocation) {
+    let coords = []
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (lastLocation) {
+      coords = [lastLocation.get('longitude'), lastLocation.get('latitude')]
+    }
+    return {
+      type: "FeatureCollection",
+      features: [{
+        type: 'Feature',
+        "geometry": {
+          "type": "Point",
+          "coordinates": coords
+        },
+        id: 'currentLocation'
+      }]
+    }
+  }
+&nbsp;
+  recenterButton () {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (this.props.userControlledMap) {
+<span class="cstat-no" title="statement not covered" >      return (</span>
+        &lt;View style={{position: 'absolute', left: 20, bottom: 35}}&gt;
+          &lt;TouchableOpacity
+            style={{backgroundColor: 'white', height: width / 8, width: width / 3, borderRadius: 3}}
+            onPress={this.props.recenter}
+          &gt;
+            &lt;View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}&gt;
+              &lt;View style={{flex: 1}}&gt;
+                &lt;BuildImage style={{height: width / 9, width: width / 9}} source={require('../../img/recenter.png')} resizeMode={"contain"}/&gt;
+              &lt;/View&gt;
+              &lt;View style={{flex: 3}}&gt;
+                &lt;Text style={styles.text}&gt;Re-center&lt;/Text&gt;
+              &lt;/View&gt;
+            &lt;/View&gt;
+          &lt;/TouchableOpacity&gt;
+        &lt;/View&gt;
+      )
+    } else {
+      return null
+    }
+  }
+&nbsp;
+  renderMaptypeButtons () {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (this.state.showingMaptypes) {
+      const chosenColor = <span class="cstat-no" title="statement not covered" >'#aaa3a2'</span>
+      const notChosenColor = <span class="cstat-no" title="statement not covered" >'#ffffff'</span>
+<span class="cstat-no" title="statement not covered" >      return [</span>
+          &lt;TouchableOpacity key="map" style={{
+            flex: 2,
+            borderRightWidth: 1,
+            borderRightColor: darkGrey,
+            borderLeftWidth: 2,
+            borderLeftColor: darkGrey,
+            height: '100%',
+            justifyContent: 'center',
+            backgroundColor: this.state.mapType === 'map' ? chosenColor : notChosenColor
+          }}
+          onPress={this.mapTypeMap}
+          &gt;
+            &lt;Text style={{textAlign: 'center'}}&gt;Map&lt;/Text&gt;
+          &lt;/TouchableOpacity&gt;,
+          &lt;TouchableOpacity key="photo" style={{
+            flex: 2,
+            borderLeftWidth: 1,
+            borderLeftColor: darkGrey,
+            height: '100%',
+            justifyContent: 'center',
+            borderTopRightRadius: 4,
+            backgroundColor: this.state.mapType === 'photo' ? chosenColor : notChosenColor,
+            borderBottomRightRadius: 4}}
+            onPress={this.mapTypePhoto}
+          &gt;
+            &lt;Text style={{textAlign: 'center'}}&gt;Photo&lt;/Text&gt;
+          &lt;/TouchableOpacity&gt;
+        ]
+    } else {
+      return null
+    }
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  sh</span>owMaptypeButtons () {
+<span class="cstat-no" title="statement not covered" >    this.setState({</span>
+      showingMaptypes: !this.state.showingMaptypes
+    })
+  }
+&nbsp;
+  render() {
+    logRender('RideRecorder.RidingMap')
+    const buttonWidth = this.state.showingMaptypes ? <span class="branch-0 cbranch-no" title="branch not covered" >width / 2 </span>: 40
+    const mapCoords = RidingMap.mapCoordinates(this.props.currentRideCoordinates)
+    const mapStyleURL = this.state.mapType === 'map' ? "mapbox://styles/equesteo/cjopu37k3fm442smn4ncz3x9m" : <span class="branch-1 cbranch-no" title="branch not covered" >"mapbox://styles/equesteo/cjoug4j877tc82ro2l2p3n1q2"</span>
+    return (
+      &lt;View style ={styles.container}&gt;
+        &lt;View style={{flex: 1}}&gt;
+          &lt;MapboxGL.MapView
+            animated={true}
+            centerCoordinate={this.props.centerCoordinate}
+            compassEnabled={true}
+            onRegionDidChange={this.props.mapRegionChanged}
+            pitch={45}
+            heading={this.props.heading}
+            ref={ref =&gt; (this.map = ref)}
+            styleURL={mapStyleURL}
+            onDidFinishLoadingMap={this.fitToElements}
+            style={styles.map}
+            zoomLevel={this.props.zoomLevel}
+          &gt;
+            &lt;MapboxGL.ShapeSource id="routeSource" shape={mapCoords}&gt;
+              &lt;MapboxGL.LineLayer id="route" sourceID={"routeSource"} style={layerStyles.routeLine}/&gt;
+            &lt;/MapboxGL.ShapeSource&gt;
+            &lt;MapboxGL.ShapeSource
+              id="currentLocationSource"
+              shape={this.currentLocation(this.props.lastLocation)}
+            &gt;
+              &lt;MapboxGL.SymbolLayer
+                id="currentLocation"
+                sourceID={"currentLocationSource"}
+                style={layerStyles.icon}
+              /&gt;
+            &lt;/MapboxGL.ShapeSource&gt;
+          &lt;/MapboxGL.MapView&gt;
+        &lt;/View&gt;
+        &lt;View style={{
+          position: 'absolute',
+          left: 10,
+          top: 10,
+          width: buttonWidth,
+        }}&gt;
+          &lt;View style={{flex: 1, flexDirection: 'row', backgroundColor: 'white', borderRadius: 4, alignItems: 'center', justifyContent: 'center'}}&gt;
+            &lt;TouchableOpacity style={{flex: 1}} onPress={this.showMaptypeButtons}&gt;
+              &lt;BuildImage
+                source={this.gpsStatusImage()}
+                style={{width: 40, height: 40, marginRight: 5}}
+                onError={<span class="fstat-no" title="function not covered" >(e</span>) =&gt; { <span class="cstat-no" title="statement not covered" >logError('there was an error loading RidingMap image') </span>}}
+              /&gt;
+            &lt;/TouchableOpacity&gt;
+            { this.renderMaptypeButtons() }
+          &lt;/View&gt;
+        &lt;/View&gt;
+        { this.recenterButton() }
+      &lt;/View&gt;
+    )
+  }
+}
+&nbsp;
+RidingMap.propTypes = {
+  centerCoordinate: PropTypes.array,
+  currentRideCoordinates: PropTypes.instanceOf(List).isRequired,
+  heading: PropTypes.number.isRequired,
+  lastLocation: PropTypes.instanceOf(Map).isRequired,
+  mapRegionChanged: PropTypes.func.isRequired,
+  recenter: PropTypes.func.isRequired,
+  userControlledMap: PropTypes.bool.isRequired,
+  zoomLevel: PropTypes.number.isRequired,
+}
+&nbsp;
+const layerStyles = MapboxGL.StyleSheet.create({
+  routeLine: {
+    lineColor: MapboxGL.StyleSheet.identity('stroke'),
+    lineWidth: 3,
+    lineCap: 'round',
+  },
+  icon: {
+    iconImage: require('../../img/logo.png'),
+    iconIgnorePlacement: true,
+    iconSize: 1.5,
+  }
+})
+&nbsp;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1
+  },
+  map: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  text: {
+    color: brand,
+    textAlign:'left',
+    paddingLeft : 10,
+    paddingRight : 10,
+    fontSize: 15
+  },
+});
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu Nov 29 2018 07:11:17 GMT-0800 (PST)
+</div>
+</div>
+<script src="../../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../../sorter.js"></script>
+</body>
+</html>

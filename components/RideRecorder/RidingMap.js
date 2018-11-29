@@ -1,5 +1,7 @@
+import { List, Map } from 'immutable'
 import React, { PureComponent } from 'react';
 import MapboxGL from '@mapbox/react-native-mapbox-gl';
+import PropTypes from 'prop-types'
 import {
   Dimensions,
   StyleSheet,
@@ -10,7 +12,7 @@ import {
 
 import BuildImage from '../BuildImage'
 import { haversine, logError, logRender, parseRideCoordinate } from '../../helpers'
-import { brand, darkGrey, lightGrey } from '../../colors'
+import { brand, darkGrey } from '../../colors'
 import { rainbow } from '../../services/Rainbow'
 
 const { width } = Dimensions.get('window')
@@ -272,6 +274,17 @@ export default class RidingMap extends PureComponent {
       </View>
     )
   }
+}
+
+RidingMap.propTypes = {
+  centerCoordinate: PropTypes.array,
+  currentRideCoordinates: PropTypes.instanceOf(List).isRequired,
+  heading: PropTypes.number.isRequired,
+  lastLocation: PropTypes.instanceOf(Map).isRequired,
+  mapRegionChanged: PropTypes.func.isRequired,
+  recenter: PropTypes.func.isRequired,
+  userControlledMap: PropTypes.bool.isRequired,
+  zoomLevel: PropTypes.number.isRequired,
 }
 
 const layerStyles = MapboxGL.StyleSheet.create({

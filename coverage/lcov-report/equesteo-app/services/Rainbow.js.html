@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for equesteo-app/services/Rainbow.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../index.html">All files</a> / <a href="index.html">equesteo-app/services</a> Rainbow.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">97.22% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>35/36</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">75% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>6/8</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>6/6</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">97.22% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>35/36</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">297x</span>
+<span class="cline-any cline-yes">297x</span>
+<span class="cline-any cline-yes">297x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">297x</span>
+<span class="cline-any cline-yes">297x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">99x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">54x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">99x</span>
+<span class="cline-any cline-yes">99x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">99x</span>
+<span class="cline-any cline-yes">99x</span>
+<span class="cline-any cline-yes">99x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">99x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// modified from https://stackoverflow.com/questions/3080421/javascript-color-gradient
+function hex (c) {
+  var s = "0123456789abcdef";
+  var i = parseInt (c);
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (i == 0 || isNaN (c))
+<span class="cstat-no" title="statement not covered" >    return "00";</span>
+  i = Math.round (Math.min (Math.max (0, i), 255));
+  return s.charAt ((i - i % 16) / 16) + s.charAt (i % 16);
+}
+&nbsp;
+/* Convert an RGB triplet to a hex string */
+function convertToHex (rgb) {
+  return hex(rgb[0]) + hex(rgb[1]) + hex(rgb[2]);
+}
+&nbsp;
+/* Remove '#' in color hex string */
+function trim (s) { return (s.charAt(0) == '#') ? s.substring(1, 7) : <span class="branch-1 cbranch-no" title="branch not covered" >s </span>}
+&nbsp;
+/* Convert a hex string to an RGB triplet */
+function convertToRGB (hex) {
+  var color = [];
+  color[0] = parseInt ((trim(hex)).substring (0, 2), 16);
+  color[1] = parseInt ((trim(hex)).substring (2, 4), 16);
+  color[2] = parseInt ((trim(hex)).substring (4, 6), 16);
+  return color;
+}
+&nbsp;
+export function generateColor(colorStart,colorEnd,colorCount){
+&nbsp;
+	// The beginning of your gradient
+	var start = convertToRGB (colorStart);
+&nbsp;
+	// The end of your gradient
+	var end   = convertToRGB (colorEnd);
+&nbsp;
+	// The number of colors to compute
+	var len = colorCount;
+&nbsp;
+	//Alpha blending amount
+	var alpha = 0.0;
+&nbsp;
+	var saida = [];
+&nbsp;
+	for (i = 0; i &lt; len; i++) {
+		var c = [];
+		alpha += (1.0/len);
+&nbsp;
+		c[0] = start[0] * alpha + (1 - alpha) * end[0];
+		c[1] = start[1] * alpha + (1 - alpha) * end[1];
+		c[2] = start[2] * alpha + (1 - alpha) * end[2];
+&nbsp;
+		saida.push(convertToHex (c));
+&nbsp;
+	}
+&nbsp;
+	return saida;
+&nbsp;
+}
+&nbsp;
+export function rainbow () {
+	const keyColors = [
+		'#ff5442',
+    '#ff9248',
+    '#fff455',
+    '#a1ff5b',
+    '#57ff9d',
+    '#97e4ff',
+    '#5d55ff',
+    '#8e45ff',
+    '#eb55ff',
+    '#ab4479',
+	]
+  let allColors = []
+  let lastColor = null
+  for (let keyColor of keyColors) {
+    if (lastColor) {
+      let newColors = generateColor(keyColor, lastColor, 11)
+      allColors = allColors.concat(newColors)
+      lastColor = keyColor
+    } else {
+      lastColor = keyColor
+    }
+  }
+  return allColors
+}
+&nbsp;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu Nov 29 2018 07:11:17 GMT-0800 (PST)
+</div>
+</div>
+<script src="../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../sorter.js"></script>
+</body>
+</html>
