@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1543504277153" clover="3.2.0">
-  <project timestamp="1543504277154" name="All files">
+<coverage generated="1543687794919" clover="3.2.0">
+  <project timestamp="1543687794919" name="All files">
     <metrics statements="590" coveredstatements="380" conditionals="168" coveredconditionals="73" methods="149" coveredmethods="52" elements="907" coveredelements="505" complexity="0" loc="590" ncloc="590" packages="6" files="12" classes="12">
       <package name="equesteo-app">
         <metrics statements="236" coveredstatements="164" conditionals="57" coveredconditionals="12" methods="38" coveredmethods="17"/>
