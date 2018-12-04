@@ -1,3 +1,4 @@
+import { fromJS } from 'immutable'
 import memoizeOne from 'memoize-one';
 import { Navigation } from 'react-native-navigation'
 import React, { PureComponent } from 'react'
@@ -94,7 +95,6 @@ class RideContainer extends PureComponent {
     }
     this.closeDeleteModal = this.closeDeleteModal.bind(this)
     this.deleteRide = this.deleteRide.bind(this)
-    this.horses = this.horses.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
     this.rideComments = this.rideComments.bind(this)
     this.showFullscreenMap = this.showFullscreenMap.bind(this)
@@ -187,9 +187,7 @@ class RideContainer extends PureComponent {
     Navigation.pop(this.props.componentId)
   }
 
-  horses () {
-    return this.props.horses.toList()
-  }
+
 
   showPhotoLightbox (sources) {
     Navigation.push(this.props.componentId, {
@@ -221,16 +219,6 @@ class RideContainer extends PureComponent {
     })
   }
 
-  rideHorseOwnerID () {
-    let rideHorseOwnerID
-    this.props.horseUsers.forEach(hu => {
-      if (hu.get('owner') === true && hu.get('horseID') === this.props.ride.get('horseID')) {
-        rideHorseOwnerID = hu.get('userID')
-      }
-    })
-    return rideHorseOwnerID
-  }
-
   thisRidesPhotos (ridePhotos) {
     return ridePhotos.filter((rp) => {
       return rp.get('rideID') === this.props.ride.get('_id') && rp.get('deleted') !== true
@@ -245,22 +233,54 @@ class RideContainer extends PureComponent {
     ).toList()
   }
 
+  rideHorses () {
+    // remove this when you've created rideHorses for all old rides and everyone's on > 43
+    let rideHorses = this.props.rideHorses.filter(rh => {
+      return rh.get('rideID') === this.props.ride.get('_id') && rh.get('deleted') !== true
+    })
+    if (this.props.ride.get('horseID') && !rideHorses.count()) {
+      rideHorses = fromJS({
+        'a fake ID': {
+        _id: 'a fake ID',
+        rideID: this.props.ride.get('_id'),
+        horseID: this.props.ride.get('horseID'),
+        rideHorseType: 'rider',
+        type: 'rideHorse',
+        timestamp: unixTimeNow(),
+        userID: this.props.userID,
+      }})
+    }
+    // remove this when you've created rideHorses for all old rides and everyone's on > 43
+
+    logDebug(rideHorses.toJSON())
+    return rideHorses
+  }
+
+  horseOwnerIDs () {
+    return this.props.horseUsers.filter(hu => {
+      return hu.get('owner') === true
+    }).mapEntries(([horseUserID, horseUser]) => {
+      return [horseUser.get('horseID'), horseUser.get('userID')]
+    })
+  }
+
   render() {
     logRender('RideContainer')
     return (
       <Ride
         closeDeleteModal={this.closeDeleteModal}
         deleteRide={this.deleteRide}
-        horses={this.horses()}
+        horses={this.props.horses}
         horsePhotos={this.props.horsePhotos}
+        horseOwnerIDs={this.horseOwnerIDs()} //memoize this
         modalOpen={this.state.modalOpen}
         newComment={this.state.newComment}
         ride={this.props.ride}
-        rideHorseOwnerID={this.rideHorseOwnerID()}
         rideUser={this.props.rideUser}
         rideComments={this.memoRideComments(this.props.rideComments)}
         rideCoordinates={this.props.rideCoordinates}
         rideElevations={this.props.rideElevations}
+        rideHorses={this.rideHorses()} // memoize this
         ridePhotos={this.memoThisRidesPhotos(this.props.ridePhotos)}
         showFullscreenMap={this.showFullscreenMap}
         showHorseProfile={this.showHorseProfile}
@@ -294,6 +314,7 @@ function mapStateToProps (state, passedProps) {
     rideComments: pouchState.get('rideComments'),
     rideCoordinates,
     rideElevations,
+    rideHorses: pouchState.get('rideHorses'),
     ridePhotos: pouchState.get('ridePhotos'),
     rideUser: pouchState.getIn(['users', ride.get('userID')]),
     skipToComments: passedProps.skipToComments,

@@ -6,15 +6,16 @@ import React from 'react'
 import { connect } from 'react-redux';
 import {
   clearPausedLocations,
-  stashRidePhoto,
   deleteUnpersistedRide,
   discardCurrentRide,
   mergeStashedLocations,
   removeStashedRidePhoto,
   rideCoordinatesLoaded,
+  rideHorseUpdated,
   rideUpdated,
   setPopShowRide,
   stopStashNewLocations,
+  stashRidePhoto,
   updateNewRideCoords,
 } from '../actions/standard'
 import {
@@ -60,6 +61,8 @@ class UpdateRideContainer extends BackgroundComponent {
       cachedRide: null,
       deletedPhotoIDs: [],
       showPhotoMenu: false,
+      showSelectHorseMenu: false,
+      selectedHorseID: null,
       selectedPhotoID: null,
       trimValues: null,
     }
@@ -69,13 +72,17 @@ class UpdateRideContainer extends BackgroundComponent {
     this.changePublic = this.changePublic.bind(this)
     this.changeRideName = this.changeRideName.bind(this)
     this.changeRideNotes = this.changeRideNotes.bind(this)
-    this.clearPhotoMenu = this.clearPhotoMenu.bind(this)
+    this.clearMenus = this.clearMenus.bind(this)
     this.createPhoto = this.createPhoto.bind(this)
     this.horses = this.horses.bind(this)
     this.markPhotoDeleted = this.markPhotoDeleted.bind(this)
     this.openPhotoMenu = this.openPhotoMenu.bind(this)
+    this.openSelectHorseMenu = this.openSelectHorseMenu.bind(this)
+    this.rideHorses = this.rideHorses.bind(this)
+    this.selectHorse = this.selectHorse.bind(this)
     this.stashedRidePhotoKey = this.stashedRidePhotoKey.bind(this)
     this.trimRide = this.trimRide.bind(this)
+    this.unselectHorse = this.unselectHorse.bind(this)
     this.updateLocalRideCoords = this.updateLocalRideCoords.bind(this)
 
     this.memoizedHorses = memoizeOne(this.horses)
@@ -152,7 +159,8 @@ class UpdateRideContainer extends BackgroundComponent {
           true,
           this.props.stashedRidePhotos,
           this.state.deletedPhotoIDs,
-          this.state.trimValues
+          this.state.trimValues,
+          this.rideHorses(),
         ))
         this.props.dispatch(setPopShowRide(this.props.ride.get('_id'), true))
         Navigation.popToRoot(this.props.componentId).then(() => {
@@ -182,6 +190,7 @@ class UpdateRideContainer extends BackgroundComponent {
           this.props.stashedRidePhotos,
           this.state.deletedPhotoIDs,
           this.state.trimValues,
+          this.rideHorses(),
         ))
         Navigation.pop(this.props.componentId)
       } else if (buttonId === 'back' || buttonId === 'discard') {
@@ -203,7 +212,7 @@ class UpdateRideContainer extends BackgroundComponent {
       const justCoords = updatedCoords.get('rideCoordinates')
       const firstCoord = parseRideCoordinate(justCoords.get(0))
       const lastCoord = parseRideCoordinate(justCoords.get(justCoords.count() - 1))
-      // @TODO: fuck. if you pause the ride then remove the portion where it was paused, it will still reduce the
+      // @TODO: if you pause the ride then remove the portion where it was paused, it will still reduce the
       // @TODO: ride time by that number. someday when you have time, you'll need to record the timestamp of all
       // @TODO: pauses and factor that into trimming. urgh.
 
@@ -246,11 +255,7 @@ class UpdateRideContainer extends BackgroundComponent {
     }
   }
 
-  openPhotoMenu (coverPhotoID) {
-    this.setState({
-      showPhotoMenu: true,
-      selectedPhotoID: coverPhotoID
-    })
+  removeTopbarButtons () {
     Navigation.mergeOptions(this.props.componentId, {
       topBar: {
         rightButtons: [],
@@ -259,12 +264,30 @@ class UpdateRideContainer extends BackgroundComponent {
     })
   }
 
-  clearPhotoMenu () {
+  openPhotoMenu (coverPhotoID) {
+    this.setState({
+      showPhotoMenu: true,
+      selectedPhotoID: coverPhotoID
+    })
+    this.removeTopbarButtons()
+  }
+
+  clearMenus () {
     this.setState({
       showPhotoMenu: false,
-      selectedPhotoID: null
+      selectedPhotoID: null,
+      showSelectHorseMenu: false,
+      selectedHorseID: null
     })
     this.setTopbarButtons(this.props)
+  }
+
+  openSelectHorseMenu (horseID) {
+    this.setState({
+      showSelectHorseMenu: true,
+      selectedHorseID: horseID
+    })
+    this.removeTopbarButtons()
   }
 
   markPhotoDeleted (photoID) {
@@ -292,7 +315,7 @@ class UpdateRideContainer extends BackgroundComponent {
         deletedPhotoIDs: [...this.state.deletedPhotoIDs, photoID],
       })
     }
-
+    this.clearMenus()
   }
 
   changePublic () {
@@ -323,6 +346,7 @@ class UpdateRideContainer extends BackgroundComponent {
     this.props.dispatch(rideUpdated(
       this.props.ride.set('coverPhotoID', coverPhotoID)
     ))
+    this.clearMenus()
   }
 
   stashedRidePhotoKey () {
@@ -351,6 +375,12 @@ class UpdateRideContainer extends BackgroundComponent {
     })
   }
 
+  rideHorses () {
+    return this.props.rideHorses.filter(rh => {
+      return rh.get('rideID') === this.props.rideID
+    })
+  }
+
   allPhotos (ridePhotos, stashedRidePhotos, deletedPhotoIDs) {
     const existing = ridePhotos.filter((rp) => {
       return rp.get('rideID') === this.props.ride.get('_id')
@@ -370,6 +400,50 @@ class UpdateRideContainer extends BackgroundComponent {
     })
   }
 
+  selectHorse (selectionType, horseID) {
+    let foundRideHorse
+    this.rideHorses().valueSeq().forEach((rideHorse) => {
+      if (rideHorse.get('horseID') === horseID
+        && rideHorse.get('rideID') === this.props.ride.get('_id')
+        && rideHorse.get('rideHorseType') === selectionType) {
+        foundRideHorse = rideHorse
+      }
+    })
+    if (!foundRideHorse) {
+      foundRideHorse = Map({
+        _id: `${this.props.ride.get('_id')}_${horseID}_${selectionType}`,
+        rideID: this.props.ride.get('_id'),
+        horseID: horseID,
+        rideHorseType: selectionType,
+        type: 'rideHorse',
+        timestamp: unixTimeNow(),
+        userID: this.props.userID,
+      })
+    }
+    if (selectionType === 'rider') {
+      // remove this after everyone on version > 43
+      this.props.dispatch(rideUpdated(this.props.ride.set('horseID', horseID)))
+    }
+    foundRideHorse = foundRideHorse.set('deleted', false)
+    this.props.dispatch(rideHorseUpdated(foundRideHorse))
+    this.clearMenus()
+  }
+
+  unselectHorse (horseID) {
+    this.rideHorses().valueSeq().forEach((rideHorse) => {
+      if (rideHorse.get('horseID') === horseID) {
+        this.props.dispatch(rideHorseUpdated(
+          rideHorse.set('deleted', true),
+        ))
+      }
+    })
+    // when everyone is on version > 43 we can remove horseID from the ride
+    // record then we can get rid of this
+    if (this.props.ride.get('horseID') === horseID) {
+      this.props.dispatch(rideUpdated(this.props.ride.set('horseID', null)))
+    }
+  }
+
   render() {
     logRender('rendering UpdateRideContainer')
     return (
@@ -379,23 +453,29 @@ class UpdateRideContainer extends BackgroundComponent {
         changeRideNotes={this.changeRideNotes}
         changeHorseID={this.changeHorseID}
         changePublic={this.changePublic}
-        clearPhotoMenu={this.clearPhotoMenu}
+        clearMenus={this.clearMenus}
         createPhoto={this.createPhoto}
         horses={this.memoizedHorses()}
         horsePhotos={this.props.horsePhotos}
         markPhotoDeleted={this.markPhotoDeleted}
         rideCoordinates={this.props.rideCoordinates}
         openPhotoMenu={this.openPhotoMenu}
+        openSelectHorseMenu={this.openSelectHorseMenu}
         ride={this.props.ride}
         ridePhotos={this.memoizedAllPhotos(
           this.props.ridePhotos,
           this.props.stashedRidePhotos,
           this.state.deletedPhotoIDs)
         }
+        rideHorses={this.rideHorses()} // memoize this
         selectedPhotoID={this.state.selectedPhotoID}
+        selectedHorseID={this.state.selectedHorseID}
+        selectHorse={this.selectHorse}
         showPhotoMenu={this.state.showPhotoMenu}
+        showSelectHorseMenu={this.state.showSelectHorseMenu}
         trimRide={this.trimRide}
         trimValues={this.state.trimValues}
+        unselectHorse={this.unselectHorse}
       />
     )
   }
@@ -410,14 +490,15 @@ function mapStateToProps (state, passedProps) {
 
   return {
     activeComponent: localState.get('activeComponent'),
-    stashedRidePhotos: localState.getIn(['ridePhotoStash', ridePhotoStashIndex]) || Map(),
     horses: pouchState.get('horses'),
     horsePhotos: pouchState.get('horsePhotos'),
     horseUsers: pouchState.get('horseUsers'),
     newRide,
     ride: state.getIn(['pouchRecords', 'rides', passedProps.rideID]),
     rideCoordinates: pouchState.get('selectedRideCoordinates'),
+    rideHorses: pouchState.get('rideHorses'),
     ridePhotos: pouchState.get('ridePhotos'),
+    stashedRidePhotos: localState.getIn(['ridePhotoStash', ridePhotoStashIndex]) || Map(),
     userID,
     user: pouchState.getIn(['users', localState.get('userID')]),
   }

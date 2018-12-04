@@ -183,7 +183,7 @@ class RecorderContainer extends PureComponent {
       this.props.currentRide,
       this.props.currentRideElevations,
       this.props.currentRideCoordinates,
-      this.props.currentRidePhotos
+      this.props.currentRidePhotos,
     ))
     Navigation.push(this.props.componentId, {
       component: {
@@ -242,6 +242,7 @@ function mapStateToProps (state) {
     currentRideElevations: currentRideState.get('currentRideElevations'),
     currentRideCoordinates: currentRideState.get('currentRideCoordinates'),
     currentRidePhotos: localState.getIn(['ridePhotoStash', 'currentRide']) || Map(),
+    horseUsers: pouchState.get('horseUsers'),
     lastElevation: currentRideState.get('lastElevation'),
     lastLocation: currentRideState.get('lastLocation'),
     refiningLocation: currentRideState.get('refiningLocation'),

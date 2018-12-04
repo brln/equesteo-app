@@ -79,6 +79,7 @@ export default class Training extends PureComponent {
            mondayString={item}
            pickType={this.pickType}
            rides={rideWeeks[item]}
+           rideHorses={this.props.rideHorses}
            showRide={this.props.showRide}
            types={this.TYPES}
            userID={this.props.userID}
@@ -113,7 +114,7 @@ export default class Training extends PureComponent {
       }
       return a
     }, [])
-    items.push({ label: "Rides With No Horse", value: 'NO HORSE' })
+    items.push({ label: "Rides With No Horse", value: this.TYPES.NO_HORSE })
     return (
       <View style={{flex: 1, borderWidth: 1, borderColor: lightGrey}}>
         <RNPickerSelect

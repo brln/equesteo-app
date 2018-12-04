@@ -20,18 +20,22 @@ export default class SyncingStatus extends PureComponent {
   }
 
   render() {
-    if (this.props.feedMessage.get('timeout') && !this.feedTimeout) {
-      this.timeout()
+    if (this.props.visible) {
+      if (this.props.feedMessage.get('timeout') && !this.feedTimeout) {
+        this.timeout()
+      }
+      return (
+        <View style={{width}}>
+          <Text
+            style={[styles.syncing, {backgroundColor: this.props.feedMessage.get('color')}]}
+          >
+            {this.props.feedMessage.get('message')}
+          </Text>
+        </View>
+      )
+    } else {
+      return null
     }
-    return (
-      <View style={{width}}>
-        <Text
-          style={[styles.syncing, {backgroundColor: this.props.feedMessage.get('color')}]}
-        >
-          {this.props.feedMessage.get('message')}
-        </Text>
-      </View>
-    )
   }
 }
 

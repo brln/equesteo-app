@@ -1,4 +1,4 @@
-import { Map } from 'immutable'
+import { List, Map } from 'immutable'
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
 import { Navigation } from 'react-native-navigation'
@@ -35,6 +35,7 @@ class TrainingContainer extends PureComponent {
     super(props)
     this.allRidersButYou = this.allRidersButYou.bind(this)
     this.allRidesOnYourHorses = this.allRidesOnYourHorses.bind(this)
+    this.rideHorses = this.rideHorses.bind(this)
     this.showRide = this.showRide.bind(this)
     this.yourHorses = this.yourHorses.bind(this)
   }
@@ -58,9 +59,25 @@ class TrainingContainer extends PureComponent {
 
   allRidesOnYourHorses () {
     const yourHorseIDs = this.yourHorses().valueSeq().map(h => h.get('_id'))
+    const horseIDsByRideID = this.props.rideHorses.reduce((accum, rh) => {
+      if (!accum.get(rh.get('rideID'))) {
+        accum = accum.set(rh.get('rideID'), List())
+      }
+      const horseIDs = accum.get(rh.get('rideID')).push(rh.get('horseID'))
+      return accum.set(rh.get('rideID'), horseIDs)
+    }, Map())
     return this.props.rides.valueSeq().filter((ride) => {
+      const thisRidesHorseIDs = horseIDsByRideID.get(ride.get('_id'))
+      let includesHorse = yourHorseIDs.indexOf(ride.get('horseID')) >= 0 // so we show old rides with horseID
+      if (thisRidesHorseIDs && thisRidesHorseIDs.count() > 0) {
+        thisRidesHorseIDs.map(horseID => {
+          if (yourHorseIDs.indexOf(horseID) >= 0) {
+            includesHorse = true
+          }
+        })
+      }
       return (
-        yourHorseIDs.indexOf(ride.get('horseID')) >= 0
+        includesHorse
           || (ride.get('userID') === this.props.userID && !ride.get('horseID'))
         ) && ride.get('deleted') !== true
     })
@@ -80,6 +97,11 @@ class TrainingContainer extends PureComponent {
     return peopleWhoRideYourHorses
   }
 
+  rideHorses () {
+    return this.props.rideHorses.filter(rh => {
+      return rh.get('deleted') !== true
+    })
+  }
 
   render() {
     logRender('TrainingContainer')
@@ -87,6 +109,7 @@ class TrainingContainer extends PureComponent {
       <Training
         horses={this.props.horses}
         horseUsers={this.props.horseUsers}
+        rideHorses={this.rideHorses()}
         rides={this.allRidesOnYourHorses()}
         riders={this.allRidersButYou()}
         showRide={this.showRide}
@@ -105,6 +128,7 @@ function mapStateToProps (state, passedProps) {
     horses: pouchState.get('horses'),
     horseUsers: pouchState.get('horseUsers'),
     rides: pouchState.get('rides'),
+    rideHorses: pouchState.get('rideHorses'),
     user: pouchState.getIn(['users', userID]),
     users: pouchState.get('users'),
     userID,

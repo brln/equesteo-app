@@ -31,6 +31,7 @@ export default class Feed extends PureComponent {
         rides={rides}
         rideCarrots={this.props.rideCarrots}
         rideComments={this.props.rideComments}
+        rideHorses={this.props.rideHorses}
         ridePhotos={this.props.ridePhotos}
         showComments={this.props.showComments}
         showHorseProfile={this.props.showHorseProfile}
@@ -46,16 +47,6 @@ export default class Feed extends PureComponent {
   }
 
   render() {
-    let statusBar
-    if (this.props.feedMessage) {
-      statusBar = (
-        <SyncingStatus
-          clearFeedMessage={this.props.clearFeedMessage}
-          feedMessage={this.props.feedMessage}
-        />
-      )
-    }
-
     return (
       <Container>
         <Tabs
@@ -69,7 +60,11 @@ export default class Feed extends PureComponent {
             heading="Following"
             activeTextStyle={{color: 'white'}}
           >
-            { statusBar }
+            <SyncingStatus
+              clearFeedMessage={this.props.clearFeedMessage}
+              feedMessage={this.props.feedMessage}
+              visible={this.props.feedMessage}
+            />
             { this.renderRideList(false, this.props.followingRides) }
           </Tab>
           <Tab
@@ -78,7 +73,11 @@ export default class Feed extends PureComponent {
             activeTextStyle={{color: 'white'}}
             heading="You"
           >
-            { statusBar }
+            <SyncingStatus
+              clearFeedMessage={this.props.clearFeedMessage}
+              feedMessage={this.props.feedMessage}
+              visible={this.props.feedMessage}
+            />
             { this.renderRideList(true, this.props.yourRides) }
           </Tab>
         </Tabs>

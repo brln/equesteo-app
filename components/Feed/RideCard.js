@@ -130,21 +130,19 @@ export default class RideCard extends PureComponent {
   }
 
   horseSection () {
+    let section = null
     if (this.props.horse) {
-      let section = null
-      if (this.props.ride.get('horseID')) {
-        section = (
-          <TouchableOpacity
-            style={{flex: 1, alignItems: 'center'}}
-            onPress={this.showHorseProfile}
-          >
-            <Text style={{color: darkGrey, fontSize: 12, textAlign: 'center'}}>{this.props.horse.get('name')}</Text>
-            { this.horseAvatar() }
-          </TouchableOpacity>
-        )
-      }
-      return section
+      section = (
+        <TouchableOpacity
+          style={{flex: 1, alignItems: 'center'}}
+          onPress={this.showHorseProfile}
+        >
+          <Text style={{color: darkGrey, fontSize: 12, textAlign: 'center'}}>{this.props.horse.get('name')}</Text>
+          { this.horseAvatar() }
+        </TouchableOpacity>
+      )
     }
+    return section
   }
 
   avgSpeed () {

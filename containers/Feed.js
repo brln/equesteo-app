@@ -74,6 +74,7 @@ class FeedContainer extends BackgroundComponent {
     this.memoizeHorseOwnerIDs = memoizeOne(this.horseOwnerIDs)
     this.memoizeFilteredHorses = memoizeOne(this.filteredHorses)
     this.memoizeFilteredHorseUsers = memoizeOne(this.filteredHorseUsers)
+    this.memoizeRideHorses = memoizeOne(this.rideHorses.bind(this))
     this.memoizeYourRides = memoizeOne(this.yourRides)
 
     Navigation.events().bindComponent(this)
@@ -241,6 +242,12 @@ class FeedContainer extends BackgroundComponent {
     })
   }
 
+  rideHorses (rideHorses) {
+    return rideHorses.filter(rh => {
+      return rh.get('deleted') !== true
+    })
+  }
+
   render() {
     logRender('feedContainer')
     return (
@@ -253,6 +260,7 @@ class FeedContainer extends BackgroundComponent {
         horsePhotos={this.props.horsePhotos}
         horseOwnerIDs={this.memoizeHorseOwnerIDs(this.props.horseUsers)}
         horseUsers={this.memoizeFilteredHorseUsers(this.props.follows, this.props.userID, this.props.horseUsers)}
+        rideHorses={this.memoizeRideHorses(this.props.rideHorses)}
         refreshing={this.state.refreshing}
         rideCarrots={this.props.rideCarrots.toList()}
         rideComments={this.props.rideComments.toList()}
@@ -292,6 +300,7 @@ function mapStateToProps (state) {
     rides: pouchState.get('rides'),
     rideCarrots: pouchState.get('rideCarrots'),
     rideComments: pouchState.get('rideComments'),
+    rideHorses: pouchState.get('rideHorses'),
     ridePhotos: pouchState.get('ridePhotos'),
     users: pouchState.get('users'),
     userID,

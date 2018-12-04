@@ -44,7 +44,26 @@ export default class RideList extends PureComponent {
   }
 
   getHorse (ride) {
-    return this.props.horses.get(ride.get('horseID'))
+    const rideHorses = this.props.rideHorses.filter(rh => {
+      return rh.get('rideID') === ride.get('_id')
+    })
+    if (rideHorses.count()) {
+      let feedHorse = null
+      const sorted = rideHorses.valueSeq().sort((a, b) => a.timestamp - b.timestamp)
+      sorted.forEach(rh => {
+        if (!feedHorse && rh.get('rideHorseType') === 'rider') {
+          feedHorse = this.props.horses.get(rh.get('horseID'))
+        }
+      })
+      if (!feedHorse && sorted.count() > 0) {
+        feedHorse = this.props.horses.get(sorted.get(0).get('horseID'))
+      }
+      return feedHorse
+    } else if (ride.get('horseID')) {
+      // remove this when you've created rideHorses for all old rides and everyone's on > 43
+
+      return this.props.horses.get(ride.get('horseID'))
+    }
   }
 
   _renderCard ({item}) {
@@ -66,12 +85,12 @@ export default class RideList extends PureComponent {
           rideCarrots={this.props.rideCarrots.filter(childFilter(item.childData))}
           rideComments={this.props.rideComments.filter(childFilter(item.childData))}
           ridePhotos={this.props.ridePhotos.filter(childFilter(item.childData))}
+          rideUser={item.itemUser}
           showComments={this.props.showComments}
           showHorseProfile={this.props.showHorseProfile}
           showProfile={this.props.showProfile}
           showRide={this.props.showRide}
           toggleCarrot={this.props.toggleCarrot}
-          rideUser={item.itemUser}
           userProfilePhotoURL={this.getUserProfilePhotoURL(item.itemUser)}
           userID={this.props.userID}
           users={this.props.users}

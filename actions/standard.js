@@ -46,6 +46,7 @@ import {
   RIDE_COMMENT_UPDATED,
   RIDE_COORDINATES_LOADED,
   RIDE_ELEVATIONS_UPDATED,
+  RIDE_HORSE_UPDATED,
   RIDE_PHOTO_UPDATED,
   RIDE_UPDATED,
   SAVE_USER_ID,
@@ -151,7 +152,7 @@ export function createRide (
   currentRide,
   currentRideElevations,
   currentRideCoordinates,
-  currentRidePhotos
+  currentRidePhotos,
 ) {
   return {
     type: CREATE_RIDE,
@@ -376,6 +377,13 @@ export function rideCommentUpdated (rideComment) {
   return {
     type: RIDE_COMMENT_UPDATED,
     rideComment
+  }
+}
+
+export function rideHorseUpdated (rideHorse) {
+  return {
+    type: RIDE_HORSE_UPDATED,
+    rideHorse
   }
 }
 

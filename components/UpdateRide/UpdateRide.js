@@ -1,6 +1,7 @@
 import { List } from 'immutable'
 import React, { PureComponent } from 'react';
 import {
+  BackHandler,
   Dimensions,
   ScrollView,
   StyleSheet,
@@ -22,6 +23,7 @@ import FabImage from '../FabImage'
 import HorseSelector from './HorseSelector'
 import PhotosByTimestamp from '../PhotosByTimestamp'
 import PhotoMenu from '../PhotoMenu'
+import SelectHorseMenu from './SelectHorseMenu'
 import ViewingMap from '../Ride/ViewingMap'
 
 const { width } = Dimensions.get('window')
@@ -37,17 +39,29 @@ export default class UpdateRide extends PureComponent {
     this.changeRideNotes = this.changeRideNotes.bind(this)
     this.createPhoto = this.createPhoto.bind(this)
     this.deletePhoto = this.deletePhoto.bind(this)
+    this.handleBackPress = this.handleBackPress.bind(this)
     this.startTrim = this.startTrim.bind(this)
+  }
+
+  componentDidMount() {
+    BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
+  }
+
+  componentWillUnmount() {
+    BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
+  }
+
+  handleBackPress () {
+    this.props.clearMenus()
+    return true
   }
 
   deletePhoto () {
     this.props.markPhotoDeleted(this.props.selectedPhotoID)
-    this.props.clearPhotoMenu()
   }
 
   changeCoverPhoto () {
     this.props.changeCoverPhoto(this.props.selectedPhotoID)
-    this.props.clearPhotoMenu()
   }
 
   changeRideName (name) {
@@ -150,23 +164,6 @@ export default class UpdateRide extends PureComponent {
               { trimmer }
             </Card>
 
-            {/*<Card>*/}
-              {/*<CardItem header style={{padding: 5}}>*/}
-                {/*<View style={{paddingLeft: 5}}>*/}
-                  {/*<Text style={{color: darkBrand}}>Trim Ride</Text>*/}
-                {/*</View>*/}
-              {/*</CardItem>*/}
-              {/*<CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20}}>*/}
-                  {/*<MultiSlider*/}
-                    {/*sliderLength={width - 40}*/}
-                    {/*values={[0, numCoords]}*/}
-                    {/*min={0}*/}
-                    {/*max={numCoords}*/}
-                    {/*onValuesChange={this.props.trimRide}*/}
-                  {/*/>*/}
-              {/*</CardItem>*/}
-            {/*</Card>*/}
-
             <Card>
               <CardItem header style={{padding: 5}}>
                 <View style={{paddingLeft: 5}}>
@@ -220,9 +217,12 @@ export default class UpdateRide extends PureComponent {
               <View style={{marginLeft: 20, marginBottom: 30}}>
                 <HorseSelector
                   changeHorseID={this.props.changeHorseID}
-                  horseID={this.props.ride.get('horseID')}
+                  horseID={this.props.ride.get('horseID')} // remove when everyone version > 43
                   horses={this.props.horses}
                   horsePhotos={this.props.horsePhotos}
+                  openSelectHorseMenu={this.props.openSelectHorseMenu}
+                  rideHorses={this.props.rideHorses}
+                  unselectHorse={this.props.unselectHorse}
                 />
               </View>
             </Card>
@@ -277,9 +277,13 @@ export default class UpdateRide extends PureComponent {
         <PhotoMenu
           changeProfilePhotoID={this.changeCoverPhoto}
           deletePhoto={this.deletePhoto}
-          clearPhotoMenu={this.props.clearPhotoMenu}
           selectedPhotoID={this.props.selectedPhotoID}
           visible={this.props.showPhotoMenu}
+        />
+        <SelectHorseMenu
+          horseID={this.props.selectedHorseID}
+          selectHorse={this.props.selectHorse}
+          visible={this.props.showSelectHorseMenu}
         />
       </View>
     )

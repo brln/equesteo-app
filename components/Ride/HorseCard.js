@@ -1,12 +1,18 @@
+
 import React, { PureComponent } from 'react'
+import { StyleSheet, View } from 'react-native'
 import {
   Card,
-  CardItem,
 } from 'native-base'
 
-import Stat from '../Stat'
+import RideHorse from './RideHorse'
 
 export default class HorseCard extends PureComponent {
+  constructor (props) {
+    super(props)
+    this.allRideHorses = this.allRideHorses.bind(this)
+  }
+
   horseProfileURL (horse) {
     if (horse) {
       const profilePhotoID = horse.get('profilePhotoID')
@@ -28,29 +34,32 @@ export default class HorseCard extends PureComponent {
     return source
   }
 
-  whichHorse () {
-    let found = null
-    for (let horse of this.props.horses) {
-      if (horse.get('_id') === this.props.ride.get('horseID')) {
-        found = horse
-        break
-      }
-    }
-    return found
+  allRideHorses () {
+    const all = []
+    this.props.rideHorses.valueSeq().sort((a, b) => a.timestamp - b.timestamp).forEach(rideHorse => {
+      const horse = this.props.horses.get(rideHorse.get('horseID'))
+      const ownerID = this.props.horseOwnerIDs.get(rideHorse.get('horseID'))
+      all.push(
+         <RideHorse
+          key={rideHorse.get('_id')}
+          imgSrc={this.horseAvatar(horse)}
+          horse={horse}
+          ownerID={ownerID}
+          rideHorse={rideHorse}
+          showHorseProfile={this.props.showHorseProfile}
+        />
+      )
+    })
+    return all
   }
 
   render () {
-    if (this.props.ride.get('horseID')) {
-      const horse = this.whichHorse()
+    if (this.props.ride.get('horseID') || this.props.rideHorses.keySeq().count() > 0) { // remove when everyone > version 43
       return (
         <Card style={{flex: 1}}>
-          <CardItem cardBody style={{ flex: 1, paddingBottom: 20, paddingTop: 20}}>
-            <Stat
-              imgSrc={this.horseAvatar(horse)}
-              text={'Ridden'}
-              value={ horse ? horse.get('name') : 'none'}
-            />
-          </CardItem>
+          <View style={styles.main}>
+            { this.allRideHorses() }
+          </View>
         </Card>
       )
     } else {
@@ -58,3 +67,11 @@ export default class HorseCard extends PureComponent {
     }
   }
 }
+
+const styles = StyleSheet.create({
+  main: {
+    flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+});

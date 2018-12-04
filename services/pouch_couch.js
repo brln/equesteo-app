@@ -213,6 +213,7 @@ export default class PouchCouch {
       rideComments: rideDocs.filter(r => r.type === 'comment'),
       rideElevations: rideDocs.filter(r => r.type === 'rideElevations'),
       ridePhotos: rideDocs.filter(r => r.type === 'ridePhoto'),
+      rideHorses: rideDocs.filter(r => r.type === 'rideHorse'), // this getting silly, only iterate once
       rides: rideDocs.filter(r => r.type === 'ride'),
       users: userDocs.filter(u => u.type === 'user'),
       userPhotos: userDocs.filter(u => u.type === 'userPhoto')

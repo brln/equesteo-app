@@ -17,17 +17,25 @@ const { width } = Dimensions.get('window')
 export default class HorseSelector extends PureComponent {
   constructor (props) {
     super(props)
+    this.isChosen = this.isChosen.bind(this)
     this.thumbnail = this.thumbnail.bind(this)
-    this.changeHorseID = this.changeHorseID.bind(this)
+    this.openSelectHorseMenu = this.openSelectHorseMenu.bind(this)
+    this.unselectHorse = this.unselectHorse.bind(this)
   }
 
-  changeHorseID(horseID) {
+  openSelectHorseMenu(horseID) {
     return () => {
-      this.props.changeHorseID(horseID)
+      this.props.openSelectHorseMenu(horseID)
     }
   }
 
-  thumbnail (horse, style) {
+  unselectHorse(horseID) {
+    return () => {
+      this.props.unselectHorse(horseID)
+    }
+  }
+
+  thumbnail (horse, style, onPress) {
     let horseThumb = (
       <BuildImage
         source={require('../../img/emptyHorseBlack.png')}
@@ -49,71 +57,42 @@ export default class HorseSelector extends PureComponent {
       <TouchableOpacity
         key={horse.get('_id')}
         style={[style, {marginRight: 5}]}
-        onPress={this.changeHorseID(horse.get('_id'))}
+        onPress={onPress}
       >
         { horseThumb }
-        <View style={{
-          position: 'absolute',
-          alignItems: 'center',
-          justifyContent: 'center',
-          left: 5,
-          right: 5,
-          top: 5,
-          bottom: 5,
-          padding: 5
-        }}>
-          <Text style={{
-            textAlign: 'center',
-            color: 'white',
-            textShadowColor: 'black',
-            textShadowRadius: 5,
-            textShadowOffset: {
-              width: -1,
-              height: 1
-            }}}>{horse.get('name')}</Text>
+        <View style={styles.horseCard}>
+          <Text style={styles.horseName}>{horse.get('name')}</Text>
         </View>
       </TouchableOpacity>
     )
   }
 
+  isChosen (horse) {
+    let chosen = false
+    if (this.props.horseID === horse.get('_id')) {
+      chosen = true
+    } else {
+      this.props.rideHorses.valueSeq().forEach(rideHorse => {
+        if (rideHorse.get('deleted') !== true
+          && rideHorse.get('horseID') === horse.get('_id'))    {
+            chosen = true
+          }
+      })
+    }
+    return chosen
+  }
+
   render () {
     const thumbnails = this.props.horses.reduce((accum, h) => {
-      const style = h.get('_id') === this.props.horseID ? styles.chosenThumb : styles.thumbnail
-      accum.push(this.thumbnail(
-        h,
-        style,
-      ))
+      let style = styles.thumbnail
+      let onPress = this.openSelectHorseMenu(h.get('_id'))
+      if (this.isChosen(h)) {
+         style = styles.chosenThumb
+         onPress = this.unselectHorse(h.get('_id'))
+      }
+      accum.push(this.thumbnail(h, style, onPress))
       return accum
     }, [])
-    const noneStyle = this.props.horseID ? styles.thumbnail : [styles.thumbnail, styles.chosenThumb]
-    thumbnails.push(
-      <TouchableOpacity
-        key={null}
-        style={[noneStyle, {marginRight: 5}]}
-        onPress={this.changeHorseID(null)}
-      >
-        <View style={{
-          position: 'absolute',
-          alignItems: 'center',
-          justifyContent: 'center',
-          left: 5,
-          right: 5,
-          top: 5,
-          bottom: 5,
-          padding: 5
-        }}>
-          <Text style={{
-            textAlign: 'center',
-            color: 'white',
-            textShadowColor: 'black',
-            textShadowRadius: 5,
-            textShadowOffset: {
-              width: -2,
-              height: 2
-            }}}>None</Text>
-        </View>
-      </TouchableOpacity>
-    )
     return (
       <View style={styles.photoContainer}>
         {thumbnails}
@@ -135,5 +114,25 @@ const styles = StyleSheet.create({
   chosenThumb: {
     borderWidth: 5,
     borderColor: orange
+  },
+  horseName: {
+    textAlign: 'center',
+    color: 'white',
+    textShadowColor: 'black',
+    textShadowRadius: 5,
+    textShadowOffset: {
+      width: -1,
+      height: 1
+    }
+  },
+  horseCard: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    left: 5,
+    right: 5,
+    top: 5,
+    bottom: 5,
+    padding: 5
   }
 });

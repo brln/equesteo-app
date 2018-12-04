@@ -88,7 +88,10 @@ export default function LocalStateReducer(state=initialState, action) {
     case DEQUEUE_PHOTO:
       return state.deleteIn(['photoQueue', action.photoID])
     case DISCARD_CURRENT_RIDE:
-      return state.setIn(['ridePhotoStash', 'currentRidePhotoStash'], Map())
+      return state.setIn(
+        ['ridePhotoStash', 'currentRidePhotoStash'],
+        Map()
+      )
     case DISMISS_ERROR:
       return state.set('error', null)
     case ENQUEUE_PHOTO:

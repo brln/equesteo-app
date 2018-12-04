@@ -13,24 +13,6 @@ import BuildImage from './BuildImage'
 const { width } = Dimensions.get('window')
 
 export default class PhotoMenu extends PureComponent {
-  constructor (props) {
-    super(props)
-    this.handleBackPress = this.handleBackPress.bind(this)
-  }
-
-  componentDidMount() {
-    BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
-  }
-
-  componentWillUnmount() {
-    BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
-  }
-
-  handleBackPress () {
-    this.props.clearPhotoMenu()
-    return true
-  }
-
   render() {
     if (this.props.visible) {
       return (

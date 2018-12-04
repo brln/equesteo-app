@@ -97,6 +97,3 @@ export default class HorseBarnCard extends PureComponent {
     )
   }
 }
-
-const styles = StyleSheet.create({
-});

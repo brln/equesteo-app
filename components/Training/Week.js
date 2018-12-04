@@ -93,11 +93,32 @@ export default class Week extends Component {
     this.showRide = this.showRide.bind(this)
     this.pickTypeDistance = this.pickTypeDistance.bind(this)
     this.pickTypeTime = this.pickTypeTime.bind(this)
+    this.rideShouldShow = this.rideShouldShow.bind(this)
   }
 
   showRide (ride) {
     return () => {
       this.props.showRide(ride)
+    }
+  }
+
+  rideShouldShow (ride, day) {
+    const happenedOnDay = moment(ride.get('startTime')).date() === day.date()
+    const riderShouldBeShowing = ride.get('userID') === this.props.chosenUserID
+      || this.props.chosenUserID === this.props.types.SHOW_ALL_RIDERS
+    if (happenedOnDay && riderShouldBeShowing) {
+      const showingNoHorse = this.props.chosenHorseID === this.props.types.NO_HORSE
+      const showingHorseIDs = this.props.rideHorses.valueSeq().filter(rh => {
+        return rh.get('rideID') === ride.get('_id')
+      }).map(rh => {
+        return rh.get('horseID')
+      }).toList()
+      return showingHorseIDs.contains(this.props.chosenHorseID)
+        || this.props.chosenHorseID === this.props.types.SHOW_ALL_HORSES
+        || !showingHorseIDs.count() && showingNoHorse && !ride.get('horseID') // remove this last part when > 43
+        || (!showingHorseIDs.count() && ride.get('horseID') && ride.get('horseID') === this.props.chosenHorseID) // remove when everyone > 43
+    } else {
+      return false
     }
   }
 
@@ -111,17 +132,7 @@ export default class Week extends Component {
       const eachDay = moment(start).add(i, 'days')
       const daysRides = []
       for (let ride of this.props.rides) {
-        const showingHorseID = ride.get('horseID') ? ride.get('horseID') : 'NO HORSE'
-        if (moment(ride.get('startTime')).date() === eachDay.date()
-          && (
-            showingHorseID === this.props.chosenHorseID
-            || this.props.chosenHorseID === this.props.types.SHOW_ALL_HORSES
-          ) && (
-            ride.get('userID') === this.props.chosenUserID
-            || this.props.chosenUserID === this.props.types.SHOW_ALL_RIDERS
-          )
-
-        ) {
+        if (this.rideShouldShow(ride, eachDay)) {
           daysRides.push(ride)
           totalDistance += ride.get('distance')
           totalTime += ride.get('elapsedTimeSecs')

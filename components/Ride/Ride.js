@@ -98,28 +98,32 @@ export default class Ride extends PureComponent {
     let totalDistance = 0
     let totalGain = 0
     let lastPoint = null
-    for (let rideCoord of rideCoordinates) {
-      const parsedCoord = parseRideCoordinate(rideCoord)
-      if (!lastPoint) {
-        lastPoint = parsedCoord
-      } else {
-        const newDistance = haversine(
-          lastPoint.get('latitude'),
-          lastPoint.get('longitude'),
-          parsedCoord.get('latitude'),
-          parsedCoord.get('longitude')
-        )
-        totalDistance += newDistance
-        const elevation = rideElevations.getIn([
-          toElevationKey(parsedCoord.get('latitude')),
-          toElevationKey(parsedCoord.get('longitude'))
-        ])
-        const lastElevation = rideElevations.getIn([
-          toElevationKey(lastPoint.get('latitude')),
-          toElevationKey(lastPoint.get('longitude'))
-        ])
-        totalGain = newElevationGain(newDistance, lastElevation, elevation, totalGain)
-        lastPoint = parsedCoord
+    if (rideElevations && rideElevations.get('elevation')) {
+      for (let rideCoord of rideCoordinates.get('rideCoordinates')) {
+        const parsedCoord = parseRideCoordinate(rideCoord)
+        if (!lastPoint) {
+          lastPoint = parsedCoord
+        } else {
+          const newDistance = haversine(
+            lastPoint.get('latitude'),
+            lastPoint.get('longitude'),
+            parsedCoord.get('latitude'),
+            parsedCoord.get('longitude')
+          )
+          totalDistance += newDistance
+          const elevation = rideElevations.getIn([
+            'elevations',
+            toElevationKey(parsedCoord.get('latitude')),
+            toElevationKey(parsedCoord.get('longitude'))
+          ])
+          const lastElevation = rideElevations.getIn([
+            'elevations',
+            toElevationKey(lastPoint.get('latitude')),
+            toElevationKey(lastPoint.get('longitude'))
+          ])
+          totalGain = newElevationGain(newDistance, lastElevation, elevation, totalGain)
+          lastPoint = parsedCoord
+        }
       }
     }
     return totalGain
@@ -169,7 +173,7 @@ export default class Ride extends PureComponent {
     const profilePhotoID = user.get('profilePhotoID')
     let profilePhotoURL = null
     if (profilePhotoID) {
-      profilePhotoURL = user.getIn(['photosByID', profilePhotoID, 'uri'])
+      profilePhotoURL = this.props.userPhotos.getIn([profilePhotoID, 'uri'])
     }
     return profilePhotoURL
   }
@@ -259,7 +263,7 @@ export default class Ride extends PureComponent {
   _renderRide () {
     logRender('Ride.Ride')
     let maxSpeed = this.memoizedMaxSpeed(this.props.rideCoordinates.get('rideCoordinates'))
-    let elevationGain = this.memoizedElevationGain(this.props.rideCoordinates.get('rideCoordinates'), this.props.rideElevations.get('elevations'))
+    let elevationGain = this.memoizedElevationGain(this.props.rideCoordinates, this.props.rideElevations)
     const height = (width * 9 / 16) + 54
     return (
       <ScrollView
@@ -309,8 +313,12 @@ export default class Ride extends PureComponent {
 
           <HorseCard
             horses={this.props.horses}
+            horseOwnerIDs={this.props.horseOwnerIDs}
             horsePhotos={this.props.horsePhotos}
             ride={this.props.ride}
+            rideHorses={this.props.rideHorses}
+            showHorseProfile={this.props.showHorseProfile}
+            userID={this.props.userID}
           />
 
           <View style={{flex: 1}}>
@@ -320,10 +328,8 @@ export default class Ride extends PureComponent {
                   <Stats
                     elevationGain={elevationGain}
                     horsePhotos={this.props.horsePhotos}
-                    horses={this.props.horses}
                     maxSpeed={maxSpeed}
                     ride={this.props.ride}
-                    rideHorseOwnerID={this.props.rideHorseOwnerID}
                     rideUser={this.props.rideUser}
                     showHorseProfile={this.props.showHorseProfile}
                     userID={this.props.userID}
