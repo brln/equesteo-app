@@ -435,12 +435,11 @@ export function persistHorseUpdate (horseID, horseUserID, deletedPhotoIDs, newPh
     const horseSaves = pouchCouch.saveHorse(theHorse.toJS()).then((doc) => {
       const theHorseAfterSave = getState().getIn(['pouchRecords', 'horses', horseID])
       dispatch(horseUpdated(theHorseAfterSave.set('_rev', doc.rev)))
-
       const theHorseUser = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
-      return pouchCouch.saveHorse(theHorseUser.toJS()).then((doc) => {
-        const theHorseUserAfterSave = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
-        dispatch(horseUserUpdated(theHorseUserAfterSave.set('_rev', doc.rev)))
-      })
+      return pouchCouch.saveHorse(theHorseUser.toJS())
+    }).then(({ rev }) => {
+      const theHorseUserAfterSave = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
+      dispatch(horseUserUpdated(theHorseUserAfterSave.set('_rev', rev)))
     })
 
     for (let photoID of deletedPhotoIDs) {
@@ -477,18 +476,17 @@ export function persistHorseUpdate (horseID, horseUserID, deletedPhotoIDs, newPh
       }
     }
 
-    const userID = getState().getIn(['pouchRecords', 'localState', 'userID'])
-    const horseUsers = getState().getIn(['pouchRecords', 'horseUsers']).filter(hu => hu.userID === userID)
+    const userID = getState().getIn(['localState', 'userID'])
+    const horseUsers = getState().getIn(['pouchRecords', 'horseUsers']).filter(hu => hu.get('userID') === userID)
     if (previousDefaultValue !== theHorseUser.get('rideDefault')
       && theHorseUser.get('rideDefault') === true) {
       horseUsers.valueSeq().forEach(horseUser => {
         if (horseUser.get('_id') !== theHorseUser.get('_id') && horseUser.get('rideDefault') === true) {
           horseSaves.then(() => {
-            const theHorseUser = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
-            const withoutDefault = theHorseUser.set('rideDefault', false)
+            const withoutDefault = horseUser.set('rideDefault', false)
             dispatch(horseUserUpdated(withoutDefault))
             return pouchCouch.saveHorse(withoutDefault.toJS()).then((doc) => {
-              const theHorseUserAfterSave = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
+              const theHorseUserAfterSave = getState().getIn(['pouchRecords', 'horseUsers', withoutDefault.get('_id')])
               dispatch(horseUserUpdated(theHorseUserAfterSave.set('_rev', doc.rev)))
             })
           })

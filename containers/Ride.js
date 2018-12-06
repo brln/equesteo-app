@@ -251,8 +251,6 @@ class RideContainer extends PureComponent {
       }})
     }
     // remove this when you've created rideHorses for all old rides and everyone's on > 43
-
-    logDebug(rideHorses.toJSON())
     return rideHorses
   }
 

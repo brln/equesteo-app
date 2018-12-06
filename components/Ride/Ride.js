@@ -98,7 +98,7 @@ export default class Ride extends PureComponent {
     let totalDistance = 0
     let totalGain = 0
     let lastPoint = null
-    if (rideElevations && rideElevations.get('elevation')) {
+    if (rideElevations && rideElevations.get('elevations')) {
       for (let rideCoord of rideCoordinates.get('rideCoordinates')) {
         const parsedCoord = parseRideCoordinate(rideCoord)
         if (!lastPoint) {

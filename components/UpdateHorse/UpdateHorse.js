@@ -1,4 +1,3 @@
-import { Map } from 'immutable'
 import React, { PureComponent } from 'react';
 import ImagePicker from 'react-native-image-crop-picker'
 import {
@@ -6,6 +5,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import {
@@ -15,7 +15,7 @@ import {
 } from 'native-base';
 import RNPickerSelect from 'react-native-picker-select';
 
-import { brand, darkBrand } from '../../colors'
+import { darkBrand } from '../../colors'
 import PhotoFab from './PhotoFab'
 import PhotosByTimestamp from '../PhotosByTimestamp'
 import PhotoMenu from '../PhotoMenu'
@@ -371,7 +371,7 @@ export default class UpdateHorse extends PureComponent {
                   <Text style={{color: darkBrand }}>Settings:</Text>
                 </CardItem>
                 <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
-                  <View style={{flex: 1, flexDirection: 'row'}}>
+                  <TouchableOpacity style={{flex: 1, flexDirection: 'row'}} onPress={this.props.setDefaultHorse}>
                     <View style={{flex: 1}}>
                       <CheckBox
                         checked={this.props.horseUser.get('rideDefault')}
@@ -381,7 +381,7 @@ export default class UpdateHorse extends PureComponent {
                     <View style={{flex: 6, justifyContent: 'center'}}>
                       <Text>This is my default horse for rides.</Text>
                     </View>
-                  </View>
+                  </TouchableOpacity>
                 </CardItem>
               </Card>
             </View>

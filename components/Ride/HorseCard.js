@@ -54,7 +54,7 @@ export default class HorseCard extends PureComponent {
   }
 
   render () {
-    if (this.props.ride.get('horseID') || this.props.rideHorses.keySeq().count() > 0) { // remove when everyone > version 43
+    if (this.props.ride.get('horseID') || this.props.rideHorses.keySeq().count() > 0) { // remove when everyone > version 4e
       return (
         <Card style={{flex: 1}}>
           <View style={styles.main}>

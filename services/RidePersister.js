@@ -50,9 +50,7 @@ export default class RidePersister {
   }
 
   saveRideHorse (rideHorse) {
-    logDebug('saving ride Horse')
     return this.pouchCouch.saveRide(rideHorse.toJS()).then(({ rev }) => {
-      logDebug(rev, 'rev')
       this.dispatch(rideHorseUpdated(this.getRideHorse(rideHorse.get('_id')).set('_rev', rev)))
     })
   }
