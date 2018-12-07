@@ -6,11 +6,9 @@ import { BackHandler, Keyboard } from 'react-native'
 
 import {
   userUpdated,
-  userPhotoUpdated
 } from "../actions/standard"
 import {
-  persistUser,
-  persistUserPhoto,
+  persistUserUpdate,
 } from "../actions/functional"
 import { brand } from '../colors'
 import { logRender } from '../helpers'
@@ -70,7 +68,6 @@ class UpdateProfileContainer extends PureComponent {
       showPhotoMenu: false,
       selectedPhotoID: null
     }
-    this.actuallyDeletePhotos = this.actuallyDeletePhotos.bind(this)
     this.changeAccountDetails = this.changeAccountDetails.bind(this)
     this.clearPhotoMenu = this.clearPhotoMenu.bind(this)
     this.goBack = this.goBack.bind(this)
@@ -83,12 +80,11 @@ class UpdateProfileContainer extends PureComponent {
     Navigation.events().bindComponent(this);
   }
 
-  async navigationButtonPressed ({ buttonId }) {
+  navigationButtonPressed ({ buttonId }) {
     Keyboard.dismiss()
     if (buttonId === 'save') {
       Navigation.pop(this.props.componentId)
-      await this.props.dispatch(persistUser(this.props.user.get('_id')))
-      this.actuallyDeletePhotos()
+      this.props.dispatch(persistUserUpdate(this.props.user.get('_id'), this.state.deletedPhotoIDs))
     } else if (buttonId === 'back') {
       this.goBack()
     }
@@ -132,7 +128,7 @@ class UpdateProfileContainer extends PureComponent {
     })
   }
 
-  async goBack () {
+  goBack () {
     this.props.dispatch(userUpdated(this.state.cachedUser))
     Navigation.pop(this.props.componentId)
   }
@@ -162,14 +158,6 @@ class UpdateProfileContainer extends PureComponent {
     this.setState({
       deletedPhotoIDs: [...this.state.deletedPhotoIDs, photoID]
     })
-  }
-
-  actuallyDeletePhotos () {
-    for (let photoID of this.state.deletedPhotoIDs) {
-      const deleted = this.props.userPhotos.get(photoID).set('deleted', true)
-      this.props.dispatch(userPhotoUpdated(deleted))
-      this.props.dispatch(persistUserPhoto(deleted.get('_id')))
-    }
   }
 
   thisUsersPhotos (userPhotos, deletedPhotoIDs) {

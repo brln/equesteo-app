@@ -13,9 +13,8 @@ import {
 } from '../actions/standard'
 import {
   persistHorseUpdate,
-  persistUser,
-  persistUserPhoto,
-  photoNeedsUpload,
+  persistUserUpdate,
+  persistUserWithPhoto,
 } from '../actions/functional'
 import { brand } from '../colors'
 import { generateUUID, logRender, unixTimeNow } from '../helpers'
@@ -114,7 +113,7 @@ class FirstStartContainer extends PureComponent {
     })
   }
 
-  async uploadProfilePhoto (location) {
+  uploadProfilePhoto (location) {
     let photoID = generateUUID()
     let userID = this.props.user.get('_id')
     this.props.dispatch(createUserPhoto(
@@ -126,10 +125,7 @@ class FirstStartContainer extends PureComponent {
       }
     ))
     this.props.dispatch(userUpdated(this.props.user.set('profilePhotoID', photoID)))
-
-    await this.props.dispatch(persistUser(userID))
-    this.props.dispatch(persistUserPhoto(photoID))
-    this.props.dispatch(photoNeedsUpload('user', location, photoID))
+    this.props.dispatch(persistUserWithPhoto(userID, photoID))
   }
 
   addHorseProfilePhoto (location) {
@@ -152,12 +148,12 @@ class FirstStartContainer extends PureComponent {
   }
 
   commitUpdateUser () {
-    this.props.dispatch(persistUser(this.props.user.get('_id')))
+    this.props.dispatch(persistUserUpdate(this.props.user.get('_id'), []))
   }
 
   done () {
     this.props.dispatch(userUpdated(this.props.user.set('finishedFirstStart', true)))
-    this.props.dispatch(persistUser(this.props.user.get('_id')))
+    this.props.dispatch(persistUserUpdate(this.props.user.get('_id'), []))
     if (this.state.horseUpdated) {
       this.props.dispatch(persistHorseUpdate(
         this.props.horse.get('_id'),
@@ -216,25 +212,27 @@ class FirstStartContainer extends PureComponent {
 
   render() {
     logRender('FirstStartContainer')
-    return <FirstStart
-      addHorseProfilePhoto={this.addHorseProfilePhoto}
-      changeHorseName={this.changeHorseName}
-      changeHorseBreed={this.changeHorseBreed}
-      commitUpdateUser={this.commitUpdateUser}
-      currentPage={this.state.currentPage}
-      deleteHorse={this.deleteHorse}
-      done={this.done}
-      horse={this.props.horse}
-      horsePhotos={this.props.horsePhotos}
-      nextPage={this.nextPage}
-      pages={this.pages}
-      setSkip={this.setSkip}
-      skipHorsePhoto={this.skipHorsePhoto}
-      updateUser={this.updateUser}
-      uploadProfilePhoto={this.uploadProfilePhoto}
-      user={this.props.user}
-      userPhotos={this.props.userPhotos}
-    />
+    return (
+      <FirstStart
+        addHorseProfilePhoto={this.addHorseProfilePhoto}
+        changeHorseName={this.changeHorseName}
+        changeHorseBreed={this.changeHorseBreed}
+        commitUpdateUser={this.commitUpdateUser}
+        currentPage={this.state.currentPage}
+        deleteHorse={this.deleteHorse}
+        done={this.done}
+        horse={this.props.horse}
+        horsePhotos={this.props.horsePhotos}
+        nextPage={this.nextPage}
+        pages={this.pages}
+        setSkip={this.setSkip}
+        skipHorsePhoto={this.skipHorsePhoto}
+        updateUser={this.updateUser}
+        uploadProfilePhoto={this.uploadProfilePhoto}
+        user={this.props.user}
+        userPhotos={this.props.userPhotos}
+      />
+    )
   }
 }
 

@@ -1,48 +1,46 @@
 import ApiClient from './api_client'
 
-
 export default class UserAPI {
-
   constructor (token) {
     this.apiClient = new ApiClient(token)
   }
 
-  async getPWCode (email) {
-    return await this.apiClient.post('/users/getPWCode', {
+  getPWCode (email) {
+    return this.apiClient.post('/users/getPWCode', {
       email: email
     })
   }
 
-  async login (email, password) {
-    return await this.apiClient.post('/users/login', {
+  login (email, password) {
+    return this.apiClient.post('/users/login', {
       email: email,
       password: password,
     })
   }
 
-  async signup (email, password) {
-    return await this.apiClient.post('/users', {
+  signup (email, password) {
+    return this.apiClient.post('/users', {
       email: email,
       password: password,
     })
   }
 
-  async changePassword (newPassword) {
-    return await this.apiClient.post('/users/changePW', {
+  changePassword (newPassword) {
+    return this.apiClient.post('/users/changePW', {
       password: newPassword
     })
   }
 
-  async exchangePWCodeForToken (email, code) {
-    return await this.apiClient.post('/users/exchangePWCode', { email, code })
+  exchangePWCodeForToken (email, code) {
+    return this.apiClient.post('/users/exchangePWCode', { email, code })
   }
 
-  async setFCMToken (id, token) {
-    return await this.apiClient.post('/users/setFCMToken', { id, token })
+  setFCMToken (id, token) {
+    return this.apiClient.post('/users/setFCMToken', { id, token })
   }
 
-  async setDistribution (id, distribution) {
-    return await this.apiClient.post('/users/setDistribution', { id, distribution })
+  setDistribution (id, distribution) {
+    return this.apiClient.post('/users/setDistribution', { id, distribution })
   }
 
   _uploadProfilePhoto (imageLocation, photoID) {
@@ -70,7 +68,7 @@ export default class UserAPI {
     }
   }
 
-  async findUser (searchPhrase) {
-    return await this.apiClient.get('/users/search?q=' + searchPhrase)
+  findUser (searchPhrase) {
+    return this.apiClient.get('/users/search?q=' + searchPhrase)
   }
 }

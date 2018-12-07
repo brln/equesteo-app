@@ -7,55 +7,64 @@ export default class LocalStorage {
   static LOCAL_STATE_KEY = '@equesteo:localState'
   static CURRENT_RIDE_STATE_KEY = '@equesteo:currentRide'
 
-  static async saveToken (token, userID) {
-    return await AsyncStorage.setItem(LocalStorage.TOKEN_KEY, JSON.stringify({
+  static saveToken (token, userID) {
+    return AsyncStorage.setItem(LocalStorage.TOKEN_KEY, JSON.stringify({
       token,
       userID
     }));
   }
 
-  static async loadToken () {
-    const asString = await AsyncStorage.getItem(LocalStorage.TOKEN_KEY);
-    return JSON.parse(asString)
-  }
-
-  static async deleteToken () {
-    logInfo('deleting JWT')
-    return await AsyncStorage.removeItem(LocalStorage.TOKEN_KEY).catch(e => {
-      logError(e)
-      throw e
+  static loadToken () {
+    return AsyncStorage.getItem(LocalStorage.TOKEN_KEY).then(asString => {
+      return JSON.parse(asString)
     })
   }
 
-  static async saveLocalState (dataAsObject) {
+  static deleteToken () {
+    logInfo('deleting JWT')
+    return AsyncStorage.removeItem(LocalStorage.TOKEN_KEY)
+  }
+
+
+  static saveLocalState (dataAsObject) {
     return AsyncStorage.setItem(LocalStorage.LOCAL_STATE_KEY, JSON.stringify(dataAsObject))
   }
 
-  static async saveCurrentRideState (dataAsObject) {
+  static saveCurrentRideState (dataAsObject) {
     return AsyncStorage.setItem(LocalStorage.CURRENT_RIDE_STATE_KEY, JSON.stringify(dataAsObject))
   }
 
-  static async loadLocalState () {
-    const asString = await AsyncStorage.getItem(LocalStorage.LOCAL_STATE_KEY);
-    if (asString) {
-      const asObj = JSON.parse(asString)
-      return fromJS(asObj)
-    }
+  static loadLocalState () {
+    return new Promise((res, rej) => {
+      AsyncStorage.getItem(LocalStorage.LOCAL_STATE_KEY).then(asString => {
+        let asObj
+        if (asString) {
+          asObj = JSON.parse(asString)
+        }
+        res(fromJS(asObj))
+      }).catch(e => {
+        rej(e)
+      })
+    })
+
   }
 
-  static async loadCurrentRideState () {
-    const asString = await AsyncStorage.getItem(LocalStorage.CURRENT_RIDE_STATE_KEY);
-    if (asString) {
-      const asObj = JSON.parse(asString)
-      return fromJS(asObj)
-    }
+  static loadCurrentRideState () {
+    return new Promise((res, rej) => {
+      AsyncStorage.getItem(LocalStorage.CURRENT_RIDE_STATE_KEY).then(asString => {
+        let asObj
+        if (asString) {
+          asObj = JSON.parse(asString)
+        }
+        res(fromJS(asObj))
+      }).catch(e => {
+        rej(e)
+      })
+    })
   }
 
   static async deleteLocalState () {
     logInfo('deleting async storage local state')
-    return await AsyncStorage.removeItem(LocalStorage.LOCAL_STATE_KEY).catch(e => {
-      logError(e)
-      throw e
-    })
+    return AsyncStorage.removeItem(LocalStorage.LOCAL_STATE_KEY)
   }
 }

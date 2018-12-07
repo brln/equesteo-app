@@ -23,10 +23,15 @@ import {
   profilePhotoURL
 } from "../helpers"
 import { danger, green, warning } from '../colors'
-import { appStates, coordSplice } from '../helpers'
+import {
+  configureBackgroundGeolocation,
+  loginAndSync,
+  stopListeningFCM,
+  tryToLoadStateFromDisk
+} from './helpers'
+import { appStates } from '../helpers'
 import { CAMERA, DRAWER, FEED, RECORDER, SIGNUP_LOGIN, UPDATE_NEW_RIDE_ID } from '../screens'
 import { LocalStorage, PouchCouch, RidePersister, UserAPI } from '../services'
-import {BadRequestError, NotConnectedError, UnauthorizedError} from "../errors"
 
 const DB_NEEDS_SYNC = 'DB_NEEDS_SYNC'
 const DB_SYNCING = 'DB_SYNCING'
@@ -41,13 +46,10 @@ import {
   dequeuePhoto,
   dismissError,
   enqueuePhoto,
-  errorOccurred,
   horsePhotoUpdated,
   horseUpdated,
   followUpdated,
   horseUserUpdated,
-  loadCurrentRideState,
-  loadLocalState,
   localDataLoaded,
   newAppState,
   newLocation,
@@ -107,46 +109,33 @@ export function addHorseUser (horse, user) {
 }
 
 export function appInitialized () {
-  return async (dispatch) => {
-    await dispatch(tryToLoadStateFromDisk())
-    dispatch(startActiveComponentListener())
-    dispatch(dismissError())
-    dispatch(checkFCMPermission())
-    dispatch(findLocalToken())
-    dispatch(startNetworkTracking())
-    dispatch(startAppStateTracking())
+  return (dispatch) => {
+    tryToLoadStateFromDisk(dispatch).then(() => {
+      dispatch(startActiveComponentListener())
+      dispatch(dismissError())
+      dispatch(checkFCMPermission())
+      dispatch(findLocalToken())
+      dispatch(startNetworkTracking())
+      dispatch(startAppStateTracking())
+    }).catch(catchAsyncError)
   }
 }
 
 export function checkFCMPermission () {
-  return async () => {
-    const enabled = await firebase.messaging().hasPermission();
-    if (!enabled) {
-      try {
-        const resp = await firebase.messaging().requestPermission();
-      } catch (error) {
-        alert('YOU HAVE TO.')
-        throw error
+  return () => {
+    firebase.messaging().hasPermission().then(enabled => {
+      if (!enabled) {
+        firebase.messaging().requestPermission().then((resp) => {
+          if (!resp) {
+            alert('FCM permission must be enabled.')
+          }
+        })
       }
-    }
+    })
   }
 }
 
-function configureBackgroundGeolocation () {
-  return async () => {
-    logInfo('configuring geolocation')
-    // @TODO this should return a promise wrapped around callback
-    BackgroundGeolocation.configure({
-      desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
-      locationProvider: BackgroundGeolocation.RAW_PROVIDER,
-      distanceFilter: 0,
-      maxLocations: 10,
-      interval: 0,
-      notificationTitle: 'You\'re out on a ride.',
-      notificationText: 'Tap here to see your progress.',
-    });
-  }
-}
+
 
 export function createRideComment(commentData) {
   return (dispatch, getState) => {
@@ -168,7 +157,7 @@ export function createRideComment(commentData) {
       const afterSave = getState().getIn(['pouchRecords', 'rideComments', commentID])
       dispatch(rideCommentUpdated(afterSave.set('_rev', doc.rev)))
       dispatch(needsRemotePersist('rides'))
-    }).catch(catchAsyncError)
+    }).catch(cachAsyncError)
 
   }
 }
@@ -185,92 +174,54 @@ export function deleteHorseUser (horseUserID) {
 }
 
 export function exchangePWCode (email, code) {
-  return async (dispatch) => {
+  return (dispatch) => {
     let userAPI = new UserAPI()
-    try {
-      const resp = await userAPI.exchangePWCodeForToken(email, code)
-      dispatch(dismissError())
-      const token = resp.token
-      const userID = resp.id
-      const following = resp.following
-      const followers = resp.followers
-      const pouchCouch = new PouchCouch(token)
-      dispatch(setAwaitingPasswordChange(true))
-      await pouchCouch.localReplicateDB('all', [...following, userID], followers)
-      dispatch(receiveJWT(resp.token))
-      dispatch(saveUserID(resp.id))
-      setUserContext(resp.id)
-      await dispatch(loadLocalData())
-      dispatch(startListeningFCMTokenRefresh())
-      dispatch(getFCMToken())
-      dispatch(setDistributionOnServer())
-      dispatch(startListeningFCM())
-      await LocalStorage.saveToken(resp.token, resp.id);
-    } catch (e) {
-      logError(e)
-      if (e instanceof UnauthorizedError) {
-        dispatch(errorOccurred(e.message))
-      }
-    }
+    loginAndSync(userAPI.exchangePWCodeForToken.bind(userAPI), [email, code], dispatch)
   }
 }
 
-
-
 function findLocalToken () {
-  return async (dispatch) => {
-    const storedToken = await LocalStorage.loadToken()
-    if (storedToken !== null) {
-      dispatch(receiveJWT(storedToken.token))
-      dispatch(saveUserID(storedToken.userID))
-      setUserContext(storedToken.userID)
-      dispatch(switchRoot(FEED))
-      await dispatch(loadLocalData())
-      dispatch(startListeningFCMTokenRefresh())
-      dispatch(getFCMToken())
-      dispatch(startListeningFCM())
-      dispatch(setDistributionOnServer())
-      dispatch(syncDBPull('all'))
-    } else {
-      dispatch(switchRoot(SIGNUP_LOGIN))
-    }
+  return (dispatch) => {
+    LocalStorage.loadToken().then(storedToken => {
+      if (storedToken !== null) {
+        dispatch(receiveJWT(storedToken.token))
+        dispatch(saveUserID(storedToken.userID))
+        setUserContext(storedToken.userID)
+        dispatch(switchRoot(FEED))
+        const pouchCouch = new PouchCouch(storedToken.token)
+        return pouchCouch.localLoad()
+      } else {
+        dispatch(switchRoot(SIGNUP_LOGIN))
+      }
+    }).then((localData) => {
+      if (localData) {
+        dispatch(localDataLoaded(localData))
+        dispatch(startListeningFCMTokenRefresh())
+        dispatch(getFCMToken())
+        dispatch(startListeningFCM())
+        dispatch(setDistributionOnServer())
+        dispatch(syncDBPull('all'))
+      }
+    }).catch(catchAsyncError)
   }
 }
 
 export function getPWCode (email) {
-  return async () => {
+  return () => {
     let userAPI = new UserAPI()
-    await userAPI.getPWCode(email)
+    userAPI.getPWCode(email).catch(catchAsyncError)
   }
 }
 
 export function getFCMToken () {
-  return async (dispatch) => {
-    let fcmToken
-    try {
-      fcmToken = await firebase.messaging().getToken();
-    } catch (e) {
+  return (dispatch) => {
+    firebase.messaging().getToken().then(fcmToken => {
+      if (fcmToken) {
+        dispatch(setFCMTokenOnServer(fcmToken))
+      }
+    }).catch(() => {
       logInfo('no token available')
-    }
-    if (fcmToken) {
-      dispatch(setFCMTokenOnServer(fcmToken))
-    }
-  }
-}
-
-function loadLocalData () {
-  return async (dispatch, getState) => {
-    const jwt = getState().getIn(['localState', 'jwt'])
-    const pouchCouch = new PouchCouch(jwt)
-    try {
-      logInfo('==== Starting local data load ===')
-      const localData = await pouchCouch.localLoad()
-      logInfo('==== Local data loaded from pouch complete ===')
-      dispatch(localDataLoaded(localData))
-    } catch (e) {
-      logError(e)
-      throw e
-    }
+    })
   }
 }
 
@@ -284,15 +235,12 @@ export function loadRideCoordinates (rideID) {
 }
 
 export function newPassword (password) {
-  return async (dispatch, getState) => {
+  return (dispatch, getState) => {
     const jwt = getState().getIn(['localState', 'jwt'])
     const userAPI = new UserAPI(jwt)
-    try {
-      await userAPI.changePassword(password)
+    userAPI.changePassword(password).then(() => {
       dispatch(switchRoot(FEED))
-    } catch (e) {
-      logError(e)
-    }
+    }).catch(catchAsyncError)
   }
 }
 
@@ -326,7 +274,7 @@ export function needsRemotePersist(db) {
 }
 
 export function persistFollow (followID) {
-  return async (dispatch, getState) => {
+  return (dispatch, getState) => {
     const theFollow = getState().getIn(['pouchRecords', 'follows', followID])
     if (!theFollow) {
       throw new Error('no follow with that ID')
@@ -334,12 +282,12 @@ export function persistFollow (followID) {
 
     const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
-    const doc = await pouchCouch.saveUser(theFollow.toJS())
-
-    let foundAfterSave = getState().getIn(['pouchRecords', 'follows', followID])
-    dispatch(followUpdated(foundAfterSave.set('_rev', doc.rev)))
-    dispatch(needsRemotePersist('users'))
-    dispatch(syncDBPull())
+    pouchCouch.saveUser(theFollow.toJS()).then(({ rev }) => {
+      let foundAfterSave = getState().getIn(['pouchRecords', 'follows', followID])
+      dispatch(followUpdated(foundAfterSave.set('_rev', rev)))
+      dispatch(needsRemotePersist('users'))
+      dispatch(syncDBPull())
+    }).catch(catchAsyncError)
   }
 }
 
@@ -350,35 +298,34 @@ export function persistRide (rideID, newRide, stashedPhotos, deletedPhotoIDs, tr
   }
 }
 
-export function persistUser (userID) {
-  return async (dispatch, getState) => {
-    const theUser = getState().getIn(['pouchRecords', 'users', userID])
-    if (!theUser) {
-      throw new Error('no user with that ID')
-    }
-    const jwt = getState().getIn(['localState', 'jwt'])
-    const pouchCouch = new PouchCouch(jwt)
-    const doc = await pouchCouch.saveUser(theUser.toJS())
-
-    const theUserAfterSave = getState().getIn(['pouchRecords', 'users', userID])
-    dispatch(userUpdated(theUserAfterSave.set('_rev', doc.rev)))
-    dispatch(needsRemotePersist('users'))
-  }
-}
-
-export function persistUserPhoto (userPhotoID) {
-  return async (dispatch, getState) => {
+export function persistUserWithPhoto (userID, userPhotoID) {
+  return (dispatch, getState) => {
     const theUserPhoto = getState().getIn(['pouchRecords', 'userPhotos', userPhotoID])
     if (!theUserPhoto) {
       throw new Error('no user photo with that ID: ' + userPhotoID)
     }
+
     const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
-    const doc = await pouchCouch.saveUser(theUserPhoto.toJS())
-
-    const theUserPhotoAfterSave = getState().getIn(['pouchRecords', 'userPhotos', userPhotoID])
-    dispatch(userPhotoUpdated(theUserPhotoAfterSave.set('_rev', doc.rev)))
-    dispatch(needsRemotePersist('users'))
+    pouchCouch.saveUser(theUserPhoto.toJS()).then(({ rev }) => {
+      const theUserPhotoAfterSave = getState().getIn(['pouchRecords', 'userPhotos', userPhotoID])
+      dispatch(userPhotoUpdated(theUserPhotoAfterSave.set('_rev', rev)))
+      dispatch(enqueuePhoto(Map({
+        type: 'user',
+        photoLocation: theUserPhoto.get('uri'),
+        photoID: userPhotoID
+      })))
+      const theUser = getState().getIn(['pouchRecords', 'users', userID])
+      if (!theUser) {
+        throw new Error('no user with that ID')
+      }
+      return pouchCouch.saveUser(theUser.toJS())
+    }).then(({ rev }) => {
+      const theUserAfterSave = getState().getIn(['pouchRecords', 'users', userID])
+      dispatch(userUpdated(theUserAfterSave.set('_rev', rev)))
+    }).then(() => {
+      dispatch(needsRemotePersist('users'))
+    }).catch(catchAsyncError)
   }
 }
 
@@ -486,18 +433,55 @@ export function persistHorseUpdate (horseID, horseUserID, deletedPhotoIDs, newPh
 }
 
 export function persistHorseUser (horseUserID) {
-  return async (dispatch, getState) => {
+  return (dispatch, getState) => {
     const theHorseUser = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
     if (!theHorseUser) {
       throw new Error('no horse user with that ID')
     }
     const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
-    const doc = await pouchCouch.saveHorse(theHorseUser.toJS())
+    pouchCouch.saveHorse(theHorseUser.toJS()).then(({ rev }) => {
+      const theHorseUserAfterSave = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
+      dispatch(horseUserUpdated(theHorseUserAfterSave.set('_rev', rev)))
+      dispatch(needsRemotePersist('horses'))
+    }).catch(catchAsyncError)
+  }
+}
 
-    const theHorseUserAfterSave = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
-    await dispatch(horseUserUpdated(theHorseUserAfterSave.set('_rev', doc.rev)))
-    dispatch(needsRemotePersist('horses'))
+export function persistUserUpdate (userID, deletedPhotoIDs) {
+  return (dispatch, getState) => {
+    const theUser = getState().getIn(['pouchRecords', 'users', userID])
+    if (!theUser) {
+      throw new Error('no user with that ID')
+    }
+    const jwt = getState().getIn(['localState', 'jwt'])
+    const pouchCouch = new PouchCouch(jwt)
+    const userSave = pouchCouch.saveUser(theUser.toJS())
+
+    userSave.then(({ rev }) => {
+      const theUserAfterSave = getState().getIn(['pouchRecords', 'users', userID])
+      dispatch(userUpdated(theUserAfterSave.set('_rev', rev)))
+    })
+
+    for (let userPhotoID of deletedPhotoIDs) {
+      const theUserPhoto = getState().getIn(['pouchRecords', 'userPhotos', userPhotoID])
+      if (!theUserPhoto) {
+        throw new Error('no user photo with that ID: ' + userPhotoID)
+      }
+      const markedDeleted = theUserPhoto.set('deleted', true)
+      dispatch(userPhotoUpdated(markedDeleted))
+      userSave.then(() => {
+        return pouchCouch.saveUser(markedDeleted.toJS())
+      }).then(({ rev }) => {
+        const theUserPhotoAfterSave = getState().getIn(['pouchRecords', 'userPhotos', userPhotoID])
+        dispatch(userPhotoUpdated(theUserPhotoAfterSave.set('_rev', rev)))
+        dispatch(needsRemotePersist('users'))
+      })
+    }
+
+    userSave.then(() => {
+      dispatch(needsRemotePersist('users'))
+    }).catch(catchAsyncError)
   }
 }
 
@@ -581,8 +565,8 @@ export function uploadPhoto (type, photoLocation, photoID) {
 }
 
 export function remotePersistComplete (db) {
-  return async (dispatch) => {
-    dispatch(setRemotePersistDB(db, DB_SYNCED))
+  return (dispatch) => {
+    dispatch(setRemotePersistComplete(db, DB_SYNCED))
     dispatch(setFeedMessage(Map({
       message: 'All Data Uploaded',
       color: green,
@@ -594,7 +578,7 @@ export function remotePersistComplete (db) {
 }
 
 export function remotePersistError (db) {
-  return async (dispatch) => {
+  return (dispatch) => {
     dispatch(setRemotePersistDB(db, DB_NEEDS_SYNC))
     dispatch(setFeedMessage(Map({
       message: 'Can\'t Upload Data',
@@ -604,7 +588,7 @@ export function remotePersistError (db) {
 }
 
 export function remotePersistStarted (db) {
-  return async (dispatch) => {
+  return (dispatch) => {
     dispatch(setRemotePersistDB(db, DB_SYNCING))
     dispatch(setFeedMessage(Map({
       message: 'Data Uploading',
@@ -614,28 +598,23 @@ export function remotePersistStarted (db) {
 }
 
 export function searchForFriends (phrase) {
-  return async (dispatch, getState) => {
+  return (dispatch, getState) => {
     const jwt = getState().getIn(['localState', 'jwt'])
     const userAPI = new UserAPI(jwt)
-    try {
-      const resp = await userAPI.findUser(phrase)
+    userAPI.findUser(phrase).then(resp => {
       dispatch(userSearchReturned(fromJS(resp)))
-    } catch (e) {
-      logError(e)
-    }
+    }).catch(catchAsyncError)
   }
 }
 
 export function setFCMTokenOnServer (token) {
-  return async (_, getState) => {
-    try {
-      const jwt = getState().getIn(['localState', 'jwt'])
-      const userAPI = new UserAPI(jwt)
-      const currentUserID = getState().getIn(['localState', 'userID'])
-      await userAPI.setFCMToken(currentUserID, token)
-    } catch (e) {
+  return (_, getState) => {
+    const jwt = getState().getIn(['localState', 'jwt'])
+    const userAPI = new UserAPI(jwt)
+    const currentUserID = getState().getIn(['localState', 'userID'])
+    userAPI.setFCMToken(currentUserID, token).catch(() => {
       logError('Could not set FCM token')
-    }
+    })
   }
 }
 
@@ -644,23 +623,25 @@ export function setDistributionOnServer () {
     const jwt = getState().getIn(['localState', 'jwt'])
     const userAPI = new UserAPI(jwt)
     const currentUserID = getState().getIn(['localState', 'userID'])
-    userAPI.setDistribution(currentUserID, DISTRIBUTION).catch(() => {})
+    userAPI.setDistribution(currentUserID, DISTRIBUTION).catch(() => {
+      logError('Could not set distribution remotely')
+    })
   }
 }
 
 export function signOut () {
-  return async(dispatch) => {
+  return (dispatch) => {
     dispatch(stopLocationTracking())
     dispatch(clearStateAfterPersist())
-
     const pouchCouch = new PouchCouch()
-    await Promise.all([
+    Promise.all([
       LocalStorage.deleteToken(),
       pouchCouch.deleteLocalDBs(),
-      dispatch(stopListeningFCM()),
+      stopListeningFCM(),
       LocalStorage.deleteLocalState()
-    ])
-    dispatch(switchRoot(SIGNUP_LOGIN))
+    ]).then(() => {
+      dispatch(switchRoot(SIGNUP_LOGIN))
+    }).catch(catchAsyncError)
   }
 }
 
@@ -690,70 +671,71 @@ export function showLocalNotification (message, background, rideID, scrollToComm
 }
 
 export function startLocationTracking () {
-  return async (dispatch, getState) => {
+  return (dispatch, getState) => {
     logInfo('action: startLocationTracking')
-    await configureBackgroundGeolocation()()
-    const KALMAN_FILTER_Q = 6
-    BackgroundGeolocation.on('location', (location) => {
-      const lastLocation = getState().getIn(['currentRide', 'lastLocation'])
-      let timeDiff = 0
-      if (lastLocation) {
-        timeDiff = (location.time / 1000) - (lastLocation.get('timestamp') / 1000)
-      }
+    configureBackgroundGeolocation().then(() => {
+      const KALMAN_FILTER_Q = 6
+      BackgroundGeolocation.on('location', (location) => {
+        const lastLocation = getState().getIn(['currentRide', 'lastLocation'])
+        let timeDiff = 0
+        if (lastLocation) {
+          timeDiff = (location.time / 1000) - (lastLocation.get('timestamp') / 1000)
+        }
 
-      if (!lastLocation || timeDiff > 5) {
-        const refiningLocation = getState().getIn(['currentRide', 'refiningLocation'])
+        if (!lastLocation || timeDiff > 5) {
+          const refiningLocation = getState().getIn(['currentRide', 'refiningLocation'])
 
-        let parsedLocation = Map({
-          accuracy: location.accuracy,
-          latitude: location.latitude,
-          longitude: location.longitude,
-          provider: location.provider,
-          timestamp: location.time,
-          speed: location.speed,
-        })
+          let parsedLocation = Map({
+            accuracy: location.accuracy,
+            latitude: location.latitude,
+            longitude: location.longitude,
+            provider: location.provider,
+            timestamp: location.time,
+            speed: location.speed,
+          })
 
-        let parsedElevation = Map({
-          latitude: location.latitude,
-          longitude: location.longitude,
-          elevation: location.altitude,
-        })
+          let parsedElevation = Map({
+            latitude: location.latitude,
+            longitude: location.longitude,
+            elevation: location.altitude,
+          })
 
-        let replaced = false
-        if (refiningLocation && lastLocation) {
-          // If you have at least one point already recorded, run the Kalman filter
-          // on the new location coming in using the one you already have
-          parsedLocation = kalmanFilter(
-            parsedLocation,
-            lastLocation,
-            KALMAN_FILTER_Q
-          )
-          parsedElevation = parsedElevation.set(
-            'latitude', parsedLocation.get('latitude')
-          ).set(
-            'longitude', parsedLocation.get('longitude')
-          ).set(
-            'accuracy', parsedLocation.get('accuracy')
-          )
+          let replaced = false
+          if (refiningLocation && lastLocation) {
+            // If you have at least one point already recorded, run the Kalman filter
+            // on the new location coming in using the one you already have
+            parsedLocation = kalmanFilter(
+              parsedLocation,
+              lastLocation,
+              KALMAN_FILTER_Q
+            )
+            parsedElevation = parsedElevation.set(
+              'latitude', parsedLocation.get('latitude')
+            ).set(
+              'longitude', parsedLocation.get('longitude')
+            ).set(
+              'accuracy', parsedLocation.get('accuracy')
+            )
 
-          let distance = haversine(
-            refiningLocation.get('latitude'),
-            refiningLocation.get('longitude'),
-            parsedLocation.get('latitude'),
-            parsedLocation.get('longitude')
-          )
-          if (distance < (30 / 5280)) {
-            // If you're within a 30' radius of the last place you were, don't
-            // just add the point on, replace the old one.
-            dispatch(replaceLastLocation(parsedLocation, parsedElevation))
-            replaced = true
+            let distance = haversine(
+              refiningLocation.get('latitude'),
+              refiningLocation.get('longitude'),
+              parsedLocation.get('latitude'),
+              parsedLocation.get('longitude')
+            )
+            if (distance < (30 / 5280)) {
+              // If you're within a 30' radius of the last place you were, don't
+              // just add the point on, replace the old one.
+              dispatch(replaceLastLocation(parsedLocation, parsedElevation))
+              replaced = true
+            }
+          }
+          if (!replaced) {
+            dispatch(newLocation(parsedLocation, parsedElevation))
           }
         }
-        if (!replaced) {
-          dispatch(newLocation(parsedLocation, parsedElevation))
-        }
-      }
-    })
+      })
+    }).catch(catchAsyncError)
 
     BackgroundGeolocation.on('error', (error) => {
       logError('[ERROR] BackgroundGeolocation error:', error);
@@ -797,17 +779,17 @@ function startNetworkTracking () {
   }
 }
 
-function startListeningFCM () {
-  return async (dispatch) => {
-    firebase.messaging().onMessage(async (m) => {
+export function startListeningFCM () {
+  return (dispatch) => {
+    firebase.messaging().onMessage((m) => {
       handleNotification(dispatch, m._data, false)
     })
   }
 }
 
-function startListeningFCMTokenRefresh () {
-  return async (dispatch, getState) => {
-    firebase.messaging().onTokenRefresh(async (newToken) => {
+export function startListeningFCMTokenRefresh () {
+  return (dispatch) => {
+    firebase.messaging().onTokenRefresh((newToken) => {
       dispatch(setFCMTokenOnServer(newToken))
     })
   }
@@ -828,15 +810,6 @@ export function stopLocationTracking () {
     BackgroundGeolocation.stop()
     BackgroundGeolocation.removeAllListeners('location')
     dispatch(clearLastLocation())
-  }
-}
-
-function stopListeningFCM () {
-  return async () => {
-    // maybe delete token on server here?
-    logInfo('deleting local FCM token')
-    await firebase.iid().deleteToken('373350399276', 'GCM')
-    firebase.messaging().onTokenRefresh(() => {})
   }
 }
 
@@ -865,71 +838,21 @@ function startAppStateTracking () {
 }
 
 export function submitLogin (email, password) {
-  return async (dispatch) => {
+  return (dispatch) => {
     const userAPI = new UserAPI()
-    try {
-      const resp = await userAPI.login(email, password)
-      await LocalStorage.saveToken(resp.token, resp.id);
-      dispatch(dismissError())
-      dispatch(setDoingInitialLoad(true))
-      const token = resp.token
-      const userID = resp.id
-      const following = resp.following
-      const followers = resp.followers
-      const pouchCouch = new PouchCouch(token)
-      await pouchCouch.localReplicateDB('all', [...following, userID], followers)
-      await dispatch(loadLocalData())
-      dispatch(receiveJWT(resp.token))
-      dispatch(switchRoot(FEED))
-      dispatch(setDoingInitialLoad(false))
-      dispatch(saveUserID(resp.id))
-      setUserContext()
-      dispatch(startListeningFCMTokenRefresh())
-      dispatch(getFCMToken())
-      dispatch(setDistributionOnServer())
-      dispatch(startListeningFCM())
-    } catch (e) {
-      if (e instanceof UnauthorizedError) {
-        dispatch(errorOccurred(e.message))
-      } else if (e instanceof NotConnectedError) {
-        dispatch(errorOccurred(e.message))
-      }
-    }
+    loginAndSync(userAPI.login.bind(userAPI), [email, password], dispatch)
   }
 }
 
 export function submitSignup (email, password) {
-  return async (dispatch) => {
+  return (dispatch) => {
     const userAPI = new UserAPI()
-    try {
-      const resp = await userAPI.signup(email, password)
-      dispatch(dismissError())
-      dispatch(setDoingInitialLoad(true))
-      await LocalStorage.saveToken(resp.token, resp.id);
-      const following = resp.following
-      const userID = resp.id
-      const pouchCouch = new PouchCouch(resp.token)
-      await pouchCouch.localReplicateDB('all', [...following, userID], [])
-      dispatch(receiveJWT(resp.token))
-      dispatch(switchRoot(FEED))
-      dispatch(setDoingInitialLoad(false))
-      dispatch(saveUserID(resp.id))
-      setUserContext()
-      await dispatch(loadLocalData())
-      dispatch(startListeningFCMTokenRefresh())
-      dispatch(getFCMToken())
-      dispatch(setDistributionOnServer())
-      dispatch(startListeningFCM())
-    } catch (e) {
-      if (e instanceof BadRequestError) {
-        dispatch(errorOccurred(e.message))
-      }
-    }
+    loginAndSync(userAPI.signup.bind(userAPI), [email, password], dispatch)
   }
 }
 
 export function syncDBPull () {
-  return async (dispatch, getState) => {
+  return (dispatch, getState) => {
     logInfo('action syncDBPull')
     dispatch(setFeedMessage(Map({
       message: 'Loading...',
@@ -951,10 +874,12 @@ export function syncDBPull () {
       f => f.get('followerID')
     ).toJS()
     following.push(userID)
-    try {
-      dispatch(setFullSyncFail(false))
-      await pouchCouch.localReplicateDB('all', following, followers)
-      await dispatch(loadLocalData())
+
+    dispatch(setFullSyncFail(false))
+    pouchCouch.localReplicateDB('all', following, followers).then(() => {
+      return pouchCouch.localLoad()
+    }).then(localData => {
+      dispatch(localDataLoaded(localData))
       dispatch(syncComplete())
       dispatch(setFeedMessage(Map({
         message: 'Data Loaded',
@@ -964,7 +889,7 @@ export function syncDBPull () {
       setTimeout(() => {
         dispatch(clearFeedMessage())
       }, 3000)
-    } catch (e) {
+    }).catch((e) => {
       dispatch(setFeedMessage(Map({
         message: 'Error Fetching Data',
         color: warning,
@@ -973,12 +898,12 @@ export function syncDBPull () {
         dispatch(clearFeedMessage())
       }, 3000)
       dispatch(setFullSyncFail(true))
-    }
+    })
   }
 }
 
-function switchRoot (newRoot) {
-  return async () => {
+export function switchRoot (newRoot) {
+  return () => {
     if (newRoot === FEED) {
       Navigation.setRoot({
         root: {
@@ -1056,25 +981,5 @@ export function toggleRideCarrot (rideID) {
     save.then(() => {
       dispatch(needsRemotePersist('rides'))
     }).catch(catchAsyncError)
-  }
-}
-
-export function tryToLoadStateFromDisk () {
-  return async (dispatch) => {
-    const [localState, currentRideState] = await Promise.all([
-      await LocalStorage.loadLocalState(),
-      await LocalStorage.loadCurrentRideState()
-    ])
-    if (localState) {
-      dispatch(loadLocalState(localState))
-    } else {
-      logInfo('no cached local state found')
-    }
-
-    if (currentRideState) {
-      dispatch(loadCurrentRideState(currentRideState))
-    } else {
-      logInfo('no cached current ride state found')
-    }
   }
 }

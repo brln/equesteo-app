@@ -13,9 +13,7 @@ import {
 } from "../actions/standard"
 import {
   persistFollow,
-  persistUser,
-  persistUserPhoto,
-  photoNeedsUpload,
+  persistUserWithPhoto,
   signOut,
 } from "../actions/functional"
 import { brand } from '../colors'
@@ -133,7 +131,7 @@ class ProfileContainer extends BackgroundComponent {
     this.props.dispatch(persistFollow(followID))
   }
 
-  async uploadPhoto (location) {
+  uploadPhoto (location) {
     let photoID = generateUUID()
     let userID = this.props.profileUser.get('_id')
     this.props.dispatch(createUserPhoto(
@@ -145,10 +143,7 @@ class ProfileContainer extends BackgroundComponent {
       }
     ))
     this.props.dispatch(userUpdated(this.props.profileUser.set('profilePhotoID', photoID)))
-
-    await this.props.dispatch(persistUser(userID))
-    this.props.dispatch(persistUserPhoto(photoID))
-    this.props.dispatch(photoNeedsUpload('user', location, photoID))
+    this.props.dispatch(persistUserWithPhoto(userID, photoID))
   }
 
   showUserList (followRecords, followingOrFollower) {

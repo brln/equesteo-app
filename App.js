@@ -39,8 +39,8 @@ Mapbox.setAccessToken(MAPBOX_TOKEN)
 
 export default function start () {
   registerScreens(store, Provider)
-  Navigation.events().registerAppLaunchedListener(async () => {
-    await store.dispatch(appInitialized())
+  Navigation.events().registerAppLaunchedListener(() => {
+    store.dispatch(appInitialized())
   })
   return store
 }

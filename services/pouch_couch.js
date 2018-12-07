@@ -1,7 +1,5 @@
 import PouchDB from 'pouchdb-react-native'
 import { API_URL } from 'react-native-dotenv'
-import { captureException } from '../services/Sentry'
-
 
 import { logInfo, logError } from '../helpers'
 
@@ -24,37 +22,20 @@ export default class PouchCouch {
     this.remoteUsersDB = new PouchDB(`${API_URL}/couchproxy/${usersDBName}`, remoteHeaders)
   }
 
-  catchError (e) {
-    logInfo("ERROR TO FOLLOW: ")
-    logError(e)
-    captureException(e)
-    throw e
-  }
-
   saveHorse (horseData) {
-    return this.localHorsesDB.put(horseData).catch((e) => {
-      logInfo('error saving horse')
-      this.catchError(e)
-    })
+    return this.localHorsesDB.put(horseData)
   }
 
   saveRide (rideData) {
     return this.localRidesDB.put(rideData)
   }
 
-
   saveUser (userData) {
-    return this.localUsersDB.put(userData).catch((e) => {
-      logInfo('error saving user')
-      this.catchError(e)
-    })
+    return this.localUsersDB.put(userData)
   }
 
   deleteRide (id, rev) {
-    return this.localRidesDB.remove(id, rev).catch((e) => {
-      logInfo('error deleting ride')
-      this.catchError(e)
-    })
+    return this.localRidesDB.remove(id, rev)
   }
 
   remoteReplicateDB(db) {
@@ -85,11 +66,11 @@ export default class PouchCouch {
   localReplicateDB(db, userIDs, followerUserIDs) {
     switch(db) {
       case 'horses':
-        return this.localReplicateHorses([...userIDs, ...followerUserIDs]).catch(e => {})
+        return this.localReplicateHorses([...userIDs, ...followerUserIDs])
       case 'rides':
-        return this.localReplicateRides(userIDs, followerUserIDs).catch(e => {})
+        return this.localReplicateRides(userIDs, followerUserIDs)
       case 'users':
-        return this.localReplicateUsers([...userIDs, ...followerUserIDs]).catch(e => {})
+        return this.localReplicateUsers([...userIDs, ...followerUserIDs])
       case 'all':
         const rideReplicate = this.localReplicateRides(userIDs, followerUserIDs)
         const userReplicate = this.localReplicateUsers([...userIDs, ...followerUserIDs])
@@ -116,9 +97,7 @@ export default class PouchCouch {
       ).on('complete', () => {
         resolve()
       }).on('error', (e) => {
-        logError('localReplicateRides')
-        logError(e)
-        reject()
+        reject(e)
       })
     })
   }
@@ -134,9 +113,7 @@ export default class PouchCouch {
       ).on('complete', () => {
           resolve()
       }).on('error', (e) => {
-        logError('localReplicateUsers')
-        logError(e)
-        reject()
+        reject(e)
       })
     })
   }
@@ -156,6 +133,8 @@ export default class PouchCouch {
             }
           }
         }
+        return fetchIDs
+      }).then(fetchIDs => {
         PouchDB.replicate(
           this.remoteHorsesDB,
           this.localHorsesDB,
@@ -166,56 +145,51 @@ export default class PouchCouch {
         ).on('complete', () => {
           resolve()
         }).on('error', (e) => {
-          logError('localReplicateHorses')
-          logError(e)
-          reject()
+          throw e
         })
       }).catch((e) => {
-        logError('localReplicateHorses allJoins error')
-        logError(e)
-        reject()
+        reject(e)
       })
     })
   }
 
-  async deleteLocalDBs () {
+  deleteLocalDBs () {
     logInfo('deleting all local DBs')
-    await this.localHorsesDB.destroy()
-    await this.localUsersDB.destroy()
-    await this.localRidesDB.destroy()
+    return Promise.all([
+      this.localHorsesDB.destroy(),
+      this.localUsersDB.destroy(),
+      this.localRidesDB.destroy(),
+    ])
   }
 
-  async localLoad () {
-    async function allDocs () {
-      const promises = [
-        this.localHorsesDB.allDocs(),
-        this.localRidesDB.allDocs(),
-        this.localUsersDB.allDocs(),
-      ]
-      return Promise.all(promises)
-    }
-    [ horsesResp, ridesResp, usersResp ] = await allDocs.bind(this)()
-    const rideDocs = ridesResp.rows.map(r => r.doc)
-    const userDocs = usersResp.rows.map(u => u.doc)
-    const horseDocs = horsesResp.rows.map(h => h.doc)
-    return {
-      horses: horseDocs.filter(h => h.type === 'horse'),
-      horsePhotos: horseDocs.filter(h => h.type === 'horsePhoto'),
-      horseUsers: horseDocs.filter(h => h.type === 'horseUser'),
-      follows: userDocs.filter(u => u.type === 'follow'),
-      rideCarrots: rideDocs.filter(r => r.type === 'carrot'),
-      rideCoordinates: rideDocs.filter(r => r.type === 'rideCoordinates'),
-      rideComments: rideDocs.filter(r => r.type === 'comment'),
-      rideElevations: rideDocs.filter(r => r.type === 'rideElevations'),
-      ridePhotos: rideDocs.filter(r => r.type === 'ridePhoto'),
-      rideHorses: rideDocs.filter(r => r.type === 'rideHorse'), // this getting silly, only iterate once
-      rides: rideDocs.filter(r => r.type === 'ride'),
-      users: userDocs.filter(u => u.type === 'user'),
-      userPhotos: userDocs.filter(u => u.type === 'userPhoto')
-    }
+  localLoad () {
+    return Promise.all([
+      this.localHorsesDB.allDocs(),
+      this.localRidesDB.allDocs(),
+      this.localUsersDB.allDocs(),
+    ]).then(([horsesResp, ridesResp, usersResp]) => {
+      const rideDocs = ridesResp.rows.map(r => r.doc)
+      const userDocs = usersResp.rows.map(u => u.doc)
+      const horseDocs = horsesResp.rows.map(h => h.doc)
+      return {
+        horses: horseDocs.filter(h => h.type === 'horse'),
+        horsePhotos: horseDocs.filter(h => h.type === 'horsePhoto'),
+        horseUsers: horseDocs.filter(h => h.type === 'horseUser'),
+        follows: userDocs.filter(u => u.type === 'follow'),
+        rideCarrots: rideDocs.filter(r => r.type === 'carrot'),
+        rideCoordinates: rideDocs.filter(r => r.type === 'rideCoordinates'),
+        rideComments: rideDocs.filter(r => r.type === 'comment'),
+        rideElevations: rideDocs.filter(r => r.type === 'rideElevations'),
+        ridePhotos: rideDocs.filter(r => r.type === 'ridePhoto'),
+        rideHorses: rideDocs.filter(r => r.type === 'rideHorse'), // this getting silly, only iterate once
+        rides: rideDocs.filter(r => r.type === 'ride'),
+        users: userDocs.filter(u => u.type === 'user'),
+        userPhotos: userDocs.filter(u => u.type === 'userPhoto')
+      }
+    })
   }
 
-  async loadRideCoordinates (rideID) {
-    return this.localRidesDB.get(`${rideID}_coordinates`).catch(e => this.catchError(e))
+  loadRideCoordinates (rideID) {
+    return this.localRidesDB.get(`${rideID}_coordinates`)
   }
 }

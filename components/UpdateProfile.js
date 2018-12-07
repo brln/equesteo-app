@@ -68,17 +68,6 @@ export default class UpdateProfile extends PureComponent {
 
   render() {
     const hasPictures = this.props.userPhotos.count() > 0
-    let photoMenu = null
-    if (this.props.showPhotoMenu) {
-      photoMenu = (
-        <PhotoMenu
-          changeProfilePhotoID={this.changeProfilePhotoID}
-          deletePhoto={this.deletePhoto}
-          clearPhotoMenu={this.props.clearPhotoMenu}
-          selectedPhotoID={this.props.selectedPhotoID}
-        />
-      )
-    }
     return (
       <View>
         <ScrollView keyboardShouldPersistTaps={'always'}>
@@ -167,7 +156,13 @@ export default class UpdateProfile extends PureComponent {
             </View>
           </View>
         </ScrollView>
-        { photoMenu }
+        <PhotoMenu
+          changeProfilePhotoID={this.changeProfilePhotoID}
+          deletePhoto={this.deletePhoto}
+          clearPhotoMenu={this.props.clearPhotoMenu}
+          selectedPhotoID={this.props.selectedPhotoID}
+          visible={this.props.showPhotoMenu}
+        />
       </View>
     )
   }

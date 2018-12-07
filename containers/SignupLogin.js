@@ -120,7 +120,7 @@ class SignupLoginContainer extends PureComponent {
     this.props.dispatch(submitLogin(email, password))
   }
 
-  async getPWCode (email) {
+  getPWCode (email) {
     this.setState({ forgotSubmitted: true })
     this.props.dispatch(getPWCode(email))
   }
