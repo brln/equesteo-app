@@ -15,14 +15,10 @@ import {
   ENQUEUE_PHOTO,
   ERROR_OCCURRED,
   LOAD_LOCAL_STATE,
-  NEEDS_REMOTE_PERSIST,
   NEW_APP_STATE,
   NEW_NETWORK_STATE,
   POP_SHOW_RIDE_SHOWN,
   RECEIVE_JWT,
-  REMOTE_PERSIST_COMPLETE,
-  REMOTE_PERSIST_ERROR,
-  REMOTE_PERSIST_STARTED,
   REMOVE_STASHED_RIDE_PHOTO,
   SAVE_USER_ID,
   SET_ACTIVE_COMPONENT,
@@ -30,6 +26,7 @@ import {
   SET_FIRST_START_HORSE_ID,
   SET_FULL_SYNC_FAIL,
   SET_POP_SHOW_RIDE,
+  SET_REMOTE_PERSIST_DB,
   SET_SHOWING_RIDE,
   SHOW_POP_SHOW_RIDE,
   SET_AWAITING_PW_CHANGE,
@@ -65,7 +62,6 @@ export const initialState = Map({
   photoQueue: Map(),
   popShowRide: null,
   popShowRideNow: null,
-  remotePersistActive: false,
   ridePhotoStash: Map(),
   root: SIGNUP_LOGIN,
   showingRideID: null,
@@ -105,8 +101,8 @@ export default function LocalStateReducer(state=initialState, action) {
     case LOAD_LOCAL_STATE:
       const loadedState = action.localState
       return loadedState.set('feedMessage', null).set('doingInitialLoad', false).set('showingRideID', null)
-    case NEEDS_REMOTE_PERSIST:
-      return state.setIn(['needsRemotePersist', action.database], true)
+    case SET_REMOTE_PERSIST_DB:
+      return state.setIn(['needsRemotePersist', action.database], action.value)
     case NEW_APP_STATE:
       return state.set('appState', action.newState)
     case NEW_NETWORK_STATE:
@@ -119,22 +115,6 @@ export default function LocalStateReducer(state=initialState, action) {
       )
     case RECEIVE_JWT:
       return state.set('jwt', action.token)
-    case REMOTE_PERSIST_COMPLETE:
-      let dbSwitched = state.setIn(
-        ['needsRemotePersist', action.database],
-        false
-      )
-      const allDone = dbSwitched.get(
-        'needsRemotePersist'
-      ).valueSeq().filter(x => x).count() === 0
-      if (allDone) {
-        dbSwitched = dbSwitched.set('remotePersistActive', false)
-      }
-      return dbSwitched
-    case REMOTE_PERSIST_ERROR:
-      return state.set('remotePersistActive', false)
-    case REMOTE_PERSIST_STARTED:
-      return state.set('remotePersistActive', true)
     case REMOVE_STASHED_RIDE_PHOTO:
       return state.deleteIn(['ridePhotoStash', action.stashKey, action.photoID])
     case SAVE_USER_ID:

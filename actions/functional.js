@@ -23,6 +23,10 @@ import { CAMERA, DRAWER, FEED, RECORDER, SIGNUP_LOGIN, UPDATE_NEW_RIDE_ID } from
 import { LocalStorage, PouchCouch, RidePersister, UserAPI } from '../services'
 import {BadRequestError, NotConnectedError, UnauthorizedError} from "../errors"
 
+const DB_NEEDS_SYNC = 'DB_NEEDS_SYNC'
+const DB_SYNCING = 'DB_SYNCING'
+const DB_SYNCED = 'DB_SYNCED'
+
 import {
   awaitFullSync,
   clearLastLocation,
@@ -47,8 +51,6 @@ import {
   rideCarrotCreated,
   rideCarrotSaved,
   rideCommentUpdated,
-  rideUpdated,
-  rideElevationsUpdated,
   ridePhotoUpdated,
   setPopShowRide,
   setRemotePersistDB,
@@ -289,6 +291,22 @@ export function newPassword (password) {
   }
 }
 
+export function doRemotePersist(db) {
+  return (dispatch, getState) => {
+    const goodConnection = getState().getIn(['localState', 'goodConnection'])
+    const jwt = getState().getIn(['localState', 'jwt'])
+    if (jwt && goodConnection) {
+      const pouchCouch = new PouchCouch(jwt)
+      dispatch(remotePersistStarted(db))
+      pouchCouch.remoteReplicateDB(db).on('complete', () => {
+        dispatch(remotePersistComplete(db))
+      }).on('error', () => {
+        dispatch(remotePersistError(db))
+      })
+    }
+  }
+}
+
 export function needsRemotePersist(db) {
   return (dispatch) => {
     dispatch(setFeedMessage(Map({
@@ -296,7 +314,8 @@ export function needsRemotePersist(db) {
       color: warning,
       timeout: false
     })))
-    dispatch(setRemotePersistDB(db))
+    dispatch(setRemotePersistDB(db, DB_NEEDS_SYNC))
+    dispatch(doRemotePersist(db))
   }
 }
 
@@ -518,7 +537,7 @@ export function persistHorseUser (horseUserID) {
 
 export function remotePersistComplete (db) {
   return async (dispatch) => {
-    dispatch(setRemotePersistComplete(db))
+    dispatch(setRemotePersistDB(db, DB_SYNCED))
     dispatch(setFeedMessage(Map({
       message: 'All Data Uploaded',
       color: green,
@@ -529,7 +548,7 @@ export function remotePersistComplete (db) {
 
 export function remotePersistError () {
   return async (dispatch) => {
-    dispatch(setRemotePersistError())
+    dispatch(setRemotePersistDB(db, DB_NEEDS_SYNC))
     dispatch(setFeedMessage(Map({
       message: 'Can\'t Upload Data',
       color: danger,
@@ -538,9 +557,9 @@ export function remotePersistError () {
   }
 }
 
-export function remotePersistStarted () {
+export function remotePersistStarted (db) {
   return async (dispatch) => {
-    dispatch(setRemotePersistStarted())
+    dispatch(setRemotePersistDB(db, DB_SYNCING))
     dispatch(setFeedMessage(Map({
       message: 'Data Uploading',
       color: warning,
@@ -701,7 +720,7 @@ export function startLocationTracking () {
 }
 
 function startNetworkTracking () {
-  return (dispatch) => {
+  return (dispatch, getState) => {
     NetInfo.getConnectionInfo().then((connectionInfo) => {
       dispatch(newNetworkState(connectionInfo.type, connectionInfo.effectiveType))
     });
@@ -709,6 +728,9 @@ function startNetworkTracking () {
       'connectionChange',
       (connectionInfo) => {
         dispatch(newNetworkState(connectionInfo.type, connectionInfo.effectiveType))
+
+
+
       }
     );
   }

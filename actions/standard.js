@@ -29,16 +29,12 @@ import {
   LOAD_LOCAL_STATE,
   LOCAL_DATA_LOADED,
   MERGE_STASHED_LOCATIONS,
-  NEEDS_REMOTE_PERSIST,
   NEW_LOCATION,
   NEW_APP_STATE,
   NEW_NETWORK_STATE,
   PAUSE_LOCATION_TRACKING,
   POP_SHOW_RIDE_SHOWN,
   RECEIVE_JWT,
-  REMOTE_PERSIST_COMPLETE,
-  REMOTE_PERSIST_ERROR,
-  REMOTE_PERSIST_STARTED,
   REMOVE_STASHED_RIDE_PHOTO,
   REPLACE_LAST_LOCATION,
   RIDE_CARROT_CREATED,
@@ -55,6 +51,7 @@ import {
   SET_FIRST_START_HORSE_ID,
   SET_FULL_SYNC_FAIL,
   SET_POP_SHOW_RIDE,
+  SET_REMOTE_PERSIST_DB,
   SHOW_POP_SHOW_RIDE,
   START_RIDE,
   STASH_NEW_LOCATIONS,
@@ -417,10 +414,11 @@ export function setPopShowRide (rideID, showRideNow, scrollToComments) {
   }
 }
 
-export function setRemotePersistDB (database) {
+export function setRemotePersistDB (database, value) {
   return {
-    type: NEEDS_REMOTE_PERSIST,
-    database
+    type: SET_REMOTE_PERSIST_DB,
+    database,
+    value
   }
 }
 
@@ -436,25 +434,6 @@ export function setFullSyncFail (status) {
     type: SET_FULL_SYNC_FAIL,
     status,
     logData: ['status']
-  }
-}
-
-export function setRemotePersistStarted () {
-  return {
-    type: REMOTE_PERSIST_STARTED
-  }
-}
-
-export function setRemotePersistComplete (database) {
-  return {
-    type: REMOTE_PERSIST_COMPLETE,
-    database
-  }
-}
-
-export function setRemotePersistError () {
-  return {
-    type: REMOTE_PERSIST_ERROR,
   }
 }
 
