@@ -305,11 +305,10 @@ export function newLocation (location, elevation) {
   }
 }
 
-export function newNetworkState (connectionType, effectiveConnectionType) {
+export function newNetworkState (goodConnection) {
   return {
     type: NEW_NETWORK_STATE,
-    connectionType,
-    effectiveConnectionType,
+    goodConnection,
     logData: ['connectionType', 'effectiveConnectionType'],
   }
 }

@@ -76,7 +76,7 @@ public class MainApplication extends NavigationApplication {
             new RNFirebaseNotificationsPackage(),
             new ReactNativePushNotificationPackage(),
             new RNFirebaseInstanceIdPackage(),
-            new RNSentryPackage(MainApplication.this),
+            new RNSentryPackage(),
             new SvgPackage(),
             new RCTMGLPackage(),
             new RNCameraPackage()

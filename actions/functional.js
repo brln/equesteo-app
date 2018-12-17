@@ -12,6 +12,7 @@ import { captureException, setUserContext } from "../services/Sentry"
 import { handleNotification } from '../services/PushNotificationHandler'
 
 import {
+  goodConnection,
   haversine,
   logError,
   logInfo,
@@ -302,6 +303,8 @@ export function doRemotePersist(db) {
         dispatch(remotePersistComplete(db))
       }).on('error', () => {
         dispatch(remotePersistError(db))
+      }).on('denied', () => {
+        dispatch(remotePersistError(db))
       })
     }
   }
@@ -546,7 +549,7 @@ export function remotePersistComplete (db) {
   }
 }
 
-export function remotePersistError () {
+export function remotePersistError (db) {
   return async (dispatch) => {
     dispatch(setRemotePersistDB(db, DB_NEEDS_SYNC))
     dispatch(setFeedMessage(Map({
@@ -727,12 +730,24 @@ function startNetworkTracking () {
     NetInfo.addEventListener(
       'connectionChange',
       (connectionInfo) => {
-        dispatch(newNetworkState(connectionInfo.type, connectionInfo.effectiveType))
+        const gc = goodConnection(
+          connectionInfo.type,
+          connectionInfo.effectiveType
+        )
+        dispatch(newNetworkState(gc))
 
-
-
+        const needsPersist = getState().getIn(['localState', 'needsRemotePersist'])
+        const needsAnyPersist = needsPersist.valueSeq().filter(x => x).count() > 0
+        const jwt = getState().getIn(['localState', 'jwt'])
+        if (needsAnyPersist && jwt && gc) {
+          for (let db of needsPersist.keySeq()) {
+            if (needsPersist.get(db)) {
+              dispatch(doRemotePersist(db))
+            }
+          }
+        }
       }
-    );
+    )
   }
 }
 

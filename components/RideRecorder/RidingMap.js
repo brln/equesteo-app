@@ -280,7 +280,7 @@ RidingMap.propTypes = {
   centerCoordinate: PropTypes.array,
   currentRideCoordinates: PropTypes.instanceOf(List).isRequired,
   heading: PropTypes.number.isRequired,
-  lastLocation: PropTypes.instanceOf(Map).isRequired,
+  lastLocation: PropTypes.instanceOf(Map),
   mapRegionChanged: PropTypes.func.isRequired,
   recenter: PropTypes.func.isRequired,
   userControlledMap: PropTypes.bool.isRequired,

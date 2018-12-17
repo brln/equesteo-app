@@ -106,13 +106,7 @@ export default function LocalStateReducer(state=initialState, action) {
     case NEW_APP_STATE:
       return state.set('appState', action.newState)
     case NEW_NETWORK_STATE:
-      return state.set(
-        'goodConnection',
-        goodConnection(
-          action.connectionType,
-          action.effectiveConnectionType
-        )
-      )
+      return state.set('goodConnection', action.goodConnection)
     case RECEIVE_JWT:
       return state.set('jwt', action.token)
     case REMOVE_STASHED_RIDE_PHOTO:
