@@ -8,6 +8,7 @@ import firebase from 'react-native-firebase'
 import { Navigation } from 'react-native-navigation'
 import PushNotification from 'react-native-push-notification'
 
+import { UnauthorizedError } from "../errors"
 import kalmanFilter from '../services/Kalman'
 import { captureException, setUserContext } from "../services/Sentry"
 import { handleNotification } from '../services/PushNotificationHandler'
@@ -46,6 +47,7 @@ import {
   dequeuePhoto,
   dismissError,
   enqueuePhoto,
+  errorOccurred,
   horsePhotoUpdated,
   horseUpdated,
   followUpdated,
@@ -65,24 +67,31 @@ import {
   setRemotePersistDB,
   setFeedMessage,
   setFullSyncFail,
+  setSigningOut,
   showPopShowRide,
   saveUserID,
   setActiveComponent,
   syncComplete,
-  setAwaitingPasswordChange,
-  setDoingInitialLoad,
   updatePhotoStatus,
   userPhotoUpdated,
   userSearchReturned,
   userUpdated,
 } from './standard'
 
-export function catchAsyncError (e) {
-  logError(e)
-  captureException(e)
-  setTimeout(() => {
-    throw Error('Async error')
-  }, 0)
+export function catchAsyncError (dispatch, action) {
+  return (e) => {
+    logDebug('catchAsync error', 'dbg')
+    if (e.status === 401) {
+      logDebug('handle401 in catchAsync', 'dbg')
+      dispatch(handle401(action))
+    } else {
+      setTimeout(() => {
+        throw Error('Async error')
+      }, 0)
+    }
+    logError(e)
+    captureException(e)
+  }
 }
 
 
@@ -117,7 +126,7 @@ export function appInitialized () {
       dispatch(findLocalToken())
       dispatch(startNetworkTracking())
       dispatch(startAppStateTracking())
-    }).catch(catchAsyncError)
+    }).catch(catchAsyncError(dispatch))
   }
 }
 
@@ -134,8 +143,6 @@ export function checkFCMPermission () {
     })
   }
 }
-
-
 
 export function createRideComment(commentData) {
   return (dispatch, getState) => {
@@ -157,7 +164,7 @@ export function createRideComment(commentData) {
       const afterSave = getState().getIn(['pouchRecords', 'rideComments', commentID])
       dispatch(rideCommentUpdated(afterSave.set('_rev', doc.rev)))
       dispatch(needsRemotePersist('rides'))
-    }).catch(cachAsyncError)
+    }).catch(catchAsyncError(dispatch))
 
   }
 }
@@ -202,14 +209,16 @@ function findLocalToken () {
         dispatch(setDistributionOnServer())
         dispatch(syncDBPull('all'))
       }
-    }).catch(catchAsyncError)
+    }).catch(catchAsyncError(dispatch))
   }
 }
 
 export function getPWCode (email) {
-  return () => {
+  return (dispatch) => {
     let userAPI = new UserAPI()
-    userAPI.getPWCode(email).catch(catchAsyncError)
+    userAPI.getPWCode(email).catch(e => {
+      dispatch(errorOccurred(e.message))
+    })
   }
 }
 
@@ -225,12 +234,35 @@ export function getFCMToken () {
   }
 }
 
+export function handle401 (priorAction) {
+  return (dispatch, getState) => {
+    logDebug('in handle401', 'dbg')
+    const jwt = getState().getIn(['localState', 'jwt'])
+    let userAPI = new UserAPI(jwt)
+    userAPI.renewToken().then(resp => {
+      dispatch(receiveJWT(resp.token))
+      const userID = getState().getIn(['localState', 'userID'])
+      return LocalStorage.saveToken(resp.token, userID)
+    }).then(() => {
+      if (priorAction) {
+        logDebug('dispatching prior action', 'dbg')
+        dispatch(priorAction())
+      }
+    }).catch(e => {
+      if (e instanceof UnauthorizedError) {
+        logDebug('handle401 error signout', 'dbg')
+        dispatch(signOut())
+      }
+    })
+  }
+}
+
 export function loadRideCoordinates (rideID) {
   return (dispatch) => {
     const pouchCouch = new PouchCouch()
     pouchCouch.loadRideCoordinates(rideID).then((coords) => {
       dispatch(rideCoordinatesLoaded(coords))
-    }).catch(catchAsyncError)
+    }).catch(catchAsyncError(dispatch))
   }
 }
 
@@ -240,7 +272,7 @@ export function newPassword (password) {
     const userAPI = new UserAPI(jwt)
     userAPI.changePassword(password).then(() => {
       dispatch(switchRoot(FEED))
-    }).catch(catchAsyncError)
+    }).catch(catchAsyncError(dispatch))
   }
 }
 
@@ -287,7 +319,7 @@ export function persistFollow (followID) {
       dispatch(followUpdated(foundAfterSave.set('_rev', rev)))
       dispatch(needsRemotePersist('users'))
       dispatch(syncDBPull())
-    }).catch(catchAsyncError)
+    }).catch(catchAsyncError(dispatch))
   }
 }
 
@@ -325,7 +357,7 @@ export function persistUserWithPhoto (userID, userPhotoID) {
       dispatch(userUpdated(theUserAfterSave.set('_rev', rev)))
     }).then(() => {
       dispatch(needsRemotePersist('users'))
-    }).catch(catchAsyncError)
+    }).catch(catchAsyncError(dispatch))
   }
 }
 
@@ -351,7 +383,7 @@ export function persistHorseWithPhoto (horseID, horsePhotoID) {
       const theHorseAfterSave = getState().getIn(['pouchRecords', 'horses', horseID])
       dispatch(horseUpdated(theHorseAfterSave.set('_rev', doc.rev)))
       dispatch(needsRemotePersist('horses'))
-    })
+    }).catch(catchAsyncError(dispatch))
   }
 }
 
@@ -428,7 +460,7 @@ export function persistHorseUpdate (horseID, horseUserID, deletedPhotoIDs, newPh
 
     horseSaves.then(() => {
       dispatch(needsRemotePersist('horses'))
-    })
+    }).catch(catchAsyncError(dispatch))
   }
 }
 
@@ -444,7 +476,7 @@ export function persistHorseUser (horseUserID) {
       const theHorseUserAfterSave = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
       dispatch(horseUserUpdated(theHorseUserAfterSave.set('_rev', rev)))
       dispatch(needsRemotePersist('horses'))
-    }).catch(catchAsyncError)
+    }).catch(catchAsyncError(dispatch))
   }
 }
 
@@ -475,13 +507,12 @@ export function persistUserUpdate (userID, deletedPhotoIDs) {
       }).then(({ rev }) => {
         const theUserPhotoAfterSave = getState().getIn(['pouchRecords', 'userPhotos', userPhotoID])
         dispatch(userPhotoUpdated(theUserPhotoAfterSave.set('_rev', rev)))
-        dispatch(needsRemotePersist('users'))
       })
     }
 
     userSave.then(() => {
       dispatch(needsRemotePersist('users'))
-    }).catch(catchAsyncError)
+    }).catch(catchAsyncError(dispatch))
   }
 }
 
@@ -566,7 +597,7 @@ export function uploadPhoto (type, photoLocation, photoID) {
 
 export function remotePersistComplete (db) {
   return (dispatch) => {
-    dispatch(setRemotePersistComplete(db, DB_SYNCED))
+    dispatch(setRemotePersistDB(db, DB_SYNCED))
     dispatch(setFeedMessage(Map({
       message: 'All Data Uploaded',
       color: green,
@@ -603,7 +634,7 @@ export function searchForFriends (phrase) {
     const userAPI = new UserAPI(jwt)
     userAPI.findUser(phrase).then(resp => {
       dispatch(userSearchReturned(fromJS(resp)))
-    }).catch(catchAsyncError)
+    }).catch(catchAsyncError(dispatch))
   }
 }
 
@@ -612,7 +643,9 @@ export function setFCMTokenOnServer (token) {
     const jwt = getState().getIn(['localState', 'jwt'])
     const userAPI = new UserAPI(jwt)
     const currentUserID = getState().getIn(['localState', 'userID'])
-    userAPI.setFCMToken(currentUserID, token).catch(() => {
+    userAPI.setFCMToken(currentUserID, token).then(() => {
+      logInfo('FCM token set')
+    }).catch(() => {
       logError('Could not set FCM token')
     })
   }
@@ -623,25 +656,33 @@ export function setDistributionOnServer () {
     const jwt = getState().getIn(['localState', 'jwt'])
     const userAPI = new UserAPI(jwt)
     const currentUserID = getState().getIn(['localState', 'userID'])
-    userAPI.setDistribution(currentUserID, DISTRIBUTION).catch(() => {
+    userAPI.setDistribution(currentUserID, DISTRIBUTION).then(() => {
+      logInfo('Distribution Set')
+    }).catch(() => {
       logError('Could not set distribution remotely')
     })
   }
 }
 
 export function signOut () {
-  return (dispatch) => {
-    dispatch(stopLocationTracking())
-    dispatch(clearStateAfterPersist())
-    const pouchCouch = new PouchCouch()
-    Promise.all([
-      LocalStorage.deleteToken(),
-      pouchCouch.deleteLocalDBs(),
-      stopListeningFCM(),
-      LocalStorage.deleteLocalState()
-    ]).then(() => {
-      dispatch(switchRoot(SIGNUP_LOGIN))
-    }).catch(catchAsyncError)
+  return (dispatch, getState) => {
+    logDebug('signOut start', 'dbg')
+    if (!getState().getIn(['localState', 'signingOut'])) {
+      dispatch(setSigningOut(true))
+      dispatch(stopLocationTracking())
+      dispatch(clearStateAfterPersist())
+      const pouchCouch = new PouchCouch()
+      Promise.all([
+        LocalStorage.deleteToken(),
+        pouchCouch.deleteLocalDBs(),
+        stopListeningFCM(),
+        LocalStorage.deleteLocalState()
+      ]).then(() => {
+        logDebug('signout done', 'dbg')
+        dispatch(switchRoot(SIGNUP_LOGIN))
+        dispatch(setSigningOut(false))
+      }).catch(catchAsyncError(dispatch))
+    }
   }
 }
 
@@ -735,7 +776,7 @@ export function startLocationTracking () {
           }
         }
       })
-    }).catch(catchAsyncError)
+    }).catch(catchAsyncError(dispatch))
 
     BackgroundGeolocation.on('error', (error) => {
       logError('[ERROR] BackgroundGeolocation error:', error);
@@ -890,14 +931,18 @@ export function syncDBPull () {
         dispatch(clearFeedMessage())
       }, 3000)
     }).catch((e) => {
-      dispatch(setFeedMessage(Map({
-        message: 'Error Fetching Data',
-        color: warning,
-      })))
-      setTimeout(() => {
-        dispatch(clearFeedMessage())
-      }, 3000)
-      dispatch(setFullSyncFail(true))
+      if (e.status === 401) {
+        dispatch(handle401(syncDBPull))
+      } else {
+        dispatch(setFeedMessage(Map({
+          message: 'Error Fetching Data',
+          color: warning,
+        })))
+        setTimeout(() => {
+          dispatch(clearFeedMessage())
+        }, 3000)
+        dispatch(setFullSyncFail(true))
+      }
     })
   }
 }
@@ -980,6 +1025,6 @@ export function toggleRideCarrot (rideID) {
     }
     save.then(() => {
       dispatch(needsRemotePersist('rides'))
-    }).catch(catchAsyncError)
+    }).catch(catchAsyncError(dispatch))
   }
 }

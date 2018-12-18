@@ -63,7 +63,7 @@ export default class LocalStorage {
     })
   }
 
-  static async deleteLocalState () {
+  static deleteLocalState () {
     logInfo('deleting async storage local state')
     return AsyncStorage.removeItem(LocalStorage.LOCAL_STATE_KEY)
   }

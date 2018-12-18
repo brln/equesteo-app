@@ -28,9 +28,10 @@ import {
   SET_POP_SHOW_RIDE,
   SET_REMOTE_PERSIST_DB,
   SET_SHOWING_RIDE,
-  SHOW_POP_SHOW_RIDE,
   SET_AWAITING_PW_CHANGE,
   SET_DOING_INITIAL_LOAD,
+  SET_SIGNING_OUT,
+  SHOW_POP_SHOW_RIDE,
   STASH_RIDE_PHOTO,
   SYNC_COMPLETE,
   UPDATE_PHOTO_STATUS,
@@ -66,6 +67,7 @@ export const initialState = Map({
   ridePhotoStash: Map(),
   root: SIGNUP_LOGIN,
   showingRideID: null,
+  signingOut: false,
   userID: null,
   userSearchResults: List(),
 })
@@ -126,10 +128,12 @@ export default function LocalStateReducer(state=initialState, action) {
       ).set(
         'popShowRideNow', action.showRideNow
       )
-    case SHOW_POP_SHOW_RIDE:
-      return state.set('popShowRideNow', true)
     case SET_SHOWING_RIDE:
       return state.set('showingRideID', action.rideID)
+    case SET_SIGNING_OUT:
+      return state.set('signingOut', action.value)
+    case SHOW_POP_SHOW_RIDE:
+      return state.set('popShowRideNow', true)
     case SYNC_COMPLETE:
       return state.set(
         'lastFullSync', new Date()

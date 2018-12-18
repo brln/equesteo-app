@@ -164,8 +164,8 @@ export function newRideName (currentRide) {
 }
 
 export function logError (error) {
+  console.log('*************** logError ****************')
   console.log(error)
-  console.log('*****************************************')
   console.log(error.stack)
   console.log('*****************************************')
 }
@@ -177,7 +177,7 @@ export function logInfo (info) {
 export function logDebug (info, title) {
   console.log(`======================= ${title} ===========================`)
   console.log(info)
-  console.log(`=================== end ${title} ===========================`)
+  console.log(`============================================================`)
 }
 
 export function logRender (componentName) {

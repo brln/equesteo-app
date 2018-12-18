@@ -29,6 +29,7 @@ import { setUserContext } from "../services/Sentry"
 export function loginAndSync(loginFunc, loginArgs, dispatch) {
   let pouchCouch
   loginFunc(...loginArgs).then(resp => {
+    // @TODO: figure out why followers have _id here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
     const token = resp.token
     const userID = resp.id
     const following = resp.following

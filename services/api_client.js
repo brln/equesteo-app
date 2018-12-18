@@ -45,15 +45,15 @@ export default class ApiClient {
         method
       }
     ).then(resp => {
-      switch (resp.status) {
-        case 400:
-          throw new BadRequestError(json.error)
-        case 401:
-          throw new UnauthorizedError(json.error)
-      }
-      return resp.json()
-    }).then(json => {
-      return json
+      return resp.json().then(json => {
+        switch (resp.status) {
+          case 400:
+            throw new BadRequestError(json.error)
+          case 401:
+            throw new UnauthorizedError(json.error)
+        }
+        return json
+      })
     }).catch(e => {
       if (e instanceof TypeError) {
         if (e.toString() === 'TypeError: Network request failed') {
@@ -61,7 +61,7 @@ export default class ApiClient {
           throw new NotConnectedError('Cannot find the internet.')
         }
       } else {
-        logError(e)
+        throw e
       }
     })
   }

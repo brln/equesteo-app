@@ -53,6 +53,7 @@ import {
   SET_POP_SHOW_RIDE,
   SET_REMOTE_PERSIST_DB,
   SHOW_POP_SHOW_RIDE,
+  SET_SIGNING_OUT,
   START_RIDE,
   STASH_NEW_LOCATIONS,
   STASH_RIDE_PHOTO,
@@ -520,6 +521,13 @@ export function setDoingInitialLoad (newVal) {
   return {
     type: SET_DOING_INITIAL_LOAD,
     newVal
+  }
+}
+
+export function setSigningOut (value) {
+  return {
+    type: SET_SIGNING_OUT,
+    value
   }
 }
 

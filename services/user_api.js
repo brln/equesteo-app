@@ -18,6 +18,10 @@ export default class UserAPI {
     })
   }
 
+  renewToken () {
+    return this.apiClient.get('/users/renewToken')
+  }
+
   signup (email, password) {
     return this.apiClient.post('/users', {
       email: email,
