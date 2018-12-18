@@ -61,7 +61,6 @@ export default class Feed extends PureComponent {
             activeTextStyle={{color: 'white'}}
           >
             <SyncingStatus
-              clearFeedMessage={this.props.clearFeedMessage}
               feedMessage={this.props.feedMessage}
               visible={this.props.feedMessage}
             />

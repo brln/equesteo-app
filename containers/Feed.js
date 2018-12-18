@@ -55,7 +55,6 @@ class FeedContainer extends BackgroundComponent {
       firstStartPopped: false,
       ridePopped: false,
     }
-    this.clearFeedMessage = this.clearFeedMessage.bind(this)
     this.toggleCarrot = this.toggleCarrot.bind(this)
     this.showProfile = this.showProfile.bind(this)
     this.showRide = this.showRide.bind(this)
@@ -106,10 +105,6 @@ class FeedContainer extends BackgroundComponent {
       nextState.refreshing = false
     }
     return nextState
-  }
-
-  clearFeedMessage () {
-     this.props.dispatch(clearFeedMessage())
   }
 
   componentDidUpdate () {
@@ -252,7 +247,6 @@ class FeedContainer extends BackgroundComponent {
     logRender('feedContainer')
     return (
       <Feed
-        clearFeedMessage={this.clearFeedMessage}
         deleteRide={this.deleteRide}
         feedMessage={this.props.feedMessage}
         followingRides={this.memoizeFollowingRides(this.props.follows, this.props.userID, this.props.rides)}

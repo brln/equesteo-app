@@ -1,3 +1,4 @@
+import ImagePicker from 'react-native-image-crop-picker'
 import { fromJS, Map  } from 'immutable'
 import { AppState, NetInfo } from 'react-native'
 import { DISTRIBUTION } from 'react-native-dotenv'
@@ -14,9 +15,12 @@ import { handleNotification } from '../services/PushNotificationHandler'
 import {
   goodConnection,
   haversine,
+  horsePhotoURL,
   logError,
   logInfo,
+  ridePhotoURL,
   unixTimeNow,
+  profilePhotoURL
 } from "../helpers"
 import { danger, green, warning } from '../colors'
 import { appStates, coordSplice } from '../helpers'
@@ -31,8 +35,10 @@ const DB_SYNCED = 'DB_SYNCED'
 import {
   awaitFullSync,
   clearLastLocation,
+  clearFeedMessage,
   clearStateAfterPersist,
   deleteUnpersistedPhoto,
+  dequeuePhoto,
   dismissError,
   enqueuePhoto,
   errorOccurred,
@@ -57,15 +63,13 @@ import {
   setRemotePersistDB,
   setFeedMessage,
   setFullSyncFail,
-  setRemotePersistStarted,
-  setRemotePersistComplete,
-  setRemotePersistError,
   showPopShowRide,
   saveUserID,
   setActiveComponent,
   syncComplete,
   setAwaitingPasswordChange,
   setDoingInitialLoad,
+  updatePhotoStatus,
   userPhotoUpdated,
   userSearchReturned,
   userUpdated,
@@ -315,7 +319,6 @@ export function needsRemotePersist(db) {
     dispatch(setFeedMessage(Map({
       message: 'Data Needs to Upload',
       color: warning,
-      timeout: false
     })))
     dispatch(setRemotePersistDB(db, DB_NEEDS_SYNC))
     dispatch(doRemotePersist(db))
@@ -344,22 +347,6 @@ export function persistRide (rideID, newRide, stashedPhotos, deletedPhotoIDs, tr
   return (dispatch, getState) => {
     const ridePersister = new RidePersister(dispatch, getState, rideID)
     ridePersister.persistRide(newRide, stashedPhotos, deletedPhotoIDs, trimValues, rideHorses)
-  }
-}
-
-export function persistRidePhoto (ridePhotoID) {
-  return (dispatch, getState) => {
-    const theRidePhoto = getState().getIn(['pouchRecords', 'ridePhotos', ridePhotoID])
-    if (!theRidePhoto) {
-      throw new Error('no ride photo with that ID')
-    }
-    const jwt = getState().getIn(['localState', 'jwt'])
-    const pouchCouch = new PouchCouch(jwt)
-    pouchCouch.saveRide(theRidePhoto.toJS()).then((doc) => {
-      const theRidePhotoAfterSave = getState().getIn(['pouchRecords', 'ridePhotos', ridePhotoID])
-      dispatch(ridePhotoUpdated(theRidePhotoAfterSave.set('_rev', doc.rev)))
-      dispatch(needsRemotePersist('rides'))
-    }).catch(catchAsyncError)
   }
 }
 
@@ -407,11 +394,7 @@ export function persistHorseWithPhoto (horseID, horsePhotoID) {
     pouchCouch.saveHorse(theHorsePhoto.toJS()).then((doc) => {
       const theHorsePhotoAfterSave = getState().getIn(['pouchRecords', 'horsePhotos', horsePhotoID])
       dispatch(horsePhotoUpdated(theHorsePhotoAfterSave.set('_rev', doc.rev)))
-      dispatch(enqueuePhoto(Map({
-        type: 'horse',
-        photoLocation: theHorsePhoto.get('uri'),
-        photoID: horsePhotoID
-      })))
+      dispatch(photoNeedsUpload('horse', theHorsePhoto.get('uri'), horsePhotoID))
       const theHorse = getState().getIn(['pouchRecords', 'horses', horseID])
       if (!theHorse) {
         throw new Error('no horse with that ID')
@@ -422,22 +405,6 @@ export function persistHorseWithPhoto (horseID, horsePhotoID) {
       dispatch(horseUpdated(theHorseAfterSave.set('_rev', doc.rev)))
       dispatch(needsRemotePersist('horses'))
     })
-  }
-}
-
-export function persistHorsePhoto (horsePhotoID) {
-  return async (dispatch, getState) => {
-    const theHorsePhoto = getState().getIn(['pouchRecords', 'horsePhotos', horsePhotoID])
-    if (!theHorsePhoto) {
-      throw new Error('no horse photo with that ID')
-    }
-    const jwt = getState().getIn(['localState', 'jwt'])
-    const pouchCouch = new PouchCouch(jwt)
-    const doc = await pouchCouch.saveHorse(theHorsePhoto.toJS())
-
-    const theHorsePhotoAfterSave = getState().getIn(['pouchRecords', 'horsePhotos', horsePhotoID])
-    dispatch(horsePhotoUpdated(theHorsePhotoAfterSave.set('_rev', doc.rev)))
-    dispatch(needsRemotePersist('horses'))
   }
 }
 
@@ -488,11 +455,7 @@ export function persistHorseUpdate (horseID, horseUserID, deletedPhotoIDs, newPh
             const theHorsePhotoAfterSave = getState().getIn(['pouchRecords', 'horsePhotos', photoID])
             dispatch(horsePhotoUpdated(theHorsePhotoAfterSave.set('_rev', doc.rev)))
             const photoLocation = theHorsePhotoAfterSave.get('uri')
-            dispatch(enqueuePhoto(Map({
-              type: 'horse',
-              photoLocation,
-              photoID
-            })))
+            dispatch(photoNeedsUpload('horse', photoLocation, photoID))
           })
         })
       }
@@ -538,14 +501,95 @@ export function persistHorseUser (horseUserID) {
   }
 }
 
+export function photoNeedsUpload (type, photoLocation, photoID) {
+  return (dispatch, getState) => {
+    const item = Map({
+      type,
+      photoLocation,
+      photoID,
+      status: 'enqueued',
+      timestamp: unixTimeNow()
+    })
+    dispatch(enqueuePhoto(item))
+
+    getState().getIn(['localState', 'photoQueue']).forEach((p) => {
+      if (p.get('status') === 'enqueued'
+        || p.get('status') === 'failed'
+        || p.get('status') === 'uploading' && unixTimeNow() - p.get('timestamp') > 300000) {
+        dispatch(uploadPhoto(
+          p.get('type'),
+          p.get('photoLocation'),
+          p.get('photoID'),
+        ))
+      }
+    })
+
+  }
+}
+
+export function uploadPhoto (type, photoLocation, photoID) {
+  return (dispatch, getState) => {
+    const jwt = getState().getIn(['localState', 'jwt'])
+    const goodConnection = getState().getIn(['localState', 'goodConnection'])
+    if (jwt && goodConnection) {
+      dispatch(updatePhotoStatus(photoID, 'uploading'))
+      const userAPI = new UserAPI(jwt)
+      userAPI.uploadPhoto(type, photoLocation, photoID).then(() => {
+        const pouchCouch = new PouchCouch(jwt)
+        switch (type) {
+          case 'horse':
+            const uploadedHorseURI = horsePhotoURL(photoID)
+            const horsePhoto = getState().getIn(['pouchRecords', 'horsePhotos', photoID]).set('uri', uploadedHorseURI)
+            dispatch(horsePhotoUpdated(horsePhoto))
+            return pouchCouch.saveHorse(horsePhoto.toJS()).then((doc) => {
+              const theHorsePhotoAfterSave = getState().getIn(['pouchRecords', 'horsePhotos', photoID])
+              dispatch(horsePhotoUpdated(theHorsePhotoAfterSave.set('_rev', doc.rev)))
+              dispatch(needsRemotePersist('horses'))
+            })
+          case 'ride':
+            const uploadedRideURI = ridePhotoURL(photoID)
+            const ridePhoto = getState().getIn(['pouchRecords', 'ridePhotos', photoID]).set('uri', uploadedRideURI)
+            dispatch(ridePhotoUpdated(ridePhoto))
+            logDebug(ridePhoto.toJSON(), 'wut')
+            return pouchCouch.saveRide(ridePhoto.toJS()).then((doc) => {
+              const theRidePhotoAfterSave = getState().getIn(['pouchRecords', 'ridePhotos', photoID])
+              dispatch(ridePhotoUpdated(theRidePhotoAfterSave.set('_rev', doc.rev)))
+              dispatch(needsRemotePersist('rides'))
+            })
+          case 'user':
+            const uploadedUserPhotoURI = profilePhotoURL(photoID)
+            const userPhoto = getState().getIn(['pouchRecords', 'userPhotos', photoID]).set('uri', uploadedUserPhotoURI)
+            dispatch(userPhotoUpdated(userPhoto))
+            return pouchCouch.saveUser(userPhoto.toJS()).then((doc) => {
+              const theUserPhotoAfterSave = getState().getIn(['pouchRecords', 'userPhotos', photoID])
+              dispatch(userPhotoUpdated(theUserPhotoAfterSave.set('_rev', doc.rev)))
+              dispatch(needsRemotePersist('users'))
+              dispatch(persistUserPhoto(userPhoto.get('_id')))
+            })
+          default:
+            throw Error('cant persist type I don\'t know about')
+        }
+      }).then(() => {
+        dispatch(dequeuePhoto(photoID))
+        return ImagePicker.cleanSingle(photoLocation)
+      }).catch(e => {
+        logError(e)
+        dispatch(updatePhotoStatus(photoID, 'failed'))
+      })
+    }
+  }
+}
+
 export function remotePersistComplete (db) {
   return async (dispatch) => {
     dispatch(setRemotePersistDB(db, DB_SYNCED))
     dispatch(setFeedMessage(Map({
       message: 'All Data Uploaded',
       color: green,
-      timeout: 3000
     })))
+    setTimeout(() => {
+      dispatch(clearFeedMessage())
+    }, 3000)
   }
 }
 
@@ -555,7 +599,6 @@ export function remotePersistError (db) {
     dispatch(setFeedMessage(Map({
       message: 'Can\'t Upload Data',
       color: danger,
-      timeout: false
     })))
   }
 }
@@ -566,7 +609,6 @@ export function remotePersistStarted (db) {
     dispatch(setFeedMessage(Map({
       message: 'Data Uploading',
       color: warning,
-      timeout: false
     })))
   }
 }
@@ -725,8 +767,12 @@ export function startLocationTracking () {
 function startNetworkTracking () {
   return (dispatch, getState) => {
     NetInfo.getConnectionInfo().then((connectionInfo) => {
-      dispatch(newNetworkState(connectionInfo.type, connectionInfo.effectiveType))
-    });
+      const gc = goodConnection(
+        connectionInfo.type,
+        connectionInfo.effectiveType
+      )
+      dispatch(newNetworkState(gc))
+    }).catch(catchAsyncError)
     NetInfo.addEventListener(
       'connectionChange',
       (connectionInfo) => {
@@ -735,7 +781,7 @@ function startNetworkTracking () {
           connectionInfo.effectiveType
         )
         dispatch(newNetworkState(gc))
-
+        //
         const needsPersist = getState().getIn(['localState', 'needsRemotePersist'])
         const needsAnyPersist = needsPersist.valueSeq().filter(x => x).count() > 0
         const jwt = getState().getIn(['localState', 'jwt'])
@@ -888,7 +934,6 @@ export function syncDBPull () {
     dispatch(setFeedMessage(Map({
       message: 'Loading...',
       color: warning,
-      timeout: null
     })))
     const jwt = getState().getIn(['localState', 'jwt'])
     const pouchCouch = new PouchCouch(jwt)
@@ -916,12 +961,17 @@ export function syncDBPull () {
         color: green,
         timeout: 3000
       })))
+      setTimeout(() => {
+        dispatch(clearFeedMessage())
+      }, 3000)
     } catch (e) {
       dispatch(setFeedMessage(Map({
         message: 'Error Fetching Data',
         color: warning,
-        timeout: 3000
       })))
+      setTimeout(() => {
+        dispatch(clearFeedMessage())
+      }, 3000)
       dispatch(setFullSyncFail(true))
     }
   }
@@ -1026,11 +1076,5 @@ export function tryToLoadStateFromDisk () {
     } else {
       logInfo('no cached current ride state found')
     }
-  }
-}
-
-export function uploadUserPhoto (photoID, photoLocation) {
-  return (dispatch) => {
-    dispatch(enqueuePhoto(Map({type: 'user', photoLocation, photoID})))
   }
 }

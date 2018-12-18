@@ -15,7 +15,7 @@ import {
   persistHorseUpdate,
   persistUser,
   persistUserPhoto,
-  uploadUserPhoto,
+  photoNeedsUpload,
 } from '../actions/functional'
 import { brand } from '../colors'
 import { generateUUID, logRender, unixTimeNow } from '../helpers'
@@ -129,7 +129,7 @@ class FirstStartContainer extends PureComponent {
 
     await this.props.dispatch(persistUser(userID))
     this.props.dispatch(persistUserPhoto(photoID))
-    this.props.dispatch(uploadUserPhoto(photoID, location))
+    this.props.dispatch(photoNeedsUpload('user', location, photoID))
   }
 
   addHorseProfilePhoto (location) {

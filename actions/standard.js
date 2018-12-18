@@ -63,6 +63,7 @@ import {
   SET_SHOWING_RIDE,
   UNPAUSE_LOCATION_TRACKING,
   UPDATE_NEW_RIDE_COORDS,
+  UPDATE_PHOTO_STATUS,
   USER_PHOTO_UPDATED,
   USER_SEARCH_RETURNED,
   USER_UPDATED,
@@ -417,7 +418,8 @@ export function setRemotePersistDB (database, value) {
   return {
     type: SET_REMOTE_PERSIST_DB,
     database,
-    value
+    value,
+    logData: ['database', 'value']
   }
 }
 
@@ -524,6 +526,15 @@ export function setDoingInitialLoad (newVal) {
 export function unpauseLocationTracking () {
   return {
     type: UNPAUSE_LOCATION_TRACKING
+  }
+}
+
+export function updatePhotoStatus (photoID, newStatus) {
+  return {
+    type: UPDATE_PHOTO_STATUS,
+    photoID,
+    newStatus,
+    logData: ['photoID', 'newStatus']
   }
 }
 

@@ -1,7 +1,6 @@
 import { fromJS, Map } from 'immutable'
 
 import {
-  enqueuePhoto,
   rideCoordinatesLoaded,
   rideElevationsUpdated,
   rideHorseUpdated,
@@ -10,6 +9,7 @@ import {
 } from '../actions/standard'
 import {
   needsRemotePersist,
+  photoNeedsUpload,
 } from "../actions/functional"
 import { coordSplice } from '../helpers'
 import { PouchCouch } from '../services'
@@ -107,13 +107,8 @@ export default class RidePersister {
           rideID: this.rideID,
         }))
         this.dispatch(ridePhotoUpdated(toSave))
-        this.dispatch(enqueuePhoto(Map({
-          type: 'ride',
-          photoLocation: stashedPhoto.get('uri'),
-          photoID,
-          rideID: this.rideID,
-        })))
         return this.pouchCouch.saveRide(toSave.toJS()).then(rideDoc => {
+          this.dispatch(photoNeedsUpload('ride', stashedPhoto.get('uri'), photoID))
           this.dispatch(ridePhotoUpdated(this.getRidePhoto(photoID).set('_rev', rideDoc.rev)))
         })
       })

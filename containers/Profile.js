@@ -15,8 +15,8 @@ import {
   persistFollow,
   persistUser,
   persistUserPhoto,
+  photoNeedsUpload,
   signOut,
-  uploadUserPhoto,
 } from "../actions/functional"
 import { brand } from '../colors'
 import {
@@ -148,7 +148,7 @@ class ProfileContainer extends BackgroundComponent {
 
     await this.props.dispatch(persistUser(userID))
     this.props.dispatch(persistUserPhoto(photoID))
-    this.props.dispatch(uploadUserPhoto(photoID, location))
+    this.props.dispatch(photoNeedsUpload('user', location, photoID))
   }
 
   showUserList (followRecords, followingOrFollower) {

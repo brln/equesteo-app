@@ -11,7 +11,6 @@ import { MAPBOX_TOKEN } from 'react-native-dotenv'
 import { appInitialized } from "./actions/functional"
 import { logDebug } from './helpers'
 import logger from './middleware/logger'
-import uploadPhotos from './middleware/photos'
 import storeLocalState from './middleware/localstate'
 import { registerScreens } from './screens'
 
@@ -29,7 +28,6 @@ const store = createStore(
   applyMiddleware(
     thunkMiddleware,
     logger,
-    uploadPhotos,
     storeLocalState,
   )
 )

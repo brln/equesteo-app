@@ -1,7 +1,7 @@
 import { List, Map } from 'immutable'
 
 import { FEED, SIGNUP_LOGIN } from '../screens'
-import { appStates, goodConnection } from '../helpers'
+import { appStates, goodConnection, unixTimeNow } from '../helpers'
 
 import {
   AWAIT_FULL_SYNC,
@@ -33,6 +33,7 @@ import {
   SET_DOING_INITIAL_LOAD,
   STASH_RIDE_PHOTO,
   SYNC_COMPLETE,
+  UPDATE_PHOTO_STATUS,
   USER_SEARCH_RETURNED,
 } from '../constants'
 
@@ -145,6 +146,10 @@ export default function LocalStateReducer(state=initialState, action) {
         newState = newState.setIn(['ridePhotoStash', action.stashKey], Map())
       }
       return newState.setIn(['ridePhotoStash', action.stashKey, action.photoData.get('_id')], action.photoData)
+    case UPDATE_PHOTO_STATUS:
+      const queueItem = state.getIn(['photoQueue', action.photoID])
+      const updated = queueItem.set('status', action.newStatus).set('timestamp', unixTimeNow())
+      return state.setIn(['photoQueue', action.photoID], updated)
     case USER_SEARCH_RETURNED:
       return state.set('userSearchResults', action.userSearchResults)
     default:

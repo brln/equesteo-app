@@ -70,10 +70,6 @@ export default class PouchCouch {
     }
   }
 
-  // --START MESSAGE
-  // Do not put error handlers on these, the errors are handled in
-  // middleware/couch.js::remotePersist and if you catch them here
-  // it fucks the queue up
   remoteReplicateHorses () {
     return PouchDB.replicate(this.localHorsesDB, this.remoteHorsesDB)
   }
@@ -85,7 +81,6 @@ export default class PouchCouch {
   remoteReplicateUsers () {
     return PouchDB.replicate(this.localUsersDB, this.remoteUsersDB)
   }
-  // ---END MESSAGE
 
   localReplicateDB(db, userIDs, followerUserIDs) {
     switch(db) {

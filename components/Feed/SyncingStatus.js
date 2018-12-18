@@ -6,24 +6,10 @@ const { width } = Dimensions.get('window')
 export default class SyncingStatus extends PureComponent {
   constructor (props) {
     super(props)
-    this.timeout = this.timeout.bind(this)
-  }
-
-  componentWillUnmount() {
-    this.feedTimeout = null
-  }
-
-  timeout () {
-    this.feedTimeout = setTimeout(() => {
-      this.props.clearFeedMessage()
-    }, this.props.feedMessage.get('timeout'))
   }
 
   render() {
     if (this.props.visible) {
-      if (this.props.feedMessage.get('timeout') && !this.feedTimeout) {
-        this.timeout()
-      }
       return (
         <View style={{width}}>
           <Text
