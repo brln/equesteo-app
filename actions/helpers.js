@@ -27,14 +27,12 @@ import { LocalStorage, PouchCouch } from '../services'
 import { setUserContext } from "../services/Sentry"
 
 export function loginAndSync(loginFunc, loginArgs, dispatch) {
-  let pouchCouch
   loginFunc(...loginArgs).then(resp => {
     // @TODO: figure out why followers have _id here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
     const token = resp.token
     const userID = resp.id
     const following = resp.following
     const followers = resp.followers
-    pouchCouch = new PouchCouch(token)
 
     dispatch(dismissError())
     dispatch(setAwaitingPasswordChange(true))
@@ -46,11 +44,10 @@ export function loginAndSync(loginFunc, loginArgs, dispatch) {
     dispatch(setDistributionOnServer())
     dispatch(setDoingInitialLoad(true))
     return Promise.all([
-      pouchCouch.localReplicateDB('all', [...following, userID], followers),
-      LocalStorage.saveToken(token, userID),
+      PouchCouch.localReplicateDB('all', [...following, userID], followers),
     ])
   }).then(() => {
-    return pouchCouch.localLoad()
+    return PouchCouch.localLoad()
   }).then(localData => {
     dispatch(localDataLoaded(localData))
     dispatch(setDoingInitialLoad(false))

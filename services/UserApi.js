@@ -1,63 +1,61 @@
-export default class UserAPI {
-  constructor (apiClient) {
-    this.apiClient = apiClient
-  }
+import ApiClient from './ApiClient'
 
-  getPWCode (email) {
-    return this.apiClient.post('/users/getPWCode', {
+export default class UserAPI {
+  static getPWCode (email) {
+    return ApiClient.post('/users/getPWCode', {
       email: email
     })
   }
 
-  login (email, password) {
-    return this.apiClient.post('/users/login', {
+  static login (email, password) {
+    return ApiClient.post('/users/login', {
       email: email,
       password: password,
     })
   }
 
-  renewToken () {
-    return this.apiClient.get('/users/renewToken')
+  static renewToken () {
+    return ApiClient.get('/users/renewToken')
   }
 
-  signup (email, password) {
-    return this.apiClient.post('/users', {
+  static signup (email, password) {
+    return ApiClient.post('/users', {
       email: email,
       password: password,
     })
   }
 
-  changePassword (newPassword) {
-    return this.apiClient.post('/users/changePW', {
+  static changePassword (newPassword) {
+    return ApiClient.post('/users/changePW', {
       password: newPassword
     })
   }
 
-  exchangePWCodeForToken (email, code) {
-    return this.apiClient.post('/users/exchangePWCode', { email, code })
+  static exchangePWCodeForToken (email, code) {
+    return ApiClient.post('/users/exchangePWCode', { email, code })
   }
 
-  setFCMToken (id, token) {
-    return this.apiClient.post('/users/setFCMToken', { id, token })
+  static setFCMToken (id, token) {
+    return ApiClient.post('/users/setFCMToken', { id, token })
   }
 
-  setDistribution (id, distribution) {
-    return this.apiClient.post('/users/setDistribution', { id, distribution })
+  static setDistribution (id, distribution) {
+    return ApiClient.post('/users/setDistribution', { id, distribution })
   }
 
-  _uploadProfilePhoto (imageLocation, photoID) {
-    return this.apiClient.uploadImage('/users/profilePhoto', photoID, imageLocation)
+  static _uploadProfilePhoto (imageLocation, photoID) {
+    return ApiClient.uploadImage('/users/profilePhoto', photoID, imageLocation)
   }
 
-  _uploadHorsePhoto (imageLocation, photoID) {
-    return this.apiClient.uploadImage('/users/horsePhoto', photoID, imageLocation)
+  static _uploadHorsePhoto (imageLocation, photoID) {
+    return ApiClient.uploadImage('/users/horsePhoto', photoID, imageLocation)
   }
 
-  _uploadRidePhoto (imageLocation, photoID) {
-    return this.apiClient.uploadImage('/users/ridePhoto', photoID, imageLocation)
+  static _uploadRidePhoto (imageLocation, photoID) {
+    return ApiClient.uploadImage('/users/ridePhoto', photoID, imageLocation)
   }
 
-  uploadPhoto (type, imageLocation, photoID) {
+  static uploadPhoto (type, imageLocation, photoID) {
     switch (type) {
       case 'horse':
         return this._uploadHorsePhoto(imageLocation, photoID)
@@ -70,7 +68,7 @@ export default class UserAPI {
     }
   }
 
-  findUser (searchPhrase) {
-    return this.apiClient.get('/users/search?q=' + searchPhrase)
+  static findUser (searchPhrase) {
+    return ApiClient.get('/users/search?q=' + searchPhrase)
   }
 }

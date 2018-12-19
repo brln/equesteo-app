@@ -8,7 +8,7 @@ import firebase from 'react-native-firebase'
 import { Navigation } from 'react-native-navigation'
 import PushNotification from 'react-native-push-notification'
 
-import { UnauthorizedError } from "../errors"
+import ApiClient from '../services/ApiClient'
 import kalmanFilter from '../services/Kalman'
 import { captureException, setUserContext } from "../services/Sentry"
 import { handleNotification } from '../services/PushNotificationHandler'
@@ -114,9 +114,21 @@ export function appInitialized () {
       dispatch(startActiveComponentListener())
       dispatch(dismissError())
       dispatch(checkFCMPermission())
-      dispatch(findLocalToken())
       dispatch(startNetworkTracking())
       dispatch(startAppStateTracking())
+      if (ApiClient.getToken()) {
+        PouchCouch.localLoad().then((localData) => {
+          dispatch(localDataLoaded(localData))
+          dispatch(startListeningFCMTokenRefresh())
+          dispatch(getFCMToken())
+          dispatch(startListeningFCM())
+          dispatch(setDistributionOnServer())
+          dispatch(syncDBPull('all'))
+          dispatch(switchRoot(FEED))
+        })
+      } else {
+        dispatch(switchRoot(SIGNUP_LOGIN))
+      }
     }).catch(catchAsyncError(dispatch))
   }
 }
@@ -137,8 +149,6 @@ export function checkFCMPermission () {
 
 export function createRideComment(commentData) {
   return (dispatch, getState) => {
-    const jwt = getState().getIn(['localState', 'jwt'])
-    const pouchCouch = new PouchCouch(jwt)
     const currentUserID = getState().getIn(['localState', 'userID'])
     const commentID = `${currentUserID}_${(new Date).getTime().toString()}`
     const newComment = Map({
@@ -151,7 +161,7 @@ export function createRideComment(commentData) {
       timestamp: commentData.timestamp
     })
     dispatch(rideCommentUpdated(newComment))
-    pouchCouch.saveRide(newComment.toJS()).then((doc) => {
+    PouchCouch.saveRide(newComment.toJS()).then((doc) => {
       const afterSave = getState().getIn(['pouchRecords', 'rideComments', commentID])
       dispatch(rideCommentUpdated(afterSave.set('_rev', doc.rev)))
       dispatch(needsRemotePersist('rides'))
@@ -173,41 +183,13 @@ export function deleteHorseUser (horseUserID) {
 
 export function exchangePWCode (email, code) {
   return (dispatch) => {
-    let userAPI = new UserAPI()
-    loginAndSync(userAPI.exchangePWCodeForToken.bind(userAPI), [email, code], dispatch)
-  }
-}
-
-function findLocalToken () {
-  return (dispatch) => {
-    LocalStorage.loadToken().then(storedToken => {
-      if (storedToken !== null) {
-        dispatch(receiveJWT(storedToken.token))
-        dispatch(saveUserID(storedToken.userID))
-        setUserContext(storedToken.userID)
-        dispatch(switchRoot(FEED))
-        const pouchCouch = new PouchCouch(storedToken.token)
-        return pouchCouch.localLoad()
-      } else {
-        dispatch(switchRoot(SIGNUP_LOGIN))
-      }
-    }).then((localData) => {
-      if (localData) {
-        dispatch(localDataLoaded(localData))
-        dispatch(startListeningFCMTokenRefresh())
-        dispatch(getFCMToken())
-        dispatch(startListeningFCM())
-        dispatch(setDistributionOnServer())
-        dispatch(syncDBPull('all'))
-      }
-    }).catch(catchAsyncError(dispatch))
+    loginAndSync(UserAPI.exchangePWCodeForToken, [email, code], dispatch)
   }
 }
 
 export function getPWCode (email) {
-  return (dispatch) => {
-    let userAPI = new UserAPI()
-    userAPI.getPWCode(email).catch(e => {
+  return (dispatch, getState) => {
+    UserAPI.getPWCode(email).catch(e => {
       dispatch(errorOccurred(e.message))
     })
   }
@@ -225,10 +207,9 @@ export function getFCMToken () {
   }
 }
 
-export function loadRideCoordinates () {
+export function loadRideCoordinates (rideID) {
   return (dispatch) => {
-    const pouchCouch = new PouchCouch()
-    pouchCouch.loadRideCoordinates(rideID).then((coords) => {
+    PouchCouch.loadRideCoordinates(rideID).then((coords) => {
       dispatch(rideCoordinatesLoaded(coords))
     }).catch(catchAsyncError(dispatch))
   }
@@ -236,9 +217,7 @@ export function loadRideCoordinates () {
 
 export function newPassword (password) {
   return (dispatch, getState) => {
-    const jwt = getState().getIn(['localState', 'jwt'])
-    const userAPI = new UserAPI(jwt)
-    userAPI.changePassword(password).then(() => {
+    UserAPI.changePassword(password).then(() => {
       dispatch(switchRoot(FEED))
     }).catch(catchAsyncError(dispatch))
   }
@@ -247,13 +226,11 @@ export function newPassword (password) {
 export function doRemotePersist(db) {
   return (dispatch, getState) => {
     const goodConnection = getState().getIn(['localState', 'goodConnection'])
-    const jwt = getState().getIn(['localState', 'jwt'])
-    if (jwt && goodConnection) {
-      const pouchCouch = new PouchCouch(jwt)
+    if (goodConnection) {
       dispatch(remotePersistStarted(db))
-      pouchCouch.remoteReplicateDB(db).on('complete', () => {
+      PouchCouch.remoteReplicateDB(db).then(() => {
         dispatch(remotePersistComplete(db))
-      }).on('error', (e) => {
+      }).catch((e) => {
         catchAsyncError(dispatch)(e)
         dispatch(remotePersistError(db))
       })
@@ -279,9 +256,7 @@ export function persistFollow (followID) {
       throw new Error('no follow with that ID')
     }
 
-    const jwt = getState().getIn(['localState', 'jwt'])
-    const pouchCouch = new PouchCouch(jwt)
-    pouchCouch.saveUser(theFollow.toJS()).then(({ rev }) => {
+    PouchCouch.saveUser(theFollow.toJS()).then(({ rev }) => {
       let foundAfterSave = getState().getIn(['pouchRecords', 'follows', followID])
       dispatch(followUpdated(foundAfterSave.set('_rev', rev)))
       dispatch(needsRemotePersist('users'))
@@ -304,9 +279,7 @@ export function persistUserWithPhoto (userID, userPhotoID) {
       throw new Error('no user photo with that ID: ' + userPhotoID)
     }
 
-    const jwt = getState().getIn(['localState', 'jwt'])
-    const pouchCouch = new PouchCouch(jwt)
-    pouchCouch.saveUser(theUserPhoto.toJS()).then(({ rev }) => {
+    PouchCouch.saveUser(theUserPhoto.toJS()).then(({ rev }) => {
       const theUserPhotoAfterSave = getState().getIn(['pouchRecords', 'userPhotos', userPhotoID])
       dispatch(userPhotoUpdated(theUserPhotoAfterSave.set('_rev', rev)))
       dispatch(enqueuePhoto(Map({
@@ -318,7 +291,7 @@ export function persistUserWithPhoto (userID, userPhotoID) {
       if (!theUser) {
         throw new Error('no user with that ID')
       }
-      return pouchCouch.saveUser(theUser.toJS())
+      return PouchCouch.saveUser(theUser.toJS())
     }).then(({ rev }) => {
       const theUserAfterSave = getState().getIn(['pouchRecords', 'users', userID])
       dispatch(userUpdated(theUserAfterSave.set('_rev', rev)))
@@ -334,10 +307,7 @@ export function persistHorseWithPhoto (horseID, horsePhotoID) {
     if (!theHorsePhoto) {
       throw new Error('no horse photo with that ID')
     }
-    const jwt = getState().getIn(['localState', 'jwt'])
-    const pouchCouch = new PouchCouch(jwt)
-
-    pouchCouch.saveHorse(theHorsePhoto.toJS()).then((doc) => {
+    PouchCouch.saveHorse(theHorsePhoto.toJS()).then((doc) => {
       const theHorsePhotoAfterSave = getState().getIn(['pouchRecords', 'horsePhotos', horsePhotoID])
       dispatch(horsePhotoUpdated(theHorsePhotoAfterSave.set('_rev', doc.rev)))
       dispatch(photoNeedsUpload('horse', theHorsePhoto.get('uri'), horsePhotoID))
@@ -345,7 +315,7 @@ export function persistHorseWithPhoto (horseID, horsePhotoID) {
       if (!theHorse) {
         throw new Error('no horse with that ID')
       }
-      return pouchCouch.saveHorse(theHorse.toJS())
+      return PouchCouch.saveHorse(theHorse.toJS())
     }).then((doc) => {
       const theHorseAfterSave = getState().getIn(['pouchRecords', 'horses', horseID])
       dispatch(horseUpdated(theHorseAfterSave.set('_rev', doc.rev)))
@@ -365,13 +335,11 @@ export function persistHorseUpdate (horseID, horseUserID, deletedPhotoIDs, newPh
       throw new Error('no horse user with that ID')
     }
 
-    const jwt = getState().getIn(['localState', 'jwt'])
-    const pouchCouch = new PouchCouch(jwt)
-    const horseSaves = pouchCouch.saveHorse(theHorse.toJS()).then((doc) => {
+    const horseSaves = PouchCouch.saveHorse(theHorse.toJS()).then((doc) => {
       const theHorseAfterSave = getState().getIn(['pouchRecords', 'horses', horseID])
       dispatch(horseUpdated(theHorseAfterSave.set('_rev', doc.rev)))
       const theHorseUser = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
-      return pouchCouch.saveHorse(theHorseUser.toJS())
+      return PouchCouch.saveHorse(theHorseUser.toJS())
     }).then(({ rev }) => {
       const theHorseUserAfterSave = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
       dispatch(horseUserUpdated(theHorseUserAfterSave.set('_rev', rev)))
@@ -383,7 +351,7 @@ export function persistHorseUpdate (horseID, horseUserID, deletedPhotoIDs, newPh
           const theHorsePhoto = getState().getIn(['pouchRecords', 'horsePhotos', photoID])
           const deleted = theHorsePhoto.set('deleted', true)
           dispatch(horsePhotoUpdated(deleted))
-          return pouchCouch.saveHorse(deleted.toJS()).then((doc) => {
+          return PouchCouch.saveHorse(deleted.toJS()).then((doc) => {
             const theHorsePhotoAfterSave = getState().getIn(['pouchRecords', 'horsePhotos', photoID])
             dispatch(horsePhotoUpdated(theHorsePhotoAfterSave.set('_rev', doc.rev)))
           })
@@ -397,7 +365,7 @@ export function persistHorseUpdate (horseID, horseUserID, deletedPhotoIDs, newPh
       if (deletedPhotoIDs.indexOf(photoID) < 0) {
         horseSaves.then(() => {
           const theHorsePhoto = getState().getIn(['pouchRecords', 'horsePhotos', photoID])
-          return pouchCouch.saveHorse(theHorsePhoto.toJS()).then((doc) => {
+          return PouchCouch.saveHorse(theHorsePhoto.toJS()).then((doc) => {
             const theHorsePhotoAfterSave = getState().getIn(['pouchRecords', 'horsePhotos', photoID])
             dispatch(horsePhotoUpdated(theHorsePhotoAfterSave.set('_rev', doc.rev)))
             const photoLocation = theHorsePhotoAfterSave.get('uri')
@@ -416,7 +384,7 @@ export function persistHorseUpdate (horseID, horseUserID, deletedPhotoIDs, newPh
           horseSaves.then(() => {
             const withoutDefault = horseUser.set('rideDefault', false)
             dispatch(horseUserUpdated(withoutDefault))
-            return pouchCouch.saveHorse(withoutDefault.toJS()).then((doc) => {
+            return PouchCouch.saveHorse(withoutDefault.toJS()).then((doc) => {
               const theHorseUserAfterSave = getState().getIn(['pouchRecords', 'horseUsers', withoutDefault.get('_id')])
               dispatch(horseUserUpdated(theHorseUserAfterSave.set('_rev', doc.rev)))
             })
@@ -437,9 +405,7 @@ export function persistHorseUser (horseUserID) {
     if (!theHorseUser) {
       throw new Error('no horse user with that ID')
     }
-    const jwt = getState().getIn(['localState', 'jwt'])
-    const pouchCouch = new PouchCouch(jwt)
-    pouchCouch.saveHorse(theHorseUser.toJS()).then(({ rev }) => {
+    PouchCouch.saveHorse(theHorseUser.toJS()).then(({ rev }) => {
       const theHorseUserAfterSave = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
       dispatch(horseUserUpdated(theHorseUserAfterSave.set('_rev', rev)))
       dispatch(needsRemotePersist('horses'))
@@ -453,9 +419,7 @@ export function persistUserUpdate (userID, deletedPhotoIDs) {
     if (!theUser) {
       throw new Error('no user with that ID')
     }
-    const jwt = getState().getIn(['localState', 'jwt'])
-    const pouchCouch = new PouchCouch(jwt)
-    const userSave = pouchCouch.saveUser(theUser.toJS())
+    const userSave = PouchCouch.saveUser(theUser.toJS())
 
     userSave.then(({ rev }) => {
       const theUserAfterSave = getState().getIn(['pouchRecords', 'users', userID])
@@ -470,7 +434,7 @@ export function persistUserUpdate (userID, deletedPhotoIDs) {
       const markedDeleted = theUserPhoto.set('deleted', true)
       dispatch(userPhotoUpdated(markedDeleted))
       userSave.then(() => {
-        return pouchCouch.saveUser(markedDeleted.toJS())
+        return PouchCouch.saveUser(markedDeleted.toJS())
       }).then(({ rev }) => {
         const theUserPhotoAfterSave = getState().getIn(['pouchRecords', 'userPhotos', userPhotoID])
         dispatch(userPhotoUpdated(theUserPhotoAfterSave.set('_rev', rev)))
@@ -512,19 +476,16 @@ export function photoNeedsUpload (type, photoLocation, photoID) {
 
 export function uploadPhoto (type, photoLocation, photoID) {
   return (dispatch, getState) => {
-    const jwt = getState().getIn(['localState', 'jwt'])
     const goodConnection = getState().getIn(['localState', 'goodConnection'])
-    if (jwt && goodConnection) {
+    if (goodConnection) {
       dispatch(updatePhotoStatus(photoID, 'uploading'))
-      const userAPI = new UserAPI(jwt)
-      userAPI.uploadPhoto(type, photoLocation, photoID).then(() => {
-        const pouchCouch = new PouchCouch(jwt)
+      UserAPI.uploadPhoto(type, photoLocation, photoID).then(() => {
         switch (type) {
           case 'horse':
             const uploadedHorseURI = horsePhotoURL(photoID)
             const horsePhoto = getState().getIn(['pouchRecords', 'horsePhotos', photoID]).set('uri', uploadedHorseURI)
             dispatch(horsePhotoUpdated(horsePhoto))
-            return pouchCouch.saveHorse(horsePhoto.toJS()).then((doc) => {
+            return PouchCouch.saveHorse(horsePhoto.toJS()).then((doc) => {
               const theHorsePhotoAfterSave = getState().getIn(['pouchRecords', 'horsePhotos', photoID])
               dispatch(horsePhotoUpdated(theHorsePhotoAfterSave.set('_rev', doc.rev)))
               dispatch(needsRemotePersist('horses'))
@@ -533,7 +494,7 @@ export function uploadPhoto (type, photoLocation, photoID) {
             const uploadedRideURI = ridePhotoURL(photoID)
             const ridePhoto = getState().getIn(['pouchRecords', 'ridePhotos', photoID]).set('uri', uploadedRideURI)
             dispatch(ridePhotoUpdated(ridePhoto))
-            return pouchCouch.saveRide(ridePhoto.toJS()).then((doc) => {
+            return PouchCouch.saveRide(ridePhoto.toJS()).then((doc) => {
               const theRidePhotoAfterSave = getState().getIn(['pouchRecords', 'ridePhotos', photoID])
               dispatch(ridePhotoUpdated(theRidePhotoAfterSave.set('_rev', doc.rev)))
               dispatch(needsRemotePersist('rides'))
@@ -542,7 +503,7 @@ export function uploadPhoto (type, photoLocation, photoID) {
             const uploadedUserPhotoURI = profilePhotoURL(photoID)
             const userPhoto = getState().getIn(['pouchRecords', 'userPhotos', photoID]).set('uri', uploadedUserPhotoURI)
             dispatch(userPhotoUpdated(userPhoto))
-            return pouchCouch.saveUser(userPhoto.toJS()).then((doc) => {
+            return PouchCouch.saveUser(userPhoto.toJS()).then((doc) => {
               const theUserPhotoAfterSave = getState().getIn(['pouchRecords', 'userPhotos', photoID])
               dispatch(userPhotoUpdated(theUserPhotoAfterSave.set('_rev', doc.rev)))
               dispatch(needsRemotePersist('users'))
@@ -596,10 +557,8 @@ export function remotePersistStarted (db) {
 }
 
 export function searchForFriends (phrase) {
-  return (dispatch, getState) => {
-    const jwt = getState().getIn(['localState', 'jwt'])
-    const userAPI = new UserAPI(jwt)
-    userAPI.findUser(phrase).then(resp => {
+  return (dispatch) => {
+    UserAPI.findUser(phrase).then(resp => {
       dispatch(userSearchReturned(fromJS(resp)))
     }).catch(catchAsyncError(dispatch))
   }
@@ -607,10 +566,8 @@ export function searchForFriends (phrase) {
 
 export function setFCMTokenOnServer (token) {
   return (dispatch, getState) => {
-    const jwt = getState().getIn(['localState', 'jwt'])
-    const userAPI = new UserAPI(jwt)
     const currentUserID = getState().getIn(['localState', 'userID'])
-    userAPI.setFCMToken(currentUserID, token).then(() => {
+    UserAPI.setFCMToken(currentUserID, token).then(() => {
       logInfo('FCM token set')
     }).catch(catchAsyncError(dispatch))
   }
@@ -618,10 +575,8 @@ export function setFCMTokenOnServer (token) {
 
 export function setDistributionOnServer () {
   return (dispatch, getState) => {
-    const jwt = getState().getIn(['localState', 'jwt'])
-    const userAPI = new UserAPI(jwt)
     const currentUserID = getState().getIn(['localState', 'userID'])
-    userAPI.setDistribution(currentUserID, DISTRIBUTION).then(() => {
+    UserAPI.setDistribution(currentUserID, DISTRIBUTION).then(() => {
       logInfo('Distribution Set')
     }).catch(catchAsyncError(dispatch))
   }
@@ -633,10 +588,9 @@ export function signOut () {
       dispatch(setSigningOut(true))
       dispatch(stopLocationTracking())
       dispatch(clearStateAfterPersist())
-      const pouchCouch = new PouchCouch()
+      const apiClient = getState().getIn(['localState', 'apiClient'])
       Promise.all([
-        LocalStorage.deleteToken(),
-        pouchCouch.deleteLocalDBs(),
+        PouchCouch.deleteLocalDBs(),
         stopListeningFCM(),
         LocalStorage.deleteLocalState()
       ]).then(() => {
@@ -841,15 +795,13 @@ function startAppStateTracking () {
 
 export function submitLogin (email, password) {
   return (dispatch) => {
-    const userAPI = new UserAPI()
-    loginAndSync(userAPI.login.bind(userAPI), [email, password], dispatch)
+    loginAndSync(UserAPI.login, [email, password], dispatch)
   }
 }
 
 export function submitSignup (email, password) {
   return (dispatch) => {
-    const userAPI = new UserAPI()
-    loginAndSync(userAPI.signup.bind(userAPI), [email, password], dispatch)
+    loginAndSync(UserAPI.signup, [email, password], dispatch)
   }
 }
 
@@ -860,8 +812,6 @@ export function syncDBPull () {
       message: 'Loading...',
       color: warning,
     })))
-    const jwt = getState().getIn(['localState', 'jwt'])
-    const pouchCouch = new PouchCouch(jwt)
     const userID = getState().getIn(['localState', 'userID'])
     const follows = getState().getIn(['pouchRecords', 'follows'])
     const following = follows.valueSeq().filter(
@@ -878,8 +828,8 @@ export function syncDBPull () {
     following.push(userID)
 
     dispatch(setFullSyncFail(false))
-    pouchCouch.localReplicateDB('all', following, followers).then(() => {
-      return pouchCouch.localLoad()
+    PouchCouch.localReplicateDB('all', following, followers).then(() => {
+      return PouchCouch.localLoad()
     }).then(localData => {
       dispatch(localDataLoaded(localData))
       dispatch(syncComplete())
@@ -949,8 +899,6 @@ export function switchRoot (newRoot) {
 
 export function toggleRideCarrot (rideID) {
   return (dispatch, getState) => {
-    const jwt = getState().getIn(['localState', 'jwt'])
-    const pouchCouch = new PouchCouch(jwt)
     const currentUserID = getState().getIn(['localState', 'userID'])
     let existing = getState().getIn(['pouchRecords', 'rideCarrots']).valueSeq().filter((c) => {
       return c.get('rideID') === rideID && c.get('userID') === currentUserID
@@ -961,7 +909,7 @@ export function toggleRideCarrot (rideID) {
     if (existing) {
       let toggled = existing.set('deleted', !existing.get('deleted'))
       dispatch(rideCarrotSaved(toggled))
-      save = pouchCouch.saveRide(toggled.toJS()).then((doc) => {
+      save = PouchCouch.saveRide(toggled.toJS()).then((doc) => {
         let afterSave = getState().getIn(['pouchRecords', 'rideCarrots', toggled.get('_id')])
         dispatch(rideCarrotSaved(afterSave.set('_rev', doc.rev)))
       })
@@ -975,7 +923,7 @@ export function toggleRideCarrot (rideID) {
         type: 'carrot'
       })
       dispatch(rideCarrotCreated(newCarrot))
-      save = pouchCouch.saveRide(newCarrot.toJS()).then(doc => {
+      save = PouchCouch.saveRide(newCarrot.toJS()).then(doc => {
         let afterSave = getState().getIn(['pouchRecords', 'rideCarrots', carrotID])
         dispatch(rideCarrotSaved(afterSave.set('_rev', doc.rev)))
       })

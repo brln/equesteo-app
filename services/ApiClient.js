@@ -1,23 +1,32 @@
 import { API_URL } from 'react-native-dotenv'
 import { logError } from '../helpers'
 import {BadRequestError, UnauthorizedError, NotConnectedError} from '../errors'
+import LocalStorage from './LocalStorage'
+
+let token = null
+
+const GET = 'get'
+const POST = 'post'
+const PUT = 'put'
 
 export default class ApiClient {
-  GET = 'get'
-  POST = 'post'
-  PUT = 'put'
-
-  constructor(token){
-    this.token = token
+  static getToken () {
+    return token
   }
 
-  checkAuth() {
-    return this.get('/checkAuth')
+  static setToken (t) {
+    if (t !== token) {
+      token = t
+    }
   }
 
-  headers (isJson) {
+  static checkAuth() {
+    return ApiClient.get('/checkAuth')
+  }
+
+  static headers (isJson) {
     let headers = {
-     'Authorization': 'Bearer: ' + this.token,
+     'Authorization': 'Bearer: ' + this.getToken(),
     }
     if (isJson) {
       headers['Content-Type'] = 'application/json'
@@ -25,19 +34,19 @@ export default class ApiClient {
     return new Headers(headers)
   }
 
-  get (endpoint) {
-    return this.request(this.GET, endpoint)
+  static get (endpoint) {
+    return ApiClient.request(GET, endpoint)
   }
 
-  post (endpoint, body) {
-    return this.request(this.POST, endpoint, body)
+  static post (endpoint, body) {
+    return ApiClient.request(POST, endpoint, body)
   }
 
-  put (endpoint, body) {
-    return this.request(this.PUT, endpoint, body)
+  static put (endpoint, body) {
+    return ApiClient.request(PUT, endpoint, body)
   }
 
-  request (method, endpoint, body, isJSON=true) {
+  static request (method, endpoint, body, isJSON=true) {
     if (isJSON) {
       body = body ? JSON.stringify(body) : undefined
     }
@@ -45,16 +54,17 @@ export default class ApiClient {
       API_URL + endpoint,
       {
         body,
-        headers: this.headers(isJSON),
+        headers: ApiClient.headers(isJSON),
         method
       }
     ).then(resp => {
-      console.log(resp.headers.authToken)
+      this.setToken(resp.headers.map['x-auth-token'][0])
       return resp.json().then(json => {
         switch (resp.status) {
           case 400:
             throw new BadRequestError(json.error)
           case 401:
+            token = null
             throw new UnauthorizedError(json.error)
         }
         return json
@@ -71,7 +81,7 @@ export default class ApiClient {
     })
   }
 
-  uploadImage (endpoint, photoID, imageLocation) {
+  static uploadImage (endpoint, photoID, imageLocation) {
     const data = new FormData()
     const name = `${photoID}.jpg`
     data.append('file', {
@@ -79,6 +89,6 @@ export default class ApiClient {
       uri: imageLocation,
       type: 'image/jpeg',
     })
-    return this.request(this.POST, endpoint, data, false)
+    return ApiClient.request(POST, endpoint, data, false)
   }
 }

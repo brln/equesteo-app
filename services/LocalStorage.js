@@ -7,10 +7,9 @@ export default class LocalStorage {
   static LOCAL_STATE_KEY = '@equesteo:localState'
   static CURRENT_RIDE_STATE_KEY = '@equesteo:currentRide'
 
-  static saveToken (token, userID) {
+  static saveToken (token) {
     return AsyncStorage.setItem(LocalStorage.TOKEN_KEY, JSON.stringify({
       token,
-      userID
     }));
   }
 

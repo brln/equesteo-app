@@ -41,7 +41,6 @@ import {
 
 export const initialState = Map({
   activeComponent: null,
-  apiClient: new ApiClient(),
   appState: appStates.active,
   awaitingPWChange: false,
   awaitingFullSync: false,
@@ -105,7 +104,13 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.set('popShowRide', null).set('popShowRideNow', null)
     case LOAD_LOCAL_STATE:
       const loadedState = action.localState
-      return loadedState.set('feedMessage', null).set('doingInitialLoad', false).set('showingRideID', null)
+      return loadedState.set(
+        'feedMessage', null
+      ).set(
+        'doingInitialLoad', false
+      ).set(
+        'showingRideID', null
+      )
     case SET_REMOTE_PERSIST_DB:
       return state.setIn(['needsRemotePersist', action.database], action.value)
     case NEW_APP_STATE:
