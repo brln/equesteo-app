@@ -2,6 +2,7 @@ export class UnauthorizedError extends Error {
   constructor (message, ...params) {
     super(...params)
     this.message = message
+    this.status = 401
 
     // Javascript hacks to be able to call instanceof
     this.constructor = UnauthorizedError

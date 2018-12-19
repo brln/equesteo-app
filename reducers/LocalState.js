@@ -1,5 +1,6 @@
 import { List, Map } from 'immutable'
 
+import ApiClient from '../services/ApiClient'
 import { FEED, SIGNUP_LOGIN } from '../screens'
 import { appStates, goodConnection, unixTimeNow } from '../helpers'
 
@@ -40,6 +41,7 @@ import {
 
 export const initialState = Map({
   activeComponent: null,
+  apiClient: new ApiClient(),
   appState: appStates.active,
   awaitingPWChange: false,
   awaitingFullSync: false,

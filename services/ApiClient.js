@@ -11,6 +11,10 @@ export default class ApiClient {
     this.token = token
   }
 
+  checkAuth() {
+    return this.get('/checkAuth')
+  }
+
   headers (isJson) {
     let headers = {
      'Authorization': 'Bearer: ' + this.token,
@@ -45,6 +49,7 @@ export default class ApiClient {
         method
       }
     ).then(resp => {
+      console.log(resp.headers.authToken)
       return resp.json().then(json => {
         switch (resp.status) {
           case 400:

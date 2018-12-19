@@ -1,7 +1,7 @@
-import LocalStorage from './local_storage'
-import PouchCouch from './pouch_couch'
+import LocalStorage from './LocalStorage'
+import PouchCouch from './PouchCouch'
 import RidePersister from './RidePersister'
-import UserAPI from './user_api'
+import UserAPI from './UserApi'
 
 export {
   LocalStorage,

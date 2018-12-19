@@ -78,17 +78,8 @@ import {
   userUpdated,
 } from './standard'
 
-export function catchAsyncError (dispatch, action) {
+export function catchAsyncError (dispatch) {
   return (e) => {
-    logDebug('catchAsync error', 'dbg')
-    if (e.status === 401) {
-      logDebug('handle401 in catchAsync', 'dbg')
-      dispatch(handle401(action))
-    } else {
-      setTimeout(() => {
-        throw Error('Async error')
-      }, 0)
-    }
     logError(e)
     captureException(e)
   }
@@ -234,30 +225,7 @@ export function getFCMToken () {
   }
 }
 
-export function handle401 (priorAction) {
-  return (dispatch, getState) => {
-    logDebug('in handle401', 'dbg')
-    const jwt = getState().getIn(['localState', 'jwt'])
-    let userAPI = new UserAPI(jwt)
-    userAPI.renewToken().then(resp => {
-      dispatch(receiveJWT(resp.token))
-      const userID = getState().getIn(['localState', 'userID'])
-      return LocalStorage.saveToken(resp.token, userID)
-    }).then(() => {
-      if (priorAction) {
-        logDebug('dispatching prior action', 'dbg')
-        dispatch(priorAction())
-      }
-    }).catch(e => {
-      if (e instanceof UnauthorizedError) {
-        logDebug('handle401 error signout', 'dbg')
-        dispatch(signOut())
-      }
-    })
-  }
-}
-
-export function loadRideCoordinates (rideID) {
+export function loadRideCoordinates () {
   return (dispatch) => {
     const pouchCouch = new PouchCouch()
     pouchCouch.loadRideCoordinates(rideID).then((coords) => {
@@ -285,9 +253,8 @@ export function doRemotePersist(db) {
       dispatch(remotePersistStarted(db))
       pouchCouch.remoteReplicateDB(db).on('complete', () => {
         dispatch(remotePersistComplete(db))
-      }).on('error', () => {
-        dispatch(remotePersistError(db))
-      }).on('denied', () => {
+      }).on('error', (e) => {
+        catchAsyncError(dispatch)(e)
         dispatch(remotePersistError(db))
       })
     }
@@ -518,6 +485,7 @@ export function persistUserUpdate (userID, deletedPhotoIDs) {
 
 export function photoNeedsUpload (type, photoLocation, photoID) {
   return (dispatch, getState) => {
+    logDebug(photoID, 'ENQUEUEQUEUEUEQUQUEUQEUQEUQUEUEUE')
     const item = Map({
       type,
       photoLocation,
@@ -565,7 +533,6 @@ export function uploadPhoto (type, photoLocation, photoID) {
             const uploadedRideURI = ridePhotoURL(photoID)
             const ridePhoto = getState().getIn(['pouchRecords', 'ridePhotos', photoID]).set('uri', uploadedRideURI)
             dispatch(ridePhotoUpdated(ridePhoto))
-            logDebug(ridePhoto.toJSON(), 'wut')
             return pouchCouch.saveRide(ridePhoto.toJS()).then((doc) => {
               const theRidePhotoAfterSave = getState().getIn(['pouchRecords', 'ridePhotos', photoID])
               dispatch(ridePhotoUpdated(theRidePhotoAfterSave.set('_rev', doc.rev)))
@@ -579,12 +546,12 @@ export function uploadPhoto (type, photoLocation, photoID) {
               const theUserPhotoAfterSave = getState().getIn(['pouchRecords', 'userPhotos', photoID])
               dispatch(userPhotoUpdated(theUserPhotoAfterSave.set('_rev', doc.rev)))
               dispatch(needsRemotePersist('users'))
-              dispatch(persistUserPhoto(userPhoto.get('_id')))
             })
           default:
             throw Error('cant persist type I don\'t know about')
         }
       }).then(() => {
+        logDebug('######################### dequeueing photo')
         dispatch(dequeuePhoto(photoID))
         return ImagePicker.cleanSingle(photoLocation)
       }).catch(e => {
@@ -639,34 +606,29 @@ export function searchForFriends (phrase) {
 }
 
 export function setFCMTokenOnServer (token) {
-  return (_, getState) => {
+  return (dispatch, getState) => {
     const jwt = getState().getIn(['localState', 'jwt'])
     const userAPI = new UserAPI(jwt)
     const currentUserID = getState().getIn(['localState', 'userID'])
     userAPI.setFCMToken(currentUserID, token).then(() => {
       logInfo('FCM token set')
-    }).catch(() => {
-      logError('Could not set FCM token')
-    })
+    }).catch(catchAsyncError(dispatch))
   }
 }
 
 export function setDistributionOnServer () {
-  return (_, getState) => {
+  return (dispatch, getState) => {
     const jwt = getState().getIn(['localState', 'jwt'])
     const userAPI = new UserAPI(jwt)
     const currentUserID = getState().getIn(['localState', 'userID'])
     userAPI.setDistribution(currentUserID, DISTRIBUTION).then(() => {
       logInfo('Distribution Set')
-    }).catch(() => {
-      logError('Could not set distribution remotely')
-    })
+    }).catch(catchAsyncError(dispatch))
   }
 }
 
 export function signOut () {
   return (dispatch, getState) => {
-    logDebug('signOut start', 'dbg')
     if (!getState().getIn(['localState', 'signingOut'])) {
       dispatch(setSigningOut(true))
       dispatch(stopLocationTracking())
@@ -678,7 +640,6 @@ export function signOut () {
         stopListeningFCM(),
         LocalStorage.deleteLocalState()
       ]).then(() => {
-        logDebug('signout done', 'dbg')
         dispatch(switchRoot(SIGNUP_LOGIN))
         dispatch(setSigningOut(false))
       }).catch(catchAsyncError(dispatch))
@@ -795,7 +756,7 @@ function startNetworkTracking () {
         connectionInfo.effectiveType
       )
       dispatch(newNetworkState(gc))
-    }).catch(catchAsyncError)
+    }).catch(catchAsyncError(dispatch))
     NetInfo.addEventListener(
       'connectionChange',
       (connectionInfo) => {
@@ -931,18 +892,14 @@ export function syncDBPull () {
         dispatch(clearFeedMessage())
       }, 3000)
     }).catch((e) => {
-      if (e.status === 401) {
-        dispatch(handle401(syncDBPull))
-      } else {
-        dispatch(setFeedMessage(Map({
-          message: 'Error Fetching Data',
-          color: warning,
-        })))
-        setTimeout(() => {
-          dispatch(clearFeedMessage())
-        }, 3000)
-        dispatch(setFullSyncFail(true))
-      }
+      dispatch(setFeedMessage(Map({
+        message: 'Error Fetching Data',
+        color: warning,
+      })))
+      setTimeout(() => {
+        dispatch(clearFeedMessage())
+      }, 3000)
+      dispatch(setFullSyncFail(true))
     })
   }
 }

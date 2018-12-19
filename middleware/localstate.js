@@ -1,4 +1,4 @@
-import LocalStorage from '../services/local_storage'
+import LocalStorage from '../services/LocalStorage'
 
 let lastLocalStateHash = null
 let lastCurrentRideHash = null

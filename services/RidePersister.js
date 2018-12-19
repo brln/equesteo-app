@@ -126,6 +126,6 @@ export default class RidePersister {
 
     rideSaves.then(() => {
       this.dispatch(needsRemotePersist('rides'))
-    }).catch(catchAsyncError)
+    }).catch(catchAsyncError(this.dispatch))
   }
 }
