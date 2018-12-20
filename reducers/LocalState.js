@@ -1,6 +1,5 @@
 import { List, Map } from 'immutable'
 
-import ApiClient from '../services/ApiClient'
 import { FEED, SIGNUP_LOGIN } from '../screens'
 import { appStates, goodConnection, unixTimeNow } from '../helpers'
 
@@ -19,7 +18,6 @@ import {
   NEW_APP_STATE,
   NEW_NETWORK_STATE,
   POP_SHOW_RIDE_SHOWN,
-  RECEIVE_JWT,
   REMOVE_STASHED_RIDE_PHOTO,
   SAVE_USER_ID,
   SET_ACTIVE_COMPONENT,
@@ -52,7 +50,6 @@ export const initialState = Map({
   firstStartHorseID: null,
   fullSyncFail: false,
   goodConnection: false,
-  jwt: null,
   lastFullSync: null,
   lastLocation: null,
   locationStashingActive: false,
@@ -117,8 +114,6 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.set('appState', action.newState)
     case NEW_NETWORK_STATE:
       return state.set('goodConnection', action.goodConnection)
-    case RECEIVE_JWT:
-      return state.set('jwt', action.token)
     case REMOVE_STASHED_RIDE_PHOTO:
       return state.deleteIn(['ridePhotoStash', action.stashKey, action.photoID])
     case SAVE_USER_ID:

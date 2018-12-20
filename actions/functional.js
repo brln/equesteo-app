@@ -56,7 +56,6 @@ import {
   newAppState,
   newLocation,
   newNetworkState,
-  receiveJWT,
   replaceLastLocation,
   rideCoordinatesLoaded,
   rideCarrotCreated,
@@ -116,8 +115,10 @@ export function appInitialized () {
       dispatch(checkFCMPermission())
       dispatch(startNetworkTracking())
       dispatch(startAppStateTracking())
-      if (ApiClient.getToken()) {
-        PouchCouch.localLoad().then((localData) => {
+      return ApiClient.getToken()
+    }).then((token) => {
+      if (token) {
+        return PouchCouch.localLoad().then((localData) => {
           dispatch(localDataLoaded(localData))
           dispatch(startListeningFCMTokenRefresh())
           dispatch(getFCMToken())
@@ -137,12 +138,14 @@ export function checkFCMPermission () {
   return () => {
     firebase.messaging().hasPermission().then(enabled => {
       if (!enabled) {
-        firebase.messaging().requestPermission().then((resp) => {
+        return firebase.messaging().requestPermission().then((resp) => {
           if (!resp) {
             alert('FCM permission must be enabled.')
           }
         })
       }
+    }).catch(e => {
+      logError(e)
     })
   }
 }
@@ -449,7 +452,6 @@ export function persistUserUpdate (userID, deletedPhotoIDs) {
 
 export function photoNeedsUpload (type, photoLocation, photoID) {
   return (dispatch, getState) => {
-    logDebug(photoID, 'ENQUEUEQUEUEUEQUQUEUQEUQEUQUEUEUE')
     const item = Map({
       type,
       photoLocation,
@@ -512,7 +514,6 @@ export function uploadPhoto (type, photoLocation, photoID) {
             throw Error('cant persist type I don\'t know about')
         }
       }).then(() => {
-        logDebug('######################### dequeueing photo')
         dispatch(dequeuePhoto(photoID))
         return ImagePicker.cleanSingle(photoLocation)
       }).catch(e => {
@@ -588,11 +589,11 @@ export function signOut () {
       dispatch(setSigningOut(true))
       dispatch(stopLocationTracking())
       dispatch(clearStateAfterPersist())
-      const apiClient = getState().getIn(['localState', 'apiClient'])
       Promise.all([
         PouchCouch.deleteLocalDBs(),
         stopListeningFCM(),
-        LocalStorage.deleteLocalState()
+        LocalStorage.deleteLocalState(),
+        ApiClient.clearToken(),
       ]).then(() => {
         dispatch(switchRoot(SIGNUP_LOGIN))
         dispatch(setSigningOut(false))
@@ -621,8 +622,7 @@ export function showLocalNotification (message, background, rideID, scrollToComm
           message: message,
         })
       }
-    })
-
+    }).catch(catchAsyncError)
   }
 }
 
@@ -722,8 +722,7 @@ function startNetworkTracking () {
         //
         const needsPersist = getState().getIn(['localState', 'needsRemotePersist'])
         const needsAnyPersist = needsPersist.valueSeq().filter(x => x).count() > 0
-        const jwt = getState().getIn(['localState', 'jwt'])
-        if (needsAnyPersist && jwt && gc) {
+        if (needsAnyPersist && gc) {
           for (let db of needsPersist.keySeq()) {
             if (needsPersist.get(db)) {
               dispatch(doRemotePersist(db))

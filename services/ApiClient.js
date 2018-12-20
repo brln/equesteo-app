@@ -11,13 +11,28 @@ const PUT = 'put'
 
 export default class ApiClient {
   static getToken () {
-    return token
+    if (!token) {
+      return LocalStorage.loadToken().then(t => {
+        if (t) {
+          token = t.token
+        }
+        return token
+      })
+    } else {
+      return Promise.resolve(token)
+    }
   }
 
   static setToken (t) {
     if (t !== token) {
       token = t
+      LocalStorage.saveToken(t)
     }
+  }
+
+  static clearToken () {
+    token = null
+    return LocalStorage.deleteToken()
   }
 
   static checkAuth() {
@@ -25,13 +40,15 @@ export default class ApiClient {
   }
 
   static headers (isJson) {
-    let headers = {
-     'Authorization': 'Bearer: ' + this.getToken(),
-    }
-    if (isJson) {
-      headers['Content-Type'] = 'application/json'
-    }
-    return new Headers(headers)
+    return this.getToken().then(token => {
+      let headers = {
+       'Authorization': 'Bearer: ' + token,
+      }
+      if (isJson) {
+        headers['Content-Type'] = 'application/json'
+      }
+      return new Headers(headers)
+    })
   }
 
   static get (endpoint) {
@@ -50,14 +67,16 @@ export default class ApiClient {
     if (isJSON) {
       body = body ? JSON.stringify(body) : undefined
     }
-    return fetch(
-      API_URL + endpoint,
-      {
-        body,
-        headers: ApiClient.headers(isJSON),
-        method
-      }
-    ).then(resp => {
+    return this.headers(isJSON).then((headers) => {
+      return fetch(
+        API_URL + endpoint,
+        {
+          body,
+          headers: headers,
+          method
+        }
+      )
+    }).then(resp => {
       this.setToken(resp.headers.map['x-auth-token'][0])
       return resp.json().then(json => {
         switch (resp.status) {

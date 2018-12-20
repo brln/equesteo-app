@@ -328,13 +328,6 @@ export function popShowRideShown () {
   }
 }
 
-export function receiveJWT (token) {
-  return {
-    type: RECEIVE_JWT,
-    token
-  }
-}
-
 export function removeStashedRidePhoto (photoID, stashKey) {
   return {
     type: REMOVE_STASHED_RIDE_PHOTO,

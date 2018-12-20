@@ -7,7 +7,6 @@ import {
   loadCurrentRideState,
   loadLocalState,
   localDataLoaded,
-  receiveJWT,
   saveUserID,
   setAwaitingPasswordChange,
   setDoingInitialLoad,
@@ -20,7 +19,7 @@ import {
   setDistributionOnServer,
   switchRoot,
 } from './functional'
-import { logInfo } from '../helpers'
+import { logError, logInfo } from '../helpers'
 import { FEED } from '../screens'
 import { LocalStorage, PouchCouch } from '../services'
 
@@ -29,23 +28,19 @@ import { setUserContext } from "../services/Sentry"
 export function loginAndSync(loginFunc, loginArgs, dispatch) {
   loginFunc(...loginArgs).then(resp => {
     // @TODO: figure out why followers have _id here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-    const token = resp.token
     const userID = resp.id
     const following = resp.following
     const followers = resp.followers
 
     dispatch(dismissError())
-    dispatch(setAwaitingPasswordChange(true))
-    dispatch(receiveJWT(token))
+    // dispatch(setAwaitingPasswordChange(true))
     dispatch(saveUserID(userID))
-    setUserContext(userID)
-    dispatch(getFCMToken())
-    dispatch(startListeningFCMTokenRefresh())
-    dispatch(setDistributionOnServer())
+    // setUserContext(userID)
+    // dispatch(getFCMToken())
+    // dispatch(startListeningFCMTokenRefresh())
+    // dispatch(setDistributionOnServer())
     dispatch(setDoingInitialLoad(true))
-    return Promise.all([
-      PouchCouch.localReplicateDB('all', [...following, userID], followers),
-    ])
+    return PouchCouch.localReplicateDB('all', [...following, userID], followers)
   }).then(() => {
     return PouchCouch.localLoad()
   }).then(localData => {
@@ -54,6 +49,7 @@ export function loginAndSync(loginFunc, loginArgs, dispatch) {
     dispatch(switchRoot(FEED))
     dispatch(startListeningFCM())
   }).catch(e => {
+    logDebug(JSON.stringify(e), 'this error specifically')
     dispatch(errorOccurred(e.message))
   })
 }
