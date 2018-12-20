@@ -88,12 +88,11 @@ export default class PouchCouch {
       case 'users':
         return PouchCouch.localReplicateUsers([...userIDs, ...followerUserIDs])
       case 'all':
-        return Promise.all([
-          PouchCouch.localReplicateRides(userIDs, followerUserIDs),
-          PouchCouch.localReplicateUsers([...userIDs, ...followerUserIDs]),
-          PouchCouch.localReplicateHorses([...userIDs, ...followerUserIDs]),
-        ])
-
+        return PouchCouch.localReplicateRides(userIDs, followerUserIDs).then(() => {
+          return PouchCouch.localReplicateUsers([...userIDs, ...followerUserIDs])
+        }).then(() => {
+          return PouchCouch.localReplicateHorses([...userIDs, ...followerUserIDs])
+        })
       default:
         throw('Local DB not found')
     }
@@ -137,7 +136,7 @@ export default class PouchCouch {
         ).on('complete', () => {
             resolve()
         }).on('error', (e) => {
-          logDebug('user errorzzzzzzzzzzzz')
+          logDebug('user error')
           reject(e)
         });
       })

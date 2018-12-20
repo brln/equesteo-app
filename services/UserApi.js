@@ -14,10 +14,6 @@ export default class UserAPI {
     })
   }
 
-  static renewToken () {
-    return ApiClient.get('/users/renewToken')
-  }
-
   static signup (email, password) {
     return ApiClient.post('/users', {
       email: email,

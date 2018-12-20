@@ -121,7 +121,6 @@ export function appInitialized () {
         return PouchCouch.localLoad().then((localData) => {
           dispatch(localDataLoaded(localData))
           dispatch(startListeningFCMTokenRefresh())
-          dispatch(getFCMToken())
           dispatch(startListeningFCM())
           dispatch(setDistributionOnServer())
           dispatch(syncDBPull('all'))
@@ -194,18 +193,6 @@ export function getPWCode (email) {
   return (dispatch, getState) => {
     UserAPI.getPWCode(email).catch(e => {
       dispatch(errorOccurred(e.message))
-    })
-  }
-}
-
-export function getFCMToken () {
-  return (dispatch) => {
-    firebase.messaging().getToken().then(fcmToken => {
-      if (fcmToken) {
-        dispatch(setFCMTokenOnServer(fcmToken))
-      }
-    }).catch(() => {
-      logInfo('no token available')
     })
   }
 }
@@ -285,11 +272,7 @@ export function persistUserWithPhoto (userID, userPhotoID) {
     PouchCouch.saveUser(theUserPhoto.toJS()).then(({ rev }) => {
       const theUserPhotoAfterSave = getState().getIn(['pouchRecords', 'userPhotos', userPhotoID])
       dispatch(userPhotoUpdated(theUserPhotoAfterSave.set('_rev', rev)))
-      dispatch(enqueuePhoto(Map({
-        type: 'user',
-        photoLocation: theUserPhoto.get('uri'),
-        photoID: userPhotoID
-      })))
+      dispatch(photoNeedsUpload('user', theUserPhoto.get('uri', userPhotoID)))
       const theUser = getState().getIn(['pouchRecords', 'users', userID])
       if (!theUser) {
         throw new Error('no user with that ID')
@@ -481,7 +464,9 @@ export function uploadPhoto (type, photoLocation, photoID) {
     const goodConnection = getState().getIn(['localState', 'goodConnection'])
     if (goodConnection) {
       dispatch(updatePhotoStatus(photoID, 'uploading'))
+      logDebug('uploading user photo')
       UserAPI.uploadPhoto(type, photoLocation, photoID).then(() => {
+        logDebug('user photo uploaded')
         switch (type) {
           case 'horse':
             const uploadedHorseURI = horsePhotoURL(photoID)

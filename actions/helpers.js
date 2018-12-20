@@ -13,7 +13,6 @@ import {
 } from './standard'
 
 import {
-  getFCMToken,
   startListeningFCMTokenRefresh,
   startListeningFCM,
   setDistributionOnServer,
@@ -28,17 +27,17 @@ import { setUserContext } from "../services/Sentry"
 export function loginAndSync(loginFunc, loginArgs, dispatch) {
   loginFunc(...loginArgs).then(resp => {
     // @TODO: figure out why followers have _id here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+    logDebug(resp, 'lingAndSync')
     const userID = resp.id
     const following = resp.following
     const followers = resp.followers
 
     dispatch(dismissError())
-    // dispatch(setAwaitingPasswordChange(true))
+    dispatch(setAwaitingPasswordChange(true))
     dispatch(saveUserID(userID))
-    // setUserContext(userID)
-    // dispatch(getFCMToken())
-    // dispatch(startListeningFCMTokenRefresh())
-    // dispatch(setDistributionOnServer())
+    setUserContext(userID)
+    dispatch(startListeningFCMTokenRefresh())
+    dispatch(setDistributionOnServer())
     dispatch(setDoingInitialLoad(true))
     return PouchCouch.localReplicateDB('all', [...following, userID], followers)
   }).then(() => {
@@ -49,7 +48,6 @@ export function loginAndSync(loginFunc, loginArgs, dispatch) {
     dispatch(switchRoot(FEED))
     dispatch(startListeningFCM())
   }).catch(e => {
-    logDebug(JSON.stringify(e), 'this error specifically')
     dispatch(errorOccurred(e.message))
   })
 }

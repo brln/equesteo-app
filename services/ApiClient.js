@@ -28,6 +28,7 @@ export default class ApiClient {
       token = t
       LocalStorage.saveToken(t)
     }
+    console.log(token)
   }
 
   static clearToken () {
@@ -77,7 +78,6 @@ export default class ApiClient {
         }
       )
     }).then(resp => {
-      this.setToken(resp.headers.map['x-auth-token'][0])
       return resp.json().then(json => {
         switch (resp.status) {
           case 400:
@@ -86,6 +86,7 @@ export default class ApiClient {
             token = null
             throw new UnauthorizedError(json.error)
         }
+        this.setToken(resp.headers.map['x-auth-token'][0])
         return json
       })
     }).catch(e => {
