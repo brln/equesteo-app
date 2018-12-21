@@ -8,7 +8,6 @@ import {
   CLEAR_FEED_MESSAGE,
   CLEAR_SEARCH,
   CLEAR_STATE,
-  CLEAR_STATE_AFTER_PERSIST,
   DEQUEUE_PHOTO,
   DISCARD_CURRENT_RIDE,
   DISMISS_ERROR,
@@ -42,7 +41,6 @@ export const initialState = Map({
   appState: appStates.active,
   awaitingPWChange: false,
   awaitingFullSync: false,
-  clearStateAfterPersist: false,
   currentScreen: FEED,
   doingInitialLoad: false,
   error: null,
@@ -80,8 +78,6 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.set('userSearchResults', List())
     case CLEAR_STATE:
       return initialState.set('goodConnection', state.get('goodConnection'))
-    case CLEAR_STATE_AFTER_PERSIST:
-      return state.set('clearStateAfterPersist', true)
     case DEQUEUE_PHOTO:
       return state.deleteIn(['photoQueue', action.photoID])
     case DISCARD_CURRENT_RIDE:

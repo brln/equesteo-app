@@ -42,7 +42,7 @@ import {
   awaitFullSync,
   clearLastLocation,
   clearFeedMessage,
-  clearStateAfterPersist,
+  clearState,
   deleteUnpersistedPhoto,
   dequeuePhoto,
   dismissError,
@@ -272,7 +272,7 @@ export function persistUserWithPhoto (userID, userPhotoID) {
     PouchCouch.saveUser(theUserPhoto.toJS()).then(({ rev }) => {
       const theUserPhotoAfterSave = getState().getIn(['pouchRecords', 'userPhotos', userPhotoID])
       dispatch(userPhotoUpdated(theUserPhotoAfterSave.set('_rev', rev)))
-      dispatch(photoNeedsUpload('user', theUserPhoto.get('uri', userPhotoID)))
+      dispatch(photoNeedsUpload('user', theUserPhoto.get('uri'), userPhotoID))
       const theUser = getState().getIn(['pouchRecords', 'users', userID])
       if (!theUser) {
         throw new Error('no user with that ID')
@@ -444,6 +444,7 @@ export function photoNeedsUpload (type, photoLocation, photoID) {
     })
     dispatch(enqueuePhoto(item))
 
+    logDebug(getState().getIn(['localState', 'photoQueue']).toJSON(), 'photoQUEUE')
     getState().getIn(['localState', 'photoQueue']).forEach((p) => {
       if (p.get('status') === 'enqueued'
         || p.get('status') === 'failed'
@@ -464,9 +465,9 @@ export function uploadPhoto (type, photoLocation, photoID) {
     const goodConnection = getState().getIn(['localState', 'goodConnection'])
     if (goodConnection) {
       dispatch(updatePhotoStatus(photoID, 'uploading'))
-      logDebug('uploading user photo')
+      logDebug(`uploading ${type} photo`)
       UserAPI.uploadPhoto(type, photoLocation, photoID).then(() => {
-        logDebug('user photo uploaded')
+        logDebug(`uploading ${type} photo complete`)
         switch (type) {
           case 'horse':
             const uploadedHorseURI = horsePhotoURL(photoID)
@@ -573,7 +574,6 @@ export function signOut () {
     if (!getState().getIn(['localState', 'signingOut'])) {
       dispatch(setSigningOut(true))
       dispatch(stopLocationTracking())
-      dispatch(clearStateAfterPersist())
       Promise.all([
         PouchCouch.deleteLocalDBs(),
         stopListeningFCM(),
@@ -581,6 +581,7 @@ export function signOut () {
         ApiClient.clearToken(),
       ]).then(() => {
         dispatch(switchRoot(SIGNUP_LOGIN))
+        dispatch(clearState())
         dispatch(setSigningOut(false))
       }).catch(catchAsyncError(dispatch))
     }

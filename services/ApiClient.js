@@ -28,7 +28,6 @@ export default class ApiClient {
       token = t
       LocalStorage.saveToken(t)
     }
-    console.log(token)
   }
 
   static clearToken () {

@@ -18,7 +18,7 @@ import {
   setDistributionOnServer,
   switchRoot,
 } from './functional'
-import { logError, logInfo } from '../helpers'
+import { logInfo } from '../helpers'
 import { FEED } from '../screens'
 import { LocalStorage, PouchCouch } from '../services'
 

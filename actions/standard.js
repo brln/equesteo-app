@@ -6,7 +6,6 @@ import {
   CLEAR_SEARCH,
   CLEAR_SELECTED_RIDE_COORDINATES,
   CLEAR_STATE,
-  CLEAR_STATE_AFTER_PERSIST,
   CREATE_FOLLOW,
   CREATE_HORSE,
   CREATE_HORSE_PHOTO,
@@ -110,12 +109,6 @@ export function clearSelectedRideCoordinates () {
 export function clearState () {
   return {
     type: CLEAR_STATE,
-  }
-}
-
-export function clearStateAfterPersist () {
-  return {
-    type: CLEAR_STATE_AFTER_PERSIST,
   }
 }
 
