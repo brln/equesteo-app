@@ -68,7 +68,6 @@ import {
   setFullSyncFail,
   setSigningOut,
   showPopShowRide,
-  saveUserID,
   setActiveComponent,
   syncComplete,
   updatePhotoStatus,
@@ -79,6 +78,9 @@ import {
 
 export function catchAsyncError (dispatch) {
   return (e) => {
+    if (e.status === 401) {
+      dispatch(signOut())
+    }
     logError(e)
     captureException(e)
   }
@@ -580,10 +582,17 @@ export function signOut () {
         LocalStorage.deleteLocalState(),
         ApiClient.clearToken(),
       ]).then(() => {
+        const activeComponent = getState().getIn(['localState', 'activeComponent'])
+        if (activeComponent !== FEED) {
+          return Navigation.popToRoot(activeComponent)
+        }
+      }).then(() => {
         dispatch(switchRoot(SIGNUP_LOGIN))
         dispatch(clearState())
         dispatch(setSigningOut(false))
-      }).catch(catchAsyncError(dispatch))
+      }).catch(e => {
+        logDebug(e)
+      })
     }
   }
 }
@@ -827,6 +836,9 @@ export function syncDBPull () {
         dispatch(clearFeedMessage())
       }, 3000)
     }).catch((e) => {
+      if (e.status === 401) {
+        catchAsyncError(dispatch)(e)
+      }
       dispatch(setFeedMessage(Map({
         message: 'Error Fetching Data',
         color: warning,

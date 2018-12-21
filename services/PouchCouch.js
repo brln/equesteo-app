@@ -62,13 +62,16 @@ export default class PouchCouch {
     }
     return options.then(options => {
       const remoteDB = new PouchDB(remoteConnectionString, options)
-      return PouchDB.replicate(localDB, remoteDB).on('complete', (resp) => {
-        res(resp)
-      }).on('error', (e) => {
-        rej(e)
+      return new Promise((res, rej) => {
+        PouchDB.replicate(localDB, remoteDB).on('complete', (resp) => {
+          res(resp)
+        }).on('error', (e) => {
+          logDebug('REMOTE REPLICATE DB ERROR')
+          logDebug(e, 'the error')
+          rej(e)
+        })
       })
     })
-
   }
 
   static preReplicate () {
@@ -93,7 +96,6 @@ export default class PouchCouch {
           PouchCouch.localReplicateUsers([...userIDs, ...followerUserIDs]),
           PouchCouch.localReplicateHorses([...userIDs, ...followerUserIDs]),
         ])
-
       default:
         throw('Local DB not found')
     }

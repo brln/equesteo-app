@@ -103,6 +103,8 @@ export default function LocalStateReducer(state=initialState, action) {
         'doingInitialLoad', false
       ).set(
         'showingRideID', null
+      ).set(
+        'signingOut', false
       )
     case SET_REMOTE_PERSIST_DB:
       return state.setIn(['needsRemotePersist', action.database], action.value)
