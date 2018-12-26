@@ -1,4 +1,4 @@
-import { fromJS } from 'immutable'
+import { fromJS, List } from 'immutable'
 import memoizeOne from 'memoize-one';
 import { Navigation } from 'react-native-navigation'
 import React, { PureComponent } from 'react'
@@ -183,7 +183,7 @@ class RideContainer extends PureComponent {
 
   deleteRide () {
     this.props.dispatch(rideUpdated(this.props.ride.set('deleted', true)))
-    this.props.dispatch(persistRide(this.props.ride.get('_id'), false, [], [], null))
+    this.props.dispatch(persistRide(this.props.ride.get('_id'), false, [], [], null, List()))
     Navigation.pop(this.props.componentId)
   }
 
