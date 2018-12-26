@@ -110,7 +110,7 @@ export function addHorseUser (horse, user) {
 }
 
 export function appInitialized () {
-  return (dispatch) => {
+  return (dispatch, getState) => {
     tryToLoadStateFromDisk(dispatch).then(() => {
       dispatch(startActiveComponentListener())
       dispatch(dismissError())
@@ -120,6 +120,8 @@ export function appInitialized () {
       return ApiClient.getToken()
     }).then((token) => {
       if (token) {
+        const currentUserID = getState().getIn(['localState', 'userID'])
+        setUserContext(currentUserID)
         return PouchCouch.localLoad().then((localData) => {
           dispatch(localDataLoaded(localData))
           dispatch(startListeningFCMTokenRefresh())
@@ -739,6 +741,11 @@ export function startListeningFCM () {
 
 export function startListeningFCMTokenRefresh () {
   return (dispatch) => {
+    firebase.messaging().getToken().then(newToken => {
+      if (newToken) {
+        dispatch(setFCMTokenOnServer(newToken))
+      }
+    })
     firebase.messaging().onTokenRefresh((newToken) => {
       dispatch(setFCMTokenOnServer(newToken))
     })

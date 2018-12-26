@@ -92,7 +92,6 @@ export default class ApiClient {
       if (e instanceof TypeError) {
         if (e.toString() === 'TypeError: Network request failed') {
           logError(e)
-          throw new NotConnectedError('Cannot find the internet.')
         }
       } else {
         throw e
