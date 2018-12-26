@@ -3,15 +3,14 @@ import {
   Thumbnail,
 } from 'native-base';
 import {
-  Dimensions,
   FlatList,
-  ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
 import moment from 'moment'
 import { darkGrey } from '../../colors'
+import { userName } from '../../modelHelpers/user'
 
 export default class CommentList extends PureComponent {
   constructor (props) {
@@ -61,7 +60,7 @@ export default class CommentList extends PureComponent {
             <Text
               style={{fontWeight: 'bold', color: 'black'}}
             >
-              {commentUser.get('firstName') || ''} {commentUser.get('lastName') || ''}
+              { userName(commentUser) }
             </Text>
             </View>
             <View style={{flex: 1, alignItems: 'flex-end'}}>

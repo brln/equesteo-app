@@ -7,7 +7,6 @@ import {
   Dimensions,
   Keyboard,
   ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -21,6 +20,7 @@ import {
 
 import BuildImage from '../BuildImage'
 import Button from '../Button'
+import CarrotCard from './CarrotCard'
 import { brand, darkBrand, darkGrey } from '../../colors'
 import HorseCard from './HorseCard'
 import {
@@ -31,6 +31,7 @@ import {
   parseRideCoordinate,
   toElevationKey
 } from '../../helpers'
+import { userName } from '../../modelHelpers/user'
 import PhotoFilmstrip from './PhotoFilmstrip'
 import Stats from './Stats'
 import DeleteModal from '../Shared/DeleteModal'
@@ -38,6 +39,7 @@ import RideComments from '../RideComments/RideComments'
 import ViewingMap from './ViewingMap'
 
 const { width } = Dimensions.get('window')
+const iconWidth = width / 15
 
 export default class Ride extends PureComponent {
   constructor (props) {
@@ -52,7 +54,6 @@ export default class Ride extends PureComponent {
     this._renderLoading = this._renderLoading.bind(this)
     this.fullscreenMap = this.fullscreenMap.bind(this)
     this.userAvatar = this.userAvatar.bind(this)
-    this.userName = this.userName.bind(this)
     this.rideNotes = this.rideNotes.bind(this)
     this.rideTime = this.rideTime.bind(this)
     this.maybeShowID = this.maybeShowID.bind(this)
@@ -204,18 +205,6 @@ export default class Ride extends PureComponent {
     }
   }
 
-  userName () {
-    const firstName = this.props.rideUser.get('firstName')
-    const lastName = this.props.rideUser.get('lastName')
-    if (firstName && lastName) {
-      return `${firstName} ${lastName}`
-    } else if (firstName || lastName) {
-      return firstName || lastName
-    } else {
-      return 'No Name'
-    }
-  }
-
   rideTime () {
     const t = this.props.ride.get('startTime')
     return `${moment(t).format('MMMM Do YYYY')} at ${moment(t).format('h:mm a')}`
@@ -284,7 +273,7 @@ export default class Ride extends PureComponent {
             <TouchableWithoutFeedback onPress={this.maybeShowID}>
               <View>
                 <Text style={{fontSize: 20, color: 'black'}}>{this.props.ride.get('name') || 'No Name'}</Text>
-                <Text style={{fontSize: 14}}>{this.userName()}</Text>
+                <Text style={{fontSize: 14}}>{ userName(this.props.rideUser) }</Text>
                 <Text style={{fontSize: 12, fontWeight: 'normal', color: darkGrey}}>{this.rideTime()}</Text>
               </View>
             </TouchableWithoutFeedback>
@@ -341,10 +330,25 @@ export default class Ride extends PureComponent {
 
             { this.rideNotes() }
 
+            <CarrotCard
+              rideCarrots={this.props.rideCarrots}
+              showProfile={this.props.showProfile}
+              users={this.props.users}
+              userPhotos={this.props.userPhotos}
+            />
+
             <Card style={{flex: 1}}>
               <CardItem header style={{padding: 5}}>
-                <View style={{paddingLeft: 5}}>
-                  <Text style={{color: darkBrand}}>Comments</Text>
+                <View style={{flex: 1, paddingLeft: 5, flexDirection: 'row'}}>
+                  <View style={{flex: 1}}>
+                    <BuildImage
+                      source={require('../../img/comment.png')}
+                      style={{flex: 1, height: iconWidth, width: iconWidth, resizeMode: 'contain'}}
+                    />
+                  </View>
+                  <View style={{flex: 5}}>
+                    <Text style={{color: darkBrand }}>Comments</Text>
+                  </View>
                 </View>
               </CardItem>
               <CardItem cardBody style={{ flex: 1}}>
@@ -372,19 +376,3 @@ export default class Ride extends PureComponent {
     }
   }
 }
-
-const styles = StyleSheet.create({
-  wrapper: {
-    width,
-    flex: 1
-  },
-  text: {
-    color: '#fff',
-    fontSize: 30,
-    fontWeight: 'bold'
-  },
-  image: {
-    width,
-    flex: 1
-},
-});

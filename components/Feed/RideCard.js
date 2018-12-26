@@ -10,7 +10,6 @@ import {
 } from 'native-base'
 import {
   Dimensions,
-  Image,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -21,6 +20,7 @@ import Swiper from 'react-native-swiper'
 import BuildImage from '../BuildImage'
 import { brand, darkGrey } from '../../colors'
 import { logError } from '../../helpers'
+import { userName } from '../../modelHelpers/user'
 import RideImage from './RideImage'
 import URIImage from '../URIImage'
 
@@ -111,17 +111,11 @@ export default class RideCard extends PureComponent {
   }
 
   userName () {
-    const firstName = this.props.rideUser.get('firstName')
-    const lastName = this.props.rideUser.get('lastName')
+    let name = null
     if (this.props.rideUser.get('_id') !== this.props.userID || !this.props.ownRideList) {
-      if (firstName && lastName) {
-        return `${firstName} ${lastName}`
-      } else if (firstName || lastName) {
-        return firstName || lastName
-      } else {
-        return 'No Name'
-      }
+      name = userName(this.props.rideUser)
     }
+    return name
   }
 
   rideTime () {

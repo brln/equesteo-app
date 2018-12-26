@@ -26,6 +26,7 @@ import {
 import BuildImage from '../BuildImage'
 import { brand, danger, darkBrand, green } from '../../colors'
 import { logRender, logError, logInfo } from '../../helpers'
+import { userName } from '../../modelHelpers/user'
 import PhotoFilmstrip from '../Ride/PhotoFilmstrip'
 import URIImage from '../URIImage'
 
@@ -309,7 +310,7 @@ export default class Profile extends PureComponent {
               </View>
             </CardItem>
             <CardItem cardBody style={{marginLeft: 20, marginRight: 20}}>
-              <Text>{this.props.profileUser.get('firstName') || ''} {this.props.profileUser.get('lastName') || ''}</Text>
+              <Text>{ userName(this.props.profileUser) }</Text>
             </CardItem>
 
             <CardItem header style={{padding: 5}}>

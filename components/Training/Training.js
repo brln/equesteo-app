@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react'
 import RNPickerSelect from 'react-native-picker-select';
 import {
   FlatList,
-  Picker,
   ScrollView,
   Text,
   View,
@@ -11,6 +10,7 @@ import {
 import Week from './Week'
 import { lightGrey } from '../../colors'
 import { getMonday } from '../../helpers'
+import { userName } from '../../modelHelpers/user'
 
 function DaysOfWeek () {
   const asNums = {0: 'M', 1: 'T', 2: 'W', 3: 'R', 4: 'F', 5: 'Sa', 6: 'Su'}
@@ -131,20 +131,12 @@ export default class Training extends PureComponent {
     )
   }
 
-  userName(user) {
-    if (user.get('firstName') || user.get('lastName')) {
-      return `${user.get('firstName') || ''} ${user.get('lastName') || ''}`
-    } else {
-      return 'No Name'
-    }
-  }
-
   userPicker () {
     const items = [
       {label: 'Only You', value: this.props.userID}
     ]
     const userItems = this.props.riders.valueSeq().reduce((a, r) => {
-      a.push({ label: this.userName(r), value: r.get('_id') })
+      a.push({ label: userName(r), value: r.get('_id') })
       return a
     }, [])
     const allItems = [...items, ...userItems]

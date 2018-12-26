@@ -96,13 +96,11 @@ class RideContainer extends PureComponent {
     this.closeDeleteModal = this.closeDeleteModal.bind(this)
     this.deleteRide = this.deleteRide.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
-    this.rideComments = this.rideComments.bind(this)
     this.showFullscreenMap = this.showFullscreenMap.bind(this)
     this.showHorseProfile = this.showHorseProfile.bind(this)
     this.showPhotoLightbox = this.showPhotoLightbox.bind(this)
     this.showProfile = this.showProfile.bind(this)
     this.submitComment = this.submitComment.bind(this)
-    this.thisRidesPhotos = this.thisRidesPhotos.bind(this)
     this.updateNewComment = this.updateNewComment.bind(this)
     this.viewRideCharts = this.viewRideCharts.bind(this)
 
@@ -116,8 +114,10 @@ class RideContainer extends PureComponent {
       })
     }
 
-    this.memoRideComments = memoizeOne(this.rideComments)
-    this.memoThisRidesPhotos = memoizeOne(this.thisRidesPhotos)
+    this.memoRideCarrots = memoizeOne(this.rideCarrots.bind(this))
+    this.memoRideComments = memoizeOne(this.rideComments.bind(this))
+    this.memoRideHorses = memoizeOne(this.rideHorses.bind(this))
+    this.memoThisRidesPhotos = memoizeOne(this.thisRidesPhotos.bind(this))
   }
 
   viewRideCharts () {
@@ -233,13 +233,19 @@ class RideContainer extends PureComponent {
     ).toList()
   }
 
-  rideHorses () {
+  rideCarrots (rideCarrots) {
+    return rideCarrots.valueSeq().filter(
+      (rc) => rc.get('rideID') === this.props.ride.get('_id')
+    ).toList()
+  }
+
+  rideHorses (rideHorses) {
     // remove this when you've created rideHorses for all old rides and everyone's on > 43
-    let rideHorses = this.props.rideHorses.filter(rh => {
+    let horses = rideHorses.filter(rh => {
       return rh.get('rideID') === this.props.ride.get('_id') && rh.get('deleted') !== true
     })
     if (this.props.ride.get('horseID') && !rideHorses.count()) {
-      rideHorses = fromJS({
+      horses = fromJS({
         'a fake ID': {
         _id: 'a fake ID',
         rideID: this.props.ride.get('_id'),
@@ -251,7 +257,7 @@ class RideContainer extends PureComponent {
       }})
     }
     // remove this when you've created rideHorses for all old rides and everyone's on > 43
-    return rideHorses
+    return horses
   }
 
   horseOwnerIDs () {
@@ -275,10 +281,11 @@ class RideContainer extends PureComponent {
         newComment={this.state.newComment}
         ride={this.props.ride}
         rideUser={this.props.rideUser}
+        rideCarrots={this.memoRideCarrots(this.props.rideCarrots)}
         rideComments={this.memoRideComments(this.props.rideComments)}
         rideCoordinates={this.props.rideCoordinates}
         rideElevations={this.props.rideElevations}
-        rideHorses={this.rideHorses()} // memoize this
+        rideHorses={this.memoRideHorses(this.props.rideHorses)}
         ridePhotos={this.memoThisRidesPhotos(this.props.ridePhotos)}
         showFullscreenMap={this.showFullscreenMap}
         showHorseProfile={this.showHorseProfile}
@@ -309,6 +316,7 @@ function mapStateToProps (state, passedProps) {
     horseUsers: pouchState.get('horseUsers'),
     isPopShow: passedProps.isPopShow,
     ride,
+    rideCarrots: pouchState.get('rideCarrots'),
     rideComments: pouchState.get('rideComments'),
     rideCoordinates,
     rideElevations,

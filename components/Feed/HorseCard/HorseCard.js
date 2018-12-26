@@ -18,6 +18,7 @@ import Headline from './Headline'
 import URIImage from '../../URIImage'
 import { darkGrey } from '../../../colors'
 import { logError } from '../../../helpers'
+import { userName } from '../../../modelHelpers/user'
 
 const { width } = Dimensions.get('window')
 
@@ -95,17 +96,11 @@ export default class HorseCard extends PureComponent {
   }
 
   userName () {
-    const firstName = this.props.rider.get('firstName')
-    const lastName = this.props.rider.get('lastName')
+    let name = null
     if (this.props.rider.get('_id') !== this.props.userID) {
-      if (firstName && lastName) {
-        return `${firstName} ${lastName}`
-      } else if (firstName || lastName) {
-        return firstName || lastName
-      } else {
-        return 'No Name'
-      }
+      name = userName(this.props.rider)
     }
+    return name
   }
 
   createTime () {

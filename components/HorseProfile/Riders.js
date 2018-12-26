@@ -8,8 +8,9 @@ import {
 } from 'react-native';
 
 import BuildImage from '../BuildImage'
-import { brand, darkGrey, orange } from '../../colors'
+import { brand, orange } from '../../colors'
 import { logError } from '../../helpers'
+import { userName } from '../../modelHelpers/user'
 import URIImage from '../URIImage'
 
 const { width } = Dimensions.get('window')
@@ -46,7 +47,7 @@ export default class Riders extends PureComponent {
       >
         { profileThumb }
         <View style={styles.nameView}>
-          <Text style={styles.nameText}>{rider.get('firstName')} {rider.get('lastName')}</Text>
+          <Text style={styles.nameText}>{ userName(rider) }</Text>
         </View>
       </TouchableOpacity>
     )

@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 
 import BuildImage from '../BuildImage'
+import { userName } from '../../modelHelpers/user'
 import { brand, darkBrand } from '../../colors'
 import { logError, MONTHS } from '../../helpers'
 import DeleteModal from '../Shared/DeleteModal'
@@ -175,7 +176,7 @@ export default class HorseProfile extends PureComponent {
         </CardItem>
         <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20}}>
           <Text>
-            {`${this.props.horseOwner.get('firstName') || ''} ${this.props.horseOwner.get('lastName') || ''}`}
+            { userName(this.props.horseOwner) }
             </Text>
         </CardItem>
         </View>

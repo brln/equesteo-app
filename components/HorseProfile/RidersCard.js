@@ -39,5 +39,3 @@ export default class RidersCard extends PureComponent {
     )
   }
 }
-
-const styles = StyleSheet.create({});

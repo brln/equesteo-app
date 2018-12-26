@@ -254,6 +254,7 @@ export default function PouchRecordsReducer(state=initialState, action) {
         userPhotos: {},
       }
 
+      // Key all records by ID
       for (let recordType of Object.keys(actionRecords)) {
         action.localData[recordType].reduce((accum, record) => {
           accum[record._id] = record
