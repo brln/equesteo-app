@@ -16,6 +16,7 @@ import {
   startListeningFCMTokenRefresh,
   startListeningFCM,
   setDistributionOnServer,
+  setFCMTokenOnServer,
   switchRoot,
 } from './functional'
 import { logInfo } from '../helpers'
@@ -27,7 +28,6 @@ import { setUserContext } from "../services/Sentry"
 export function loginAndSync(loginFunc, loginArgs, dispatch) {
   loginFunc(...loginArgs).then(resp => {
     // @TODO: figure out why followers have _id here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-    logDebug(resp, 'lingAndSync')
     const userID = resp.id
     const following = resp.following
     const followers = resp.followers
@@ -36,6 +36,7 @@ export function loginAndSync(loginFunc, loginArgs, dispatch) {
     dispatch(setAwaitingPasswordChange(true))
     dispatch(saveUserID(userID))
     setUserContext(userID)
+    dispatch(setFCMTokenOnServer())
     dispatch(startListeningFCMTokenRefresh())
     dispatch(setDistributionOnServer())
     dispatch(setDoingInitialLoad(true))

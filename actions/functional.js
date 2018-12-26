@@ -123,6 +123,7 @@ export function appInitialized () {
         return PouchCouch.localLoad().then((localData) => {
           dispatch(localDataLoaded(localData))
           dispatch(startListeningFCMTokenRefresh())
+          dispatch(setFCMTokenOnServer())
           dispatch(startListeningFCM())
           dispatch(setDistributionOnServer())
           dispatch(syncDBPull('all'))
@@ -822,7 +823,7 @@ export function syncDBPull () {
     following.push(userID)
 
     dispatch(setFullSyncFail(false))
-    PouchCouch.localReplicateDB('all', following, followers).then(() => {
+    return PouchCouch.localReplicateDB('all', following, followers).then(() => {
       return PouchCouch.localLoad()
     }).then(localData => {
       dispatch(localDataLoaded(localData))
