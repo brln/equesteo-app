@@ -36,7 +36,6 @@ export function loginAndSync(loginFunc, loginArgs, dispatch) {
     dispatch(setAwaitingPasswordChange(true))
     dispatch(saveUserID(userID))
     setUserContext(userID)
-    dispatch(setFCMTokenOnServer())
     dispatch(startListeningFCMTokenRefresh())
     dispatch(setDistributionOnServer())
     dispatch(setDoingInitialLoad(true))

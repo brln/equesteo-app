@@ -123,7 +123,6 @@ export function appInitialized () {
         return PouchCouch.localLoad().then((localData) => {
           dispatch(localDataLoaded(localData))
           dispatch(startListeningFCMTokenRefresh())
-          dispatch(setFCMTokenOnServer())
           dispatch(startListeningFCM())
           dispatch(setDistributionOnServer())
           dispatch(syncDBPull('all'))
