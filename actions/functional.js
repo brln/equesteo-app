@@ -438,7 +438,7 @@ export function persistUserUpdate (userID, deletedPhotoIDs) {
 }
 
 export function photoNeedsUpload (type, photoLocation, photoID) {
-  return (dispatch, getState) => {
+  return (dispatch) => {
     const item = Map({
       type,
       photoLocation,
@@ -447,12 +447,16 @@ export function photoNeedsUpload (type, photoLocation, photoID) {
       timestamp: unixTimeNow()
     })
     dispatch(enqueuePhoto(item))
+    dispatch(runPhotoQueue())
+  }
+}
 
-    logDebug(getState().getIn(['localState', 'photoQueue']).toJSON(), 'photoQUEUE')
+export function runPhotoQueue() {
+  return (dispatch, getState) => {
     getState().getIn(['localState', 'photoQueue']).forEach((p) => {
       if (p.get('status') === 'enqueued'
         || p.get('status') === 'failed'
-        || p.get('status') === 'uploading' && unixTimeNow() - p.get('timestamp') > 300000) {
+        || p.get('status') === 'uploading' && unixTimeNow() - p.get('timestamp') > 60000) {
         dispatch(uploadPhoto(
           p.get('type'),
           p.get('photoLocation'),
@@ -460,7 +464,6 @@ export function photoNeedsUpload (type, photoLocation, photoID) {
         ))
       }
     })
-
   }
 }
 
@@ -716,13 +719,15 @@ function startNetworkTracking () {
           connectionInfo.effectiveType
         )
         dispatch(newNetworkState(gc))
-        //
-        const needsPersist = getState().getIn(['localState', 'needsRemotePersist'])
-        const needsAnyPersist = needsPersist.valueSeq().filter(x => x).count() > 0
-        if (needsAnyPersist && gc) {
-          for (let db of needsPersist.keySeq()) {
-            if (needsPersist.get(db)) {
-              dispatch(doRemotePersist(db))
+        if (gc) {
+          dispatch(runPhotoQueue())
+          const needsPersist = getState().getIn(['localState', 'needsRemotePersist'])
+          const needsAnyPersist = needsPersist.valueSeq().filter(x => x).count() > 0
+          if (needsAnyPersist) {
+            for (let db of needsPersist.keySeq()) {
+              if (needsPersist.get(db)) {
+                dispatch(doRemotePersist(db))
+              }
             }
           }
         }
