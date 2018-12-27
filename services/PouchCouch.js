@@ -8,9 +8,9 @@ const horsesDBName = 'horses'
 const ridesDBName = 'rides'
 const usersDBName = 'users'
 
-let localHorsesDB = new PouchDB(horsesDBName)
-let localRidesDB = new PouchDB(ridesDBName)
-let localUsersDB = new PouchDB(usersDBName)
+let localHorsesDB = new PouchDB(horsesDBName, {auto_compaction: true})
+let localRidesDB = new PouchDB(ridesDBName, {auto_compaction: true})
+let localUsersDB = new PouchDB(usersDBName, {auto_compaction: true})
 
 // PouchDB.debug.enable('*')
 
