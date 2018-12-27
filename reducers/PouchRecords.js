@@ -24,6 +24,7 @@ import {
   RIDE_HORSE_UPDATED,
   RIDE_PHOTO_UPDATED,
   RIDE_UPDATED,
+  RIDE_ELEVATIONS_LOADED,
   RIDE_ELEVATIONS_UPDATED,
   UPDATE_NEW_RIDE_COORDS,
   USER_PHOTO_UPDATED,
@@ -41,6 +42,7 @@ export const initialState = Map({
   rides: Map(),
   rideCarrots: Map(),
   selectedRideCoordinates: null,
+  selectedRideElevations: null,
   rideComments: Map(),
   rideElevations: Map(),
   rideHorses: Map(),
@@ -247,7 +249,6 @@ export default function PouchRecordsReducer(state=initialState, action) {
         rides: {},
         rideCarrots: {},
         rideComments: {},
-        rideElevations: {},
         rideHorses: {},
         ridePhotos: {},
         users: {},
@@ -272,7 +273,6 @@ export default function PouchRecordsReducer(state=initialState, action) {
         rides: fromJS(actionRecords.rides),
         rideCarrots: fromJS(actionRecords.rideCarrots),
         rideComments: fromJS(actionRecords.rideComments),
-        rideElevations: fromJS(actionRecords.rideElevations),
         rideHorses: fromJS(actionRecords.rideHorses),
         ridePhotos: fromJS(actionRecords.ridePhotos),
         users: fromJS(actionRecords.users),
@@ -288,6 +288,8 @@ export default function PouchRecordsReducer(state=initialState, action) {
       return state.set('selectedRideCoordinates', fromJS(action.rideCoordinates))
     case RIDE_ELEVATIONS_CREATED:
       return state.setIn(['rideElevations', action.elevationData.get('_id')], action.elevationData)
+    case RIDE_ELEVATIONS_LOADED:
+      return state.set('selectedRideElevations', fromJS(action.rideElevations))
     case RIDE_HORSE_UPDATED:
       return state.setIn(['rideHorses', action.rideHorse.get('_id')], Map(action.rideHorse))
     case RIDE_PHOTO_UPDATED:

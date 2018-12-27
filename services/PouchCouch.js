@@ -228,4 +228,8 @@ export default class PouchCouch {
   static loadRideCoordinates (rideID) {
     return localRidesDB.get(`${rideID}_coordinates`)
   }
+
+  static loadRideElevations (rideID) {
+    return localRidesDB.get(`${rideID}_elevations`)
+  }
 }

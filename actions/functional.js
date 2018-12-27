@@ -61,6 +61,7 @@ import {
   rideCarrotCreated,
   rideCarrotSaved,
   rideCommentUpdated,
+  rideElevationsLoaded,
   ridePhotoUpdated,
   setPopShowRide,
   setRemotePersistDB,
@@ -205,6 +206,14 @@ export function loadRideCoordinates (rideID) {
   return (dispatch) => {
     PouchCouch.loadRideCoordinates(rideID).then((coords) => {
       dispatch(rideCoordinatesLoaded(coords))
+    }).catch(catchAsyncError(dispatch))
+  }
+}
+
+export function loadRideElevations (rideID) {
+  return (dispatch) => {
+    PouchCouch.loadRideElevations(rideID).then((elevations) => {
+      dispatch(rideElevationsLoaded(elevations))
     }).catch(catchAsyncError(dispatch))
   }
 }

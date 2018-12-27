@@ -15,6 +15,7 @@ import {
 import {
   createRideComment,
   loadRideCoordinates,
+  loadRideElevations,
   persistRide,
 } from '../actions/functional'
 import { brand } from '../colors'
@@ -170,6 +171,7 @@ class RideContainer extends PureComponent {
   componentDidMount () {
     if(!this.props.rideCoordinates || this.props.rideCoordinates.get('rideID') !== this.props.ride.get('_id')) {
       this.props.dispatch(loadRideCoordinates(this.props.ride.get('_id')))
+      this.props.dispatch(loadRideElevations(this.props.ride.get('_id')))
     }
     this.props.dispatch(setShowingRide(this.props.ride.get('_id')))
     if (this.props.isPopShow) {
@@ -308,7 +310,7 @@ function mapStateToProps (state, passedProps) {
   const localState = state.get('localState')
   const ride = pouchState.getIn(['rides', passedProps.rideID])
   const rideCoordinates = pouchState.get('selectedRideCoordinates')
-  const rideElevations = pouchState.getIn(['rideElevations', passedProps.rideID + '_elevations'])
+  const rideElevations = pouchState.get('selectedRideElevations')
   const userID = localState.get('userID')
   return {
     horses: pouchState.get('horses'),

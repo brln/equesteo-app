@@ -6,7 +6,7 @@ import { Keyboard } from 'react-native'
 import { brand } from '../colors'
 import RideCharts from '../components/RideCharts/RideCharts'
 
-class RideChartContainer extends PureComponent {
+class RideChartsContainer extends PureComponent {
   static options() {
     return {
       topBar: {
@@ -56,7 +56,7 @@ function mapStateToProps (state, passedProps) {
   const pouchState = state.get('pouchRecords')
   const ride = pouchState.getIn(['rides', passedProps.rideID])
   const rideCoordinates = pouchState.getIn(['selectedRideCoordinates'])
-  const rideElevations = pouchState.getIn(['rideElevations', passedProps.rideID + '_elevations'])
+  const rideElevations = pouchState.getIn(['selectedRideElevations'])
   return {
     ride,
     rideComments: pouchState.get('rideComments'),
@@ -65,4 +65,4 @@ function mapStateToProps (state, passedProps) {
   }
 }
 
-export default  connect(mapStateToProps)(RideChartContainer)
+export default  connect(mapStateToProps)(RideChartsContainer)

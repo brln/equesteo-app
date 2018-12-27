@@ -40,6 +40,7 @@ import {
   RIDE_CARROT_SAVED,
   RIDE_COMMENT_UPDATED,
   RIDE_COORDINATES_LOADED,
+  RIDE_ELEVATIONS_LOADED,
   RIDE_ELEVATIONS_UPDATED,
   RIDE_HORSE_UPDATED,
   RIDE_PHOTO_UPDATED,
@@ -362,6 +363,13 @@ export function rideCommentUpdated (rideComment) {
   return {
     type: RIDE_COMMENT_UPDATED,
     rideComment
+  }
+}
+
+export function rideElevationsLoaded (rideElevations) {
+  return {
+    type: RIDE_ELEVATIONS_LOADED,
+    rideElevations
   }
 }
 
