@@ -97,31 +97,31 @@ export default class PouchCouch {
     return ApiClient.checkAuth()
   }
 
-  static localReplicateDB(db, userIDs, followerUserIDs) {
+  static localReplicateDB(db, ownUserID, followingUserIDs, followerUserIDs) {
     let preRepPromise = PouchCouch.preReplicate()
     let repPromise
     switch(db) {
       case 'horses':
         repPromise = preRepPromise.then(options => {
-          return PouchCouch.localReplicateHorses(options, [...userIDs, ...followerUserIDs])
+          return PouchCouch.localReplicateHorses(options, [ownUserID, ...followingUserIDs, ...followerUserIDs])
         })
         break
       case 'rides':
         repPromise = preRepPromise.then(options => {
-          return PouchCouch.localReplicateRides(options, userIDs, followerUserIDs)
+          return PouchCouch.localReplicateRides(options, [ownUserID, ...followingUserIDs], followerUserIDs)
         })
         break
       case 'users':
         repPromise = preRepPromise.then(options => {
-          return PouchCouch.localReplicateUsers(options)
+          return PouchCouch.localReplicateUsers(options, ownUserID, [...followingUserIDs, ...followerUserIDs])
         })
         break
       case 'all':
         repPromise = preRepPromise.then(options => {
           return Promise.all([
-            PouchCouch.localReplicateRides(options, userIDs, followerUserIDs),
-            PouchCouch.localReplicateUsers(options),
-            PouchCouch.localReplicateHorses(options, [...userIDs, ...followerUserIDs]),
+            PouchCouch.localReplicateHorses(options, [ownUserID, ...followingUserIDs, ...followerUserIDs]),
+            PouchCouch.localReplicateRides(options, [ownUserID, ...followingUserIDs], followerUserIDs),
+            PouchCouch.localReplicateUsers(options, ownUserID, [...followingUserIDs, ...followerUserIDs]),
           ])
         })
         break
@@ -155,7 +155,8 @@ export default class PouchCouch {
     })
   }
 
-  static localReplicateUsers (options) {
+  static localReplicateUsers (options, ownUserID, userIDs) {
+    const remoteUsersDB = new PouchDB(`${API_URL}/couchproxy/${usersDBName}`, options)
     return new Promise((resolve, reject) => {
       const remoteUsersDB = new PouchDB(`${API_URL}/couchproxy/${usersDBName}`, options)
       PouchDB.replicate(
@@ -163,6 +164,10 @@ export default class PouchCouch {
         localUsersDB,
         {
           live: false,
+          query_params: {
+            ownUserID,
+            userIDs: userIDs
+          }
         }
       ).on('complete', () => {
           resolve()
@@ -196,6 +201,10 @@ export default class PouchCouch {
           {
             live: false,
             doc_ids: fetchIDs,
+            filter: 'users/byUserIDs',
+            query_params: {
+              userIDs: userIDs
+            }
           }
         ).on('complete', () => {
           resolve()
@@ -227,24 +236,84 @@ export default class PouchCouch {
       localRidesDB.allDocs(),
       localUsersDB.allDocs(),
     ]).then(([horsesResp, ridesResp, usersResp]) => {
-      const rideDocs = ridesResp.rows.map(r => r.doc)
-      const userDocs = usersResp.rows.map(u => u.doc)
-      const horseDocs = horsesResp.rows.map(h => h.doc)
-      return {
-        horses: horseDocs.filter(h => h.type === 'horse'),
-        horsePhotos: horseDocs.filter(h => h.type === 'horsePhoto'),
-        horseUsers: horseDocs.filter(h => h.type === 'horseUser'),
-        follows: userDocs.filter(u => u.type === 'follow'),
-        rideCarrots: rideDocs.filter(r => r.type === 'carrot'),
-        rideCoordinates: rideDocs.filter(r => r.type === 'rideCoordinates'),
-        rideComments: rideDocs.filter(r => r.type === 'comment'),
-        rideElevations: rideDocs.filter(r => r.type === 'rideElevations'),
-        ridePhotos: rideDocs.filter(r => r.type === 'ridePhoto'),
-        rideHorses: rideDocs.filter(r => r.type === 'rideHorse'), // this getting silly, only iterate once
-        rides: rideDocs.filter(r => r.type === 'ride'),
-        users: userDocs.filter(u => u.type === 'user'),
-        userPhotos: userDocs.filter(u => u.type === 'userPhoto')
+      const parsed = {
+        horses: {},
+        horsePhotos: {},
+        horseUsers: {},
+        follows: {},
+        rideCarrots: {},
+        rideCoordinates: {},
+        rideComments: {},
+        rideElevations: {},
+        ridePhotos: {},
+        rideHorses: {},
+        rides: {},
+        trainings: {},
+        users: {},
+        userPhotos: {}
       }
+
+      for (let horseDoc of horsesResp.rows) {
+        switch (horseDoc.doc.type) {
+          case 'horse':
+            parsed.horses[horseDoc.doc._id] = horseDoc.doc
+            break
+          case 'horsePhoto':
+            parsed.horsePhotos[horseDoc.doc._id] = horseDoc.doc
+            break
+          case 'horseUser':
+            parsed.horseUsers[horseDoc.doc._id] = horseDoc.doc
+            break
+        }
+      }
+
+      for (let userDoc of usersResp.rows) {
+        const doc = userDoc.doc
+        const id = doc._id
+        switch (userDoc.doc.type) {
+          case 'follow':
+            parsed.follows[id] = doc
+            break
+          case 'user':
+            parsed.users[id] = doc
+            break
+          case 'userPhoto':
+            parsed.userPhotos[id] = doc
+            break
+          case 'training':
+            parsed.trainings[id] = doc
+            break
+        }
+      }
+
+      for (let rideDoc of ridesResp.rows) {
+        const doc = rideDoc.doc
+        const id = doc._id
+        switch (rideDoc.doc.type) {
+          case 'carrot':
+            parsed.rideCarrots[id] = doc
+            break
+          case 'rideCoordinates':
+            parsed.rideCoordinates[id] = doc
+            break
+          case 'comment':
+            parsed.rideComments[id] = doc
+            break
+          case 'rideElevations':
+            parsed.rideElevations[id] = doc
+            break
+          case 'ridePhoto':
+            parsed.ridePhotos[id] = doc
+            break
+          case 'rideHorse':
+            parsed.rideHorses[id] = doc
+            break
+          case 'ride':
+            parsed.rides[id] = doc
+            break
+        }
+      }
+      return parsed
     })
   }
 

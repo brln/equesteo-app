@@ -21,7 +21,7 @@ export default class ElevationGain extends PureComponent {
     return (
       <View style={styles.container}>
         <VictoryChart
-          padding={{ top: 50, bottom: 50, left: 80, right: 10 }}
+          padding={{ top: 50, bottom: 50, left: 80, right: 30 }}
         >
           <VictoryAxis
             label={'mi'}

@@ -192,8 +192,12 @@ export function toElevationKey (coord) {
   return coord.toFixed(4)
 }
 
-export function metersToFeet(meters) {
+export function metersToFeet (meters) {
   return meters * 3.28084
+}
+
+export function feetToMeters (feet) {
+  return feet / 3.28084
 }
 
 export function elapsedTime (startTime, currentTime, pausedTime, lastPauseStart) {
@@ -308,15 +312,62 @@ export function speedGradient (speed) {
 
 export function newElevationGain (distance, lastElevation, newElevation, oldTotal) {
   let newTotal = oldTotal
-  const diff = Math.abs(newElevation - lastElevation)
+  const diff = metersToFeet(Math.abs(newElevation - lastElevation))
   if (diff) {
     const grade = diff / (distance * 5280)
-    if (grade < 0.35) {
+    if (grade < 0.5) {
       const elevationChange = newElevation - lastElevation
       newTotal = oldTotal + (elevationChange > 0 ? elevationChange : 0)
     }
   }
   return newTotal
+}
+
+export function parseElevationData (rideCoordinates, rideElevations) {
+  let totalDistance = 0
+  let totalGain = 0
+  let lastPoint = null
+  let points = []
+  let oldTotalGain = null
+
+  for (let rideCoord of rideCoordinates) {
+    const parsedCoord = parseRideCoordinate(rideCoord)
+    const elevation = rideElevations.getIn([
+      toElevationKey(parsedCoord.get('latitude')),
+      toElevationKey(parsedCoord.get('longitude'))
+    ])
+    if (!lastPoint) {
+      lastPoint = parsedCoord
+      points.push({
+        distance: 0,
+        gain: 0,
+        elevation: metersToFeet(elevation),
+      })
+    } else {
+      const newDistance = haversine(
+        lastPoint.get('latitude'),
+        lastPoint.get('longitude'),
+        parsedCoord.get('latitude'),
+        parsedCoord.get('longitude')
+      )
+      totalDistance += newDistance
+      const lastElevation = rideElevations.getIn([
+        toElevationKey(lastPoint.get('latitude')),
+        toElevationKey(lastPoint.get('longitude'))
+      ])
+      totalGain = newElevationGain(newDistance, lastElevation, elevation, totalGain)
+      if (elevation !== undefined && totalDistance !== undefined && totalGain !== undefined) {
+        points.push({
+          elevation: metersToFeet(elevation),
+          distance: totalDistance,
+          gain: metersToFeet(totalGain)
+        })
+        oldTotalGain = totalGain
+        lastPoint = parsedCoord
+      }
+    }
+  }
+  return points
 }
 
 export function coordSplice (rideCoords, trimValues) {

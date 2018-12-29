@@ -37,16 +37,21 @@ class TrainingContainer extends PureComponent {
     this.allRidesOnYourHorses = this.allRidesOnYourHorses.bind(this)
     this.rideHorses = this.rideHorses.bind(this)
     this.showRide = this.showRide.bind(this)
+    this.trainings = this.trainings.bind(this)
     this.yourHorses = this.yourHorses.bind(this)
   }
 
   showRide (ride) {
-    Navigation.push(this.props.componentId, {
-      component: {
-        name: RIDE,
-        passProps: {rideID: ride.get('_id')}
-      }
-    });
+    if (this.props.rides.get(ride.get('rideID'))) {
+      Navigation.push(this.props.componentId, {
+        component: {
+          name: RIDE,
+          passProps: {rideID: ride.get('rideID')}
+        }
+      })
+    } else {
+      alert('Ride not loaded. Feature in progress.')
+    }
   }
 
   yourHorses () {
@@ -103,6 +108,12 @@ class TrainingContainer extends PureComponent {
     })
   }
 
+  trainings () {
+    return this.props.trainings.getIn([`${this.props.userID}_training`, 'rides']).filter(t => {
+      return t.get('deleted') !== true
+    })
+  }
+
   render() {
     logRender('TrainingContainer')
     return (
@@ -113,6 +124,7 @@ class TrainingContainer extends PureComponent {
         rides={this.allRidesOnYourHorses()}
         riders={this.allRidersButYou()}
         showRide={this.showRide}
+        trainings={this.trainings()}
         user={this.props.user}
         userID={this.props.userID}
       />
@@ -120,7 +132,7 @@ class TrainingContainer extends PureComponent {
   }
 }
 
-function mapStateToProps (state, passedProps) {
+function mapStateToProps (state) {
   const pouchState = state.get('pouchRecords')
   const localState = state.get('localState')
   const userID = localState.get('userID')
@@ -129,6 +141,7 @@ function mapStateToProps (state, passedProps) {
     horseUsers: pouchState.get('horseUsers'),
     rides: pouchState.get('rides'),
     rideHorses: pouchState.get('rideHorses'),
+    trainings: pouchState.get('trainings'),
     user: pouchState.getIn(['users', userID]),
     users: pouchState.get('users'),
     userID,

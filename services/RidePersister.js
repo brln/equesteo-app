@@ -3,7 +3,7 @@ import { fromJS, Map } from 'immutable'
 import {
   clearRidePhotoFromStash,
   rideCoordinatesLoaded,
-  rideElevationsUpdated,
+  rideElevationsLoaded,
   rideHorseUpdated,
   ridePhotoUpdated,
   rideUpdated
@@ -24,11 +24,11 @@ export default class RidePersister {
   }
 
   getCoordinates () {
-    return this.getState().getIn(['pouchRecords', 'newRideCoordinates'])
+    return this.getState().getIn(['pouchRecords', 'selectedRideCoordinates'])
   }
 
   getElevations () {
-    return this.getState().getIn(['pouchRecords', 'rideElevations', this.rideID + '_elevations'])
+    return this.getState().getIn(['pouchRecords', 'selectedRideElevations'])
   }
 
   getRide () {
@@ -56,36 +56,34 @@ export default class RidePersister {
   }
 
   saveElevations () {
-    return PouchCouch.saveRide(this.getElevations().toJS()).then(({ rev }) => {
-      this.dispatch(rideElevationsUpdated(this.getElevations().set('_rev', rev)))
+    let theElevations = this.getElevations().toJS()
+    return PouchCouch.saveRide(theElevations).then(({ rev }) => {
+      theElevations._rev = rev
+      this.dispatch(rideElevationsLoaded(theElevations))
     })
   }
 
-  saveCoordinates (trimValues) {
+  saveCoordinates () {
     let theCoordinates = this.getCoordinates().toJS()
-    if (trimValues) {
-      theCoordinates.rideCoordinates = coordSplice(theCoordinates.rideCoordinates, trimValues)
-    }
-    return PouchCouch.saveRide(theCoordinates).then((coordinateDoc) => {
-      this.dispatch(rideCoordinatesLoaded(fromJS(theCoordinates).set('_rev', coordinateDoc.rev)))
+    return PouchCouch.saveRide(theCoordinates).then(({ rev }) => {
+      theCoordinates._rev = rev
+      this.dispatch(rideCoordinatesLoaded(theCoordinates))
     })
   }
 
   persistRide (newRide, stashedPhotos, deletedPhotoIDs, trimValues, rideHorses) {
-    const rideSaves = this.saveRide()
+    // Ride elevations needs to be saved before the ride so that the elevations
+    // are available in the changes iterator on the server when it processes
+    // the new ride for trainings.
 
-    let docSaves = rideSaves
+    let docSaves = Promise.resolve()
     if (newRide) {
-      docSaves = rideSaves.then(() => {
-        return this.saveElevations()
-      }).then(() => {
+      docSaves = this.saveElevations().then(() => {
         return this.saveCoordinates()
       })
     } else if (trimValues) {
       let immutableCoordinates
-      docSaves = rideSaves.then(() => {
-        return PouchCouch.loadRideCoordinates(this.rideID)
-      }).then((theCoordinates) => {
+      docSaves = PouchCouch.loadRideCoordinates(this.rideID).then((theCoordinates) => {
         theCoordinates.rideCoordinates = coordSplice(theCoordinates.rideCoordinates, trimValues)
         immutableCoordinates = fromJS(theCoordinates)
         return PouchCouch.saveRide(theCoordinates)
@@ -127,8 +125,8 @@ export default class RidePersister {
       )
     }
 
-    rideSaves.then(() => {
-      return Promise.all(docSaves)
+    docSaves.then(() => {
+      return this.saveRide()
     }).then(() => {
       return Promise.all(rideHorseSaves)
     }).then(() => {

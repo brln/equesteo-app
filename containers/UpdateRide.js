@@ -12,12 +12,12 @@ import {
   mergeStashedLocations,
   removeStashedRidePhoto,
   rideCoordinatesLoaded,
+  rideElevationsLoaded,
   rideHorseUpdated,
   rideUpdated,
   setPopShowRide,
   stopStashNewLocations,
   stashRidePhoto,
-  updateNewRideCoords,
 } from '../actions/standard'
 import {
   loadRideCoordinates,
@@ -29,10 +29,12 @@ import { brand } from '../colors'
 import {
   coordSplice,
   elapsedTime,
+  feetToMeters,
   generateUUID,
   haversine,
   logRender,
   parseRideCoordinate,
+  parseElevationData,
   staticMap,
   unixTimeNow
 } from '../helpers'
@@ -154,7 +156,7 @@ class UpdateRideContainer extends BackgroundComponent {
     if (this.props.newRide) {
       Navigation.mergeOptions(this.props.componentId, {topBar: {rightButtons: []}})
       if (buttonId === 'save') {
-        this.updateLocalRideCoords(updateNewRideCoords)
+        this.updateLocalRideCoords()
         this.props.dispatch(persistRide(
           this.props.ride.get('_id'),
           true,
@@ -185,7 +187,7 @@ class UpdateRideContainer extends BackgroundComponent {
       }
     } else {
       if (buttonId === 'save') {
-        this.updateLocalRideCoords(rideCoordinatesLoaded)
+        this.updateLocalRideCoords()
         this.props.dispatch(persistRide(
           this.props.ride.get('_id'),
           false,
@@ -205,12 +207,12 @@ class UpdateRideContainer extends BackgroundComponent {
     Keyboard.dismiss()
   }
 
-  updateLocalRideCoords (toDispatch) {
+  updateLocalRideCoords () {
     if (this.state.trimValues) {
       const rideCoords = this.props.rideCoordinates.get('rideCoordinates').toJS()
       const spliced = coordSplice(rideCoords, this.state.trimValues)
       const updatedCoords = this.props.rideCoordinates.set('rideCoordinates', fromJS(spliced))
-      this.props.dispatch(toDispatch(updatedCoords))
+      this.props.dispatch(rideCoordinatesLoaded(updatedCoords))
 
       const justCoords = updatedCoords.get('rideCoordinates')
       const firstCoord = parseRideCoordinate(justCoords.get(0))
@@ -239,6 +241,14 @@ class UpdateRideContainer extends BackgroundComponent {
         accum.lastCoord = c
         return accum
       }, {total: 0, lastCoord: null}).total
+
+      const newElevationData = parseElevationData(
+        updatedCoords.get('rideCoordinates'),
+        this.props.rideElevations.get('elevations')
+      )
+      const newTotalGain = feetToMeters(newElevationData[newElevationData.length - 1].gain)
+      const updatedElevation = this.props.rideElevations.set('elevationGain', newTotalGain)
+      this.props.dispatch(rideElevationsLoaded(updatedElevation))
 
       const updatedRide = this.props.ride.set(
         'mapURL', staticMap(this.props.ride, updatedCoords.get('rideCoordinates'))
@@ -499,6 +509,7 @@ function mapStateToProps (state, passedProps) {
     newRide,
     ride: state.getIn(['pouchRecords', 'rides', passedProps.rideID]),
     rideCoordinates: pouchState.get('selectedRideCoordinates'),
+    rideElevations: pouchState.get('selectedRideElevations'),
     rideHorses: pouchState.get('rideHorses'),
     ridePhotos: pouchState.get('ridePhotos'),
     stashedRidePhotos: localState.getIn(['ridePhotoStash', ridePhotoStashIndex]) || Map(),

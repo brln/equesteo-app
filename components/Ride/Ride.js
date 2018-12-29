@@ -27,9 +27,7 @@ import {
   haversine,
   logRender,
   logInfo,
-  newElevationGain,
   parseRideCoordinate,
-  toElevationKey
 } from '../../helpers'
 import { userName } from '../../modelHelpers/user'
 import PhotoFilmstrip from './PhotoFilmstrip'
@@ -60,7 +58,6 @@ export default class Ride extends PureComponent {
     this.showProfile = this.showProfile.bind(this)
 
     this.memoizedMaxSpeed = memoizeOne(this.maxSpeed)
-    this.memoizedElevationGain = memoizeOne(this.elevationGain.bind(this))
   }
 
   componentDidMount () {
@@ -93,41 +90,6 @@ export default class Ride extends PureComponent {
 
   showProfile () {
     this.props.showProfile(this.props.rideUser)
-  }
-
-  elevationGain (rideCoordinates, rideElevations) {
-    let totalDistance = 0
-    let totalGain = 0
-    let lastPoint = null
-    if (rideElevations && rideElevations.get('elevations')) {
-      for (let rideCoord of rideCoordinates.get('rideCoordinates')) {
-        const parsedCoord = parseRideCoordinate(rideCoord)
-        if (!lastPoint) {
-          lastPoint = parsedCoord
-        } else {
-          const newDistance = haversine(
-            lastPoint.get('latitude'),
-            lastPoint.get('longitude'),
-            parsedCoord.get('latitude'),
-            parsedCoord.get('longitude')
-          )
-          totalDistance += newDistance
-          const elevation = rideElevations.getIn([
-            'elevations',
-            toElevationKey(parsedCoord.get('latitude')),
-            toElevationKey(parsedCoord.get('longitude'))
-          ])
-          const lastElevation = rideElevations.getIn([
-            'elevations',
-            toElevationKey(lastPoint.get('latitude')),
-            toElevationKey(lastPoint.get('longitude'))
-          ])
-          totalGain = newElevationGain(newDistance, lastElevation, elevation, totalGain)
-          lastPoint = parsedCoord
-        }
-      }
-    }
-    return totalGain
   }
 
   maxSpeed(rideCoordinates) {
@@ -252,7 +214,7 @@ export default class Ride extends PureComponent {
   _renderRide () {
     logRender('Ride.Ride')
     let maxSpeed = this.memoizedMaxSpeed(this.props.rideCoordinates.get('rideCoordinates'))
-    let elevationGain = this.memoizedElevationGain(this.props.rideCoordinates, this.props.rideElevations)
+    let elevationGain = this.props.rideElevations ? this.props.rideElevations.get('elevationGain') : 0
     const height = (width * 9 / 16) + 54
     return (
       <ScrollView

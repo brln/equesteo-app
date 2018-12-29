@@ -2,7 +2,7 @@ import moment from 'moment'
 import React, { Component } from 'react'
 
 import { lightGrey } from '../../colors'
-import { formattedWeekString } from "../../helpers"
+import { formattedWeekString, metersToFeet } from "../../helpers"
 
 import {
   StyleSheet,
@@ -29,6 +29,17 @@ function RideDay (props) {
       {textAlign: 'center', fontSize: 15, fontWeight: 'bold'},
       false
     )
+  } else if (props.chosenType === props.types.TYPE_GAIN) {
+    showString = (
+      <Text style={{
+        textAlign: 'center',
+        fontSize: 15,
+        fontWeight: 'bold'}}
+      >
+        {Math.round(metersToFeet(props.ride.get('elevationGain')) || 0)}
+      </Text>
+    )
+
   }
   return (
     <View style={{flex: 1, justifyContent: 'center'}}>
@@ -61,9 +72,19 @@ function MultiRideDay (props) {
               {textAlign: 'center', fontSize: 15, fontWeight: 'bold'},
               false
             )
+          } else if (props.chosenType === props.types.TYPE_GAIN) {
+            showString = (
+              <Text style={{
+                textAlign: 'center',
+                fontSize: 15,
+                fontWeight: 'bold'}}
+              >
+                {Math.round(metersToFeet(r.get('elevationGain')))}
+              </Text>
+            )
           }
           return (
-            <TouchableOpacity key={r.get('_id')} onPress={props.showRide(r)}>
+            <TouchableOpacity key={r.get('rideID')} onPress={props.showRide(r)}>
               { showString }
             </TouchableOpacity>
           )
@@ -93,6 +114,7 @@ export default class Week extends Component {
     this.showRide = this.showRide.bind(this)
     this.pickTypeDistance = this.pickTypeDistance.bind(this)
     this.pickTypeTime = this.pickTypeTime.bind(this)
+    this.pickTypeGain = this.pickTypeGain.bind(this)
     this.rideShouldShow = this.rideShouldShow.bind(this)
   }
 
@@ -106,20 +128,9 @@ export default class Week extends Component {
     const happenedOnDay = moment(ride.get('startTime')).date() === day.date()
     const riderShouldBeShowing = ride.get('userID') === this.props.chosenUserID
       || this.props.chosenUserID === this.props.types.SHOW_ALL_RIDERS
-    if (happenedOnDay && riderShouldBeShowing) {
-      const showingNoHorse = this.props.chosenHorseID === this.props.types.NO_HORSE
-      const showingHorseIDs = this.props.rideHorses.valueSeq().filter(rh => {
-        return rh.get('rideID') === ride.get('_id')
-      }).map(rh => {
-        return rh.get('horseID')
-      }).toList()
-      return showingHorseIDs.contains(this.props.chosenHorseID)
-        || this.props.chosenHorseID === this.props.types.SHOW_ALL_HORSES
-        || !showingHorseIDs.count() && showingNoHorse && !ride.get('horseID') // remove this last part when > 43
-        || (!showingHorseIDs.count() && ride.get('horseID') && ride.get('horseID') === this.props.chosenHorseID) // remove when everyone > 43
-    } else {
-      return false
-    }
+    const horseShouldBeShowing = ride.get('horseIDs').indexOf(this.props.chosenHorseID) >= 0
+      || this.props.chosenHorseID === this.props.types.SHOW_ALL_HORSES
+    return happenedOnDay && riderShouldBeShowing && horseShouldBeShowing
   }
 
   days (mondayString) {
@@ -127,7 +138,7 @@ export default class Week extends Component {
     const start = moment(new Date(mondayString))
     let totalDistance = 0.0
     let totalTime = 0
-    let weekHasRides = false
+    let totalGain = 0
     for (let i = 0; i < 7; i++) {
       const eachDay = moment(start).add(i, 'days')
       const daysRides = []
@@ -136,13 +147,13 @@ export default class Week extends Component {
           daysRides.push(ride)
           totalDistance += ride.get('distance')
           totalTime += ride.get('elapsedTimeSecs')
+          totalGain += ride.get('elevationGain') || 0
         }
       }
 
       if (daysRides.length === 0) {
         days.push(<ZeroDay key={i}/>)
       } else if (daysRides.length === 1) {
-        weekHasRides = true
         days.push(
           <RideDay
             key={i}
@@ -154,7 +165,6 @@ export default class Week extends Component {
           />
         )
       } else if (daysRides.length > 1) {
-        weekHasRides = true
         days.push(
           <MultiRideDay
             key={i}
@@ -167,7 +177,7 @@ export default class Week extends Component {
         )
       }
     }
-    return { days, totalDistance, totalTime, weekHasRides }
+    return { days, totalDistance, totalTime, totalGain }
   }
 
   timeString (seconds, style, showSpace=true) {
@@ -190,34 +200,38 @@ export default class Week extends Component {
     this.props.pickType('typeTime')
   }
 
+  pickTypeGain () {
+    this.props.pickType('typeGain')
+  }
+
   render () {
     const weekData = this.days(this.props.mondayString)
-    if (weekData.weekHasRides) {
-      return (
-        <View style={{flex: 1, flexDirection: 'column', paddingTop: 10, paddingBottom: 10, marginBottom: 10, backgroundColor: lightGrey}}>
-          <View style={{flex: 1}}>
-            <Text style={{textAlign: 'center'}}>
-              {formattedWeekString(this.props.mondayString)}
-            </Text>
-          </View>
-          <View style={{flex: 1, flexDirection: 'row', marginBottom: 15}}>
-            {weekData.days}
-          </View>
-          <View style={{flex: 1, flexDirection: 'row'}}>
-            <TouchableOpacity style={{flex: 1}} onPress={this.pickTypeDistance}>
-              <Text style={{textAlign: 'center', fontSize: 20}}>{ weekData.totalDistance.toFixed(1) } mi</Text>
-              <Text style={{textAlign: 'center', fontSize: 10}}>DISTANCE</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={{flex: 1}}a onPress={this.pickTypeTime}>
-              {this.timeString(weekData.totalTime, {textAlign: 'center', fontSize: 20})}
-              <Text style={{textAlign: 'center', fontSize: 10}}>TIME</Text>
-            </TouchableOpacity>
-          </View>
+    return (
+      <View style={{flex: 1, flexDirection: 'column', paddingTop: 10, paddingBottom: 10, marginBottom: 10, backgroundColor: lightGrey}}>
+        <View style={{flex: 1}}>
+          <Text style={{textAlign: 'center'}}>
+            {formattedWeekString(this.props.mondayString)}
+          </Text>
         </View>
-      )
-    } else {
-      return null
-    }
+        <View style={{flex: 1, flexDirection: 'row', marginBottom: 15}}>
+          {weekData.days}
+        </View>
+        <View style={{flex: 1, flexDirection: 'row'}}>
+          <TouchableOpacity style={{flex: 1}} onPress={this.pickTypeDistance}>
+            <Text style={{textAlign: 'center', fontSize: 20}}>{ weekData.totalDistance.toFixed(1) } mi</Text>
+            <Text style={{textAlign: 'center', fontSize: 10}}>DISTANCE</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={{flex: 1}} onPress={this.pickTypeTime}>
+            {this.timeString(weekData.totalTime, {textAlign: 'center', fontSize: 20})}
+            <Text style={{textAlign: 'center', fontSize: 10}}>TIME</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={{flex: 1}} onPress={this.pickTypeGain}>
+            <Text style={{textAlign: 'center', fontSize: 20}}>{ Math.round(metersToFeet(weekData.totalGain)) } ft</Text>
+            <Text style={{textAlign: 'center', fontSize: 10}}>GAIN</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    )
   }
 }
 

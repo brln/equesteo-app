@@ -27,7 +27,7 @@ export default class ElevationProfile extends PureComponent {
     return (
       <View style={styles.container}>
         <VictoryChart
-          padding={{ top: 50, bottom: 50, left: 80, right: 10 }}
+          padding={{ top: 50, bottom: 50, left: 80, right: 30 }}
           minDomain={{y: this.memoMinDomain(this.props.elevationData)}}
         >
           <VictoryAxis

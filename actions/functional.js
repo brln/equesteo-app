@@ -141,7 +141,7 @@ export function appInitialized () {
           dispatch(startListeningFCMTokenRefresh())
           dispatch(startListeningFCM())
           dispatch(setDistributionOnServer())
-          dispatch(syncDBPull('all'))
+          dispatch(syncDBPull())
           dispatch(switchRoot(FEED))
         })
       } else {
@@ -234,7 +234,13 @@ export function loadRideElevations (rideID) {
   return (dispatch) => {
     PouchCouch.loadRideElevations(rideID).then((elevations) => {
       dispatch(rideElevationsLoaded(elevations))
-    }).catch(catchAsyncError(dispatch, false))
+    }).catch(e => {
+      if (e.status === 404) {
+        dispatch(rideElevationsLoaded(null))
+      } else {
+        catchAsyncError(dispatch)
+      }
+    })
   }
 }
 
@@ -242,6 +248,8 @@ export function newPassword (password) {
   cb('newPassword')
   return (dispatch) => {
     UserAPI.changePassword(password).then(() => {
+      // @TODO: this should show a spinner while the load
+      // @TODO: completes and then switch to the feed.
       dispatch(switchRoot(FEED))
     }).catch(catchAsyncError(dispatch))
   }
@@ -255,6 +263,8 @@ export function doRemotePersist(db) {
       dispatch(remotePersistStarted(db))
       PouchCouch.remoteReplicateDB(db).then(() => {
         dispatch(remotePersistComplete(db))
+      }).then(() => {
+        dispatch(syncDBPull())
       }).catch((e) => {
         if (e instanceof NotConnectedError) {
           dispatch(remotePersistError(db))
@@ -877,7 +887,7 @@ export function submitSignup (email, password) {
   }
 }
 
-export function syncDBPull () {
+export function syncDBPull (userID, followingIDs, followerIDs) {
   cb('syncDBPull')
   return (dispatch, getState) => {
     logInfo('action syncDBPull')
@@ -885,23 +895,25 @@ export function syncDBPull () {
       message: 'Loading...',
       color: warning,
     })))
-    const userID = getState().getIn(['localState', 'userID'])
-    const follows = getState().getIn(['pouchRecords', 'follows'])
-    const following = follows.valueSeq().filter(
-      f => !f.get('deleted') && f.get('followerID') === userID
-    ).map(
-      f => f.get('followingID')
-    ).toJS()
 
-    const followers = follows.valueSeq().filter(
-      f => !f.get('deleted') && f.get('followingID') === userID
-    ).map(
-      f => f.get('followerID')
-    ).toJS()
-    following.push(userID)
+    if (userID === undefined || !followingIDs === undefined || !followerIDs === undefined) {
+      const userID = getState().getIn(['localState', 'userID'])
+      const follows = getState().getIn(['pouchRecords', 'follows'])
+      followingIDs = follows.valueSeq().filter(
+        f => !f.get('deleted') && f.get('followerID') === userID
+      ).map(
+        f => f.get('followingID')
+      ).toJS()
+
+      followerIDs = follows.valueSeq().filter(
+        f => !f.get('deleted') && f.get('followingID') === userID
+      ).map(
+        f => f.get('followerID')
+      ).toJS()
+    }
 
     dispatch(setFullSyncFail(false))
-    return PouchCouch.localReplicateDB('all', following, followers).then(() => {
+    return PouchCouch.localReplicateDB('all', userID, followingIDs, followerIDs).then(() => {
       return PouchCouch.localLoad()
     }).then(localData => {
       dispatch(localDataLoaded(localData))
@@ -915,6 +927,7 @@ export function syncDBPull () {
         dispatch(clearFeedMessage())
       }, 3000)
     }).catch((e) => {
+      logError(e)
       if (e.status === 401) {
         catchAsyncError(dispatch)(e)
       }

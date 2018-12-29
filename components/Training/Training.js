@@ -37,6 +37,7 @@ export default class Training extends PureComponent {
     this.TYPES = {
       DISTANCE: 'typeDistance',
       TYPE_TIME: 'typeTime',
+      TYPE_GAIN: 'typeGain',
       SHOW_ALL_HORSES: 'showAllHorses',
       SHOW_ALL_RIDERS: 'showAllRiders',
       NO_HORSE: 'noHorse'
@@ -56,14 +57,30 @@ export default class Training extends PureComponent {
     this.userPicker = this.userPicker.bind(this)
   }
 
-  ridesToWeeks (rides) {
+  ridesToWeeks (trainings) {
     const rideWeeks = {}
-    for (let ride of rides) {
+    for (let ride of trainings) {
       let monday = getMonday(ride.get('startTime'))
       if (!rideWeeks[monday]) {
         rideWeeks[monday] = []
       }
       rideWeeks[monday].push(ride)
+    }
+
+    const addDays = (days, date) => {
+      let newDate = new Date(date);
+      newDate.setDate(date.getDate() + days);
+      return newDate;
+    }
+
+    const mondayDates = Object.keys(rideWeeks)
+    mondayDates.sort((a, b) => new Date(a) - new Date(b))
+    const start = new Date(mondayDates[0])
+    const finish = new Date(mondayDates[mondayDates.length - 1])
+    for (i = start; i < finish; i = addDays(7, i)) {
+      if (!rideWeeks[i]) {
+        rideWeeks[i] = []
+      }
     }
     return rideWeeks
   }
@@ -108,7 +125,7 @@ export default class Training extends PureComponent {
 
   horsePicker () {
     const items = this.props.horseUsers.valueSeq().reduce((a, h) => {
-      if (h.get('userID') === this.props.userID && h.get('deleted') !== true) {
+      if (h.get('userID') === this.props.userID) {
         const horse = this.props.horses.get(h.get('horseID'))
         a.push({ label: horse.get('name'), value: horse.get('_id') })
       }
@@ -158,7 +175,7 @@ export default class Training extends PureComponent {
   }
 
   render() {
-    const rideWeeks = this.ridesToWeeks(this.props.rides)
+    const rideWeeks = this.ridesToWeeks(this.props.trainings)
     const mondayDates = Object.keys(rideWeeks)
     mondayDates.sort((a, b) => new Date(b) - new Date(a))
     return (

@@ -43,7 +43,6 @@ import {
   RIDE_COMMENT_UPDATED,
   RIDE_COORDINATES_LOADED,
   RIDE_ELEVATIONS_LOADED,
-  RIDE_ELEVATIONS_UPDATED,
   RIDE_HORSE_UPDATED,
   RIDE_PHOTO_UPDATED,
   RIDE_UPDATED,
@@ -67,6 +66,7 @@ import {
   SET_SHOWING_RIDE,
   UNPAUSE_LOCATION_TRACKING,
   UPDATE_NEW_RIDE_COORDS,
+  UPDATE_NEW_RIDE_ELEVATIONS,
   UPDATE_PHOTO_STATUS,
   USER_PHOTO_UPDATED,
   USER_SEARCH_RETURNED,
@@ -404,13 +404,6 @@ export function rideUpdated (ride) {
   }
 }
 
-export function rideElevationsUpdated (rideElevations) {
-  return {
-    type: RIDE_ELEVATIONS_UPDATED,
-    rideElevations
-  }
-}
-
 export function ridePhotoUpdated (ridePhoto) {
   return {
     type: RIDE_PHOTO_UPDATED,
@@ -555,13 +548,6 @@ export function updatePhotoStatus (photoID, newStatus) {
     photoID,
     newStatus,
     logData: ['photoID', 'newStatus']
-  }
-}
-
-export function updateNewRideCoords (newCoords) {
-  return {
-    type: UPDATE_NEW_RIDE_COORDS,
-    newCoords
   }
 }
 

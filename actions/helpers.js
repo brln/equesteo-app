@@ -6,7 +6,6 @@ import {
   errorOccurred,
   loadCurrentRideState,
   loadLocalState,
-  localDataLoaded,
   saveUserID,
   setAwaitingPasswordChange,
   setDoingInitialLoad,
@@ -15,18 +14,18 @@ import {
 import {
   startListeningFCMTokenRefresh,
   startListeningFCM,
+  syncDBPull,
   setDistributionOnServer,
   switchRoot,
 } from './functional'
-import { logInfo } from '../helpers'
+import { logError, logInfo } from '../helpers'
 import { FEED } from '../screens'
-import { LocalStorage, PouchCouch } from '../services'
+import { LocalStorage } from '../services'
 
 import { setUserContext } from "../services/Sentry"
 
 export function loginAndSync(loginFunc, loginArgs, dispatch) {
   loginFunc(...loginArgs).then(resp => {
-    // @TODO: figure out why followers have _id here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
     const userID = resp.id
     const following = resp.following
     const followers = resp.followers

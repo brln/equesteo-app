@@ -12,10 +12,8 @@ import {
 
 import {
   haversine,
-  metersToFeet,
-  newElevationGain,
+  parseElevationData,
   parseRideCoordinate,
-  toElevationKey,
   speedGradient
 } from '../../helpers'
 import ElevationGain from './ElevationGain'
@@ -27,50 +25,7 @@ export default class RideCharts extends PureComponent {
     super(props)
 
     this.memoizedParse = memoizeOne(this.parseSpeedData)
-    this.memoizedParseElevation = memoizeOne(this.parseElevationData)
-  }
-
-  parseElevationData (rideCoordinates, rideElevations) {
-    let totalDistance = 0
-    let totalGain = 0
-    let lastPoint = null
-    let points = []
-    let oldTotalGain = null
-
-    for (let rideCoord of rideCoordinates) {
-      const parsedCoord = parseRideCoordinate(rideCoord)
-      if (!lastPoint) {
-        lastPoint = parsedCoord
-      } else {
-        const newDistance = haversine(
-          lastPoint.get('latitude'),
-          lastPoint.get('longitude'),
-          parsedCoord.get('latitude'),
-          parsedCoord.get('longitude')
-        )
-        totalDistance += newDistance
-        const elevation = rideElevations.getIn([
-          toElevationKey(parsedCoord.get('latitude')),
-          toElevationKey(parsedCoord.get('longitude'))
-        ])
-        const lastElevation = rideElevations.getIn([
-          toElevationKey(lastPoint.get('latitude')),
-          toElevationKey(lastPoint.get('longitude'))
-        ])
-        totalGain = newElevationGain(newDistance, lastElevation, elevation, totalGain)
-        if (elevation !== undefined && totalDistance !== undefined && totalGain !== undefined) {
-          points.push({
-            elevation: metersToFeet(elevation),
-            distance: totalDistance,
-            gain: metersToFeet(totalGain)
-          })
-          oldTotalGain = totalGain
-          lastPoint = parsedCoord
-        }
-
-      }
-    }
-    return points
+    this.memoizedParseElevation = memoizeOne(parseElevationData)
   }
 
   parseSpeedData (rideCoordinates) {

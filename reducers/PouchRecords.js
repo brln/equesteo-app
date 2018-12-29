@@ -20,17 +20,23 @@ import {
   RIDE_CARROT_CREATED,
   RIDE_CARROT_SAVED,
   RIDE_COORDINATES_LOADED,
-  RIDE_ELEVATIONS_CREATED,
   RIDE_HORSE_UPDATED,
   RIDE_PHOTO_UPDATED,
   RIDE_UPDATED,
   RIDE_ELEVATIONS_LOADED,
-  RIDE_ELEVATIONS_UPDATED,
   UPDATE_NEW_RIDE_COORDS,
+  UPDATE_NEW_RIDE_ELEVATIONS,
   USER_PHOTO_UPDATED,
   USER_UPDATED,
 } from '../constants'
-import { elapsedTime, newRideName, staticMap, unixTimeNow } from '../helpers'
+import {
+  elapsedTime,
+  feetToMeters,
+  newRideName,
+  parseElevationData,
+  staticMap,
+  unixTimeNow
+} from '../helpers'
 import { simplifyLine } from '../services/DouglasPeucker'
 
 export const initialState = Map({
@@ -38,15 +44,14 @@ export const initialState = Map({
   horsePhotos: Map(),
   horseUsers: Map(),
   follows: Map(),
-  newRideCoordinates: null,
   rides: Map(),
   rideCarrots: Map(),
   selectedRideCoordinates: null,
   selectedRideElevations: null,
   rideComments: Map(),
-  rideElevations: Map(),
   rideHorses: Map(),
   ridePhotos: Map(),
+  trainings: Map(),
   users: Map(),
   userPhotos: Map(),
 })
@@ -177,10 +182,17 @@ export default function PouchRecordsReducer(state=initialState, action) {
         userID: action.userID,
       }
 
+
+      // @TODO: go into old records and re-parse the elevation data.
+      const simplifiedElevationData = parseElevationData(
+        simplifiedCoords,
+        action.currentRideElevations.get('elevations')
+      )
+      const elevationGain = feetToMeters(simplifiedElevationData[simplifiedElevationData.length - 1].gain)
       const elevationData = {
         _id: action.rideID + '_elevations',
         rideID: theRide._id,
-        elevationGain: action.currentRideElevations.get('elevationGain'),
+        elevationGain,
         elevations: action.currentRideElevations.get('elevations'),
         type: 'rideElevations',
         userID: action.userID,
@@ -195,19 +207,16 @@ export default function PouchRecordsReducer(state=initialState, action) {
       }
       theRide.mapURL = staticMap(theRide, coordinateData.rideCoordinates)
 
+      const coordMap = Map(coordinateData)
+      const elevMap = Map(elevationData)
       return newState.setIn(
         ['rides', theRide._id], Map(theRide)
-      ).setIn(
-        ['rideElevations', elevationData._id], Map(elevationData),
-      ).set(
-        'newRideCoordinates',
-        Map(coordinateData)
       ).set(
         'selectedRideCoordinates',
-        Map(coordinateData)
+        coordMap
       ).set(
         'selectedRideElevations',
-        Map(elevationData)
+        elevMap
       )
     case CREATE_USER_PHOTO:
       const newUserPhoto = {
@@ -230,8 +239,6 @@ export default function PouchRecordsReducer(state=initialState, action) {
     case DELETE_UNPERSISTED_RIDE:
       return state.deleteIn(
         ['rides', action.rideID]
-      ).deleteIn(
-        ['rideElevations', action.rideID + '_elevations']
       )
     case DELETE_UNPERSISTED_PHOTO:
       return state.deleteIn([action.photoSection, action.photoID])
@@ -244,42 +251,22 @@ export default function PouchRecordsReducer(state=initialState, action) {
     case HORSE_PHOTO_UPDATED:
       return state.setIn(['horsePhotos', action.horsePhoto.get('_id')], action.horsePhoto)
     case LOCAL_DATA_LOADED:
-      const actionRecords = {
-        follows: {},
-        horses: {},
-        horsePhotos: {},
-        horseUsers: {},
-        rides: {},
-        rideCarrots: {},
-        rideComments: {},
-        rideHorses: {},
-        ridePhotos: {},
-        users: {},
-        userPhotos: {},
-      }
-
-      // Key all records by ID
-      for (let recordType of Object.keys(actionRecords)) {
-        action.localData[recordType].reduce((accum, record) => {
-          accum[record._id] = record
-          return accum
-        }, actionRecords[recordType])
-      }
       return state.merge(Map({
-        follows: fromJS(actionRecords.follows),
+        follows: fromJS(action.localData.follows),
         // First start creates a horse, probably before the finishes,
         // so keep it from blowing the new horse away
-        horses: state.get('horses').merge(fromJS(actionRecords.horses)),
-        horseUsers: state.get('horseUsers').merge(fromJS(actionRecords.horseUsers)),
+        horses: state.get('horses').merge(fromJS(action.localData.horses)),
+        horseUsers: state.get('horseUsers').merge(fromJS(action.localData.horseUsers)),
 
-        horsePhotos: fromJS(actionRecords.horsePhotos),
-        rides: fromJS(actionRecords.rides),
-        rideCarrots: fromJS(actionRecords.rideCarrots),
-        rideComments: fromJS(actionRecords.rideComments),
-        rideHorses: fromJS(actionRecords.rideHorses),
-        ridePhotos: fromJS(actionRecords.ridePhotos),
-        users: fromJS(actionRecords.users),
-        userPhotos: fromJS(actionRecords.userPhotos)
+        horsePhotos: fromJS(action.localData.horsePhotos),
+        rides: fromJS(action.localData.rides),
+        rideCarrots: fromJS(action.localData.rideCarrots),
+        rideComments: fromJS(action.localData.rideComments),
+        rideHorses: fromJS(action.localData.rideHorses),
+        ridePhotos: fromJS(action.localData.ridePhotos),
+        trainings: fromJS(action.localData.trainings),
+        users: fromJS(action.localData.users),
+        userPhotos: fromJS(action.localData.userPhotos)
       }))
     case RIDE_CARROT_CREATED:
       return state.setIn(['rideCarrots', action.carrotData.get('_id')], action.carrotData)
@@ -289,8 +276,6 @@ export default function PouchRecordsReducer(state=initialState, action) {
       return state.setIn(['rideComments', action.rideComment.get('_id')], action.rideComment)
     case RIDE_COORDINATES_LOADED:
       return state.set('selectedRideCoordinates', fromJS(action.rideCoordinates))
-    case RIDE_ELEVATIONS_CREATED:
-      return state.setIn(['rideElevations', action.elevationData.get('_id')], action.elevationData)
     case RIDE_ELEVATIONS_LOADED:
       return state.set('selectedRideElevations', fromJS(action.rideElevations))
     case RIDE_HORSE_UPDATED:
@@ -299,10 +284,6 @@ export default function PouchRecordsReducer(state=initialState, action) {
       return state.setIn(['ridePhotos', action.ridePhoto.get('_id')], action.ridePhoto)
     case RIDE_UPDATED:
       return state.setIn(['rides', action.ride.get('_id')], action.ride)
-    case RIDE_ELEVATIONS_UPDATED:
-      return state.setIn(['rideElevations', action.rideElevations.get('_id')], action.rideElevations)
-    case UPDATE_NEW_RIDE_COORDS:
-      return state.set('newRideCoordinates', action.newCoords)
     case USER_PHOTO_UPDATED:
       return state.setIn(['userPhotos', action.userPhoto.get('_id')], action.userPhoto)
     case USER_UPDATED:
