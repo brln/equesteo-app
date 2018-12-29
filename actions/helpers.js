@@ -15,12 +15,13 @@ import {
 import {
   startListeningFCMTokenRefresh,
   startListeningFCM,
+  syncDBPull,
   setDistributionOnServer,
   switchRoot,
 } from './functional'
 import { logError, logInfo } from '../helpers'
 import { FEED } from '../screens'
-import { LocalStorage, PouchCouch } from '../services'
+import { LocalStorage } from '../services'
 
 import { setUserContext } from "../services/Sentry"
 
