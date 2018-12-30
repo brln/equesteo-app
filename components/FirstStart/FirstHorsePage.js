@@ -16,8 +16,8 @@ import Button from '../Button'
 const { height, width } = Dimensions.get('window')
 
 export default class FirstHorsePage extends PureComponent {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.next = this.next.bind(this)
     this.skipHorse = this.skipHorse.bind(this)
   }

@@ -77,15 +77,11 @@ class FirstStartContainer extends PureComponent {
   navigationButtonPressed ({ buttonId }) {
     if (buttonId === 'back') {
       if (this.pages[this.state.currentPage].i === 1) {
-        Navigation.pop(this.props.componentId)
+        this.done(false)
       } else {
         this.prevPage()
       }
     }
-  }
-
-  componentDidMount () {
-    this.createHorse()
   }
 
   createHorse () {
@@ -151,9 +147,11 @@ class FirstStartContainer extends PureComponent {
     this.props.dispatch(persistUserUpdate(this.props.user.get('_id'), []))
   }
 
-  done () {
-    this.props.dispatch(userUpdated(this.props.user.set('finishedFirstStart', true)))
-    this.props.dispatch(persistUserUpdate(this.props.user.get('_id'), []))
+  done (complete) {
+    if (complete) {
+      this.props.dispatch(userUpdated(this.props.user.set('finishedFirstStart', true)))
+      this.props.dispatch(persistUserUpdate(this.props.user.get('_id'), []))
+    }
     if (this.state.horseUpdated) {
       this.props.dispatch(persistHorseUpdate(
         this.props.horse.get('_id'),
@@ -162,7 +160,7 @@ class FirstStartContainer extends PureComponent {
         this.state.horsePhoto,
         this.props.horseUser.get('rideDefault')
       ))
-    } else {
+    } else if (this.props.horse) {
       this.props.dispatch(deleteUnpersistedHorse(this.props.horse.get('_id'), this.props.horseUser.get('_id')))
     }
     Navigation.pop(this.props.componentId)
@@ -186,6 +184,10 @@ class FirstStartContainer extends PureComponent {
     }
     for (let pageData of Object.values(this.pages)) {
       if (pageData.i === nextIndex) {
+        if (pageData.name === this.pages.FIRST_HORSE.name) {
+          this.createHorse()
+        }
+
         this.setState({
           currentPage: pageData.name
         })

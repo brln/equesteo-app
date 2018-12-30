@@ -13,6 +13,15 @@ import Button from '../Button'
 const { height, width } = Dimensions.get('window')
 
 export default class FinalPage extends PureComponent {
+  constructor(props) {
+    super(props)
+    this.done = this.done.bind(this)
+  }
+
+  done () {
+    this.props.done(true)
+  }
+
   render() {
     logRender('FinalPage')
 
@@ -39,7 +48,7 @@ export default class FinalPage extends PureComponent {
                 <Button
                   color={brand}
                   text={"Got It"}
-                  onPress={this.props.done}
+                  onPress={this.done}
                 />
               </View>
             </View>
