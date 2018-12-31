@@ -481,9 +481,7 @@ export function uploadPhoto (type, photoLocation, photoID) {
     const goodConnection = getState().getIn(['localState', 'goodConnection'])
     if (goodConnection) {
       dispatch(updatePhotoStatus(photoID, 'uploading'))
-      logDebug(`uploading ${type} photo`)
       UserAPI.uploadPhoto(type, photoLocation, photoID).then(() => {
-        logDebug(`uploading ${type} photo complete`)
         switch (type) {
           case 'horse':
             const uploadedHorseURI = horsePhotoURL(photoID)
@@ -605,7 +603,7 @@ export function signOut () {
         dispatch(clearState())
         dispatch(setSigningOut(false))
       }).catch(e => {
-        logDebug(e)
+        logError(e)
       })
     }
   }
@@ -860,6 +858,7 @@ export function syncDBPull () {
       if (e.status === 401) {
         catchAsyncError(dispatch)(e)
       }
+      logError(e)
       dispatch(setFeedMessage(Map({
         message: 'Error Fetching Data',
         color: warning,

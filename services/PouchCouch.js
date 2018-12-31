@@ -1,7 +1,7 @@
 import PouchDB from 'pouchdb-react-native'
 import { API_URL } from 'react-native-dotenv'
 
-import { logInfo } from '../helpers'
+import { logError, logInfo } from '../helpers'
 import ApiClient from './ApiClient'
 
 const horsesDBName = 'horses'
@@ -66,14 +66,21 @@ export default class PouchCouch {
         PouchDB.replicate(localDB, remoteDB).on('complete', (resp) => {
           res(resp)
         }).on('error', (e) => {
-          logDebug('REMOTE REPLICATE DB ERROR')
-          logDebug(e, 'the error')
+          logError(e)
           rej(e)
         })
+      }).then(() => {
+        return PouchCouch.postReplicate()
       })
     })
   }
 
+  // There are no hooks in Pouch to be able to swap out the JWT mid-replication,
+  // so you need to make a call to make sure the token is good before, and that
+  // it has remained good throughout the replicate process. Also, the overlap time
+  // set in ApiClient needs to be >>> than the time it will take to replicate
+  // and then refresh the token, or the next call after replication will 401 and
+  // boot the user.
   static preReplicate () {
     return ApiClient.checkAuth().then(() => {
       return ApiClient.getToken()
@@ -82,105 +89,117 @@ export default class PouchCouch {
     })
   }
 
+  static postReplicate () {
+    return ApiClient.checkAuth()
+  }
+
   static localReplicateDB(db, userIDs, followerUserIDs) {
+    let preRepPromise = PouchCouch.preReplicate()
+    let repPromise
     switch(db) {
       case 'horses':
-        return PouchCouch.localReplicateHorses([...userIDs, ...followerUserIDs])
+        repPromise = preRepPromise.then(options => {
+          return PouchCouch.localReplicateHorses(options, [...userIDs, ...followerUserIDs])
+        })
+        break
       case 'rides':
-        return PouchCouch.localReplicateRides(userIDs, followerUserIDs)
+        repPromise = preRepPromise.then(options => {
+          return PouchCouch.localReplicateRides(options, userIDs, followerUserIDs)
+        })
+        break
       case 'users':
-        return PouchCouch.localReplicateUsers([...userIDs, ...followerUserIDs])
+        repPromise = preRepPromise.then(options => {
+          return PouchCouch.localReplicateUsers(options)
+        })
+        break
       case 'all':
-        return Promise.all([
-          PouchCouch.localReplicateRides(userIDs, followerUserIDs),
-          PouchCouch.localReplicateUsers([...userIDs, ...followerUserIDs]),
-          PouchCouch.localReplicateHorses([...userIDs, ...followerUserIDs]),
-        ])
+        repPromise = preRepPromise.then(options => {
+          return Promise.all([
+            PouchCouch.localReplicateRides(options, userIDs, followerUserIDs),
+            PouchCouch.localReplicateUsers(options),
+            PouchCouch.localReplicateHorses(options, [...userIDs, ...followerUserIDs]),
+          ])
+        })
+        break
       default:
         throw('Local DB not found')
     }
+    return repPromise.then(() => {
+      return PouchCouch.postReplicate()
+    })
   }
 
-  static localReplicateRides (userIDs, followerUserIDs) {
-    return PouchCouch.preReplicate().then((options) => {
-      const remoteRidesDB = new PouchDB(`${API_URL}/couchproxy/${ridesDBName}`, options)
-      return new Promise((resolve, reject) => {
-        PouchDB.replicate(
-          remoteRidesDB,
-          localRidesDB,
-          {
-            live: false,
-            filter: 'rides/byUserIDs',
-            query_params: {
-              userIDs: userIDs.join(','),
-              followerUserIDs: followerUserIDs.join(',')
-            }
+  static localReplicateRides (options, userIDs, followerUserIDs) {
+    const remoteRidesDB = new PouchDB(`${API_URL}/couchproxy/${ridesDBName}`, options)
+    return new Promise((resolve, reject) => {
+      PouchDB.replicate(
+        remoteRidesDB,
+        localRidesDB,
+        {
+          live: false,
+          filter: 'rides/byUserIDs',
+          query_params: {
+            userIDs: userIDs.join(','),
+            followerUserIDs: followerUserIDs.join(',')
           }
-        ).on('complete', (resp) => {
-          resolve(resp)
-        }).on('error', (e) => {
-          logDebug('ride error')
-          reject(e)
-        })
+        }
+      ).on('complete', (resp) => {
+        resolve(resp)
+      }).on('error', (e) => {
+        reject(e)
       })
     })
   }
 
-  static localReplicateUsers () {
-    return PouchCouch.preReplicate().then(options => {
-      const remoteUsersDB = new PouchDB(`${API_URL}/couchproxy/${usersDBName}`, options)
-      return new Promise((resolve, reject) => {
+  static localReplicateUsers (options) {
+    const remoteUsersDB = new PouchDB(`${API_URL}/couchproxy/${usersDBName}`, options)
+    return new Promise((resolve, reject) => {
+      PouchDB.replicate(
+        remoteUsersDB,
+        localUsersDB,
+        {
+          live: false,
+        }
+      ).on('complete', () => {
+          resolve()
+      }).on('error', (e) => {
+        reject(e)
+      });
+    })
+  }
+
+  static localReplicateHorses (options, userIDs) {
+    const remoteHorsesDB = new PouchDB(`${API_URL}/couchproxy/${horsesDBName}`, options)
+    return new Promise((resolve, reject) => {
+      remoteHorsesDB.query('horses/allJoins', {}).then((resp) => {
+        const fetchIDs = []
+        for (let row of resp.rows) {
+          const joinID = row.id
+          const userID = row.key
+          const horseID = row.value
+          if (userIDs.indexOf(userID) >= 0) {
+            fetchIDs.push(joinID)
+            if (fetchIDs.indexOf(horseID) < 0) {
+              fetchIDs.push(horseID)
+            }
+          }
+        }
+        return fetchIDs
+      }).then(fetchIDs => {
         PouchDB.replicate(
-          remoteUsersDB,
-          localUsersDB,
+          remoteHorsesDB,
+          localHorsesDB,
           {
             live: false,
+            doc_ids: fetchIDs,
           }
         ).on('complete', () => {
-            resolve()
+          resolve()
         }).on('error', (e) => {
-          logDebug('user error')
-          reject(e)
-        });
-      })
-    })
-  }
-
-  static localReplicateHorses (userIDs) {
-    return PouchCouch.preReplicate().then((options) => {
-      return new Promise((resolve, reject) => {
-        const remoteHorsesDB = new PouchDB(`${API_URL}/couchproxy/${horsesDBName}`, options)
-        remoteHorsesDB.query('horses/allJoins', {}).then((resp) => {
-          const fetchIDs = []
-          for (let row of resp.rows) {
-            const joinID = row.id
-            const userID = row.key
-            const horseID = row.value
-            if (userIDs.indexOf(userID) >= 0) {
-              fetchIDs.push(joinID)
-              if (fetchIDs.indexOf(horseID) < 0) {
-                fetchIDs.push(horseID)
-              }
-            }
-          }
-          return fetchIDs
-        }).then(fetchIDs => {
-          PouchDB.replicate(
-            remoteHorsesDB,
-            localHorsesDB,
-            {
-              live: false,
-              doc_ids: fetchIDs,
-            }
-          ).on('complete', () => {
-            resolve()
-          }).on('error', (e) => {
-            throw e
-          })
-        }).catch((e) => {
-          logDebug('horse error')
-          reject(e)
+          throw e
         })
+      }).catch((e) => {
+        reject(e)
       })
     })
   }
