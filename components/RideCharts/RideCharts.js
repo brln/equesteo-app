@@ -58,13 +58,16 @@ export default class RideCharts extends PureComponent {
           toElevationKey(lastPoint.get('longitude'))
         ])
         totalGain = newElevationGain(newDistance, lastElevation, elevation, totalGain)
-        points.push({
-          elevation: metersToFeet(elevation),
-          distance: totalDistance,
-          gain: metersToFeet(totalGain)
-        })
-        oldTotalGain = totalGain
-        lastPoint = parsedCoord
+        if (elevation !== undefined && totalDistance !== undefined && totalGain !== undefined) {
+          points.push({
+            elevation: metersToFeet(elevation),
+            distance: totalDistance,
+            gain: metersToFeet(totalGain)
+          })
+          oldTotalGain = totalGain
+          lastPoint = parsedCoord
+        }
+
       }
     }
     return points

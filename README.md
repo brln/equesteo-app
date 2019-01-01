@@ -21,3 +21,6 @@ yo rn-toolbox:assets --splash splashscreen.svg --android
 
 # install an apk
 adb install android/app/build/outputs/apk/release/app-release.apk
+
+# version appropriate files
+./versioning.py 55 0.46.1
