@@ -108,7 +108,7 @@ class FeedContainer extends BackgroundComponent {
   }
 
   componentDidUpdate () {
-    if (this.props.popShowRideNow && !this.props.awaitingFullSync) {
+    if (this.props.popShowRideNow && this.props.popShowRide && !this.props.awaitingFullSync) {
       const showRide = this.props.rides.get(this.props.popShowRide.get('rideID'))
       if (showRide && !this.state.ridePopped) {
         // PushNotification.showNotification gets called when it shouldn't if the app reboots unexpectedly.
