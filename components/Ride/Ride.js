@@ -369,7 +369,7 @@ export default class Ride extends PureComponent {
   }
 
   render () {
-    if (this.props.rideCoordinates && this.props.rideElevations) {
+    if (this.props.rideCoordinates) {
       return this._renderRide()
     } else {
       return this._renderLoading()

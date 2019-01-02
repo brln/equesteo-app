@@ -193,7 +193,7 @@ class FeedContainer extends BackgroundComponent {
       (r) => r.get('userID') === userID && r.get('deleted') !== true
     ).sort((a, b) =>
       b.get('startTime') - a.get('startTime')
-    ).toList()
+    ).toList().slice(0, 30)
   }
 
   followIDs (follows, userID) {
@@ -211,7 +211,7 @@ class FeedContainer extends BackgroundComponent {
         && (r.get('userID') === userID || this.memoizeFollowIDs(follows, userID).indexOf(r.get('userID')) >= 0) // user hasn't removed follow
     ).sort(
       (a, b) => b.get('startTime') - a.get('startTime')
-    ).toList()
+    ).toList().slice(0, 50)
   }
 
   filteredHorses (follows, userID, horseUsers, horses) {
