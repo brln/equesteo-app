@@ -205,6 +205,9 @@ export default function PouchRecordsReducer(state=initialState, action) {
       ).set(
         'selectedRideCoordinates',
         Map(coordinateData)
+      ).set(
+        'selectedRideElevations',
+        Map(elevationData)
       )
     case CREATE_USER_PHOTO:
       const newUserPhoto = {

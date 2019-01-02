@@ -16,7 +16,6 @@ import {
   startListeningFCMTokenRefresh,
   startListeningFCM,
   setDistributionOnServer,
-  setFCMTokenOnServer,
   switchRoot,
 } from './functional'
 import { logInfo } from '../helpers'
@@ -96,7 +95,6 @@ export function configureBackgroundGeolocation () {
 
 export function stopListeningFCM () {
   // maybe delete token on server here?
-  return firebase.iid().deleteToken('373350399276', 'GCM').then(() => {
-    firebase.messaging().onTokenRefresh(() => {})
-  })
+  firebase.messaging().onTokenRefresh(() => {})
+  return firebase.iid().deleteToken('373350399276', 'GCM')
 }
