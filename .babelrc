@@ -1,11 +1,11 @@
 {
   "presets": ["react-native", "react-native-dotenv"],
   "env": {
-    "production": {
-      "plugins": ["transform-remove-console"]
-    },
     "test": {
       "presets": ["react-native", "react-native-dotenv"]
+    },
+    "production": {
+      "plugins": ["transform-remove-console"]
     }
   }
 }

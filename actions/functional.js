@@ -10,7 +10,7 @@ import PushNotification from 'react-native-push-notification'
 
 import ApiClient from '../services/ApiClient'
 import kalmanFilter from '../services/Kalman'
-import { captureException, setUserContext } from "../services/Sentry"
+import { captureBreadcrumb, captureException, setUserContext } from "../services/Sentry"
 import { handleNotification } from '../services/PushNotificationHandler'
 
 import {
@@ -77,18 +77,26 @@ import {
   userUpdated,
 } from './standard'
 
-export function catchAsyncError (dispatch) {
+function cb(action) {
+  logInfo('functionalAction: ' + action)
+  captureBreadcrumb(action, 'functionalAction')
+}
+
+export function catchAsyncError (dispatch, sentry=true) {
   return (e) => {
     if (e.status === 401) {
       dispatch(signOut())
     }
     logError(e)
-    captureException(e)
+    if (sentry) {
+      captureException(e)
+    }
   }
 }
 
 
 export function addHorseUser (horse, user) {
+  cb('addHorseUser')
   return (dispatch, getState) => {
     const id = `${user.get('_id')}_${horse.get('_id')}`
     let newHorseUser = getState().getIn(['pouchRecords', 'horseUsers', id])
@@ -111,6 +119,7 @@ export function addHorseUser (horse, user) {
 }
 
 export function appInitialized () {
+  cb('appInitialized')
   return (dispatch, getState) => {
     tryToLoadStateFromDisk(dispatch).then(() => {
       dispatch(startActiveComponentListener())
@@ -120,8 +129,8 @@ export function appInitialized () {
       dispatch(startAppStateTracking())
       return ApiClient.getToken()
     }).then((token) => {
-      if (token) {
-        const currentUserID = getState().getIn(['localState', 'userID'])
+      const currentUserID = getState().getIn(['localState', 'userID'])
+      if (token && currentUserID) {
         setUserContext(currentUserID)
         return PouchCouch.localLoad().then((localData) => {
           dispatch(localDataLoaded(localData))
@@ -139,6 +148,7 @@ export function appInitialized () {
 }
 
 export function checkFCMPermission () {
+  cb('checkFCMPermission')
   return () => {
     firebase.messaging().hasPermission().then(enabled => {
       if (!enabled) {
@@ -155,6 +165,7 @@ export function checkFCMPermission () {
 }
 
 export function createRideComment(commentData) {
+  cb('createRideComment')
   return (dispatch, getState) => {
     const currentUserID = getState().getIn(['localState', 'userID'])
     const commentID = `${currentUserID}_${(new Date).getTime().toString()}`
@@ -178,6 +189,7 @@ export function createRideComment(commentData) {
 }
 
 export function deleteHorseUser (horseUserID) {
+  cb('deleteHorseUser')
   return (dispatch, getState) => {
     let theHorseUser = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
     if (!theHorseUser) {
@@ -189,13 +201,15 @@ export function deleteHorseUser (horseUserID) {
 }
 
 export function exchangePWCode (email, code) {
+  cb('exchangePWCode')
   return (dispatch) => {
     loginAndSync(UserAPI.exchangePWCodeForToken, [email, code], dispatch)
   }
 }
 
 export function getPWCode (email) {
-  return (dispatch, getState) => {
+  cb('getPWCode')
+  return (dispatch) => {
     UserAPI.getPWCode(email).catch(e => {
       dispatch(errorOccurred(e.message))
     })
@@ -203,6 +217,7 @@ export function getPWCode (email) {
 }
 
 export function loadRideCoordinates (rideID) {
+  cb('loadRideCoordinates')
   return (dispatch) => {
     PouchCouch.loadRideCoordinates(rideID).then((coords) => {
       dispatch(rideCoordinatesLoaded(coords))
@@ -211,15 +226,17 @@ export function loadRideCoordinates (rideID) {
 }
 
 export function loadRideElevations (rideID) {
+  cb('loadRideElevations')
   return (dispatch) => {
     PouchCouch.loadRideElevations(rideID).then((elevations) => {
       dispatch(rideElevationsLoaded(elevations))
-    }).catch(catchAsyncError(dispatch))
+    }).catch(catchAsyncError(dispatch, false))
   }
 }
 
 export function newPassword (password) {
-  return (dispatch, getState) => {
+  cb('newPassword')
+  return (dispatch) => {
     UserAPI.changePassword(password).then(() => {
       dispatch(switchRoot(FEED))
     }).catch(catchAsyncError(dispatch))
@@ -227,6 +244,7 @@ export function newPassword (password) {
 }
 
 export function doRemotePersist(db) {
+  cb('doRemotePersist')
   return (dispatch, getState) => {
     const goodConnection = getState().getIn(['localState', 'goodConnection'])
     if (goodConnection) {
@@ -242,6 +260,7 @@ export function doRemotePersist(db) {
 }
 
 export function needsRemotePersist(db) {
+  cb('needsRemotePersist')
   return (dispatch) => {
     dispatch(setFeedMessage(Map({
       message: 'Data Needs to Upload',
@@ -253,6 +272,7 @@ export function needsRemotePersist(db) {
 }
 
 export function persistFollow (followID) {
+  cb('persistFollow')
   return (dispatch, getState) => {
     const theFollow = getState().getIn(['pouchRecords', 'follows', followID])
     if (!theFollow) {
@@ -269,6 +289,7 @@ export function persistFollow (followID) {
 }
 
 export function persistRide (rideID, newRide, stashedPhotos, deletedPhotoIDs, trimValues, rideHorses) {
+  cb('persistRide')
   return (dispatch, getState) => {
     const ridePersister = new RidePersister(dispatch, getState, rideID)
     ridePersister.persistRide(newRide, stashedPhotos, deletedPhotoIDs, trimValues, rideHorses)
@@ -276,6 +297,7 @@ export function persistRide (rideID, newRide, stashedPhotos, deletedPhotoIDs, tr
 }
 
 export function persistUserWithPhoto (userID, userPhotoID) {
+  cb('persistUserWithPhoto')
   return (dispatch, getState) => {
     const theUserPhoto = getState().getIn(['pouchRecords', 'userPhotos', userPhotoID])
     if (!theUserPhoto) {
@@ -301,6 +323,7 @@ export function persistUserWithPhoto (userID, userPhotoID) {
 }
 
 export function persistHorseWithPhoto (horseID, horsePhotoID) {
+  cb('persistHorseWithPhoto')
   return (dispatch, getState) => {
     const theHorsePhoto = getState().getIn(['pouchRecords', 'horsePhotos', horsePhotoID])
     if (!theHorsePhoto) {
@@ -324,6 +347,7 @@ export function persistHorseWithPhoto (horseID, horsePhotoID) {
 }
 
 export function persistHorseUpdate (horseID, horseUserID, deletedPhotoIDs, newPhotoIDs, previousDefaultValue) {
+  cb('persistHorseUpdate')
   return (dispatch, getState) => {
     const theHorse = getState().getIn(['pouchRecords', 'horses', horseID])
     if (!theHorse) {
@@ -399,6 +423,7 @@ export function persistHorseUpdate (horseID, horseUserID, deletedPhotoIDs, newPh
 }
 
 export function persistHorseUser (horseUserID) {
+  cb('persistHorseUser')
   return (dispatch, getState) => {
     const theHorseUser = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
     if (!theHorseUser) {
@@ -413,6 +438,7 @@ export function persistHorseUser (horseUserID) {
 }
 
 export function persistUserUpdate (userID, deletedPhotoIDs) {
+  cb('persistUserUpdate')
   return (dispatch, getState) => {
     const theUser = getState().getIn(['pouchRecords', 'users', userID])
     if (!theUser) {
@@ -447,6 +473,7 @@ export function persistUserUpdate (userID, deletedPhotoIDs) {
 }
 
 export function photoNeedsUpload (type, photoLocation, photoID) {
+  cb('photoNeedsUpload')
   return (dispatch) => {
     const item = Map({
       type,
@@ -461,6 +488,7 @@ export function photoNeedsUpload (type, photoLocation, photoID) {
 }
 
 export function runPhotoQueue() {
+  cb('runPhotoQueue')
   return (dispatch, getState) => {
     getState().getIn(['localState', 'photoQueue']).forEach((p) => {
       if (p.get('status') === 'enqueued'
@@ -477,6 +505,7 @@ export function runPhotoQueue() {
 }
 
 export function uploadPhoto (type, photoLocation, photoID) {
+  cb('uploadPhoto')
   return (dispatch, getState) => {
     const goodConnection = getState().getIn(['localState', 'goodConnection'])
     if (goodConnection) {
@@ -525,6 +554,7 @@ export function uploadPhoto (type, photoLocation, photoID) {
 }
 
 export function remotePersistComplete (db) {
+  cb('remotePersistComplete')
   return (dispatch) => {
     dispatch(setRemotePersistDB(db, DB_SYNCED))
     dispatch(setFeedMessage(Map({
@@ -538,6 +568,7 @@ export function remotePersistComplete (db) {
 }
 
 export function remotePersistError (db) {
+  cb('remotePersistError')
   return (dispatch) => {
     dispatch(setRemotePersistDB(db, DB_NEEDS_SYNC))
     dispatch(setFeedMessage(Map({
@@ -548,6 +579,7 @@ export function remotePersistError (db) {
 }
 
 export function remotePersistStarted (db) {
+  cb('remotePersistStarted')
   return (dispatch) => {
     dispatch(setRemotePersistDB(db, DB_SYNCING))
     dispatch(setFeedMessage(Map({
@@ -558,6 +590,7 @@ export function remotePersistStarted (db) {
 }
 
 export function searchForFriends (phrase) {
+  cb('searchForFriends')
   return (dispatch) => {
     UserAPI.findUser(phrase).then(resp => {
       dispatch(userSearchReturned(fromJS(resp)))
@@ -566,8 +599,10 @@ export function searchForFriends (phrase) {
 }
 
 export function setFCMTokenOnServer (token) {
+  cb('setFCMTokenOnServer')
   return (dispatch, getState) => {
     const currentUserID = getState().getIn(['localState', 'userID'])
+    logInfo('setting fcm token')
     UserAPI.setFCMToken(currentUserID, token).then(() => {
       logInfo('FCM token set')
     }).catch(catchAsyncError(dispatch))
@@ -575,8 +610,10 @@ export function setFCMTokenOnServer (token) {
 }
 
 export function setDistributionOnServer () {
+  cb('setDistributionOnServer')
   return (dispatch, getState) => {
     const currentUserID = getState().getIn(['localState', 'userID'])
+    logInfo('setting distribution')
     UserAPI.setDistribution(currentUserID, DISTRIBUTION).then(() => {
       logInfo('Distribution Set')
     }).catch(catchAsyncError(dispatch))
@@ -584,16 +621,20 @@ export function setDistributionOnServer () {
 }
 
 export function signOut () {
+  cb('signOut')
   return (dispatch, getState) => {
     if (!getState().getIn(['localState', 'signingOut'])) {
       dispatch(setSigningOut(true))
       dispatch(stopLocationTracking())
-      Promise.all([
-        PouchCouch.deleteLocalDBs(),
-        stopListeningFCM(),
-        LocalStorage.deleteLocalState(),
-        ApiClient.clearToken(),
-      ]).then(() => {
+      stopListeningFCM().catch(e => {
+        logError(e)
+      }).then(() => {
+        return Promise.all([
+          PouchCouch.deleteLocalDBs(),
+          LocalStorage.deleteLocalState(),
+          ApiClient.clearToken(),
+        ])
+      }).then(() => {
         const activeComponent = getState().getIn(['localState', 'activeComponent'])
         if (activeComponent !== FEED) {
           return Navigation.popToRoot(activeComponent)
@@ -610,6 +651,7 @@ export function signOut () {
 }
 
 export function showLocalNotification (message, background, rideID, scrollToComments) {
+  cb('showLocalNotification')
   return (dispatch, getState) => {
     PushNotification.configure({
       onNotification: () => {
@@ -634,6 +676,7 @@ export function showLocalNotification (message, background, rideID, scrollToComm
 }
 
 export function startLocationTracking () {
+  cb('startLocationTracking')
   return (dispatch, getState) => {
     logInfo('action: startLocationTracking')
     configureBackgroundGeolocation().then(() => {
@@ -710,6 +753,7 @@ export function startLocationTracking () {
 }
 
 function startNetworkTracking () {
+  cb('startNetworkTracking')
   return (dispatch, getState) => {
     NetInfo.getConnectionInfo().then((connectionInfo) => {
       const gc = goodConnection(
@@ -744,6 +788,7 @@ function startNetworkTracking () {
 }
 
 export function startListeningFCM () {
+  cb('startListeningFCM')
   return (dispatch) => {
     firebase.messaging().onMessage((m) => {
       handleNotification(dispatch, m._data, false)
@@ -752,6 +797,7 @@ export function startListeningFCM () {
 }
 
 export function startListeningFCMTokenRefresh () {
+  cb('startListeningFCMTokenRefresh')
   return (dispatch) => {
     firebase.messaging().getToken().then(newToken => {
       if (newToken) {
@@ -765,6 +811,7 @@ export function startListeningFCMTokenRefresh () {
 }
 
 function startActiveComponentListener () {
+  cb('startActiveComponentListener')
   return (dispatch) => {
     Navigation.events().registerComponentDidAppearListener( ( { componentId } ) => {
       if (componentId !== DRAWER) {
@@ -775,6 +822,7 @@ function startActiveComponentListener () {
 }
 
 export function stopLocationTracking () {
+  cb('stopLocationTracking')
   return (dispatch) => {
     BackgroundGeolocation.stop()
     BackgroundGeolocation.removeAllListeners('location')
@@ -783,6 +831,7 @@ export function stopLocationTracking () {
 }
 
 function startAppStateTracking () {
+  cb('startAppStateTracking')
   return (dispatch, getState) => {
     AppState.addEventListener('change', (nextAppState) => {
       dispatch(newAppState(nextAppState))
@@ -807,18 +856,21 @@ function startAppStateTracking () {
 }
 
 export function submitLogin (email, password) {
+  cb('submitLogin')
   return (dispatch) => {
     loginAndSync(UserAPI.login, [email, password], dispatch)
   }
 }
 
 export function submitSignup (email, password) {
+  cb('submitSignup')
   return (dispatch) => {
     loginAndSync(UserAPI.signup, [email, password], dispatch)
   }
 }
 
 export function syncDBPull () {
+  cb('syncDBPull')
   return (dispatch, getState) => {
     logInfo('action syncDBPull')
     dispatch(setFeedMessage(Map({
@@ -872,6 +924,7 @@ export function syncDBPull () {
 }
 
 export function switchRoot (newRoot) {
+  cb('switchRoot')
   return () => {
     if (newRoot === FEED) {
       Navigation.setRoot({
@@ -915,6 +968,7 @@ export function switchRoot (newRoot) {
 }
 
 export function toggleRideCarrot (rideID) {
+  cb('toggleRideCarrot')
   return (dispatch, getState) => {
     const currentUserID = getState().getIn(['localState', 'userID'])
     let existing = getState().getIn(['pouchRecords', 'rideCarrots']).valueSeq().filter((c) => {

@@ -6,7 +6,7 @@ import { logError } from '../helpers'
 export function setUserContext(userID) {
   if (ENV !== 'local') {
     Sentry.setUserContext({
-      userID,
+      id: userID,
     });
   }
 }
@@ -14,7 +14,7 @@ export function setUserContext(userID) {
 export function captureException (e) {
   if (ENV !== 'local') {
     try {
-      Sentry.captureException(new Error(JSON.stringify(e)))
+      Sentry.captureException(e)
     } catch (e) {
       logError('not captured by sentry!')
       logError(e)

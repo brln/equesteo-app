@@ -1,6 +1,6 @@
 import { API_URL } from 'react-native-dotenv'
 import { logError } from '../helpers'
-import {BadRequestError, UnauthorizedError, NotConnectedError} from '../errors'
+import { BadRequestError, UnauthorizedError } from '../errors'
 import LocalStorage from './LocalStorage'
 
 let token = null

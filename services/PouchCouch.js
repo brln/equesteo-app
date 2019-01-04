@@ -61,8 +61,8 @@ export default class PouchCouch {
         throw('Remote DB not found')
     }
     return options.then(options => {
-      const remoteDB = new PouchDB(remoteConnectionString, options)
       return new Promise((res, rej) => {
+        const remoteDB = new PouchDB(remoteConnectionString, options)
         PouchDB.replicate(localDB, remoteDB).on('complete', (resp) => {
           res(resp)
         }).on('error', (e) => {
@@ -130,8 +130,8 @@ export default class PouchCouch {
   }
 
   static localReplicateRides (options, userIDs, followerUserIDs) {
-    const remoteRidesDB = new PouchDB(`${API_URL}/couchproxy/${ridesDBName}`, options)
     return new Promise((resolve, reject) => {
+      const remoteRidesDB = new PouchDB(`${API_URL}/couchproxy/${ridesDBName}`, options)
       PouchDB.replicate(
         remoteRidesDB,
         localRidesDB,
@@ -152,8 +152,8 @@ export default class PouchCouch {
   }
 
   static localReplicateUsers (options) {
-    const remoteUsersDB = new PouchDB(`${API_URL}/couchproxy/${usersDBName}`, options)
     return new Promise((resolve, reject) => {
+      const remoteUsersDB = new PouchDB(`${API_URL}/couchproxy/${usersDBName}`, options)
       PouchDB.replicate(
         remoteUsersDB,
         localUsersDB,
@@ -169,8 +169,8 @@ export default class PouchCouch {
   }
 
   static localReplicateHorses (options, userIDs) {
-    const remoteHorsesDB = new PouchDB(`${API_URL}/couchproxy/${horsesDBName}`, options)
     return new Promise((resolve, reject) => {
+      const remoteHorsesDB = new PouchDB(`${API_URL}/couchproxy/${horsesDBName}`, options)
       remoteHorsesDB.query('horses/allJoins', {}).then((resp) => {
         const fetchIDs = []
         for (let row of resp.rows) {

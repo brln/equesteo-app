@@ -49,9 +49,7 @@ export const initialState = Map({
   fullSyncFail: false,
   goodConnection: false,
   lastFullSync: null,
-  lastLocation: null,
   locationStashingActive: false,
-  moving: false,
   needsRemotePersist: Map({
     horses: false,
     rides: false,
