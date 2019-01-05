@@ -74,7 +74,7 @@ export default class Ride extends PureComponent {
   }
 
   componentWillUnmount () {
-    clearInterval(this.scrollTimeout)
+    clearTimeout(this.scrollTimeout)
     Keyboard.removeAllListeners('keyboardDidShow')
   }
 

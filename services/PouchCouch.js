@@ -67,7 +67,7 @@ export default class PouchCouch {
           res(resp)
         }).on('error', (e) => {
           logError(e)
-          rej(e)
+          rej(new Error('remoteReplicateDB error'))
         })
       }).then(() => {
         return PouchCouch.postReplicate()
@@ -146,7 +146,7 @@ export default class PouchCouch {
       ).on('complete', (resp) => {
         resolve(resp)
       }).on('error', (e) => {
-        reject(e)
+        reject(new Error('localReplicateRides error'))
       })
     })
   }
@@ -163,7 +163,7 @@ export default class PouchCouch {
       ).on('complete', () => {
           resolve()
       }).on('error', (e) => {
-        reject(e)
+        reject(new Error('localReplicateUsers error'))
       });
     })
   }
@@ -196,7 +196,7 @@ export default class PouchCouch {
         ).on('complete', () => {
           resolve()
         }).on('error', (e) => {
-          throw e
+          reject(new Error('localReplicateHorses error'))
         })
       }).catch((e) => {
         reject(e)

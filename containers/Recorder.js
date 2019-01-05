@@ -87,7 +87,7 @@ class RecorderContainer extends PureComponent {
   }
 
   componentWillUnmount () {
-    clearInterval(this.gpsTimeout)
+    clearTimeout(this.gpsTimeout)
   }
 
   navigationButtonPressed ({ buttonId }) {
