@@ -554,6 +554,7 @@ export function uploadPhoto (type, photoLocation, photoID) {
         return ImagePicker.cleanSingle(photoLocation)
       }).catch(e => {
         logError(e)
+        captureException(e)
         dispatch(updatePhotoStatus(photoID, 'failed'))
       })
     }
