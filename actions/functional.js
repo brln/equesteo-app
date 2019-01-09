@@ -87,9 +87,12 @@ export function catchAsyncError (dispatch, sentry=true) {
     if (e.status === 401) {
       dispatch(signOut())
     }
-    logError(e)
     if (sentry) {
       captureException(e)
+    }
+    if (ENV === 'local') {
+      logError(e)
+      throw e
     }
   }
 }

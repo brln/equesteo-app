@@ -5,6 +5,7 @@ import { Keyboard } from 'react-native'
 import React from 'react'
 import { connect } from 'react-redux';
 import {
+  clearRidePhotoStash,
   clearPausedLocations,
   deleteUnpersistedRide,
   discardCurrentRide,
@@ -171,6 +172,7 @@ class UpdateRideContainer extends BackgroundComponent {
       } else if (buttonId === 'discard') {
         Navigation.popToRoot(this.props.componentId).then(() => {
           this.props.dispatch(clearPausedLocations())
+          this.props.dispatch(clearRidePhotoStash(this.stashedRidePhotoKey()))
           this.props.dispatch(stopLocationTracking())
           this.props.dispatch(discardCurrentRide())
           this.props.dispatch(deleteUnpersistedRide(this.props.ride.get('_id')))
@@ -196,6 +198,7 @@ class UpdateRideContainer extends BackgroundComponent {
       } else if (buttonId === 'back' || buttonId === 'discard') {
         Navigation.pop(this.props.componentId).then(() => {
           this.props.dispatch(rideUpdated(this.state.cachedRide))
+          this.props.dispatch(clearRidePhotoStash(this.stashedRidePhotoKey()))
         })
       }
     }

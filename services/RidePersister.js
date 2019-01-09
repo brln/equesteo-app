@@ -1,6 +1,7 @@
 import { fromJS, Map } from 'immutable'
 
 import {
+  clearRidePhotoFromStash,
   rideCoordinatesLoaded,
   rideElevationsUpdated,
   rideHorseUpdated,
@@ -73,15 +74,16 @@ export default class RidePersister {
   persistRide (newRide, stashedPhotos, deletedPhotoIDs, trimValues, rideHorses) {
     const rideSaves = this.saveRide()
 
+    let docSaves = rideSaves
     if (newRide) {
-      rideSaves.then(() => {
+      docSaves = rideSaves.then(() => {
         return this.saveElevations()
       }).then(() => {
         return this.saveCoordinates()
       })
     } else if (trimValues) {
       let immutableCoordinates
-      rideSaves.then(() => {
+      docSaves = rideSaves.then(() => {
         return PouchCouch.loadRideCoordinates(this.rideID)
       }).then((theCoordinates) => {
         theCoordinates.rideCoordinates = coordSplice(theCoordinates.rideCoordinates, trimValues)
@@ -93,37 +95,47 @@ export default class RidePersister {
       })
     }
 
+    const rideHorseSaves = []
     rideHorses.forEach((rideHorse) => {
-      rideSaves.then(() => {
-        return this.saveRideHorse(rideHorse)
-      })
+      rideHorseSaves.push(this.saveRideHorse(rideHorse))
     })
 
+    const newPhotoSaves = []
     stashedPhotos.forEach((stashedPhoto, photoID) => {
-      rideSaves.then(() => {
-        const toSave = stashedPhoto.merge(Map({
-          type: 'ridePhoto',
-          rideID: this.rideID,
-        }))
-        this.dispatch(ridePhotoUpdated(toSave))
-        return PouchCouch.saveRide(toSave.toJS()).then(rideDoc => {
+      const toSave = stashedPhoto.merge(Map({
+        type: 'ridePhoto',
+        rideID: this.rideID,
+      }))
+      this.dispatch(ridePhotoUpdated(toSave))
+      newPhotoSaves.push(
+        PouchCouch.saveRide(toSave.toJS()).then(rideDoc => {
           this.dispatch(photoNeedsUpload('ride', stashedPhoto.get('uri'), photoID))
           this.dispatch(ridePhotoUpdated(this.getRidePhoto(photoID).set('_rev', rideDoc.rev)))
+          this.dispatch(clearRidePhotoFromStash(this.rideID, photoID))
         })
-      })
+      )
     })
 
+    const deletedPhotoSaves = []
     for (let deletedPhotoID of deletedPhotoIDs) {
       const deleted = this.getRidePhoto(deletedPhotoID).set('deleted', true)
       this.dispatch(ridePhotoUpdated(deleted))
-      rideSaves.then(() => {
-        return PouchCouch.saveRide(deleted.toJS()).then(rideDoc => {
+      deletedPhotoSaves.push(
+        PouchCouch.saveRide(deleted.toJS()).then(rideDoc => {
           this.dispatch(ridePhotoUpdated(this.getRidePhoto(deletedPhotoID).set('_rev', rideDoc.rev)))
         })
-      })
+      )
     }
 
     rideSaves.then(() => {
+      return Promise.all(docSaves)
+    }).then(() => {
+      return Promise.all(rideHorseSaves)
+    }).then(() => {
+      return Promise.all(newPhotoSaves)
+    }).then(() => {
+      return Promise.all(deletedPhotoSaves)
+    }).then(() => {
       this.dispatch(needsRemotePersist('rides'))
     }).catch(catchAsyncError(this.dispatch))
   }

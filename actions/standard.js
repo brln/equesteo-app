@@ -3,6 +3,8 @@ import {
   CLEAR_FEED_MESSAGE,
   CLEAR_LAST_LOCATION,
   CLEAR_PAUSED_LOCATIONS,
+  CLEAR_RIDE_PHOTO_FROM_STASH,
+  CLEAR_RIDE_PHOTO_STASH,
   CLEAR_SEARCH,
   CLEAR_SELECTED_RIDE_COORDINATES,
   CLEAR_STATE,
@@ -92,6 +94,21 @@ export function clearLastLocation () {
 export function clearPausedLocations () {
   return {
     type: CLEAR_PAUSED_LOCATIONS
+  }
+}
+
+export function clearRidePhotoFromStash (stashKey, photoID) {
+  return {
+    type: CLEAR_RIDE_PHOTO_FROM_STASH,
+    stashKey,
+    photoID
+  }
+}
+
+export function clearRidePhotoStash (stashKey) {
+  return {
+    type: CLEAR_RIDE_PHOTO_STASH,
+    stashKey
   }
 }
 

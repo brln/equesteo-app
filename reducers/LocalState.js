@@ -6,6 +6,8 @@ import { appStates, goodConnection, unixTimeNow } from '../helpers'
 import {
   AWAIT_FULL_SYNC,
   CLEAR_FEED_MESSAGE,
+  CLEAR_RIDE_PHOTO_FROM_STASH,
+  CLEAR_RIDE_PHOTO_STASH,
   CLEAR_SEARCH,
   CLEAR_STATE,
   DEQUEUE_PHOTO,
@@ -72,6 +74,10 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.set('awaitingFullSync', true)
     case CLEAR_FEED_MESSAGE:
       return state.set('feedMessage', null)
+    case CLEAR_RIDE_PHOTO_FROM_STASH:
+      return state.deleteIn(['ridePhotoStash', action.stashKey, action.photoID])
+    case CLEAR_RIDE_PHOTO_STASH:
+      return state.deleteIn(['ridePhotoStash', action.stashKey])
     case CLEAR_SEARCH:
       return state.set('userSearchResults', List())
     case CLEAR_STATE:
