@@ -4,6 +4,7 @@ import firebase from 'react-native-firebase'
 import {
   dismissError,
   errorOccurred,
+  localDataLoaded,
   loadCurrentRideState,
   loadLocalState,
   saveUserID,
@@ -14,13 +15,12 @@ import {
 import {
   startListeningFCMTokenRefresh,
   startListeningFCM,
-  syncDBPull,
   setDistributionOnServer,
   switchRoot,
 } from './functional'
 import { logError, logInfo } from '../helpers'
 import { FEED } from '../screens'
-import { LocalStorage } from '../services'
+import { LocalStorage, PouchCouch } from '../services'
 
 import { setUserContext } from "../services/Sentry"
 
@@ -29,6 +29,7 @@ export function loginAndSync(loginFunc, loginArgs, dispatch) {
     const userID = resp.id
     const following = resp.following
     const followers = resp.followers
+    logDebug(following)
 
     dispatch(dismissError())
     dispatch(setAwaitingPasswordChange(true))
@@ -37,7 +38,7 @@ export function loginAndSync(loginFunc, loginArgs, dispatch) {
     dispatch(startListeningFCMTokenRefresh())
     dispatch(setDistributionOnServer())
     dispatch(setDoingInitialLoad(true))
-    return PouchCouch.localReplicateDB('all', [...following, userID], followers)
+    return PouchCouch.localReplicateDB('all', userID, following, followers)
   }).then(() => {
     return PouchCouch.localLoad()
   }).then(localData => {
@@ -46,6 +47,7 @@ export function loginAndSync(loginFunc, loginArgs, dispatch) {
     dispatch(switchRoot(FEED))
     dispatch(startListeningFCM())
   }).catch(e => {
+    logError(e)
     dispatch(errorOccurred(e.message))
   })
 }

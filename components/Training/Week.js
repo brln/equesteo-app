@@ -79,7 +79,7 @@ function MultiRideDay (props) {
                 fontSize: 15,
                 fontWeight: 'bold'}}
               >
-                {Math.round(metersToFeet(r.get('elevationGain')))}
+                {Math.round(metersToFeet(r.get('elevationGain'))) || 0}
               </Text>
             )
           }
