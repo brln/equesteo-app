@@ -1,6 +1,7 @@
 import PouchDB from 'pouchdb-react-native'
 import { API_URL } from 'react-native-dotenv'
 
+import { NotConnectedError } from "../errors"
 import { logError, logInfo } from '../helpers'
 import ApiClient from './ApiClient'
 
@@ -66,8 +67,11 @@ export default class PouchCouch {
         PouchDB.replicate(localDB, remoteDB).on('complete', (resp) => {
           res(resp)
         }).on('error', (e) => {
-          logError(e)
-          rej(new Error('remoteReplicateDB error'))
+          if (e.status === 0) {
+            rej(new NotConnectedError())
+          } else {
+            rej(new Error(JSON.stringify(e)))
+          }
         })
       }).then(() => {
         return PouchCouch.postReplicate()

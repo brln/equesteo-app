@@ -76,6 +76,7 @@ import {
   userSearchReturned,
   userUpdated,
 } from './standard'
+import {NotConnectedError} from "../errors"
 
 function cb(action) {
   logInfo('functionalAction: ' + action)
@@ -255,8 +256,11 @@ export function doRemotePersist(db) {
       PouchCouch.remoteReplicateDB(db).then(() => {
         dispatch(remotePersistComplete(db))
       }).catch((e) => {
-        catchAsyncError(dispatch)(e)
-        dispatch(remotePersistError(db))
+        if (e instanceof NotConnectedError) {
+          dispatch(remotePersistError(db))
+        } else {
+          catchAsyncError(dispatch)(e)
+        }
       })
     }
   }
