@@ -40,15 +40,15 @@ export default class UserAPI {
   }
 
   static _uploadProfilePhoto (imageLocation, photoID) {
-    return ApiClient.uploadImage('/users/profilePhoto', photoID, imageLocation)
+    return ApiClient.uploadImage('/photos/user', photoID, imageLocation)
   }
 
   static _uploadHorsePhoto (imageLocation, photoID) {
-    return ApiClient.uploadImage('/users/horsePhoto', photoID, imageLocation)
+    return ApiClient.uploadImage('/photos/horse', photoID, imageLocation)
   }
 
   static _uploadRidePhoto (imageLocation, photoID) {
-    return ApiClient.uploadImage('/users/ridePhoto', photoID, imageLocation)
+    return ApiClient.uploadImage('/photos/ride', photoID, imageLocation)
   }
 
   static uploadPhoto (type, imageLocation, photoID) {

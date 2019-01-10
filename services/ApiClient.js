@@ -1,6 +1,6 @@
 import { API_URL } from 'react-native-dotenv'
-import { logError } from '../helpers'
-import { BadRequestError, UnauthorizedError } from '../errors'
+import { logError, logInfo } from '../helpers'
+import {BadRequestError, BadResponseError, UnauthorizedError} from '../errors'
 import LocalStorage from './LocalStorage'
 
 let token = null
@@ -67,6 +67,7 @@ export default class ApiClient {
     if (isJSON) {
       body = body ? JSON.stringify(body) : undefined
     }
+    let rawResp
     return this.headers(isJSON).then((headers) => {
       return fetch(
         API_URL + endpoint,
@@ -77,6 +78,7 @@ export default class ApiClient {
         }
       )
     }).then(resp => {
+      rawResp = resp
       return resp.json().then(json => {
         switch (resp.status) {
           case 400:
@@ -89,7 +91,12 @@ export default class ApiClient {
         return json
       })
     }).catch(e => {
-      if (e instanceof TypeError) {
+      if (e instanceof SyntaxError) {
+        logError(e)
+        logInfo(rawResp)
+        throw new BadResponseError('Can\'t parse response.')
+
+      } else if (e instanceof TypeError) {
         if (e.toString() === 'TypeError: Network request failed') {
           logError(e)
         }
