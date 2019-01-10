@@ -561,7 +561,9 @@ export function uploadPhoto (type, photoLocation, photoID) {
         }
       }).then(() => {
         dispatch(dequeuePhoto(photoID))
-        return ImagePicker.cleanSingle(photoLocation)
+        ImagePicker.cleanSingle(photoLocation).catch(e => {
+          logError(e)
+        })
       }).catch(e => {
         logError(e)
         captureException(e)
