@@ -226,7 +226,7 @@ export default class Ride extends PureComponent {
 
         <View style={{flex: 1, flexDirection: 'row', paddingTop: 10, paddingBottom: 10}}>
           { this.userAvatar() }
-          <View style={{flex: 4, paddingRight: 20}}>
+          <View style={{flex: 4, paddingLeft: 10, paddingRight: 20}}>
             <TouchableWithoutFeedback onPress={this.maybeShowID}>
               <View>
                 <Text style={{fontSize: 20, color: 'black'}}>{this.props.ride.get('name') || 'No Name'}</Text>
