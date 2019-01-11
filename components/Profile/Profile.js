@@ -25,7 +25,7 @@ import { logRender, logError, logInfo } from '../../helpers'
 import { userName } from '../../modelHelpers/user'
 import PhotoFilmstrip from '../Ride/PhotoFilmstrip'
 import Thumbnail from '../Images/Thumbnail'
-import URIImage from '../Images/URIImage'
+import MedImage from '../Images/MedImage'
 
 import FabImage from '../FabImage'
 
@@ -148,18 +148,14 @@ export default class Profile extends PureComponent {
       const profileSource = {uri: this.props.userPhotos.getIn([user.get('profilePhotoID'), 'uri'])}
       const profileSources = this.photoSources(user.get('profilePhotoID'))
       images.push(
-        <TouchableOpacity
-          style={styles.slide}
+        <MedImage
           onPress={() => {this.props.showPhotoLightbox(profileSources)}}
           key={"profile"}
-        >
-          <URIImage
-            style={{width: '100%', height: '100%'}}
-            source={profileSource}
-            onError={e => logError("Can't load Profile image")}
-            showSource={true}
-          />
-        </TouchableOpacity>
+          style={{width: '100%', height: '100%'}}
+          source={profileSource}
+          onError={e => logError("Can't load Profile image")}
+          showSource={true}
+        />
       )
     } else {
       images.push(

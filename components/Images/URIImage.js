@@ -95,6 +95,7 @@ export default class URIImage extends PureComponent {
         <View style={{position: 'absolute', bottom: 5, right: 5}}>
           { this.typeImage() }
         </View>
+        {this.props.children}
       </View>
     )
   }

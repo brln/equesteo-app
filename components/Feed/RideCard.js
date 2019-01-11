@@ -21,7 +21,7 @@ import { brand, darkGrey } from '../../colors'
 import { logError } from '../../helpers'
 import { userName } from '../../modelHelpers/user'
 import RideImage from './RideImage'
-import URIImage from '../Images/URIImage'
+import MedImage from '../Images/MedImage'
 import Thumbnail from '../Images/Thumbnail'
 
 const { width } = Dimensions.get('window')
@@ -153,15 +153,14 @@ export default class RideCard extends PureComponent {
       let coverImage = null
       this.props.ridePhotos.reduce((accum, photo) => {
         const thisImage = (
-          <TouchableOpacity onPress={() => {this.showRide(false)}} style={{flex: 1}} key="map">
-            <URIImage
-              style={{height: swiperHeight, width: null}}
-              key={photo.get('uri')}
-              source={{uri: photo.get('uri')}}
-              onError={(e) => { logError('there was an error loading RideCard image') }}
-              showSource={true}
-            />
-          </TouchableOpacity>
+          <MedImage
+            style={{height: swiperHeight, width: null}}
+            key={photo.get('uri')}
+            source={{uri: photo.get('uri')}}
+            onError={(e) => { logError('there was an error loading RideCard image') }}
+            showSource={true}
+            onPress={() => {this.showRide(false)}}
+          />
         )
         if (photo.get('_id') !== this.props.ride.get('coverPhotoID')) {
           accum.push(thisImage)

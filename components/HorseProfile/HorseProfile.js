@@ -10,7 +10,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View
 } from 'react-native';
 
@@ -24,7 +23,7 @@ import FabImage from '../FabImage'
 import TrainingCard from './TrainingCard'
 import Stat from '../Stat'
 import PhotoFilmstrip from "../Ride/PhotoFilmstrip"
-import URIImage from '../Images/URIImage'
+import MedImage from '../Images/MedImage'
 
 const { height } = Dimensions.get('window')
 
@@ -113,19 +112,16 @@ export default class HorseProfile extends PureComponent {
       const profileSource = {uri: this.props.horsePhotos.getIn([horse.get('profilePhotoID'), 'uri'])}
       const swiperSources = this.photoSources(horse.get('profilePhotoID'))
       images.push(
-        <TouchableOpacity
+        <MedImage
           key={"profile"}
-          style={styles.slide}
           onPress={() => this.props.showPhotoLightbox(swiperSources)}
+          style={{width: '100%', height: '100%'}}
+          source={profileSource}
+          onError={e => logError("Can't load HorseProfile image")}
+          showSource={true}
         >
-          <URIImage
-            style={{width: '100%', height: '100%'}}
-            source={profileSource}
-            onError={e => logError("Can't load HorseProfile image")}
-            showSource={true}
-          />
           { nameText }
-        </TouchableOpacity>
+        </MedImage>
       )
     } else {
       images.push(

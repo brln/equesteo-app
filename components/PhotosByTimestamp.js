@@ -2,13 +2,11 @@ import React, { Component } from 'react'
 import {
   Dimensions,
   StyleSheet,
-  TouchableOpacity,
   View
 } from 'react-native';
 
 import { darkGrey, orange } from '../colors'
 import Thumbnail from './Images/Thumbnail'
-import URIImage from './Images/URIImage'
 
 const { width } = Dimensions.get('window')
 

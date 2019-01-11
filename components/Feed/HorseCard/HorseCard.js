@@ -15,10 +15,10 @@ import Swiper from 'react-native-swiper';
 
 import Headline from './Headline'
 import Thumbnail from '../../Images/Thumbnail'
-import URIImage from '../../Images/URIImage'
 import { darkGrey } from '../../../colors'
 import { logError } from '../../../helpers'
 import { userName } from '../../../modelHelpers/user'
+import MedImage from '../../Images/MedImage'
 
 const { width } = Dimensions.get('window')
 
@@ -94,14 +94,13 @@ export default class HorseCard extends PureComponent {
       photos.keySeq().reduce((accum, id) => {
         const photo = photos.get(id)
         const thisImage = (
-          <TouchableOpacity onPress={this.showHorseProfile} style={{flex: 1}} key="map">
-            <URIImage
-              style={{height: swiperHeight}}
-              key={photo.get('uri')}
-              source={{uri: photo.get('uri')}}
-              onError={e => logError("Can't load HorseCard image")}
-            />
-          </TouchableOpacity>
+          <MedImage
+            style={{height: swiperHeight, width: null}}
+            key={photo.get('uri')}
+            source={{uri: photo.get('uri')}}
+            onError={e => logError("Can't load HorseCard image")}
+            onPress={this.showHorseProfile}
+          />
         )
         if (id !== this.props.horse.get('profilePhotoID')) {
           accum.push(thisImage)

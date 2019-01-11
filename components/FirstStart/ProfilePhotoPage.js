@@ -13,7 +13,7 @@ import BuildImage from '../Images/BuildImage'
 import { brand } from '../../colors'
 import { logRender } from '../../helpers'
 import Button from '../Button'
-import URIImage from '../Images/URIImage'
+import MedImage from '../Images/MedImage'
 
 const { width } = Dimensions.get('window')
 
@@ -66,9 +66,10 @@ export default class ProfilePhotoPage extends PureComponent {
       )
       skip = null
       profilePhoto = (
-        <URIImage
+        <MedImage
           source={{uri: this.props.userPhotos.getIn([this.props.user.get('profilePhotoID'), 'uri'])}}
           style={{width: '100%', height: '100%'}}
+          onError={e => logError("Can't load FirstProfilePhoto image")}
         />
       )
     }

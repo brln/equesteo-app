@@ -1,20 +1,13 @@
 import React, { PureComponent } from 'react';
 import {
   Dimensions,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
 
-import URIImage from '../Images/URIImage'
-import BuildImage from '../Images/BuildImage'
 import { black, brand } from '../../colors'
-import { logError } from '../../helpers'
+import Thumbnail from '../Images/Thumbnail'
 
 const { width } = Dimensions.get('window')
-const calcWidth = (width / 2) - 41
-
 
 export default class HorseBarnCard extends PureComponent {
   constructor (props) {
@@ -22,26 +15,6 @@ export default class HorseBarnCard extends PureComponent {
   }
 
   render() {
-    let horseImageStyle = {height: calcWidth, width: calcWidth, margin: 10}
-    let horseImage = (
-      <BuildImage
-        source={require('../../img/emptyHorseBlack.png')}
-        style={horseImageStyle}
-      />
-    )
-
-    let horse = this.props.horse
-    if (horse.get('profilePhotoID')) {
-      horseImage = (
-        <URIImage
-          source={{uri: this.props.horsePhotos.getIn([horse.get('profilePhotoID'), 'uri'])}}
-          style={horseImageStyle}
-          onError={e => logError("Can't load HorseBarnCard image")}
-          showSource={false}
-        />
-      )
-    }
-
     return (
       <View
         elevation={5}
@@ -57,42 +30,16 @@ export default class HorseBarnCard extends PureComponent {
           shadowOpacity: 1.0
         }}
       >
-        <TouchableOpacity
-          onPress={() => {
-            this.props.horseProfile(horse, this.props.ownerID)
-          }}
-        >
-          <View
-            title={horse.name}
-            style={{flex: 1}}
-          >
-            <View style={{flex: 1, alignItems: 'center', paddingBottom: 5}}>
-              { horseImage }
-              <View style={{
-                position: 'absolute',
-                alignItems: 'center',
-                justifyContent: 'center',
-                left: 5,
-                right: 5,
-                top: 5,
-                bottom: 5,
-                padding: 5
-              }}>
-                <Text style={{
-                  textAlign: 'center',
-                  fontSize: 20,
-                  color: 'white',
-                  textShadowColor: 'black',
-                  textShadowRadius: 5,
-                  textShadowOffset: {
-                    width: -1,
-                    height: 1
-                  }
-                }}>{horse.get('name')}</Text>
-              </View>
-            </View>
-          </View>
-        </TouchableOpacity>
+        <Thumbnail
+          onPress={() => { this.props.horseProfile(this.props.horse, this.props.ownerID) }}
+          source={{uri: this.props.horsePhotos.getIn([this.props.horse.get('profilePhotoID'), 'uri'])}}
+          emptySource={require('../../img/emptyHorseBlack.png')}
+          empty={!this.props.horse.get('profilePhotoID')}
+          height={(width / 2) - (width / 12)}
+          width={(width / 2) - (width / 12)}
+          textOverlay={this.props.horse.get('name')}
+          padding={5}
+        />
       </View>
     )
   }

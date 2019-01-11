@@ -13,7 +13,7 @@ import BuildImage from '../Images/BuildImage'
 import { brand } from '../../colors'
 import { logRender } from '../../helpers'
 import Button from '../Button'
-import URIImage from '../Images/URIImage'
+import MedImage from '../Images/MedImage'
 
 const { width } = Dimensions.get('window')
 
@@ -71,9 +71,10 @@ export default class FirstHorsePhoto extends PureComponent {
       )
       skip = null
       horseProfileImage = (
-        <URIImage
-          source={{uri: this.props.horsePhotos.getIn([this.props.horse.get('profilePhotoID'), 'uri'])}}
+        <MedImage
           style={{width: '100%', height: '100%'}}
+          source={{uri: this.props.horsePhotos.getIn([this.props.horse.get('profilePhotoID'), 'uri'])}}
+          onError={e => logError("Can't load FirstHorsePhoto image")}
         />
       )
     }
