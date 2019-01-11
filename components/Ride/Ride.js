@@ -15,7 +15,6 @@ import {
 import {
   Card,
   CardItem,
-  Thumbnail
 } from 'native-base'
 
 import BuildImage from '../Images/BuildImage'
@@ -33,6 +32,7 @@ import { userName } from '../../modelHelpers/user'
 import PhotoFilmstrip from './PhotoFilmstrip'
 import Stats from './Stats'
 import DeleteModal from '../Shared/DeleteModal'
+import Thumbnail from '../Images/Thumbnail'
 import RideComments from '../RideComments/RideComments'
 import ViewingMap from './ViewingMap'
 
@@ -142,29 +142,24 @@ export default class Ride extends PureComponent {
   }
 
   userAvatar () {
+    let avatar
     if (this.props.userID !== this.props.rideUser.get('_id')) {
-      let source
       const userProfilePhotoURL = this.getUserProfilePhotoURL(this.props.rideUser)
-      if (userProfilePhotoURL) {
-        source = {uri: userProfilePhotoURL}
-      } else {
-        source = require('../../img/empty.png')
-      }
-      return (
-        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', marginRight: -20}}>
-          <TouchableOpacity
+      avatar = (
+        <View style={{paddingRight: 5}}>
+          <Thumbnail
+            source={{uri: userProfilePhotoURL}}
+            emptySource={require('../../img/empty.png')}
+            empty={!userProfilePhotoURL}
+            height={width / 6}
+            width={width / 6}
+            round={true}
             onPress={this.showProfile}
-          >
-            <Thumbnail
-              small
-              source={source}
-            />
-          </TouchableOpacity>
+          />
         </View>
       )
-    } else {
-      return null
     }
+    return avatar
   }
 
   rideTime () {
@@ -231,7 +226,7 @@ export default class Ride extends PureComponent {
 
         <View style={{flex: 1, flexDirection: 'row', paddingTop: 10, paddingBottom: 10}}>
           { this.userAvatar() }
-          <View style={{flex: 4, paddingLeft: 20, paddingRight: 20}}>
+          <View style={{flex: 4, paddingRight: 20}}>
             <TouchableWithoutFeedback onPress={this.maybeShowID}>
               <View>
                 <Text style={{fontSize: 20, color: 'black'}}>{this.props.ride.get('name') || 'No Name'}</Text>

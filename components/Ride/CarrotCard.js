@@ -52,7 +52,7 @@ export default class CarrotCard extends PureComponent {
               </View>
             </View>
           </CardItem>
-          <CardItem cardBody style={{ flex: 1}}>
+          <CardItem cardBody style={{ flex: 1 }}>
             { this.carrots() }
           </CardItem>
         </Card>

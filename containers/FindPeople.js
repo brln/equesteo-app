@@ -1,10 +1,12 @@
 import { Navigation } from 'react-native-navigation'
 import React, { PureComponent } from 'react'
+import { Keyboard } from 'react-native'
 import { connect } from 'react-redux';
 
 import { searchForFriends } from "../actions/functional"
+import { clearSearch } from "../actions/standard"
 import { brand } from '../colors'
-import { logRender } from '../helpers'
+import { logError, logRender } from '../helpers'
 import { PROFILE } from '../screens'
 import FindPeople from '../components/FindPeople'
 
@@ -21,9 +23,13 @@ class FindPeopleContainer extends PureComponent {
           color: brand,
         },
         elevation: 0,
-        backButton: {
-          color: 'white'
-        }
+        leftButtons: [
+          {
+            id: 'back',
+            icon: require('../img/back-arrow.png'),
+            color: 'white'
+          }
+        ],
       },
       layout: {
         orientation: ['portrait']
@@ -33,8 +39,20 @@ class FindPeopleContainer extends PureComponent {
 
   constructor (props) {
     super(props)
+    this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
     this.search = this.search.bind(this)
     this.showProfile = this.showProfile.bind(this)
+
+    Navigation.events().bindComponent(this)
+  }
+
+  navigationButtonPressed ({ buttonId }) {
+    if (buttonId === 'back') {
+      Keyboard.dismiss()
+      Navigation.pop(this.props.componentId).then(() => {
+        this.props.dispatch(clearSearch())
+      }).catch(e => logError(e))
+    }
   }
 
   showProfile (profileUser) {

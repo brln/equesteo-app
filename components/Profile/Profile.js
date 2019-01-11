@@ -3,13 +3,9 @@ import React, { PureComponent } from 'react';
 import Swiper from 'react-native-swiper';
 import ImagePicker from 'react-native-image-crop-picker'
 import {
-  Body,
   Card,
   CardItem,
   Fab,
-  ListItem,
-  Left,
-  Thumbnail,
 } from 'native-base';
 import {
   Clipboard,
@@ -24,10 +20,11 @@ import {
 } from 'react-native';
 
 import BuildImage from '../Images/BuildImage'
-import { brand, danger, darkBrand, green } from '../../colors'
+import { brand, danger, darkBrand, darkGrey, green, lightGrey } from '../../colors'
 import { logRender, logError, logInfo } from '../../helpers'
 import { userName } from '../../modelHelpers/user'
 import PhotoFilmstrip from '../Ride/PhotoFilmstrip'
+import Thumbnail from '../Images/Thumbnail'
 import URIImage from '../Images/URIImage'
 
 import FabImage from '../FabImage'
@@ -92,36 +89,43 @@ export default class Profile extends PureComponent {
   }
 
   renderHorse ({item}) {
-    let uri = 'https://s3.us-west-1.amazonaws.com/equesteo-horse-photos/empty.png'
-    if (item.profilePhotoID) {
-      uri = this.props.horsePhotos.getIn([item.profilePhotoID, 'uri'])
-    }
     return (
-      <ListItem
-        avatar
-        noBorder={true}
-        style={{height: 80}}
-        onPress={this.horseProfile(Map(item))}
-      >
-        <Left>
-          <Thumbnail size={30} source={{ uri }} />
-        </Left>
-        <Body>
-          <Text>{item.name}</Text>
-        </Body>
-      </ListItem>
+      <View style={{flex: 1}}>
+        <TouchableOpacity
+          style={{height: 80}}
+          onPress={this.horseProfile(Map(item))}
+        >
+          <View style={{flex: 1, flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: darkGrey, padding: 20}}>
+            <View style={{flex: 1, justifyContent:'center'}}>
+              <Thumbnail
+                source={{uri: this.props.horsePhotos.getIn([item.profilePhotoID, 'uri'])}}
+                emptySource={require('../../img/emptyHorseBlack.png')}
+                empty={!item.profilePhotoID}
+                height={width / 7}
+                width={width/ 7}
+                round={true}
+              />
+            </View>
+            <View style={{flex: 3, justifyContent: 'center'}}>
+              <Text>{`${item.name || 'No Name'}`}</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </View>
     )
   }
 
   renderHorses (horses) {
     if (horses.count() > 0) {
       return (
-        <FlatList
-          data={horses.toJS()}
-          renderItem={this.renderHorse}
-          keyExtractor={(i) => i._id}
-          ItemSeparatorComponent={null}
-        />
+        <View style={{flex: 1, borderTopWidth: 2, borderTopColor: lightGrey}}>
+          <FlatList
+            data={horses.toJS()}
+            renderItem={this.renderHorse}
+            keyExtractor={(i) => i._id}
+            ItemSeparatorComponent={null}
+          />
+        </View>
       )
     }
   }

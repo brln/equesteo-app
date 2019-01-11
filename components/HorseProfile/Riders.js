@@ -9,10 +9,8 @@ import {
 
 import BuildImage from '../Images/BuildImage'
 import { brand, orange } from '../../colors'
-import { logError } from '../../helpers'
 import { userName } from '../../modelHelpers/user'
 import Thumbnail from '../Images/Thumbnail'
-import URIImage from '../Images/URIImage'
 
 const { width } = Dimensions.get('window')
 

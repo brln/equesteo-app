@@ -1,6 +1,7 @@
-import { fromJS } from 'immutable'
+import { fromJS, Map } from 'immutable'
 import React, { PureComponent } from 'react';
 import {
+  Dimensions,
   FlatList,
   ScrollView,
   StyleSheet,
@@ -8,11 +9,12 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
-import {
-  Thumbnail,
-} from 'native-base'
 
 import { darkGrey }  from '../colors'
+import { userName } from '../modelHelpers/user'
+import Thumbnail from './Images/Thumbnail'
+
+const { width } = Dimensions.get('window')
 
 export default class FollowList extends PureComponent {
   constructor (props) {
@@ -28,25 +30,25 @@ export default class FollowList extends PureComponent {
   }
 
   renderResult ({item}) {
-    let avatar
-    if (this.props.userPhotos.get(item.profilePhotoID)) {
-      avatar = <Thumbnail size={30} source={{uri: this.props.userPhotos.getIn([item.profilePhotoID, 'uri'])}} />
-    } else {
-      avatar = <Thumbnail size={30} source={require('../img/emptyProfile.png')} />
-    }
-
     return (
-      <View style={{flex: 1, borderBottomWidth: 1, borderColor: darkGrey}}>
+      <View style={{flex: 1}}>
         <TouchableOpacity
           style={{height: 80}}
           onPress={this.showProfile(item)}
         >
-          <View style={{flex: 1, flexDirection: 'row', paddingLeft: 20}}>
+          <View style={{flex: 1, flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: darkGrey, padding: 20}}>
             <View style={{flex: 1, justifyContent:'center'}}>
-              { avatar }
+              <Thumbnail
+                source={{uri: this.props.userPhotos.getIn([item.profilePhotoID, 'uri'])}}
+                emptySource={require('../img/emptyProfile.png')}
+                empty={!this.props.userPhotos.get(item.profilePhotoID)}
+                height={width / 7}
+                width={width/ 7}
+                round={true}
+              />
             </View>
             <View style={{flex: 3, justifyContent: 'center'}}>
-              <Text>{`${item.firstName || ''} ${item.lastName || ''}`}</Text>
+              <Text>{userName(Map(item))}</Text>
             </View>
           </View>
         </TouchableOpacity>

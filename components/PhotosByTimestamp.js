@@ -6,8 +6,9 @@ import {
   View
 } from 'react-native';
 
-import URIImage from './Images/URIImage'
 import { darkGrey, orange } from '../colors'
+import Thumbnail from './Images/Thumbnail'
+import URIImage from './Images/URIImage'
 
 const { width } = Dimensions.get('window')
 
@@ -15,7 +16,6 @@ export default class PhotosByTimestamp extends Component {
   constructor (props) {
     super(props)
     this.changeProfilePhoto = this.changeProfilePhoto.bind(this)
-    this.thumbnail = this.thumbnail.bind(this)
   }
 
   changeProfilePhoto (photoID) {
@@ -24,33 +24,21 @@ export default class PhotosByTimestamp extends Component {
     }
   }
 
-  thumbnail (photoID, style, source) {
-    return (
-      <TouchableOpacity
-        key={photoID}
-        style={styles.photoThumbnail}
-        onPress={this.changeProfilePhoto(photoID)}
-      >
-        <View style={style}>
-          <URIImage
-            source={source}
-            style={{width: '100%', height: '100%'}}
-          />
-        </View>
-      </TouchableOpacity>
-    )
-  }
-
   render () {
     const byTimestamp = {}
     for (let photoID of this.props.photosByID.keySeq()) {
       const photoData = this.props.photosByID.get(photoID)
-      const source = {uri: photoData.get('uri')}
-      let style = styles.thumbnail
-      if (photoID === this.props.profilePhotoID) {
-        style = styles.profilePhoto
-      }
-      byTimestamp[photoData.get('timestamp')] = this.thumbnail(photoID, style, source)
+      byTimestamp[photoData.get('timestamp')] = (
+        <Thumbnail
+          borderColor={photoID === this.props.profilePhotoID ? orange : darkGrey}
+          key={photoData.get('uri')}
+          source={{uri: photoData.get('uri')}}
+          onPress={this.changeProfilePhoto(photoID)}
+          width={width / 4}
+          height={width / 4}
+          padding={2}
+        />
+      )
     }
     const sortedKeys = Object.keys(byTimestamp).sort((a, b) => b - a)
     const sortedVals = []
@@ -74,16 +62,4 @@ const styles = StyleSheet.create({
   photoThumbnail: {
     padding: 5
   },
-  thumbnail: {
-    width: width / 4,
-    height: width / 4,
-    borderColor: darkGrey,
-    borderWidth: 2
-  },
-  profilePhoto: {
-    width: width / 4,
-    height: width / 4,
-    borderWidth: 2,
-    borderColor: orange
-  }
 })

@@ -2,15 +2,11 @@ import React, { PureComponent } from 'react';
 import {
   Dimensions,
   StyleSheet,
-  Text,
-  TouchableOpacity,
   View
 } from 'react-native';
 
-import BuildImage from '../Images/BuildImage'
-import { orange } from '../../colors'
-import { logError } from '../../helpers'
-import URIImage from '../Images/URIImage'
+import { darkGrey, orange } from '../../colors'
+import Thumbnail from '../Images/Thumbnail'
 
 const { width } = Dimensions.get('window')
 
@@ -18,7 +14,6 @@ export default class HorseSelector extends PureComponent {
   constructor (props) {
     super(props)
     this.isChosen = this.isChosen.bind(this)
-    this.thumbnail = this.thumbnail.bind(this)
     this.openSelectHorseMenu = this.openSelectHorseMenu.bind(this)
     this.unselectHorse = this.unselectHorse.bind(this)
   }
@@ -33,38 +28,6 @@ export default class HorseSelector extends PureComponent {
     return () => {
       this.props.unselectHorse(horseID)
     }
-  }
-
-  thumbnail (horse, style, onPress) {
-    let horseThumb = (
-      <BuildImage
-        source={require('../../img/emptyHorseBlack.png')}
-        style={styles.thumbnail}
-      />
-    )
-
-    if (horse.get('profilePhotoID')) {
-      horseThumb = (
-        <URIImage
-          source={{uri: this.props.horsePhotos.getIn([horse.get('profilePhotoID'), 'uri'])}}
-          style={styles.thumbnail}
-          onError={(e) => { logError('there was an error loading HorseSelector avatar') }}
-        />
-      )
-
-    }
-    return (
-      <TouchableOpacity
-        key={horse.get('_id')}
-        style={[style, {marginRight: 5}]}
-        onPress={onPress}
-      >
-        { horseThumb }
-        <View style={styles.horseCard}>
-          <Text style={styles.horseName}>{horse.get('name')}</Text>
-        </View>
-      </TouchableOpacity>
-    )
   }
 
   isChosen (horse) {
@@ -84,13 +47,27 @@ export default class HorseSelector extends PureComponent {
 
   render () {
     const thumbnails = this.props.horses.reduce((accum, h) => {
-      let style = styles.thumbnail
       let onPress = this.openSelectHorseMenu(h.get('_id'))
-      if (this.isChosen(h)) {
-         style = styles.chosenThumb
-         onPress = this.unselectHorse(h.get('_id'))
+      let isChosen = this.isChosen(h)
+      let borderColor = darkGrey
+      if (isChosen) {
+        borderColor = orange
+        onPress = this.unselectHorse(h.get('_id'))
       }
-      accum.push(this.thumbnail(h, style, onPress))
+      accum.push(
+        <Thumbnail
+          key={h.get('_id')}
+          borderColor={borderColor}
+          source={{uri: this.props.horsePhotos.getIn([h.get('profilePhotoID'), 'uri'])}}
+          emptySource={require('../../img/emptyHorseBlack.png')}
+          empty={!h.get('profilePhotoID')}
+          height={width / 4}
+          width={width / 4}
+          onPress={onPress}
+          padding={3}
+          textOverlay={h.get('name')}
+        />
+      )
       return accum
     }, [])
     return (
@@ -106,14 +83,6 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
-  },
-  thumbnail: {
-    width: width / 4,
-    height: width / 4,
-  },
-  chosenThumb: {
-    borderWidth: 5,
-    borderColor: orange
   },
   horseName: {
     textAlign: 'center',

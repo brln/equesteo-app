@@ -1,6 +1,7 @@
 import { fromJS } from 'immutable'
 import React, { PureComponent } from 'react';
 import {
+  Dimensions,
   FlatList,
   ScrollView,
   StyleSheet,
@@ -8,11 +9,11 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
-import {
-  Thumbnail,
-} from 'native-base'
+
+const { width } = Dimensions.get('window')
 
 import { darkGrey, lightGrey }  from '../../colors'
+import Thumbnail from '../Images/Thumbnail'
 
 export default class CarrotList extends PureComponent {
   constructor (props) {
@@ -28,13 +29,6 @@ export default class CarrotList extends PureComponent {
   }
 
   renderResult ({item}) {
-    let avatar
-    if (this.props.userPhotos.get(item.profilePhotoID)) {
-      avatar = <Thumbnail size={30} source={{uri: this.props.userPhotos.getIn([item.profilePhotoID, 'uri'])}} />
-    } else {
-      avatar = <Thumbnail size={30} source={require('../../img/emptyProfile.png')} />
-    }
-
     return (
       <View style={{flex: 1}}>
         <TouchableOpacity
@@ -43,7 +37,14 @@ export default class CarrotList extends PureComponent {
         >
           <View style={{flex: 1, flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: darkGrey, padding: 20}}>
             <View style={{flex: 1, justifyContent:'center'}}>
-              { avatar }
+              <Thumbnail
+                source={{uri: this.props.userPhotos.getIn([item.profilePhotoID, 'uri'])}}
+                emptySource={require('../../img/emptyProfile.png')}
+                empty={!this.props.userPhotos.get(item.profilePhotoID)}
+                height={width / 7}
+                width={width/ 7}
+                round={true}
+              />
             </View>
             <View style={{flex: 3, justifyContent: 'center'}}>
               <Text>{`${item.firstName || ''} ${item.lastName || ''}`}</Text>

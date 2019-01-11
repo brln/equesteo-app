@@ -3,7 +3,6 @@ import {
   Card,
   CardItem,
   Text,
-  Thumbnail,
 } from 'native-base';
 import {
   Dimensions,
@@ -15,6 +14,7 @@ import moment from 'moment'
 import Swiper from 'react-native-swiper';
 
 import Headline from './Headline'
+import Thumbnail from '../../Images/Thumbnail'
 import URIImage from '../../Images/URIImage'
 import { darkGrey } from '../../../colors'
 import { logError } from '../../../helpers'
@@ -27,7 +27,6 @@ export default class HorseCard extends PureComponent {
     super(props)
     this.createTime = this.createTime.bind(this)
     this.horseProfileURL = this.horseProfileURL.bind(this)
-    this.horseAvatar = this.horseAvatar.bind(this)
     this.renderSwiper = this.renderSwiper.bind(this)
     this.showHorseProfile = this.showHorseProfile.bind(this)
     this.showProfile = this.showProfile.bind(this)
@@ -51,45 +50,21 @@ export default class HorseCard extends PureComponent {
     this.props.showProfile(this.props.rider)
   }
 
-  horseAvatar () {
-    const horseProfileURL = this.horseProfileURL()
-    let el
-    if (horseProfileURL) {
-      el = (<Thumbnail
-        small
-        source={{uri: horseProfileURL}}
-      />)
-    } else {
-      el = <Text>{this.props.horse.name || 'None'}</Text>
-    }
-    return (
-      <TouchableOpacity
-        onPress={this.showHorseProfile}
-      >
-        {el}
-      </TouchableOpacity>
-    )
-  }
-
   userAvatar () {
     let avatar
     if (this.props.userID !== this.props.rider.get('_id')) {
-      let source
-      if (this.props.userProfilePhotoURL) {
-        source = {uri: this.props.userProfilePhotoURL}
-      } else {
-        source = require('../../../img/empty.png')
-      }
       avatar = (
-        <TouchableOpacity
-          style={{paddingRight: 10}}
-          onPress={this.showProfile}
-        >
+        <View style={{paddingRight: 5}}>
           <Thumbnail
-            small
-            source={source}
+            source={{uri: this.props.userProfilePhotoURL}}
+            emptySource={require('../../../img/empty.png')}
+            empty={!this.props.userProfilePhotoURL}
+            height={width / 9}
+            width={width/ 9}
+            round={true}
+            onPress={this.showProfile}
           />
-        </TouchableOpacity>
+        </View>
       )
     }
     return avatar

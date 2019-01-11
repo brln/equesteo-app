@@ -1,16 +1,18 @@
+import moment from 'moment'
 import React, { PureComponent } from 'react';
 import {
-  Thumbnail,
-} from 'native-base';
-import {
+  Dimensions,
   FlatList,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
-import moment from 'moment'
+
+const { width } = Dimensions.get('window')
+
 import { darkGrey } from '../../colors'
 import { userName } from '../../modelHelpers/user'
+import Thumbnail from '../Images/Thumbnail'
 
 export default class CommentList extends PureComponent {
   constructor (props) {
@@ -27,33 +29,21 @@ export default class CommentList extends PureComponent {
     return profilePhotoURL
   }
 
-
-  userAvatar (user) {
-    let source
-    let photoURL = this.commentProfilePhotoURL(user)
-    if (photoURL) {
-      source = {uri: photoURL}
-    } else {
-      source = require('../../img/empty.png')
-    }
-    return (
-      <View
-        style={{flex: 1}}
-      >
-        <Thumbnail
-          small
-          source={source}
-        />
-      </View>
-    )
-  }
-
   singleComment({item}) {
     const rideComment = item
     const commentUser = this.props.users.get(rideComment.userID)
+    const commentProfilePhotoURL = this.commentProfilePhotoURL(commentUser)
     return (
       <View style={{flex: 1, flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: darkGrey, padding: 20}} key={rideComment._id}>
-        { this.userAvatar(commentUser) }
+        <Thumbnail
+          source={{uri: commentProfilePhotoURL}}
+          emptySource={require('../../img/empty.png')}
+          empty={!commentProfilePhotoURL}
+          height={width / 9}
+          width={width/ 9}
+          round={true}
+          padding={5}
+        />
         <View style={{flex: 6}}>
           <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
             <View style={{flex: 1}}>

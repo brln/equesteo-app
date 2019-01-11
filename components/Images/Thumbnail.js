@@ -27,7 +27,6 @@ export default class Thumbnail extends PureComponent {
       splitup[splitup.length - 1] = `${filenameSplitup[0]}_sm.${filenameSplitup[1]}`
       newSource = splitup.join('/')
     }
-    logDebug(newSource, 'newSource')
     return newSource
   }
 
@@ -66,9 +65,9 @@ export default class Thumbnail extends PureComponent {
   container () {
     let container
     if (this.props.onPress) {
-      container = (p) => <TouchableOpacity onPress={this.props.onPress}>{p.children}</TouchableOpacity>
+      container = (p) => <TouchableOpacity onPress={this.props.onPress} style={{padding: this.props.padding}}>{p.children}</TouchableOpacity>
     } else {
-      container = (p) => <View>{p.children}</View>
+      container = (p) => <View style={{padding: this.props.padding}}>{p.children}</View>
     }
     return container
   }
@@ -104,7 +103,8 @@ Thumbnail.propTypes = {
   borderColor: PropTypes.string,
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
-  textOverlay: PropTypes.string
+  textOverlay: PropTypes.string,
+  padding: PropTypes.number,
 }
 
 const styles = StyleSheet.create({

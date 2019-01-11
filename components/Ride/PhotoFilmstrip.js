@@ -43,6 +43,7 @@ export default class PhotoFilmstrip extends Component {
             borderColor={darkGrey}
             width={width / 3.5}
             height={width / 3.5}
+            padding={2}
           />
         )
         renderAnything = true
