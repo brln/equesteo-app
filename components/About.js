@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 
 import { brand, lightGrey } from '../colors'
-import BuildImage from './BuildImage'
+import BuildImage from './Images/BuildImage'
 
 
 export default class About extends PureComponent {

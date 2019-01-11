@@ -7,8 +7,8 @@ import {
   View,
 } from 'react-native';
 
-import URIImage from '../URIImage'
-import BuildImage from '../BuildImage'
+import URIImage from '../Images/URIImage'
+import BuildImage from '../Images/BuildImage'
 import { black, brand } from '../../colors'
 import { logError } from '../../helpers'
 

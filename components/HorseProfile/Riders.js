@@ -7,11 +7,12 @@ import {
   View
 } from 'react-native';
 
-import BuildImage from '../BuildImage'
+import BuildImage from '../Images/BuildImage'
 import { brand, orange } from '../../colors'
 import { logError } from '../../helpers'
 import { userName } from '../../modelHelpers/user'
-import URIImage from '../URIImage'
+import Thumbnail from '../Images/Thumbnail'
+import URIImage from '../Images/URIImage'
 
 const { width } = Dimensions.get('window')
 
@@ -23,33 +24,18 @@ export default class Riders extends PureComponent {
   }
 
   thumbnail (rider) {
-    let profileThumb = (
-      <BuildImage
-        style={styles.thumbnail}
-        source={require('../../img/emptyProfile.png')}
-      />
-    )
-
-    if (rider.get('profilePhotoID')) {
-      profileThumb = (
-        <URIImage
-          style={styles.thumbnail}
-          source={{uri: this.props.userPhotos.getIn([rider.get('profilePhotoID'), 'uri'])}}
-          onError={e => { logError('there was an error loading Riders image') }}
-        />
-      )
-    }
     return (
-      <TouchableOpacity
+      <Thumbnail
+        borderColor={'transparent'}
         key={rider.get('_id')}
-        style={{marginRight: 5}}
+        empty={!rider.get('profilePhotoID')}
+        emptySource={require('../../img/emptyProfile.png')}
+        source={{uri: this.props.userPhotos.getIn([rider.get('profilePhotoID'), 'uri'])}}
         onPress={this.props.showRiderProfile(rider)}
-      >
-        { profileThumb }
-        <View style={styles.nameView}>
-          <Text style={styles.nameText}>{ userName(rider) }</Text>
-        </View>
-      </TouchableOpacity>
+        width={width / 4}
+        height={width / 4}
+        textOverlay={ userName(rider) }
+      />
     )
   }
 

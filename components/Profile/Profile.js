@@ -23,12 +23,12 @@ import {
   View
 } from 'react-native';
 
-import BuildImage from '../BuildImage'
+import BuildImage from '../Images/BuildImage'
 import { brand, danger, darkBrand, green } from '../../colors'
 import { logRender, logError, logInfo } from '../../helpers'
 import { userName } from '../../modelHelpers/user'
 import PhotoFilmstrip from '../Ride/PhotoFilmstrip'
-import URIImage from '../URIImage'
+import URIImage from '../Images/URIImage'
 
 import FabImage from '../FabImage'
 

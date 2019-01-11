@@ -18,7 +18,7 @@ import {
   Thumbnail
 } from 'native-base'
 
-import BuildImage from '../BuildImage'
+import BuildImage from '../Images/BuildImage'
 import Button from '../Button'
 import CarrotCard from './CarrotCard'
 import { brand, darkBrand, darkGrey } from '../../colors'

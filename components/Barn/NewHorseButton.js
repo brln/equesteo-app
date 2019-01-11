@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native';
 
-import BuildImage from '../BuildImage'
+import BuildImage from '../Images/BuildImage'
 import { black, brand } from '../../colors'
 import { logError } from '../../helpers'
 

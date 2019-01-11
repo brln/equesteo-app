@@ -7,7 +7,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import BuildImage from '../BuildImage'
+import BuildImage from '../Images/BuildImage'
 
 const { width } = Dimensions.get('window')
 

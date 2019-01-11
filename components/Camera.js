@@ -10,8 +10,8 @@ import {
 } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 
-import BuildImage from './BuildImage'
-import URIImage from './URIImage'
+import BuildImage from './Images/BuildImage'
+import URIImage from './Images/URIImage'
 import { logError } from '../helpers'
 
 const { width } = Dimensions.get('window');

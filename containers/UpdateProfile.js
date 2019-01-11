@@ -147,12 +147,17 @@ class UpdateProfileContainer extends PureComponent {
 
   markPhotoDeleted (photoID) {
     if (photoID === this.props.user.get('profilePhotoID')) {
+      let swapped = false
       const allPhotos = this.memoThisUsersPhotos(this.props.userPhotos, this.state.deletedPhotoIDs)
       for (let otherPhoto of allPhotos.valueSeq()) {
         const id = otherPhoto.get('_id')
         if (id !== photoID && this.state.deletedPhotoIDs.indexOf(id) < 0) {
+          swapped = true
           this.props.dispatch(userUpdated(this.props.user.set('profilePhotoID', id)))
         }
+      }
+      if (!swapped) {
+        this.props.dispatch(userUpdated(this.props.user.set('profilePhotoID', null)))
       }
     }
     this.setState({

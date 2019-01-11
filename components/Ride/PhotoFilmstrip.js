@@ -3,18 +3,15 @@ import {
   Dimensions,
   ScrollView,
   StyleSheet,
-  TouchableOpacity,
-  View,
 } from 'react-native';
+import Thumbnail from '../Images/Thumbnail'
 
-import URIImage from '../URIImage'
 const { width } = Dimensions.get('window')
 import { darkGrey } from '../../colors'
 
 export default class PhotoFilmstrip extends Component {
   constructor (props) {
     super(props)
-    this.thumbnail = this.thumbnail.bind(this)
     this.showPhotoLightbox = this.showPhotoLightbox.bind(this)
   }
 
@@ -31,23 +28,6 @@ export default class PhotoFilmstrip extends Component {
     }
   }
 
-  thumbnail (photoID, source) {
-    return (
-      <TouchableOpacity
-        key={photoID}
-        style={styles.photoThumbnail}
-        onPress={this.showPhotoLightbox(photoID)}
-      >
-        <View style={{borderColor: darkGrey, borderWidth: 2, width: width / 3.5, height: width / 3.5}}>
-          <URIImage
-            source={source}
-            style={{width: '100%', height: '100%'}}
-          />
-        </View>
-      </TouchableOpacity>
-    )
-  }
-
   render () {
     const byTimestamp = {}
     let renderAnything = false
@@ -55,7 +35,16 @@ export default class PhotoFilmstrip extends Component {
       if (this.props.exclude.indexOf(photoID) < 0) {
         const photoData = this.props.photosByID.get(photoID)
         const source = {uri: photoData.get('uri')}
-        byTimestamp[photoData.get('timestamp')] = this.thumbnail(photoID, source)
+        byTimestamp[photoData.get('timestamp')] = (
+          <Thumbnail
+            key={photoID}
+            source={source}
+            onPress={this.showPhotoLightbox(photoID)}
+            borderColor={darkGrey}
+            width={width / 3.5}
+            height={width / 3.5}
+          />
+        )
         renderAnything = true
       }
     }
@@ -81,8 +70,5 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
-  },
-  photoThumbnail: {
-    padding: 5
   },
 })

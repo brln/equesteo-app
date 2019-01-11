@@ -3,6 +3,7 @@ import { logError, logInfo } from '../helpers'
 import {BadRequestError, BadResponseError, UnauthorizedError} from '../errors'
 import LocalStorage from './LocalStorage'
 
+
 let token = null
 
 const GET = 'get'

@@ -10,7 +10,7 @@ import {
   View
 } from 'react-native';
 
-import BuildImage from '../BuildImage'
+import BuildImage from '../Images/BuildImage'
 import { haversine, logError, logRender, parseRideCoordinate } from '../../helpers'
 import { brand, darkGrey } from '../../colors'
 import { rainbow } from '../../services/Rainbow'

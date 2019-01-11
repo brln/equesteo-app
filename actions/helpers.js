@@ -30,7 +30,6 @@ export function loginAndSync(loginFunc, loginArgs, dispatch) {
     const userID = resp.id
     const following = resp.following
     const followers = resp.followers
-    logDebug(following)
 
     dispatch(dismissError())
     dispatch(setAwaitingPasswordChange(true))

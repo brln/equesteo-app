@@ -9,11 +9,11 @@ import {
   View
 } from 'react-native'
 
-import BuildImage from '../BuildImage'
+import BuildImage from '../Images/BuildImage'
 import { brand } from '../../colors'
 import { logRender } from '../../helpers'
 import Button from '../Button'
-import URIImage from '../URIImage'
+import URIImage from '../Images/URIImage'
 
 const { width } = Dimensions.get('window')
 

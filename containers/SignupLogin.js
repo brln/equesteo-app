@@ -23,7 +23,7 @@ import {
   submitLogin,
   submitSignup
 } from '../actions/functional'
-import BuildImage from '../components/BuildImage'
+import BuildImage from '../components/Images/BuildImage'
 import ForgotPage from '../components/SignupLogin/ForgotPage'
 import SignupPage from '../components/SignupLogin/SignupPage'
 import LoginPage from '../components/SignupLogin/LoginPage'

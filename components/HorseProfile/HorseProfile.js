@@ -14,7 +14,7 @@ import {
   View
 } from 'react-native';
 
-import BuildImage from '../BuildImage'
+import BuildImage from '../Images/BuildImage'
 import { userName } from '../../modelHelpers/user'
 import { brand, darkBrand } from '../../colors'
 import { logError, MONTHS } from '../../helpers'
@@ -24,7 +24,7 @@ import FabImage from '../FabImage'
 import TrainingCard from './TrainingCard'
 import Stat from '../Stat'
 import PhotoFilmstrip from "../Ride/PhotoFilmstrip"
-import URIImage from '../URIImage'
+import URIImage from '../Images/URIImage'
 
 const { height } = Dimensions.get('window')
 

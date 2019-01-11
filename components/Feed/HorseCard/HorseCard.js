@@ -15,7 +15,7 @@ import moment from 'moment'
 import Swiper from 'react-native-swiper';
 
 import Headline from './Headline'
-import URIImage from '../../URIImage'
+import URIImage from '../../Images/URIImage'
 import { darkGrey } from '../../../colors'
 import { logError } from '../../../helpers'
 import { userName } from '../../../modelHelpers/user'

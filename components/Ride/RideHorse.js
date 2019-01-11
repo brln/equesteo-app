@@ -6,7 +6,7 @@ import {
   View
 } from 'react-native';
 
-import BuildImage from '../BuildImage'
+import BuildImage from '../Images/BuildImage'
 import { logError } from '../../helpers'
 
 const { width } = Dimensions.get('window')

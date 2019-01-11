@@ -7,10 +7,10 @@ import {
   View
 } from 'react-native';
 
-import BuildImage from '../BuildImage'
+import BuildImage from '../Images/BuildImage'
 import { orange } from '../../colors'
 import { logError } from '../../helpers'
-import URIImage from '../URIImage'
+import URIImage from '../Images/URIImage'
 
 const { width } = Dimensions.get('window')
 

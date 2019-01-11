@@ -18,7 +18,7 @@ import {
   RECORDER,
   TRAINING,
 } from '../screens'
-import BuildImage from '../components/BuildImage'
+import BuildImage from '../components/Images/BuildImage'
 import { brand, lightGrey } from '../colors'
 import { logRender } from '../helpers'
 

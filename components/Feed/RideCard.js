@@ -6,7 +6,6 @@ import {
   Left,
   Right,
   Text,
-  Thumbnail,
 } from 'native-base'
 import {
   Dimensions,
@@ -17,12 +16,13 @@ import {
 import moment from 'moment'
 import Swiper from 'react-native-swiper'
 
-import BuildImage from '../BuildImage'
+import BuildImage from '../Images/BuildImage'
 import { brand, darkGrey } from '../../colors'
 import { logError } from '../../helpers'
 import { userName } from '../../modelHelpers/user'
 import RideImage from './RideImage'
-import URIImage from '../URIImage'
+import URIImage from '../Images/URIImage'
+import Thumbnail from '../Images/Thumbnail'
 
 const { width } = Dimensions.get('window')
 
@@ -68,41 +68,30 @@ export default class RideCard extends PureComponent {
 
   horseAvatar () {
     const horseProfileURL = this.horseProfileURL()
-    let el
-    if (horseProfileURL) {
-      el = (<Thumbnail
-        small
-        source={{uri: horseProfileURL}}
-      />)
-    } else {
-      el = (<Thumbnail
-        small
-        source={require('../../img/breed.png')}
-      />)
-    }
     return (
-      <View>
-        {el}
-      </View>
+      <Thumbnail
+        source={{uri: horseProfileURL}}
+        emptySource={require('../../img/breed.png')}
+        empty={!horseProfileURL}
+        height={width / 10}
+        width={width / 10}
+        round={true}
+      />
     )
   }
 
   userAvatar () {
     let avatar
     if (this.props.userID !== this.props.rideUser.get('_id') || !this.props.ownRideList) {
-      let source
-      if (this.props.userProfilePhotoURL) {
-        source = {uri: this.props.userProfilePhotoURL}
-      } else {
-        source = require('../../img/empty.png')
-      }
       avatar = (
-        <View
-          style={{paddingRight: 10}}
-        >
+        <View style={{paddingRight: 5}}>
           <Thumbnail
-            small
-            source={source}
+            source={{uri: this.props.userProfilePhotoURL}}
+            emptySource={require('../../img/empty.png')}
+            empty={!this.props.userProfilePhotoURL}
+            height={width / 9}
+            width={width/ 9}
+            round={true}
           />
         </View>
       )

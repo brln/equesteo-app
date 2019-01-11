@@ -6,7 +6,7 @@ import {
 } from 'react-native'
 import BuildImage from './BuildImage'
 
-export default class URIIImage extends PureComponent {
+export default class URIImage extends PureComponent {
   constructor () {
     super()
     this.state = {
@@ -45,14 +45,14 @@ export default class URIIImage extends PureComponent {
         if (sourceType === 'https') {
           typeImage = (
             <BuildImage
-              source={require('../img/cloud.png')}
+              source={require('../../img/cloud.png')}
               style={{width: 20, height: 20}}
             />
           )
         } else if (sourceType === 'file' || sourceType === 'content') {
           typeImage = (
             <BuildImage
-              source={require('../img/onDevice.png')}
+              source={require('../../img/onDevice.png')}
               style={{width: 20, height: 20}}
             />
           )
@@ -68,7 +68,7 @@ export default class URIIImage extends PureComponent {
       mainImage = (
         <View style={{height: '100%', width: '100%', padding: 5, justifyContent: 'center', alignItems: 'center'}}>
           <BuildImage
-            source={require('../img/error.png')}
+            source={require('../../img/error.png')}
             style={{width: 30, height: 30}}
           />
           <Text style={{textAlign: 'center'}}>Could not load Image</Text>

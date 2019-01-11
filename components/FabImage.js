@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { logError } from '../helpers'
-import BuildImage from './BuildImage'
+import BuildImage from './Images/BuildImage'
 
 export default function FabImage (props) {
   return (

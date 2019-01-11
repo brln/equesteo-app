@@ -7,7 +7,7 @@ import {
   View
 } from 'react-native';
 
-import BuildImage from '../BuildImage'
+import BuildImage from '../Images/BuildImage'
 import { lightGrey } from '../../colors'
 import { logError } from '../../helpers'
 import MultiPlatform from '../../components/MultiPlatform'

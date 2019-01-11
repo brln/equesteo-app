@@ -6,7 +6,7 @@ import {
   View
 } from 'react-native';
 
-import URIImage from './URIImage'
+import URIImage from './Images/URIImage'
 import { darkGrey, orange } from '../colors'
 
 const { width } = Dimensions.get('window')

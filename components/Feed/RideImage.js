@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 
 import { logError } from '../../helpers'
 import { MAPBOX_TOKEN } from 'react-native-dotenv'
-import URIImage from '../URIImage'
+import URIImage from '../Images/URIImage'
 
 export default class RideImage extends PureComponent {
   render() {
