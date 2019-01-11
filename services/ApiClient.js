@@ -1,6 +1,11 @@
 import { API_URL } from 'react-native-dotenv'
 import { logError, logInfo } from '../helpers'
-import {BadRequestError, BadResponseError, UnauthorizedError} from '../errors'
+import {
+  BadRequestError,
+  BadResponseError,
+  NotConnectedError,
+  UnauthorizedError
+} from '../errors'
 import LocalStorage from './LocalStorage'
 
 
@@ -9,6 +14,7 @@ let token = null
 const GET = 'get'
 const POST = 'post'
 const PUT = 'put'
+
 
 export default class ApiClient {
   static getToken () {
@@ -99,7 +105,7 @@ export default class ApiClient {
 
       } else if (e instanceof TypeError) {
         if (e.toString() === 'TypeError: Network request failed') {
-          logError(e)
+          throw new NotConnectedError('Can\'t find the internet.')
         }
       } else {
         throw e
