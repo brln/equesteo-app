@@ -12,6 +12,7 @@ import {
   userUpdated,
 } from "../actions/standard"
 import {
+  DB_NEEDS_SYNC,
   persistFollow,
   persistUserWithPhoto,
   signOut,
@@ -50,12 +51,17 @@ class ProfileContainer extends BackgroundComponent {
 
   constructor (props) {
     super(props)
+    this.state = {
+      logoutModalOpen: false
+    }
     this.createFollow = this.createFollow.bind(this)
     this.deleteFollow = this.deleteFollow.bind(this)
+    this.doLogout = this.doLogout.bind(this)
     this.followings = this.followings.bind(this)
     this.followers = this.followers.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
     this.profileUserHorses = this.profileUserHorses.bind(this)
+    this.setLogoutModalOpen = this.setLogoutModalOpen.bind(this)
     this.showAboutPage = this.showAboutPage.bind(this)
     this.showHorseProfile = this.showHorseProfile.bind(this)
     this.showPhotoLightbox = this.showPhotoLightbox.bind(this)
@@ -83,6 +89,12 @@ class ProfileContainer extends BackgroundComponent {
         }
       })
     }
+  }
+
+  setLogoutModalOpen (open) {
+    this.setState({
+      logoutModalOpen: open
+    })
   }
 
   showPhotoLightbox (sources) {
@@ -114,8 +126,19 @@ class ProfileContainer extends BackgroundComponent {
         }
       });
     } else if (buttonId === 'logout') {
-      this.props.dispatch(signOut())
+      const needsAnyPersist = this.props.needsRemotePersist.valueSeq().filter(x => x === DB_NEEDS_SYNC).count() > 0
+      logDebug(needsAnyPersist, 'needsAnyPerisst')
+      logDebug(this.props.photoQueue.count(), 'pqc')
+      if (needsAnyPersist || this.props.photoQueue.count() > 0) {
+        this.setLogoutModalOpen(true)
+      } else {
+        this.doLogout()
+      }
     }
+  }
+
+  doLogout () {
+    this.props.dispatch(signOut())
   }
 
   createFollow (followingID) {
@@ -212,12 +235,15 @@ class ProfileContainer extends BackgroundComponent {
         <Profile
           createFollow={this.createFollow}
           deleteFollow={this.deleteFollow}
+          doLogout={this.doLogout}
           followings={this.followings()}
           followers={this.followers()}
           horses={this.profileUserHorses()}
           horseOwnerIDs={this.horseOwnerIDs()}
           horsePhotos={this.props.horsePhotos}
+          logoutModalOpen={this.state.logoutModalOpen}
           profileUser={this.props.profileUser}
+          setLogoutModalOpen={this.setLogoutModalOpen}
           showAboutPage={this.showAboutPage}
           showHorseProfile={this.showHorseProfile}
           showPhotoLightbox={this.showPhotoLightbox}
@@ -246,6 +272,8 @@ function mapStateToProps (state, passedProps) {
     horseUsers: pouchState.get('horseUsers'),
     horses: pouchState.get('horses'),
     horsePhotos: pouchState.get('horsePhotos'),
+    needsRemotePersist: localState.get('needsRemotePersist'),
+    photoQueue: localState.get('photoQueue'),
     profileUser: pouchState.getIn(['users', profileUserID]) || passedProps.profileUser || new Map(),
     users: pouchState.get('users'),
     userID,

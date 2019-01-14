@@ -1,15 +1,12 @@
 import React, { PureComponent } from 'react'
 import { VictoryArea, VictoryAxis, VictoryChart } from "victory-native"
 import {
-  Dimensions,
   StyleSheet,
   View,
 } from 'react-native'
 
-import { brand, darkBrand, lightGrey } from '../../colors'
+import { darkBrand, lightGrey } from '../../colors'
 import { logRender } from '../../helpers'
-
-const { width } = Dimensions.get('window')
 
 export default class ElevationGain extends PureComponent {
   constructor (props) {

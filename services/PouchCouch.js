@@ -136,7 +136,6 @@ export default class PouchCouch {
   }
 
   static localReplicateRides (options, userIDs, followerUserIDs) {
-    logDebug(API_URL, 'API_URL')
     return new Promise((resolve, reject) => {
       const remoteRidesDB = new PouchDB(`${API_URL}/couchproxy/${ridesDBName}`, options)
       PouchDB.replicate(

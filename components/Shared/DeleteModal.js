@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
   },
   modal3: {
     marginTop: height / 4,
-    height: height / 4,
+    height: height / 3.5,
     width: width * .8,
   },
 });

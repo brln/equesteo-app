@@ -34,7 +34,7 @@ import { appStates } from '../helpers'
 import { CAMERA, DRAWER, FEED, RECORDER, SIGNUP_LOGIN, UPDATE_NEW_RIDE_ID } from '../screens'
 import { LocalStorage, PouchCouch, RidePersister, UserAPI } from '../services'
 
-const DB_NEEDS_SYNC = 'DB_NEEDS_SYNC'
+export const DB_NEEDS_SYNC = 'DB_NEEDS_SYNC'
 const DB_SYNCING = 'DB_SYNCING'
 const DB_SYNCED = 'DB_SYNCED'
 
@@ -793,7 +793,7 @@ function startNetworkTracking () {
         if (gc) {
           dispatch(runPhotoQueue())
           const needsPersist = getState().getIn(['localState', 'needsRemotePersist'])
-          const needsAnyPersist = needsPersist.valueSeq().filter(x => x).count() > 0
+          const needsAnyPersist = needsPersist.valueSeq().filter(x => x === DB_NEEDS_SYNC ).count() > 0
           if (needsAnyPersist) {
             for (let db of needsPersist.keySeq()) {
               if (needsPersist.get(db)) {
