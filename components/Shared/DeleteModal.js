@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
 import {
   Button,
@@ -41,13 +42,20 @@ export default class DeleteModal extends PureComponent {
   }
 }
 
+DeleteModal.propTypes = {
+  modalOpen: PropTypes.bool.isRequired,
+  closeDeleteModal: PropTypes.func.isRequired,
+  text: PropTypes.string.isRequired,
+  deleteFunc: PropTypes.func.isRequired,
+}
+
 const styles = StyleSheet.create({
   modal: {
     justifyContent: 'center',
     alignItems: 'center'
   },
   modal3: {
-    marginTop: 30,
+    marginTop: height / 4,
     height: height / 4,
     width: width * .8,
   },

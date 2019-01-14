@@ -19,6 +19,7 @@ import ImagePicker from 'react-native-image-crop-picker'
 import MultiSlider from '@ptomasroos/react-native-multi-slider'
 
 import { brand, darkBrand, darkGrey } from '../../colors'
+import DeleteModal from '../Shared/DeleteModal'
 import FabImage from '../FabImage'
 import HorseSelector from './HorseSelector'
 import PhotosByTimestamp from '../PhotosByTimestamp'
@@ -144,6 +145,12 @@ export default class UpdateRide extends PureComponent {
 
     return (
       <View>
+        <DeleteModal
+          modalOpen={this.props.discardModalOpen}
+          closeDeleteModal={() => {this.props.setDiscardModalOpen(false)}}
+          text={"Are you sure you want to discard this ride?"}
+          deleteFunc={this.props.discardRide}
+        />
         <ScrollView>
           <View style={styles.container}>
             <Card style={{flex: 1}}>

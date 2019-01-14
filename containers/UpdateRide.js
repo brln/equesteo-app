@@ -63,6 +63,7 @@ class UpdateRideContainer extends BackgroundComponent {
     this.state = {
       cachedRide: null,
       deletedPhotoIDs: [],
+      discardModalOpen: false,
       showPhotoMenu: false,
       showSelectHorseMenu: false,
       selectedHorseID: null,
@@ -77,12 +78,14 @@ class UpdateRideContainer extends BackgroundComponent {
     this.changeRideNotes = this.changeRideNotes.bind(this)
     this.clearMenus = this.clearMenus.bind(this)
     this.createPhoto = this.createPhoto.bind(this)
+    this.discardRide = this.discardRide.bind(this)
     this.horses = this.horses.bind(this)
     this.markPhotoDeleted = this.markPhotoDeleted.bind(this)
     this.openPhotoMenu = this.openPhotoMenu.bind(this)
     this.openSelectHorseMenu = this.openSelectHorseMenu.bind(this)
     this.rideHorses = this.rideHorses.bind(this)
     this.selectHorse = this.selectHorse.bind(this)
+    this.setDiscardModalOpen = this.setDiscardModalOpen.bind(this)
     this.stashedRidePhotoKey = this.stashedRidePhotoKey.bind(this)
     this.trimRide = this.trimRide.bind(this)
     this.unselectHorse = this.unselectHorse.bind(this)
@@ -154,8 +157,8 @@ class UpdateRideContainer extends BackgroundComponent {
 
   navigationButtonPressed({ buttonId }) {
     if (this.props.newRide) {
-      Navigation.mergeOptions(this.props.componentId, {topBar: {rightButtons: []}})
       if (buttonId === 'save') {
+        Navigation.mergeOptions(this.props.componentId, {topBar: {rightButtons: []}})
         this.updateLocalRideCoords()
         this.props.dispatch(persistRide(
           this.props.ride.get('_id'),
@@ -172,13 +175,7 @@ class UpdateRideContainer extends BackgroundComponent {
           this.props.dispatch(discardCurrentRide())
         })
       } else if (buttonId === 'discard') {
-        Navigation.popToRoot(this.props.componentId).then(() => {
-          this.props.dispatch(clearPausedLocations())
-          this.props.dispatch(clearRidePhotoStash(this.stashedRidePhotoKey()))
-          this.props.dispatch(stopLocationTracking())
-          this.props.dispatch(discardCurrentRide())
-          this.props.dispatch(deleteUnpersistedRide(this.props.ride.get('_id')))
-        })
+        this.setDiscardModalOpen(true)
       } else if (buttonId === 'back') {
         Navigation.pop(this.props.componentId).then(() => {
           this.props.dispatch(stopStashNewLocations())
@@ -205,6 +202,22 @@ class UpdateRideContainer extends BackgroundComponent {
       }
     }
     Keyboard.dismiss()
+  }
+
+  setDiscardModalOpen (open) {
+    this.setState({
+      discardModalOpen: open
+    })
+  }
+
+  discardRide () {
+    Navigation.popToRoot(this.props.componentId).then(() => {
+      this.props.dispatch(clearPausedLocations())
+      this.props.dispatch(clearRidePhotoStash(this.stashedRidePhotoKey()))
+      this.props.dispatch(stopLocationTracking())
+      this.props.dispatch(discardCurrentRide())
+      this.props.dispatch(deleteUnpersistedRide(this.props.ride.get('_id')))
+    })
   }
 
   updateLocalRideCoords () {
@@ -468,6 +481,8 @@ class UpdateRideContainer extends BackgroundComponent {
         changePublic={this.changePublic}
         clearMenus={this.clearMenus}
         createPhoto={this.createPhoto}
+        discardRide={this.discardRide}
+        discardModalOpen={this.state.discardModalOpen}
         horses={this.memoizedHorses()}
         horsePhotos={this.props.horsePhotos}
         markPhotoDeleted={this.markPhotoDeleted}
@@ -484,6 +499,7 @@ class UpdateRideContainer extends BackgroundComponent {
         selectedPhotoID={this.state.selectedPhotoID}
         selectedHorseID={this.state.selectedHorseID}
         selectHorse={this.selectHorse}
+        setDiscardModalOpen={this.setDiscardModalOpen}
         showPhotoMenu={this.state.showPhotoMenu}
         showSelectHorseMenu={this.state.showSelectHorseMenu}
         trimRide={this.trimRide}
