@@ -16,7 +16,10 @@ export default class SpeedChart extends PureComponent {
   render () {
     logRender('rendering SpeedChart')
     return (
-      <View style={styles.container}>
+      // https://github.com/FormidableLabs/victory-native/issues/395
+      // Needs the pointerEvents='none' or the chart swallows drag events
+      // and scrolling gets fucked.
+      <View pointerEvents='none' style={styles.container}>
         <VictoryChart
           padding={{bottom: 50, left: 80, right: 10 }}
         >

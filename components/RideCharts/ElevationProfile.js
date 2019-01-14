@@ -25,7 +25,10 @@ export default class ElevationProfile extends PureComponent {
   render () {
     logRender('rendering ElevationProfile')
     return (
-      <View style={styles.container}>
+      // https://github.com/FormidableLabs/victory-native/issues/395
+      // Needs the pointerEvents='none' or the chart swallows drag events
+      // and scrolling gets fucked.
+      <View pointerEvents='none' style={styles.container}>
         <VictoryChart
           padding={{ top: 50, bottom: 50, left: 80, right: 30 }}
           minDomain={{y: this.memoMinDomain(this.props.elevationData)}}
