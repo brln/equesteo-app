@@ -69,7 +69,8 @@ export default class PouchCouch {
           res(resp)
         }).on('error', (e) => {
           if (e.status === 0) {
-            rej(new NotConnectedError())
+            logDebug('status 0 error')
+            rej(new NotConnectedError('Cannot find the database'))
           } else {
             rej(new Error(JSON.stringify(e)))
           }
@@ -135,6 +136,7 @@ export default class PouchCouch {
   }
 
   static localReplicateRides (options, userIDs, followerUserIDs) {
+    logDebug(API_URL, 'API_URL')
     return new Promise((resolve, reject) => {
       const remoteRidesDB = new PouchDB(`${API_URL}/couchproxy/${ridesDBName}`, options)
       PouchDB.replicate(

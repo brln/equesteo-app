@@ -59,7 +59,6 @@ function mapStateToProps (state, passedProps) {
   const rideElevations = pouchState.getIn(['selectedRideElevations'])
   return {
     ride,
-    rideComments: pouchState.get('rideComments'),
     rideCoordinates,
     rideElevations,
   }

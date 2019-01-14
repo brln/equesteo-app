@@ -13,27 +13,6 @@ export default class HorseCard extends PureComponent {
     this.allRideHorses = this.allRideHorses.bind(this)
   }
 
-  horseProfileURL (horse) {
-    if (horse) {
-      const profilePhotoID = horse.get('profilePhotoID')
-      if (horse && profilePhotoID &&
-        this.props.horsePhotos.get(profilePhotoID)) {
-        return this.props.horsePhotos.getIn([profilePhotoID, 'uri'])
-      }
-    }
-  }
-
-  horseAvatar (horse) {
-    const horseProfileURL = this.horseProfileURL(horse)
-    let source
-    if (horseProfileURL) {
-      source = { uri: horseProfileURL }
-    } else {
-      source = require('../../img/breed.png')
-    }
-    return source
-  }
-
   allRideHorses () {
     const all = []
     this.props.rideHorses.valueSeq().sort((a, b) => a.timestamp - b.timestamp).forEach(rideHorse => {
@@ -42,8 +21,8 @@ export default class HorseCard extends PureComponent {
       all.push(
          <RideHorse
           key={rideHorse.get('_id')}
-          imgSrc={this.horseAvatar(horse)}
           horse={horse}
+          horsePhotos={this.props.horsePhotos}
           ownerID={ownerID}
           rideHorse={rideHorse}
           showHorseProfile={this.props.showHorseProfile}

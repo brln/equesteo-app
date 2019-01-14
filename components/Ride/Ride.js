@@ -146,7 +146,7 @@ export default class Ride extends PureComponent {
     if (this.props.userID !== this.props.rideUser.get('_id')) {
       const userProfilePhotoURL = this.getUserProfilePhotoURL(this.props.rideUser)
       avatar = (
-        <View style={{paddingRight: 5}}>
+        <View style={{paddingLeft: 10, paddingRight: 5}}>
           <Thumbnail
             source={{uri: userProfilePhotoURL}}
             emptySource={require('../../img/empty.png')}

@@ -117,7 +117,7 @@ export default class HorseProfile extends PureComponent {
           onPress={() => this.props.showPhotoLightbox(swiperSources)}
           style={{width: '100%', height: '100%'}}
           source={profileSource}
-          onError={e => logError("Can't load HorseProfile image")}
+          onError={e => logError("Can't load HorseProfile image: " + profileSource.uri)}
           showSource={true}
         >
           { nameText }
