@@ -9,7 +9,7 @@ import {
   rideUpdated
 } from '../actions/standard'
 import {
-  needsRemotePersist,
+  doSync,
   photoNeedsUpload,
 } from "../actions/functional"
 import { coordSplice } from '../helpers'
@@ -134,7 +134,7 @@ export default class RidePersister {
     }).then(() => {
       return Promise.all(deletedPhotoSaves)
     }).then(() => {
-      this.dispatch(needsRemotePersist('rides'))
+      this.dispatch(doSync())
     }).catch(catchAsyncError(this.dispatch))
   }
 }

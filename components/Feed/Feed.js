@@ -16,7 +16,7 @@ export default class Feed extends PureComponent {
   }
 
   startRefresh () {
-    this.props.syncDBPull()
+    this.props.syncDB()
   }
 
   renderRideList (ownRideList, rides) {

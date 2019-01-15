@@ -42,42 +42,43 @@ export default class PouchCouch {
     return localRidesDB.remove(id, rev)
   }
 
-  static remoteReplicateDB(db) {
-    let remoteConnectionString
-    let localDB
-    const options = PouchCouch.preReplicate()
-    switch(db) {
-      case 'horses':
-        localDB = localHorsesDB
-        remoteConnectionString = `${API_URL}/couchproxy/${horsesDBName}`
-        break
-      case 'rides':
-        localDB = localRidesDB
-        remoteConnectionString = `${API_URL}/couchproxy/${ridesDBName}`
-        break
-      case 'users':
-        localDB = localUsersDB
-        remoteConnectionString = `${API_URL}/couchproxy/${usersDBName}`
-        break
-      default:
-        throw('Remote DB not found')
-    }
-    return options.then(options => {
-      return new Promise((res, rej) => {
-        const remoteDB = new PouchDB(remoteConnectionString, options)
-        PouchDB.replicate(localDB, remoteDB).on('complete', (resp) => {
-          res(resp)
-        }).on('error', (e) => {
-          if (e.status === 0) {
-            logDebug('status 0 error')
-            rej(new NotConnectedError('Cannot find the database'))
-          } else {
-            rej(new Error(JSON.stringify(e)))
-          }
-        })
-      }).then(() => {
-        return PouchCouch.postReplicate()
-      })
+  static remoteReplicateDBs() {
+    const dbs = [
+      {
+        local: localHorsesDB,
+        remote: `${API_URL}/couchproxy/${horsesDBName}`
+      },
+      {
+        local: localRidesDB,
+        remote: `${API_URL}/couchproxy/${ridesDBName}`
+      },
+      {
+        local: localUsersDB,
+        remote: `${API_URL}/couchproxy/${usersDBName}`
+      }
+    ]
+    return PouchCouch.preReplicate().then(options => {
+      const replications = []
+      for (let db of dbs) {
+        const remoteDB = new PouchDB(db.remote, options)
+        replications.push(
+          new Promise((res, rej) => {
+            PouchDB.replicate(db.local, remoteDB).on('complete', (resp) => {
+              res(resp)
+            }).on('error', (e) => {
+              if (e.status === 0) {
+                logDebug('status 0 error')
+                rej(new NotConnectedError('Cannot find the database'))
+              } else {
+                rej(new Error(JSON.stringify(e)))
+              }
+            })
+          })
+        )
+      }
+      return Promise.all(replications)
+    }).then(() => {
+      return PouchCouch.postReplicate()
     })
   }
 
@@ -99,38 +100,14 @@ export default class PouchCouch {
     return ApiClient.checkAuth()
   }
 
-  static localReplicateDB(db, ownUserID, followingUserIDs, followerUserIDs) {
-    let preRepPromise = PouchCouch.preReplicate()
-    let repPromise
-    switch(db) {
-      case 'horses':
-        repPromise = preRepPromise.then(options => {
-          return PouchCouch.localReplicateHorses(options, [ownUserID, ...followingUserIDs, ...followerUserIDs])
-        })
-        break
-      case 'rides':
-        repPromise = preRepPromise.then(options => {
-          return PouchCouch.localReplicateRides(options, [ownUserID, ...followingUserIDs], followerUserIDs)
-        })
-        break
-      case 'users':
-        repPromise = preRepPromise.then(options => {
-          return PouchCouch.localReplicateUsers(options, ownUserID, [...followingUserIDs, ...followerUserIDs])
-        })
-        break
-      case 'all':
-        repPromise = preRepPromise.then(options => {
-          return Promise.all([
-            PouchCouch.localReplicateHorses(options, [ownUserID, ...followingUserIDs, ...followerUserIDs]),
-            PouchCouch.localReplicateRides(options, [ownUserID, ...followingUserIDs], followerUserIDs),
-            PouchCouch.localReplicateUsers(options, ownUserID, [...followingUserIDs, ...followerUserIDs]),
-          ])
-        })
-        break
-      default:
-        throw('Local DB not found')
-    }
-    return repPromise.then(() => {
+  static localReplicateDBs (ownUserID, followingUserIDs, followerUserIDs) {
+    return PouchCouch.preReplicate().then(options => {
+      return Promise.all([
+        PouchCouch.localReplicateHorses(options, [ownUserID, ...followingUserIDs, ...followerUserIDs]),
+        PouchCouch.localReplicateRides(options, [ownUserID, ...followingUserIDs], followerUserIDs),
+        PouchCouch.localReplicateUsers(options, ownUserID, [...followingUserIDs, ...followerUserIDs]),
+      ])
+    }).then(() => {
       return PouchCouch.postReplicate()
     })
   }
@@ -158,7 +135,6 @@ export default class PouchCouch {
   }
 
   static localReplicateUsers (options, ownUserID, userIDs) {
-    const remoteUsersDB = new PouchDB(`${API_URL}/couchproxy/${usersDBName}`, options)
     return new Promise((resolve, reject) => {
       const remoteUsersDB = new PouchDB(`${API_URL}/couchproxy/${usersDBName}`, options)
       PouchDB.replicate(

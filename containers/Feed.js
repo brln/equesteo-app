@@ -3,8 +3,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Navigation } from 'react-native-navigation'
 
-import { clearFeedMessage } from "../actions/standard";
-import { syncDBPull, toggleRideCarrot } from "../actions/functional";
+import { doSync, toggleRideCarrot } from "../actions/functional"
 import BackgroundComponent from '../components/BackgroundComponent'
 import { brand } from '../colors'
 import Feed from '../components/Feed/Feed'
@@ -59,7 +58,7 @@ class FeedContainer extends BackgroundComponent {
     this.showProfile = this.showProfile.bind(this)
     this.showRide = this.showRide.bind(this)
     this.showHorseProfile = this.showHorseProfile.bind(this)
-    this.syncDBPull = this.syncDBPull.bind(this)
+    this.syncDB = this.syncDB.bind(this)
 
     this.followIDs = this.followIDs.bind(this)
     this.followingRides = this.followingRides.bind(this)
@@ -177,11 +176,11 @@ class FeedContainer extends BackgroundComponent {
     });
   }
 
-  syncDBPull () {
+  syncDB () {
     this.setState({
       refreshing: true
     })
-    this.props.dispatch(syncDBPull())
+    this.props.dispatch(doSync())
   }
 
   toggleCarrot (rideID) {
@@ -263,7 +262,7 @@ class FeedContainer extends BackgroundComponent {
         showComments={this.showComments}
         showProfile={this.showProfile}
         showRide={this.showRide}
-        syncDBPull={this.syncDBPull}
+        syncDB={this.syncDB}
         toggleCarrot={this.toggleCarrot}
         userID={this.props.userID}
         users={this.props.users}

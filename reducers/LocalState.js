@@ -1,7 +1,8 @@
 import { List, Map } from 'immutable'
 
 import { FEED, SIGNUP_LOGIN } from '../screens'
-import { appStates, goodConnection, unixTimeNow } from '../helpers'
+import { appStates, unixTimeNow } from '../helpers'
+import { DB_NEEDS_SYNC, DB_SYNCING, DB_SYNCED } from "../actions/functional"
 
 import {
   AWAIT_FULL_SYNC,
@@ -26,7 +27,7 @@ import {
   SET_FIRST_START_HORSE_ID,
   SET_FULL_SYNC_FAIL,
   SET_POP_SHOW_RIDE,
-  SET_REMOTE_PERSIST_DB,
+  SET_REMOTE_PERSIST,
   SET_SHOWING_RIDE,
   SET_AWAITING_PW_CHANGE,
   SET_DOING_INITIAL_LOAD,
@@ -49,14 +50,10 @@ export const initialState = Map({
   feedMessage: null,
   firstStartHorseID: null,
   fullSyncFail: false,
-  goodConnection: false,
+  goodConnection: true,
   lastFullSync: null,
   locationStashingActive: false,
-  needsRemotePersist: Map({
-    horses: false,
-    rides: false,
-    users: false,
-  }),
+  needsRemotePersist: DB_SYNCED,
   photoQueue: Map(),
   popShowRide: null,
   popShowRideNow: null,
@@ -113,9 +110,11 @@ export default function LocalStateReducer(state=initialState, action) {
         'popShowRide', null,
       ).set(
         'popShowRideNow', false
+      ).set(
+        'needsRemotePersist', loadedState.get('needsRemotePersist') === DB_SYNCING ? DB_NEEDS_SYNC : DB_SYNCED
       )
-    case SET_REMOTE_PERSIST_DB:
-      return state.setIn(['needsRemotePersist', action.database], action.value)
+    case SET_REMOTE_PERSIST:
+      return state.set('needsRemotePersist', action.value)
     case NEW_APP_STATE:
       return state.set('appState', action.newState)
     case NEW_NETWORK_STATE:

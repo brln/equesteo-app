@@ -126,9 +126,7 @@ class ProfileContainer extends BackgroundComponent {
         }
       });
     } else if (buttonId === 'logout') {
-      const needsAnyPersist = this.props.needsRemotePersist.valueSeq().filter(x => x === DB_NEEDS_SYNC).count() > 0
-      logDebug(needsAnyPersist, 'needsAnyPerisst')
-      logDebug(this.props.photoQueue.count(), 'pqc')
+      const needsAnyPersist = this.props.needsRemotePersist  === DB_NEEDS_SYNC
       if (needsAnyPersist || this.props.photoQueue.count() > 0) {
         this.setLogoutModalOpen(true)
       } else {

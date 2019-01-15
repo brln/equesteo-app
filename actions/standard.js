@@ -53,7 +53,7 @@ import {
   SET_FIRST_START_HORSE_ID,
   SET_FULL_SYNC_FAIL,
   SET_POP_SHOW_RIDE,
-  SET_REMOTE_PERSIST_DB,
+  SET_REMOTE_PERSIST,
   SHOW_POP_SHOW_RIDE,
   SET_SIGNING_OUT,
   START_RIDE,
@@ -420,19 +420,19 @@ export function setPopShowRide (rideID, showRideNow, scrollToComments) {
   }
 }
 
-export function setRemotePersistDB (database, value) {
+export function setRemotePersist (value) {
   return {
-    type: SET_REMOTE_PERSIST_DB,
-    database,
+    type: SET_REMOTE_PERSIST,
     value,
-    logData: ['database', 'value']
+    logData: ['value']
   }
 }
 
 export function setFeedMessage (message) {
   return {
     type: SET_FEED_MESSAGE,
-    message
+    message,
+    logData: ['message']
   }
 }
 

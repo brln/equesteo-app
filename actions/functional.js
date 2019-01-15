@@ -35,8 +35,9 @@ import { CAMERA, DRAWER, FEED, RECORDER, SIGNUP_LOGIN, UPDATE_NEW_RIDE_ID } from
 import { LocalStorage, PouchCouch, RidePersister, UserAPI } from '../services'
 
 export const DB_NEEDS_SYNC = 'DB_NEEDS_SYNC'
-const DB_SYNCING = 'DB_SYNCING'
-const DB_SYNCED = 'DB_SYNCED'
+export const DB_SYNCING = 'DB_SYNCING'
+export const DB_SYNCING_AND_ENQUEUED = 'DB_SYNCING_AND_ENQUEUED'
+export const DB_SYNCED = 'DB_SYNCED'
 
 import {
   awaitFullSync,
@@ -64,7 +65,7 @@ import {
   rideElevationsLoaded,
   ridePhotoUpdated,
   setPopShowRide,
-  setRemotePersistDB,
+  setRemotePersist,
   setFeedMessage,
   setFullSyncFail,
   setSigningOut,
@@ -125,25 +126,30 @@ export function addHorseUser (horse, user) {
 export function appInitialized () {
   cb('appInitialized')
   return (dispatch, getState) => {
+    let localData
     tryToLoadStateFromDisk(dispatch).then(() => {
       dispatch(startActiveComponentListener())
       dispatch(dismissError())
       dispatch(checkFCMPermission())
-      dispatch(startNetworkTracking())
       dispatch(startAppStateTracking())
       return ApiClient.getToken()
     }).then((token) => {
       const currentUserID = getState().getIn(['localState', 'userID'])
       if (token && currentUserID) {
         setUserContext(currentUserID)
-        return PouchCouch.localLoad().then((localData) => {
+        return PouchCouch.localLoad().then((_data) => {
+          localData = _data
           dispatch(localDataLoaded(localData))
           dispatch(startListeningFCMTokenRefresh())
           dispatch(startListeningFCM())
           dispatch(setDistributionOnServer())
-          dispatch(syncDBPull())
+          return dispatch(startNetworkTracking())
+        }).then(() => {
+          return dispatch(doSync())
+        }).then(() => {
           dispatch(switchRoot(FEED))
         })
+
       } else {
         dispatch(switchRoot(SIGNUP_LOGIN))
       }
@@ -186,7 +192,7 @@ export function createRideComment(commentData) {
     PouchCouch.saveRide(newComment.toJS()).then((doc) => {
       const afterSave = getState().getIn(['pouchRecords', 'rideComments', commentID])
       dispatch(rideCommentUpdated(afterSave.set('_rev', doc.rev)))
-      dispatch(needsRemotePersist('rides'))
+      dispatch(doSync())
     }).catch(catchAsyncError(dispatch))
 
   }
@@ -255,39 +261,6 @@ export function newPassword (password) {
   }
 }
 
-export function doRemotePersist(db) {
-  cb('doRemotePersist')
-  return (dispatch, getState) => {
-    const goodConnection = getState().getIn(['localState', 'goodConnection'])
-    if (goodConnection) {
-      dispatch(remotePersistStarted(db))
-      PouchCouch.remoteReplicateDB(db).then(() => {
-        dispatch(remotePersistComplete(db))
-      }).then(() => {
-        dispatch(syncDBPull())
-      }).catch((e) => {
-        if (e instanceof NotConnectedError) {
-          dispatch(remotePersistError(db))
-        } else {
-          catchAsyncError(dispatch)(e)
-        }
-      })
-    }
-  }
-}
-
-export function needsRemotePersist(db) {
-  cb('needsRemotePersist')
-  return (dispatch) => {
-    dispatch(setFeedMessage(Map({
-      message: 'Data Needs to Upload',
-      color: warning,
-    })))
-    dispatch(setRemotePersistDB(db, DB_NEEDS_SYNC))
-    dispatch(doRemotePersist(db))
-  }
-}
-
 export function persistFollow (followID) {
   cb('persistFollow')
   return (dispatch, getState) => {
@@ -299,8 +272,7 @@ export function persistFollow (followID) {
     PouchCouch.saveUser(theFollow.toJS()).then(({ rev }) => {
       let foundAfterSave = getState().getIn(['pouchRecords', 'follows', followID])
       dispatch(followUpdated(foundAfterSave.set('_rev', rev)))
-      dispatch(needsRemotePersist('users'))
-      dispatch(syncDBPull())
+      dispatch(doSync())
     }).catch(catchAsyncError(dispatch))
   }
 }
@@ -334,7 +306,7 @@ export function persistUserWithPhoto (userID, userPhotoID) {
       const theUserAfterSave = getState().getIn(['pouchRecords', 'users', userID])
       dispatch(userUpdated(theUserAfterSave.set('_rev', rev)))
     }).then(() => {
-      dispatch(needsRemotePersist('users'))
+      dispatch(doSync())
     }).catch(catchAsyncError(dispatch))
   }
 }
@@ -358,7 +330,7 @@ export function persistHorseWithPhoto (horseID, horsePhotoID) {
     }).then((doc) => {
       const theHorseAfterSave = getState().getIn(['pouchRecords', 'horses', horseID])
       dispatch(horseUpdated(theHorseAfterSave.set('_rev', doc.rev)))
-      dispatch(needsRemotePersist('horses'))
+      dispatch(doSync())
     }).catch(catchAsyncError(dispatch))
   }
 }
@@ -434,7 +406,7 @@ export function persistHorseUpdate (horseID, horseUserID, deletedPhotoIDs, newPh
     }
 
     horseSaves.then(() => {
-      dispatch(needsRemotePersist('horses'))
+      dispatch(doSync())
     }).catch(catchAsyncError(dispatch))
   }
 }
@@ -449,7 +421,7 @@ export function persistHorseUser (horseUserID) {
     PouchCouch.saveHorse(theHorseUser.toJS()).then(({ rev }) => {
       const theHorseUserAfterSave = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
       dispatch(horseUserUpdated(theHorseUserAfterSave.set('_rev', rev)))
-      dispatch(needsRemotePersist('horses'))
+      dispatch(doSync())
     }).catch(catchAsyncError(dispatch))
   }
 }
@@ -484,7 +456,7 @@ export function persistUserUpdate (userID, deletedPhotoIDs) {
     }
 
     userSave.then(() => {
-      dispatch(needsRemotePersist('users'))
+      dispatch(doSync())
     }).catch(catchAsyncError(dispatch))
   }
 }
@@ -536,7 +508,7 @@ export function uploadPhoto (type, photoLocation, photoID) {
             return PouchCouch.saveHorse(horsePhoto.toJS()).then((doc) => {
               const theHorsePhotoAfterSave = getState().getIn(['pouchRecords', 'horsePhotos', photoID])
               dispatch(horsePhotoUpdated(theHorsePhotoAfterSave.set('_rev', doc.rev)))
-              dispatch(needsRemotePersist('horses'))
+              dispatch(doSync({}, false))
             })
           case 'ride':
             const uploadedRideURI = ridePhotoURL(photoID)
@@ -545,7 +517,7 @@ export function uploadPhoto (type, photoLocation, photoID) {
             return PouchCouch.saveRide(ridePhoto.toJS()).then((doc) => {
               const theRidePhotoAfterSave = getState().getIn(['pouchRecords', 'ridePhotos', photoID])
               dispatch(ridePhotoUpdated(theRidePhotoAfterSave.set('_rev', doc.rev)))
-              dispatch(needsRemotePersist('rides'))
+              dispatch(doSync({}, false))
             })
           case 'user':
             const uploadedUserPhotoURI = profilePhotoURL(photoID)
@@ -554,7 +526,7 @@ export function uploadPhoto (type, photoLocation, photoID) {
             return PouchCouch.saveUser(userPhoto.toJS()).then((doc) => {
               const theUserPhotoAfterSave = getState().getIn(['pouchRecords', 'userPhotos', photoID])
               dispatch(userPhotoUpdated(theUserPhotoAfterSave.set('_rev', doc.rev)))
-              dispatch(needsRemotePersist('users'))
+              dispatch(doSync({}, false))
             })
           default:
             throw Error('cant persist type I don\'t know about')
@@ -570,42 +542,6 @@ export function uploadPhoto (type, photoLocation, photoID) {
         dispatch(updatePhotoStatus(photoID, 'failed'))
       })
     }
-  }
-}
-
-export function remotePersistComplete (db) {
-  cb('remotePersistComplete')
-  return (dispatch) => {
-    dispatch(setRemotePersistDB(db, DB_SYNCED))
-    dispatch(setFeedMessage(Map({
-      message: 'All Data Uploaded',
-      color: green,
-    })))
-    setTimeout(() => {
-      dispatch(clearFeedMessage())
-    }, 3000)
-  }
-}
-
-export function remotePersistError (db) {
-  cb('remotePersistError')
-  return (dispatch) => {
-    dispatch(setRemotePersistDB(db, DB_NEEDS_SYNC))
-    dispatch(setFeedMessage(Map({
-      message: 'Can\'t Upload Data',
-      color: danger,
-    })))
-  }
-}
-
-export function remotePersistStarted (db) {
-  cb('remotePersistStarted')
-  return (dispatch) => {
-    dispatch(setRemotePersistDB(db, DB_SYNCING))
-    dispatch(setFeedMessage(Map({
-      message: 'Data Uploading',
-      color: warning,
-    })))
   }
 }
 
@@ -683,7 +619,7 @@ export function showLocalNotification (message, background, rideID, scrollToComm
       }
     })
     dispatch(awaitFullSync())
-    dispatch(syncDBPull()).then(() => {
+    dispatch(doSync()).then(() => {
       const showingRideID = getState().getIn(['localState', 'showingRideID'])
       if (background || showingRideID !== rideID) {
         dispatch(setPopShowRide(rideID, false, scrollToComments))
@@ -772,38 +708,50 @@ export function startLocationTracking () {
   }
 }
 
-function startNetworkTracking () {
+let networkListenerRemover = null
+export function startNetworkTracking () {
   cb('startNetworkTracking')
   return (dispatch, getState) => {
-    NetInfo.getConnectionInfo().then((connectionInfo) => {
-      const gc = goodConnection(
-        connectionInfo.type,
-        connectionInfo.effectiveType
-      )
-      dispatch(newNetworkState(gc))
-    }).catch(catchAsyncError(dispatch))
-    NetInfo.addEventListener(
+    function currentlyUsingOnlyWifi () {
+      let useOnlyWifi = false
+      const currentUserID = getState().getIn(['localState', 'userID'])
+      if (currentUserID) {
+        const currentUser = getState().getIn(['pouchRecords', 'users', currentUserID])
+        useOnlyWifi = currentUser.get('onlyUseWifi')
+      }
+      return useOnlyWifi
+    }
+
+    if (networkListenerRemover) {
+      networkListenerRemover.remove()
+    }
+    networkListenerRemover = NetInfo.addEventListener(
       'connectionChange',
       (connectionInfo) => {
         const gc = goodConnection(
           connectionInfo.type,
-          connectionInfo.effectiveType
+          connectionInfo.effectiveType,
+          currentlyUsingOnlyWifi()
         )
         dispatch(newNetworkState(gc))
         if (gc) {
           dispatch(runPhotoQueue())
-          const needsPersist = getState().getIn(['localState', 'needsRemotePersist'])
-          const needsAnyPersist = needsPersist.valueSeq().filter(x => x === DB_NEEDS_SYNC ).count() > 0
-          if (needsAnyPersist) {
-            for (let db of needsPersist.keySeq()) {
-              if (needsPersist.get(db)) {
-                dispatch(doRemotePersist(db))
-              }
-            }
+          const needsPersist = getState().getIn(['localState', 'needsRemotePersist']) === DB_NEEDS_SYNC
+          if (needsPersist) {
+            dispatch(doSync())
           }
         }
       }
     )
+
+    return NetInfo.getConnectionInfo().then((connectionInfo) => {
+      const gc = goodConnection(
+        connectionInfo.type,
+        connectionInfo.effectiveType,
+        currentlyUsingOnlyWifi(),
+      )
+      dispatch(newNetworkState(gc))
+    }).catch(catchAsyncError(dispatch))
   }
 }
 
@@ -889,62 +837,88 @@ export function submitSignup (email, password) {
   }
 }
 
-export function syncDBPull (userID, followingIDs, followerIDs) {
-  cb('syncDBPull')
+export function doSync (syncData={}, showProgress=true) {
   return (dispatch, getState) => {
-    logInfo('action syncDBPull')
-    dispatch(setFeedMessage(Map({
-      message: 'Loading...',
-      color: warning,
-    })))
-
-    if (userID === undefined || !followingIDs === undefined || !followerIDs === undefined) {
-      const userID = getState().getIn(['localState', 'userID'])
-      const follows = getState().getIn(['pouchRecords', 'follows'])
-      followingIDs = follows.valueSeq().filter(
-        f => !f.get('deleted') && f.get('followerID') === userID
-      ).map(
-        f => f.get('followingID')
-      ).toJS()
-
-      followerIDs = follows.valueSeq().filter(
-        f => !f.get('deleted') && f.get('followingID') === userID
-      ).map(
-        f => f.get('followerID')
-      ).toJS()
+    function feedMessage(message, color, timeout) {
+      if (showProgress) {
+        dispatch(setFeedMessage(Map({
+          message,
+          color,
+        })))
+        if (timeout) {
+          setTimeout(() => {
+            dispatch(clearFeedMessage())
+          }, timeout)
+        }
+      }
     }
 
-    dispatch(setFullSyncFail(false))
-    return PouchCouch.localReplicateDB('all', userID, followingIDs, followerIDs).then(() => {
-      return PouchCouch.localLoad()
-    }).then(localData => {
-      dispatch(localDataLoaded(localData))
-      dispatch(syncComplete())
-      dispatch(setFeedMessage(Map({
-        message: 'Data Loaded',
-        color: green,
-        timeout: 3000
-      })))
-      setTimeout(() => {
-        dispatch(clearFeedMessage())
-      }, 3000)
-    }).catch((e) => {
-      logError(e)
-      if (e.status === 401) {
-        catchAsyncError(dispatch)(e)
+    if (getState().getIn(['localState', 'goodConnection'])) {
+      dispatch(runPhotoQueue())
+
+      const remotePersistStatus = getState().getIn(['localState', 'needsRemotePersist'])
+      if (remotePersistStatus === DB_SYNCING) {
+        // If a sync has already started, wait 5 seconds then run another one.
+        // This gives time for everything (photo uploads, mostly) to settle,
+        // then they can all go with one sync.
+        dispatch(setRemotePersist(DB_SYNCING_AND_ENQUEUED))
+        setTimeout(() => {
+          dispatch(doSync(syncData, showProgress))
+        }, 5000)
+        return Promise.resolve()
+      } else {
+        dispatch(setRemotePersist(DB_SYNCING))
       }
-      logError(e)
-      dispatch(setFeedMessage(Map({
-        message: 'Error Fetching Data',
-        color: warning,
-      })))
-      setTimeout(() => {
-        dispatch(clearFeedMessage())
-      }, 3000)
+
+      feedMessage('Starting Sync', warning, null)
+      return PouchCouch.remoteReplicateDBs().then(() => {
+        feedMessage('Data Uploaded', warning, null)
+
+        let userID = syncData.userID
+        let followingIDs = syncData.followingIDs
+        let followerIDs = syncData.followerIDs
+        if (!Object.keys(syncData).length) {
+          userID = getState().getIn(['localState', 'userID'])
+          const follows = getState().getIn(['pouchRecords', 'follows'])
+          followingIDs = follows.valueSeq().filter(
+            f => !f.get('deleted') && f.get('followerID') === userID
+          ).map(
+            f => f.get('followingID')
+          ).toJS()
+
+          followerIDs = follows.valueSeq().filter(
+            f => !f.get('deleted') && f.get('followingID') === userID
+          ).map(
+            f => f.get('followerID')
+          ).toJS()
+        }
+        dispatch(setFullSyncFail(false))
+        return PouchCouch.localReplicateDBs(userID, followingIDs, followerIDs)
+      }).then(() => {
+        feedMessage('Data Downloaded', warning, null)
+        return PouchCouch.localLoad()
+      }).then(localData => {
+        dispatch(localDataLoaded(localData))
+        dispatch(setRemotePersist(DB_SYNCED))
+        dispatch(syncComplete())
+        feedMessage('Sync Complete', green, 3000)
+      }).catch((e) => {
+        dispatch(setFullSyncFail(true))
+        dispatch(setRemotePersist(DB_NEEDS_SYNC))
+        feedMessage('Error Syncing Data', danger, 5000)
+        logError(e)
+        if (!(e instanceof NotConnectedError)) {
+          catchAsyncError(dispatch)(e)
+        }
+      })
+    } else {
       dispatch(setFullSyncFail(true))
-    })
+      feedMessage('No Internet Connection', warning, 10000)
+      return Promise.resolve()
+    }
   }
 }
+
 
 export function switchRoot (newRoot) {
   cb('switchRoot')
@@ -1023,7 +997,7 @@ export function toggleRideCarrot (rideID) {
       })
     }
     save.then(() => {
-      dispatch(needsRemotePersist('rides'))
+      dispatch(doSync())
     }).catch(catchAsyncError(dispatch))
   }
 }

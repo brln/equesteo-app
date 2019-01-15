@@ -111,10 +111,14 @@ export const appStates = {
   inactive: 'inactive'
 }
 
-export function goodConnection(type, effectiveType) {
-  return (type === connectionType.wifi || (
-    type === connectionType.cellular && (effectiveType === effectiveConnectionType.fourG)
-  ))
+export function goodConnection(type, effectiveType, useOnlyWifi) {
+  return (type === connectionType.wifi
+    || (
+      type === connectionType.cellular
+      && effectiveType === effectiveConnectionType.fourG
+      && !useOnlyWifi
+    )
+  )
 }
 
 export function getMonday (d) {
@@ -166,7 +170,6 @@ export function newRideName (currentRide) {
 export function logError (error) {
   console.log('*************** logError ****************')
   console.log(error)
-  console.log(error.stack)
   console.log('*****************************************')
 }
 

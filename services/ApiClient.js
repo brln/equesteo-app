@@ -102,7 +102,6 @@ export default class ApiClient {
         logError(e)
         logInfo(rawResp)
         throw new BadResponseError('Can\'t parse response.')
-
       } else if (e instanceof TypeError) {
         if (e.toString() === 'TypeError: Network request failed') {
           throw new NotConnectedError('Can\'t find the internet.')

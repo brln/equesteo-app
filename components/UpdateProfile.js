@@ -20,10 +20,11 @@ export default class UpdateProfile extends PureComponent {
   constructor (props) {
     super(props)
     this.inputs = {}
+    this.changeAboutMe = this.changeAboutMe.bind(this)
     this.changeDefaultPublic = this.changeDefaultPublic.bind(this)
     this.changeFirstName = this.changeFirstName.bind(this)
     this.changeLastName = this.changeLastName.bind(this)
-    this.changeAboutMe = this.changeAboutMe.bind(this)
+    this.changeOnlyUseWifi = this.changeOnlyUseWifi.bind(this)
     this.changeProfilePhotoID = this.changeProfilePhotoID.bind(this)
     this.deletePhoto = this.deletePhoto.bind(this)
     this.moveToLastName = this.moveToLastName.bind(this)
@@ -37,6 +38,11 @@ export default class UpdateProfile extends PureComponent {
 
   changeDefaultPublic () {
     this.props.changeAccountDetails(this.props.user.set('ridesDefaultPublic', !this.props.user.get('ridesDefaultPublic')))
+  }
+
+  changeOnlyUseWifi () {
+    this.props.changeAccountDetails(this.props.user.set('onlyUseWifi', !this.props.user.get('onlyUseWifi')))
+    this.props.restartNetworkListener()
   }
 
   moveToLastName () {
@@ -135,7 +141,7 @@ export default class UpdateProfile extends PureComponent {
                 </CardItem>
               </Card>
 
-               <Card>
+              <Card>
                 <CardItem header>
                   <Text style={{color: darkBrand }}>Privacy:</Text>
                 </CardItem>
@@ -149,6 +155,25 @@ export default class UpdateProfile extends PureComponent {
                     </View>
                     <View style={{flex: 6, justifyContent: 'center'}}>
                       <Text>Default my rides to publicly viewable.</Text>
+                    </View>
+                  </View>
+                </CardItem>
+              </Card>
+
+              <Card>
+                <CardItem header>
+                  <Text style={{color: darkBrand }}>Settings:</Text>
+                </CardItem>
+                <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
+                  <View style={{flex: 1, flexDirection: 'row'}}>
+                    <View style={{flex: 1}}>
+                      <CheckBox
+                        checked={this.props.user.get('onlyUseWifi')}
+                        onPress={this.changeOnlyUseWifi}
+                      />
+                    </View>
+                    <View style={{flex: 6, justifyContent: 'center'}}>
+                      <Text>Only use wifi (no cellular).</Text>
                     </View>
                   </View>
                 </CardItem>
