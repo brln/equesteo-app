@@ -33,7 +33,6 @@ export default class SpeedChart extends PureComponent {
               axisLabel: {padding: 40},
               grid: {stroke: (t) => speedGradient(t), opacity: 0.5},
             }}
-
           />
           <VictoryArea
             data={this.props.speedData}

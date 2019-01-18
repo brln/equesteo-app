@@ -280,7 +280,9 @@ export default class Ride extends PureComponent {
                     showHorseProfile={this.props.showHorseProfile}
                     userID={this.props.userID}
                   />
+                  <View style={{marginLeft: 50, marginRight: 50}}>
                   <Button text={"View Ride Charts"} color={brand} onPress={this.props.viewRideCharts}/>
+                  </View>
                 </View>
               </CardItem>
             </Card>

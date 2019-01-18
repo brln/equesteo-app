@@ -44,7 +44,7 @@ export default class FinalPage extends PureComponent {
             </View>
             <View>
               <Text style={{textAlign: 'center', fontSize: 20}}>info@equesteo.com</Text>
-              <View style={{paddingTop: 20}}>
+              <View style={{paddingTop: 20, marginRight: 40, marginLeft: 40}}>
                 <Button
                   color={brand}
                   text={"Got It"}

@@ -258,7 +258,7 @@ export function boundingBox (rideCoordinates) {
   const firstCoord = asJS[0]
 
   const initialVal = [[firstCoord[1], firstCoord[0]], [firstCoord[1], firstCoord[0]]]
-  const coordinates = asJS.reduce((accum, coord) => {
+  return asJS.reduce((accum, coord) => {
     if (coord[0] > accum[0][1]) {
       accum[0][1] = coord[0]
     }
@@ -273,7 +273,6 @@ export function boundingBox (rideCoordinates) {
     }
     return accum
   }, initialVal)
-  return coordinates
 }
 
 export function speedGradient (speed) {
@@ -380,4 +379,20 @@ export function coordSplice (rideCoords, trimValues) {
   cloned.splice(0, lengthFirstSplice)
   cloned.splice(trimValues[1] - lengthFirstSplice + 1, lengthSecondSplice)
   return cloned
+}
+
+export function addDays (date, days) {
+  let dat = new Date(date.valueOf())
+  dat.setDate(dat.getDate() + days);
+  return dat;
+}
+
+export function dateArray (startDate, stopDate) {
+  let dateArray = []
+  let currentDate = startDate;
+  while (currentDate <= stopDate) {
+    dateArray.push(currentDate)
+    currentDate = addDays(currentDate, 1);
+  }
+  return dateArray;
 }

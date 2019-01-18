@@ -112,25 +112,12 @@ export default class Week extends Component {
     super(props)
     this.days = this.days.bind(this)
     this.showRide = this.showRide.bind(this)
-    this.pickTypeDistance = this.pickTypeDistance.bind(this)
-    this.pickTypeTime = this.pickTypeTime.bind(this)
-    this.pickTypeGain = this.pickTypeGain.bind(this)
-    this.rideShouldShow = this.rideShouldShow.bind(this)
   }
 
   showRide (ride) {
     return () => {
       this.props.showRide(ride)
     }
-  }
-
-  rideShouldShow (ride, day) {
-    const happenedOnDay = moment(ride.get('startTime')).date() === day.date()
-    const riderShouldBeShowing = ride.get('userID') === this.props.chosenUserID
-      || this.props.chosenUserID === this.props.types.SHOW_ALL_RIDERS
-    const horseShouldBeShowing = ride.get('horseIDs').indexOf(this.props.chosenHorseID) >= 0
-      || this.props.chosenHorseID === this.props.types.SHOW_ALL_HORSES
-    return happenedOnDay && riderShouldBeShowing && horseShouldBeShowing
   }
 
   days (mondayString) {
@@ -143,7 +130,7 @@ export default class Week extends Component {
       const eachDay = moment(start).add(i, 'days')
       const daysRides = []
       for (let ride of this.props.rides) {
-        if (this.rideShouldShow(ride, eachDay)) {
+        if (this.props.rideShouldShow(ride, eachDay)) {
           daysRides.push(ride)
           totalDistance += ride.get('distance')
           totalTime += ride.get('elapsedTimeSecs')
@@ -192,18 +179,6 @@ export default class Week extends Component {
     }
   }
 
-  pickTypeDistance () {
-    this.props.pickType('typeDistance')
-  }
-
-  pickTypeTime () {
-    this.props.pickType('typeTime')
-  }
-
-  pickTypeGain () {
-    this.props.pickType('typeGain')
-  }
-
   render () {
     const weekData = this.days(this.props.mondayString)
     return (
@@ -217,18 +192,18 @@ export default class Week extends Component {
           {weekData.days}
         </View>
         <View style={{flex: 1, flexDirection: 'row'}}>
-          <TouchableOpacity style={{flex: 1}} onPress={this.pickTypeDistance}>
+          <View style={{flex: 1}}>
             <Text style={{textAlign: 'center', fontSize: 20}}>{ weekData.totalDistance.toFixed(1) } mi</Text>
             <Text style={{textAlign: 'center', fontSize: 10}}>DISTANCE</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={{flex: 1}} onPress={this.pickTypeTime}>
+          </View>
+          <View style={{flex: 1}}>
             {this.timeString(weekData.totalTime, {textAlign: 'center', fontSize: 20})}
             <Text style={{textAlign: 'center', fontSize: 10}}>TIME</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={{flex: 1}} onPress={this.pickTypeGain}>
+          </View>
+          <View style={{flex: 1}}>
             <Text style={{textAlign: 'center', fontSize: 20}}>{ Math.round(metersToFeet(weekData.totalGain)) } ft</Text>
             <Text style={{textAlign: 'center', fontSize: 10}}>GAIN</Text>
-          </TouchableOpacity>
+          </View>
         </View>
       </View>
     )

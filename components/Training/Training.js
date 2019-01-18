@@ -1,35 +1,14 @@
+import moment from 'moment'
+import { Container, Tab, Tabs } from 'native-base';
 import React, { PureComponent } from 'react'
-import RNPickerSelect from 'react-native-picker-select';
 import {
-  FlatList,
-  ScrollView,
-  Text,
   View,
 } from 'react-native'
 
-import Week from './Week'
-import { lightGrey } from '../../colors'
-import { getMonday } from '../../helpers'
-import { userName } from '../../modelHelpers/user'
-
-function DaysOfWeek () {
-  const asNums = {0: 'M', 1: 'T', 2: 'W', 3: 'R', 4: 'F', 5: 'Sa', 6: 'Su'}
-  const days = []
-  for (let i = 0; i < 7; i++) {
-    days.push(
-      <View key={i} style={{flex: 1, justifyContent: 'center'}}>
-        <Text style={{textAlign: 'center', fontSize: 15, color: "#C2C2C2"}}>{asNums[i]}</Text>
-      </View>
-    )
-  }
-  return (
-    <View style={{paddingTop: 20, borderBottomWidth: 1, borderBottomColor: '#C2C2C2'}}>
-      <View style={{flex: 1, flexDirection: 'row', marginBottom: 15}}>
-        {days}
-      </View>
-    </View>
-  )
-}
+import Calendar from './Calendar'
+import Charts from './Charts'
+import { brand, lightGrey } from '../../colors'
+import SettingsModal from './SettingsModal'
 
 export default class Training extends PureComponent {
   constructor (props) {
@@ -49,60 +28,10 @@ export default class Training extends PureComponent {
       chosenUserID: this.TYPES.SHOW_ALL_RIDERS,
     }
 
-    this._renderItem = this._renderItem.bind(this)
-    this.horsePicker = this.horsePicker.bind(this)
     this.pickHorse = this.pickHorse.bind(this)
     this.pickRider = this.pickRider.bind(this)
     this.pickType = this.pickType.bind(this)
-    this.userPicker = this.userPicker.bind(this)
-  }
-
-  ridesToWeeks (trainings) {
-    const rideWeeks = {}
-    for (let ride of trainings) {
-      let monday = getMonday(ride.get('startTime'))
-      if (!rideWeeks[monday]) {
-        rideWeeks[monday] = []
-      }
-      rideWeeks[monday].push(ride)
-    }
-
-    const addDays = (days, date) => {
-      let newDate = new Date(date);
-      newDate.setDate(date.getDate() + days);
-      return newDate;
-    }
-
-    const mondayDates = Object.keys(rideWeeks)
-    mondayDates.sort((a, b) => new Date(a) - new Date(b))
-    const start = new Date(mondayDates[0])
-    const finish = new Date(mondayDates[mondayDates.length - 1])
-    for (i = start; i < finish; i = addDays(7, i)) {
-      if (!rideWeeks[i]) {
-        rideWeeks[i] = []
-      }
-    }
-    return rideWeeks
-  }
-
-  _renderItem (rideWeeks) {
-    return ({item, index}) => {
-       return (
-         <Week
-           chosenHorseID={this.state.chosenHorseID}
-           chosenType={this.state.chosenType}
-           chosenUserID={this.state.chosenUserID}
-           index={index}
-           mondayString={item}
-           pickType={this.pickType}
-           rides={rideWeeks[item]}
-           rideHorses={this.props.rideHorses}
-           showRide={this.props.showRide}
-           types={this.TYPES}
-           userID={this.props.userID}
-         />
-      )
-    }
+    this.rideShouldShow = this.rideShouldShow.bind(this)
   }
 
   pickHorse (value) {
@@ -123,78 +52,76 @@ export default class Training extends PureComponent {
     })
   }
 
-  horsePicker () {
-    const items = this.props.horseUsers.valueSeq().reduce((a, h) => {
-      if (h.get('userID') === this.props.userID) {
-        const horse = this.props.horses.get(h.get('horseID'))
-        a.push({ label: horse.get('name'), value: horse.get('_id') })
-      }
-      return a
-    }, [])
-    items.push({ label: "Rides With No Horse", value: this.TYPES.NO_HORSE })
-    return (
-      <View style={{flex: 1, borderWidth: 1, borderColor: lightGrey}}>
-        <RNPickerSelect
-          value={this.state.chosenHorseID}
-          items={items}
-          onValueChange={this.pickHorse}
-          style={{inputIOS: {fontSize: 20, fontWeight: 'bold', textAlign: 'center', paddingTop: 10}, underline: { borderTopWidth: 0 }}}
-          placeholder={{
-            label: 'All Rides',
-            value: this.TYPES.SHOW_ALL_HORSES,
-          }}
-        />
-      </View>
-    )
-  }
-
-  userPicker () {
-    const items = [
-      {label: 'Only You', value: this.props.userID}
-    ]
-    const userItems = this.props.riders.valueSeq().reduce((a, r) => {
-      a.push({ label: userName(r), value: r.get('_id') })
-      return a
-    }, [])
-    const allItems = [...items, ...userItems]
-
-    return (
-      <View style={{flex: 1, borderWidth: 1, borderColor: lightGrey}}>
-        <RNPickerSelect
-          value={this.state.chosenUserID}
-          items={allItems}
-          onValueChange={this.pickRider}
-          style={{inputIOS: {fontSize: 20, fontWeight: 'bold', textAlign: 'center', paddingTop: 10}, underline: { borderTopWidth: 0 }}}
-          placeholder={{
-            label: 'All Riders',
-            value: this.TYPES.SHOW_ALL_RIDERS,
-          }}
-        />
-      </View>
-    )
+  rideShouldShow (ride, day) {
+    const happenedOnDay = moment(ride.get('startTime')).isSame(day, 'day')
+    const riderShouldBeShowing = ride.get('userID') === this.state.chosenUserID
+      || this.state.chosenUserID === this.TYPES.SHOW_ALL_RIDERS
+    const horseShouldBeShowing = ride.get('horseIDs').indexOf(this.state.chosenHorseID) >= 0
+      || this.state.chosenHorseID === this.TYPES.SHOW_ALL_HORSES
+    return happenedOnDay && riderShouldBeShowing && horseShouldBeShowing
   }
 
   render() {
-    const rideWeeks = this.ridesToWeeks(this.props.trainings)
-    const mondayDates = Object.keys(rideWeeks)
-    mondayDates.sort((a, b) => new Date(b) - new Date(a))
     return (
-      <View style={{flex: 1}}>
-        <View style={{flex: 1, flexDirection: 'row'}}>
-          { this.horsePicker() }
-          { this.userPicker() }
-        </View>
-        <View style={{flex: 10}}>
-          <DaysOfWeek />
-          <ScrollView>
-            <FlatList
-              data={mondayDates}
-              keyExtractor={(i) => i}
-              renderItem={this._renderItem(rideWeeks)}
+      <Container>
+        <SettingsModal
+          chosenHorseID={this.state.chosenHorseID}
+          chosenType={this.state.chosenType}
+          chosenUserID={this.state.chosenUserID}
+          closeModal={() => {this.props.settingsModalToggle(false)}}
+          horses={this.props.horses}
+          horseUsers={this.props.horseUsers}
+          modalOpen={this.props.settingsModalOpen}
+          pickHorse={this.pickHorse}
+          pickRider={this.pickRider}
+          pickType={this.pickType}
+          riders={this.props.riders}
+          types={this.TYPES}
+          userID={this.props.userID}
+        />
+        <Tabs
+          initialPage={0}
+          locked={true}
+          tabBarUnderlineStyle={{backgroundColor: 'white'}}
+        >
+          <Tab
+            tabStyle={{backgroundColor: brand}}
+            activeTabStyle={{backgroundColor: brand}}
+            heading="Calendar"
+            activeTextStyle={{color: 'white'}}
+          >
+            <View style={{flex: 1}}>
+              <Calendar
+                chosenHorseID={this.state.chosenHorseID}
+                chosenType={this.state.chosenType}
+                chosenUserID={this.state.chosenUserID}
+                rideHorses={this.props.rideHorses}
+                rideShouldShow={this.rideShouldShow}
+                showRide={this.props.showRide}
+                types={this.TYPES}
+                trainings={this.props.trainings}
+                userID={this.props.userID}
+              />
+            </View>
+          </Tab>
+          <Tab
+            tabStyle={{backgroundColor: brand}}
+            activeTabStyle={{backgroundColor: brand}}
+            activeTextStyle={{color: 'white'}}
+            heading="Charts"
+          >
+            <Charts
+              chosenHorseID={this.state.chosenHorseID}
+              chosenType={this.state.chosenType}
+              chosenUserID={this.state.chosenUserID}
+              horses={this.props.horses}
+              rideShouldShow={this.rideShouldShow}
+              trainings={this.props.trainings}
+              types={this.TYPES}
             />
-          </ScrollView>
-        </View>
-      </View>
+          </Tab>
+        </Tabs>
+      </Container>
     )
   }
 }

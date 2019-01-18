@@ -23,7 +23,12 @@ class TrainingContainer extends PureComponent {
         elevation: 0,
         backButton: {
           color: 'white'
-        }
+        },
+        rightButtons: [{
+          id: 'settings',
+          icon: require('../img/settings.png'),
+          color: 'white'
+        }],
       },
       layout: {
         orientation: ['portrait']
@@ -33,13 +38,33 @@ class TrainingContainer extends PureComponent {
 
   constructor (props) {
     super(props)
+    this.state = {
+      settingsModalOpen: false
+    }
     this.allRidersButYou = this.allRidersButYou.bind(this)
     this.allRidesOnYourHorses = this.allRidesOnYourHorses.bind(this)
     this.rideHorses = this.rideHorses.bind(this)
+    this.settingsModalToggle = this.settingsModalToggle.bind(this)
     this.showRide = this.showRide.bind(this)
     this.trainings = this.trainings.bind(this)
     this.yourHorses = this.yourHorses.bind(this)
+
+    Navigation.events().bindComponent(this)
+    this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
   }
+
+  navigationButtonPressed({ buttonId }) {
+    if (buttonId === 'settings') {
+      this.settingsModalToggle(true)
+    }
+  }
+
+  settingsModalToggle (open) {
+    this.setState({
+      settingsModalOpen: open
+    })
+  }
+
 
   showRide (ride) {
     if (this.props.rides.get(ride.get('rideID'))) {
@@ -123,6 +148,8 @@ class TrainingContainer extends PureComponent {
         rideHorses={this.rideHorses()}
         rides={this.allRidesOnYourHorses()}
         riders={this.allRidersButYou()}
+        settingsModalOpen={this.state.settingsModalOpen}
+        settingsModalToggle={this.settingsModalToggle}
         showRide={this.showRide}
         trainings={this.trainings()}
         user={this.props.user}
