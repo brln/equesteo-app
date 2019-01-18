@@ -221,7 +221,7 @@ export default class HorseProfile extends PureComponent {
               </View>
             </CardItem>
             <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20, flex: 1}}>
-              <View style={{flex: 1, paddingTop: 20}}>
+              <View style={{flex: 1}}>
                 <View style={{flex: 1, flexDirection: 'row', paddingBottom: 10}}>
                   <Stat
                     imgSrc={require('../../img/birthday.png')}

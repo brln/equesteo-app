@@ -82,7 +82,7 @@ export default class Thumbnail extends PureComponent {
             borderWidth: 2,
             width: this.props.width,
             height: this.props.height,
-
+            borderRadius: this.props.round ? this.props.height / 2 : 0
           }}
         >
           { this.image() }

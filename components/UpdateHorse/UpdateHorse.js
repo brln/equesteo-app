@@ -15,7 +15,9 @@ import {
 } from 'native-base';
 import RNPickerSelect from 'react-native-picker-select';
 
-import { darkBrand } from '../../colors'
+import Button from '../Button'
+import ColorModal from './ColorModal'
+import { brand, darkBrand } from '../../colors'
 import PhotoFab from './PhotoFab'
 import PhotosByTimestamp from '../PhotosByTimestamp'
 import PhotoMenu from '../PhotoMenu'
@@ -73,8 +75,6 @@ export default class UpdateHorse extends PureComponent {
     })
     this.props.clearPhotoMenu()
   }
-
-
 
   changeHorseBirthDay (birthDay) {
     this.changeHorseDetails({ birthDay })
@@ -267,6 +267,12 @@ export default class UpdateHorse extends PureComponent {
   render() {
     return (
       <View>
+        <ColorModal
+          initialColor={this.props.horse.get('color') || brand}
+          changeColor={this.props.changeColor}
+          modalOpen={this.props.colorModalOpen}
+          onClosed={this.props.onColorModalClosed}
+        />
         <ScrollView keyboardShouldPersistTaps={'always'}>
           <View style={styles.container}>
             <View style={{flex: 1, padding: 5}}>
@@ -323,6 +329,16 @@ export default class UpdateHorse extends PureComponent {
               </Card>
 
               <Card>
+                <CardItem header>
+                  <Text style={{color: darkBrand }}>Tack Color:</Text>
+                </CardItem>
+                <CardItem cardBody style={{marginLeft: 20, marginRight: 20}}>
+                  <TouchableOpacity
+                    style={{height: 40, width: '100%', backgroundColor: this.props.horse.get('color') || brand}}
+                    onPress={this.props.openColorModal(true)}
+                  />
+                </CardItem>
+
                 <CardItem header>
                   <Text style={{color: darkBrand }}>Height:</Text>
                 </CardItem>

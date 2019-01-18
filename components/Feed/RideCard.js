@@ -76,6 +76,7 @@ export default class RideCard extends PureComponent {
         height={width / 10}
         width={width / 10}
         round={true}
+        borderColor={this.props.horse.get('color') || null}
       />
     )
   }

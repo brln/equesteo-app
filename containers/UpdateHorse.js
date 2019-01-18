@@ -2,7 +2,9 @@ import memoizeOne from 'memoize-one';
 import React, { PureComponent } from 'react'
 import { BackHandler, Keyboard } from 'react-native'
 import { connect } from 'react-redux';
+import { fromHsv } from 'react-native-color-picker'
 import { Navigation } from 'react-native-navigation'
+
 
 import UpdateHorse from '../components/UpdateHorse/UpdateHorse'
 import {
@@ -60,13 +62,18 @@ class UpdateHorseContainer extends PureComponent {
       newPhotoIDs: [],
       deletedPhotoIDs: [],
       showPhotoMenu: false,
-      selectedPhotoID: null
+      selectedPhotoID: null,
+      colorModalOpen: false,
+      chosenColor: null,
     }
+    this.changeColor = this.changeColor.bind(this)
     this.clearPhotoMenu = this.clearPhotoMenu.bind(this)
     this.goBack = this.goBack.bind(this)
     this.horseUpdated = this.horseUpdated.bind(this)
     this.markPhotoDeleted = this.markPhotoDeleted.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
+    this.onColorModalClosed = this.onColorModalClosed.bind(this)
+    this.openColorModal = this.openColorModal.bind(this)
     this.openPhotoMenu = this.openPhotoMenu.bind(this)
     this.setDefaultHorse = this.setDefaultHorse.bind(this)
     this.stashPhoto = this.stashPhoto.bind(this)
@@ -92,6 +99,25 @@ class UpdateHorseContainer extends PureComponent {
       }
     }
     return nextState
+  }
+
+  openColorModal (colorModalOpen) {
+    return () => {
+      this.setState({ colorModalOpen })
+    }
+  }
+
+  onColorModalClosed () {
+    this.setState({ colorModalOpen: false})
+    logDebug(this.state.chosenColor, 'chosenColor')
+    this.horseUpdated(this.props.horse.merge({
+      color: fromHsv(this.state.chosenColor)
+    }))
+  }
+
+  changeColor (chosenColor) {
+    this.setState({ chosenColor })
+    console.log(chosenColor)
   }
 
   openPhotoMenu (profilePhotoID) {
@@ -235,8 +261,10 @@ class UpdateHorseContainer extends PureComponent {
     const horsePhotos = this.memoThisHorsesPhotos(this.props.horsePhotos, this.state.deletedPhotoIDs)
     return (
       <UpdateHorse
+        changeColor={this.changeColor}
         clearPhotoMenu={this.clearPhotoMenu}
         closeDeleteModal={this.closeDeleteModal}
+        colorModalOpen={this.state.colorModalOpen}
         deleteHorse={this.deleteHorse}
         horse={this.props.horse}
         horsePhotos={horsePhotos}
@@ -244,6 +272,8 @@ class UpdateHorseContainer extends PureComponent {
         horseUser={this.props.horseUser}
         markPhotoDeleted={this.markPhotoDeleted}
         newHorse={this.props.newHorse}
+        onColorModalClosed={this.onColorModalClosed}
+        openColorModal={this.openColorModal}
         openPhotoMenu={this.openPhotoMenu}
         setDefaultHorse={this.setDefaultHorse}
         showPhotoMenu={this.state.showPhotoMenu}

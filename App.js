@@ -18,6 +18,10 @@ import CurrentRideReducer from './reducers/CurrentRide'
 import LocalStateReducer from './reducers/LocalState'
 import PouchRecordsReducer from './reducers/PouchRecords'
 
+import { YellowBox } from 'react-native'
+// Remove when on > 0.56
+YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated'])
+
 const store = createStore(
   combineReducers({
     pouchRecords: PouchRecordsReducer,

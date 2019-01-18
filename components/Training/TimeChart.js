@@ -118,15 +118,14 @@ export default class TimeChart extends PureComponent {
 
   yMeta () {
     let yLabel
-    let chartLeftPadding = 50
-    let axisPadding = 30
+    let chartLeftPadding = 60
+    let axisPadding = 40
     switch(this.props.chosenType) {
       case this.props.types.DISTANCE:
         yLabel = 'Miles'
         break
       case this.props.types.TYPE_TIME:
         yLabel = 'Hours'
-        chartLeftPadding = 60
         axisPadding = 40
         break
       case this.props.types.TYPE_GAIN:
