@@ -1,6 +1,10 @@
 import moment from 'moment'
 import React, { PureComponent } from 'react'
-import { VictoryArea, VictoryBar, VictoryAxis, VictoryChart, VictoryLine } from "victory-native"
+import {
+  VictoryBar,
+  VictoryAxis,
+  VictoryChart,
+} from "victory-native"
 import {
   Dimensions,
   StyleSheet,
@@ -9,8 +13,9 @@ import {
 
 const { width } = Dimensions.get('window')
 
-import { brand, darkGrey, darkBrand, lightGrey } from '../../colors'
+import { darkGrey } from '../../colors'
 import { dateArray, addDays, metersToFeet } from '../../helpers'
+import { rideColor } from '../../modelHelpers/training'
 
 export default class TimeChart extends PureComponent {
   constructor (props) {
@@ -84,14 +89,7 @@ export default class TimeChart extends PureComponent {
             monthlyData[month] = []
           }
 
-          let horseColor = brand
-          if (ride.get('horseIDs').count() > 0) {
-            const firstHorseID = ride.getIn(['horseIDs', 0])
-            const firstHorse = this.props.horses.get(firstHorseID)
-            if (firstHorse && firstHorse.get('color')) {
-              horseColor = firstHorse.get('color')
-            }
-          }
+          const horseColor = rideColor(ride, this.props.horses)
 
           const dailyY0 = dailyData[day].reduce((a, d) => { return a + (d.y - d.y0) }, 0)
           dailyData[day].push({x: day, y: yVal + dailyY0, y0: dailyY0, fill: horseColor})
@@ -147,7 +145,8 @@ export default class TimeChart extends PureComponent {
     let tickFormat
     let tickCount
     let label
-    let barRatio
+    let barWidth
+    let tickSize = 3
     switch(this.props.showDays) {
       case 7:
         dataTimeframe = 'daily'
@@ -156,52 +155,78 @@ export default class TimeChart extends PureComponent {
           const date = moment(dateString, 'M-D-YYYY')
           return date.format('M/D')
         }
+        tickSize = 8
         tickCount = 6
         label = 'Day'
-        barRatio = 3
+        barWidth = (width - 80) / 8
         break
       case 30:
         dataTimeframe = 'daily'
         categories = this.days()
-        tickFormat = (dateString) => {
+        tickFormat = (dateString, x) => {
           const date = moment(dateString, 'M-D-YYYY')
-          return date.format('M/D')
+          if (x % 7 === 0) {
+            return date.format('M/D')
+          }
         }
-        tickCount = 7
+        tickSize = (_, x) => {
+          if (x % 7 === 0) {
+            return 8
+          }
+          return 4
+        }
+        tickCount = 30
         label = 'Day'
-        barRatio = 0.3
+        barWidth = (width - 80) / 32
         break
       case 90:
         dataTimeframe = 'weekly'
         categories = this.weeks()
-        tickFormat = (dateString) => {
+        tickFormat = (dateString, x) => {
           const date = moment(dateString, 'w-YYYY')
-          return date.format('M/D')
+          if (x % 3 === 0) {
+            return date.format('M/D')
+          }
         }
-        tickCount = 5
+        tickSize = (_, x) => {
+          if (x % 3 === 0) {
+            return 8
+          }
+          return 4
+        }
+        tickCount = 11
         label = 'Week'
-        barRatio = 3
+        barWidth = (width - 80) / 15
         break
       case 365:
         categories = this.months()
-        console.log(categories)
         dataTimeframe = 'monthly'
-        tickFormat = (dateString) => {
+        tickFormat = (dateString, x) => {
           const date = moment(dateString, 'MM-YYYY')
-          return date.format('M')
+          if (x % 3 === 0) {
+             return date.format('M')
+          }
+
+        }
+        tickSize = (_, x) => {
+          if (x % 3 === 0) {
+            return 8
+          }
+          return 4
         }
         tickCount = 11
         label = 'Month'
-        barRatio = 8
+        barWidth = (width - 80) / 13
         break
     }
     return {
+      barWidth,
       dataTimeframe,
       categories,
+      label,
       tickFormat,
       tickCount,
-      label,
-      barRatio,
+      tickSize,
     }
   }
 
@@ -218,7 +243,7 @@ export default class TimeChart extends PureComponent {
         >
           <VictoryBar
             alignment={'start'}
-            barRatio={xMetaData.barRatio}
+            barWidth={xMetaData.barWidth}
             categories={{x: xMetaData.categories}}
             style={{ data: { fill: x => x.fill, stroke: darkGrey }}}
             data={this.data()[xMetaData.dataTimeframe]}
@@ -226,7 +251,7 @@ export default class TimeChart extends PureComponent {
           <VictoryAxis
             label={xMetaData.label}
             tickFormat={xMetaData.tickFormat}
-            style={{ticks: {stroke: "grey", size: 5}, axisLabel: {padding: 40, fontSize: 12}}}
+            style={{ticks: {stroke: "grey", size: xMetaData.tickSize}, axisLabel: {padding: 40, fontSize: 12}}}
             tickCount={xMetaData.tickCount}
           />
           <VictoryAxis

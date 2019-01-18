@@ -52,7 +52,7 @@ export default class RideHorse extends PureComponent {
     return (
       <View style={{width: width / 2.3, padding: 10}}>
         <TouchableOpacity style={{flex: 1, flexDirection: 'row', alignItems: 'center'}} onPress={this.showHorseProfile}>
-          <View style={{flex: 1.2, paddingRight: 10}}>
+          <View style={{flex: 1.2, paddingRight: 20}}>
             <Thumbnail
               source={{uri: horseProfileURL}}
               emptySource={require('../../img/breed.png')}
@@ -60,6 +60,7 @@ export default class RideHorse extends PureComponent {
               height={width / 8}
               width={width / 8}
               round={true}
+              borderColor={this.props.horse.get('color') || null}
             />
           </View>
           <View style={{flex: 3}}>

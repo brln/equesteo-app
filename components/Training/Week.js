@@ -1,9 +1,5 @@
 import moment from 'moment'
 import React, { Component } from 'react'
-
-import { lightGrey } from '../../colors'
-import { formattedWeekString, metersToFeet } from "../../helpers"
-
 import {
   StyleSheet,
   Text,
@@ -11,14 +7,22 @@ import {
   View,
 } from 'react-native';
 
+import { darkGrey, lightGrey } from '../../colors'
+import { formattedWeekString, metersToFeet } from "../../helpers"
+import { rideColor } from '../../modelHelpers/training'
+
 function RideDay (props) {
+  const horseColor =  rideColor(props.ride, props.horses, null)
   let showString
   if (props.chosenType === props.types.DISTANCE) {
     showString = (
-      <Text style={{
-        textAlign: 'center',
-        fontSize: 25,
-        fontWeight: 'bold'}}
+      <Text
+        style={{
+          textAlign: 'center',
+          fontSize: 25,
+          fontWeight: 'bold',
+          color: horseColor
+        }}
       >
         {props.ride.get('distance').toFixed(1)}
       </Text>
@@ -55,13 +59,17 @@ function MultiRideDay (props) {
     <View style={{flex: 1, justifyContent: 'center'}}>
       {
         props.rides.map((r) => {
+          const horseColor =  rideColor(r, props.horses, null)
           let showString
           if (props.chosenType === props.types.DISTANCE) {
             showString = (
-              <Text style={{
-                textAlign: 'center',
-                fontSize: 25,
-                fontWeight: 'bold'}}
+              <Text
+                style={{
+                  textAlign: 'center',
+                  fontSize: 25,
+                  fontWeight: 'bold',
+                  color: horseColor
+                }}
               >
                 {r.get('distance').toFixed(1)}
               </Text>
@@ -143,6 +151,7 @@ export default class Week extends Component {
       } else if (daysRides.length === 1) {
         days.push(
           <RideDay
+            horses={this.props.horses}
             key={i}
             ride={daysRides[0]}
             showRide={this.showRide}
@@ -154,6 +163,7 @@ export default class Week extends Component {
       } else if (daysRides.length > 1) {
         days.push(
           <MultiRideDay
+            horses={this.props.horses}
             key={i}
             rides={daysRides}
             showRide={this.showRide}

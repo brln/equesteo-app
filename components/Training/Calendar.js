@@ -68,6 +68,7 @@ export default class Calendar extends PureComponent {
           chosenHorseID={this.props.chosenHorseID}
           chosenType={this.props.chosenType}
           chosenUserID={this.props.chosenUserID}
+          horses={this.props.horses}
           index={index}
           mondayString={item}
           pickType={this.pickType}

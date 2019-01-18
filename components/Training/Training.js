@@ -95,6 +95,7 @@ export default class Training extends PureComponent {
                 chosenHorseID={this.state.chosenHorseID}
                 chosenType={this.state.chosenType}
                 chosenUserID={this.state.chosenUserID}
+                horses={this.props.horses}
                 rideHorses={this.props.rideHorses}
                 rideShouldShow={this.rideShouldShow}
                 showRide={this.props.showRide}

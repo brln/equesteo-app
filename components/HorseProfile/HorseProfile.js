@@ -141,7 +141,11 @@ export default class HorseProfile extends PureComponent {
   renderImageSwiper () {
     return (
       <View>
-        <View style={{height: ((height / 2) - 20)}}>
+        <View style={{
+          height: ((height / 2) - 20),
+          borderBottomColor: this.props.horse.get('color') || null,
+          borderBottomWidth: this.props.horse.get('color') ? 3 : null
+        }}>
           {this.renderProfileImage()}
           <Fab
             direction="up"
