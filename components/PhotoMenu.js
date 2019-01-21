@@ -16,7 +16,7 @@ export default class PhotoMenu extends PureComponent {
   render() {
     if (this.props.visible) {
       return (
-        <TouchableWithoutFeedback style={{width: '100%', height: '100%'}}>
+        <TouchableWithoutFeedback style={{width: '100%', height: '100%'}} onPress={this.props.clearPhotoMenu}>
           <View style={styles.modalBackground}>
             <View style={{position: 'absolute', bottom: 0, height: 150, width, backgroundColor: 'white', elevation: 20}}>
               <View style={{flex: 1}}>

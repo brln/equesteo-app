@@ -1,6 +1,6 @@
-import memoizeOne from 'memoize-one';
+import memoizeOne from 'memoize-one'
 import React, { PureComponent } from 'react'
-import { connect } from 'react-redux';
+import { connect } from 'react-redux'
 import { Navigation } from 'react-native-navigation'
 import { BackHandler, Keyboard } from 'react-native'
 

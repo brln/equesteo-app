@@ -73,7 +73,6 @@ export default class Calendar extends PureComponent {
           mondayString={item}
           pickType={this.pickType}
           rides={rideWeeks[item]}
-          rideHorses={this.props.rideHorses}
           rideShouldShow={this.props.rideShouldShow}
           showRide={this.props.showRide}
           types={this.props.types}

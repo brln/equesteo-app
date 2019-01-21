@@ -15,7 +15,6 @@ import {
 } from 'native-base';
 import RNPickerSelect from 'react-native-picker-select';
 
-import Button from '../Button'
 import ColorModal from './ColorModal'
 import { brand, darkBrand } from '../../colors'
 import PhotoFab from './PhotoFab'

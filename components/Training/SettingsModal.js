@@ -103,7 +103,7 @@ export default class SettingsModal extends PureComponent {
         isOpen={this.props.modalOpen}
         onClosed={this.props.closeModal}
       >
-        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', paddingLeft: 20, paddingRight: 20}}>
+        <View style={{flex: 1, alignItems: 'center', justifyContent: 'flex-start', paddingTop: 30, paddingLeft: 20, paddingRight: 20}}>
           <View style={{height: height * 0.45, width: width * 0.75}}>
             <View>
               <Text style={{color: darkBrand }}>Show Horse:</Text>
@@ -139,8 +139,8 @@ const styles = StyleSheet.create({
   modal: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: height * 0.1,
-    height: height * 0.5,
+    marginTop: height * 0.15,
+    height: height * 0.70,
     width: width * .8,
   },
 });

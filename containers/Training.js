@@ -1,4 +1,5 @@
 import { List, Map } from 'immutable'
+import memoizeOne from 'memoize-one'
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
 import { Navigation } from 'react-native-navigation'
@@ -41,13 +42,12 @@ class TrainingContainer extends PureComponent {
     this.state = {
       settingsModalOpen: false
     }
-    this.allRidersButYou = this.allRidersButYou.bind(this)
-    this.allRidesOnYourHorses = this.allRidesOnYourHorses.bind(this)
+
     this.rideHorses = this.rideHorses.bind(this)
     this.settingsModalToggle = this.settingsModalToggle.bind(this)
     this.showRide = this.showRide.bind(this)
-    this.trainings = this.trainings.bind(this)
-    this.yourHorses = this.yourHorses.bind(this)
+    this.memoTrainings = memoizeOne(this.trainings.bind(this))
+    this.memoAllRidersButYou = memoizeOne(this.allRidersButYou.bind(this))
 
     Navigation.events().bindComponent(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
@@ -79,48 +79,13 @@ class TrainingContainer extends PureComponent {
     }
   }
 
-  yourHorses () {
-    return this.props.horseUsers.valueSeq().filter((hu) => {
-      return (hu.get('userID') === this.props.userID)
-    }).map((hu) => {
-      return this.props.horses.get(hu.get('horseID'))
-    })
-  }
-
-  allRidesOnYourHorses () {
-    const yourHorseIDs = this.yourHorses().valueSeq().map(h => h.get('_id'))
-    const horseIDsByRideID = this.props.rideHorses.reduce((accum, rh) => {
-      if (!accum.get(rh.get('rideID'))) {
-        accum = accum.set(rh.get('rideID'), List())
-      }
-      const horseIDs = accum.get(rh.get('rideID')).push(rh.get('horseID'))
-      return accum.set(rh.get('rideID'), horseIDs)
-    }, Map())
-    return this.props.rides.valueSeq().filter((ride) => {
-      const thisRidesHorseIDs = horseIDsByRideID.get(ride.get('_id'))
-      let includesHorse = yourHorseIDs.indexOf(ride.get('horseID')) >= 0 // so we show old rides with horseID
-      if (thisRidesHorseIDs && thisRidesHorseIDs.count() > 0) {
-        thisRidesHorseIDs.map(horseID => {
-          if (yourHorseIDs.indexOf(horseID) >= 0) {
-            includesHorse = true
-          }
-        })
-      }
-      return (
-        includesHorse
-          || (ride.get('userID') === this.props.userID && !ride.get('horseID'))
-        ) && ride.get('deleted') !== true
-    })
-  }
-
-  allRidersButYou () {
-    const ridesOnYourHorses = this.allRidesOnYourHorses()
+  allRidersButYou (trainings, users, userID) {
     let peopleWhoRideYourHorses = Map()
-    ridesOnYourHorses.forEach(ride => {
-      if (ride.get('userID') !== this.props.userID) {
+    this.trainings(trainings, userID).forEach(ride => {
+      if (ride.get('userID') !== userID) {
         peopleWhoRideYourHorses = peopleWhoRideYourHorses.set(
           ride.get('userID'),
-          this.props.users.get(ride.get('userID'))
+          users.get(ride.get('userID'))
         )
       }
     })
@@ -133,8 +98,8 @@ class TrainingContainer extends PureComponent {
     })
   }
 
-  trainings () {
-    return this.props.trainings.getIn([`${this.props.userID}_training`, 'rides']).filter(t => {
+  trainings (trainings, userID) {
+    return trainings.getIn([`${userID}_training`, 'rides']).filter(t => {
       return t.get('deleted') !== true
     })
   }
@@ -145,13 +110,11 @@ class TrainingContainer extends PureComponent {
       <Training
         horses={this.props.horses}
         horseUsers={this.props.horseUsers}
-        rideHorses={this.rideHorses()}
-        rides={this.allRidesOnYourHorses()}
-        riders={this.allRidersButYou()}
+        riders={this.memoAllRidersButYou(this.props.trainings, this.props.users, this.props.userID)}
         settingsModalOpen={this.state.settingsModalOpen}
         settingsModalToggle={this.settingsModalToggle}
         showRide={this.showRide}
-        trainings={this.trainings()}
+        trainings={this.memoTrainings(this.props.trainings, this.props.userID)}
         user={this.props.user}
         userID={this.props.userID}
       />

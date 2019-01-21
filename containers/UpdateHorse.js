@@ -103,16 +103,19 @@ class UpdateHorseContainer extends PureComponent {
 
   openColorModal (colorModalOpen) {
     return () => {
+      this.removeMenuItems()
       this.setState({ colorModalOpen })
     }
   }
 
   onColorModalClosed () {
+    this.replaceMenuItems()
     this.setState({ colorModalOpen: false})
-    logDebug(this.state.chosenColor, 'chosenColor')
-    this.horseUpdated(this.props.horse.merge({
-      color: fromHsv(this.state.chosenColor)
-    }))
+    if (this.state.chosenColor) {
+      this.horseUpdated(this.props.horse.merge({
+        color: fromHsv(this.state.chosenColor)
+      }))
+    }
   }
 
   changeColor (chosenColor) {
@@ -125,6 +128,10 @@ class UpdateHorseContainer extends PureComponent {
       showPhotoMenu: true,
       selectedPhotoID: profilePhotoID
     })
+    this.removeMenuItems()
+  }
+
+  removeMenuItems () {
     Navigation.mergeOptions(this.props.componentId, {
       topBar: {
         rightButtons: [],
@@ -133,11 +140,7 @@ class UpdateHorseContainer extends PureComponent {
     })
   }
 
-  clearPhotoMenu () {
-    this.setState({
-      showPhotoMenu: false,
-      selectedPhotoID: null
-    })
+  replaceMenuItems () {
     Navigation.mergeOptions(this.props.componentId, {
       topBar: {
         leftButtons: [
@@ -156,6 +159,14 @@ class UpdateHorseContainer extends PureComponent {
         ]
       }
     })
+  }
+
+  clearPhotoMenu () {
+    this.setState({
+      showPhotoMenu: false,
+      selectedPhotoID: null
+    })
+    this.replaceMenuItems()
   }
 
   navigationButtonPressed ({ buttonId }) {
