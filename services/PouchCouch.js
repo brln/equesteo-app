@@ -137,21 +137,43 @@ export default class PouchCouch {
   static localReplicateUsers (options, ownUserID, userIDs) {
     return new Promise((resolve, reject) => {
       const remoteUsersDB = new PouchDB(`${API_URL}/couchproxy/${usersDBName}`, options)
-      PouchDB.replicate(
-        remoteUsersDB,
-        localUsersDB,
-        {
-          live: false,
-          query_params: {
-            ownUserID,
-            userIDs: userIDs
+      remoteUsersDB.query('users/relevantFollows', {key: ownUserID}).then((resp) => {
+        logDebug(resp, 'resp')
+        const fetchIDs = resp.rows.reduce((fetchIDs, row) => {
+          if (fetchIDs.indexOf(row.value[0]) < 0) {
+            fetchIDs.push(row.value[0])
           }
-        }
-      ).on('complete', () => {
+          return fetchIDs
+        }, [])
+        logDebug(fetchIDs, 'round 1')
+        return remoteUsersDB.query('users/relevantFollows', {keys: fetchIDs})
+      }).then(resp2 => {
+        const fetchIDs = resp2.rows.reduce((fetchIDs, row) => {
+          if (fetchIDs.indexOf(row.value[0]) < 0) {
+            fetchIDs.push(row.value[0])
+          }
+          return fetchIDs
+        }, [])
+        logDebug(fetchIDs, 'round 2')
+        return PouchDB.replicate(
+          remoteUsersDB,
+          localUsersDB,
+          {
+            live: false,
+            filter: 'users/byUserIDs',
+            query_params: {
+              ownUserID,
+              userIDs: fetchIDs
+            }
+          }
+        ).on('complete', () => {
           resolve()
-      }).on('error', (e) => {
-        reject(new Error('localReplicateUsers error'))
-      });
+        }).on('change', (x) => {
+          // logDebug(x, 'change')
+        }).on('error', (e) => {
+          reject(new Error('localReplicateUsers error'))
+        })
+      })
     })
   }
 

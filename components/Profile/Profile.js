@@ -21,6 +21,7 @@ import {
 
 import BuildImage from '../Images/BuildImage'
 import { brand, danger, darkBrand, darkGrey, green, lightGrey } from '../../colors'
+import FollowersCard from './FollowersCard'
 import DeleteModal from '../Shared/DeleteModal'
 import { logRender, logError, logInfo } from '../../helpers'
 import { userName } from '../../modelHelpers/user'
@@ -45,6 +46,7 @@ export default class Profile extends PureComponent {
     this.maybeShowID = this.maybeShowID.bind(this)
     this.photoSources = this.photoSources.bind(this)
     this.renderHorse = this.renderHorse.bind(this)
+    this.showUserList = this.showUserList.bind(this)
     this.uploadProfile = this.uploadProfile.bind(this)
   }
 
@@ -283,29 +285,12 @@ export default class Profile extends PureComponent {
         />
         {this.renderImageSwiper()}
         <View style={{flex: 1}}>
-          <Card>
-            <CardItem>
-              <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
-                <View style={{flex: 1}} />
-                  <TouchableOpacity
-                    onPress={this.showUserList(this.props.followers, 'followerID')}
-                    style={{flex: 2, paddingLeft: 5, flexDirection: 'row', alignItems: 'center'}}
-                  >
-                    <Text style={{color: darkBrand, paddingRight: 10}}>Followers:</Text>
-                    <Text style={{fontSize: 24}}>{this.props.followers.count()}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={this.showUserList(this.props.followings, 'followingID')}
-                    style={{flex: 2, paddingLeft: 5, flexDirection: 'row', alignItems: 'center'}}
-                  >
-                    <Text style={{color: darkBrand, paddingRight: 10}}>Following:</Text>
-                    <Text style={{fontSize: 24}}>{this.props.followings.count()}</Text>
-                  </TouchableOpacity>
-                <View style={{flex: 1}} />
-              </View>
-            </CardItem>
-          </Card>
-
+          <FollowersCard
+            followers={this.props.followers}
+            followings={this.props.followings}
+            showUserList={this.showUserList}
+            visible={this.props.oneDegreeUser}
+          />
           <Card>
             <CardItem header style={{padding: 5}}>
               <View style={{paddingLeft: 5}}>

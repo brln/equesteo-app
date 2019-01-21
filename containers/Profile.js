@@ -60,6 +60,7 @@ class ProfileContainer extends BackgroundComponent {
     this.followings = this.followings.bind(this)
     this.followers = this.followers.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
+    this.oneDegreeUser = this.oneDegreeUser.bind(this)
     this.profileUserHorses = this.profileUserHorses.bind(this)
     this.setLogoutModalOpen = this.setLogoutModalOpen.bind(this)
     this.showAboutPage = this.showAboutPage.bind(this)
@@ -201,15 +202,35 @@ class ProfileContainer extends BackgroundComponent {
   }
 
   followings () {
-    return this.props.follows.filter(
-      f => !f.get('deleted') && f.get('followerID') === this.props.profileUser.get('_id')
+    return this.props.follows.filter(f =>
+      !f.get('deleted') && f.get('followerID') === this.props.profileUser.get('_id')
     )
   }
 
   followers () {
-    return this.props.follows.filter(
-      f => !f.get('deleted') && f.get('followingID') === this.props.profileUser.get('_id')
+    return this.props.follows.filter(f =>
+      !f.get('deleted') && f.get('followingID') === this.props.profileUser.get('_id')
     )
+  }
+
+  oneDegreeUser () {
+    if (this.props.profileUser.get('_id') === this.props.userID) {
+      return true
+    }
+
+    let oneDegree = false
+    this.props.follows.forEach((follow) => {
+      if (!follow.get('deleted')) {
+        const followerID = follow.get('followerID')
+        const followingID = follow.get('followingID')
+        if (followerID === this.props.userID && followingID === this.props.profileUser.get('_id')) {
+          oneDegree = true
+        } else if (followingID === this.props.userID && followerID === this.props.profileUser.get('_id'))  {
+          oneDegree = true
+        }
+      }
+    })
+    return oneDegree
   }
 
   horseOwnerIDs () {
@@ -240,6 +261,7 @@ class ProfileContainer extends BackgroundComponent {
           horseOwnerIDs={this.horseOwnerIDs()}
           horsePhotos={this.props.horsePhotos}
           logoutModalOpen={this.state.logoutModalOpen}
+          oneDegreeUser={this.oneDegreeUser()}
           profileUser={this.props.profileUser}
           setLogoutModalOpen={this.setLogoutModalOpen}
           showAboutPage={this.showAboutPage}
