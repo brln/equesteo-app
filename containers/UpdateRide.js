@@ -48,9 +48,6 @@ class UpdateRideContainer extends BackgroundComponent {
           color: brand,
         },
         elevation: 0,
-        backButton: {
-          color: 'white'
-        },
       },
       layout: {
         orientation: ['portrait']
@@ -178,6 +175,7 @@ class UpdateRideContainer extends BackgroundComponent {
         this.setDiscardModalOpen(true)
       } else if (buttonId === 'back') {
         Navigation.pop(this.props.componentId).then(() => {
+          this.props.dispatch(deleteUnpersistedRide(this.props.ride.get('_id')))
           this.props.dispatch(stopStashNewLocations())
           this.props.dispatch(mergeStashedLocations())
         })
