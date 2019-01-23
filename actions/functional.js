@@ -145,11 +145,9 @@ export function appInitialized () {
           dispatch(setDistributionOnServer())
           return dispatch(startNetworkTracking())
         }).then(() => {
-          return dispatch(doSync())
-        }).then(() => {
           dispatch(switchRoot(FEED))
+          return dispatch(doSync())
         })
-
       } else {
         dispatch(switchRoot(SIGNUP_LOGIN))
       }
@@ -717,7 +715,9 @@ export function startNetworkTracking () {
       const currentUserID = getState().getIn(['localState', 'userID'])
       if (currentUserID) {
         const currentUser = getState().getIn(['pouchRecords', 'users', currentUserID])
-        useOnlyWifi = currentUser.get('onlyUseWifi')
+        if (currentUser) {
+          useOnlyWifi = currentUser.get('onlyUseWifi')
+        }
       }
       return useOnlyWifi
     }

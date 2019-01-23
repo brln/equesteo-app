@@ -20,7 +20,7 @@ import BuildImage from '../Images/BuildImage'
 import { brand, darkGrey } from '../../colors'
 import { logError } from '../../helpers'
 import { userName } from '../../modelHelpers/user'
-import RideImage from './RideImage'
+import RideMapImage from './RideMapImage'
 import MedImage from '../Images/MedImage'
 import Thumbnail from '../Images/Thumbnail'
 
@@ -143,7 +143,7 @@ export default class RideCard extends PureComponent {
     const swiperHeight = width * (2/3)
     const mapImage = (
       <TouchableOpacity onPress={() => {this.showRide(false)}} style={{flex: 1}} key="map">
-        <RideImage
+        <RideMapImage
           uri={this.props.ride.get('mapURL')}
           style={{height: swiperHeight, width: null, flex: 1}}
         />

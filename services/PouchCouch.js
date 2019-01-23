@@ -119,6 +119,7 @@ export default class PouchCouch {
         remoteRidesDB,
         localRidesDB,
         {
+          batch_size: 500,
           live: false,
           filter: 'rides/byUserIDs',
           query_params: {
@@ -159,8 +160,9 @@ export default class PouchCouch {
           remoteUsersDB,
           localUsersDB,
           {
+            batch_size: 500,
             live: false,
-            filter: 'users/byUserIDs',
+            filter: 'users/byUserIDs2',
             query_params: {
               ownUserID,
               userIDs: fetchIDs
@@ -199,6 +201,7 @@ export default class PouchCouch {
           remoteHorsesDB,
           localHorsesDB,
           {
+            batch_size: 500,
             live: false,
             doc_ids: fetchIDs,
             filter: 'users/byUserIDs',
