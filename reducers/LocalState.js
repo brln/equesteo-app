@@ -6,6 +6,7 @@ import { DB_NEEDS_SYNC, DB_SYNCING, DB_SYNCED } from "../actions/functional"
 
 import {
   AWAIT_FULL_SYNC,
+  CARROT_MUTEX,
   CLEAR_FEED_MESSAGE,
   CLEAR_RIDE_PHOTO_FROM_STASH,
   CLEAR_RIDE_PHOTO_STASH,
@@ -44,6 +45,7 @@ export const initialState = Map({
   appState: appStates.active,
   awaitingPWChange: false,
   awaitingFullSync: false,
+  carrotMutex: false,
   currentScreen: FEED,
   doingInitialLoad: false,
   error: null,
@@ -69,6 +71,8 @@ export default function LocalStateReducer(state=initialState, action) {
   switch (action.type) {
     case AWAIT_FULL_SYNC:
       return state.set('awaitingFullSync', true)
+    case CARROT_MUTEX:
+      return state.set('carrotMutex', action.value)
     case CLEAR_FEED_MESSAGE:
       return state.set('feedMessage', null)
     case CLEAR_RIDE_PHOTO_FROM_STASH:
@@ -99,6 +103,8 @@ export default function LocalStateReducer(state=initialState, action) {
     case LOAD_LOCAL_STATE:
       const loadedState = action.localState
       return loadedState.set(
+        'carrotMutex', false,
+      ).set(
         'feedMessage', null
       ).set(
         'doingInitialLoad', false

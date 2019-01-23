@@ -1,5 +1,6 @@
 import {
   AWAIT_FULL_SYNC,
+  CARROT_MUTEX,
   CLEAR_FEED_MESSAGE,
   CLEAR_LAST_LOCATION,
   CLEAR_PAUSED_LOCATIONS,
@@ -76,6 +77,13 @@ import {
 export function awaitFullSync () {
   return {
     type: AWAIT_FULL_SYNC
+  }
+}
+
+export function carrotMutex (value) {
+  return {
+    type: CARROT_MUTEX,
+    value,
   }
 }
 

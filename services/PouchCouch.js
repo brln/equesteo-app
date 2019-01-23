@@ -67,7 +67,6 @@ export default class PouchCouch {
               res(resp)
             }).on('error', (e) => {
               if (e.status === 0) {
-                logDebug('status 0 error')
                 rej(new NotConnectedError('Cannot find the database'))
               } else {
                 rej(new Error(JSON.stringify(e)))
@@ -139,14 +138,12 @@ export default class PouchCouch {
     return new Promise((resolve, reject) => {
       const remoteUsersDB = new PouchDB(`${API_URL}/couchproxy/${usersDBName}`, options)
       remoteUsersDB.query('users/relevantFollows', {key: ownUserID}).then((resp) => {
-        logDebug(resp, 'resp')
         const fetchIDs = resp.rows.reduce((fetchIDs, row) => {
           if (fetchIDs.indexOf(row.value[0]) < 0) {
             fetchIDs.push(row.value[0])
           }
           return fetchIDs
         }, [])
-        logDebug(fetchIDs, 'round 1')
         return remoteUsersDB.query('users/relevantFollows', {keys: fetchIDs})
       }).then(resp2 => {
         const fetchIDs = resp2.rows.reduce((fetchIDs, row) => {
@@ -155,7 +152,6 @@ export default class PouchCouch {
           }
           return fetchIDs
         }, [])
-        logDebug(fetchIDs, 'round 2')
         return PouchDB.replicate(
           remoteUsersDB,
           localUsersDB,

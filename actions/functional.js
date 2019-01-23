@@ -41,6 +41,7 @@ export const DB_SYNCED = 'DB_SYNCED'
 
 import {
   awaitFullSync,
+  carrotMutex,
   clearLastLocation,
   clearFeedMessage,
   clearState,
@@ -967,37 +968,43 @@ export function switchRoot (newRoot) {
 export function toggleRideCarrot (rideID) {
   cb('toggleRideCarrot')
   return (dispatch, getState) => {
-    const currentUserID = getState().getIn(['localState', 'userID'])
-    let existing = getState().getIn(['pouchRecords', 'rideCarrots']).valueSeq().filter((c) => {
-      return c.get('rideID') === rideID && c.get('userID') === currentUserID
-    })
-    existing = existing.count() > 0 ? existing.get(0) : null
+    const mutexSet = getState().getIn(['localState', 'carrotMutex'])
+    if (!mutexSet) {
+      dispatch(carrotMutex(true))
+      const currentUserID = getState().getIn(['localState', 'userID'])
+      let existing = getState().getIn(['pouchRecords', 'rideCarrots']).valueSeq().filter((c) => {
+        return c.get('rideID') === rideID && c.get('userID') === currentUserID
+      })
+      existing = existing.count() > 0 ? existing.get(0) : null
 
-    let save
-    if (existing) {
-      let toggled = existing.set('deleted', !existing.get('deleted'))
-      dispatch(rideCarrotSaved(toggled))
-      save = PouchCouch.saveRide(toggled.toJS()).then((doc) => {
-        let afterSave = getState().getIn(['pouchRecords', 'rideCarrots', toggled.get('_id')])
-        dispatch(rideCarrotSaved(afterSave.set('_rev', doc.rev)))
-      })
-    } else {
-      const carrotID = `${currentUserID}_${(new Date).getTime().toString()}`
-      const newCarrot = Map({
-        _id: carrotID,
-        rideID,
-        userID: currentUserID,
-        deleted: false,
-        type: 'carrot'
-      })
-      dispatch(rideCarrotCreated(newCarrot))
-      save = PouchCouch.saveRide(newCarrot.toJS()).then(doc => {
-        let afterSave = getState().getIn(['pouchRecords', 'rideCarrots', carrotID])
-        dispatch(rideCarrotSaved(afterSave.set('_rev', doc.rev)))
-      })
+      let save
+      if (existing) {
+        let toggled = existing.set('deleted', !existing.get('deleted'))
+        dispatch(rideCarrotSaved(toggled))
+        save = PouchCouch.saveRide(toggled.toJS()).then((doc) => {
+          let afterSave = getState().getIn(['pouchRecords', 'rideCarrots', toggled.get('_id')])
+          let withRev = afterSave.set('_rev', doc.rev)
+          dispatch(rideCarrotSaved(withRev))
+        })
+      } else {
+        const carrotID = `${currentUserID}_${(new Date).getTime().toString()}`
+        const newCarrot = Map({
+          _id: carrotID,
+          rideID,
+          userID: currentUserID,
+          deleted: false,
+          type: 'carrot'
+        })
+        dispatch(rideCarrotCreated(newCarrot))
+        save = PouchCouch.saveRide(newCarrot.toJS()).then(doc => {
+          let afterSave = getState().getIn(['pouchRecords', 'rideCarrots', carrotID])
+          dispatch(rideCarrotSaved(afterSave.set('_rev', doc.rev)))
+        })
+      }
+      save.then(() => {
+        dispatch(carrotMutex(false))
+        dispatch(doSync())
+      }).catch(catchAsyncError(dispatch))
     }
-    save.then(() => {
-      dispatch(doSync())
-    }).catch(catchAsyncError(dispatch))
   }
 }
