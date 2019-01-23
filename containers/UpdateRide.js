@@ -209,14 +209,14 @@ class UpdateRideContainer extends BackgroundComponent {
   }
 
   discardRide () {
-    Navigation.popToRoot(this.props.componentId).then(() => {
-      this.props.dispatch(clearPausedLocations())
-      this.props.dispatch(clearRidePhotoStash(this.stashedRidePhotoKey()))
-      this.props.dispatch(stopLocationTracking())
-      this.props.dispatch(discardCurrentRide())
-      this.props.dispatch(deleteUnpersistedRide(this.props.ride.get('_id')))
-    })
+    this.props.dispatch(clearPausedLocations())
+    this.props.dispatch(clearRidePhotoStash(this.stashedRidePhotoKey()))
+    this.props.dispatch(stopLocationTracking())
+    this.props.dispatch(discardCurrentRide())
+    this.props.dispatch(deleteUnpersistedRide(this.props.ride.get('_id')))
+    Navigation.popToRoot(this.props.componentId)
   }
+
 
   updateLocalRideCoords () {
     if (this.state.trimValues) {

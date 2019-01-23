@@ -104,196 +104,200 @@ export default class UpdateRide extends PureComponent {
   }
 
   render() {
-    const height = (width * 9 / 16) + 54
-    const numCoords = this.props.rideCoordinates.get('rideCoordinates').count()
+    if (this.props.ride) {
+      const height = (width * 9 / 16) + 54
+      const numCoords = this.props.rideCoordinates.get('rideCoordinates').count()
 
-    let trimButton = (
-      <Fab
-        direction="up"
-        style={{ backgroundColor: brand }}
-        position="bottomRight"
-        onPress={this.startTrim}>
-        <FabImage source={require('../../img/trim.png')} height={30} width={30} />
-      </Fab>
-    )
-    let trimmer = null
-    if (this.state.trimming) {
-      trimButton = null
-      trimmer = (
-        <CardItem header style={{padding: 5}}>
-          <View style={{paddingLeft: 5}}>
-            <MultiSlider
-              sliderLength={width - 40}
-              values={[0, numCoords]}
-              min={0}
-              max={numCoords}
-              onValuesChange={this.props.trimRide}
-              trackStyle={{
-                backgroundColor: darkGrey
-              }}
-              selectedStyle={{
-                backgroundColor: brand
-              }}
-              markerStyle={{
-                backgroundColor: brand
-              }}
-            />
-          </View>
-        </CardItem>
+      let trimButton = (
+        <Fab
+          direction="up"
+          style={{ backgroundColor: brand }}
+          position="bottomRight"
+          onPress={this.startTrim}>
+          <FabImage source={require('../../img/trim.png')} height={30} width={30} />
+        </Fab>
       )
+      let trimmer = null
+      if (this.state.trimming) {
+        trimButton = null
+        trimmer = (
+          <CardItem header style={{padding: 5}}>
+            <View style={{paddingLeft: 5}}>
+              <MultiSlider
+                sliderLength={width - 40}
+                values={[0, numCoords]}
+                min={0}
+                max={numCoords}
+                onValuesChange={this.props.trimRide}
+                trackStyle={{
+                  backgroundColor: darkGrey
+                }}
+                selectedStyle={{
+                  backgroundColor: brand
+                }}
+                markerStyle={{
+                  backgroundColor: brand
+                }}
+              />
+            </View>
+          </CardItem>
+        )
+      }
+
+      return (
+        <View>
+          <DeleteModal
+            modalOpen={this.props.discardModalOpen}
+            closeDeleteModal={() => {this.props.setDiscardModalOpen(false)}}
+            text={"Are you sure you want to discard this ride?"}
+            deleteFunc={this.props.discardRide}
+          />
+          <ScrollView>
+            <View style={styles.container}>
+              <Card style={{flex: 1}}>
+                <CardItem header style={{padding: 5}}>
+                  <View style={{paddingLeft: 5}}>
+                    <Text style={{color: darkBrand}}>Map</Text>
+                  </View>
+                </CardItem>
+
+                <View style={{height}}>
+                  <ViewingMap
+                    rideCoordinates={this.showCoords(this.props.rideCoordinates.get('rideCoordinates'), this.props.trimValues)}
+                    ridePhotos={this.props.ridePhotos}
+                    showPhotoLightbox={this.props.showPhotoLightbox}
+                  />
+                </View>
+                { trimButton }
+                { trimmer }
+              </Card>
+
+              <Card>
+                <CardItem header style={{padding: 5}}>
+                  <View style={{paddingLeft: 5}}>
+                    <Text style={{color: darkBrand}}>Ride Photos</Text>
+                  </View>
+                </CardItem>
+
+                <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20}}>
+                  <PhotosByTimestamp
+                    photosByID={this.props.ridePhotos}
+                    profilePhotoID={this.props.ride.get('coverPhotoID')}
+                    changeProfilePhoto={this.props.openPhotoMenu}
+                  />
+                </CardItem>
+
+                <View style={{paddingTop: 15}}>
+                  <Fab
+                    direction="up"
+                    style={{ backgroundColor: brand }}
+                    position="bottomRight"
+                    onPress={this.createPhoto}>
+                    <FabImage source={require('../../img/addphoto.png')} height={30} width={30} />
+                  </Fab>
+                </View>
+              </Card>
+
+              <Card>
+                <CardItem header style={{padding: 5}}>
+                  <View style={{paddingLeft: 5}}>
+                    <Text style={{color: darkBrand}}>Ride Name</Text>
+                  </View>
+                </CardItem>
+                <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20}}>
+                  <TextInput
+                    selectTextOnFocus={true}
+                    style={{width: '100%', height: 50, padding: 10, borderColor: darkBrand, borderWidth: 1}}
+                    value={this.props.ride.get('name')}
+                    onChangeText={this.changeRideName}
+                    underlineColorAndroid={'transparent'}
+                    maxLength={500}
+                  />
+                </CardItem>
+              </Card>
+
+              <Card>
+                <CardItem header style={{padding: 5}}>
+                  <View style={{paddingLeft: 5}}>
+                    <Text style={{color: darkBrand}}>Horse</Text>
+                  </View>
+                </CardItem>
+                <View style={{marginLeft: 20, marginBottom: 30}}>
+                  <HorseSelector
+                    changeHorseID={this.props.changeHorseID}
+                    horseID={this.props.ride.get('horseID')} // remove when everyone version > 43
+                    horses={this.props.horses}
+                    horsePhotos={this.props.horsePhotos}
+                    openSelectHorseMenu={this.props.openSelectHorseMenu}
+                    rideHorses={this.props.rideHorses}
+                    unselectHorse={this.props.unselectHorse}
+                  />
+                </View>
+              </Card>
+
+              <Card>
+                <CardItem header>
+                  <Text style={{color: darkBrand }}>Notes:</Text>
+                </CardItem>
+                <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
+                  <TextInput
+                    style={{
+                      width: '100%',
+                      height: 150,
+                      padding: 10,
+                      borderColor: darkBrand,
+                      borderWidth: 1,
+                      textAlignVertical: "top"
+                    }}
+                    value={this.props.ride.get('notes')}
+                    onChangeText={this.changeRideNotes}
+                    multiline={true}
+                    numberOfLines={3}
+                    underlineColorAndroid="transparent"
+                    maxLength={5000}
+                  />
+                </CardItem>
+              </Card>
+
+              <Card>
+                <CardItem header style={{padding: 5}}>
+                  <View style={{paddingLeft: 5}}>
+                    <Text style={{color: darkBrand}}>Privacy</Text>
+                  </View>
+                </CardItem>
+
+                <View style={{marginLeft: 20, marginBottom: 30}}>
+                  <View style={{flex: 1, flexDirection: 'row'}}>
+                    <View style={{flex: 1}}>
+                      <CheckBox
+                        checked={this.props.ride.get('isPublic')}
+                        onPress={this.props.changePublic}
+                      />
+                    </View>
+                    <View style={{flex: 6, justifyContent: 'center'}}>
+                      <Text>Show this ride on other people's feed.</Text>
+                    </View>
+                  </View>
+                </View>
+              </Card>
+            </View>
+          </ScrollView>
+          <PhotoMenu
+            changeProfilePhotoID={this.changeCoverPhoto}
+            deletePhoto={this.deletePhoto}
+            selectedPhotoID={this.props.selectedPhotoID}
+            visible={this.props.showPhotoMenu}
+          />
+          <SelectHorseMenu
+            horseID={this.props.selectedHorseID}
+            selectHorse={this.props.selectHorse}
+            visible={this.props.showSelectHorseMenu}
+          />
+        </View>
+      )
+    } else {
+      return null
     }
-
-    return (
-      <View>
-        <DeleteModal
-          modalOpen={this.props.discardModalOpen}
-          closeDeleteModal={() => {this.props.setDiscardModalOpen(false)}}
-          text={"Are you sure you want to discard this ride?"}
-          deleteFunc={this.props.discardRide}
-        />
-        <ScrollView>
-          <View style={styles.container}>
-            <Card style={{flex: 1}}>
-              <CardItem header style={{padding: 5}}>
-                <View style={{paddingLeft: 5}}>
-                  <Text style={{color: darkBrand}}>Map</Text>
-                </View>
-              </CardItem>
-
-              <View style={{height}}>
-                <ViewingMap
-                  rideCoordinates={this.showCoords(this.props.rideCoordinates.get('rideCoordinates'), this.props.trimValues)}
-                  ridePhotos={this.props.ridePhotos}
-                  showPhotoLightbox={this.props.showPhotoLightbox}
-                />
-              </View>
-              { trimButton }
-              { trimmer }
-            </Card>
-
-            <Card>
-              <CardItem header style={{padding: 5}}>
-                <View style={{paddingLeft: 5}}>
-                  <Text style={{color: darkBrand}}>Ride Photos</Text>
-                </View>
-              </CardItem>
-
-              <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20}}>
-                <PhotosByTimestamp
-                  photosByID={this.props.ridePhotos}
-                  profilePhotoID={this.props.ride.get('coverPhotoID')}
-                  changeProfilePhoto={this.props.openPhotoMenu}
-                />
-              </CardItem>
-
-              <View style={{paddingTop: 15}}>
-                <Fab
-                  direction="up"
-                  style={{ backgroundColor: brand }}
-                  position="bottomRight"
-                  onPress={this.createPhoto}>
-                  <FabImage source={require('../../img/addphoto.png')} height={30} width={30} />
-                </Fab>
-              </View>
-            </Card>
-
-            <Card>
-              <CardItem header style={{padding: 5}}>
-                <View style={{paddingLeft: 5}}>
-                  <Text style={{color: darkBrand}}>Ride Name</Text>
-                </View>
-              </CardItem>
-              <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20}}>
-                <TextInput
-                  selectTextOnFocus={true}
-                  style={{width: '100%', height: 50, padding: 10, borderColor: darkBrand, borderWidth: 1}}
-                  value={this.props.ride.get('name')}
-                  onChangeText={this.changeRideName}
-                  underlineColorAndroid={'transparent'}
-                  maxLength={500}
-                />
-              </CardItem>
-            </Card>
-
-            <Card>
-              <CardItem header style={{padding: 5}}>
-                <View style={{paddingLeft: 5}}>
-                  <Text style={{color: darkBrand}}>Horse</Text>
-                </View>
-              </CardItem>
-              <View style={{marginLeft: 20, marginBottom: 30}}>
-                <HorseSelector
-                  changeHorseID={this.props.changeHorseID}
-                  horseID={this.props.ride.get('horseID')} // remove when everyone version > 43
-                  horses={this.props.horses}
-                  horsePhotos={this.props.horsePhotos}
-                  openSelectHorseMenu={this.props.openSelectHorseMenu}
-                  rideHorses={this.props.rideHorses}
-                  unselectHorse={this.props.unselectHorse}
-                />
-              </View>
-            </Card>
-
-            <Card>
-              <CardItem header>
-                <Text style={{color: darkBrand }}>Notes:</Text>
-              </CardItem>
-              <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
-                <TextInput
-                  style={{
-                    width: '100%',
-                    height: 150,
-                    padding: 10,
-                    borderColor: darkBrand,
-                    borderWidth: 1,
-                    textAlignVertical: "top"
-                  }}
-                  value={this.props.ride.get('notes')}
-                  onChangeText={this.changeRideNotes}
-                  multiline={true}
-                  numberOfLines={3}
-                  underlineColorAndroid="transparent"
-                  maxLength={5000}
-                />
-              </CardItem>
-            </Card>
-
-            <Card>
-              <CardItem header style={{padding: 5}}>
-                <View style={{paddingLeft: 5}}>
-                  <Text style={{color: darkBrand}}>Privacy</Text>
-                </View>
-              </CardItem>
-
-              <View style={{marginLeft: 20, marginBottom: 30}}>
-                <View style={{flex: 1, flexDirection: 'row'}}>
-                  <View style={{flex: 1}}>
-                    <CheckBox
-                      checked={this.props.ride.get('isPublic')}
-                      onPress={this.props.changePublic}
-                    />
-                  </View>
-                  <View style={{flex: 6, justifyContent: 'center'}}>
-                    <Text>Show this ride on other people's feed.</Text>
-                  </View>
-                </View>
-              </View>
-            </Card>
-          </View>
-        </ScrollView>
-        <PhotoMenu
-          changeProfilePhotoID={this.changeCoverPhoto}
-          deletePhoto={this.deletePhoto}
-          selectedPhotoID={this.props.selectedPhotoID}
-          visible={this.props.showPhotoMenu}
-        />
-        <SelectHorseMenu
-          horseID={this.props.selectedHorseID}
-          selectHorse={this.props.selectHorse}
-          visible={this.props.showSelectHorseMenu}
-        />
-      </View>
-    )
   }
 }
 

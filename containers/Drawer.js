@@ -14,6 +14,7 @@ import {
 
 import {
   BARN,
+  FEED,
   PROFILE,
   RECORDER,
   TRAINING,
@@ -41,53 +42,63 @@ class DrawerContainer extends Component {
 
   openRecorder () {
     this.toggleDrawer()
-    Navigation.push(this.props.activeComponent, {
-      component: {
-        name: RECORDER,
-        id: RECORDER
-      }
-    });
-	}
+    if (this.props.activeComponent === FEED) {
+      this.toggleDrawer()
+      Navigation.push(this.props.activeComponent, {
+        component: {
+          name: RECORDER,
+          id: RECORDER
+        }
+      })
+    }
+  }
+
 
   openAccount () {
     this.toggleDrawer()
-    Navigation.push(this.props.activeComponent, {
-      component: {
-        name: PROFILE,
-        title: 'My Account',
-        passProps: {
-          profileUser: this.props.user,
+    if (this.props.activeComponent === FEED) {
+      Navigation.push(this.props.activeComponent, {
+        component: {
+          name: PROFILE,
+          title: 'My Account',
+          passProps: {
+            profileUser: this.props.user,
+          }
         }
-      }
-    });
+      })
+    }
 	}
 
   openBarn () {
     this.toggleDrawer()
-    Navigation.push(this.props.activeComponent, {
-      component: {
-        name: BARN,
-      }
-    });
+    if (this.props.activeComponent === FEED) {
+      Navigation.push(this.props.activeComponent, {
+        component: {
+          name: BARN,
+        }
+      })
+    }
   }
 
   openTraining () {
     this.toggleDrawer()
-    Navigation.push(this.props.activeComponent, {
-      component: {
-        name: TRAINING,
-      }
-    });
+    if (this.props.activeComponent === FEED) {
+      Navigation.push(this.props.activeComponent, {
+        component: {
+          name: TRAINING,
+        }
+      })
+    }
   }
 
   toggleDrawer() {
-    Navigation.mergeOptions(this.props.activeComponent, {
+    return Navigation.mergeOptions(this.props.activeComponent, {
       sideMenu: {
         left: {
           visible: false,
         }
       }
-    });
+    })
   }
 
   render() {
