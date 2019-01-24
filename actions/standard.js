@@ -36,7 +36,6 @@ import {
   NEW_NETWORK_STATE,
   PAUSE_LOCATION_TRACKING,
   POP_SHOW_RIDE_SHOWN,
-  RECEIVE_JWT,
   REMOVE_STASHED_RIDE_PHOTO,
   REPLACE_LAST_LOCATION,
   RIDE_CARROT_CREATED,
@@ -49,7 +48,6 @@ import {
   RIDE_UPDATED,
   SAVE_USER_ID,
   SET_ACTIVE_COMPONENT,
-  SET_API_CLIENT,
   SET_FEED_MESSAGE,
   SET_FIRST_START_HORSE_ID,
   SET_FULL_SYNC_FAIL,
@@ -66,8 +64,6 @@ import {
   SET_DOING_INITIAL_LOAD,
   SET_SHOWING_RIDE,
   UNPAUSE_LOCATION_TRACKING,
-  UPDATE_NEW_RIDE_COORDS,
-  UPDATE_NEW_RIDE_ELEVATIONS,
   UPDATE_PHOTO_STATUS,
   USER_PHOTO_UPDATED,
   USER_SEARCH_RETURNED,
@@ -143,7 +139,8 @@ export function createFollow (followID, followingID, followerID) {
     type: CREATE_FOLLOW,
     followID,
     followingID,
-    followerID
+    followerID,
+    mixpanel: true
   }
 }
 
@@ -152,7 +149,8 @@ export function createHorse (horseID, horseUserID, userID) {
     type: CREATE_HORSE,
     horseID,
     horseUserID,
-    userID
+    userID,
+    mixpanel: true
   }
 }
 
@@ -162,6 +160,7 @@ export function createHorsePhoto (horseID, userID, photoData) {
     horseID,
     userID,
     photoData,
+    mixpanel: true
   }
 }
 
@@ -180,7 +179,8 @@ export function createRide (
     currentRideElevations,
     currentRidePhotos,
     rideID,
-    userID
+    userID,
+    mixpanel: true
   }
 }
 
@@ -188,14 +188,16 @@ export function createUserPhoto (userID, photoData) {
   return {
     type: CREATE_USER_PHOTO,
     userID,
-    photoData
+    photoData,
+    mixpanel: true
   }
 }
 
 export function deleteFollow (followID) {
   return {
     type: DELETE_FOLLOW,
-    followID
+    followID,
+    mixpanel: true
   }
 }
 
@@ -231,7 +233,8 @@ export function dequeuePhoto (photoID) {
 
 export function discardCurrentRide ()  {
   return {
-    type: DISCARD_CURRENT_RIDE
+    type: DISCARD_CURRENT_RIDE,
+    mixpanel: true
   }
 }
 
@@ -251,7 +254,9 @@ export function enqueuePhoto (queueItem) {
 export function errorOccurred (message) {
   return {
     type: ERROR_OCCURRED,
-    message
+    message,
+    logData: ['message'],
+    mixpanel: true
   }
 }
 
@@ -265,7 +270,7 @@ export function horsePhotoUpdated (horsePhoto) {
 export function horseUpdated (horse) {
   return {
     type: HORSE_UPDATED,
-    horse
+    horse,
   }
 }
 
@@ -273,14 +278,14 @@ export function horseUpdated (horse) {
 export function followUpdated (follow) {
   return {
     type: FOLLOW_UPDATED,
-    follow
+    follow,
   }
 }
 
 export function horseUserUpdated (horseUser) {
   return {
     type: HORSE_USER_UPDATED,
-    horseUser
+    horseUser,
   }
 }
 
@@ -373,7 +378,8 @@ export function rideCoordinatesLoaded (rideCoordinates) {
 export function rideCarrotCreated (carrotData) {
   return {
     type: RIDE_CARROT_CREATED,
-    carrotData
+    carrotData,
+    mixpanel: true
   }
 }
 
@@ -387,7 +393,7 @@ export function rideCarrotSaved (carrotData) {
 export function rideCommentUpdated (rideComment) {
   return {
     type: RIDE_COMMENT_UPDATED,
-    rideComment
+    rideComment,
   }
 }
 
@@ -408,7 +414,8 @@ export function rideHorseUpdated (rideHorse) {
 export function rideUpdated (ride) {
   return {
     type: RIDE_UPDATED,
-    ride
+    ride,
+    mixpanel: true
   }
 }
 
@@ -448,7 +455,7 @@ export function setFullSyncFail (status) {
   return {
     type: SET_FULL_SYNC_FAIL,
     status,
-    logData: ['status']
+    logData: ['status'],
   }
 }
 
@@ -456,6 +463,7 @@ export function setShowingRide (rideID) {
   return {
     type: SET_SHOWING_RIDE,
     rideID,
+    mixpanel: true
   }
 }
 
@@ -513,13 +521,15 @@ export function startRide(firstCoord, firstElevation, startTime) {
     type: START_RIDE,
     firstCoord,
     firstElevation,
-    startTime
+    startTime,
+    mixpanel: true
   }
 }
 
 export function syncComplete () {
   return {
     type: SYNC_COMPLETE,
+    mixpanel: true
   }
 }
 
@@ -540,7 +550,7 @@ export function setDoingInitialLoad (newVal) {
 export function setSigningOut (value) {
   return {
     type: SET_SIGNING_OUT,
-    value
+    value,
   }
 }
 
@@ -577,6 +587,7 @@ export function userUpdated (userData) {
   return {
     type: USER_UPDATED,
     userData,
+    mixpanel: true
   }
 }
 

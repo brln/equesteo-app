@@ -5,6 +5,7 @@ import { DISTRIBUTION } from 'react-native-dotenv'
 import BackgroundGeolocation from 'react-native-mauron85-background-geolocation'
 import { ENV } from 'react-native-dotenv'
 import firebase from 'react-native-firebase'
+import  Mixpanel from 'react-native-mixpanel'
 import { Navigation } from 'react-native-navigation'
 import PushNotification from 'react-native-push-notification'
 
@@ -80,9 +81,12 @@ import {
 } from './standard'
 import {NotConnectedError} from "../errors"
 
-function cb(action) {
+function cb(action, mixpanel=false) {
   logInfo('functionalAction: ' + action)
   captureBreadcrumb(action, 'functionalAction')
+  if (mixpanel) {
+    Mixpanel.track(action)
+  }
 }
 
 export function catchAsyncError (dispatch, sentry=true) {
@@ -94,7 +98,7 @@ export function catchAsyncError (dispatch, sentry=true) {
       captureException(e)
     }
     if (ENV === 'local') {
-      logError(e)
+      logError(e, 'catchAsyncError')
       throw e
     }
   }
@@ -102,7 +106,7 @@ export function catchAsyncError (dispatch, sentry=true) {
 
 
 export function addHorseUser (horse, user) {
-  cb('addHorseUser')
+  cb('addHorseUser', true)
   return (dispatch, getState) => {
     const id = `${user.get('_id')}_${horse.get('_id')}`
     let newHorseUser = getState().getIn(['pouchRecords', 'horseUsers', id])
@@ -125,7 +129,7 @@ export function addHorseUser (horse, user) {
 }
 
 export function appInitialized () {
-  cb('appInitialized')
+  cb('appInitialized', true)
   return (dispatch, getState) => {
     let localData
     tryToLoadStateFromDisk(dispatch).then(() => {
@@ -138,6 +142,7 @@ export function appInitialized () {
       const currentUserID = getState().getIn(['localState', 'userID'])
       if (token && currentUserID) {
         setUserContext(currentUserID)
+        Mixpanel.identify(currentUserID)
         return PouchCouch.localLoad().then((_data) => {
           localData = _data
           dispatch(localDataLoaded(localData))
@@ -168,13 +173,13 @@ export function checkFCMPermission () {
         })
       }
     }).catch(e => {
-      logError(e)
+      logError(e, 'checkFCMPermission')
     })
   }
 }
 
 export function createRideComment(commentData) {
-  cb('createRideComment')
+  cb('createRideComment', true)
   return (dispatch, getState) => {
     const currentUserID = getState().getIn(['localState', 'userID'])
     const commentID = `${currentUserID}_${(new Date).getTime().toString()}`
@@ -198,7 +203,7 @@ export function createRideComment(commentData) {
 }
 
 export function deleteHorseUser (horseUserID) {
-  cb('deleteHorseUser')
+  cb('deleteHorseUser', true)
   return (dispatch, getState) => {
     let theHorseUser = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
     if (!theHorseUser) {
@@ -217,7 +222,7 @@ export function exchangePWCode (email, code) {
 }
 
 export function getPWCode (email) {
-  cb('getPWCode')
+  cb('getPWCode', true)
   return (dispatch) => {
     UserAPI.getPWCode(email).catch(e => {
       dispatch(errorOccurred(e.message))
@@ -277,7 +282,7 @@ export function persistFollow (followID) {
 }
 
 export function persistRide (rideID, newRide, stashedPhotos, deletedPhotoIDs, trimValues, rideHorses) {
-  cb('persistRide')
+  cb('persistRide', true)
   return (dispatch, getState) => {
     const ridePersister = new RidePersister(dispatch, getState, rideID)
     ridePersister.persistRide(newRide, stashedPhotos, deletedPhotoIDs, trimValues, rideHorses)
@@ -285,7 +290,7 @@ export function persistRide (rideID, newRide, stashedPhotos, deletedPhotoIDs, tr
 }
 
 export function persistUserWithPhoto (userID, userPhotoID) {
-  cb('persistUserWithPhoto')
+  cb('persistUserWithPhoto', true)
   return (dispatch, getState) => {
     const theUserPhoto = getState().getIn(['pouchRecords', 'userPhotos', userPhotoID])
     if (!theUserPhoto) {
@@ -311,7 +316,7 @@ export function persistUserWithPhoto (userID, userPhotoID) {
 }
 
 export function persistHorseWithPhoto (horseID, horsePhotoID) {
-  cb('persistHorseWithPhoto')
+  cb('persistHorseWithPhoto', true)
   return (dispatch, getState) => {
     const theHorsePhoto = getState().getIn(['pouchRecords', 'horsePhotos', horsePhotoID])
     if (!theHorsePhoto) {
@@ -335,7 +340,7 @@ export function persistHorseWithPhoto (horseID, horsePhotoID) {
 }
 
 export function persistHorseUpdate (horseID, horseUserID, deletedPhotoIDs, newPhotoIDs, previousDefaultValue) {
-  cb('persistHorseUpdate')
+  cb('persistHorseUpdate', true)
   return (dispatch, getState) => {
     const theHorse = getState().getIn(['pouchRecords', 'horses', horseID])
     if (!theHorse) {
@@ -411,7 +416,7 @@ export function persistHorseUpdate (horseID, horseUserID, deletedPhotoIDs, newPh
 }
 
 export function persistHorseUser (horseUserID) {
-  cb('persistHorseUser')
+  cb('persistHorseUser', true)
   return (dispatch, getState) => {
     const theHorseUser = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
     if (!theHorseUser) {
@@ -426,7 +431,7 @@ export function persistHorseUser (horseUserID) {
 }
 
 export function persistUserUpdate (userID, deletedPhotoIDs) {
-  cb('persistUserUpdate')
+  cb('persistUserUpdate', true)
   return (dispatch, getState) => {
     const theUser = getState().getIn(['pouchRecords', 'users', userID])
     if (!theUser) {
@@ -461,7 +466,7 @@ export function persistUserUpdate (userID, deletedPhotoIDs) {
 }
 
 export function photoNeedsUpload (type, photoLocation, photoID) {
-  cb('photoNeedsUpload')
+  cb('photoNeedsUpload', true)
   return (dispatch) => {
     const item = Map({
       type,
@@ -493,7 +498,7 @@ export function runPhotoQueue() {
 }
 
 export function uploadPhoto (type, photoLocation, photoID) {
-  cb('uploadPhoto')
+  cb('uploadPhoto', true)
   return (dispatch, getState) => {
     const goodConnection = getState().getIn(['localState', 'goodConnection'])
     if (goodConnection) {
@@ -533,10 +538,10 @@ export function uploadPhoto (type, photoLocation, photoID) {
       }).then(() => {
         dispatch(dequeuePhoto(photoID))
         ImagePicker.cleanSingle(photoLocation).catch(e => {
-          logError(e)
+          logError(e, 'ImagePicker.cleanSingle')
         })
       }).catch(e => {
-        logError(e)
+        logError(e, 'uploadPhoto')
         captureException(e)
         dispatch(updatePhotoStatus(photoID, 'failed'))
       })
@@ -545,7 +550,7 @@ export function uploadPhoto (type, photoLocation, photoID) {
 }
 
 export function searchForFriends (phrase) {
-  cb('searchForFriends')
+  cb('searchForFriends', true)
   return (dispatch) => {
     UserAPI.findUser(phrase).then(resp => {
       dispatch(userSearchReturned(fromJS(resp)))
@@ -576,13 +581,13 @@ export function setDistributionOnServer () {
 }
 
 export function signOut () {
-  cb('signOut')
+  cb('signOut', true)
   return (dispatch, getState) => {
     if (!getState().getIn(['localState', 'signingOut'])) {
       dispatch(setSigningOut(true))
       dispatch(stopLocationTracking())
       stopListeningFCM().catch(e => {
-        logError(e)
+        logError(e, 'signOut.stopListeningFCM')
       }).then(() => {
         return Promise.all([
           PouchCouch.deleteLocalDBs(),
@@ -599,7 +604,7 @@ export function signOut () {
         dispatch(clearState())
         dispatch(setSigningOut(false))
       }).catch(e => {
-        logError(e)
+        logError(e, 'signOut')
       })
     }
   }
@@ -699,7 +704,7 @@ export function startLocationTracking () {
     }).catch(catchAsyncError(dispatch))
 
     BackgroundGeolocation.on('error', (error) => {
-      logError('[ERROR] BackgroundGeolocation error:', error);
+      logError(error, 'BackgroundGeolocation.error')
       captureException(error)
     });
 
@@ -825,20 +830,21 @@ function startAppStateTracking () {
 }
 
 export function submitLogin (email, password) {
-  cb('submitLogin')
+  cb('submitLogin', true)
   return (dispatch) => {
     loginAndSync(UserAPI.login, [email, password], dispatch)
   }
 }
 
 export function submitSignup (email, password) {
-  cb('submitSignup')
+  cb('submitSignup', true)
   return (dispatch) => {
     loginAndSync(UserAPI.signup, [email, password], dispatch)
   }
 }
 
 export function doSync (syncData={}, showProgress=true) {
+  cb('doSync', true)
   return (dispatch, getState) => {
     function feedMessage(message, color, timeout) {
       if (showProgress) {
@@ -907,7 +913,7 @@ export function doSync (syncData={}, showProgress=true) {
         dispatch(setFullSyncFail(true))
         dispatch(setRemotePersist(DB_NEEDS_SYNC))
         feedMessage('Error Syncing Data', danger, 5000)
-        logError(e)
+        logError(e, 'doSync.remoteReplicateDBs')
         if (!(e instanceof NotConnectedError)) {
           catchAsyncError(dispatch)(e)
         }
@@ -966,7 +972,7 @@ export function switchRoot (newRoot) {
 }
 
 export function toggleRideCarrot (rideID) {
-  cb('toggleRideCarrot')
+  cb('toggleRideCarrot', true)
   return (dispatch, getState) => {
     const mutexSet = getState().getIn(['localState', 'carrotMutex'])
     if (!mutexSet) {

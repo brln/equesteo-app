@@ -17,7 +17,7 @@ export function captureException (e) {
       Sentry.captureException(e)
     } catch (e) {
       logError('not captured by sentry!')
-      logError(e)
+      logError(e, 'Sentry.captureException')
     }
   }
 }

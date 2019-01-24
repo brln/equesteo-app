@@ -103,8 +103,8 @@ android {
         minSdkVersion 21
         targetSdkVersion 26
         missingDimensionStrategy "RNN.reactNativeVersion", "reactNative55"
-        versionCode 69
-        versionName "0.48.1"
+        versionCode 70
+        versionName "0.48.2"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
@@ -176,6 +176,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-location:+'
     implementation 'com.google.firebase:firebase-core:16.0.1'
     implementation project(':mapbox-react-native-mapbox-gl')
+    implementation project(':react-native-mixpanel')
 }
 
 // Run this once to be able to run the application with BUCK

@@ -28,7 +28,7 @@ export default class RideList extends PureComponent {
     const user = this.props.users.get(item.get('userID'))
     if (!user) {
       logInfo(item.get('userID'))
-      logInfo(this.props.users.toJSON())
+      logInfo(Object.keys(this.props.users.toJS()))
       throw Error('User does not exist.')
     }
     return user

@@ -51,7 +51,7 @@ class FindPeopleContainer extends PureComponent {
       Keyboard.dismiss()
       Navigation.pop(this.props.componentId).then(() => {
         this.props.dispatch(clearSearch())
-      }).catch(e => logError(e))
+      }).catch(e => logError(e, 'FindPeople.navigationButtonPressed'))
     }
   }
 

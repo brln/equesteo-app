@@ -167,8 +167,8 @@ export function newRideName (currentRide) {
   return name
 }
 
-export function logError (error) {
-  console.log('*************** logError ****************')
+export function logError (error, id) {
+  console.log(`******** logError ${id} ****************`)
   console.log(error)
   console.log('*****************************************')
 }

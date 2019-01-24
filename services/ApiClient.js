@@ -99,7 +99,7 @@ export default class ApiClient {
       })
     }).catch(e => {
       if (e instanceof SyntaxError) {
-        logError(e)
+        logError(e, 'ApiClient.request')
         logInfo(rawResp)
         throw new BadResponseError('Can\'t parse response.')
       } else if (e instanceof TypeError) {

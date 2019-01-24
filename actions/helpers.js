@@ -1,5 +1,6 @@
 import BackgroundGeolocation from 'react-native-mauron85-background-geolocation'
 import firebase from 'react-native-firebase'
+import  Mixpanel from 'react-native-mixpanel'
 
 import {
   dismissError,
@@ -34,6 +35,7 @@ export function loginAndSync(loginFunc, loginArgs, dispatch) {
     dispatch(setAwaitingPasswordChange(true))
     dispatch(saveUserID(userID))
     setUserContext(userID)
+    Mixpanel.identify(userID)
     dispatch(startListeningFCMTokenRefresh())
     dispatch(setDistributionOnServer())
     dispatch(setDoingInitialLoad(true))
@@ -42,7 +44,7 @@ export function loginAndSync(loginFunc, loginArgs, dispatch) {
     dispatch(switchRoot(FEED))
     dispatch(startListeningFCM())
   }).catch(e => {
-    logError(e)
+    logError(e, 'loginAndSync')
     dispatch(errorOccurred(e.message))
   })
 }

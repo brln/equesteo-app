@@ -137,14 +137,15 @@ export default class PouchCouch {
   static localReplicateUsers (options, ownUserID, userIDs) {
     return new Promise((resolve, reject) => {
       const remoteUsersDB = new PouchDB(`${API_URL}/couchproxy/${usersDBName}`, options)
+      const firstFetchIDs = []
       remoteUsersDB.query('users/relevantFollows', {key: ownUserID}).then((resp) => {
-        const fetchIDs = resp.rows.reduce((fetchIDs, row) => {
+        resp.rows.reduce((fetchIDs, row) => {
           if (fetchIDs.indexOf(row.value[0]) < 0) {
             fetchIDs.push(row.value[0])
           }
           return fetchIDs
-        }, [])
-        return remoteUsersDB.query('users/relevantFollows', {keys: fetchIDs})
+        }, firstFetchIDs)
+        return remoteUsersDB.query('users/relevantFollows', {keys: firstFetchIDs})
       }).then(resp2 => {
         const fetchIDs = resp2.rows.reduce((fetchIDs, row) => {
           if (fetchIDs.indexOf(row.value[0]) < 0) {
@@ -161,13 +162,11 @@ export default class PouchCouch {
             filter: 'users/byUserIDs2',
             query_params: {
               ownUserID,
-              userIDs: fetchIDs
+              userIDs: fetchIDs.concat(firstFetchIDs)
             }
           }
         ).on('complete', () => {
           resolve()
-        }).on('change', (x) => {
-          // logDebug(x, 'change')
         }).on('error', (e) => {
           reject(new Error('localReplicateUsers error'))
         })

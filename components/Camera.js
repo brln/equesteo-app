@@ -53,9 +53,9 @@ export default class Camera extends Component {
           data.uri,
           cropData,
           (successURI) => {
-            ImagePicker.cleanSingle(data.uri).catch(e => logError(e))
+            ImagePicker.cleanSingle(data.uri).catch(e => logError(e, 'Camera.ImagePicker.cleanSingle'))
             CameraRoll.saveToCameraRoll(successURI).then((newURI) => {
-              ImagePicker.cleanSingle(successURI).catch(e => logError(e))
+              ImagePicker.cleanSingle(successURI).catch(e => logError(e, 'Camera.ImagePicker.cleanSingle2'))
               if (this.camera) {
                 this.camera.resumePreview()
               }
@@ -63,11 +63,11 @@ export default class Camera extends Component {
             })
           },
           (error) => {
-            logError(error.message);
+            logError(error.message, 'Camera.ImageEditor.cropImage');
           },
         );
 
-      }).catch((e) => { logError(e) })
+      }).catch((e) => { logError(e, 'Camera.takePicture.takePictureAsync') })
     }
   }
 

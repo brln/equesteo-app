@@ -102,7 +102,7 @@ export default class ViewingMap extends PureComponent {
         this.props.showPhotoLightbox(sources)
       }
     }).catch(e => {
-      logError(e)
+      logError(e, 'ViewingMap.photoPress')
     })
 
   }
