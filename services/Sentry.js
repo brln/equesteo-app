@@ -14,9 +14,12 @@ export function setUserContext(userID) {
 export function captureException (e) {
   if (ENV !== 'local') {
     try {
-      Sentry.captureException(e)
+      if (e.stacktrace) {
+        Sentry.captureException(e)
+      } else {
+        Sentry.captureException(new Error(e.toString()))
+      }
     } catch (e) {
-      logError('not captured by sentry!')
       logError(e, 'Sentry.captureException')
     }
   }
