@@ -91,8 +91,3 @@ export function configureBackgroundGeolocation () {
   })
 }
 
-export function stopListeningFCM () {
-  // maybe delete token on server here?
-  firebase.messaging().onTokenRefresh(() => {})
-  return firebase.iid().deleteToken('373350399276', 'GCM')
-}

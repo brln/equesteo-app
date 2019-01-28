@@ -11,7 +11,7 @@ import PushNotification from 'react-native-push-notification'
 
 import ApiClient from '../services/ApiClient'
 import kalmanFilter from '../services/Kalman'
-import { captureBreadcrumb, captureException, setUserContext } from "../services/Sentry"
+import { captureBreadcrumb, captureException, captureMessage, setUserContext } from "../services/Sentry"
 import { handleNotification } from '../services/PushNotificationHandler'
 
 import {
@@ -28,7 +28,6 @@ import { danger, green, warning } from '../colors'
 import {
   configureBackgroundGeolocation,
   loginAndSync,
-  stopListeningFCM,
   tryToLoadStateFromDisk
 } from './helpers'
 import { appStates } from '../helpers'
@@ -131,7 +130,6 @@ export function addHorseUser (horse, user) {
 export function appInitialized () {
   cb('appInitialized', true)
   return (dispatch, getState) => {
-    let localData
     tryToLoadStateFromDisk(dispatch).then(() => {
       dispatch(startActiveComponentListener())
       dispatch(dismissError())
@@ -143,18 +141,18 @@ export function appInitialized () {
       if (token && currentUserID) {
         setUserContext(currentUserID)
         Mixpanel.identify(currentUserID)
-        return PouchCouch.localLoad().then((_data) => {
-          localData = _data
+        return PouchCouch.localLoad().then((localData) => {
           dispatch(localDataLoaded(localData))
+          dispatch(switchRoot(FEED))
           dispatch(startListeningFCMTokenRefresh())
           dispatch(startListeningFCM())
           dispatch(setDistributionOnServer())
           return dispatch(startNetworkTracking())
         }).then(() => {
-          dispatch(switchRoot(FEED))
           return dispatch(doSync())
         })
       } else {
+        captureMessage(`token && currentUserID === false, currentUserID: ${currentUserID}`)
         dispatch(switchRoot(SIGNUP_LOGIN))
       }
     }).catch(catchAsyncError(dispatch))
@@ -586,7 +584,8 @@ export function signOut () {
     if (!getState().getIn(['localState', 'signingOut'])) {
       dispatch(setSigningOut(true))
       dispatch(stopLocationTracking())
-      stopListeningFCM().catch(e => {
+      FCMTokenRefreshListenerRemover ? FCMTokenRefreshListenerRemover() : null
+      firebase.iid().deleteToken('373350399276', 'GCM').catch(e => {
         logError(e, 'signOut.stopListeningFCM')
       }).then(() => {
         return Promise.all([
@@ -770,6 +769,7 @@ export function startListeningFCM () {
   }
 }
 
+let FCMTokenRefreshListenerRemover = null
 export function startListeningFCMTokenRefresh () {
   cb('startListeningFCMTokenRefresh')
   return (dispatch) => {
@@ -778,7 +778,7 @@ export function startListeningFCMTokenRefresh () {
         dispatch(setFCMTokenOnServer(newToken))
       }
     })
-    firebase.messaging().onTokenRefresh((newToken) => {
+    FCMTokenRefreshListenerRemover = firebase.messaging().onTokenRefresh((newToken) => {
       dispatch(setFCMTokenOnServer(newToken))
     })
   }

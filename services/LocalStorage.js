@@ -10,7 +10,7 @@ export default class LocalStorage {
   static saveToken (token) {
     return AsyncStorage.setItem(LocalStorage.TOKEN_KEY, JSON.stringify({
       token,
-    }));
+    }))
   }
 
   static loadToken () {

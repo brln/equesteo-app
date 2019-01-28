@@ -11,6 +11,12 @@ export function setUserContext(userID) {
   }
 }
 
+export function captureMessage (m) {
+  if (ENV !== 'local') {
+    Sentry.captureMessage(m)
+  }
+}
+
 export function captureException (e) {
   if (ENV !== 'local') {
     try {

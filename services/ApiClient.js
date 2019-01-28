@@ -7,6 +7,7 @@ import {
   UnauthorizedError
 } from '../errors'
 import LocalStorage from './LocalStorage'
+import { captureException, captureMessage } from './Sentry'
 
 
 let token = null
@@ -30,10 +31,15 @@ export default class ApiClient {
     }
   }
 
-  static setToken (t) {
-    if (t !== token) {
+  static setToken (t, url) {
+    if (t && t !== token) {
       token = t
-      LocalStorage.saveToken(t)
+      return LocalStorage.saveToken(t).catch(e => {
+        logDebug(e, '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+        captureException(e)
+      })
+    } else if (!token) {
+      captureMessage(`Trying to set null token from ${url}`)
     }
   }
 
@@ -94,7 +100,7 @@ export default class ApiClient {
             token = null
             throw new UnauthorizedError(json.error)
         }
-        this.setToken(resp.headers.map['x-auth-token'][0])
+        this.setToken(resp.headers.map['x-auth-token'][0], endpoint)
         return json
       })
     }).catch(e => {
