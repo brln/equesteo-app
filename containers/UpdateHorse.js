@@ -120,7 +120,6 @@ class UpdateHorseContainer extends PureComponent {
 
   changeColor (chosenColor) {
     this.setState({ chosenColor })
-    console.log(chosenColor)
   }
 
   openPhotoMenu (profilePhotoID) {

@@ -40,7 +40,6 @@ export const DB_SYNCING_AND_ENQUEUED = 'DB_SYNCING_AND_ENQUEUED'
 export const DB_SYNCED = 'DB_SYNCED'
 
 import {
-  awaitFullSync,
   carrotMutex,
   clearLastLocation,
   clearFeedMessage,
@@ -70,8 +69,8 @@ import {
   setFeedMessage,
   setFullSyncFail,
   setSigningOut,
-  showPopShowRide,
   setActiveComponent,
+  showPopShowRide,
   syncComplete,
   updatePhotoStatus,
   userPhotoUpdated,
@@ -615,17 +614,19 @@ export function showLocalNotification (message, background, rideID, scrollToComm
     PushNotification.configure({
       onNotification: () => {
         const activeComponent = getState().getIn(['localState', 'activeComponent'])
+        let upNext = Promise.resolve()
         if (activeComponent !== FEED) {
-          Navigation.popToRoot(activeComponent)
+          upNext = Navigation.popToRoot(activeComponent)
         }
-        dispatch(showPopShowRide())
+        upNext.then(() => {
+          dispatch(showPopShowRide())
+        })
       }
     })
-    dispatch(awaitFullSync())
     dispatch(doSync()).then(() => {
       const showingRideID = getState().getIn(['localState', 'showingRideID'])
       if (background || showingRideID !== rideID) {
-        dispatch(setPopShowRide(rideID, false, scrollToComments))
+        dispatch(setPopShowRide(rideID, background, scrollToComments))
         PushNotification.localNotification({
           message: message,
         })

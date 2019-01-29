@@ -1,5 +1,4 @@
 import {
-  AWAIT_FULL_SYNC,
   CARROT_MUTEX,
   CLEAR_FEED_MESSAGE,
   CLEAR_LAST_LOCATION,
@@ -69,12 +68,6 @@ import {
   USER_SEARCH_RETURNED,
   USER_UPDATED,
 } from '../constants'
-
-export function awaitFullSync () {
-  return {
-    type: AWAIT_FULL_SYNC
-  }
-}
 
 export function carrotMutex (value) {
   return {

@@ -1,5 +1,4 @@
 import BackgroundGeolocation from 'react-native-mauron85-background-geolocation'
-import firebase from 'react-native-firebase'
 import  Mixpanel from 'react-native-mixpanel'
 
 import {
@@ -61,10 +60,13 @@ export function tryToLoadStateFromDisk (dispatch) {
     }
 
     if (currentRideState) {
+      logInfo('current ride state loaded')
       dispatch(loadCurrentRideState(currentRideState))
     } else {
       logInfo('no cached current ride state found')
     }
+  }).catch(e => {
+    logError(e)
   })
 }
 

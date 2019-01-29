@@ -165,7 +165,7 @@ class UpdateRideContainer extends BackgroundComponent {
           this.state.trimValues,
           this.rideHorses(),
         ))
-        this.props.dispatch(setPopShowRide(this.props.ride.get('_id'), true))
+        this.props.dispatch(setPopShowRide(this.props.ride.get('_id'), true, false))
         Navigation.popToRoot(this.props.componentId).then(() => {
           this.props.dispatch(clearPausedLocations())
           this.props.dispatch(stopLocationTracking())

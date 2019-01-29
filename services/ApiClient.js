@@ -35,7 +35,6 @@ export default class ApiClient {
     if (t && t !== token) {
       token = t
       return LocalStorage.saveToken(t).catch(e => {
-        logDebug(e, '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         captureException(e)
       })
     } else if (!token) {

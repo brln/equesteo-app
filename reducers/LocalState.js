@@ -5,7 +5,6 @@ import { appStates, unixTimeNow } from '../helpers'
 import { DB_NEEDS_SYNC, DB_SYNCING, DB_SYNCED } from "../actions/functional"
 
 import {
-  AWAIT_FULL_SYNC,
   CARROT_MUTEX,
   CLEAR_FEED_MESSAGE,
   CLEAR_RIDE_PHOTO_FROM_STASH,
@@ -44,7 +43,6 @@ export const initialState = Map({
   activeComponent: null,
   appState: appStates.active,
   awaitingPWChange: false,
-  awaitingFullSync: false,
   carrotMutex: false,
   currentScreen: FEED,
   doingInitialLoad: false,
@@ -69,8 +67,6 @@ export const initialState = Map({
 
 export default function LocalStateReducer(state=initialState, action) {
   switch (action.type) {
-    case AWAIT_FULL_SYNC:
-      return state.set('awaitingFullSync', true)
     case CARROT_MUTEX:
       return state.set('carrotMutex', action.value)
     case CLEAR_FEED_MESSAGE:
@@ -112,10 +108,6 @@ export default function LocalStateReducer(state=initialState, action) {
         'showingRideID', null
       ).set(
         'signingOut', false
-      ).set(
-        'popShowRide', null,
-      ).set(
-        'popShowRideNow', false
       ).set(
         'needsRemotePersist', loadedState.get('needsRemotePersist') === DB_SYNCING ? DB_NEEDS_SYNC : DB_SYNCED
       )

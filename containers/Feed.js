@@ -107,7 +107,7 @@ class FeedContainer extends BackgroundComponent {
   }
 
   componentDidUpdate () {
-    if (this.props.popShowRideNow && this.props.popShowRide && !this.props.awaitingFullSync) {
+    if (this.props.popShowRideNow && this.props.popShowRide.get('rideID')) {
       const showRide = this.props.rides.get(this.props.popShowRide.get('rideID'))
       if (showRide && !this.state.ridePopped) {
         // PushNotification.showNotification gets called when it shouldn't if the app reboots unexpectedly.
@@ -279,7 +279,6 @@ function mapStateToProps (state) {
   const userID = localState.get('userID')
   return {
     activeComponent: localState.get('activeComponent'),
-    awaitingFullSync: localState.get('awaitingFullSync'),
     feedMessage: localState.get('feedMessage'),
     follows: pouchState.get('follows'),
     fullSyncFail: localState.get('fullSyncFail'),
