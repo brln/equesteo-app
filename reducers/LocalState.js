@@ -1,7 +1,7 @@
 import { List, Map } from 'immutable'
 
 import { FEED, SIGNUP_LOGIN } from '../screens'
-import { appStates, unixTimeNow } from '../helpers'
+import { appStates, logError, unixTimeNow } from '../helpers'
 import { DB_NEEDS_SYNC, DB_SYNCING, DB_SYNCED } from "../actions/functional"
 
 import {
@@ -156,9 +156,15 @@ export default function LocalStateReducer(state=initialState, action) {
       }
       return newState.setIn(['ridePhotoStash', action.stashKey, action.photoData.get('_id')], action.photoData)
     case UPDATE_PHOTO_STATUS:
+      let updatedState = state
       const queueItem = state.getIn(['photoQueue', action.photoID])
-      const updated = queueItem.set('status', action.newStatus).set('timestamp', unixTimeNow())
-      return state.setIn(['photoQueue', action.photoID], updated)
+      if (queueItem) {
+        const updated = queueItem.set('status', action.newStatus).set('timestamp', unixTimeNow())
+        updatedState = state.setIn(['photoQueue', action.photoID], updated)
+      } else {
+        logError('Updating queue item that doesn\'t exist in queue anymore')
+      }
+      return updatedState
     case USER_SEARCH_RETURNED:
       return state.set('userSearchResults', action.userSearchResults)
     default:
