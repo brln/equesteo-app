@@ -15,6 +15,7 @@ import {
 import {
   BARN,
   FEED,
+  FEEDBACK,
   PROFILE,
   RECORDER,
   TRAINING,
@@ -34,6 +35,7 @@ class DrawerContainer extends Component {
     this.openBarn = this.openBarn.bind(this)
     this.openRecorder = this.openRecorder.bind(this)
     this.openTraining = this.openTraining.bind(this)
+    this.openFeedback = this.openFeedback.bind(this)
   }
 
   shouldComponentUpdate () {
@@ -86,6 +88,17 @@ class DrawerContainer extends Component {
       Navigation.push(this.props.activeComponent, {
         component: {
           name: TRAINING,
+        }
+      })
+    }
+  }
+
+  openFeedback () {
+    this.toggleDrawer()
+    if (this.props.activeComponent === FEED) {
+      Navigation.push(this.props.activeComponent, {
+        component: {
+          name: FEEDBACK,
         }
       })
     }
@@ -175,6 +188,19 @@ class DrawerContainer extends Component {
                     />
                     <Text style={styles.drawerListItemText}>
                       My Account
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+
+
+                <TouchableOpacity onPress={this.openFeedback}>
+                  <View style={styles.drawerListItem}>
+                    <BuildImage
+                      source={require('../img/feedback.png')}
+                      style={styles.icon}
+                    />
+                    <Text style={styles.drawerListItemText}>
+                      Feedback
                     </Text>
                   </View>
                 </TouchableOpacity>

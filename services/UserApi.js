@@ -27,6 +27,13 @@ export default class UserAPI {
     })
   }
 
+  static sendFeedback (userID, feedback) {
+    return ApiClient.post('/users/feedback', {
+      id: userID,
+      feedback
+    })
+  }
+
   static exchangePWCodeForToken (email, code) {
     return ApiClient.post('/users/exchangePWCode', { email, code })
   }
