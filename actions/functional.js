@@ -151,7 +151,6 @@ export function appInitialized () {
           return dispatch(doSync())
         })
       } else {
-        captureMessage(`token && currentUserID === false, currentUserID: ${currentUserID}`)
         dispatch(switchRoot(SIGNUP_LOGIN))
       }
     }).catch(catchAsyncError(dispatch))
@@ -539,8 +538,10 @@ export function uploadPhoto (type, photoLocation, photoID) {
         })
       }).catch(e => {
         logError(e, 'uploadPhoto')
-        captureException(e)
         dispatch(updatePhotoStatus(photoID, 'failed'))
+        if (!(e instanceof NotConnectedError)) {
+          captureException(e)
+        }
       })
     }
   }
@@ -701,14 +702,14 @@ export function startLocationTracking () {
           }
         }
       })
+
+      BackgroundGeolocation.on('error', (error) => {
+        logError(error, 'BackgroundGeolocation.error')
+        captureException(error)
+      });
+
+      BackgroundGeolocation.start()
     }).catch(catchAsyncError(dispatch))
-
-    BackgroundGeolocation.on('error', (error) => {
-      logError(error, 'BackgroundGeolocation.error')
-      captureException(error)
-    });
-
-    BackgroundGeolocation.start()
   }
 }
 

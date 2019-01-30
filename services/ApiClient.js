@@ -38,7 +38,7 @@ export default class ApiClient {
         captureException(e)
       })
     } else if (!token) {
-      captureMessage(`Trying to set null token from ${url}`)
+      logError(`Trying to set null token from ${url}`)
     }
   }
 
