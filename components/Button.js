@@ -4,18 +4,31 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  View,
 } from 'react-native';
+
+import { lightGrey, darkGrey } from '../colors'
 
 export default class Button extends PureComponent {
   render () {
-    return (
-      <TouchableOpacity
-        style={[{backgroundColor: this.props.color}, styles.button]}
-        onPress={this.props.onPress}
-      >
-        <Text style={styles.text}>{this.props.text}</Text>
-      </TouchableOpacity>
-    )
+    if (this.props.disabled) {
+      return (
+        <View
+          style={[{backgroundColor: lightGrey}, styles.button]}
+        >
+          <Text style={[styles.text, {color: darkGrey}]}>{this.props.text}</Text>
+        </View>
+      )
+    } else {
+      return (
+        <TouchableOpacity
+          style={[{backgroundColor: this.props.color}, styles.button]}
+          onPress={this.props.onPress}
+        >
+          <Text style={styles.text}>{this.props.text}</Text>
+        </TouchableOpacity>
+      )
+    }
   }
 }
 

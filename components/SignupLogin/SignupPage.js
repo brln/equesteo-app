@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import TOSModal from './TOSModal'
 
 import {
   ActivityIndicator,
@@ -8,6 +9,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { CheckBox } from 'native-base'
 
 import Button from '../Button'
 import { brand, darkBrand } from '../../colors'
@@ -19,6 +21,8 @@ export default class SignupPage extends PureComponent {
       email: null,
       password1: null,
       password2: null,
+      tosAccepted: false,
+      showTOS: false,
     }
     this._renderSignupForm = this._renderSignupForm.bind(this)
     this._renderLoading = this._renderLoading.bind(this)
@@ -27,8 +31,22 @@ export default class SignupPage extends PureComponent {
     this.changePassword2 = this.changePassword2.bind(this)
     this.moveToPassword = this.moveToPassword.bind(this)
     this.moveToPassword2 = this.moveToPassword2.bind(this)
+    this.showTOS = this.showTOS.bind(this)
     this.submitSignup = this.submitSignup.bind(this)
+    this.toggleTOS = this.toggleTOS.bind(this)
     this.inputs = {}
+  }
+
+  showTOS () {
+    this.setState({
+      showTOS: !this.state.showTOS
+    })
+  }
+
+  toggleTOS () {
+    this.setState({
+      tosAccepted: !this.state.tosAccepted
+    })
   }
 
   changeEmail (text) {
@@ -70,6 +88,10 @@ export default class SignupPage extends PureComponent {
   _renderSignupForm () {
     return (
       <View>
+        <TOSModal
+          modalOpen={this.state.showTOS}
+          onClosed={this.showTOS}
+        />
         <Text>Email:</Text>
         <TextInput
           autoCapitalize={'none'}
@@ -107,8 +129,19 @@ export default class SignupPage extends PureComponent {
           maxLength={200}
         />
         <View style={styles.switchup}>
-          <Button text={'Submit'} color={brand} onPress={this.submitSignup}/>
-          <TouchableOpacity onPress={this.props.showLogin}>
+          <View style={{flex: 1, justifyContent: 'flex-start', flexDirection: 'row'}}>
+            <View style={{paddingRight: 30, paddingLeft: 20}}>
+              <CheckBox
+                checked={this.state.tosAccepted}
+                onPress={this.toggleTOS}
+              />
+            </View>
+            <TouchableOpacity onPress={this.showTOS}>
+              <Text>I accept the Equesteo <Text style={styles.underlineText}>Terms of Service.</Text></Text>
+            </TouchableOpacity>
+          </View>
+          <Button text={'Submit'} color={brand} onPress={this.submitSignup} disabled={!this.state.tosAccepted}/>
+          <TouchableOpacity onPress={this.props.showLogin} style={{paddingTop: 10}}>
             <Text style={styles.switchupText}>Or, <Text style={styles.underlineText}>Log In</Text>.</Text>
           </TouchableOpacity>
         </View>

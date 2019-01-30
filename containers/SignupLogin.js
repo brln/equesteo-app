@@ -203,7 +203,7 @@ class SignupLoginContainer extends PureComponent {
             <View style={{height: height - StatusBar.currentHeight}}>
               {error}
               <BuildImage
-                source={require('../img/loginbg3.jpg')}
+                source={require('../img/loginbg4.jpg')}
                 style={{ width, height, resizeMode: 'stretch' }}
               />
               {form}

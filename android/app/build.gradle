@@ -154,6 +154,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-webview')
     implementation project(':react-native-camera')
     implementation project(':react-native-push-notification')
     implementation project(':react-native-firebase')
