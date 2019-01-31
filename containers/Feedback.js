@@ -3,6 +3,7 @@ import React, { PureComponent } from 'react'
 import {
   Dimensions,
   Keyboard,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -86,8 +87,7 @@ class FeedbackContainer extends PureComponent {
 
   render() {
     const unsubmitted = (
-      <View>
-        <Text style={{paddingBottom: 10, textAlign: 'center'}}>Let us know what you think!</Text>
+      <ScrollView>
         <TextInput
           style={{
             width: width * 0.8,
@@ -102,9 +102,12 @@ class FeedbackContainer extends PureComponent {
           multiline={true}
           underlineColorAndroid="transparent"
           maxLength={5000}
+          placeholder={"Let us know what you think. Likes, dislikes, problems, feature requests, musings, anecdotes, stories, we'd love to hear it.\n\nIt sends a message straight to our phones.\n\nIf you want to hear back, let us know the best way to get in touch. Email, facebook, phone number, etc.\n\nOr come to Ben Lomond and ride with us!"}
         />
-        <Button color={brand} text="Submit" onPress={this.submit} />
-      </View>
+        <View style={{paddingBottom: 10}}>
+          <Button color={brand} text="Submit" onPress={this.submit} />
+        </View>
+      </ScrollView>
     )
 
     const submitted = (

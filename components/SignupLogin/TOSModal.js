@@ -20,6 +20,7 @@ export default class TOSModal extends PureComponent {
         position={"top"}
         isOpen={this.props.modalOpen}
         onClosed={this.props.onClosed}
+        swipeToClose={false}
       >
         <View style={{width: '100%', height: '100%'}}>
           <WebView
@@ -42,7 +43,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: height * 0.05,
-    height: height * 0.9,
+    height: height * 0.8,
     width: width * .9,
   },
 });

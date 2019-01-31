@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react';
 import {
-  BackHandler,
   Dimensions,
   StyleSheet,
   Text,

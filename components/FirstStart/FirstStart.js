@@ -28,6 +28,7 @@ export default class FirstStart extends PureComponent {
       case this.props.pages.INTRO_PAGE.name:
         return (
           <IntroPage
+            done={this.props.done}
             nextPage={this.props.nextPage}
           />
         )

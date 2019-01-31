@@ -3,6 +3,7 @@ import { Navigation } from 'react-native-navigation'
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import LocationServicesDialogBox from "react-native-android-location-services-dialog-box";
+import { BackHandler } from 'react-native'
 
 import {
   createRide,
@@ -54,6 +55,8 @@ class RecorderContainer extends PureComponent {
     this.backToFeed = this.backToFeed.bind(this)
     this.closeDiscardModal = this.closeDiscardModal.bind(this)
     this.discardRide = this.discardRide.bind(this)
+    this.goBack = this.goBack.bind(this)
+    this.handleBackPress = this.handleBackPress.bind(this)
     this.finishRide = this.finishRide.bind(this)
     this.pauseLocationTracking = this.pauseLocationTracking.bind(this)
     this.showCamera = this.showCamera.bind(this)
@@ -78,6 +81,17 @@ class RecorderContainer extends PureComponent {
     }
   }
 
+  handleBackPress () {
+    this.goBack()
+  }
+
+  goBack () {
+    if (!this.props.currentRide) {
+      this.props.dispatch(stopLocationTracking())
+    }
+    Navigation.pop(this.props.componentId)
+  }
+
   componentWillReceiveProps (nextProps) {
     if (nextProps.lastLocation && !this.gpsTimeout) {
       this.gpsTimeout = setTimeout(() => {
@@ -87,6 +101,7 @@ class RecorderContainer extends PureComponent {
   }
 
   componentWillUnmount () {
+    BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
     clearTimeout(this.gpsTimeout)
   }
 
@@ -94,14 +109,12 @@ class RecorderContainer extends PureComponent {
     if (buttonId === 'finishRide') {
       this.finishRide()
     } else if (buttonId === 'back') {
-      if (!this.props.currentRide) {
-        this.props.dispatch(stopLocationTracking())
-      }
-      Navigation.pop(this.props.componentId)
+      this.goBack()
     }
   }
 
   componentDidMount () {
+    BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
     if (isAndroid()) {
       LocationServicesDialogBox.checkLocationServicesIsEnabled({
         message: "You need to turn on the GPS and enable 'High Accuracy' to record your ride. \nPlease do so and then come back.",
@@ -219,6 +232,7 @@ class RecorderContainer extends PureComponent {
         discardModalOpen={this.state.discardModalOpen}
         lastElevation={this.props.lastElevation}
         lastLocation={this.props.lastLocation}
+        nullMapLocation={this.props.nullMapLocation}
         refiningLocation={this.props.refiningLocation}
         pauseLocationTracking={this.pauseLocationTracking}
         showCamera={this.showCamera}
@@ -245,6 +259,7 @@ function mapStateToProps (state) {
     horseUsers: pouchState.get('horseUsers'),
     lastElevation: currentRideState.get('lastElevation'),
     lastLocation: currentRideState.get('lastLocation'),
+    nullMapLocation: currentRideState.get('nullMapLocation'),
     refiningLocation: currentRideState.get('refiningLocation'),
     user: pouchState.getIn(['users', userID]),
     userID,

@@ -134,7 +134,7 @@ export default class RidePersister {
     }).then(() => {
       return Promise.all(deletedPhotoSaves)
     }).then(() => {
-      this.dispatch(doSync())
+      return this.dispatch(doSync())
     }).catch(catchAsyncError(this.dispatch))
   }
 }

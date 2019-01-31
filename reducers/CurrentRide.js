@@ -33,6 +33,7 @@ export const initialState = Map({
   lastLocation: null,
   locationStashingActive: false,
   moving: false,
+  nullMapLocation: null,
   stashedCoordinates: List(),
   refiningLocation: null,
 })
@@ -79,6 +80,9 @@ export default function CurrentRideReducer(state=initialState, action) {
       ).set(
         'lastElevation',
         action.elevation
+      ).set(
+        'nullMapLocation',
+        List([action.location.get('longitude'), action.location.get('latitude')])
       )
       const currentRide = state.get('currentRide')
       const currentElevations = state.get('currentRideElevations')

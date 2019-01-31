@@ -22,10 +22,10 @@ export default class Button extends PureComponent {
     } else {
       return (
         <TouchableOpacity
-          style={[{backgroundColor: this.props.color}, styles.button]}
+          style={[{backgroundColor: this.props.color, borderColor: this.props.borderColor, borderWidth: this.props.borderColor ? 1 : null}, styles.button]}
           onPress={this.props.onPress}
         >
-          <Text style={styles.text}>{this.props.text}</Text>
+          <Text style={[styles.text, this.props.otherTextStyle]}>{this.props.text}</Text>
         </TouchableOpacity>
       )
     }

@@ -1,17 +1,13 @@
 import React, { PureComponent } from 'react'
 import {
-  Dimensions,
-  Image,
   StyleSheet,
   Text,
   View
 } from 'react-native'
 
-import { brand } from '../../colors'
+import { brand, darkGrey, lightGrey } from '../../colors'
 import { logRender } from '../../helpers'
 import Button from '../Button'
-
-const { width } = Dimensions.get('window')
 
 export default class NamePage extends PureComponent {
   render() {
@@ -33,11 +29,24 @@ export default class NamePage extends PureComponent {
             <Text style={{textAlign: 'center', fontSize: 20}}>Let's get you set up to ride.</Text>
           </View>
           <View style={{flex: 3}}>
-            <Button
-              color={brand}
-              text={"Get Started"}
-              onPress={this.props.nextPage}
-            />
+            <View style={{flex: 1, flexDirection: 'row'}}>
+              <View style={{padding: 5}}>
+                <Button
+                  borderColor={lightGrey}
+                  color={"transparent"}
+                  text={"Skip Forever"}
+                  otherTextStyle={{color: darkGrey}}
+                  onPress={this.props.done}
+                />
+              </View>
+              <View style={{padding: 5}}>
+                <Button
+                  color={brand}
+                  text={"Get Started"}
+                  onPress={this.props.nextPage}
+                />
+              </View>
+            </View>
           </View>
         </View>
       </View>

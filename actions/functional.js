@@ -97,7 +97,6 @@ export function catchAsyncError (dispatch, sentry=true) {
     }
     if (ENV === 'local') {
       logError(e, 'catchAsyncError')
-      throw e
     }
   }
 }
@@ -192,7 +191,7 @@ export function createRideComment(commentData) {
     PouchCouch.saveRide(newComment.toJS()).then((doc) => {
       const afterSave = getState().getIn(['pouchRecords', 'rideComments', commentID])
       dispatch(rideCommentUpdated(afterSave.set('_rev', doc.rev)))
-      dispatch(doSync())
+      return dispatch(doSync())
     }).catch(catchAsyncError(dispatch))
 
   }
@@ -272,7 +271,7 @@ export function persistFollow (followID) {
     PouchCouch.saveUser(theFollow.toJS()).then(({ rev }) => {
       let foundAfterSave = getState().getIn(['pouchRecords', 'follows', followID])
       dispatch(followUpdated(foundAfterSave.set('_rev', rev)))
-      dispatch(doSync())
+      return dispatch(doSync())
     }).catch(catchAsyncError(dispatch))
   }
 }
@@ -306,7 +305,7 @@ export function persistUserWithPhoto (userID, userPhotoID) {
       const theUserAfterSave = getState().getIn(['pouchRecords', 'users', userID])
       dispatch(userUpdated(theUserAfterSave.set('_rev', rev)))
     }).then(() => {
-      dispatch(doSync())
+      return dispatch(doSync())
     }).catch(catchAsyncError(dispatch))
   }
 }
@@ -330,7 +329,7 @@ export function persistHorseWithPhoto (horseID, horsePhotoID) {
     }).then((doc) => {
       const theHorseAfterSave = getState().getIn(['pouchRecords', 'horses', horseID])
       dispatch(horseUpdated(theHorseAfterSave.set('_rev', doc.rev)))
-      dispatch(doSync())
+      return dispatch(doSync())
     }).catch(catchAsyncError(dispatch))
   }
 }
@@ -406,7 +405,7 @@ export function persistHorseUpdate (horseID, horseUserID, deletedPhotoIDs, newPh
     }
 
     horseSaves.then(() => {
-      dispatch(doSync())
+      return dispatch(doSync())
     }).catch(catchAsyncError(dispatch))
   }
 }
@@ -421,7 +420,7 @@ export function persistHorseUser (horseUserID) {
     PouchCouch.saveHorse(theHorseUser.toJS()).then(({ rev }) => {
       const theHorseUserAfterSave = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
       dispatch(horseUserUpdated(theHorseUserAfterSave.set('_rev', rev)))
-      dispatch(doSync())
+      return dispatch(doSync())
     }).catch(catchAsyncError(dispatch))
   }
 }
@@ -456,7 +455,7 @@ export function persistUserUpdate (userID, deletedPhotoIDs) {
     }
 
     userSave.then(() => {
-      dispatch(doSync())
+      return dispatch(doSync())
     }).catch(catchAsyncError(dispatch))
   }
 }
@@ -508,7 +507,7 @@ export function uploadPhoto (type, photoLocation, photoID) {
             return PouchCouch.saveHorse(horsePhoto.toJS()).then((doc) => {
               const theHorsePhotoAfterSave = getState().getIn(['pouchRecords', 'horsePhotos', photoID])
               dispatch(horsePhotoUpdated(theHorsePhotoAfterSave.set('_rev', doc.rev)))
-              dispatch(doSync({}, false))
+              return dispatch(doSync({}, false))
             })
           case 'ride':
             const uploadedRideURI = ridePhotoURL(photoID)
@@ -517,7 +516,7 @@ export function uploadPhoto (type, photoLocation, photoID) {
             return PouchCouch.saveRide(ridePhoto.toJS()).then((doc) => {
               const theRidePhotoAfterSave = getState().getIn(['pouchRecords', 'ridePhotos', photoID])
               dispatch(ridePhotoUpdated(theRidePhotoAfterSave.set('_rev', doc.rev)))
-              dispatch(doSync({}, false))
+              return dispatch(doSync({}, false))
             })
           case 'user':
             const uploadedUserPhotoURI = profilePhotoURL(photoID)
@@ -526,7 +525,7 @@ export function uploadPhoto (type, photoLocation, photoID) {
             return PouchCouch.saveUser(userPhoto.toJS()).then((doc) => {
               const theUserPhotoAfterSave = getState().getIn(['pouchRecords', 'userPhotos', photoID])
               dispatch(userPhotoUpdated(theUserPhotoAfterSave.set('_rev', doc.rev)))
-              dispatch(doSync({}, false))
+              return dispatch(doSync({}, false))
             })
           default:
             throw Error('cant persist type I don\'t know about')
@@ -1011,7 +1010,7 @@ export function toggleRideCarrot (rideID) {
       }
       save.then(() => {
         dispatch(carrotMutex(false))
-        dispatch(doSync())
+        return dispatch(doSync())
       }).catch(catchAsyncError(dispatch))
     }
   }

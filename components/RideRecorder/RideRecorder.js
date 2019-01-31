@@ -21,10 +21,11 @@ export default class RideRecorder extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
+      centerCoordinate: null,
       fabActive: false,
       userControlledMap: false,
       heading: 0,
-      centerCoordinate: null,
+      nullMapLocation: props.nullMapLocation ? props.nullMapLocation.toJS() : null,
       zoomLevel: 14,
     }
     this.hitPause = this.hitPause.bind(this)
@@ -161,7 +162,7 @@ export default class RideRecorder extends PureComponent {
             <RidingMap
               currentRideCoordinates={this.props.currentRideCoordinates.get('rideCoordinates')}
               heading={this.state.heading}
-              centerCoordinate={this.state.centerCoordinate}
+              centerCoordinate={this.state.centerCoordinate ? this.state.centerCoordinate : this.state.nullMapLocation}
               lastLocation={this.props.lastLocation}
               mapRegionChanged={this.mapRegionChanged}
               recenter={this.recenter}
@@ -256,4 +257,4 @@ const styles = StyleSheet.create({
   gpsBar: {
     flex: 1,
   }
-});
+})

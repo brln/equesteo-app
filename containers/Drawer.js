@@ -191,20 +191,16 @@ class DrawerContainer extends Component {
                     </Text>
                   </View>
                 </TouchableOpacity>
-
-
-                <TouchableOpacity onPress={this.openFeedback}>
-                  <View style={styles.drawerListItem}>
-                    <BuildImage
-                      source={require('../img/feedback.png')}
-                      style={styles.icon}
-                    />
-                    <Text style={styles.drawerListItemText}>
-                      Feedback
-                    </Text>
-                  </View>
-                </TouchableOpacity>
               </View>
+            </View>
+            <View style={{position: 'absolute', bottom: 10, flex: 1, alignItems: 'center', justifyContent: 'center', width: '100%'}}>
+              <TouchableOpacity style={{borderColor: 'white', borderWidth: 2, borderRadius: 2}} onPress={this.openFeedback}>
+                <View style={{padding: 6}}>
+                  <Text style={{color: 'white', fontSize: 15, textAlign: 'center'}}>
+                    Feedback
+                  </Text>
+                </View>
+              </TouchableOpacity>
             </View>
         </View>
       </ScrollView>
