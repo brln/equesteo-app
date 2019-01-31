@@ -83,6 +83,7 @@ class RecorderContainer extends PureComponent {
 
   handleBackPress () {
     this.goBack()
+    return true
   }
 
   goBack () {
