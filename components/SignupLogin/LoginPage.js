@@ -15,8 +15,10 @@ export default class LoginPage extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
+      cursor: 0,
       email: null,
-      password: null
+      password: null,
+      passwordVisible: false
     }
     this.inputs = {}
     this.changeEmail = this.changeEmail.bind(this);
@@ -25,6 +27,14 @@ export default class LoginPage extends PureComponent {
     this._renderLoading = this._renderLoading.bind(this)
     this._renderLoginForm = this._renderLoginForm.bind(this)
     this.submitLogin = this.submitLogin.bind(this)
+    this.togglePasswordVisible = this.togglePasswordVisible.bind(this)
+  }
+
+  togglePasswordVisible () {
+    this.setState({
+      passwordVisible: !this.state.passwordVisible
+    })
+    this.inputs.password.blur()
   }
 
   changeEmail (text) {
@@ -53,10 +63,13 @@ export default class LoginPage extends PureComponent {
       <View>
         <LoginForm
           changeEmail={this.changeEmail}
-          moveToPassword={this.moveToPassword}
           changePassword={this.changePassword}
-          submitLogin={this.submitLogin}
+          cursor={this.state.cursor}
           inputs={this.inputs}
+          moveToPassword={this.moveToPassword}
+          passwordVisible={this.state.passwordVisible}
+          submitLogin={this.submitLogin}
+          togglePasswordVisible={this.togglePasswordVisible}
         />
         <View>
           <Button text={'Submit'} color={brand} onPress={this.submitLogin}/>

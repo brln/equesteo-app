@@ -1,13 +1,12 @@
 import React, { PureComponent } from 'react';
 import {
-  ActivityIndicator,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View
 } from 'react-native';
 
+import BuildImage from '../Images/BuildImage'
 import MultiPlatform from '../MultiPlatform'
 
 export default class LoginForm extends MultiPlatform {
@@ -26,15 +25,22 @@ export default class LoginForm extends MultiPlatform {
           maxLength={200}
         />
         <Text>Password:</Text>
-        <TextInput
-          autoCapitalize={'none'}
-          onChangeText={this.props.changePassword}
-          onSubmitEditing={this.props.submitLogin}
-          secureTextEntry={true}
-          ref={(i) => this.props.inputs['password'] = i}
-          underlineColorAndroid="black"
-          maxLength={200}
-        />
+        <View>
+          <TextInput
+            autoCapitalize={'none'}
+            onChangeText={this.props.changePassword}
+            onSubmitEditing={this.props.submitLogin}
+            secureTextEntry={!this.props.passwordVisible}
+            ref={(i) => this.props.inputs['password'] = i}
+            underlineColorAndroid="black"
+            maxLength={200}
+          />
+          <View style={{position: 'absolute', right: 0, bottom: 5}}>
+            <TouchableOpacity onPress={this.props.togglePasswordVisible}>
+              <BuildImage source={this.props.passwordVisible ? require('../../img/notVisible.png') : require('../../img/visible.png')} style={{width: 30, height: 30}}/>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
     )
   }
