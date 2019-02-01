@@ -223,7 +223,6 @@ export default class Ride extends PureComponent {
           deleteFunc={this.props.deleteRide}
           text={"Are you sure you want to delete this ride?"}
         />
-
         <View style={{flex: 1, flexDirection: 'row', paddingTop: 10, paddingBottom: 10}}>
           { this.userAvatar() }
           <View style={{flex: 4, paddingLeft: 10, paddingRight: 20}}>

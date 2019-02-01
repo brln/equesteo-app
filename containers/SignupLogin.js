@@ -47,7 +47,7 @@ class SignupLoginContainer extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      signup: false,
+      login: false,
       forgot: false,
       forgotSubmitted: false,
       resetCodeSubmitted: false,
@@ -136,7 +136,7 @@ class SignupLoginContainer extends PureComponent {
   showSignup () {
     this.props.dispatch(dismissError())
     this.setState({
-      signup: true,
+      login: false,
       forgot: false,
       forgotSubmitted: false
     })
@@ -145,7 +145,7 @@ class SignupLoginContainer extends PureComponent {
   showForgot () {
     this.props.dispatch(dismissError())
     this.setState({
-      signup: false,
+      login: false,
       forgot: true
     })
   }
@@ -153,7 +153,7 @@ class SignupLoginContainer extends PureComponent {
   showLogin () {
     this.props.dispatch(dismissError())
     this.setState({
-      signup: false,
+      login: true,
       forgot: false,
       forgotSubmitted: false
     })
@@ -162,26 +162,27 @@ class SignupLoginContainer extends PureComponent {
   render() {
     logRender('SignupLoginContainer')
     let form = (
-      <LoginPage
+      <SignupPage
         doingInitialLoad={this.props.doingInitialLoad}
-        submitLogin={this.submitLogin}
-        showSignup={this.showSignup}
-        showForgot={this.showForgot}
+        errorOccurred={this.errorOccurred}
+        submitSignup={this.submitSignup}
+        showLogin={this.showLogin}
       />
     )
-    if (this.state.signup) {
+    if (this.state.login) {
       form = (
-        <SignupPage
+        <LoginPage
           doingInitialLoad={this.props.doingInitialLoad}
-          errorOccurred={this.errorOccurred}
-          submitSignup={this.submitSignup}
-          showLogin={this.showLogin}
+          submitLogin={this.submitLogin}
+          showSignup={this.showSignup}
+          showForgot={this.showForgot}
         />
       )
     } else if (this.state.forgot) {
       form = (
         <ForgotPage
           awaitingPWChange={this.props.awaitingPWChange}
+          doingInitialLoad={this.props.doingInitialLoad}
           error={this.props.error}
           errorOccurred={this.errorOccurred}
           exchangePWCode={this.exchangePWCode}

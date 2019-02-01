@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
   },
   switchupText: {
     textAlign: 'center',
-    fontSize: 10,
+    fontSize: 12,
   },
   underlineText: {
     textDecorationLine: 'underline',

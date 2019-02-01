@@ -252,11 +252,7 @@ export function loadRideElevations (rideID) {
 export function newPassword (password) {
   cb('newPassword')
   return (dispatch) => {
-    UserAPI.changePassword(password).then(() => {
-      // @TODO: this should show a spinner while the load
-      // @TODO: completes and then switch to the feed.
-      dispatch(switchRoot(FEED))
-    }).catch(catchAsyncError(dispatch))
+    UserAPI.changePassword(password).catch(catchAsyncError(dispatch))
   }
 }
 

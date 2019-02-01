@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 
 import {
   ActivityIndicator,
+  Dimensions,
   StyleSheet,
   Text,
   TextInput,
@@ -11,6 +12,9 @@ import {
 
 import { brand, darkBrand } from '../../colors'
 import Button from '../Button'
+import EmailInfoModal from './EmailInfoModal'
+
+const { width } = Dimensions.get('window');
 
 export default class ForgotPage extends PureComponent {
   constructor (props) {
@@ -20,6 +24,7 @@ export default class ForgotPage extends PureComponent {
       resetCode: null,
       pw1: null,
       pw2: null,
+      emailInfoModalOpen: false,
     }
     this.inputs = {}
     this.changeEmail = this.changeEmail.bind(this)
@@ -27,9 +32,18 @@ export default class ForgotPage extends PureComponent {
     this.changePassword2 = this.changePassword2.bind(this)
     this.changeResetCode = this.changeResetCode.bind(this)
     this.getPWCode = this.getPWCode.bind(this)
+    this._renderForm = this._renderForm.bind(this)
+    this._renderLoading = this._renderLoading.bind(this)
+    this.setEmailInfoModalOpen = this.setEmailInfoModalOpen.bind(this)
     this.submitResetCode = this.submitResetCode.bind(this)
     this._moveToPassword2 = this._moveToPassword2.bind(this)
     this.submitNewPassword = this.submitNewPassword.bind(this)
+  }
+
+  setEmailInfoModalOpen (value) {
+    this.setState({
+      emailInfoModalOpen: value
+    })
   }
 
   changeEmail (text) {
@@ -97,7 +111,7 @@ export default class ForgotPage extends PureComponent {
   _submittedForm () {
     return (
       <View>
-        <Text>Enter your reset code:</Text>
+        <Text>Enter the reset code from your email:</Text>
         <TextInput
           autoCapitalize={'none'}
           autoFocus={true}
@@ -112,6 +126,11 @@ export default class ForgotPage extends PureComponent {
           maxLength={30}
         />
         <Button text={'Submit'} color={brand} onPress={this.submitResetCode}/>
+        <View style={{paddingTop: 20}}>
+          <TouchableOpacity onPress={() => {this.setEmailInfoModalOpen(true)}}>
+            <Text style={styles.switchupText}><Text style={styles.underlineText}>Didn't get an email?</Text></Text>
+          </TouchableOpacity>
+        </View>
       </View>
     )
   }
@@ -152,24 +171,30 @@ export default class ForgotPage extends PureComponent {
     )
   }
 
-  render() {
+  _renderLoading () {
+    return (
+      <View>
+        <ActivityIndicator size="large" color={darkBrand} />
+        <Text style={{textAlign: 'center', color: darkBrand}}>Loading Data...</Text>
+      </View>
+    )
+  }
+
+  _renderForm() {
     let form
     if (this.props.forgotSubmitted && !this.props.resetCodeSubmitted) {
       form = this._submittedForm()
     } else if (!this.props.forgotSubmitted && !this.props.resetCodeSubmitted) {
       form = this._unsubmittedForm()
-    } else if (this.state.resetCodeSubmitted && !this.props.awaitingPWChange) {
-      form = (
-        <View>
-          <ActivityIndicator size="large" color={darkBrand} />
-          <Text style={{textAlign: 'center', color: darkBrand}}>Loading...</Text>
-        </View>
-      )
     } else if (this.props.resetCodeSubmitted && this.props.awaitingPWChange) {
       form = this._newPasswordForm()
     }
     return (
       <View style={styles.container}>
+        <EmailInfoModal
+          modalOpen={this.state.emailInfoModalOpen}
+          closeModal={() => {this.setEmailInfoModalOpen(false)}}
+        />
         { form }
         <View style={styles.switchup}>
           <View>
@@ -187,13 +212,21 @@ export default class ForgotPage extends PureComponent {
       </View>
     );
   }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        { this.props.doingInitialLoad && !this.props.awaitingPWChange ? this._renderLoading() : this._renderForm() }
+      </View>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
     top: 20,
-    width: "100%",
+    width,
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'stretch',
@@ -208,7 +241,7 @@ const styles = StyleSheet.create({
   },
   switchupText: {
     textAlign: 'center',
-    fontSize: 10,
+    fontSize: 12,
   },
   underlineText: {
     textDecorationLine: 'underline',

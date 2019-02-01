@@ -95,7 +95,6 @@ export default class SignupPage extends PureComponent {
         <Text>Email:</Text>
         <TextInput
           autoCapitalize={'none'}
-          autoFocus={true}
           blurOnSubmit={false}
           keyboardType={'email-address'}
           style={styles.email}
@@ -121,7 +120,6 @@ export default class SignupPage extends PureComponent {
         <Text>Password Again:</Text>
         <TextInput
           autoCapitalize={'none'}
-          onSubmitEditing={this.submitSignup}
           secureTextEntry={true}
           onChangeText={this.changePassword2}
           ref={(i) => this.inputs['pw2'] = i}
@@ -130,7 +128,7 @@ export default class SignupPage extends PureComponent {
         />
         <View style={styles.switchup}>
           <View style={{flex: 1, justifyContent: 'flex-start', flexDirection: 'row'}}>
-            <View style={{paddingRight: 30, paddingLeft: 20}}>
+            <View style={{paddingRight: 20}}>
               <CheckBox
                 checked={this.state.tosAccepted}
                 onPress={this.toggleTOS}
@@ -183,7 +181,7 @@ const styles = StyleSheet.create({
   },
   switchupText: {
     textAlign: 'center',
-    fontSize: 10,
+    fontSize: 12,
   },
   underlineText: {
     textDecorationLine: 'underline',
