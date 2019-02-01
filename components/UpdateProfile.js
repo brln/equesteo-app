@@ -22,6 +22,7 @@ export default class UpdateProfile extends PureComponent {
     this.inputs = {}
     this.changeAboutMe = this.changeAboutMe.bind(this)
     this.changeDefaultPublic = this.changeDefaultPublic.bind(this)
+    this.changeLeaderboardOptOut = this.changeLeaderboardOptOut.bind(this)
     this.changeFirstName = this.changeFirstName.bind(this)
     this.changeLastName = this.changeLastName.bind(this)
     this.changeOnlyUseWifi = this.changeOnlyUseWifi.bind(this)
@@ -38,6 +39,10 @@ export default class UpdateProfile extends PureComponent {
 
   changeDefaultPublic () {
     this.props.changeAccountDetails(this.props.user.set('ridesDefaultPublic', !this.props.user.get('ridesDefaultPublic')))
+  }
+
+  changeLeaderboardOptOut () {
+    this.props.changeAccountDetails(this.props.user.set('leaderboardOptOut', !this.props.user.get('leaderboardOptOut')))
   }
 
   changeOnlyUseWifi () {
@@ -155,6 +160,19 @@ export default class UpdateProfile extends PureComponent {
                     </View>
                     <View style={{flex: 6, justifyContent: 'center'}}>
                       <Text>Default my rides to publicly viewable.</Text>
+                    </View>
+                  </View>
+                </CardItem>
+                <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
+                  <View style={{flex: 1, flexDirection: 'row'}}>
+                    <View style={{flex: 1}}>
+                      <CheckBox
+                        checked={this.props.user.get('leaderboardOptOut')}
+                        onPress={this.changeLeaderboardOptOut}
+                      />
+                    </View>
+                    <View style={{flex: 6, justifyContent: 'center'}}>
+                      <Text>Opt-out of leaderboards.</Text>
                     </View>
                   </View>
                 </CardItem>

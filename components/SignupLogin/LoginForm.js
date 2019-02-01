@@ -35,7 +35,7 @@ export default class LoginForm extends MultiPlatform {
             underlineColorAndroid="black"
             maxLength={200}
           />
-          <View style={{position: 'absolute', right: 0, bottom: 5}}>
+          <View style={{position: 'absolute', right: 0, bottom: 8}}>
             <TouchableOpacity onPress={this.props.togglePasswordVisible}>
               <BuildImage source={this.props.passwordVisible ? require('../../img/notVisible.png') : require('../../img/visible.png')} style={{width: 30, height: 30}}/>
             </TouchableOpacity>
