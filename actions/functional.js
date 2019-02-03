@@ -608,18 +608,22 @@ export function showLocalNotification (message, background, rideID, scrollToComm
   cb('showLocalNotification')
   return (dispatch, getState) => {
     PushNotification.configure({
-      onNotification: () => {
-        const activeComponent = getState().getIn(['localState', 'activeComponent'])
-        let upNext = Promise.resolve()
-        if (activeComponent !== FEED) {
-          upNext = Navigation.popToRoot(activeComponent)
+      onNotification: ({ userInteraction }) => {
+        if (userInteraction) {
+          const activeComponent = getState().getIn(['localState', 'activeComponent'])
+          let upNext = Promise.resolve()
+          if (activeComponent !== FEED) {
+            upNext = Navigation.popToRoot(activeComponent)
+          }
+          upNext.then(() => {
+            dispatch(showPopShowRide())
+          })
         }
-        upNext.then(() => {
-          dispatch(showPopShowRide())
-        })
       }
     })
     dispatch(doSync()).then(() => {
+      // if sync fails here, the popShowRideID gets set to a ride that hasn't
+      // been downloaded
       const showingRideID = getState().getIn(['localState', 'showingRideID'])
       if (background || showingRideID !== rideID) {
         dispatch(setPopShowRide(rideID, background, scrollToComments))
