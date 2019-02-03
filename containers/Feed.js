@@ -3,7 +3,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Navigation } from 'react-native-navigation'
 
-import { doSync, toggleRideCarrot } from "../actions/functional"
+import { doSync, pulldownSync, toggleRideCarrot } from "../actions/functional"
 import BackgroundComponent from '../components/BackgroundComponent'
 import { brand } from '../colors'
 import Feed from '../components/Feed/Feed'
@@ -180,7 +180,7 @@ class FeedContainer extends BackgroundComponent {
     this.setState({
       refreshing: true
     })
-    this.props.dispatch(doSync())
+    this.props.dispatch(pulldownSync())
   }
 
   toggleCarrot (rideID) {

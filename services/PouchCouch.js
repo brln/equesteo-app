@@ -26,6 +26,16 @@ function remoteDBOptions (token) {
 }
 
 export default class PouchCouch {
+  static errorHandler (reject) {
+    return (e) => {
+      if (e.status === 0) {
+        reject(new NotConnectedError('Cannot find the database'))
+      } else {
+        reject(new Error(JSON.stringify(e)))
+      }
+    }
+  }
+
   static saveHorse (horseData) {
     return localHorsesDB.put(horseData)
   }
@@ -65,13 +75,7 @@ export default class PouchCouch {
           new Promise((res, rej) => {
             PouchDB.replicate(db.local, remoteDB).on('complete', (resp) => {
               res(resp)
-            }).on('error', (e) => {
-              if (e.status === 0) {
-                rej(new NotConnectedError('Cannot find the database'))
-              } else {
-                rej(new Error(JSON.stringify(e)))
-              }
-            })
+            }).on('error', PouchCouch.errorHandler(rej))
           })
         )
       }
@@ -128,9 +132,7 @@ export default class PouchCouch {
         }
       ).on('complete', (resp) => {
         resolve(resp)
-      }).on('error', e => {
-        reject(e)
-      })
+      }).on('error', PouchCouch.errorHandler(reject))
     })
   }
 
@@ -167,9 +169,7 @@ export default class PouchCouch {
           }
         ).on('complete', () => {
           resolve()
-        }).on('error', e => {
-          reject(e)
-        })
+        }).on('error', PouchCouch.errorHandler(reject))
       })
     })
   }
@@ -206,9 +206,7 @@ export default class PouchCouch {
           }
         ).on('complete', () => {
           resolve()
-        }).on('error', e => {
-          reject(e)
-        })
+        }).on('error', PouchCouch.errorHandler(reject))
       }).catch((e) => {
         reject(e)
       })

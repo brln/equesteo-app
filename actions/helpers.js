@@ -12,6 +12,7 @@ import {
 } from './standard'
 
 import {
+  catchAsyncError,
   doSync,
   startListeningFCMTokenRefresh,
   startListeningFCM,
@@ -38,7 +39,7 @@ export function loginAndSync(loginFunc, loginArgs, dispatch) {
     dispatch(startListeningFCMTokenRefresh())
     dispatch(setDistributionOnServer())
     dispatch(setDoingInitialLoad(true))
-    return dispatch(doSync({userID, followingIDs, followerIDs}))
+    return dispatch(doSync({userID, followingIDs, followerIDs})).catch(catchAsyncError(dispatch))
   }).then(() => {
     dispatch(switchRoot(FEED))
     dispatch(startListeningFCM())

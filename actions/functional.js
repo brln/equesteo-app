@@ -89,14 +89,16 @@ function cb(action, mixpanel=false) {
 
 export function catchAsyncError (dispatch, sentry=true) {
   return (e) => {
-    if (e.status === 401) {
-      dispatch(signOut())
-    }
-    if (sentry) {
-      captureException(e)
-    }
-    if (ENV === 'local') {
-      logError(e, 'catchAsyncError')
+    if (!(e instanceof NotConnectedError)) {
+      if (e.status === 401) {
+        dispatch(signOut())
+      }
+      if (sentry) {
+        captureException(e)
+      }
+      if (ENV === 'local') {
+        logError(e, 'catchAsyncError')
+      }
     }
   }
 }
@@ -534,9 +536,7 @@ export function uploadPhoto (type, photoLocation, photoID) {
       }).catch(e => {
         logError(e, 'uploadPhoto')
         dispatch(updatePhotoStatus(photoID, 'failed'))
-        if (!(e instanceof NotConnectedError)) {
-          captureException(e)
-        }
+        catchAsyncError(dispatch)(e)
       })
     }
   }
@@ -631,7 +631,7 @@ export function showLocalNotification (message, background, rideID, scrollToComm
           message: message,
         })
       }
-    }).catch(catchAsyncError)
+    }).catch(catchAsyncError(dispatch))
   }
 }
 
@@ -744,7 +744,7 @@ export function startNetworkTracking () {
           dispatch(runPhotoQueue())
           const needsPersist = getState().getIn(['localState', 'needsRemotePersist']) === DB_NEEDS_SYNC
           if (needsPersist) {
-            dispatch(doSync())
+            dispatch(doSync()).catch(catchAsyncError(dispatch))
           }
         }
       }
@@ -844,6 +844,12 @@ export function submitSignup (email, password) {
   }
 }
 
+export function pulldownSync () {
+  return (dispatch) => {
+    dispatch(doSync()).catch(catchAsyncError(dispatch))
+  }
+}
+
 export function doSync (syncData={}, showProgress=true) {
   cb('doSync', true)
   return (dispatch, getState) => {
@@ -871,7 +877,7 @@ export function doSync (syncData={}, showProgress=true) {
         // then they can all go with one sync.
         dispatch(setRemotePersist(DB_SYNCING_AND_ENQUEUED))
         setTimeout(() => {
-          dispatch(doSync(syncData, showProgress))
+          dispatch(doSync(syncData, showProgress)).catch(catchAsyncError(dispatch))
         }, 5000)
         return Promise.resolve()
       } else {
@@ -915,9 +921,6 @@ export function doSync (syncData={}, showProgress=true) {
         dispatch(setRemotePersist(DB_NEEDS_SYNC))
         feedMessage('Error Syncing Data', danger, 5000)
         logError(e, 'doSync.remoteReplicateDBs')
-        if (!(e instanceof NotConnectedError)) {
-          catchAsyncError(dispatch)(e)
-        }
       })
     } else {
       dispatch(setFullSyncFail(true))
@@ -1010,7 +1013,7 @@ export function toggleRideCarrot (rideID) {
       }
       save.then(() => {
         dispatch(carrotMutex(false))
-        return dispatch(doSync())
+        return dispatch(doSync({}, false))
       }).catch(catchAsyncError(dispatch))
     }
   }
