@@ -982,7 +982,7 @@ export function toggleRideCarrot (rideID) {
       let existing = getState().getIn(['pouchRecords', 'rideCarrots']).valueSeq().filter((c) => {
         return c.get('rideID') === rideID && c.get('userID') === currentUserID
       })
-      existing = existing.count() > 0 ? existing.get(0) : null
+      existing = existing.count() > 0 ? existing.first() : null
 
       let save
       if (existing) {

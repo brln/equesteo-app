@@ -49,14 +49,14 @@ export default class RideList extends PureComponent {
     })
     if (rideHorses.count()) {
       let feedHorse = null
-      const sorted = rideHorses.valueSeq().sort((a, b) => a.timestamp - b.timestamp)
+      const sorted = rideHorses.valueSeq().sort((a, b) => a.get('timestamp') - b.get('timestamp'))
       sorted.forEach(rh => {
         if (!feedHorse && rh.get('rideHorseType') === 'rider') {
           feedHorse = this.props.horses.get(rh.get('horseID'))
         }
       })
       if (!feedHorse && sorted.count() > 0) {
-        feedHorse = this.props.horses.get(sorted.get(0).get('horseID'))
+        feedHorse = this.props.horses.get(sorted.first().get('horseID'))
       }
       return feedHorse
     } else if (ride.get('horseID')) {

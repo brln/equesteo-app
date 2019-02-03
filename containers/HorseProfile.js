@@ -151,7 +151,7 @@ class HorseProfileContainer extends BackgroundComponent {
   horseUser() {
     return this.props.horseUsers.valueSeq().filter(hu => {
       return hu.get('horseID') === this.props.horse.get('_id') && hu.get('userID') === this.props.userID
-    }).get(0)
+    }).first()
   }
 
   deleteHorse () {

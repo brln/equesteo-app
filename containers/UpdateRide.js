@@ -226,7 +226,7 @@ class UpdateRideContainer extends BackgroundComponent {
       this.props.dispatch(rideCoordinatesLoaded(updatedCoords))
 
       const justCoords = updatedCoords.get('rideCoordinates')
-      const firstCoord = parseRideCoordinate(justCoords.get(0))
+      const firstCoord = parseRideCoordinate(justCoords.first())
       const lastCoord = parseRideCoordinate(justCoords.get(justCoords.count() - 1))
       // @TODO: if you pause the ride then remove the portion where it was paused, it will still reduce the
       // @TODO: ride time by that number. someday when you have time, you'll need to record the timestamp of all

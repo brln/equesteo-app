@@ -34,11 +34,11 @@ export function simplifyLine (tolerance, points) {
 
     let douglasPeucker = function( points, tolerance ) {
       if ( points.count() <= 2 ) {
-        return List([points.get(0)]);
+        return List([points.first()]);
       }
       let returnPoints = List(),
         // make line from start to end
-        line = new Line( points.get(0), points.get(points.count() - 1) ),
+        line = new Line( points.first(), points.get(points.count() - 1) ),
         // find the largest distance from intermediate points to this line
         maxDistance = 0,
         maxDistanceIndex = 0,
@@ -77,7 +77,7 @@ export function simplifyLine (tolerance, points) {
         // ditching this point
         p = points.get(maxDistanceIndex);
         line.distanceToPoint( p, true );
-        returnPoints = List([points.get(0)])
+        returnPoints = List([points.first()])
       }
       return returnPoints;
     };
