@@ -254,7 +254,7 @@ export default class HorseProfile extends PureComponent {
             </CardItem>
           </Card>
           <TrainingCard
-            rides={this.props.rides}
+            rides={this.props.trainings}
           />
           <RidersCard
             addRider={this.props.addRider}

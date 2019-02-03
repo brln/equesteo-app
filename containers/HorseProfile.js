@@ -199,6 +199,12 @@ class HorseProfileContainer extends BackgroundComponent {
     })
   }
 
+  trainings (trainings, userID, horseID) {
+    return trainings.getIn([`${userID}_training`, 'rides']).filter(t => {
+      return t.get('deleted') !== true && (t.get('horseIDs').indexOf(horseID) >= 0)
+    })
+  }
+
   render() {
     logRender('HorseProfileContainer')
     return (
@@ -215,6 +221,7 @@ class HorseProfileContainer extends BackgroundComponent {
         riders={this.thisHorsesRiders()}
         showRiderProfile={this.showRiderProfile}
         showPhotoLightbox={this.showPhotoLightbox}
+        trainings={this.trainings(this.props.trainings, this.props.userID, this.props.horse.get('_id'))}
         uploadPhoto={this.uploadPhoto}
         user={this.props.user}
         userPhotos={this.props.userPhotos}
@@ -234,6 +241,7 @@ function mapStateToProps (state, passedProps) {
     horse: pouchState.getIn(['horses', passedProps.horse.get('_id')]),
     owner: pouchState.getIn(['users', passedProps.ownerID]),
     rides: pouchState.get('rides'),
+    trainings: pouchState.get('trainings'),
     user: pouchState.getIn(['users', localState.get('userID')]),
     userID: localState.get('userID'),
     users: pouchState.get('users'),

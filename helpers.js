@@ -134,7 +134,7 @@ export function getFirstOfMonth (d) {
 }
 
 export function getFirstOfYear (d) {
-  return new Date(d.getFullYear(), 1, 1)
+  return new Date(d.getFullYear(), 0, 1)
 }
 
 export function formattedWeekString(monday) {
