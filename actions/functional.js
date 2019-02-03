@@ -77,7 +77,7 @@ import {
   userSearchReturned,
   userUpdated,
 } from './standard'
-import {NotConnectedError} from "../errors"
+import { NotConnectedError } from "../errors"
 
 function cb(action, mixpanel=false) {
   logInfo('functionalAction: ' + action)
@@ -622,8 +622,6 @@ export function showLocalNotification (message, background, rideID, scrollToComm
       }
     })
     dispatch(doSync()).then(() => {
-      // if sync fails here, the popShowRideID gets set to a ride that hasn't
-      // been downloaded
       const showingRideID = getState().getIn(['localState', 'showingRideID'])
       if (background || showingRideID !== rideID) {
         dispatch(setPopShowRide(rideID, background, scrollToComments))
@@ -921,6 +919,9 @@ export function doSync (syncData={}, showProgress=true) {
         dispatch(setRemotePersist(DB_NEEDS_SYNC))
         feedMessage('Error Syncing Data', danger, 5000)
         logError(e, 'doSync.remoteReplicateDBs')
+        if (!(e instanceof NotConnectedError)) {
+          throw e
+        }
       })
     } else {
       dispatch(setFullSyncFail(true))
