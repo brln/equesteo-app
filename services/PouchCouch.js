@@ -170,7 +170,7 @@ export default class PouchCouch {
         ).on('complete', () => {
           resolve()
         }).on('error', PouchCouch.errorHandler(reject))
-      })
+      }).catch(PouchCouch.errorHandler(reject))
     })
   }
 
@@ -207,9 +207,7 @@ export default class PouchCouch {
         ).on('complete', () => {
           resolve()
         }).on('error', PouchCouch.errorHandler(reject))
-      }).catch((e) => {
-        reject(e)
-      })
+      }).catch(PouchCouch.errorHandler(reject))
     })
   }
 

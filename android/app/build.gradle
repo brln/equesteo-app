@@ -103,8 +103,8 @@ android {
         minSdkVersion 21
         targetSdkVersion 26
         missingDimensionStrategy "RNN.reactNativeVersion", "reactNative55"
-        versionCode 77
-        versionName "0.49.2"
+        versionCode 78
+        versionName "0.49.3"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
