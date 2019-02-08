@@ -3,18 +3,21 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Navigation } from 'react-native-navigation'
 
-import { doSync, pulldownSync, toggleRideCarrot } from "../actions/functional"
-import BackgroundComponent from '../components/BackgroundComponent'
-import { brand } from '../colors'
-import Feed from '../components/Feed/Feed'
-import { logRender } from '../helpers'
+import { pulldownSync, toggleRideCarrot } from "../../actions/functional"
+import BackgroundComponent from '../../components/BackgroundComponent'
+import { brand } from '../../colors'
+import Feed from '../../components/Feed/Feed'
+import { logRender } from '../../helpers'
 import {
+  FEED,
   FIND_PEOPLE,
   FIRST_START,
   HORSE_PROFILE,
   PROFILE,
-  RIDE
-} from '../screens'
+  RECORDER,
+  RIDE,
+  RIDE_BUTTON,
+} from '../../screens'
 
 class FeedContainer extends BackgroundComponent {
    static options() {
@@ -27,12 +30,7 @@ class FeedContainer extends BackgroundComponent {
         },
         leftButtons: [{
           id: 'sideMenu',
-          icon: require('../img/hamburger.png'),
-          color: 'white'
-        }],
-        rightButtons: [{
-          id: 'findFriends',
-          icon: require('../img/findPeople.png'),
+          icon: require('../../img/hamburger.png'),
           color: 'white'
         }],
         background: {
@@ -53,18 +51,20 @@ class FeedContainer extends BackgroundComponent {
       lastFullSync: null,
       firstStartPopped: false,
       ridePopped: false,
+      recorderDebounce: false,
     }
-    this.toggleCarrot = this.toggleCarrot.bind(this)
-    this.showProfile = this.showProfile.bind(this)
-    this.showRide = this.showRide.bind(this)
-    this.showHorseProfile = this.showHorseProfile.bind(this)
-    this.syncDB = this.syncDB.bind(this)
 
     this.followIDs = this.followIDs.bind(this)
     this.followingRides = this.followingRides.bind(this)
     this.horseOwnerIDs = this.horseOwnerIDs.bind(this)
     this.filteredHorses = this.filteredHorses.bind(this)
     this.filteredHorseUsers = this.filteredHorseUsers.bind(this)
+    this.showProfile = this.showProfile.bind(this)
+    this.showRide = this.showRide.bind(this)
+    this.showHorseProfile = this.showHorseProfile.bind(this)
+    this.syncDB = this.syncDB.bind(this)
+    this.toggleCarrot = this.toggleCarrot.bind(this)
+    this.openRecorder = this.openRecorder.bind(this)
     this.yourRides = this.yourRides.bind(this)
 
     this.memoizeFollowIDs = memoizeOne(this.followIDs)
@@ -77,6 +77,37 @@ class FeedContainer extends BackgroundComponent {
 
     Navigation.events().bindComponent(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
+    Navigation.mergeOptions(this.props.componentId, {
+      topBar: {
+        rightButtons: [{
+          component: {
+            id: RIDE_BUTTON,
+            name: RIDE_BUTTON,
+            passProps: {
+              onPress: this.openRecorder,
+            }
+          }
+        }],
+      }
+    })
+  }
+
+  openRecorder () {
+    if (!this.state.recorderDebounce) {
+      this.setState({
+        recorderDebounce: true
+      })
+      Navigation.push(this.props.activeComponent, {
+        component: {
+          name: RECORDER,
+          id: RECORDER
+        }
+      }).then(() => {
+        this.setState({
+          recorderDebounce: false
+        })
+      })
+    }
   }
 
   navigationButtonPressed({ buttonId }) {
@@ -88,12 +119,6 @@ class FeedContainer extends BackgroundComponent {
           }
         }
       });
-    } else if (buttonId === 'findFriends') {
-      Navigation.push(this.props.componentId, {
-        component: {
-          name: FIND_PEOPLE,
-        }
-      })
     }
   }
 
@@ -274,8 +299,8 @@ class FeedContainer extends BackgroundComponent {
 }
 
 function mapStateToProps (state) {
-  const pouchState = state.get('pouchRecords')
   const localState = state.get('localState')
+  const pouchState = state.get('pouchRecords')
   const userID = localState.get('userID')
   return {
     activeComponent: localState.get('activeComponent'),

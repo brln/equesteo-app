@@ -4,12 +4,14 @@ import About from './components/About'
 import BarnContainer from './containers/Barn'
 import Camera from './containers/Camera'
 import DrawerContainer from './containers/Drawer'
-import FeedContainer from './containers/Feed'
+import FeedContainer from './containers/Feed/Feed'
+import RideButton from './containers/Feed/RideButton'
 import FeedbackContainer from './containers/Feedback'
 import FindPeopleContainer from './containers/FindPeople'
 import FirstStartContainer from './containers/FirstStart'
 import FollowListContainer from './containers/FollowList'
 import HorseProfileContainer from './containers/HorseProfile'
+import LeaderboardsContainer from './containers/Leaderboards'
 import MapContainer from './containers/Map'
 import PhotoLightboxContainer from './containers/PhotoLightbox'
 import ProfileContainer from './containers/Profile'
@@ -32,11 +34,13 @@ export const FIRST_START = 'equesteo.FirstStart'
 export const FOLLOW_LIST = 'equesteo.FollowList'
 export const HORSE_PROFILE = 'equesteo.HorseProfile'
 export const FIND_PEOPLE = 'equesteo.FindPeople'
+export const LEADERBOARDS = 'equesteo.Leaderboards'
 export const MAP = 'equesteo.ViewingMap'
 export const PHOTO_LIGHTBOX = 'equesteo.PhotoLightbox'
 export const PROFILE = 'equesteo.Profile'
 export const RECORDER = 'equesteo.Recorder'
 export const RIDE = 'equesteo.Ride'
+export const RIDE_BUTTON = 'equesteo.RideButton'
 export const RIDE_CHARTS = 'equesteo.RideCharts'
 export const SIGNUP_LOGIN = 'equesteo.SignupLogin'
 export const TRAINING = 'equesteo.Training'
@@ -57,11 +61,13 @@ export function registerScreens(store, Provider) {
   Navigation.registerComponentWithRedux(FIRST_START, () => FirstStartContainer, Provider, store)
   Navigation.registerComponentWithRedux(FOLLOW_LIST, () => FollowListContainer, Provider, store)
   Navigation.registerComponentWithRedux(HORSE_PROFILE, () => HorseProfileContainer, Provider, store)
+  Navigation.registerComponentWithRedux(LEADERBOARDS, () => LeaderboardsContainer, Provider, store)
   Navigation.registerComponentWithRedux(MAP, () => MapContainer, Provider, store)
   Navigation.registerComponentWithRedux(PHOTO_LIGHTBOX, () => PhotoLightboxContainer, Provider, store)
   Navigation.registerComponentWithRedux(PROFILE, () => ProfileContainer, Provider, store)
   Navigation.registerComponentWithRedux(RECORDER, () => RecorderContainer, Provider, store)
   Navigation.registerComponentWithRedux(RIDE, () => RideContainer, Provider, store)
+  Navigation.registerComponentWithRedux(RIDE_BUTTON, () => RideButton, Provider, store)
   Navigation.registerComponentWithRedux(RIDE_CHARTS, () => RideChartsContainer, Provider, store)
   Navigation.registerComponentWithRedux(UPDATE_RIDE, () => UpdateRideContainer, Provider, store)
   Navigation.registerComponentWithRedux(SIGNUP_LOGIN, () => SignupLoginContainer, Provider, store)

@@ -217,7 +217,6 @@ class UpdateRideContainer extends BackgroundComponent {
     Navigation.popToRoot(this.props.componentId)
   }
 
-
   updateLocalRideCoords () {
     if (this.state.trimValues) {
       const rideCoords = this.props.rideCoordinates.get('rideCoordinates').toJS()
@@ -470,7 +469,7 @@ class UpdateRideContainer extends BackgroundComponent {
 
   render() {
     logRender('rendering UpdateRideContainer')
-    return (
+    return this.props.ride ?
       <UpdateRide
         changeCoverPhoto={this.changeCoverPhoto}
         changeRideName={this.changeRideName}
@@ -503,8 +502,7 @@ class UpdateRideContainer extends BackgroundComponent {
         trimRide={this.trimRide}
         trimValues={this.state.trimValues}
         unselectHorse={this.unselectHorse}
-      />
-    )
+      /> : null
   }
 }
 

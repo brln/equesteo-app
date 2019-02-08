@@ -35,43 +35,46 @@ export default class RidingMap extends PureComponent {
     this.showMaptypeButtons = this.showMaptypeButtons.bind(this)
   }
 
-  static mapCoordinates (rideCoordinates) {
+  static mapCoordinates (rideCoordinatesRecord) {
     const featureCollection = {
       type: "FeatureCollection",
       features: []
     }
 
     let totalDistance = 0
-    rideCoordinates.reduce((accum, coord) => {
-      const c = parseRideCoordinate(coord)
-      if (!accum.lastCoord) {
-        accum.lastCoord = c
-      } else {
-        totalDistance += haversine(
-          accum.lastCoord.get('latitude'),
-          accum.lastCoord.get('longitude'),
-          c.get('latitude'),
-          c.get('longitude')
-        )
-        const mile = Math.floor(totalDistance) % 100
-        const feature = {
-          type: 'Feature',
-          properties: {
-            stroke: `#${allColors[mile]}`,
-          },
-          geometry: {
-            type: "LineString",
-            coordinates: [
-              [accum.lastCoord.get('longitude'), accum.lastCoord.get('latitude')],
-              [c.get('longitude'), c.get('latitude')]
-            ]
+    if (rideCoordinatesRecord) {
+      const rideCoordinates = rideCoordinatesRecord.get('rideCoordinates')
+      rideCoordinates.reduce((accum, coord) => {
+        const c = parseRideCoordinate(coord)
+        if (!accum.lastCoord) {
+          accum.lastCoord = c
+        } else {
+          totalDistance += haversine(
+            accum.lastCoord.get('latitude'),
+            accum.lastCoord.get('longitude'),
+            c.get('latitude'),
+            c.get('longitude')
+          )
+          const mile = Math.floor(totalDistance) % 100
+          const feature = {
+            type: 'Feature',
+            properties: {
+              stroke: `#${allColors[mile]}`,
+            },
+            geometry: {
+              type: "LineString",
+              coordinates: [
+                [accum.lastCoord.get('longitude'), accum.lastCoord.get('latitude')],
+                [c.get('longitude'), c.get('latitude')]
+              ]
+            }
           }
+          accum.featureCollection.features.push(feature)
+          accum.lastCoord = c
         }
-        accum.featureCollection.features.push(feature)
-        accum.lastCoord = c
-      }
-      return accum
-    }, {lastCoord: null, featureCollection})
+        return accum
+      }, {lastCoord: null, featureCollection})
+    }
     return featureCollection
   }
 
@@ -234,7 +237,7 @@ export default class RidingMap extends PureComponent {
             heading={this.props.heading}
             ref={ref => (this.map = ref)}
             styleURL={mapStyleURL}
-            onDidFinishLoadingMap={this.fitToElements}
+            // onDidFinishLoadingMap={this.fitToElements}
             style={styles.map}
             zoomLevel={this.props.zoomLevel}
           >
@@ -278,13 +281,13 @@ export default class RidingMap extends PureComponent {
 
 RidingMap.propTypes = {
   centerCoordinate: PropTypes.array,
-  currentRideCoordinates: PropTypes.instanceOf(List).isRequired,
   heading: PropTypes.number.isRequired,
   lastLocation: PropTypes.instanceOf(Map),
   mapRegionChanged: PropTypes.func.isRequired,
   recenter: PropTypes.func.isRequired,
   userControlledMap: PropTypes.bool.isRequired,
   zoomLevel: PropTypes.number.isRequired,
+  currentRideCoordinates: PropTypes.instanceOf(Map),
 }
 
 const layerStyles = MapboxGL.StyleSheet.create({

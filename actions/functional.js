@@ -11,9 +11,8 @@ import PushNotification from 'react-native-push-notification'
 
 import ApiClient from '../services/ApiClient'
 import kalmanFilter from '../services/Kalman'
-import { captureBreadcrumb, captureException, captureMessage, setUserContext } from "../services/Sentry"
+import { captureBreadcrumb, captureException, setUserContext } from "../services/Sentry"
 import { handleNotification } from '../services/PushNotificationHandler'
-
 import {
   goodConnection,
   haversine,
@@ -31,14 +30,16 @@ import {
   tryToLoadStateFromDisk
 } from './helpers'
 import { appStates } from '../helpers'
-import { CAMERA, DRAWER, FEED, RECORDER, SIGNUP_LOGIN, UPDATE_NEW_RIDE_ID } from '../screens'
+import {
+  CAMERA,
+  DRAWER,
+  FEED,
+  RECORDER,
+  RIDE_BUTTON,
+  SIGNUP_LOGIN,
+  UPDATE_NEW_RIDE_ID
+} from '../screens'
 import { LocalStorage, PouchCouch, RidePersister, UserAPI } from '../services'
-
-export const DB_NEEDS_SYNC = 'DB_NEEDS_SYNC'
-export const DB_SYNCING = 'DB_SYNCING'
-export const DB_SYNCING_AND_ENQUEUED = 'DB_SYNCING_AND_ENQUEUED'
-export const DB_SYNCED = 'DB_SYNCED'
-
 import {
   carrotMutex,
   clearLastLocation,
@@ -78,6 +79,12 @@ import {
   userUpdated,
 } from './standard'
 import { NotConnectedError } from "../errors"
+
+export const DB_NEEDS_SYNC = 'DB_NEEDS_SYNC'
+export const DB_SYNCING = 'DB_SYNCING'
+export const DB_SYNCING_AND_ENQUEUED = 'DB_SYNCING_AND_ENQUEUED'
+export const DB_SYNCED = 'DB_SYNCED'
+
 
 function cb(action, mixpanel=false) {
   logInfo('functionalAction: ' + action)
@@ -195,7 +202,6 @@ export function createRideComment(commentData) {
       dispatch(rideCommentUpdated(afterSave.set('_rev', doc.rev)))
       return dispatch(doSync())
     }).catch(catchAsyncError(dispatch))
-
   }
 }
 
@@ -597,9 +603,7 @@ export function signOut () {
         dispatch(switchRoot(SIGNUP_LOGIN))
         dispatch(clearState())
         dispatch(setSigningOut(false))
-      }).catch(e => {
-        logError(e, 'signOut')
-      })
+      }).catch(catchAsyncError(dispatch))
     }
   }
 }
@@ -637,7 +641,7 @@ export function startLocationTracking () {
   cb('startLocationTracking')
   return (dispatch, getState) => {
     logInfo('action: startLocationTracking')
-    configureBackgroundGeolocation().then(() => {
+    return configureBackgroundGeolocation().then(() => {
       const KALMAN_FILTER_Q = 6
       BackgroundGeolocation.on('location', (location) => {
         const lastLocation = getState().getIn(['currentRide', 'lastLocation'])
@@ -785,9 +789,9 @@ export function startListeningFCMTokenRefresh () {
 
 function startActiveComponentListener () {
   cb('startActiveComponentListener')
-  return (dispatch) => {
+  return (dispatch, getState) => {
     Navigation.events().registerComponentDidAppearListener( ( { componentId } ) => {
-      if (componentId !== DRAWER) {
+      if (componentId !== DRAWER && componentId !== RIDE_BUTTON) {
         dispatch(setActiveComponent(componentId))
       }
     })
@@ -882,10 +886,8 @@ export function doSync (syncData={}, showProgress=true) {
         dispatch(setRemotePersist(DB_SYNCING))
       }
 
-      feedMessage('Starting Sync', warning, null)
+      feedMessage('Uploading...', warning, null)
       return PouchCouch.remoteReplicateDBs().then(() => {
-        feedMessage('Data Uploaded', warning, null)
-
         let userID = syncData.userID
         let followingIDs = syncData.followingIDs
         let followerIDs = syncData.followerIDs
@@ -905,9 +907,10 @@ export function doSync (syncData={}, showProgress=true) {
           ).toJS()
         }
         dispatch(setFullSyncFail(false))
+        feedMessage('Downloading...', warning, null)
         return PouchCouch.localReplicateDBs(userID, followingIDs, followerIDs)
       }).then(() => {
-        feedMessage('Data Downloaded', warning, null)
+        feedMessage('Calculating...', warning, null)
         return PouchCouch.localLoad()
       }).then(localData => {
         dispatch(localDataLoaded(localData))
@@ -940,7 +943,6 @@ export function switchRoot (newRoot) {
         root: {
           sideMenu: {
             left: {
-              visible: true,
               component: {name: DRAWER, id: DRAWER}
             },
             center: {

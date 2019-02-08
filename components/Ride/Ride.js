@@ -229,7 +229,9 @@ export default class Ride extends PureComponent {
             <TouchableWithoutFeedback onPress={this.maybeShowID}>
               <View>
                 <Text style={{fontSize: 20, color: 'black'}}>{this.props.ride.get('name') || 'No Name'}</Text>
-                <Text style={{fontSize: 14}}>{ userName(this.props.rideUser) }</Text>
+                <TouchableOpacity onPress={this.showProfile}>
+                  <Text style={{fontSize: 14}}>{ userName(this.props.rideUser) }</Text>
+                </TouchableOpacity>
                 <Text style={{fontSize: 12, fontWeight: 'normal', color: darkGrey}}>{this.rideTime()}</Text>
               </View>
             </TouchableWithoutFeedback>

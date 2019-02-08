@@ -266,7 +266,8 @@ export default function PouchRecordsReducer(state=initialState, action) {
         ridePhotos: fromJS(action.localData.ridePhotos),
         trainings: fromJS(action.localData.trainings),
         users: fromJS(action.localData.users),
-        userPhotos: fromJS(action.localData.userPhotos)
+        userPhotos: fromJS(action.localData.userPhotos),
+        leaderboards: fromJS(action.localData.leaderboards)
       }))
     case RIDE_CARROT_CREATED:
       return state.setIn(['rideCarrots', action.carrotData.get('_id')], action.carrotData)

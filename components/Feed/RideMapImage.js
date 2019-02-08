@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import { API_URL } from 'react-native-dotenv'
 
+
 import { logError } from '../../helpers'
 import { MAPBOX_TOKEN } from 'react-native-dotenv'
 import URIImage from '../Images/URIImage'

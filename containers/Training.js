@@ -82,6 +82,9 @@ class TrainingContainer extends PureComponent {
   allRidersButYou (trainings, users, userID) {
     let peopleWhoRideYourHorses = Map()
     this.trainings(trainings, userID).forEach(ride => {
+      if (!ride.get('userID')) {
+        logDebug(ride.toJSON(), 'eh?')
+      }
       if (ride.get('userID') !== userID) {
         peopleWhoRideYourHorses = peopleWhoRideYourHorses.set(
           ride.get('userID'),
@@ -89,6 +92,7 @@ class TrainingContainer extends PureComponent {
         )
       }
     })
+    logDebug(peopleWhoRideYourHorses.toJSON())
     return peopleWhoRideYourHorses
   }
 

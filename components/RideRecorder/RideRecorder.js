@@ -73,15 +73,17 @@ export default class RideRecorder extends PureComponent {
   }
 
   recenter () {
-    this.setState({
-      centerCoordinate: RideRecorder.centerCoordinate(this.props.lastLocation),
-      heading: RideRecorder.currentHeading(
-        this.props.currentRideCoordinates.get('rideCoordinates'),
-        this.props.lastLocation
-      ),
-      userControlledMap: false,
-      zoomLevel: 14,
-    })
+    if (this.props.currentRideCoordinates) {
+      this.setState({
+        centerCoordinate: RideRecorder.centerCoordinate(this.props.lastLocation),
+        heading: RideRecorder.currentHeading(
+          this.props.currentRideCoordinates.get('rideCoordinates'),
+          this.props.lastLocation
+        ),
+        userControlledMap: false,
+        zoomLevel: 14,
+      })
+    }
   }
 
   mapRegionChanged (e) {
@@ -131,7 +133,6 @@ export default class RideRecorder extends PureComponent {
   }
 
   render() {
-    let mainView = null
     let pauseButton = null
     let cameraButton = null
     if (this.state.fabActive && this.props.lastLocation) {
@@ -141,26 +142,30 @@ export default class RideRecorder extends PureComponent {
         </Button>
       )
     }
-    let startButton = (
-      <View style={styles.startButton}>
-        <Text onPress={this.props.startRide} style={styles.startText}>Start Ride</Text>
-      </View>
-    )
-    if (this.props.currentRide) {
-      startButton = null
-      if (this.state.fabActive && !this.props.currentRide.get('lastPauseStart')) {
-        pauseButton = (
-          <Button style={{ backgroundColor: danger }} onPress={this.hitPause}>
-            <FabImage source={require('../../img/pause.png')} height={30} width={30} />
-          </Button>
-        )
-      }
-
-      mainView = (
+    if (this.state.fabActive && !this.props.currentRide.get('lastPauseStart')) {
+      pauseButton = (
+        <Button style={{ backgroundColor: danger }} onPress={this.hitPause}>
+          <FabImage source={require('../../img/pause.png')} height={30} width={30} />
+        </Button>
+      )
+    }
+    return (
+      <View style={styles.container}>
+        <DiscardModal
+          modalOpen={this.props.discardModalOpen}
+          closeDiscardModal={this.props.closeDiscardModal}
+          discardFunc={this.props.discardRide}
+          text={"You haven't gone anywhere on this ride yet. Do you want to close it?"}
+        />
+        <GPSStatus
+          shown={this.props.showGPSBar}
+          style={styles.gpsBar}
+          lastLocation={this.props.lastLocation}
+        />
         <View style={{flex: 1}}>
           <View style={{flex: 5}}>
             <RidingMap
-              currentRideCoordinates={this.props.currentRideCoordinates.get('rideCoordinates')}
+              currentRideCoordinates={this.props.currentRideCoordinates}
               heading={this.state.heading}
               centerCoordinate={this.state.centerCoordinate ? this.state.centerCoordinate : this.state.nullMapLocation}
               lastLocation={this.props.lastLocation}
@@ -184,11 +189,11 @@ export default class RideRecorder extends PureComponent {
               </Fab>
             </View>
             <PlayButton
-              visible={Boolean(this.props.currentRide.get('lastPauseStart'))}
+              visible={Boolean(this.props.currentRide && this.props.currentRide.get('lastPauseStart'))}
               onPress={this.props.unpauseLocationTracking}
             />
           </View>
-          <RideStats
+          { this.props.currentRide ? <RideStats
             appState={this.props.appState}
             currentRide={this.props.currentRide}
             currentRideCoordinates={this.props.currentRideCoordinates}
@@ -196,27 +201,10 @@ export default class RideRecorder extends PureComponent {
             lastLocation={this.props.lastLocation}
             lastElevation={this.props.lastElevation}
             visible={!this.state.userControlledMap}
-          />
+          /> : null }
         </View>
-      )
-    }
-    return (
-      <View style={styles.container}>
-        <DiscardModal
-          modalOpen={this.props.discardModalOpen}
-          closeDiscardModal={this.props.closeDiscardModal}
-          discardFunc={this.props.discardRide}
-          text={"You haven't gone anywhere on this ride yet. Do you want to close it?"}
-        />
-        <GPSStatus
-          shown={this.props.showGPSBar}
-          style={styles.gpsBar}
-          lastLocation={this.props.lastLocation}
-        />
-        { mainView }
-        { startButton }
       </View>
-    );
+    )
   }
 }
 

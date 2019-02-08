@@ -21,7 +21,7 @@ import {
 import { brand } from '../colors'
 import RideRecorder from '../components/RideRecorder/RideRecorder'
 import { isAndroid, logRender, unixTimeNow } from '../helpers'
-import { CAMERA, UPDATE_RIDE, UPDATE_NEW_RIDE_ID } from "../screens"
+import { CAMERA, RECORDER, UPDATE_RIDE, UPDATE_NEW_RIDE_ID } from "../screens"
 
 class RecorderContainer extends PureComponent {
   static options() {
@@ -50,6 +50,8 @@ class RecorderContainer extends PureComponent {
     this.state = {
       showGPSBar: !props.currentRide,
       discardModalOpen: false,
+      navDebounce: false,
+      _isMounted: false,
     }
 
     this.backToFeed = this.backToFeed.bind(this)
@@ -90,31 +92,56 @@ class RecorderContainer extends PureComponent {
     if (!this.props.currentRide) {
       this.props.dispatch(stopLocationTracking())
     }
-    Navigation.pop(this.props.componentId)
+    return Navigation.pop(this.props.componentId)
   }
 
   componentWillReceiveProps (nextProps) {
     if (nextProps.lastLocation && !this.gpsTimeout) {
       this.gpsTimeout = setTimeout(() => {
-        this.setState({showGPSBar: false})
+        if (this.state._isMounted) {
+          this.setState({showGPSBar: false})
+        }
       }, 2000)
     }
   }
 
   componentWillUnmount () {
+    this.setState({
+      _isMounted: false
+    })
     BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
     clearTimeout(this.gpsTimeout)
   }
 
   navigationButtonPressed ({ buttonId }) {
-    if (buttonId === 'finishRide') {
-      this.finishRide()
-    } else if (buttonId === 'back') {
-      this.goBack()
+    if (!this.state.navDebounce && this.state._isMounted) {
+      this.setState({
+        navDebounce: true
+      })
+      let nextScreen
+      if (buttonId === 'finishRide') {
+        nextScreen = this.finishRide()
+      } else if (buttonId === 'back') {
+        nextScreen = this.goBack()
+      }
+      nextScreen.then(() => {
+        if (this.state._isMounted) {
+          this.setState({
+            navDebounce: false
+          })
+        }
+      })
     }
   }
 
+  componentWillMount() {
+    this.startRide()
+  }
+
   componentDidMount () {
+    this.setState({
+      _isMounted: true
+    })
     BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
     if (isAndroid()) {
       LocationServicesDialogBox.checkLocationServicesIsEnabled({
@@ -127,13 +154,15 @@ class RecorderContainer extends PureComponent {
         preventOutSideTouch: false,
         preventBackClick: true,
         providerListener: false,
-      }).then(
-        this.props.dispatch(startLocationTracking())
-      ).catch(
-        this.backToFeed
-      );
+      }).then(() => {
+        return this.props.dispatch(startLocationTracking())
+      }).catch(e => {
+        this.backToFeed()
+      })
     } else {
-      this.props.dispatch(startLocationTracking())
+      this.props.dispatch(startLocationTracking()).then(() => {
+        this.startRide()
+      })
     }
   }
 
@@ -175,11 +204,14 @@ class RecorderContainer extends PureComponent {
   finishRide () {
     if (this.props.currentRideCoordinates.get('rideCoordinates').count() > 0) {
       this.props.dispatch(stashNewLocations())
-      this.showUpdateRide()
+      return this.showUpdateRide()
     } else {
-      this.setState({
-        discardModalOpen: true
+      return new Promise((res) => {
+        this.setState({
+          discardModalOpen: true
+        }, res())
       })
+
     }
   }
 
@@ -199,7 +231,7 @@ class RecorderContainer extends PureComponent {
       this.props.currentRideCoordinates,
       this.props.currentRidePhotos,
     ))
-    Navigation.push(this.props.componentId, {
+    return Navigation.push(this.props.componentId, {
       component: {
         name: UPDATE_RIDE,
         id: UPDATE_NEW_RIDE_ID,
@@ -209,7 +241,7 @@ class RecorderContainer extends PureComponent {
           currentRidePhotos: this.props.currentRidePhotos.keySeq().toList(),
         }
       }
-    });
+    })
   }
 
   pauseLocationTracking () {
@@ -239,7 +271,6 @@ class RecorderContainer extends PureComponent {
         showCamera={this.showCamera}
         showGPSBar={this.state.showGPSBar}
         showUpdateRide={this.showUpdateRide}
-        startRide={this.startRide}
         unpauseLocationTracking={this.unpauseLocationTracking}
       />
     )
@@ -252,6 +283,7 @@ function mapStateToProps (state) {
   const currentRideState = state.get('currentRide')
   const userID = localState.get('userID')
   return {
+    activeComponent: localState.get('activeComponent'),
     appState: localState.get('appState'),
     currentRide: currentRideState.get('currentRide'),
     currentRideElevations: currentRideState.get('currentRideElevations'),

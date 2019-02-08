@@ -119,6 +119,7 @@ class RideContainer extends PureComponent {
     this.memoRideComments = memoizeOne(this.rideComments.bind(this))
     this.memoRideHorses = memoizeOne(this.rideHorses.bind(this))
     this.memoThisRidesPhotos = memoizeOne(this.thisRidesPhotos.bind(this))
+    this.memoHorseOwnerIDs = memoizeOne(this.horseOwnerIDs.bind(this))
   }
 
   viewRideCharts () {
@@ -262,8 +263,8 @@ class RideContainer extends PureComponent {
     return horses
   }
 
-  horseOwnerIDs () {
-    return this.props.horseUsers.filter(hu => {
+  horseOwnerIDs (horseUsers) {
+    return horseUsers.filter(hu => {
       return hu.get('owner') === true
     }).mapEntries(([horseUserID, horseUser]) => {
       return [horseUser.get('horseID'), horseUser.get('userID')]
@@ -278,7 +279,7 @@ class RideContainer extends PureComponent {
         deleteRide={this.deleteRide}
         horses={this.props.horses}
         horsePhotos={this.props.horsePhotos}
-        horseOwnerIDs={this.horseOwnerIDs()} //memoize this
+        horseOwnerIDs={this.memoHorseOwnerIDs(this.props.horseUsers)}
         modalOpen={this.state.modalOpen}
         newComment={this.state.newComment}
         ride={this.props.ride}

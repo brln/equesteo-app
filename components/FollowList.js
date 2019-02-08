@@ -80,4 +80,4 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5FCFF',
     width: '100%'
   },
-});
+})

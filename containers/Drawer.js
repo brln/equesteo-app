@@ -16,8 +16,9 @@ import {
   BARN,
   FEED,
   FEEDBACK,
+  FIND_PEOPLE,
+  LEADERBOARDS,
   PROFILE,
-  RECORDER,
   TRAINING,
 } from '../screens'
 import BuildImage from '../components/Images/BuildImage'
@@ -33,28 +34,15 @@ class DrawerContainer extends Component {
     this.toggleDrawer = this.toggleDrawer.bind(this)
     this.openAccount = this.openAccount.bind(this)
     this.openBarn = this.openBarn.bind(this)
-    this.openRecorder = this.openRecorder.bind(this)
-    this.openTraining = this.openTraining.bind(this)
     this.openFeedback = this.openFeedback.bind(this)
+    this.openFindFriends = this.openFindFriends.bind(this)
+    this.openLeaderboards = this.openLeaderboards.bind(this)
+    this.openTraining = this.openTraining.bind(this)
   }
 
   shouldComponentUpdate () {
     return false
   }
-
-  openRecorder () {
-    this.toggleDrawer()
-    if (this.props.activeComponent === FEED) {
-      this.toggleDrawer()
-      Navigation.push(this.props.activeComponent, {
-        component: {
-          name: RECORDER,
-          id: RECORDER
-        }
-      })
-    }
-  }
-
 
   openAccount () {
     this.toggleDrawer()
@@ -66,6 +54,18 @@ class DrawerContainer extends Component {
           passProps: {
             profileUser: this.props.user,
           }
+        }
+      })
+    }
+	}
+
+	openFindFriends () {
+    this.toggleDrawer()
+    if (this.props.activeComponent === FEED) {
+      Navigation.push(this.props.activeComponent, {
+        component: {
+          name: FIND_PEOPLE,
+          title: 'Find Friends',
         }
       })
     }
@@ -93,6 +93,17 @@ class DrawerContainer extends Component {
     }
   }
 
+  openLeaderboards () {
+    this.toggleDrawer()
+    if (this.props.activeComponent === FEED) {
+      Navigation.push(this.props.activeComponent, {
+        component: {
+          name: LEADERBOARDS,
+        }
+      })
+    }
+  }
+
   openFeedback () {
     this.toggleDrawer()
     if (this.props.activeComponent === FEED) {
@@ -105,7 +116,7 @@ class DrawerContainer extends Component {
   }
 
   toggleDrawer() {
-    return Navigation.mergeOptions(this.props.activeComponent, {
+    return Navigation.mergeOptions(FEED, {
       sideMenu: {
         left: {
           visible: false,
@@ -129,8 +140,8 @@ class DrawerContainer extends Component {
             <BuildImage
               source={require('../img/logo250.png')}
               style={{
-                width: 120,
-                height: 120,
+                width: 110,
+                height: 110,
                 alignItems: 'center',
               }}
             />
@@ -143,65 +154,77 @@ class DrawerContainer extends Component {
             </Text>
           </View>
           <View style={styles.container}>
-              <View style={styles.drawerList}>
-                <TouchableOpacity onPress={this.openRecorder}>
-                  <View style={styles.drawerListItem}>
-                    <BuildImage
-                      source={require('../img/runningHorse.png')}
-                      style={styles.icon}
-                    />
-                    <Text style={styles.drawerListItemText} onTouch>
-                      Go Ride
-                    </Text>
-                  </View>
-                </TouchableOpacity>
+            <View style={styles.drawerList}>
+              <TouchableOpacity onPress={this.openTraining}>
+                <View style={styles.drawerListItem}>
+                  <BuildImage
+                    source={require('../img/diary.png')}
+                    style={styles.icon}
+                  />
+                  <Text style={styles.drawerListItemText} onTouch>
+                    Training
+                  </Text>
+                </View>
+              </TouchableOpacity>
 
-                <TouchableOpacity onPress={this.openBarn}>
-                  <View style={styles.drawerListItem}>
-                    <BuildImage
-                      source={require('../img/barn.png')}
-                      style={styles.icon}
-                    />
-                    <Text style={styles.drawerListItemText}>
-                      My Barn
-                    </Text>
-                  </View>
-                </TouchableOpacity>
+              <TouchableOpacity onPress={this.openLeaderboards}>
+                <View style={styles.drawerListItem}>
+                  <BuildImage
+                    source={require('../img/leaderboard.png')}
+                    style={styles.icon}
+                  />
+                  <Text style={styles.drawerListItemText} onTouch>
+                    Leaderboards
+                  </Text>
+                </View>
+              </TouchableOpacity>
 
-                <TouchableOpacity onPress={this.openTraining}>
-                  <View style={styles.drawerListItem}>
-                    <BuildImage
-                      source={require('../img/diary.png')}
-                      style={styles.icon}
-                    />
-                    <Text style={styles.drawerListItemText} onTouch>
-                      Training
-                    </Text>
-                  </View>
-                </TouchableOpacity>
+              <TouchableOpacity onPress={this.openBarn}>
+                <View style={styles.drawerListItem}>
+                  <BuildImage
+                    source={require('../img/barn.png')}
+                    style={styles.icon}
+                  />
+                  <Text style={styles.drawerListItemText}>
+                    My Barn
+                  </Text>
+                </View>
+              </TouchableOpacity>
 
-                <TouchableOpacity onPress={this.openAccount}>
-                  <View style={styles.drawerListItem}>
-                    <BuildImage
-                      source={require('../img/account2.png')}
-                      style={styles.icon}
-                    />
-                    <Text style={styles.drawerListItemText}>
-                      My Account
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
-            </View>
-            <View style={{position: 'absolute', bottom: 10, flex: 1, alignItems: 'center', justifyContent: 'center', width: '100%'}}>
-              <TouchableOpacity style={{borderColor: 'white', borderWidth: 2, borderRadius: 2}} onPress={this.openFeedback}>
-                <View style={{padding: 6}}>
-                  <Text style={{color: 'white', fontSize: 15, textAlign: 'center'}}>
-                    Feedback
+              <TouchableOpacity onPress={this.openFindFriends}>
+                <View style={styles.drawerListItem}>
+                  <BuildImage
+                    source={require('../img/findPeople.png')}
+                    style={styles.icon}
+                  />
+                  <Text style={styles.drawerListItemText} onTouch>
+                    Find Friends
+                  </Text>
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={this.openAccount}>
+                <View style={styles.drawerListItem}>
+                  <BuildImage
+                    source={require('../img/account2.png')}
+                    style={styles.icon}
+                  />
+                  <Text style={styles.drawerListItemText}>
+                    My Account
                   </Text>
                 </View>
               </TouchableOpacity>
             </View>
+          </View>
+          <View style={{position: 'absolute', bottom: 10, flex: 1, alignItems: 'center', justifyContent: 'center', width: '100%'}}>
+            <TouchableOpacity style={{borderColor: 'white', borderWidth: 2, borderRadius: 2}} onPress={this.openFeedback}>
+              <View style={{padding: 6}}>
+                <Text style={{color: 'white', fontSize: 15, textAlign: 'center'}}>
+                  Feedback
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     )
@@ -211,7 +234,7 @@ class DrawerContainer extends Component {
 const styles = StyleSheet.create({
 	container: {
     flex: 2,
-    paddingTop: 30,
+    paddingTop: 10,
     paddingLeft: 20,
     justifyContent: 'flex-start',
     backgroundColor: brand,
@@ -223,12 +246,12 @@ const styles = StyleSheet.create({
 	drawerListItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 15
+    marginBottom: 10
 	},
 	drawerListItemText: {
 		color: 'white',
 		fontWeight: 'bold',
-		fontSize: 23,
+		fontSize: 21,
 		paddingLeft: 15,
 		flex: 1
 	},

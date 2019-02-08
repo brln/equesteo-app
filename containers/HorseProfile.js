@@ -199,8 +199,8 @@ class HorseProfileContainer extends BackgroundComponent {
     })
   }
 
-  trainings (trainings, userID, horseID) {
-    return trainings.getIn([`${userID}_training`, 'rides']).filter(t => {
+  trainings (trainings, ownerID, horseID) {
+    return trainings.getIn([`${ownerID}_training`, 'rides']).filter(t => {
       return t.get('deleted') !== true && (t.get('horseIDs').indexOf(horseID) >= 0)
     })
   }
@@ -221,7 +221,7 @@ class HorseProfileContainer extends BackgroundComponent {
         riders={this.thisHorsesRiders()}
         showRiderProfile={this.showRiderProfile}
         showPhotoLightbox={this.showPhotoLightbox}
-        trainings={this.trainings(this.props.trainings, this.props.userID, this.props.horse.get('_id'))}
+        trainings={this.trainings(this.props.trainings, this.props.owner.get('_id'), this.props.horse.get('_id'))}
         uploadPhoto={this.uploadPhoto}
         user={this.props.user}
         userPhotos={this.props.userPhotos}
