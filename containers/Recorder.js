@@ -135,7 +135,9 @@ class RecorderContainer extends PureComponent {
   }
 
   componentWillMount() {
-    this.startRide()
+    if (!this.props.currentRide) {
+      this.startRide()
+    }
   }
 
   componentDidMount () {

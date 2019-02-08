@@ -148,6 +148,7 @@ export function appInitialized () {
       if (token && currentUserID) {
         setUserContext(currentUserID)
         Mixpanel.identify(currentUserID)
+        Mixpanel.set({id: currentUserID})
         return PouchCouch.localLoad().then((localData) => {
           dispatch(localDataLoaded(localData))
           dispatch(switchRoot(FEED))

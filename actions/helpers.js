@@ -36,6 +36,7 @@ export function loginAndSync(loginFunc, loginArgs, dispatch) {
     dispatch(saveUserID(userID))
     setUserContext(userID)
     Mixpanel.identify(userID)
+    Mixpanel.set({id: userID})
     dispatch(startListeningFCMTokenRefresh())
     dispatch(setDistributionOnServer())
     dispatch(setDoingInitialLoad(true))
