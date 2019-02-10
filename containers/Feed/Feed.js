@@ -59,6 +59,7 @@ class FeedContainer extends BackgroundComponent {
     this.horseOwnerIDs = this.horseOwnerIDs.bind(this)
     this.filteredHorses = this.filteredHorses.bind(this)
     this.filteredHorseUsers = this.filteredHorseUsers.bind(this)
+    this.makeSureDrawerClosed = this.makeSureDrawerClosed.bind(this)
     this.showProfile = this.showProfile.bind(this)
     this.showRide = this.showRide.bind(this)
     this.showHorseProfile = this.showHorseProfile.bind(this)
@@ -103,6 +104,13 @@ class FeedContainer extends BackgroundComponent {
           id: RECORDER
         }
       }).then(() => {
+        Navigation.mergeOptions(this.props.componentId, {
+          sideMenu: {
+            left: {
+              visible: false,
+            }
+          }
+        })
         this.setState({
           recorderDebounce: false
         })
@@ -156,6 +164,16 @@ class FeedContainer extends BackgroundComponent {
     }
   }
 
+  makeSureDrawerClosed () {
+    Navigation.mergeOptions(this.props.componentId, {
+      sideMenu: {
+        left: {
+          visible: false,
+        }
+      }
+    })
+  }
+
   showHorseProfile (horse, ownerID) {
     Navigation.push(this.props.componentId, {
       component: {
@@ -166,6 +184,8 @@ class FeedContainer extends BackgroundComponent {
           ownerID
         }
       }
+    }).then(() => {
+      this.makeSureDrawerClosed()
     })
   }
 
@@ -185,6 +205,8 @@ class FeedContainer extends BackgroundComponent {
           profileUser: user,
         }
       }
+    }).then(() => {
+      this.makeSureDrawerClosed()
     })
   }
 
@@ -198,7 +220,9 @@ class FeedContainer extends BackgroundComponent {
           isPopShow,
         }
       }
-    });
+    }).then(() => {
+      this.makeSureDrawerClosed()
+    })
   }
 
   syncDB () {

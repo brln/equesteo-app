@@ -142,6 +142,12 @@ export function appInitialized () {
       dispatch(dismissError())
       dispatch(checkFCMPermission())
       dispatch(startAppStateTracking())
+
+      // Just in case app died, this will clear the notification
+      // just by opening app, so it's not stuck up there. Need to
+      // not clear last so if app died and the continue current ride,
+      // will keep working.
+      dispatch(stopLocationTracking(false))
       return ApiClient.getToken()
     }).then((token) => {
       const currentUserID = getState().getIn(['localState', 'userID'])
@@ -799,12 +805,14 @@ function startActiveComponentListener () {
   }
 }
 
-export function stopLocationTracking () {
+export function stopLocationTracking (clearLast=true) {
   cb('stopLocationTracking')
   return (dispatch) => {
     BackgroundGeolocation.stop()
     BackgroundGeolocation.removeAllListeners('location')
-    dispatch(clearLastLocation())
+    if (clearLast) {
+      dispatch(clearLastLocation())
+    }
   }
 }
 

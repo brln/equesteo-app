@@ -62,6 +62,7 @@ export default function CurrentRideReducer(state=initialState, action) {
         unixTimeNow()
       )
     case MERGE_STASHED_LOCATIONS:
+      // @TODO: this needs to add the distance to the ride as well
       const rideCoordinates = state.getIn(['currentRideCoordinates', 'rideCoordinates'])
       const pausedCoordinates = state.get('stashedCoordinates')
       const merged = rideCoordinates.concat(pausedCoordinates).sort((a, b) => {

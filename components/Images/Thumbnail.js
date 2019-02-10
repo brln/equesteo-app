@@ -20,7 +20,7 @@ export default class Thumbnail extends PureComponent {
 
   source () {
     let newSource = this.props.source.uri
-    if (newSource.startsWith('https://')) {
+    if (newSource && newSource.startsWith('https://')) {
       const splitup = newSource.split('/')
       const filename = splitup[splitup.length - 1]
       const filenameSplitup = filename.split('.')

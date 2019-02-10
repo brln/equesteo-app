@@ -59,19 +59,11 @@ export default class UpdateHorse extends PureComponent {
     this.changeHorseDetails({
       profilePhotoID: this.props.selectedPhotoID
     })
-    this.setState({
-      showPhotoMenu: false,
-      selectedPhotoID: null
-    })
     this.props.clearPhotoMenu()
   }
 
   deletePhoto () {
     this.props.markPhotoDeleted(this.props.selectedPhotoID)
-    this.setState({
-      showPhotoMenu: false,
-      selectedPhotoID: null
-    })
     this.props.clearPhotoMenu()
   }
 

@@ -21,7 +21,7 @@ import {
 import { brand } from '../colors'
 import RideRecorder from '../components/RideRecorder/RideRecorder'
 import { isAndroid, logRender, unixTimeNow } from '../helpers'
-import { CAMERA, RECORDER, UPDATE_RIDE, UPDATE_NEW_RIDE_ID } from "../screens"
+import { CAMERA, UPDATE_RIDE, UPDATE_NEW_RIDE_ID } from "../screens"
 
 class RecorderContainer extends PureComponent {
   static options() {
@@ -169,9 +169,11 @@ class RecorderContainer extends PureComponent {
   }
 
   closeDiscardModal () {
-    this.setState({
-      discardModalOpen: false
-    })
+    if (this.state._isMounted) {
+      this.setState({
+        discardModalOpen: false
+      })
+    }
   }
 
   backToFeed () {
@@ -209,18 +211,21 @@ class RecorderContainer extends PureComponent {
       return this.showUpdateRide()
     } else {
       return new Promise((res) => {
-        this.setState({
-          discardModalOpen: true
-        }, res())
+        if (this.state._isMounted) {
+          this.setState({
+            discardModalOpen: true
+          }, res())
+        }
       })
 
     }
   }
 
   discardRide () {
-    this.props.dispatch(discardCurrentRide())
-    this.props.dispatch(stopLocationTracking())
-    Navigation.popToRoot(this.props.componentId)
+    Navigation.popToRoot(this.props.componentId).then(() => {
+      this.props.dispatch(discardCurrentRide())
+      this.props.dispatch(stopLocationTracking())
+    })
   }
 
   showUpdateRide () {
