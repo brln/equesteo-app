@@ -98,7 +98,7 @@ export default class Ride extends PureComponent {
     let lastPoint = null
     let maxSpeed = 0
 
-    const minDistance = (50 * 3) / 5280 // 50 yards
+    const minDistance = (100 * 3) / 5280 // 100 yards
     for (let rideCoord of rideCoordinates) {
       const parsedCoord = parseRideCoordinate(rideCoord)
       if (!lastPoint) {
