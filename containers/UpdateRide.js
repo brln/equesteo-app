@@ -163,7 +163,7 @@ class UpdateRideContainer extends BackgroundComponent {
           this.props.stashedRidePhotos,
           this.state.deletedPhotoIDs,
           this.state.trimValues,
-          this.rideHorses(),
+          this.rideHorses(), // @TODO: memoize, stat
         ))
         this.props.dispatch(setPopShowRide(this.props.ride.get('_id'), true, false))
         Navigation.popToRoot(this.props.componentId).then(() => {
@@ -182,16 +182,17 @@ class UpdateRideContainer extends BackgroundComponent {
       }
     } else {
       if (buttonId === 'save') {
-        this.updateLocalRideCoords()
-        this.props.dispatch(persistRide(
-          this.props.ride.get('_id'),
-          false,
-          this.props.stashedRidePhotos,
-          this.state.deletedPhotoIDs,
-          this.state.trimValues,
-          this.rideHorses(),
-        ))
-        Navigation.pop(this.props.componentId)
+        Navigation.pop(this.props.componentId).then(() => {
+          this.updateLocalRideCoords()
+          this.props.dispatch(persistRide(
+            this.props.ride.get('_id'),
+            false,
+            this.props.stashedRidePhotos,
+            this.state.deletedPhotoIDs,
+            this.state.trimValues,
+            this.rideHorses(),
+          ))
+        })
       } else if (buttonId === 'back' || buttonId === 'discard') {
         Navigation.pop(this.props.componentId).then(() => {
           this.props.dispatch(rideUpdated(this.state.cachedRide))

@@ -11,7 +11,6 @@ import {
   PAUSE_LOCATION_TRACKING,
   REPLACE_LAST_LOCATION,
   RESUME_LOCATION_TRACKING,
-  RIDE_CREATED,
   STASH_NEW_LOCATIONS,
   STOP_STASH_NEW_LOCATIONS,
   START_RIDE,
@@ -284,8 +283,6 @@ export default function CurrentRideReducer(state=initialState, action) {
       return replacedLastLocation
     case RESUME_LOCATION_TRACKING:
       return state.set('locationStashingActive', false)
-    case RIDE_CREATED:
-      return state.set('currentRide', null)
     case START_RIDE:
       const coords = []
       let elevations = Map()

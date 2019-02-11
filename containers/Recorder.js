@@ -89,9 +89,9 @@ class RecorderContainer extends PureComponent {
   }
 
   goBack () {
-    if (!this.props.currentRide) {
-      this.props.dispatch(stopLocationTracking())
-    }
+    this.setState({
+      _isMounted: false
+    })
     return Navigation.pop(this.props.componentId)
   }
 
