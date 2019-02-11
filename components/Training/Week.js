@@ -12,7 +12,7 @@ import { formattedWeekString, metersToFeet } from "../../helpers"
 import { rideColor } from '../../modelHelpers/training'
 
 function RideDay (props) {
-  const horseColor =  rideColor(props.ride, props.horses, null)
+  const horseColor =  rideColor(props.ride, props.rideHorses, props.horses, null)
   let showString
   if (props.chosenType === props.types.DISTANCE) {
     showString = (
@@ -59,7 +59,7 @@ function MultiRideDay (props) {
     <View style={{flex: 1, justifyContent: 'center'}}>
       {
         props.rides.map((r) => {
-          const horseColor =  rideColor(r, props.horses, null)
+          const horseColor =  rideColor(r, props.rideHorses, props.horses, null)
           let showString
           if (props.chosenType === props.types.DISTANCE) {
             showString = (
@@ -154,6 +154,7 @@ export default class Week extends Component {
             horses={this.props.horses}
             key={i}
             ride={daysRides[0]}
+            rideHorses={this.props.rideHorses}
             showRide={this.showRide}
             types={this.props.types}
             chosenType={this.props.chosenType}
@@ -166,6 +167,7 @@ export default class Week extends Component {
             horses={this.props.horses}
             key={i}
             rides={daysRides}
+            rideHorses={this.props.rideHorses}
             showRide={this.showRide}
             types={this.props.types}
             chosenType={this.props.chosenType}
