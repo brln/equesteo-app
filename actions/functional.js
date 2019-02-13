@@ -185,10 +185,8 @@ export function checkFCMPermission () {
   return () => {
     firebase.messaging().hasPermission().then(enabled => {
       if (!enabled) {
-        return firebase.messaging().requestPermission().then((resp) => {
-          if (!resp) {
-            alert('FCM permission must be enabled.')
-          }
+        return firebase.messaging().requestPermission().catch((error) => {
+          alert('FCM Permission must be enabled')
         })
       }
     }).catch(e => {

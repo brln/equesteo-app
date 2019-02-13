@@ -13,6 +13,7 @@ import {
   FIRST_START,
   HORSE_PROFILE,
   LEADERBOARDS,
+  MORE,
   PROFILE,
   RECORDER,
   RIDE,
@@ -55,7 +56,7 @@ class FeedContainer extends BackgroundComponent {
       lastFullSync: null,
       firstStartPopped: false,
       ridePopped: false,
-      recorderDebounce: false,
+      debounce: false,
     }
 
     this.followIDs = this.followIDs.bind(this)
@@ -70,6 +71,7 @@ class FeedContainer extends BackgroundComponent {
     this.syncDB = this.syncDB.bind(this)
     this.toggleCarrot = this.toggleCarrot.bind(this)
     this.openLeaderboards = this.openLeaderboards.bind(this)
+    this.openMore = this.openMore.bind(this)
     this.openRecorder = this.openRecorder.bind(this)
     this.openTraining = this.openTraining.bind(this)
     this.yourRides = this.yourRides.bind(this)
@@ -104,9 +106,9 @@ class FeedContainer extends BackgroundComponent {
   }
 
   openRecorder () {
-    if (!this.state.recorderDebounce) {
+    if (!this.state.debounce) {
       this.setState({
-        recorderDebounce: true
+        debounce: true
       })
       Navigation.push(this.props.activeComponent, {
         component: {
@@ -122,16 +124,16 @@ class FeedContainer extends BackgroundComponent {
           }
         })
         this.setState({
-          recorderDebounce: false
+          debounce: false
         })
       })
     }
   }
 
   openTraining () {
-    if (!this.state.recorderDebounce) {
+    if (!this.state.debounce) {
       this.setState({
-        recorderDebounce: true
+        debounce: true
       })
       Navigation.push(this.props.activeComponent, {
         component: {
@@ -140,16 +142,16 @@ class FeedContainer extends BackgroundComponent {
         }
       }).then(() => {
         this.setState({
-          recorderDebounce: false
+          debounce: false
         })
       })
     }
   }
 
   openLeaderboards () {
-    if (!this.state.recorderDebounce) {
+    if (!this.state.debounce) {
       this.setState({
-        recorderDebounce: true
+        debounce: true
       })
       Navigation.push(this.props.activeComponent, {
         component: {
@@ -158,7 +160,25 @@ class FeedContainer extends BackgroundComponent {
         }
       }).then(() => {
         this.setState({
-          recorderDebounce: false
+          debounce: false
+        })
+      })
+    }
+  }
+  
+  openMore () {
+    if (!this.state.debounce) {
+      this.setState({
+        debounce: true
+      })
+      Navigation.push(this.props.activeComponent, {
+        component: {
+          name: MORE,
+          id: MORE,
+        }
+      }).then(() => {
+        this.setState({
+          debounce: false
         })
       })
     }
@@ -349,6 +369,7 @@ class FeedContainer extends BackgroundComponent {
         horseOwnerIDs={this.memoizeHorseOwnerIDs(this.props.horseUsers)}
         horseUsers={this.memoizeFilteredHorseUsers(this.props.follows, this.props.userID, this.props.horseUsers)}
         openLeaderboards={this.openLeaderboards}
+        openMore={this.openMore}
         openRecorder={this.openRecorder}
         openTraining={this.openTraining}
         rideHorses={this.memoizeRideHorses(this.props.rideHorses)}

@@ -54,7 +54,7 @@ export default class Feed extends PureComponent {
           initialPage={0}
           locked={true}
           tabBarUnderlineStyle={{backgroundColor: 'white'}}
-          style={{flex: 6}}
+          style={{flex: 12}}
         >
           <Tab
             tabStyle={{backgroundColor: brand}}
@@ -84,6 +84,7 @@ export default class Feed extends PureComponent {
         </Tabs>
         <TabBar
           openLeaderboards={this.props.openLeaderboards}
+          openMore={this.props.openMore}
           openRecorder={this.props.openRecorder}
           openTraining={this.props.openTraining}
         />
@@ -104,4 +105,4 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold'
   }
-});
+})
