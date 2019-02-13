@@ -1,5 +1,5 @@
 export const lightBrand = '#78cbee'
-export const brand = '#5bc0eb'
+export const brand = '#5bc0eb' // R:91, G:192, B:235
 export const darkBrand = '#4b9ec1'
 export const black = '#000000'
 export const danger = '#e55934'

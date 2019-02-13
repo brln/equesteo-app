@@ -1,5 +1,6 @@
 import memoizeOne from 'memoize-one';
 import React from 'react'
+import { Platform } from 'react-native'
 import { connect } from 'react-redux'
 import { Navigation } from 'react-native-navigation'
 
@@ -9,14 +10,14 @@ import { brand } from '../../colors'
 import Feed from '../../components/Feed/Feed'
 import { logRender } from '../../helpers'
 import {
-  FEED,
-  FIND_PEOPLE,
   FIRST_START,
   HORSE_PROFILE,
+  LEADERBOARDS,
   PROFILE,
   RECORDER,
   RIDE,
   RIDE_BUTTON,
+  TRAINING,
 } from '../../screens'
 
 class FeedContainer extends BackgroundComponent {
@@ -28,11 +29,14 @@ class FeedContainer extends BackgroundComponent {
           color: 'white',
           fontSize: 20
         },
-        leftButtons: [{
-          id: 'sideMenu',
-          icon: require('../../img/hamburger.png'),
-          color: 'white'
-        }],
+        leftButtons: Platform.select({
+          android: [{
+            id: 'sideMenu',
+            icon: require('../../img/hamburger.png'),
+            color: 'white'
+          }],
+          ios: [],
+        }),
         background: {
           color: brand,
         },
@@ -65,7 +69,9 @@ class FeedContainer extends BackgroundComponent {
     this.showHorseProfile = this.showHorseProfile.bind(this)
     this.syncDB = this.syncDB.bind(this)
     this.toggleCarrot = this.toggleCarrot.bind(this)
+    this.openLeaderboards = this.openLeaderboards.bind(this)
     this.openRecorder = this.openRecorder.bind(this)
+    this.openTraining = this.openTraining.bind(this)
     this.yourRides = this.yourRides.bind(this)
 
     this.memoizeFollowIDs = memoizeOne(this.followIDs)
@@ -78,19 +84,23 @@ class FeedContainer extends BackgroundComponent {
 
     Navigation.events().bindComponent(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
-    Navigation.mergeOptions(this.props.componentId, {
-      topBar: {
-        rightButtons: [{
-          component: {
-            id: RIDE_BUTTON,
-            name: RIDE_BUTTON,
-            passProps: {
-              onPress: this.openRecorder,
-            }
+    Navigation.mergeOptions(this.props.componentId,
+      Platform.select({
+        android: {
+          topBar: {
+            rightButtons: [{
+              component: {
+                id: RIDE_BUTTON,
+                name: RIDE_BUTTON,
+                passProps: {
+                  onPress: this.openRecorder,
+                }
+              }
+            }],
           }
-        }],
-      }
-    })
+        },
+      })
+    )
   }
 
   openRecorder () {
@@ -111,6 +121,42 @@ class FeedContainer extends BackgroundComponent {
             }
           }
         })
+        this.setState({
+          recorderDebounce: false
+        })
+      })
+    }
+  }
+
+  openTraining () {
+    if (!this.state.recorderDebounce) {
+      this.setState({
+        recorderDebounce: true
+      })
+      Navigation.push(this.props.activeComponent, {
+        component: {
+          name: TRAINING,
+          id: TRAINING
+        }
+      }).then(() => {
+        this.setState({
+          recorderDebounce: false
+        })
+      })
+    }
+  }
+
+  openLeaderboards () {
+    if (!this.state.recorderDebounce) {
+      this.setState({
+        recorderDebounce: true
+      })
+      Navigation.push(this.props.activeComponent, {
+        component: {
+          name: LEADERBOARDS,
+          id: LEADERBOARDS
+        }
+      }).then(() => {
         this.setState({
           recorderDebounce: false
         })
@@ -302,6 +348,9 @@ class FeedContainer extends BackgroundComponent {
         horsePhotos={this.props.horsePhotos}
         horseOwnerIDs={this.memoizeHorseOwnerIDs(this.props.horseUsers)}
         horseUsers={this.memoizeFilteredHorseUsers(this.props.follows, this.props.userID, this.props.horseUsers)}
+        openLeaderboards={this.openLeaderboards}
+        openRecorder={this.openRecorder}
+        openTraining={this.openTraining}
         rideHorses={this.memoizeRideHorses(this.props.rideHorses)}
         refreshing={this.state.refreshing}
         rideCarrots={this.props.rideCarrots.toList()}

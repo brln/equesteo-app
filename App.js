@@ -23,6 +23,12 @@ import { YellowBox } from 'react-native'
 // Remove when on > 0.56
 YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated'])
 
+// https://github.com/facebook/react-native/issues/14806
+YellowBox.ignoreWarnings(['Class RCTCxxModule'])
+
+// https://github.com/facebook/react-native/issues/17504
+YellowBox.ignoreWarnings(['Module RCTImageLoader requires'])
+
 const store = createStore(
   combineReducers({
     pouchRecords: PouchRecordsReducer,

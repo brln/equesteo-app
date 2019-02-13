@@ -7,6 +7,7 @@ import {
 import RideList from './RideList'
 import { brand } from '../../colors'
 import SyncingStatus from './SyncingStatus'
+import TabBar from './TabBar'
 
 export default class Feed extends PureComponent {
   constructor (props) {
@@ -53,6 +54,7 @@ export default class Feed extends PureComponent {
           initialPage={0}
           locked={true}
           tabBarUnderlineStyle={{backgroundColor: 'white'}}
+          style={{flex: 6}}
         >
           <Tab
             tabStyle={{backgroundColor: brand}}
@@ -80,6 +82,11 @@ export default class Feed extends PureComponent {
             { this.renderRideList(true, this.props.yourRides) }
           </Tab>
         </Tabs>
+        <TabBar
+          openLeaderboards={this.props.openLeaderboards}
+          openRecorder={this.props.openRecorder}
+          openTraining={this.props.openTraining}
+        />
       </Container>
     )
   }
