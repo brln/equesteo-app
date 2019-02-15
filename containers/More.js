@@ -5,14 +5,13 @@ import { Navigation } from 'react-native-navigation'
 import {
   Dimensions,
   FlatList,
-  ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native'
 import { brand, darkGrey, lightGrey } from '../colors'
 import { logRender } from '../helpers'
-import { BARN, FIND_PEOPLE, PROFILE } from '../screens'
+import { BARN, FEEDBACK, FIND_PEOPLE, PROFILE } from '../screens'
 import Thumbnail from '../components/Images/Thumbnail'
 
 const { width } = Dimensions.get('window')
@@ -126,6 +125,11 @@ class MoreContainer extends Component {
         icon: require('../img/mainMenus/profile_wt.png'),
         onPress: this.showMyAccount
       },
+      {
+        name: 'Feedback',
+        screen: FEEDBACK,
+
+      }
     ]
 
     return (

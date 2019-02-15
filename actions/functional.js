@@ -978,29 +978,46 @@ export function switchRoot (newRoot) {
   return () => {
     if (newRoot === FEED) {
       Navigation.setRoot({
-        root: {
-          sideMenu: {
-            left: {
-              component: {name: DRAWER, id: DRAWER}
-            },
-            center: {
-              stack: {
-                children: [{
-                  component: {
-                    name: FEED,
-                    id: FEED,
-                    options: {
-                      topBar: {
-                        elevation: 0
+        root: Platform.select({
+          android: {
+            sideMenu: {
+              left: {
+                component: {name: DRAWER, id: DRAWER}
+              },
+              center: {
+                stack: {
+                  children: [{
+                    component: {
+                      name: FEED,
+                      id: FEED,
+                      options: {
+                        topBar: {
+                          elevation: 0
+                        }
                       }
+                    },
+                  }]
+                }
+              },
+            }
+          },
+          ios: {
+            stack: {
+              children: [{
+                component: {
+                  name: FEED,
+                  id: FEED,
+                  options: {
+                    topBar: {
+                      elevation: 0
                     }
-                  },
-                }]
-              }
-            },
+                  }
+                }
+              }]
+            }
           }
-        }
-      });
+        })
+      })
     } else if (newRoot === SIGNUP_LOGIN) {
       Navigation.setRoot({
         root: {

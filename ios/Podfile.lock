@@ -28,17 +28,17 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.4)
-  - GoogleToolboxForMac/Defines (2.1.4)
-  - GoogleToolboxForMac/Logger (2.1.4):
-    - GoogleToolboxForMac/Defines (= 2.1.4)
-  - "GoogleToolboxForMac/NSData+zlib (2.1.4)":
-    - GoogleToolboxForMac/Defines (= 2.1.4)
-  - Mixpanel (3.3.3)
-  - nanopb (0.3.8):
-    - nanopb/decode (= 0.3.8)
-    - nanopb/encode (= 0.3.8)
-  - nanopb/decode (0.3.8)
-  - nanopb/encode (0.3.8)
+  - GoogleToolboxForMac/Defines (2.2.0)
+  - GoogleToolboxForMac/Logger (2.2.0):
+    - GoogleToolboxForMac/Defines (= 2.2.0)
+  - "GoogleToolboxForMac/NSData+zlib (2.2.0)":
+    - GoogleToolboxForMac/Defines (= 2.2.0)
+  - Mixpanel (3.3.9)
+  - nanopb (0.3.901):
+    - nanopb/decode (= 0.3.901)
+    - nanopb/encode (= 0.3.901)
+  - nanopb/decode (0.3.901)
+  - nanopb/encode (0.3.901)
   - Protobuf (3.6.1)
   - QBImagePickerController (3.4.0)
   - React (0.55.4):
@@ -108,7 +108,7 @@ PODS:
   - RNFirebase (4.3.8):
     - Firebase/Core
     - React
-  - RNImageCropPicker (0.20.3):
+  - RNImageCropPicker (0.22.0):
     - QBImagePickerController
     - React/Core
     - RSKImageCropper
@@ -116,7 +116,7 @@ PODS:
     - React
   - RNVectorIcons (4.6.0):
     - React
-  - RSKImageCropper (2.1.0)
+  - RSKImageCropper (2.2.1)
   - yoga (0.55.4.React)
 
 DEPENDENCIES:
@@ -200,9 +200,9 @@ SPEC CHECKSUMS:
   FirebaseMessaging: 6894b8fe0a0cf26c3b13dad729f1131654ae0bdb
   Folly: 211775e49d8da0ca658aebc8eab89d642935755c
   glog: 1de0bb937dccdc981596d3b5825ebfb765017ded
-  GoogleToolboxForMac: 91c824d21e85b31c2aae9bb011c5027c9b4e738f
-  Mixpanel: 3c3925c27f7a321d5978319a72f53f8f0885afc5
-  nanopb: 5601e6bca2dbf1ed831b519092ec110f66982ca3
+  GoogleToolboxForMac: ff31605b7d66400dcec09bed5861689aebadda4d
+  Mixpanel: 5bc76524e4e6f7eea1db809cceaf17b4ad504b05
+  nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
   Protobuf: 1eb9700044745f00181c136ef21b8ff3ad5a0fd5
   QBImagePickerController: d54cf93db6decf26baf6ed3472f336ef35cae022
   React: aa2040dbb6f317b95314968021bd2888816e03d5
@@ -213,7 +213,7 @@ SPEC CHECKSUMS:
   RNImageCropPicker: 32ca4b9fef4e1b7b85ba69494242122948117e06
   RNSVG: 6252323c0312735f0af5f58b5adf2965b6a9ffbf
   RNVectorIcons: c0dbfbf6068fefa240c37b0f71bd03b45dddac44
-  RSKImageCropper: 0d0c6d8525a2381f03fde32a47c6703817a2feed
+  RSKImageCropper: 98296ad26b41753f796b6898d015509598f13d97
   yoga: a23273df0088bf7f2bb7e5d7b00044ea57a2a54a
 
 PODFILE CHECKSUM: c4eb9b453a839d8979251414d1636cec7bb2fae4

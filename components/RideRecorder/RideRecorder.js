@@ -25,12 +25,14 @@ export default class RideRecorder extends PureComponent {
       fabActive: false,
       userControlledMap: false,
       heading: 0,
+      mapRef: null,
       nullMapLocation: props.nullMapLocation ? props.nullMapLocation.toJS() : null,
       zoomLevel: 14,
     }
     this.hitPause = this.hitPause.bind(this)
     this.mapRegionChanged = this.mapRegionChanged.bind(this)
     this.recenter = this.recenter.bind(this)
+    this.setMapRef = this.setMapRef.bind(this)
     this.showCamera = this.showCamera.bind(this)
     this.toggleFab = this.toggleFab.bind(this)
   }
@@ -53,8 +55,7 @@ export default class RideRecorder extends PureComponent {
       let secondToLast = parseRideCoordinate(
         currentRideCoordinates.get(currentRideCoordinates.count() - 2)
       )
-      if (currentRideCoordinates.count() > 1
-        && (lastLocation.get('speed') === undefined || lastLocation.get('speed') > 0)) {
+      if (lastLocation.get('speed') === undefined || lastLocation.get('speed') > 0) {
         newHeading = heading(
           secondToLast.get('latitude'),
           secondToLast.get('longitude'),
@@ -94,6 +95,11 @@ export default class RideRecorder extends PureComponent {
         centerCoordinate: e.geometry.coordinates,
         zoomLevel: e.properties.zoomLevel
       })
+    } else if (this.state.mapRef) {
+      this.state.mapRef.setCamera({
+        heading: this.state.heading,
+        duration: 50
+      })
     }
   }
 
@@ -129,6 +135,12 @@ export default class RideRecorder extends PureComponent {
       } else {
         alert("Sorry, without those permissions you can't take pictures.")
       }
+    })
+  }
+
+  setMapRef (ref) {
+    this.setState({
+      mapRef: ref
     })
   }
 
@@ -172,6 +184,7 @@ export default class RideRecorder extends PureComponent {
               mapRegionChanged={this.mapRegionChanged}
               recenter={this.recenter}
               refiningLocation={this.props.refiningLocation}
+              setMapRef={this.setMapRef}
               userControlledMap={this.state.userControlledMap}
               zoomLevel={this.state.zoomLevel}
             />

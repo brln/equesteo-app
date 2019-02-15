@@ -235,11 +235,12 @@ export default class RidingMap extends PureComponent {
             onRegionDidChange={this.props.mapRegionChanged}
             pitch={45}
             heading={this.props.heading}
-            ref={ref => (this.map = ref)}
+            ref={ref => (this.props.setMapRef(ref))}
             styleURL={mapStyleURL}
             // onDidFinishLoadingMap={this.fitToElements}
             style={styles.map}
             zoomLevel={this.props.zoomLevel}
+            rotateEnabled={true}
           >
             <MapboxGL.ShapeSource id="routeSource" shape={mapCoords}>
               <MapboxGL.LineLayer id="route" sourceID={"routeSource"} style={layerStyles.routeLine}/>
