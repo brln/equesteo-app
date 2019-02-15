@@ -104,7 +104,7 @@ export default class SettingsModal extends PureComponent {
         onClosed={this.props.closeModal}
       >
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'flex-start', paddingTop: 30, paddingLeft: 20, paddingRight: 20}}>
-          <View style={{height: height * 0.45, width: width * 0.75}}>
+          <View style={{height: '100%', width: width * 0.66}}>
             <View>
               <Text style={{color: darkBrand }}>Show Horse:</Text>
               { this.horsePicker() }
@@ -140,7 +140,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: height * 0.15,
-    height: height * 0.70,
-    width: width * .8,
   },
 });

@@ -27,7 +27,7 @@ class TrainingContainer extends PureComponent {
         },
         rightButtons: [{
           id: 'settings',
-          icon: require('../img/settings.png'),
+          text: 'Filters',
           color: 'white'
         }],
       },

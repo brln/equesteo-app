@@ -28,8 +28,6 @@
   
   [ReactNativeNavigation bootstrap:jsCodeLocation launchOptions:launchOptions];
   
-  self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-  self.window.backgroundColor = [UIColor whiteColor];
   return YES;
 }
 @end

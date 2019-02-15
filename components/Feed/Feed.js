@@ -54,7 +54,7 @@ export default class Feed extends PureComponent {
           initialPage={0}
           locked={true}
           tabBarUnderlineStyle={{backgroundColor: 'white'}}
-          style={{flex: 12}}
+          style={{flex: 10}}
         >
           <Tab
             tabStyle={{backgroundColor: brand}}

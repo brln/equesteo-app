@@ -679,6 +679,10 @@ export function startLocationTracking () {
       })
 
       BackgroundGeolocation.on('location', (location) => {
+        if (location.accuracy > 50) {
+          return
+        }
+
         const lastLocation = getState().getIn(['currentRide', 'lastLocation'])
         let timeDiff = 0
         if (lastLocation) {

@@ -79,12 +79,11 @@ export default class UpdateRide extends PureComponent {
     ImagePicker.openPicker({
       width: 1080,
       height: 1080,
+      cropping: true,
     }).then(image => {
-      alert('then')
       this.props.createPhoto(image.path)
     }).catch((e) => {
-      alert('catch')
-      logDebug('shit broke', 'shitbroke')
+      logError(e)
     })
   }
 

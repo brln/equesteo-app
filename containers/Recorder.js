@@ -162,9 +162,7 @@ class RecorderContainer extends PureComponent {
         captureException(e)
       })
     } else {
-      this.props.dispatch(startLocationTracking()).then(() => {
-        this.startRide()
-      })
+      this.props.dispatch(startLocationTracking())
     }
   }
 
