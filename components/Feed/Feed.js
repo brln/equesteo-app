@@ -83,6 +83,7 @@ export default class Feed extends PureComponent {
           </Tab>
         </Tabs>
         <TabBar
+          currentRide={this.props.currentRide}
           openLeaderboards={this.props.openLeaderboards}
           openMore={this.props.openMore}
           openRecorder={this.props.openRecorder}

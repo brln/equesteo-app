@@ -24,7 +24,7 @@ export default class TabBar extends PureComponent {
         <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: brand, borderTopWidth: 1, borderTopColor: lightGrey}}>
           <TouchableOpacity style={{flex: 1, alignItems: 'center'}} onPress={this.props.openRecorder}>
             <BuildImage source={require('../../img/mainMenus/goRide_wt.png')} style={{width: iconHeight, height: iconHeight}} />
-            <Text style={styles.menuText}>Go Ride!</Text>
+            <Text style={styles.menuText}>{this.props.currentRide ? "Continue Ride" : "Go Ride!"}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={{flex: 1, alignItems: 'center'}} onPress={this.props.openTraining}>
             <BuildImage source={require('../../img/mainMenus/training_wt.png')} style={{width: iconHeight, height: iconHeight}} />

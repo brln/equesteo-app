@@ -361,6 +361,7 @@ class FeedContainer extends BackgroundComponent {
     logRender('feedContainer')
     return (
       <Feed
+        currentRide={this.props.currentRide}
         deleteRide={this.deleteRide}
         feedMessage={this.props.feedMessage}
         followingRides={this.memoizeFollowingRides(this.props.follows, this.props.userID, this.props.rides)}
@@ -393,11 +394,13 @@ class FeedContainer extends BackgroundComponent {
 }
 
 function mapStateToProps (state) {
+  const currentRideState = state.get('currentRide')
   const localState = state.get('localState')
   const pouchState = state.get('pouchRecords')
   const userID = localState.get('userID')
   return {
     activeComponent: localState.get('activeComponent'),
+    currentRide: currentRideState.get('currentRide'),
     feedMessage: localState.get('feedMessage'),
     follows: pouchState.get('follows'),
     fullSyncFail: localState.get('fullSyncFail'),
