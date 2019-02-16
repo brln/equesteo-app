@@ -42,12 +42,21 @@ class MoreContainer extends Component {
   constructor (props) {
     super(props)
     this.showBarn = this.showBarn.bind(this)
+    this.showFeedback = this.showFeedback.bind(this)
     this.showFindFriends = this.showFindFriends.bind(this)
     this.showMyAccount = this.showMyAccount.bind(this)
   }
 
   shouldComponentUpdate () {
     return false
+  }
+
+  showFeedback () {
+    Navigation.push(this.props.activeComponent, {
+      component: {
+        name: FEEDBACK,
+      }
+    })
   }
 
   showBarn () {
@@ -128,7 +137,8 @@ class MoreContainer extends Component {
       {
         name: 'Feedback',
         screen: FEEDBACK,
-
+        icon: require('../img/mainMenus/feedback.png'),
+        onPress: this.showFeedback
       }
     ]
 
