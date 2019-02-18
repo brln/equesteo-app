@@ -8,7 +8,7 @@ import {
 import { Button, Fab } from 'native-base'
 
 import { black, brand, green, white, orange, danger } from '../../colors'
-import { heading, parseRideCoordinate } from '../../helpers'
+import { heading, isAndroid, parseRideCoordinate } from '../../helpers'
 import FabImage from '../FabImage'
 import GPSStatus from './GPSStatus'
 import DiscardModal from './DiscardModal'
@@ -116,26 +116,23 @@ export default class RideRecorder extends PureComponent {
 
   showCamera () {
     this.toggleFab()
-
-    let show = true
-    const needed = [
-      PermissionsAndroid.PERMISSIONS.CAMERA,
-      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-    ]
-    PermissionsAndroid.requestMultiple(
-      needed,
-    ).then((granted) => {
-      for (let permission of Object.keys(granted)) {
-        if (granted[permission] !== PermissionsAndroid.RESULTS.GRANTED) {
-          show = false
+    if (isAndroid()) {
+      PermissionsAndroid.requestMultiple([
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+      ]).then((granted) => {
+        const show = Object.values(granted).filter(p => {
+          return p !== PermissionsAndroid.RESULTS.GRANTED
+        }).length > 0
+        if (show) {
+          this.props.showCamera()
+        } else {
+          alert("Sorry, without those permissions you can't take pictures.")
         }
-      }
-      if (show) {
-        this.props.showCamera()
-      } else {
-        alert("Sorry, without those permissions you can't take pictures.")
-      }
-    })
+      })
+    } else {
+      this.props.showCamera()
+    }
   }
 
   setMapRef (ref) {

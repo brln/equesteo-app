@@ -12,7 +12,9 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		602D167C4862B18E06A69753 /* libPods-equesteo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D00C1346FC5CE9A831AC36B /* libPods-equesteo.a */; };
+		890CBC9222186DE300843B7A /* libRCTCameraRoll.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 890CBC9122186D5700843B7A /* libRCTCameraRoll.a */; };
 		8968ADBD22125F4300345955 /* libRNMixpanel.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8968ADBA22125F1100345955 /* libRNMixpanel.a */; };
+		89B7E29B2218655600B6FF2D /* libRNSentry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 89B7E2982218652600B6FF2D /* libRNSentry.a */; };
 		89D75AEC22149ADE003EF395 /* Montserrat-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 89D75AC022149ADE003EF395 /* Montserrat-Regular.otf */; };
 		A721BE372146C0DF00AE909D /* libRCTBackgroundGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A721BE362146BF8300AE909D /* libRCTBackgroundGeolocation.a */; };
 		A721BE392146C7BF00AE909D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A721BE382146C7BE00AE909D /* GoogleService-Info.plist */; };
@@ -44,6 +46,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		890CBC9022186D5700843B7A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 890CBC8C22186D5700843B7A /* RCTCameraRoll.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 58B5115D1A9E6B3D00147676;
+			remoteInfo = RCTCameraRoll;
+		};
 		8968ADB922125F1100345955 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 8968AD8B22125F1000345955 /* RNMixpanel.xcodeproj */;
@@ -57,6 +66,20 @@
 			proxyType = 2;
 			remoteGlobalIDString = 5EAEEA411F0555B100C6FED8;
 			remoteInfo = "RNMixpanel-tvOS";
+		};
+		89B7E2972218652600B6FF2D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 89B7E2662218652500B6FF2D /* RNSentry.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 134814201AA4EA6300B7C361;
+			remoteInfo = RNSentry;
+		};
+		89B7E2992218652600B6FF2D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 89B7E2662218652500B6FF2D /* RNSentry.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 274692C321B4414400BF91A8;
+			remoteInfo = "RNSentry-tvOS";
 		};
 		A721BE352146BF8300AE909D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -367,7 +390,9 @@
 		5964A287E13547F1AFD73A77 /* rubicon-icon-font.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "rubicon-icon-font.ttf"; path = "../node_modules/native-base/Fonts/rubicon-icon-font.ttf"; sourceTree = "<group>"; };
 		6AC11D8FB3DE446E8B5D6932 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/native-base/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		6D00C1346FC5CE9A831AC36B /* libPods-equesteo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-equesteo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		890CBC8C22186D5700843B7A /* RCTCameraRoll.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTCameraRoll.xcodeproj; path = "../node_modules/react-native/Libraries/CameraRoll/RCTCameraRoll.xcodeproj"; sourceTree = "<group>"; };
 		8968AD8B22125F1000345955 /* RNMixpanel.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNMixpanel.xcodeproj; path = "../node_modules/react-native-mixpanel/RNMixpanel.xcodeproj"; sourceTree = "<group>"; };
+		89B7E2662218652500B6FF2D /* RNSentry.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNSentry.xcodeproj; path = "../node_modules/react-native-sentry/ios/RNSentry.xcodeproj"; sourceTree = "<group>"; };
 		89D75AC022149ADE003EF395 /* Montserrat-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Montserrat-Regular.otf"; path = "../../assets/fonts/Montserrat-Regular.otf"; sourceTree = "<group>"; };
 		89E592B52FB948D1919982A3 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/native-base/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
 		943830C8F774413E97EC8F3A /* RNFirebase.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNFirebase.xcodeproj; path = "../node_modules/react-native-firebase/ios/RNFirebase.xcodeproj"; sourceTree = "<group>"; };
@@ -416,6 +441,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				890CBC9222186DE300843B7A /* libRCTCameraRoll.a in Frameworks */,
+				89B7E29B2218655600B6FF2D /* libRNSentry.a in Frameworks */,
 				8968ADBD22125F4300345955 /* libRNMixpanel.a in Frameworks */,
 				A74F928D2153EA9300AE0E34 /* libRCTAnimation.a in Frameworks */,
 				A74F92832153E8A200AE0E34 /* libRCTActionSheet.a in Frameworks */,
@@ -494,6 +521,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				890CBC8C22186D5700843B7A /* RCTCameraRoll.xcodeproj */,
 				A74F91D021531CE200AE0E34 /* libFirebaseCore.a */,
 				A74F91212152C95900AE0E34 /* libBackgroundGeolocation.a */,
 				2D16E6891FA4F8E400B85C8A /* libReact.a */,
@@ -514,6 +542,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				89B7E2662218652500B6FF2D /* RNSentry.xcodeproj */,
 				8968AD8B22125F1000345955 /* RNMixpanel.xcodeproj */,
 				A74F92842153EA8000AE0E34 /* RCTAnimation.xcodeproj */,
 				A74F927D2153E89400AE0E34 /* RCTActionSheet.xcodeproj */,
@@ -560,11 +589,28 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		890CBC8D22186D5700843B7A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				890CBC9122186D5700843B7A /* libRCTCameraRoll.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		8968AD8C22125F1000345955 /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				8968ADBA22125F1100345955 /* libRNMixpanel.a */,
 				8968ADBC22125F1100345955 /* libRNMixpanel-tvOS.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		89B7E2672218652500B6FF2D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				89B7E2982218652600B6FF2D /* libRNSentry.a */,
+				89B7E29A2218652600B6FF2D /* libRNSentry-tvOS.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -806,6 +852,10 @@
 					ProjectRef = A721BE302146BF8300AE909D /* RCTBackgroundGeolocation.xcodeproj */;
 				},
 				{
+					ProductGroup = 890CBC8D22186D5700843B7A /* Products */;
+					ProjectRef = 890CBC8C22186D5700843B7A /* RCTCameraRoll.xcodeproj */;
+				},
+				{
 					ProductGroup = A74F92772153E83500AE0E34 /* Products */;
 					ProjectRef = A74F92762153E83500AE0E34 /* RCTGeolocation.xcodeproj */;
 				},
@@ -857,6 +907,10 @@
 					ProductGroup = 8968AD8C22125F1000345955 /* Products */;
 					ProjectRef = 8968AD8B22125F1000345955 /* RNMixpanel.xcodeproj */;
 				},
+				{
+					ProductGroup = 89B7E2672218652500B6FF2D /* Products */;
+					ProjectRef = 89B7E2662218652500B6FF2D /* RNSentry.xcodeproj */;
+				},
 			);
 			projectRoot = "";
 			targets = (
@@ -866,6 +920,13 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		890CBC9122186D5700843B7A /* libRCTCameraRoll.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRCTCameraRoll.a;
+			remoteRef = 890CBC9022186D5700843B7A /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		8968ADBA22125F1100345955 /* libRNMixpanel.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -878,6 +939,20 @@
 			fileType = archive.ar;
 			path = "libRNMixpanel-tvOS.a";
 			remoteRef = 8968ADBB22125F1100345955 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		89B7E2982218652600B6FF2D /* libRNSentry.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNSentry.a;
+			remoteRef = 89B7E2972218652600B6FF2D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		89B7E29A2218652600B6FF2D /* libRNSentry-tvOS.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libRNSentry-tvOS.a";
+			remoteRef = 89B7E2992218652600B6FF2D /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		A721BE362146BF8300AE909D /* libRCTBackgroundGeolocation.a */ = {
@@ -1376,6 +1451,7 @@
 					"$(SRCROOT)/../node_modules/react-native/React/**",
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
+					"$(SRCROOT)/../node_modules/react-native-sentry/ios/RNSentry/**",
 				);
 				INFOPLIST_FILE = equesteo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -1404,6 +1480,7 @@
 					"$(SRCROOT)/../node_modules/react-native/React/**",
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
 					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/**",
+					"$(SRCROOT)/../node_modules/react-native-sentry/ios/RNSentry/**",
 				);
 				INFOPLIST_FILE = equesteo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;

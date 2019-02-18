@@ -37,6 +37,8 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>To take pictures to post with your rides, you must allow access to the camera.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>App requires background tracking</string>
 	<key>NSLocationAlwaysUsageDescription</key>
