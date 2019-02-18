@@ -34,6 +34,7 @@ import {
   CAMERA,
   DRAWER,
   FEED,
+  NEEDS_SYNC,
   RECORDER,
   RIDE_BUTTON,
   SIGNUP_LOGIN,
@@ -158,10 +159,14 @@ export function appInitialized () {
         Mixpanel.set({id: currentUserID})
         return PouchCouch.localLoad().then((localData) => {
           dispatch(localDataLoaded(localData))
-          dispatch(switchRoot(FEED))
           dispatch(startListeningFCMTokenRefresh())
           dispatch(startListeningFCM())
           dispatch(setDistributionOnServer())
+          if (getState().getIn(['localState', 'lastFullSync'])) {
+            dispatch(switchRoot(FEED))
+          } else {
+            dispatch(switchRoot(NEEDS_SYNC))
+          }
           return dispatch(startNetworkTracking())
         }).then(() => {
           return dispatch(doSync())
@@ -227,8 +232,8 @@ export function deleteHorseUser (horseUserID) {
 
 export function exchangePWCode (email, code) {
   cb('exchangePWCode')
-  return (dispatch) => {
-    loginAndSync(UserAPI.exchangePWCodeForToken, [email, code], dispatch)
+  return (dispatch, getState) => {
+    loginAndSync(UserAPI.exchangePWCodeForToken, [email, code], dispatch, getState)
   }
 }
 
@@ -866,15 +871,15 @@ function startAppStateTracking () {
 
 export function submitLogin (email, password) {
   cb('submitLogin', true)
-  return (dispatch) => {
-    loginAndSync(UserAPI.login, [email, password], dispatch)
+  return (dispatch, getState) => {
+    loginAndSync(UserAPI.login, [email, password], dispatch, getState)
   }
 }
 
 export function submitSignup (email, password) {
   cb('submitSignup', true)
-  return (dispatch) => {
-    loginAndSync(UserAPI.signup, [email, password], dispatch)
+  return (dispatch, getState) => {
+    loginAndSync(UserAPI.signup, [email, password], dispatch, getState)
   }
 }
 
@@ -918,6 +923,7 @@ export function doSync (syncData={}, showProgress=true) {
         dispatch(setRemotePersist(DB_SYNCING))
       }
 
+      dispatch(setFullSyncFail(true))
       feedMessage('Uploading...', warning, null)
       return PouchCouch.remoteReplicateDBs().then(() => {
         let userID = syncData.userID
@@ -938,7 +944,6 @@ export function doSync (syncData={}, showProgress=true) {
             f => f.get('followerID')
           ).toJS()
         }
-        dispatch(setFullSyncFail(false))
         feedMessage('Downloading...', warning, null)
         return PouchCouch.localReplicateDBs(userID, followingIDs, followerIDs)
       }).then(() => {
@@ -948,6 +953,7 @@ export function doSync (syncData={}, showProgress=true) {
         dispatch(localDataLoaded(localData))
         dispatch(setRemotePersist(DB_SYNCED))
         dispatch(syncComplete())
+        dispatch(setFullSyncFail(false))
         feedMessage('Sync Complete', green, 3000)
       }).catch((e) => {
         dispatch(setFullSyncFail(true))
@@ -1003,7 +1009,16 @@ export function switchRoot (newRoot) {
             id: SIGNUP_LOGIN
           },
         }
-      });
+      })
+    } else if (newRoot = NEEDS_SYNC) {
+      Navigation.setRoot({
+        root: {
+          component: {
+            name: NEEDS_SYNC,
+            id: NEEDS_SYNC
+          },
+        }
+      })
     } else {
       throw Error('That\'s a bad route, jerk.')
     }

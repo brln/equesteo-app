@@ -20,12 +20,12 @@ import {
   switchRoot,
 } from './functional'
 import { logError, logInfo } from '../helpers'
-import { FEED } from '../screens'
+import { FEED, NEEDS_SYNC } from '../screens'
 import { LocalStorage } from '../services'
 
 import { setUserContext } from "../services/Sentry"
 
-export function loginAndSync(loginFunc, loginArgs, dispatch) {
+export function loginAndSync(loginFunc, loginArgs, dispatch, getState) {
   loginFunc(...loginArgs).then(resp => {
     const userID = resp.id
     const followingIDs = resp.following
@@ -42,8 +42,13 @@ export function loginAndSync(loginFunc, loginArgs, dispatch) {
     dispatch(setDoingInitialLoad(true))
     return dispatch(doSync({userID, followingIDs, followerIDs})).catch(catchAsyncError(dispatch))
   }).then(() => {
-    dispatch(switchRoot(FEED))
-    dispatch(startListeningFCM())
+    const syncFail = getState().getIn(['localState', 'fullSyncFail'])
+    if (!syncFail) {
+      dispatch(switchRoot(FEED))
+      dispatch(startListeningFCM())
+    } else {
+      dispatch(switchRoot(NEEDS_SYNC))
+    }
   }).catch(e => {
     logError(e, 'loginAndSync')
     dispatch(errorOccurred(e.message))
