@@ -71,6 +71,7 @@ import {
   setFullSyncFail,
   setSigningOut,
   setActiveComponent,
+  setLocationRetry,
   showPopShowRide,
   syncComplete,
   updatePhotoStatus,
@@ -644,17 +645,41 @@ export function showLocalNotification (message, background, rideID, scrollToComm
   }
 }
 
+export function retryLocationTracking () {
+  cb('retryLocationTracking')
+  return (dispatch, getState) => {
+    dispatch(setLocationRetry(true))
+    setTimeout(() => {
+      if(getState().getIn(['localState', 'locationRetry'])) {
+        const lastLocation = getState().getIn(['currentRide', 'lastLocation'])
+        if (!lastLocation) {
+          BackgroundGeolocation.stop()
+          BackgroundGeolocation.removeAllListeners('location')
+          dispatch(startLocationTracking())
+        }
+      }
+    }, 30000)
+  }
+}
+
 export function startLocationTracking () {
   cb('startLocationTracking')
   return (dispatch, getState) => {
     logInfo('action: startLocationTracking')
     return configureBackgroundGeolocation().then(() => {
       const KALMAN_FILTER_Q = 6
+      BackgroundGeolocation.on('error', (error) => {
+        logError(error, 'BackgroundGeolocation.error')
+        captureException(error)
+      })
+
       BackgroundGeolocation.on('location', (location) => {
         const lastLocation = getState().getIn(['currentRide', 'lastLocation'])
         let timeDiff = 0
         if (lastLocation) {
           timeDiff = (location.time / 1000) - (lastLocation.get('timestamp') / 1000)
+        } else {
+          dispatch(setLocationRetry(false))
         }
 
         if (!lastLocation || timeDiff > 5) {
@@ -711,12 +736,9 @@ export function startLocationTracking () {
         }
       })
 
-      BackgroundGeolocation.on('error', (error) => {
-        logError(error, 'BackgroundGeolocation.error')
-        captureException(error)
-      });
-
       BackgroundGeolocation.start()
+      dispatch(retryLocationTracking())
+
     }).catch(catchAsyncError(dispatch))
   }
 }
@@ -808,6 +830,7 @@ function startActiveComponentListener () {
 export function stopLocationTracking (clearLast=true) {
   cb('stopLocationTracking')
   return (dispatch) => {
+    dispatch(setLocationRetry(false))
     BackgroundGeolocation.stop()
     BackgroundGeolocation.removeAllListeners('location')
     if (clearLast) {
