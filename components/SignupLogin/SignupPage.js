@@ -1,11 +1,8 @@
 import React, { PureComponent } from 'react';
-import TOSModal from './TOSModal'
-
 import {
   ActivityIndicator,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View
 } from 'react-native';
@@ -13,6 +10,8 @@ import { CheckBox } from 'native-base'
 
 import Button from '../Button'
 import { brand, darkBrand } from '../../colors'
+import SignupForm from './SignupForm'
+import TOSModal from './TOSModal'
 
 export default class SignupPage extends PureComponent {
   constructor (props) {
@@ -92,39 +91,13 @@ export default class SignupPage extends PureComponent {
           modalOpen={this.state.showTOS}
           onClosed={this.showTOS}
         />
-        <Text>Email:</Text>
-        <TextInput
-          autoCapitalize={'none'}
-          blurOnSubmit={false}
-          keyboardType={'email-address'}
-          style={styles.email}
-          onSubmitEditing={this.moveToPassword}
-          onChangeText={this.changeEmail}
-          returnKeyType="next"
-          ref={(i) => this.inputs['email'] = i}
-          underlineColorAndroid="black"
-          maxLength={200}
-        />
-        <Text>Password:</Text>
-        <TextInput
-          autoCapitalize={'none'}
-          blurOnSubmit={false}
-          onSubmitEditing={this.moveToPassword2}
-          onChangeText={this.changePassword1}
-          ref={(i) => this.inputs['pw1'] = i}
-          returnKeyType="next"
-          underlineColorAndroid="black"
-          secureTextEntry={true}
-          maxLength={200}
-        />
-        <Text>Password Again:</Text>
-        <TextInput
-          autoCapitalize={'none'}
-          secureTextEntry={true}
-          onChangeText={this.changePassword2}
-          ref={(i) => this.inputs['pw2'] = i}
-          underlineColorAndroid="black"
-          maxLength={200}
+        <SignupForm
+          changeEmail={this.changeEmail}
+          changePassword1={this.changePassword1}
+          changePassword2={this.changePassword2}
+          inputs={this.inputs}
+          moveToPassword={this.moveToPassword}
+          moveToPassword2={this.moveToPassword2}
         />
         <View style={styles.switchup}>
           <View style={{flex: 1, justifyContent: 'flex-start', flexDirection: 'row'}}>

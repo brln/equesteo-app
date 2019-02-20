@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react';
-
 import {
   ActivityIndicator,
   Dimensions,
@@ -10,9 +9,12 @@ import {
   View
 } from 'react-native';
 
-import { brand, darkBrand } from '../../colors'
-import Button from '../Button'
+import { darkBrand } from '../../colors'
 import EmailInfoModal from './EmailInfoModal'
+import NewPasswordForm from './NewPasswordForm'
+import SignupForm from './SignupForm'
+import SubmittedForm from './SubmittedForm'
+import UnsubmittedForm from './UnsubmittedForm'
 
 const { width } = Dimensions.get('window');
 
@@ -36,7 +38,7 @@ export default class ForgotPage extends PureComponent {
     this._renderLoading = this._renderLoading.bind(this)
     this.setEmailInfoModalOpen = this.setEmailInfoModalOpen.bind(this)
     this.submitResetCode = this.submitResetCode.bind(this)
-    this._moveToPassword2 = this._moveToPassword2.bind(this)
+    this.moveToPassword2 = this.moveToPassword2.bind(this)
     this.submitNewPassword = this.submitNewPassword.bind(this)
   }
 
@@ -86,89 +88,8 @@ export default class ForgotPage extends PureComponent {
     }
   }
 
-  _unsubmittedForm () {
-    return (
-      <View>
-        <Text>Email:</Text>
-        <TextInput
-          autoCapitalize={'none'}
-          autoFocus={true}
-          blurOnSubmit={false}
-          keyboardType={'email-address'}
-          style={styles.email}
-          onSubmitEditing={this.getPWCode}
-          onChangeText={this.changeEmail}
-          returnKeyType="send"
-          underlineColorAndroid="black"
-          value={this.state.email}
-          maxLength={200}
-        />
-        <Button text={'Submit'} color={brand} onPress={this.getPWCode}/>
-      </View>
-    )
-  }
-
-  _submittedForm () {
-    return (
-      <View>
-        <Text>Enter the reset code from your email:</Text>
-        <TextInput
-          autoCapitalize={'none'}
-          autoFocus={true}
-          blurOnSubmit={false}
-          keyboardType={'email-address'}
-          style={styles.email}
-          onSubmitEditing={this.submitResetCode}
-          onChangeText={this.changeResetCode}
-          returnKeyType="send"
-          underlineColorAndroid="black"
-          value={this.state.resetCode}
-          maxLength={30}
-        />
-        <Button text={'Submit'} color={brand} onPress={this.submitResetCode}/>
-        <View style={{paddingTop: 20}}>
-          <TouchableOpacity onPress={() => {this.setEmailInfoModalOpen(true)}}>
-            <Text style={styles.switchupText}><Text style={styles.underlineText}>Didn't get an email?</Text></Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    )
-  }
-
-  _moveToPassword2() {
+  moveToPassword2() {
     this.inputs['pw2'].focus()
-  }
-
-  _newPasswordForm () {
-    return (
-      <View>
-        <Text>Password:</Text>
-        <TextInput
-          autoCapitalize={'none'}
-          blurOnSubmit={false}
-          onSubmitEditing={this._moveToPassword2}
-          onChangeText={this.changePassword1}
-          ref={(i) => this.inputs['pw1'] = i}
-          returnKeyType="next"
-          underlineColorAndroid="black"
-          secureTextEntry={true}
-          value={this.state.pw1}
-          maxLength={200}
-        />
-        <Text>Password Again:</Text>
-        <TextInput
-          autoCapitalize={'none'}
-          onSubmitEditing={this.submitNewPassword}
-          secureTextEntry={true}
-          onChangeText={this.changePassword2}
-          ref={(i) => this.inputs['pw2'] = i}
-          underlineColorAndroid="black"
-          value={this.state.pw2}
-          maxLength={200}
-        />
-        <Button text={'Change Password'} color={brand} onPress={this.submitNewPassword}/>
-      </View>
-    )
   }
 
   _renderLoading () {
@@ -183,11 +104,35 @@ export default class ForgotPage extends PureComponent {
   _renderForm() {
     let form
     if (this.props.forgotSubmitted && !this.props.resetCodeSubmitted) {
-      form = this._submittedForm()
+      form = (
+        <SubmittedForm
+          changeResetCode={this.changeResetCode}
+          resetCode={this.state.resetCode}
+          setEmailInfoModalOpen={this.setEmailInfoModalOpen}
+          submitResetCode={this.submitResetCode}
+        />
+      )
     } else if (!this.props.forgotSubmitted && !this.props.resetCodeSubmitted) {
-      form = this._unsubmittedForm()
+      form = (
+        <UnsubmittedForm
+          changeEmail={this.changeEmail}
+          email={this.state.email}
+          getPWCode={this.getPWCode}
+          inputs={this.inputs}
+        />
+      )
     } else if (this.props.resetCodeSubmitted && this.props.awaitingPWChange) {
-      form = this._newPasswordForm()
+      form = (
+        <NewPasswordForm
+          moveToPassword2={this.moveToPassword2}
+          changePassword1={this.changePassword1}
+          changePassword2={this.changePassword2}
+          inputs={this.inputs}
+          pw1={this.state.pw1}
+          pw2={this.state.pw2}
+          submitNewPassword={this.submitNewPassword}
+        />
+      )
     }
     return (
       <View style={styles.container}>
@@ -210,7 +155,7 @@ export default class ForgotPage extends PureComponent {
           </View>
         </View>
       </View>
-    );
+    )
   }
 
   render() {

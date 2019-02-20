@@ -23,7 +23,7 @@ import {
   unixTimeNow,
   profilePhotoURL
 } from "../helpers"
-import { brand, danger, green, warning } from '../colors'
+import { danger, green, warning } from '../colors'
 import {
   configureBackgroundGeolocation,
   loginAndSync,
@@ -35,11 +35,9 @@ import {
   DRAWER,
   FEED,
   NEEDS_SYNC,
-  LEADERBOARDS,
   RECORDER,
   RIDE_BUTTON,
   SIGNUP_LOGIN,
-  TRAINING,
   UPDATE_NEW_RIDE_ID
 } from '../screens'
 import { LocalStorage, PouchCouch, RidePersister, UserAPI } from '../services'
