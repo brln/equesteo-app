@@ -6,7 +6,6 @@ import { NotConnectedError } from "../errors"
 import { logError, logInfo } from '../helpers'
 import ApiClient from './ApiClient'
 
-
 const horsesDBName = 'horses'
 const ridesDBName = 'rides'
 const usersDBName = 'users'
