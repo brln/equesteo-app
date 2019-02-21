@@ -50,7 +50,7 @@ export default class RideHorse extends PureComponent {
   render () {
     const horseProfileURL = this.horseProfileURL(this.props.horse)
     return (
-      <View style={{width: width / 2.3, padding: 10}}>
+      <View style={{width: width / 2.1, padding: 10}}>
         <TouchableOpacity style={{flex: 1, flexDirection: 'row', alignItems: 'center'}} onPress={this.showHorseProfile}>
           <View style={{flex: 1.2, paddingRight: 20}}>
             <Thumbnail
@@ -67,7 +67,11 @@ export default class RideHorse extends PureComponent {
             <View>
               <Text>{this.header(this.props.rideHorse.get('rideHorseType'))}</Text>
             </View>
-            <Text style={{fontSize: 20, fontWeight: 'bold'}}>{this.props.horse.get('name')}</Text>
+            <Text
+              style={{fontSize: 18, fontWeight: 'bold', flexShrink: 1}}
+              ellipsizeMode={'tail'}
+              numberOfLines={1}
+            >{this.props.horse.get('name')}</Text>
           </View>
         </TouchableOpacity>
       </View>
