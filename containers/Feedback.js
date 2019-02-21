@@ -3,6 +3,7 @@ import React, { PureComponent } from 'react'
 import {
   Dimensions,
   Keyboard,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -91,7 +92,7 @@ class FeedbackContainer extends PureComponent {
         <TextInput
           style={{
             width: width * 0.8,
-            height: height * 0.6,
+            height: Platform.select({ios: "100%", android: height * 0.6}),
             padding: 10,
             borderColor: darkBrand,
             borderWidth: 1,
