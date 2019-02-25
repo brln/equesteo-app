@@ -17,8 +17,8 @@ export default class SignupForm extends MultiPlatform {
           autoCorrect={false}
           blurOnSubmit={false}
           keyboardType={'email-address'}
-          onSubmitEditing={this.moveToPassword}
-          onChangeText={this.changeEmail}
+          onSubmitEditing={this.props.moveToPassword}
+          onChangeText={this.props.changeEmail}
           returnKeyType="next"
           ref={(i) => this.props.inputs['email'] = i}
           underlineColorAndroid="black"
@@ -29,8 +29,8 @@ export default class SignupForm extends MultiPlatform {
           autoCapitalize={'none'}
           autoCorrect={false}
           blurOnSubmit={false}
-          onSubmitEditing={this.moveToPassword2}
-          onChangeText={this.changePassword1}
+          onSubmitEditing={this.props.moveToPassword2}
+          onChangeText={this.props.changePassword1}
           ref={(i) => this.props.inputs['pw1'] = i}
           returnKeyType="next"
           underlineColorAndroid="black"
@@ -42,7 +42,7 @@ export default class SignupForm extends MultiPlatform {
           autoCapitalize={'none'}
           autoCorrect={false}
           secureTextEntry={true}
-          onChangeText={this.changePassword2}
+          onChangeText={this.props.changePassword2}
           ref={(i) => this.props.inputs['pw2'] = i}
           underlineColorAndroid="black"
           maxLength={200}

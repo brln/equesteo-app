@@ -1,9 +1,11 @@
 import React, { PureComponent } from 'react';
 import { Container, Tab, Tabs } from 'native-base';
 import {
+  StatusBar,
   StyleSheet,
 } from 'react-native';
 
+import { isAndroid } from '../../helpers'
 import RideList from './RideList'
 import { brand } from '../../colors'
 import SyncingStatus from './SyncingStatus'
@@ -48,8 +50,13 @@ export default class Feed extends PureComponent {
   }
 
   render() {
+    let statusBar = null
+    if (!isAndroid()) {
+      statusBar = <StatusBar backgroundColor={brand} barStyle="light-content" />
+    }
     return (
       <Container>
+        { statusBar }
         <Tabs
           initialPage={0}
           locked={true}
