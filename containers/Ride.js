@@ -26,6 +26,7 @@ import {
   PHOTO_LIGHTBOX,
   PROFILE,
   RIDE_CHARTS,
+  SHARE_RIDE,
   UPDATE_RIDE
 } from '../screens'
 
@@ -97,6 +98,7 @@ class RideContainer extends PureComponent {
     this.closeDeleteModal = this.closeDeleteModal.bind(this)
     this.deleteRide = this.deleteRide.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
+    this.shareRide = this.shareRide.bind(this)
     this.showFullscreenMap = this.showFullscreenMap.bind(this)
     this.showHorseProfile = this.showHorseProfile.bind(this)
     this.showPhotoLightbox = this.showPhotoLightbox.bind(this)
@@ -150,6 +152,17 @@ class RideContainer extends PureComponent {
       }))
       this.setState({newComment: null})
     }
+  }
+
+  shareRide () {
+    Navigation.push(this.props.componentId, {
+      component: {
+        name: SHARE_RIDE,
+        passProps: {
+          rideID: this.props.ride.get('_id'),
+        }
+      }
+    })
   }
 
   showProfile (user) {
@@ -290,6 +303,7 @@ class RideContainer extends PureComponent {
         rideElevations={this.props.rideElevations}
         rideHorses={this.memoRideHorses(this.props.rideHorses)}
         ridePhotos={this.memoThisRidesPhotos(this.props.ridePhotos)}
+        shareRide={this.shareRide}
         showFullscreenMap={this.showFullscreenMap}
         showHorseProfile={this.showHorseProfile}
         showPhotoLightbox={this.showPhotoLightbox}

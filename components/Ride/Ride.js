@@ -236,6 +236,14 @@ export default class Ride extends PureComponent {
               </View>
             </TouchableWithoutFeedback>
           </View>
+          <View style={{position: 'absolute', right: 10, top: 10}}>
+            <TouchableOpacity onPress={this.props.shareRide}>
+              <BuildImage
+                source={require('../../img/androidShare.png')}
+                style={{width: 40, height: 40}}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View style={{flex: 1}}>

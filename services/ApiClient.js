@@ -15,7 +15,6 @@ const GET = 'get'
 const POST = 'post'
 const PUT = 'put'
 
-
 export default class ApiClient {
   static getToken () {
     if (!token) {
