@@ -14,7 +14,7 @@ import {
 
 const { height, width } = Dimensions.get('window')
 
-export default class EmailInfoModal extends PureComponent {
+export default class PaceExplanationModal extends PureComponent {
   render () {
     return (
       <Modal
@@ -25,20 +25,23 @@ export default class EmailInfoModal extends PureComponent {
         onClosed={this.props.closeModal}
       >
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', paddingLeft: 20, paddingRight: 20}}>
-          <Text style={{textAlign: 'center'}}>Your email should arrive within 5 minutes. You may need to check your spam folder.</Text>
+          <Text style={{textAlign: 'center'}}>This is not a fancy gait analysis, just an estimate based on your speed.</Text>
           <Text />
-          <Text style={{textAlign: 'center'}}>If you don't get it you can try again, but only the newest code will work.</Text>
+          <Text style={{textAlign: 'center'}}>The gait speeds are estimated as follows:</Text>
           <Text />
-          <Text style={{textAlign: 'center'}}>Please contact us immediately with any problems, we'll get it figured out.</Text>
+          <Text style={{textAlign: 'center'}}>Walk: 0 - 4 mph</Text>
+          <Text style={{textAlign: 'center'}}>Trot: 4 - 8 mph</Text>
+          <Text style={{textAlign: 'center'}}>Canter: 8 - 15 mph</Text>
+          <Text style={{textAlign: 'center'}}>Gallop: > 15 mph</Text>
           <Text />
-          <Text style={{textAlign: 'center'}}>info@equesteo.com</Text>
+          <Text style={{textAlign: 'center'}}>If you have strong feelings about this or use it often, we'd love to hear about it. info@equesteo.com</Text>
         </View>
       </Modal>
     )
   }
 }
 
-EmailInfoModal.propTypes = {
+PaceExplanationModal.propTypes = {
   modalOpen: PropTypes.bool.isRequired,
   closeModal: PropTypes.func.isRequired,
 }
@@ -48,7 +51,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: height / 4,
-    height: height / 3,
+    height: height / 2,
     width: width * .8,
   },
 });

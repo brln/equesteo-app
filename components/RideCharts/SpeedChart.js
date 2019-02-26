@@ -44,7 +44,7 @@ export default class SpeedChart extends PureComponent {
           <VictoryLine
             data={this.props.speedData}
             x="distance"
-            y="pace"
+            y="speed"
             style={{
               data: {stroke: darkBrand, strokeWidth: 1}
             }}
