@@ -27,13 +27,16 @@ import {
   logRender,
   logInfo,
   parseRideCoordinate,
+  speedGradient,
 } from '../../helpers'
 import { userName } from '../../modelHelpers/user'
-import PhotoFilmstrip from './PhotoFilmstrip'
-import Stats from './Stats'
 import DeleteModal from '../Shared/DeleteModal'
-import Thumbnail from '../Images/Thumbnail'
+import PaceChart from '../RideCharts/PaceChart'
+import PaceExplanationModal from './PaceExplanation'
+import PhotoFilmstrip from './PhotoFilmstrip'
 import RideComments from '../RideComments/RideComments'
+import Stats from './Stats'
+import Thumbnail from '../Images/Thumbnail'
 import ViewingMap from './ViewingMap'
 
 const { width } = Dimensions.get('window')
@@ -46,8 +49,10 @@ export default class Ride extends PureComponent {
     this.scrollTimeout = null
     this.state = {
       titleTouchCount: 0,
-      scrolled: false
+      scrolled: false,
+      paceExplanationOpen: false
     }
+
     this._renderRide = this._renderRide.bind(this)
     this._renderLoading = this._renderLoading.bind(this)
     this.fullscreenMap = this.fullscreenMap.bind(this)
@@ -56,8 +61,10 @@ export default class Ride extends PureComponent {
     this.rideTime = this.rideTime.bind(this)
     this.maybeShowID = this.maybeShowID.bind(this)
     this.showProfile = this.showProfile.bind(this)
+    this.setPaceModalOpen = this.setPaceModalOpen.bind(this)
 
     this.memoizedMaxSpeed = memoizeOne(this.maxSpeed)
+    this.memoizedParsePaceData = memoizeOne(this.parsePaceData)
   }
 
   componentDidMount () {
@@ -125,6 +132,53 @@ export default class Ride extends PureComponent {
       }
     }
     return maxSpeed
+  }
+
+  setPaceModalOpen(val) {
+    return () => {
+      this.setState({
+        paceExplanationOpen: val
+      })
+    }
+  }
+
+
+  parsePaceData (rideCoordinates) {
+    let lastPoint = null
+    const paceBuckets = [
+      {x: 1, min: 0, max: 4, distance: 0, time: 0, color: speedGradient(0), label: "Walk"},
+      {x: 2, min: 4, max: 8, distance: 0, time: 0, color: speedGradient(3), label: "Trot"},
+      {x: 3, min: 8, max: 15, distance: 0, time: 0, color: speedGradient(5), label: "Canter"},
+      {x: 4, min: 15, max: 1000, distance: 0, time: 0, color: speedGradient(10), label: "Gallop"}
+    ]
+
+    for (let rideCoord of rideCoordinates) {
+      const parsedCoord = parseRideCoordinate(rideCoord)
+      if (lastPoint) {
+        const distance = haversine(
+          lastPoint.get('latitude'),
+          lastPoint.get('longitude'),
+          parsedCoord.get('latitude'),
+          parsedCoord.get('longitude')
+        )
+        const timeDiff = (parsedCoord.get('timestamp') / 1000) - (lastPoint.get('timestamp') / 1000)
+        if (timeDiff === 0) {
+          continue
+        }
+        const mpSecond = distance / timeDiff
+        const mph = mpSecond * 60 * 60
+
+        for (let paceBucket of paceBuckets) {
+          if (mph > paceBucket.min && mph < paceBucket.max) {
+            paceBucket.distance += distance
+            paceBucket.time += timeDiff
+          }
+        }
+
+      }
+      lastPoint = parsedCoord
+    }
+    return paceBuckets
   }
 
   fullscreenMap () {
@@ -197,6 +251,46 @@ export default class Ride extends PureComponent {
     }
   }
 
+  paceChart () {
+    let container = function (child) {
+      return (
+        <Card>
+          <CardItem header>
+            <View style={{position: 'absolute', right: 10, top: 10}}>
+              <TouchableOpacity onPress={this.setPaceModalOpen(true)}>
+                <BuildImage
+                  source={require('../../img/info.png')}
+                  style={{height: 30, width: 30}}
+                />
+              </TouchableOpacity>
+            </View>
+            <Text style={{fontSize: 20}}>Pace</Text>
+          </CardItem>
+          <CardItem cardBody style={{marginLeft: 20, marginRight: 20}}>
+
+            { child }
+          </CardItem>
+        </Card>
+      )
+    }.bind(this)
+    let paceChart = (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', minHeight: 300}}>
+        <Text>Not enough data for pace chart.</Text>
+      </View>
+    )
+    let speedData = this.memoizedParsePaceData(this.props.rideCoordinates.get('rideCoordinates'))
+    if (this.props.rideCoordinates.get('rideCoordinates').count() >= 5) {
+      paceChart = (
+        <PaceChart
+          speedData={speedData}
+        />
+      )
+      return container(paceChart)
+    } else {
+      return null
+    }
+  }
+
   _renderLoading () {
     return (
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -217,6 +311,10 @@ export default class Ride extends PureComponent {
         ref={(i) => this.scrollable = i}
         style={{flex: 1}}
       >
+        <PaceExplanationModal
+          modalOpen={this.state.paceExplanationOpen}
+          closeModal={this.setPaceModalOpen(false)}
+        />
         <DeleteModal
           modalOpen={this.props.modalOpen}
           closeDeleteModal={this.props.closeDeleteModal}
@@ -297,6 +395,8 @@ export default class Ride extends PureComponent {
             </Card>
 
             { this.rideNotes() }
+
+            { this.paceChart() }
 
             <CarrotCard
               rideCarrots={this.props.rideCarrots}

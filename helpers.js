@@ -214,10 +214,10 @@ export function elapsedTime (startTime, currentTime, pausedTime, lastPauseStart)
 }
 
 function leftPad(num) {
-    const str = num.toString()
-    const pad = "00"
-    return pad.substring(0, pad.length - str.length) + str
-  }
+  const str = num.toString()
+  const pad = "00"
+  return pad.substring(0, pad.length - str.length) + str
+}
 
 export function timeToString (elapsed) {
   const asHours = elapsed / 60 / 60

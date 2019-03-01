@@ -71,6 +71,18 @@ export default class UserAPI {
     }
   }
 
+  static getSharableRideImage (ride, rideCoordinates) {
+    return ApiClient.post('/sharableMap', {
+      id: ride.get('_id'),
+      distance: ride.get('distance'),
+      rev: ride.get('_rev'),
+      rideCoordinates: rideCoordinates.get('rideCoordinates').toJS(),
+      rideTime: ride.get('elapsedTimeSecs'),
+      startTime: ride.get('startTime'),
+      name: ride.get('name'),
+    })
+  }
+
   static findUser (searchPhrase) {
     return ApiClient.get('/users/search?q=' + searchPhrase)
   }

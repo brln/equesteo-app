@@ -1,3 +1,5 @@
+import RNFetchBlob from 'rn-fetch-blob'
+
 import { API_URL } from 'react-native-dotenv'
 import { logError, logInfo } from '../helpers'
 import {
@@ -101,6 +103,7 @@ export default class ApiClient {
         return json
       })
     }).catch(e => {
+      console.log(e)
       if (e instanceof SyntaxError) {
         logError(e, 'ApiClient.request')
         logInfo(rawResp)
@@ -124,5 +127,11 @@ export default class ApiClient {
       type: 'image/jpeg',
     })
     return ApiClient.request(POST, endpoint, data, false)
+  }
+
+  static downloadImage (imageURI) {
+    RNFetchBlob.config({fileCache: true}).fetch('GET', imageURI).then((res) => {
+      return res.path()
+    })
   }
 }
