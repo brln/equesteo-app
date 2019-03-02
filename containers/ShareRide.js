@@ -5,6 +5,8 @@ import {
   CameraRoll,
   Dimensions,
   Keyboard,
+  Linking,
+  PermissionsAndroid,
   ScrollView,
   Share,
   Text,
@@ -20,6 +22,9 @@ import UserAPI from '../services/UserApi'
 import URIImage from '../components/Images/URIImage'
 
 const { width, height } = Dimensions.get('window')
+
+const LOADING_MESSAGE = 'Generating sharable map...'
+const DOWNLOADING_MESSAGE = 'Downloading map to phone...'
 
 class ShareRideContainer extends PureComponent {
   static options() {
@@ -61,9 +66,11 @@ class ShareRideContainer extends PureComponent {
       mapURL: null,
       shareLink: null,
       loading: true,
+      loadingMessage: LOADING_MESSAGE,
     }
 
     Navigation.events().bindComponent(this);
+    this.askToDownloadMap = this.askToDownloadMap.bind(this)
     this.downloadMap = this.downloadMap.bind(this)
     this.shareMap = this.shareMap.bind(this)
   }
@@ -98,7 +105,6 @@ class ShareRideContainer extends PureComponent {
           />
           <View style={{width: '80%', paddingTop: 20}}>
             <TextInput
-              editable={false}
               style={{borderColor: darkBrand, borderWidth: 1}}
               selectTextOnFocus={true}
               underlineColorAndroid={'transparent'}
@@ -109,7 +115,7 @@ class ShareRideContainer extends PureComponent {
             <View style={{paddingRight: 10}}>
               <Button
                 color={brand}
-                onPress={this.downloadMap}
+                onPress={this.askToDownloadMap}
                 text={'Download'}
               />
             </View>
@@ -132,13 +138,38 @@ class ShareRideContainer extends PureComponent {
     })
   }
 
+  askToDownloadMap () {
+    PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+      {
+        title: 'Save to your Camera Roll',
+        message: 'To download your map you must let us write to external storage'
+        buttonNeutral: 'Ask Me Later',
+        buttonNegative: 'Cancel',
+        buttonPositive: 'OK',
+      },
+    ).then(granted => {
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        this.downloadMap()
+      } else {
+        console.log('Camera permission denied');
+      }
+    }).catch((err) => {
+      throw err
+    })
+  }
+
   downloadMap () {
+    this.setState({ loading: true, loadingMessage: DOWNLOADING_MESSAGE })
     ApiClient.downloadImage(this.state.mapURL).then(url => {
-      return CameraRoll.saveToCameraRoll(url)
-    }).then(() => {
-      console.log('done')
-    }).catch(e =>
-      {console.log(e)
+      console.log(url)
+      return CameraRoll.saveToCameraRoll(`file://${url}`)
+    }).then(newURI => {
+      this.setState({ loading: false })
+      Linking.openURL(newURI)
+    }).catch(e => {
+      this.setState({ loading: false })
+      console.log(e)
     })
   }
 
@@ -146,7 +177,7 @@ class ShareRideContainer extends PureComponent {
     return (
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
         <ActivityIndicator size="large" color={darkBrand} />
-        <Text style={{textAlign: 'center', color: darkBrand}}>Generating sharable map...</Text>
+        <Text style={{textAlign: 'center', color: darkBrand}}>{this.state.loadingMessage}</Text>
       </View>
     )
   }

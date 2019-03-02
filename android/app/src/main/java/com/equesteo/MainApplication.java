@@ -5,6 +5,7 @@ import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.facebook.react.bridge.ReadableNativeArray;
 import com.facebook.react.bridge.ReadableNativeMap;
 import com.facebook.react.ReactApplication;
+import com.RNFetchBlob.RNFetchBlobPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import org.reactnative.camera.RNCameraPackage;
 import com.facebook.react.ReactNativeHost;
@@ -83,7 +84,8 @@ public class MainApplication extends NavigationApplication {
             new RCTMGLPackage(),
             new RNCameraPackage(),
             new RNMixpanel(),
-            new RNCWebViewPackage()
+            new RNCWebViewPackage(),
+            new RNFetchBlobPackage()
         );
     }
 

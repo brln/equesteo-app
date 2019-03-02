@@ -130,7 +130,10 @@ export default class ApiClient {
   }
 
   static downloadImage (imageURI) {
-    RNFetchBlob.config({fileCache: true}).fetch('GET', imageURI).then((res) => {
+    return RNFetchBlob.config({
+      fileCache: true,
+      appendExt : 'png'
+    }).fetch('GET', imageURI).then((res) => {
       return res.path()
     })
   }
