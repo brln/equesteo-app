@@ -147,10 +147,10 @@ export default class Ride extends PureComponent {
   parsePaceData (rideCoordinates) {
     let lastPoint = null
     const paceBuckets = [
-      {x: 1, min: 0, max: 4, distance: 0, time: 0, color: speedGradient(0), label: "Walk"},
-      {x: 2, min: 4, max: 8, distance: 0, time: 0, color: speedGradient(3), label: "Trot"},
-      {x: 3, min: 8, max: 15, distance: 0, time: 0, color: speedGradient(5), label: "Canter"},
-      {x: 4, min: 15, max: 1000, distance: 0, time: 0, color: speedGradient(10), label: "Gallop"}
+      {x: 1, min: 0, max: 6, distance: 0, time: 0, color: speedGradient(1), label: "Walk"},
+      {x: 2, min: 6, max: 12, distance: 0, time: 0, color: speedGradient(6), label: "Trot"},
+      {x: 3, min: 12, max: 24, distance: 0, time: 0, color: speedGradient(12), label: "Canter"},
+      {x: 4, min: 24, max: 1000, distance: 0, time: 0, color: speedGradient(24), label: "Gallop"}
     ]
 
     for (let rideCoord of rideCoordinates) {

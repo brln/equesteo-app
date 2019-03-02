@@ -29,12 +29,12 @@ export default class PaceExplanationModal extends PureComponent {
           <Text />
           <Text style={{textAlign: 'center'}}>The gait speeds are estimated as follows:</Text>
           <Text />
-          <Text style={{textAlign: 'center'}}>Walk: 0 - 4 mph</Text>
-          <Text style={{textAlign: 'center'}}>Trot: 4 - 8 mph</Text>
-          <Text style={{textAlign: 'center'}}>Canter: 8 - 15 mph</Text>
-          <Text style={{textAlign: 'center'}}>Gallop: > 15 mph</Text>
+          <Text style={{textAlign: 'center'}}>Walk: 0 - 6 mph</Text>
+          <Text style={{textAlign: 'center'}}>Trot: 6 - 12 mph</Text>
+          <Text style={{textAlign: 'center'}}>Canter: 12 - 25 mph</Text>
+          <Text style={{textAlign: 'center'}}>Gallop: > 25 mph</Text>
           <Text />
-          <Text style={{textAlign: 'center'}}>If you have strong feelings about this or use it often, we'd love to hear about it. info@equesteo.com</Text>
+          <Text style={{textAlign: 'center'}}>If you think we're wrong, or have strong feelings about this, we'd love to hear about it. info@equesteo.com</Text>
         </View>
       </Modal>
     )
@@ -54,4 +54,4 @@ const styles = StyleSheet.create({
     height: height / 2,
     width: width * .8,
   },
-});
+})

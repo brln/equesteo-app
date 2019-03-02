@@ -277,38 +277,56 @@ export function boundingBox (rideCoordinates) {
 
 export function speedGradient (speed) {
   switch (Math.floor(speed)) {
-    case 0:
-      return "#5A35DE"
     case 1:
-      return "#6432CF"
+      return "#118AB2"
     case 2:
-      return "#6E30C0"
+      return "#0F96AF"
     case 3:
-      return "#782DB2"
+      return "#0DA3AC"
     case 4:
-      return "#822BA3"
+      return "#0BB0A9"
     case 5:
-      return "#8C2895"
+      return "#09BCA6"
     case 6:
-      return "#962686"
+      return "#07C9A3"
     case 7:
-      return "#A02378"
+      return "#06D6A0"
     case 8:
-      return "#AA2169"
+      return "#37D594"
     case 9:
-      return "#B41E5A"
+      return "#69D488"
     case 10:
-      return "#BE1C4C"
+      return "#9BD37D"
     case 11:
-      return "#C8193D"
+      return "#CDD271"
     case 12:
-      return "#D2172F"
+      return "#FFD166"
     case 13:
-      return "#DC1420"
+      return "#FFD166"
     case 14:
-      return "#E61212"
+      return "#FDC566"
+    case 15:
+      return "#FCBA67"
+    case 16:
+      return "#FBAE68"
+    case 17:
+      return "#F9A369"
+    case 18:
+      return "#F89769"
+    case 19:
+      return "#F78C6A"
+    case 20:
+      return "#F5806B"
+    case 21:
+      return "#F4756C"
+    case 22:
+      return "#F3696C"
+    case 23:
+      return "#F15E6D"
+    case 24:
+      return "#F0526E"
     default:
-      return "#E61212"
+      return "#EF476F"
   }
 }
 
