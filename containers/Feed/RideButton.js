@@ -7,7 +7,7 @@ import { brand } from '../../colors'
 const RideButton = (props) => {
   return (
     <View style={{borderWidth: 3, borderColor: brand}}>
-      <TouchableOpacity onPress={props.onPress} style={{alignItems: 'center', justifyContent: 'center', width: 100, height: 30, borderWidth: 2, borderColor: 'white'}}>
+      <TouchableOpacity onPress={props.onPress} style={{alignItems: 'center', justifyContent: 'center', width: 100, height: 30, borderWidth: 2, borderColor: 'white', borderRadius: 4}}>
         <Text style={{color: 'white', textAlign: 'center'}}>{ props.currentRide ? 'Continue Ride' : 'Start Ride!'}</Text>
       </TouchableOpacity>
     </View>

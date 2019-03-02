@@ -19,6 +19,7 @@ export default class HorseBarnCard extends PureComponent {
       <View
         elevation={5}
         style={{
+          borderRadius: 4,
           marginBottom: 20,
           backgroundColor: this.props.horse.get('color') || brand,
           shadowColor: black,

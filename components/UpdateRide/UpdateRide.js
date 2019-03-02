@@ -207,7 +207,7 @@ export default class UpdateRide extends PureComponent {
                 <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20}}>
                   <TextInput
                     selectTextOnFocus={true}
-                    style={{width: '100%', height: 50, padding: 10, borderColor: darkBrand, borderWidth: 1}}
+                    style={{width: '100%', height: 50, padding: 10, borderColor: darkBrand, borderWidth: 1, borderRadius: 4}}
                     value={this.props.ride.get('name')}
                     onChangeText={this.changeRideName}
                     underlineColorAndroid={'transparent'}
@@ -246,6 +246,7 @@ export default class UpdateRide extends PureComponent {
                       height: 150,
                       padding: 10,
                       borderColor: darkBrand,
+                      borderRadius: 4,
                       borderWidth: 1,
                       textAlignVertical: "top"
                     }}

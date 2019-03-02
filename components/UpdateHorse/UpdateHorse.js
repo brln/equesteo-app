@@ -127,7 +127,7 @@ export default class UpdateHorse extends PureComponent {
       { label: "Dec", value: "12" },
     ]
     return (
-      <View style={{flex: 3, height: 50, borderColor: darkBrand, borderWidth: 1, marginRight: 10}}>
+      <View style={{flex: 3, height: 50, borderColor: darkBrand, borderWidth: 1, marginRight: 10, borderRadius: 4}}>
         <RNPickerSelect
           value={this.props.horse.get('birthMonth')}
           items={items}
@@ -148,7 +148,7 @@ export default class UpdateHorse extends PureComponent {
       allDays.push({ label: i.toString(), value: i.toString() })
     }
     return (
-      <View style={{flex: 2.5, height: 50, borderColor: darkBrand, borderWidth: 1, marginRight: 10}}>
+      <View style={{flex: 2.5, height: 50, borderColor: darkBrand, borderWidth: 1, marginRight: 10, borderRadius: 4}}>
         <RNPickerSelect
           value={this.props.horse.get('birthDay')}
           items={allDays}
@@ -170,7 +170,7 @@ export default class UpdateHorse extends PureComponent {
       allYears.push({label: i.toString(), value: i.toString()})
     }
     return (
-      <View style={{flex: 3, height: 50, borderColor: darkBrand, borderWidth: 1}}>
+      <View style={{flex: 3, height: 50, borderColor: darkBrand, borderWidth: 1, borderRadius: 4}}>
         <RNPickerSelect
           items={allYears}
           value={this.props.horse.get('birthYear')}
@@ -193,7 +193,7 @@ export default class UpdateHorse extends PureComponent {
       {label: "Other", value: "Other"},
     ]
     return (
-      <View style={{flex: 1, height: 50, borderColor: darkBrand, borderWidth: 1}}>
+      <View style={{flex: 1, height: 50, borderColor: darkBrand, borderWidth: 1, borderRadius: 4}}>
         <RNPickerSelect
           value={this.props.horse.get('sex')}
           onValueChange={onValueChange}
@@ -226,7 +226,7 @@ export default class UpdateHorse extends PureComponent {
     ]
     return (
       <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
-        <View style={{flex: 3, height: 50, borderColor: darkBrand, borderWidth: 1, marginRight: 10}}>
+        <View style={{flex: 3, height: 50, borderColor: darkBrand, borderWidth: 1, marginRight: 10, borderRadius: 4}}>
           <RNPickerSelect
             value={this.props.horse.get('heightHands')}
             onValueChange={this.changeHorseHeightHands}
@@ -238,7 +238,7 @@ export default class UpdateHorse extends PureComponent {
             }}
           />
         </View>
-        <View style={{flex: 2, height: 50, borderColor: darkBrand, borderWidth: 1}}>
+        <View style={{flex: 2, height: 50, borderColor: darkBrand, borderWidth: 1, borderRadius: 4}}>
           <RNPickerSelect
             value={this.props.horse.get('heightInches')}
             style={{inputIOS: {fontSize: 25, fontWeight: 'bold', textAlign: 'center', paddingTop: 10}}}
@@ -288,7 +288,7 @@ export default class UpdateHorse extends PureComponent {
                 </CardItem>
                 <CardItem cardBody style={{marginLeft: 20, marginRight: 20}}>
                   <TextInput
-                    style={{width: '100%', height: 50, padding: 10, borderColor: darkBrand, borderWidth: 1}}
+                    style={{width: '100%', height: 50, padding: 10, borderColor: darkBrand, borderWidth: 1, borderRadius: 4}}
                     value={this.props.horse.get('name')}
                     onChangeText={this.changeHorseName}
                     underlineColorAndroid={'transparent'}
@@ -302,6 +302,7 @@ export default class UpdateHorse extends PureComponent {
                 <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
                   <TextInput
                     style={{
+                      borderRadius: 4,
                       width: '100%',
                       height: 100,
                       padding: 10,
@@ -354,7 +355,7 @@ export default class UpdateHorse extends PureComponent {
                 </CardItem>
                 <CardItem cardBody style={{marginLeft: 20, marginRight: 20}}>
                   <TextInput
-                    style={{width: '100%', height: 50, padding: 10, borderColor: darkBrand, borderWidth: 1}}
+                    style={{width: '100%', height: 50, padding: 10, borderColor: darkBrand, borderWidth: 1, borderRadius: 4}}
                     value={this.props.horse.get('breed')}
                     onChangeText={this.changeHorseBreed}
                     underlineColorAndroid={'transparent'}

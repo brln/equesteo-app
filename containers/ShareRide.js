@@ -4,6 +4,7 @@ import {
   ActivityIndicator,
   CameraRoll,
   Dimensions,
+  Image,
   Keyboard,
   Linking,
   PermissionsAndroid,
@@ -21,7 +22,7 @@ import { brand, darkBrand, lightGrey } from '../colors'
 import UserAPI from '../services/UserApi'
 import URIImage from '../components/Images/URIImage'
 
-const { width, height } = Dimensions.get('window')
+const { width } = Dimensions.get('window')
 
 const LOADING_MESSAGE = 'Generating sharable map...'
 const DOWNLOADING_MESSAGE = 'Downloading map to phone...'
@@ -71,6 +72,7 @@ class ShareRideContainer extends PureComponent {
 
     Navigation.events().bindComponent(this);
     this.askToDownloadMap = this.askToDownloadMap.bind(this)
+    this.imageLoaded = this.imageLoaded.bind(this)
     this.downloadMap = this.downloadMap.bind(this)
     this.shareMap = this.shareMap.bind(this)
   }
@@ -80,16 +82,20 @@ class ShareRideContainer extends PureComponent {
       this.props.ride,
       this.props.rideCoordinates,
     ).then(resp => {
-      console.log(resp)
       this.setState({
         mapURL: resp.mapURL,
-        loading: false,
         shareLink: resp.shareLink,
       })
     }).catch(() => {
       this.setState({
         loading: false
       })
+    })
+  }
+
+  imageLoaded () {
+    this.setState({
+      loading: false,
     })
   }
 
@@ -105,7 +111,7 @@ class ShareRideContainer extends PureComponent {
           />
           <View style={{width: '80%', paddingTop: 20}}>
             <TextInput
-              style={{borderColor: darkBrand, borderWidth: 1}}
+              style={{borderColor: darkBrand, borderWidth: 1, borderRadius: 4}}
               selectTextOnFocus={true}
               underlineColorAndroid={'transparent'}
               value={this.state.shareLink}
@@ -143,7 +149,7 @@ class ShareRideContainer extends PureComponent {
       PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
       {
         title: 'Save to your Camera Roll',
-        message: 'To download your map you must let us write to external storage'
+        message: 'To download your map you must let us write to external storage',
         buttonNeutral: 'Ask Me Later',
         buttonNegative: 'Cancel',
         buttonPositive: 'OK',
@@ -178,6 +184,11 @@ class ShareRideContainer extends PureComponent {
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
         <ActivityIndicator size="large" color={darkBrand} />
         <Text style={{textAlign: 'center', color: darkBrand}}>{this.state.loadingMessage}</Text>
+        {
+          this.state.mapURL ?
+          <Image style={{height: 0, width: 0}} source={{uri: this.state.mapURL }} onLoadEnd={this.imageLoaded} /> :
+          null
+        }
       </View>
     )
   }

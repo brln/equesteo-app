@@ -222,7 +222,7 @@ export default class Ride extends PureComponent {
     if (this.props.userID === this.props.rideUser.get('_id') &&
       this.props.rideCoordinates.get('rideCoordinates').count() > 1) {
       icon = (
-        <View style={{position: 'absolute', right: 10, top: 10}}>
+        <View style={{flex: 1}}>
           <TouchableOpacity onPress={this.props.shareRide}>
             <BuildImage
               source={require('../../img/androidShare.png')}
@@ -345,7 +345,12 @@ export default class Ride extends PureComponent {
           <View style={{flex: 4, paddingLeft: 10, paddingRight: 20}}>
             <TouchableWithoutFeedback onPress={this.maybeShowID}>
               <View>
-                <Text style={{fontSize: 20, color: 'black'}}>{this.props.ride.get('name') || 'No Name'}</Text>
+                <View style={{flex: 1, flexDirection: 'row', alignContent: 'space-between'}}>
+                  <View style={{flex: 8}}>
+                    <Text style={{fontSize: 24, color: 'black'}}>{this.props.ride.get('name') || 'No Name'}</Text>
+                  </View>
+                  {this.shareIcon()}
+                </View>
                 <TouchableOpacity onPress={this.showProfile}>
                   <Text style={{fontSize: 14}}>{ userName(this.props.rideUser) }</Text>
                 </TouchableOpacity>
@@ -353,7 +358,6 @@ export default class Ride extends PureComponent {
               </View>
             </TouchableWithoutFeedback>
           </View>
-          { this.shareIcon() }
         </View>
 
         <View style={{flex: 1}}>
