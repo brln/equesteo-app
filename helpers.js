@@ -278,55 +278,55 @@ export function boundingBox (rideCoordinates) {
 export function speedGradient (speed) {
   switch (Math.floor(speed)) {
     case 1:
-      return "#118AB2"
+      return "#A288E3"
     case 2:
-      return "#0F96AF"
+      return "#A980D3"
     case 3:
-      return "#0DA3AC"
+      return "#B078C3"
     case 4:
-      return "#0BB0A9"
+      return "#B771B3"
     case 5:
-      return "#09BCA6"
+      return "#BE69A3"
     case 6:
-      return "#07C9A3"
+      return "#C56193"
     case 7:
-      return "#06D6A0"
+      return "#CC5A84"
     case 8:
-      return "#37D594"
+      return "#D35274"
     case 9:
-      return "#69D488"
+      return "#DA4A64"
     case 10:
-      return "#9BD37D"
+      return "#E14354"
     case 11:
-      return "#CDD271"
+      return "#E83B44"
     case 12:
-      return "#FFD166"
+      return "#EF3334"
     case 13:
-      return "#FFD166"
+      return "#F72C25"
     case 14:
-      return "#FDC566"
+      return "#F53B28"
     case 15:
-      return "#FCBA67"
+      return "#F44A2C"
     case 16:
-      return "#FBAE68"
+      return "#F35930"
     case 17:
-      return "#F9A369"
+      return "#F26833"
     case 18:
-      return "#F89769"
+      return "#F17737"
     case 19:
-      return "#F78C6A"
+      return "#F0863B"
     case 20:
-      return "#F5806B"
+      return "#EF953E"
     case 21:
-      return "#F4756C"
+      return "#EEA442"
     case 22:
-      return "#F3696C"
+      return "#EDB346"
     case 23:
-      return "#F15E6D"
+      return "#ECC249"
     case 24:
-      return "#F0526E"
+      return "#EBD14D"
     default:
-      return "#EF476F"
+      return "#EAE151"
   }
 }
 
