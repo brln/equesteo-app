@@ -60,7 +60,6 @@ export default class Ride extends PureComponent {
     this.rideNotes = this.rideNotes.bind(this)
     this.rideTime = this.rideTime.bind(this)
     this.maybeShowID = this.maybeShowID.bind(this)
-    this.shareIcon = this.shareIcon.bind(this)
     this.showProfile = this.showProfile.bind(this)
     this.setPaceModalOpen = this.setPaceModalOpen.bind(this)
 
@@ -68,23 +67,12 @@ export default class Ride extends PureComponent {
     this.memoizedParsePaceData = memoizeOne(this.parsePaceData)
   }
 
-  componentDidMount () {
-    Keyboard.addListener('keyboardDidShow', () => {
-      this.scrollTimeout = setTimeout(() => {
-        if (this.scrollable) {
-          this.scrollable.scrollToEnd({animated: false})
-        }
-      }, 300)
-    })
-  }
-
   componentWillUnmount () {
     clearTimeout(this.scrollTimeout)
-    Keyboard.removeAllListeners('keyboardDidShow')
   }
 
   componentDidUpdate (nextProps) {
-    if (this.props.rideComments !== nextProps.rideComments || (nextProps.skipToComments && !this.state.scrolled)) {
+    if (nextProps.skipToComments && !this.state.scrolled) {
       setTimeout(() => {
         if (this.scrollable) {
           this.scrollable.scrollToEnd({animated: true})
@@ -217,24 +205,6 @@ export default class Ride extends PureComponent {
     return avatar
   }
 
-  shareIcon () {
-    let icon
-    if (this.props.userID === this.props.rideUser.get('_id') &&
-      this.props.rideCoordinates.get('rideCoordinates').count() > 1) {
-      icon = (
-        <View style={{flex: 1}}>
-          <TouchableOpacity onPress={this.props.shareRide}>
-            <BuildImage
-              source={require('../../img/androidShare.png')}
-              style={{width: 40, height: 40}}
-            />
-          </TouchableOpacity>
-        </View>
-      )
-    }
-    return icon
-  }
-
   rideTime () {
     const t = this.props.ride.get('startTime')
     return `${moment(t).format('MMMM Do YYYY')} at ${moment(t).format('h:mm a')}`
@@ -349,7 +319,6 @@ export default class Ride extends PureComponent {
                   <View style={{flex: 8}}>
                     <Text style={{fontSize: 24, color: 'black'}}>{this.props.ride.get('name') || 'No Name'}</Text>
                   </View>
-                  {this.shareIcon()}
                 </View>
                 <TouchableOpacity onPress={this.showProfile}>
                   <Text style={{fontSize: 14}}>{ userName(this.props.rideUser) }</Text>

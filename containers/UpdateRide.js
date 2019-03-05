@@ -192,7 +192,7 @@ class UpdateRideContainer extends BackgroundComponent {
           this.state.trimValues,
           this.memoizedRideHorses(this.props.rideHorses, this.props.rideID),
         ))
-        Navigation.pop(this.props.componentId)
+        Navigation.popTo(this.props.popBackTo)
       } else if (buttonId === 'back' || buttonId === 'discard') {
         Navigation.pop(this.props.componentId).then(() => {
           this.props.dispatch(rideUpdated(this.state.cachedRide))
@@ -522,6 +522,7 @@ function mapStateToProps (state, passedProps) {
     horsePhotos: pouchState.get('horsePhotos'),
     horseUsers: pouchState.get('horseUsers'),
     newRide,
+    popBackTo: passedProps.popBackTo,
     ride: state.getIn(['pouchRecords', 'rides', passedProps.rideID]),
     rideCoordinates: pouchState.get('selectedRideCoordinates'),
     rideElevations: pouchState.get('selectedRideElevations'),
