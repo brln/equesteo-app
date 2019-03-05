@@ -1,6 +1,8 @@
+import moment from 'moment'
 import React from 'react'
 import { connect } from 'react-redux';
 import { Navigation } from 'react-native-navigation'
+import { List, Map } from 'immutable'
 
 import {
   createHorsePhoto,
@@ -202,7 +204,11 @@ class HorseProfileContainer extends BackgroundComponent {
   trainings (trainings, ownerID, horseID) {
     return trainings.getIn([`${ownerID}_training`, 'rides']).filter(t => {
       return t.get('deleted') !== true && (t.get('horseIDs').indexOf(horseID) >= 0)
-    })
+    }).reduce((accum, t) => {
+      const day = moment(t.get('startTime')).hour(0).minute(0).second(0).millisecond(0).toISOString()
+      accum.get(day) ? accum = accum.set(day, accum.get(day).push(t)) : accum = accum.set(day, List([t]))
+      return accum
+    }, Map())
   }
 
   render() {

@@ -1,4 +1,6 @@
-import { Map } from 'immutable'
+import memoizeOne from 'memoize-one'
+import { List, Map } from 'immutable'
+import moment from 'moment'
 import React from 'react'
 import { connect } from 'react-redux';
 import { Navigation } from 'react-native-navigation'
@@ -69,6 +71,8 @@ class ProfileContainer extends BackgroundComponent {
     this.showUserList = this.showUserList.bind(this)
     this.thisUsersPhotos = this.thisUsersPhotos.bind(this)
     this.uploadPhoto = this.uploadPhoto.bind(this)
+
+    this.memoizeTrainings = memoizeOne(this.trainings)
 
     Navigation.events().bindComponent(this);
 
@@ -247,6 +251,16 @@ class ProfileContainer extends BackgroundComponent {
     })
   }
 
+  trainings (trainings, userID) {
+    return trainings.getIn([`${userID}_training`, 'rides']).filter(t => {
+      return t.get('deleted') !== true && t.get('riderHorseID') && t.get('userID') === this.props.profileUser.get('_id')
+    }).reduce((accum, t) => {
+      const day = moment(t.get('startTime')).hour(0).minute(0).second(0).millisecond(0).toISOString()
+      accum.get(day) ? accum = accum.set(day, accum.get(day).push(t)) : accum = accum.set(day, List([t]))
+      return accum
+    }, Map())
+  }
+
   render() {
     logRender('ProfileContainer')
     if (this.props.profileUser.get('_id')) {
@@ -268,6 +282,7 @@ class ProfileContainer extends BackgroundComponent {
           showHorseProfile={this.showHorseProfile}
           showPhotoLightbox={this.showPhotoLightbox}
           showUserList={this.showUserList}
+          trainings={this.memoizeTrainings(this.props.trainings, this.props.profileUser.get('_id'))}
           uploadPhoto={this.uploadPhoto}
           userID={this.props.userID}
           users={this.props.users}
@@ -295,6 +310,7 @@ function mapStateToProps (state, passedProps) {
     needsRemotePersist: localState.get('needsRemotePersist'),
     photoQueue: localState.get('photoQueue'),
     profileUser: pouchState.getIn(['users', profileUserID]) || passedProps.profileUser || new Map(),
+    trainings: pouchState.get('trainings'),
     users: pouchState.get('users'),
     userID,
     userPhotos: pouchState.get('userPhotos'),

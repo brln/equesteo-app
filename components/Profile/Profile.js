@@ -27,7 +27,9 @@ import { logRender, logError, logInfo } from '../../helpers'
 import { userName } from '../../modelHelpers/user'
 import PhotoFilmstrip from '../Ride/PhotoFilmstrip'
 import Thumbnail from '../Images/Thumbnail'
+import TrainingCard from '../HorseProfile/TrainingCard'
 import MedImage from '../Images/MedImage'
+import SquaresCard from './SquaresCard'
 
 import FabImage from '../FabImage'
 
@@ -291,6 +293,14 @@ export default class Profile extends PureComponent {
             showUserList={this.showUserList}
             visible={this.props.oneDegreeUser}
           />
+          <SquaresCard
+            trainings={this.props.trainings}
+          />
+
+          <TrainingCard
+            trainings={this.props.trainings}
+          />
+
           <Card>
             <CardItem header style={{padding: 5}}>
               <View style={{paddingLeft: 5}}>

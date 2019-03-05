@@ -89,6 +89,7 @@ class UpdateRideContainer extends BackgroundComponent {
     this.updateLocalRideCoords = this.updateLocalRideCoords.bind(this)
 
     this.memoizedHorses = memoizeOne(this.horses)
+    this.memoizedRideHorses = memoizeOne(this.rideHorses)
     this.memoizedAllPhotos = memoizeOne(this.allPhotos)
 
     Navigation.events().bindComponent(this);
@@ -163,7 +164,7 @@ class UpdateRideContainer extends BackgroundComponent {
           this.props.stashedRidePhotos,
           this.state.deletedPhotoIDs,
           this.state.trimValues,
-          this.rideHorses(),
+          this.memoizedRideHorses(this.props.rideHorses, this.props.rideID),
         ))
         this.props.dispatch(setPopShowRide(this.props.ride.get('_id'), true, false))
         Navigation.popToRoot(this.props.componentId).then(() => {
@@ -189,7 +190,7 @@ class UpdateRideContainer extends BackgroundComponent {
           this.props.stashedRidePhotos,
           this.state.deletedPhotoIDs,
           this.state.trimValues,
-          this.rideHorses(),
+          this.memoizedRideHorses(this.props.rideHorses, this.props.rideID),
         ))
         Navigation.pop(this.props.componentId)
       } else if (buttonId === 'back' || buttonId === 'discard') {
@@ -399,9 +400,9 @@ class UpdateRideContainer extends BackgroundComponent {
     })
   }
 
-  rideHorses () {
-    return this.props.rideHorses.filter(rh => {
-      return rh.get('rideID') === this.props.rideID
+  rideHorses (rideHorses, rideID) {
+    return rideHorses.filter(rh => {
+      return rh.get('rideID') === rideID
     })
   }
 
@@ -426,7 +427,7 @@ class UpdateRideContainer extends BackgroundComponent {
 
   selectHorse (selectionType, horseID) {
     let foundRideHorse
-    this.rideHorses().valueSeq().forEach((rideHorse) => {
+    this.memoizedRideHorses(this.props.rideHorses, this.props.rideID).valueSeq().forEach((rideHorse) => {
       if (rideHorse.get('horseID') === horseID
         && rideHorse.get('rideID') === this.props.ride.get('_id')
         && rideHorse.get('rideHorseType') === selectionType) {
@@ -454,7 +455,7 @@ class UpdateRideContainer extends BackgroundComponent {
   }
 
   unselectHorse (horseID) {
-    this.rideHorses().valueSeq().forEach((rideHorse) => {
+    this.memoizedRideHorses(this.props.rideHorses, this.props.rideID).valueSeq().forEach((rideHorse) => {
       if (rideHorse.get('horseID') === horseID) {
         this.props.dispatch(rideHorseUpdated(
           rideHorse.set('deleted', true),
@@ -493,7 +494,7 @@ class UpdateRideContainer extends BackgroundComponent {
           this.props.stashedRidePhotos,
           this.state.deletedPhotoIDs)
         }
-        rideHorses={this.rideHorses()} // memoize this
+        rideHorses={this.memoizedRideHorses(this.props.rideHorses, this.props.rideID)}
         selectedPhotoID={this.state.selectedPhotoID}
         selectedHorseID={this.state.selectedHorseID}
         selectHorse={this.selectHorse}

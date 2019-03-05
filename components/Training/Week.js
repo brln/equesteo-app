@@ -138,6 +138,7 @@ export default class Week extends Component {
       const eachDay = moment(start).add(i, 'days')
       const daysRides = []
       for (let ride of this.props.rides) {
+        // @TODO: oof, super inefficient
         if (this.props.rideShouldShow(ride, eachDay)) {
           daysRides.push(ride)
           totalDistance += ride.get('distance')

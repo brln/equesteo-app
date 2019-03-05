@@ -23,6 +23,7 @@ import FabImage from '../FabImage'
 import TrainingCard from './TrainingCard'
 import Stat from '../Stat'
 import PhotoFilmstrip from "../Ride/PhotoFilmstrip"
+import SquaresCard from '../Profile/SquaresCard'
 import MedImage from '../Images/MedImage'
 
 const { height } = Dimensions.get('window')
@@ -206,6 +207,15 @@ export default class HorseProfile extends PureComponent {
       <ScrollView>
         {this.renderDeleteModal()}
         {this.renderImageSwiper()}
+
+        <SquaresCard
+          trainings={this.props.trainings}
+        />
+
+        <TrainingCard
+          trainings={this.props.trainings}
+        />
+
         <View style={{flex: 1}}>
           <Card>
             { this.renderOwner() }
@@ -254,9 +264,6 @@ export default class HorseProfile extends PureComponent {
               </View>
             </CardItem>
           </Card>
-          <TrainingCard
-            rides={this.props.trainings}
-          />
           <RidersCard
             addRider={this.props.addRider}
             deleteHorse={this.props.deleteHorse}

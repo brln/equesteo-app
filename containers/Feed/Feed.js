@@ -1,4 +1,4 @@
-import memoizeOne from 'memoize-one';
+import memoizeOne from 'memoize-one'
 import React from 'react'
 import { connect } from 'react-redux'
 import { Navigation } from 'react-native-navigation'
@@ -9,8 +9,6 @@ import { brand } from '../../colors'
 import Feed from '../../components/Feed/Feed'
 import { logRender } from '../../helpers'
 import {
-  FEED,
-  FIND_PEOPLE,
   FIRST_START,
   HORSE_PROFILE,
   PROFILE,

@@ -48,29 +48,31 @@ export default class TrainingCard extends PureComponent {
       }
     }
 
-    for (let ride of this.props.rides)  {
-      const rideStart = new Date(ride.get('startTime'))
-      if (rideStart > thisMonday) {
-        data.rides.thisWeek += 1
-        data.miles.thisWeek += ride.get('distance')
-        data.hours.thisWeek += ride.get('elapsedTimeSecs') / 60 / 60
-      }
+    for (let rideDay of this.props.trainings.valueSeq())  {
+      for (let ride of rideDay) {
+        const rideStart = new Date(ride.get('startTime'))
+        if (rideStart > thisMonday) {
+          data.rides.thisWeek += 1
+          data.miles.thisWeek += ride.get('distance')
+          data.hours.thisWeek += ride.get('elapsedTimeSecs') / 60 / 60
+        }
 
-      if (rideStart > firstOfMonth) {
-        data.rides.thisMonth += 1
-        data.miles.thisMonth += ride.get('distance')
-        data.hours.thisMonth += ride.get('elapsedTimeSecs') / 60 / 60
-      }
+        if (rideStart > firstOfMonth) {
+          data.rides.thisMonth += 1
+          data.miles.thisMonth += ride.get('distance')
+          data.hours.thisMonth += ride.get('elapsedTimeSecs') / 60 / 60
+        }
 
-      if (rideStart > firstOfYear) {
-        data.rides.thisYear += 1
-        data.miles.thisYear += ride.get('distance')
-        data.hours.thisYear += ride.get('elapsedTimeSecs') / 60 / 60
-      }
+        if (rideStart > firstOfYear) {
+          data.rides.thisYear += 1
+          data.miles.thisYear += ride.get('distance')
+          data.hours.thisYear += ride.get('elapsedTimeSecs') / 60 / 60
+        }
 
-      data.rides.allTime += 1
-      data.miles.allTime += ride.get('distance')
-      data.hours.allTime += ride.get('elapsedTimeSecs') / 60 / 60
+        data.rides.allTime += 1
+        data.miles.allTime += ride.get('distance')
+        data.hours.allTime += ride.get('elapsedTimeSecs') / 60 / 60
+      }
     }
     return data
   }
@@ -80,7 +82,7 @@ export default class TrainingCard extends PureComponent {
     const calcs = this.calcs()
     return (
       <Card style={{flex: 1}}>
-        <CardItem header style={{padding: 5}}>
+        <CardItem header>
           <View style={{paddingLeft: 5}}>
             <Text style={{color: darkBrand}}>Training</Text>
           </View>
