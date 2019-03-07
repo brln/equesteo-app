@@ -20,8 +20,16 @@ import LocalStateReducer from './reducers/LocalState'
 import PouchRecordsReducer from './reducers/PouchRecords'
 
 import { YellowBox } from 'react-native'
+
 // Remove when on > 0.56
-YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated'])
+// https://github.com/facebook/react-native/issues/17504
+// https://github.com/facebook/react-native/issues/14806
+YellowBox.ignoreWarnings([
+  'Class RCTCxxModule',
+  'Warning: isMounted(...) is deprecated',
+  'Module RCTImageLoader requires',
+  'Task orphaned for request'
+])
 
 const store = createStore(
   combineReducers({

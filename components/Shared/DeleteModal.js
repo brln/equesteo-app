@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
 import {
-  Button,
   Dimensions,
   StyleSheet
 } from 'react-native'
@@ -11,6 +10,9 @@ import {
   Text,
   View,
 } from 'react-native';
+
+import Button from '../Button'
+import { brand, danger } from '../../colors'
 
 const { height, width } = Dimensions.get('window')
 
@@ -30,10 +32,10 @@ export default class DeleteModal extends PureComponent {
         <View style={{flex: 1, flexDirection: 'row', height: 20, alignItems: 'center'}}>
           <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', width: 300}}>
             <View style={{margin: 20, width: 80}} >
-              <Button title={"Yes"} color={"red"} onPress={this.props.deleteFunc}/>
+              <Button text={"Yes"} color={danger} onPress={this.props.deleteFunc}/>
             </View>
             <View style={{margin: 20, width: 80}} >
-              <Button title={"No"} onPress={this.props.closeDeleteModal}/>
+              <Button text={"No"} color={brand} onPress={this.props.closeDeleteModal}/>
             </View>
           </View>
         </View>

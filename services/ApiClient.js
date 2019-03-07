@@ -11,6 +11,7 @@ import {
 import LocalStorage from './LocalStorage'
 import { captureException, captureMessage } from './Sentry'
 
+
 let token = null
 
 const GET = 'get'

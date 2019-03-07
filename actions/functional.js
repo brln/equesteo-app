@@ -1,6 +1,6 @@
 import ImagePicker from 'react-native-image-crop-picker'
 import { fromJS, Map  } from 'immutable'
-import { AppState, NetInfo } from 'react-native'
+import { AppState, NetInfo, Platform } from 'react-native'
 import { DISTRIBUTION } from 'react-native-dotenv'
 import BackgroundGeolocation from 'react-native-mauron85-background-geolocation'
 import { ENV } from 'react-native-dotenv'
@@ -34,6 +34,7 @@ import {
   CAMERA,
   DRAWER,
   FEED,
+  NEEDS_SYNC,
   RECORDER,
   RIDE_BUTTON,
   SIGNUP_LOGIN,
@@ -72,6 +73,7 @@ import {
   setFullSyncFail,
   setSigningOut,
   setActiveComponent,
+  setLocationRetry,
   showPopShowRide,
   syncComplete,
   updatePhotoStatus,
@@ -158,10 +160,14 @@ export function appInitialized () {
         Mixpanel.set({id: currentUserID})
         return PouchCouch.localLoad().then((localData) => {
           dispatch(localDataLoaded(localData))
-          dispatch(switchRoot(FEED))
           dispatch(startListeningFCMTokenRefresh())
           dispatch(startListeningFCM())
           dispatch(setDistributionOnServer())
+          if (getState().getIn(['localState', 'lastFullSync'])) {
+            dispatch(switchRoot(FEED))
+          } else {
+            dispatch(switchRoot(NEEDS_SYNC))
+          }
           return dispatch(startNetworkTracking())
         }).then(() => {
           return dispatch(doSync())
@@ -178,10 +184,8 @@ export function checkFCMPermission () {
   return () => {
     firebase.messaging().hasPermission().then(enabled => {
       if (!enabled) {
-        return firebase.messaging().requestPermission().then((resp) => {
-          if (!resp) {
-            alert('FCM permission must be enabled.')
-          }
+        return firebase.messaging().requestPermission().catch((error) => {
+          alert('FCM Permission must be enabled')
         })
       }
     }).catch(e => {
@@ -266,8 +270,8 @@ export function deleteRideAtlasEntry (entryID) {
 
 export function exchangePWCode (email, code) {
   cb('exchangePWCode')
-  return (dispatch) => {
-    loginAndSync(UserAPI.exchangePWCodeForToken, [email, code], dispatch)
+  return (dispatch, getState) => {
+    loginAndSync(UserAPI.exchangePWCodeForToken, [email, code], dispatch, getState)
   }
 }
 
@@ -684,17 +688,45 @@ export function showLocalNotification (message, background, rideID, scrollToComm
   }
 }
 
+export function retryLocationTracking () {
+  cb('retryLocationTracking')
+  return (dispatch, getState) => {
+    dispatch(setLocationRetry(true))
+    setTimeout(() => {
+      if(getState().getIn(['localState', 'locationRetry'])) {
+        const lastLocation = getState().getIn(['currentRide', 'lastLocation'])
+        if (!lastLocation) {
+          BackgroundGeolocation.stop()
+          BackgroundGeolocation.removeAllListeners('location')
+          dispatch(startLocationTracking())
+        }
+      }
+    }, 30000)
+  }
+}
+
 export function startLocationTracking () {
   cb('startLocationTracking')
   return (dispatch, getState) => {
     logInfo('action: startLocationTracking')
     return configureBackgroundGeolocation().then(() => {
       const KALMAN_FILTER_Q = 6
+      BackgroundGeolocation.on('error', (error) => {
+        logError(error, 'BackgroundGeolocation.error')
+        captureException(error)
+      })
+
       BackgroundGeolocation.on('location', (location) => {
+        if (location.accuracy > 50) {
+          return
+        }
+
         const lastLocation = getState().getIn(['currentRide', 'lastLocation'])
         let timeDiff = 0
         if (lastLocation) {
           timeDiff = (location.time / 1000) - (lastLocation.get('timestamp') / 1000)
+        } else {
+          dispatch(setLocationRetry(false))
         }
 
         if (!lastLocation || timeDiff > 5) {
@@ -751,12 +783,9 @@ export function startLocationTracking () {
         }
       })
 
-      BackgroundGeolocation.on('error', (error) => {
-        logError(error, 'BackgroundGeolocation.error')
-        captureException(error)
-      });
-
       BackgroundGeolocation.start()
+      dispatch(retryLocationTracking())
+
     }).catch(catchAsyncError(dispatch))
   }
 }
@@ -848,6 +877,7 @@ function startActiveComponentListener () {
 export function stopLocationTracking (clearLast=true) {
   cb('stopLocationTracking')
   return (dispatch) => {
+    dispatch(setLocationRetry(false))
     BackgroundGeolocation.stop()
     BackgroundGeolocation.removeAllListeners('location')
     if (clearLast) {
@@ -883,15 +913,15 @@ function startAppStateTracking () {
 
 export function submitLogin (email, password) {
   cb('submitLogin', true)
-  return (dispatch) => {
-    loginAndSync(UserAPI.login, [email, password], dispatch)
+  return (dispatch, getState) => {
+    loginAndSync(UserAPI.login, [email, password], dispatch, getState)
   }
 }
 
 export function submitSignup (email, password) {
   cb('submitSignup', true)
-  return (dispatch) => {
-    loginAndSync(UserAPI.signup, [email, password], dispatch)
+  return (dispatch, getState) => {
+    loginAndSync(UserAPI.signup, [email, password], dispatch, getState)
   }
 }
 
@@ -935,6 +965,7 @@ export function doSync (syncData={}, showProgress=true) {
         dispatch(setRemotePersist(DB_SYNCING))
       }
 
+      dispatch(setFullSyncFail(true))
       feedMessage('Uploading...', warning, null)
       return PouchCouch.remoteReplicateDBs().then(() => {
         let userID = syncData.userID
@@ -955,7 +986,6 @@ export function doSync (syncData={}, showProgress=true) {
             f => f.get('followerID')
           ).toJS()
         }
-        dispatch(setFullSyncFail(false))
         feedMessage('Downloading...', warning, null)
         return PouchCouch.localReplicateDBs(userID, followingIDs, followerIDs)
       }).then(() => {
@@ -965,6 +995,7 @@ export function doSync (syncData={}, showProgress=true) {
         dispatch(localDataLoaded(localData))
         dispatch(setRemotePersist(DB_SYNCED))
         dispatch(syncComplete())
+        dispatch(setFullSyncFail(false))
         feedMessage('Sync Complete', green, 3000)
       }).catch((e) => {
         dispatch(setFullSyncFail(true))
@@ -989,29 +1020,46 @@ export function switchRoot (newRoot) {
   return () => {
     if (newRoot === FEED) {
       Navigation.setRoot({
-        root: {
-          sideMenu: {
-            left: {
-              component: {name: DRAWER, id: DRAWER}
-            },
-            center: {
-              stack: {
-                children: [{
-                  component: {
-                    name: FEED,
-                    id: FEED,
-                    options: {
-                      topBar: {
-                        elevation: 0
+        root: Platform.select({
+          android: {
+            sideMenu: {
+              left: {
+                component: {name: DRAWER, id: DRAWER}
+              },
+              center: {
+                stack: {
+                  children: [{
+                    component: {
+                      name: FEED,
+                      id: FEED,
+                      options: {
+                        topBar: {
+                          elevation: 0
+                        }
                       }
+                    },
+                  }]
+                }
+              },
+            }
+          },
+          ios: {
+            stack: {
+              children: [{
+                component: {
+                  name: FEED,
+                  id: FEED,
+                  options: {
+                    topBar: {
+                      elevation: 0
                     }
-                  },
-                }]
-              }
-            },
+                  }
+                }
+              }]
+            }
           }
-        }
-      });
+        })
+      })
     } else if (newRoot === SIGNUP_LOGIN) {
       Navigation.setRoot({
         root: {
@@ -1020,7 +1068,16 @@ export function switchRoot (newRoot) {
             id: SIGNUP_LOGIN
           },
         }
-      });
+      })
+    } else if (newRoot = NEEDS_SYNC) {
+      Navigation.setRoot({
+        root: {
+          component: {
+            name: NEEDS_SYNC,
+            id: NEEDS_SYNC
+          },
+        }
+      })
     } else {
       throw Error('That\'s a bad route, jerk.')
     }

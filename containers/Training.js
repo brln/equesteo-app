@@ -27,7 +27,7 @@ class TrainingContainer extends PureComponent {
         },
         rightButtons: [{
           id: 'settings',
-          icon: require('../img/settings.png'),
+          text: 'Filters',
           color: 'white'
         }],
       },
@@ -92,8 +92,8 @@ class TrainingContainer extends PureComponent {
     return peopleWhoRideYourHorses
   }
 
-  rideHorses () {
-    return this.props.rideHorses.filter(rh => {
+  rideHorses (rideHorses) {
+    return rideHorses.filter(rh => {
       return rh.get('deleted') !== true
     })
   }
@@ -110,6 +110,7 @@ class TrainingContainer extends PureComponent {
       <Training
         horses={this.props.horses}
         horseUsers={this.props.horseUsers}
+        rideHorses={this.rideHorses(this.props.rideHorses)}
         riders={this.memoAllRidersButYou(this.props.trainings, this.props.users, this.props.userID)}
         settingsModalOpen={this.state.settingsModalOpen}
         settingsModalToggle={this.settingsModalToggle}

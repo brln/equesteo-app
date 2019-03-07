@@ -186,16 +186,17 @@ class UpdateRideContainer extends BackgroundComponent {
       }
     } else {
       if (buttonId === 'save') {
-        this.updateLocalRideCoords()
-        this.props.dispatch(persistRide(
-          this.props.ride.get('_id'),
-          false,
-          this.props.stashedRidePhotos,
-          this.state.deletedPhotoIDs,
-          this.state.trimValues,
-          this.memoizedRideHorses(this.props.rideHorses, this.props.rideID),
-        ))
-        Navigation.popTo(this.props.popBackTo)
+        Navigation.popTo(this.props.popBackTo).then(() => {
+          this.updateLocalRideCoords()
+          this.props.dispatch(persistRide(
+            this.props.ride.get('_id'),
+            false,
+            this.props.stashedRidePhotos,
+            this.state.deletedPhotoIDs,
+            this.state.trimValues,
+            this.memoizedRideHorses(this.props.rideHorses, this.props.rideID),
+          ))
+        })
       } else if (buttonId === 'back' || buttonId === 'discard') {
         Navigation.pop(this.props.componentId).then(() => {
           this.props.dispatch(rideUpdated(this.state.cachedRide))

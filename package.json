@@ -24,7 +24,7 @@
     "react-native-camera": "SimonErm/react-native-camera#40ca7f09c91f2a8d6230aca1008d1201cec383b0",
     "react-native-color-picker": "^0.4.0",
     "react-native-firebase": "^4.3.6",
-    "react-native-image-crop-picker": "^0.20.0",
+    "react-native-image-crop-picker": "^0.22.0",
     "react-native-image-zoom-viewer": "^2.2.13",
     "react-native-mauron85-background-geolocation": "^0.5.0-alpha.50",
     "react-native-mixpanel": "^1.1.1",
@@ -57,6 +57,7 @@
   },
   "assets": [
     "assets/fonts/Panama-Light",
-    "assets/fonts/RockSalt"
+    "assets/fonts/RockSalt",
+    "assets/fonts/Montserrat-Regular"
   ]
 }

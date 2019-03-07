@@ -205,7 +205,7 @@ class SignupLoginContainer extends PureComponent {
               {error}
               <BuildImage
                 source={require('../img/loginbg4.jpg')}
-                style={{ width, height, resizeMode: 'stretch' }}
+                style={{ width, height, resizeMode: 'cover' }}
               />
               {form}
             </View>

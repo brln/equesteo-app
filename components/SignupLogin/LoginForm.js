@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React from 'react';
 import {
   Text,
   TextInput,
@@ -16,6 +16,7 @@ export default class LoginForm extends MultiPlatform {
         <Text>Email:</Text>
         <TextInput
           autoCapitalize={'none'}
+          autoCorrect={false}
           blurOnSubmit={false}
           keyboardType={'email-address'}
           onChangeText={this.props.changeEmail}
@@ -50,6 +51,7 @@ export default class LoginForm extends MultiPlatform {
       <View>
         <TextInput
           autoCapitalize={'none'}
+          autoCorrect={false}
           blurOnSubmit={false}
           keyboardType={'email-address'}
           onChangeText={this.props.changeEmail}
@@ -59,7 +61,9 @@ export default class LoginForm extends MultiPlatform {
           style={{
             backgroundColor: 'white',
             height: 50,
-            paddingLeft: 20
+            paddingLeft: 20,
+            borderWidth: 1,
+            borderColor: 'black'
           }}
           maxLength={200}
         />
@@ -75,7 +79,9 @@ export default class LoginForm extends MultiPlatform {
             height: 50,
             marginTop: 20,
             marginBottom: 20,
-            paddingLeft: 20
+            paddingLeft: 20,
+            borderWidth: 1,
+            borderColor: 'black'
           }}
           maxLength={200}
         />

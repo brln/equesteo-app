@@ -24,3 +24,7 @@ adb install android/app/build/outputs/apk/release/app-release.apk
 
 # version appropriate files
 ./versioning.py 55 0.46.1
+
+# fix glog
+cd node_modules/react-native ; ./scripts/ios-install-third-party.sh ; cd ../../
+cd node_modules/react-native/third-party/glog-0.3.4/ ; sh ../../scripts/ios-configure-glog.sh ; cd ../../../../a

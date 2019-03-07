@@ -89,7 +89,7 @@ export default class TimeChart extends PureComponent {
             monthlyData[month] = []
           }
 
-          const horseColor = rideColor(ride, this.props.horses)
+          const horseColor = rideColor(ride, this.props.rideHorses, this.props.horses)
 
           const dailyY0 = dailyData[day].reduce((a, d) => { return a + (d.y - d.y0) }, 0)
           dailyData[day].push({x: day, y: yVal + dailyY0, y0: dailyY0, fill: horseColor})

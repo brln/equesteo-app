@@ -28,46 +28,32 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.4)
-  - Google-Maps-iOS-Utils (2.1.0):
-    - Google-Maps-iOS-Utils/Clustering (= 2.1.0)
-    - Google-Maps-iOS-Utils/Geometry (= 2.1.0)
-    - Google-Maps-iOS-Utils/Heatmap (= 2.1.0)
-    - Google-Maps-iOS-Utils/QuadTree (= 2.1.0)
-    - GoogleMaps
-  - Google-Maps-iOS-Utils/Clustering (2.1.0):
-    - Google-Maps-iOS-Utils/QuadTree
-    - GoogleMaps
-  - Google-Maps-iOS-Utils/Geometry (2.1.0):
-    - GoogleMaps
-  - Google-Maps-iOS-Utils/Heatmap (2.1.0):
-    - Google-Maps-iOS-Utils/QuadTree
-    - GoogleMaps
-  - Google-Maps-iOS-Utils/QuadTree (2.1.0):
-    - GoogleMaps
-  - GoogleMaps (2.5.0):
-    - GoogleMaps/Maps (= 2.5.0)
-  - GoogleMaps/Base (2.5.0)
-  - GoogleMaps/Maps (2.5.0):
-    - GoogleMaps/Base
-  - GoogleToolboxForMac/Defines (2.1.4)
-  - GoogleToolboxForMac/Logger (2.1.4):
-    - GoogleToolboxForMac/Defines (= 2.1.4)
-  - "GoogleToolboxForMac/NSData+zlib (2.1.4)":
-    - GoogleToolboxForMac/Defines (= 2.1.4)
-  - nanopb (0.3.8):
-    - nanopb/decode (= 0.3.8)
-    - nanopb/encode (= 0.3.8)
-  - nanopb/decode (0.3.8)
-  - nanopb/encode (0.3.8)
+  - GoogleToolboxForMac/Defines (2.2.0)
+  - GoogleToolboxForMac/Logger (2.2.0):
+    - GoogleToolboxForMac/Defines (= 2.2.0)
+  - "GoogleToolboxForMac/NSData+zlib (2.2.0)":
+    - GoogleToolboxForMac/Defines (= 2.2.0)
+  - Mixpanel (3.3.9)
+  - nanopb (0.3.901):
+    - nanopb/decode (= 0.3.901)
+    - nanopb/encode (= 0.3.901)
+  - nanopb/decode (0.3.901)
+  - nanopb/encode (0.3.901)
   - Protobuf (3.6.1)
   - QBImagePickerController (3.4.0)
   - React (0.55.4):
     - React/Core (= 0.55.4)
-  - react-native-google-maps (0.21.0):
-    - Google-Maps-iOS-Utils (= 2.1.0)
-    - GoogleMaps (= 2.5.0)
+  - react-native-camera (1.4.1):
     - React
-  - react-native-maps (0.21.0):
+    - react-native-camera/RCT (= 1.4.1)
+    - react-native-camera/RN (= 1.4.1)
+  - react-native-camera/RCT (1.4.1):
+    - React
+  - react-native-camera/RN (1.4.1):
+    - React
+  - react-native-mapbox-gl (6.1.3):
+    - React
+  - react-native-webview (4.0.0):
     - React
   - React/Core (0.55.4):
     - yoga (= 0.55.4.React)
@@ -95,6 +81,9 @@ PODS:
     - React/Core
   - React/RCTBlob (0.55.4):
     - React/Core
+  - React/RCTCameraRoll (0.55.4):
+    - React/Core
+    - React/RCTImage
   - React/RCTGeolocation (0.55.4):
     - React/Core
   - React/RCTImage (0.55.4):
@@ -119,7 +108,7 @@ PODS:
   - RNFirebase (4.3.8):
     - Firebase/Core
     - React
-  - RNImageCropPicker (0.20.3):
+  - RNImageCropPicker (0.22.0):
     - QBImagePickerController
     - React/Core
     - RSKImageCropper
@@ -127,7 +116,7 @@ PODS:
     - React
   - RNVectorIcons (4.6.0):
     - React
-  - RSKImageCropper (2.1.0)
+  - RSKImageCropper (2.2.1)
   - yoga (0.55.4.React)
 
 DEPENDENCIES:
@@ -135,15 +124,17 @@ DEPENDENCIES:
   - Firebase/Core (~> 5.3.0)
   - Firebase/Messaging
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
-  - Google-Maps-iOS-Utils
-  - GoogleMaps
-  - react-native-google-maps (from `../node_modules/react-native-maps`)
-  - react-native-maps (from `../node_modules/react-native-maps`)
+  - Mixpanel
+  - react-native-camera (from `../node_modules/react-native-camera`)
+  - "react-native-mapbox-gl (from `../node_modules/@mapbox/react-native-mapbox-gl`)"
+  - react-native-webview (from `../node_modules/react-native-webview`)
   - React/Core (from `../node_modules/react-native`)
   - React/CxxBridge (from `../node_modules/react-native`)
   - React/DevSupport (from `../node_modules/react-native`)
   - React/RCTActionSheet (from `../node_modules/react-native`)
   - React/RCTAnimation (from `../node_modules/react-native`)
+  - React/RCTBlob (from `../node_modules/react-native`)
+  - React/RCTCameraRoll (from `../node_modules/react-native`)
   - React/RCTGeolocation (from `../node_modules/react-native`)
   - React/RCTImage (from `../node_modules/react-native`)
   - React/RCTLinkingIOS (from `../node_modules/react-native`)
@@ -168,9 +159,8 @@ SPEC REPOS:
     - FirebaseInstanceID
     - FirebaseMessaging
     - Folly
-    - Google-Maps-iOS-Utils
-    - GoogleMaps
     - GoogleToolboxForMac
+    - Mixpanel
     - nanopb
     - Protobuf
     - QBImagePickerController
@@ -183,10 +173,12 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
   React:
     :path: "../node_modules/react-native"
-  react-native-google-maps:
-    :path: "../node_modules/react-native-maps"
-  react-native-maps:
-    :path: "../node_modules/react-native-maps"
+  react-native-camera:
+    :path: "../node_modules/react-native-camera"
+  react-native-mapbox-gl:
+    :path: "../node_modules/@mapbox/react-native-mapbox-gl"
+  react-native-webview:
+    :path: "../node_modules/react-native-webview"
   RNFirebase:
     :path: "../node_modules/react-native-firebase/ios"
   RNImageCropPicker:
@@ -208,22 +200,22 @@ SPEC CHECKSUMS:
   FirebaseMessaging: 6894b8fe0a0cf26c3b13dad729f1131654ae0bdb
   Folly: 211775e49d8da0ca658aebc8eab89d642935755c
   glog: 1de0bb937dccdc981596d3b5825ebfb765017ded
-  Google-Maps-iOS-Utils: c32891ff472eaaa1fca032beedafa1a013af7875
-  GoogleMaps: c087b8e5dfe87ca6ebf59adb9b4894a4146bec4f
-  GoogleToolboxForMac: 91c824d21e85b31c2aae9bb011c5027c9b4e738f
-  nanopb: 5601e6bca2dbf1ed831b519092ec110f66982ca3
+  GoogleToolboxForMac: ff31605b7d66400dcec09bed5861689aebadda4d
+  Mixpanel: 5bc76524e4e6f7eea1db809cceaf17b4ad504b05
+  nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
   Protobuf: 1eb9700044745f00181c136ef21b8ff3ad5a0fd5
   QBImagePickerController: d54cf93db6decf26baf6ed3472f336ef35cae022
   React: aa2040dbb6f317b95314968021bd2888816e03d5
-  react-native-google-maps: 2cfe3b01f8422c7dae51d8764139fd70f888cfce
-  react-native-maps: 066c2afcc89e18726377bcc685315f989ca22449
+  react-native-camera: eac1e8cc7523273a2a11956d0e5dac08296cf4b0
+  react-native-mapbox-gl: b42480060cdcc515dfa3d8e403fb4dd32466a1b9
+  react-native-webview: a42108b827082f8f0333529b0772102031d5960d
   RNFirebase: 2b25fd2e60269f26bb0a76c71dcc942b35a77df0
   RNImageCropPicker: 32ca4b9fef4e1b7b85ba69494242122948117e06
   RNSVG: 6252323c0312735f0af5f58b5adf2965b6a9ffbf
   RNVectorIcons: c0dbfbf6068fefa240c37b0f71bd03b45dddac44
-  RSKImageCropper: 0d0c6d8525a2381f03fde32a47c6703817a2feed
+  RSKImageCropper: 98296ad26b41753f796b6898d015509598f13d97
   yoga: a23273df0088bf7f2bb7e5d7b00044ea57a2a54a
 
-PODFILE CHECKSUM: 6f7ecbe3270550de9df4ff073d49695a027fbe52
+PODFILE CHECKSUM: c4eb9b453a839d8979251414d1636cec7bb2fae4
 
 COCOAPODS: 1.5.3

@@ -16,6 +16,7 @@ import {
   DISMISS_ERROR,
   ENQUEUE_PHOTO,
   ERROR_OCCURRED,
+  INITIAL_SYNC_COMPLETE,
   LOAD_LOCAL_STATE,
   NEW_APP_STATE,
   NEW_NETWORK_STATE,
@@ -26,6 +27,7 @@ import {
   SET_FEED_MESSAGE,
   SET_FIRST_START_HORSE_ID,
   SET_FULL_SYNC_FAIL,
+  SET_LOCATION_RETRY,
   SET_POP_SHOW_RIDE,
   SET_REMOTE_PERSIST,
   SET_SHOWING_RIDE,
@@ -55,6 +57,7 @@ export const initialState = Map({
   goodConnection: true,
   lastFullSync: null,
   locationStashingActive: false,
+  locationRetry: false,
   needsRemotePersist: DB_SYNCED,
   photoQueue: Map(),
   popShowRide: null,
@@ -131,6 +134,8 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.set('feedMessage', action.message)
     case SET_FIRST_START_HORSE_ID:
       return state.set('firstStartHorseID', Map({ horseID: action.horseID, horseUserID: action.horseUserID }))
+    case SET_LOCATION_RETRY:
+      return state.set('locationRetry', action.newVal)
     case SET_POP_SHOW_RIDE:
       return state.set(
         'popShowRide', Map({rideID: action.rideID, scrollToComments: action.scrollToComments})

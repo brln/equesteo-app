@@ -45,6 +45,7 @@ export const initialState = Map({
   horsePhotos: Map(),
   horseUsers: Map(),
   follows: Map(),
+  leaderboards: Map(),
   rides: Map(),
   rideCarrots: Map(),
   selectedRideCoordinates: null,
@@ -253,23 +254,20 @@ export default function PouchRecordsReducer(state=initialState, action) {
       return state.setIn(['horsePhotos', action.horsePhoto.get('_id')], action.horsePhoto)
     case LOCAL_DATA_LOADED:
       return state.merge(Map({
-        follows: fromJS(action.localData.follows),
-        // First start creates a horse, probably before the finishes,
-        // so keep it from blowing the new horse away
+        follows: state.get('follows').merge(fromJS(action.localData.follows)),
         horses: state.get('horses').merge(fromJS(action.localData.horses)),
         horseUsers: state.get('horseUsers').merge(fromJS(action.localData.horseUsers)),
-
-        horsePhotos: fromJS(action.localData.horsePhotos),
-        rides: fromJS(action.localData.rides),
-        rideAtlasEntries: fromJS(action.localData.rideAtlasEntries),
-        rideCarrots: fromJS(action.localData.rideCarrots),
-        rideComments: fromJS(action.localData.rideComments),
-        rideHorses: fromJS(action.localData.rideHorses),
-        ridePhotos: fromJS(action.localData.ridePhotos),
-        trainings: fromJS(action.localData.trainings),
-        users: fromJS(action.localData.users),
-        userPhotos: fromJS(action.localData.userPhotos),
-        leaderboards: fromJS(action.localData.leaderboards)
+        horsePhotos: state.get('horsePhotos').merge(fromJS(action.localData.horsePhotos)),
+        leaderboards: state.get('leaderboards').merge(fromJS(action.localData.leaderboards)),
+        rides: state.get('rides').merge(fromJS(action.localData.rides)),
+        rideAtlasEntries: state.get('rideAtlasEntries').merge(fromJS(action.localData.rideAtlasEntries)),
+        rideCarrots: state.get('rideCarrots').merge(fromJS(action.localData.rideCarrots)),
+        rideComments: state.get('rideComments').merge(fromJS(action.localData.rideComments)),
+        rideHorses: state.get('rideHorses').merge(fromJS(action.localData.rideHorses)),
+        ridePhotos: state.get('ridePhotos').merge(fromJS(action.localData.ridePhotos)),
+        trainings: state.get('trainings').merge(fromJS(action.localData.trainings)),
+        users: state.get('users').merge(fromJS(action.localData.users)),
+        userPhotos: state.get('userPhotos').merge(fromJS(action.localData.userPhotos)),
       }))
     case RIDE_ATLAS_ENTRY_UPDATED:
       return state.setIn(['rideAtlasEntries', action.rideAtlasEntry.get('_id')], action.rideAtlasEntry)

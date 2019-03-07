@@ -71,6 +71,7 @@ export default class Charts extends PureComponent {
             chosenHorseID={this.props.chosenHorseID}
             chosenUserID={this.props.chosenUserID}
             horses={this.props.horses}
+            rideHorses={this.props.rideHorses}
             rideShouldShow={this.props.rideShouldShow}
             showDays={this.state.showDays}
             trainings={this.props.trainings}

@@ -37,13 +37,9 @@ export default class RideStats extends PureComponent {
 
   currentSpeed (lastLocation) {
     let speed = '0.0'
-    if (lastLocation) {
+    if (lastLocation && lastLocation.get('speed') && lastLocation.get('speed') > 0) {
       const found = lastLocation.get('speed')
-      if (found || found === 0) {
-        speed = (lastLocation.get('speed') * 2.236936).toFixed(1)
-      } else {
-        speed = '-'
-      }
+      speed = (found * 2.236936).toFixed(1)
     }
     return speed
   }

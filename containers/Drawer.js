@@ -158,7 +158,7 @@ class DrawerContainer extends Component {
               <TouchableOpacity onPress={this.openTraining}>
                 <View style={styles.drawerListItem}>
                   <BuildImage
-                    source={require('../img/diary.png')}
+                    source={require('../img/mainMenus/training_wt.png')}
                     style={styles.icon}
                   />
                   <Text style={styles.drawerListItemText} onTouch>
@@ -170,7 +170,7 @@ class DrawerContainer extends Component {
               <TouchableOpacity onPress={this.openLeaderboards}>
                 <View style={styles.drawerListItem}>
                   <BuildImage
-                    source={require('../img/leaderboard.png')}
+                    source={require('../img/mainMenus/leaderboard_wt.png')}
                     style={styles.icon}
                   />
                   <Text style={styles.drawerListItemText} onTouch>
@@ -182,7 +182,7 @@ class DrawerContainer extends Component {
               <TouchableOpacity onPress={this.openBarn}>
                 <View style={styles.drawerListItem}>
                   <BuildImage
-                    source={require('../img/barn.png')}
+                    source={require('../img/mainMenus/barn_wt.png')}
                     style={styles.icon}
                   />
                   <Text style={styles.drawerListItemText}>
@@ -194,7 +194,7 @@ class DrawerContainer extends Component {
               <TouchableOpacity onPress={this.openFindFriends}>
                 <View style={styles.drawerListItem}>
                   <BuildImage
-                    source={require('../img/findPeople.png')}
+                    source={require('../img/mainMenus/findPeople_wt.png')}
                     style={styles.icon}
                   />
                   <Text style={styles.drawerListItemText} onTouch>
@@ -206,7 +206,7 @@ class DrawerContainer extends Component {
               <TouchableOpacity onPress={this.openAccount}>
                 <View style={styles.drawerListItem}>
                   <BuildImage
-                    source={require('../img/account2.png')}
+                    source={require('../img/mainMenus/profile_wt.png')}
                     style={styles.icon}
                   />
                   <Text style={styles.drawerListItemText}>
@@ -246,14 +246,14 @@ const styles = StyleSheet.create({
 	drawerListItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10
+    marginBottom: 25,
 	},
 	drawerListItemText: {
 		color: 'white',
 		fontWeight: 'bold',
 		fontSize: 21,
 		paddingLeft: 15,
-		flex: 1
+		flex: 1,
 	},
 	linearGradient: {
     flex: 1,
@@ -261,8 +261,8 @@ const styles = StyleSheet.create({
     width: width * 0.75
 	},
   icon: {
-    width: 50,
-    height: 50,
+    width: width / 10,
+    height: width / 10,
     alignItems: 'center',
   }
 });

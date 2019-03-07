@@ -96,6 +96,7 @@ export default class Training extends PureComponent {
                 chosenType={this.state.chosenType}
                 chosenUserID={this.state.chosenUserID}
                 horses={this.props.horses}
+                rideHorses={this.props.rideHorses}
                 rideShouldShow={this.rideShouldShow}
                 showRide={this.props.showRide}
                 types={this.TYPES}
@@ -115,6 +116,7 @@ export default class Training extends PureComponent {
               chosenType={this.state.chosenType}
               chosenUserID={this.state.chosenUserID}
               horses={this.props.horses}
+              rideHorses={this.props.rideHorses}
               rideShouldShow={this.rideShouldShow}
               trainings={this.props.trainings}
               types={this.TYPES}

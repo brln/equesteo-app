@@ -6,6 +6,7 @@ import {
   Clipboard,
   Dimensions,
   Keyboard,
+  Platform,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -336,7 +337,7 @@ export default class Ride extends PureComponent {
               ridePhotos={this.props.ridePhotos}
               showPhotoLightbox={this.props.showPhotoLightbox}
             />
-            <View style={{position: 'absolute', right: 10, bottom: 10}}>
+            <View style={[{position: 'absolute', right: 10}, Platform.select({android: {bottom: 10}, ios: {top: 10}})]}>
               <TouchableOpacity onPress={this.fullscreenMap}>
                 <BuildImage source={require('../../img/fullscreen.png')} style={{width: 35, height: 35}} />
               </TouchableOpacity>

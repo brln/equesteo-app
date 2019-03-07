@@ -1,12 +1,15 @@
 import React, { PureComponent } from 'react';
 import { Container, Tab, Tabs } from 'native-base';
 import {
+  StatusBar,
   StyleSheet,
 } from 'react-native';
 
+import { isAndroid } from '../../helpers'
 import RideList from './RideList'
 import { brand } from '../../colors'
 import SyncingStatus from './SyncingStatus'
+import TabBar from './TabBar'
 
 export default class Feed extends PureComponent {
   constructor (props) {
@@ -47,12 +50,18 @@ export default class Feed extends PureComponent {
   }
 
   render() {
+    let statusBar = null
+    if (!isAndroid()) {
+      statusBar = <StatusBar backgroundColor={brand} barStyle="light-content" />
+    }
     return (
       <Container>
+        { statusBar }
         <Tabs
           initialPage={0}
           locked={true}
           tabBarUnderlineStyle={{backgroundColor: 'white'}}
+          style={{flex: 10}}
         >
           <Tab
             tabStyle={{backgroundColor: brand}}
@@ -80,6 +89,13 @@ export default class Feed extends PureComponent {
             { this.renderRideList(true, this.props.yourRides) }
           </Tab>
         </Tabs>
+        <TabBar
+          currentRide={this.props.currentRide}
+          openLeaderboards={this.props.openLeaderboards}
+          openMore={this.props.openMore}
+          openRecorder={this.props.openRecorder}
+          openTraining={this.props.openTraining}
+        />
       </Container>
     )
   }
@@ -97,4 +113,4 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold'
   }
-});
+})

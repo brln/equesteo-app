@@ -21,6 +21,8 @@ import {
 import { brand } from '../colors'
 import RideRecorder from '../components/RideRecorder/RideRecorder'
 import { isAndroid, logRender, unixTimeNow } from '../helpers'
+import { captureException } from '../services/Sentry'
+import { CAMERA, UPDATE_RIDE, UPDATE_NEW_RIDE_ID } from "../screens"
 import { CAMERA, RIDE_ATLAS, UPDATE_RIDE, UPDATE_NEW_RIDE_ID } from "../screens"
 
 class RecorderContainer extends PureComponent {
@@ -48,13 +50,12 @@ class RecorderContainer extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      showGPSBar: !props.currentRide,
+      showGPSBar: true,
       discardModalOpen: false,
       navDebounce: false,
       _isMounted: false,
     }
 
-    this.backToFeed = this.backToFeed.bind(this)
     this.clearActiveAtlasEntry = this.clearActiveAtlasEntry.bind(this)
     this.closeDiscardModal = this.closeDiscardModal.bind(this)
     this.discardRide = this.discardRide.bind(this)
@@ -91,9 +92,9 @@ class RecorderContainer extends PureComponent {
   }
 
   goBack () {
-    if (!this.props.currentRide) {
-      this.props.dispatch(stopLocationTracking())
-    }
+    this.setState({
+      _isMounted: false
+    })
     return Navigation.pop(this.props.componentId)
   }
 
@@ -161,12 +162,10 @@ class RecorderContainer extends PureComponent {
       }).then(() => {
         return this.props.dispatch(startLocationTracking())
       }).catch(e => {
-        this.backToFeed()
+        captureException(e)
       })
     } else {
-      this.props.dispatch(startLocationTracking()).then(() => {
-        this.startRide()
-      })
+      this.props.dispatch(startLocationTracking())
     }
   }
 
@@ -176,10 +175,6 @@ class RecorderContainer extends PureComponent {
         discardModalOpen: false
       })
     }
-  }
-
-  backToFeed () {
-    Navigation.popToRoot(this.props.componentId)
   }
 
   startRide () {

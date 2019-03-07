@@ -16,9 +16,11 @@ import {
   Fab,
 } from 'native-base'
 import ImagePicker from 'react-native-image-crop-picker'
+
 import MultiSlider from '@ptomasroos/react-native-multi-slider'
 
 import { brand, darkBrand, darkGrey } from '../../colors'
+import { logError } from '../../helpers'
 import DeleteModal from '../Shared/DeleteModal'
 import FabImage from '../FabImage'
 import HorseSelector from './HorseSelector'
@@ -77,10 +79,12 @@ export default class UpdateRide extends PureComponent {
     ImagePicker.openPicker({
       width: 1080,
       height: 1080,
-      cropping: true
+      cropping: true,
     }).then(image => {
       this.props.createPhoto(image.path)
-    }).catch((e) => {})
+    }).catch((e) => {
+      logError(e)
+    })
   }
 
   startTrim () {

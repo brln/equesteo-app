@@ -1,12 +1,13 @@
 import { brand } from '../colors'
 
-export function rideColor(trainingRide, horses, defaultColor=brand) {
+export function rideColor(trainingRide, rideHorses, horses, defaultColor=brand) {
   let horseColor = defaultColor
   if (trainingRide.get('horseIDs').count() > 0) {
-    const firstHorseID = trainingRide.getIn(['horseIDs', 0])
-    const firstHorse = horses.get(firstHorseID)
-    if (firstHorse && firstHorse.get('color')) {
-      horseColor = firstHorse.get('color')
+    const thisRidesHorse = rideHorses.filter(rh => {
+      return rh.get('rideID') === trainingRide.get('rideID') && rh.get('rideHorseType') === 'rider'
+    }).first()
+    if (thisRidesHorse) {
+      horseColor = horses.getIn([thisRidesHorse.get('horseID'), 'color']) || brand
     }
   }
   return horseColor

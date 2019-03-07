@@ -26,6 +26,7 @@ import {
   HORSE_UPDATED,
   HORSE_PHOTO_UPDATED,
   HORSE_USER_UPDATED,
+  INITIAL_SYNC_COMPLETE,
   LOAD_CURRENT_RIDE_STATE,
   LOAD_LOCAL_STATE,
   LOCAL_DATA_LOADED,
@@ -52,6 +53,7 @@ import {
   SET_FEED_MESSAGE,
   SET_FIRST_START_HORSE_ID,
   SET_FULL_SYNC_FAIL,
+  SET_LOCATION_RETRY,
   SET_POP_SHOW_RIDE,
   SET_REMOTE_PERSIST,
   SHOW_POP_SHOW_RIDE,
@@ -552,6 +554,13 @@ export function setAwaitingPasswordChange (newVal) {
 export function setDoingInitialLoad (newVal) {
   return {
     type: SET_DOING_INITIAL_LOAD,
+    newVal
+  }
+}
+
+export function setLocationRetry (newVal) {
+  return {
+    type: SET_LOCATION_RETRY,
     newVal
   }
 }

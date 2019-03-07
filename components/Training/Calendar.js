@@ -14,16 +14,14 @@ function DaysOfWeek () {
   const days = []
   for (let i = 0; i < 7; i++) {
     days.push(
-      <View key={i} style={{flex: 1, justifyContent: 'center'}}>
+      <View key={i} style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
         <Text style={{textAlign: 'center', fontSize: 15, color: "#C2C2C2"}}>{asNums[i]}</Text>
       </View>
     )
   }
   return (
-    <View style={{paddingTop: 20, borderBottomWidth: 1, borderBottomColor: '#C2C2C2'}}>
-      <View style={{flex: 1, flexDirection: 'row', marginBottom: 15}}>
-        {days}
-      </View>
+    <View style={{flex: 1, flexDirection: 'row'}}>
+      {days}
     </View>
   )
 }
@@ -72,6 +70,7 @@ export default class Calendar extends PureComponent {
           index={index}
           mondayString={item}
           pickType={this.pickType}
+          rideHorses={this.props.rideHorses}
           rides={rideWeeks[item]}
           rideShouldShow={this.props.rideShouldShow}
           showRide={this.props.showRide}
@@ -87,15 +86,20 @@ export default class Calendar extends PureComponent {
     const mondayDates = Object.keys(rideWeeks)
     mondayDates.sort((a, b) => new Date(b) - new Date(a))
     return (
-      <View style={{flex: 10}}>
-        <DaysOfWeek />
-        <ScrollView>
-          <FlatList
-            data={mondayDates}
-            keyExtractor={(i) => i}
-            renderItem={this._renderItem(rideWeeks)}
-          />
-        </ScrollView>
+      <View style={{flex: 1}}>
+        <View style={{flex: 1}}>
+          <DaysOfWeek />
+        </View>
+
+        <View style={{flex: 12}}>
+          <ScrollView>
+            <FlatList
+              data={mondayDates}
+              keyExtractor={(i) => i}
+              renderItem={this._renderItem(rideWeeks)}
+            />
+          </ScrollView>
+        </View>
       </View>
     )
   }

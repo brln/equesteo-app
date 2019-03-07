@@ -15,12 +15,15 @@ class FindPeopleContainer extends PureComponent {
     return {
       topBar: {
         title: {
-          text: "Find People",
+          text: "Find Friends",
           color: 'white',
           fontSize: 20
         },
         background: {
           color: brand,
+        },
+        backButton: {
+          color: 'white'
         },
         elevation: 0,
         leftButtons: [
