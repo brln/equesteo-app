@@ -220,6 +220,20 @@ export default class RidingMap extends PureComponent {
     })
   }
 
+  activeAtlasEntry () {
+    if (this.props.activeAtlasEntry) {
+      console.log(this.props.activeAtlasEntry.toJSON())
+      const mapCoords = RidingMap.mapCoordinates(this.props.activeAtlasEntry.get('rideCoordinates'))
+      return (
+        <MapboxGL.ShapeSource id="atlasSource" shape={mapCoords}>
+          <MapboxGL.LineLayer id="atlasRoute" sourceID={"atlasSource"} style={layerStyles.atlasLine}/>
+        </MapboxGL.ShapeSource>
+      )
+    } else {
+      return null
+    }
+  }
+
   render() {
     logRender('RideRecorder.RidingMap')
     const buttonWidth = this.state.showingMaptypes ? width / 2 : 40
@@ -241,6 +255,7 @@ export default class RidingMap extends PureComponent {
             style={styles.map}
             zoomLevel={this.props.zoomLevel}
           >
+            {this.activeAtlasEntry()}
             <MapboxGL.ShapeSource id="routeSource" shape={mapCoords}>
               <MapboxGL.LineLayer id="route" sourceID={"routeSource"} style={layerStyles.routeLine}/>
             </MapboxGL.ShapeSource>
@@ -293,6 +308,11 @@ RidingMap.propTypes = {
 const layerStyles = MapboxGL.StyleSheet.create({
   routeLine: {
     lineColor: MapboxGL.StyleSheet.identity('stroke'),
+    lineWidth: 3,
+    lineCap: 'round',
+  },
+  atlasLine: {
+    lineColor: darkGrey,
     lineWidth: 3,
     lineCap: 'round',
   },

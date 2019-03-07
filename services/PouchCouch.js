@@ -111,7 +111,7 @@ export default class PouchCouch {
     }).then((leaderboardIDs) => {
       return Promise.all([
         PouchCouch.localReplicateHorses(options, [ownUserID, ...followingUserIDs, ...followerUserIDs, ...leaderboardIDs]),
-        PouchCouch.localReplicateRides(options, [ownUserID, ...followingUserIDs], followerUserIDs),
+        PouchCouch.localReplicateRides(options, ownUserID, [ownUserID, ...followingUserIDs], followerUserIDs),
         PouchCouch.localReplicateUsers(options, ownUserID, leaderboardIDs),
       ])
     }).then(() => {
@@ -129,7 +129,7 @@ export default class PouchCouch {
     })
   }
 
-  static localReplicateRides (options, userIDs, followerUserIDs) {
+  static localReplicateRides (options, ownUserID, userIDs, followerUserIDs) {
     return new Promise((resolve, reject) => {
       const remoteRidesDB = new PouchDB(`${API_URL}/couchproxy/${ridesDBName}`, options)
       PouchDB.replicate(
@@ -141,7 +141,8 @@ export default class PouchCouch {
           filter: 'rides/byUserIDs',
           query_params: {
             userIDs: userIDs.join(','),
-            followerUserIDs: followerUserIDs.join(',')
+            followerUserIDs: followerUserIDs.join(','),
+            ownUserID,
           }
         }
       ).on('complete', (resp) => {
@@ -245,6 +246,7 @@ export default class PouchCouch {
         horsePhotos: {},
         horseUsers: {},
         follows: {},
+        rideAtlasEntries: {},
         rideCarrots: {},
         rideCoordinates: {},
         rideComments: {},
@@ -306,6 +308,9 @@ export default class PouchCouch {
             break
           case 'comment':
             parsed.rideComments[id] = doc
+            break
+          case 'rideAtlasEntry':
+            parsed.rideAtlasEntries[id] = doc
             break
           case 'rideElevations':
             parsed.rideElevations[id] = doc

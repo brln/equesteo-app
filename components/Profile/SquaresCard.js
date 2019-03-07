@@ -21,7 +21,6 @@ const SQUARE_FRACTION = 30
 class DaySquare extends PureComponent {
   render () {
     const trainings = this.props.trainings.get(this.props.day.toISOString()) || List()
-    console.log(trainings.toJSON())
     let bgColor = lightGrey
     if (trainings.count()) {
       const distance = trainings.reduce((accum, t) => {

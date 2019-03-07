@@ -34,7 +34,7 @@ class FindPeopleContainer extends PureComponent {
       layout: {
         orientation: ['portrait']
       }
-    };
+    }
   }
 
   constructor (props) {

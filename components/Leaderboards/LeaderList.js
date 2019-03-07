@@ -34,8 +34,6 @@ export default class LeaderList extends PureComponent {
   showHorseProfile (showHorse) {
     return () => {
       const ownerID = this.props.horseOwnerIDs.get(showHorse.get('_id'))
-      logDebug(showHorse.get('_id'), 'horseID')
-      logDebug(this.props.horseOwnerIDs.toJSON(), 'ownerIDs')
       this.props.showHorseProfile(showHorse, ownerID)
     }
   }

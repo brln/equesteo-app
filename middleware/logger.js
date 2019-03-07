@@ -1,6 +1,7 @@
 import { logInfo } from '../helpers'
 import { captureBreadcrumb } from '../services/Sentry'
 import  Mixpanel from 'react-native-mixpanel'
+import { ENV } from 'react-native-dotenv'
 
 export default logger = store => dispatch => action => {
   const toLog = {'action': action.type}
@@ -10,7 +11,7 @@ export default logger = store => dispatch => action => {
     }
   }
 
-  if (action.mixpanel) {
+  if (action.mixpanel && ENV !== 'local') {
     Mixpanel.track(action.type, toLog)
   }
 

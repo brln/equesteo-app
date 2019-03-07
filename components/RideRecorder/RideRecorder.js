@@ -28,9 +28,11 @@ export default class RideRecorder extends PureComponent {
       nullMapLocation: props.nullMapLocation ? props.nullMapLocation.toJS() : null,
       zoomLevel: 14,
     }
+    this.clearActiveAtlasEntry = this.clearActiveAtlasEntry.bind(this)
     this.hitPause = this.hitPause.bind(this)
     this.mapRegionChanged = this.mapRegionChanged.bind(this)
     this.recenter = this.recenter.bind(this)
+    this.showAtlas = this.showAtlas.bind(this)
     this.showCamera = this.showCamera.bind(this)
     this.toggleFab = this.toggleFab.bind(this)
   }
@@ -132,9 +134,36 @@ export default class RideRecorder extends PureComponent {
     })
   }
 
+  showAtlas () {
+    this.toggleFab()
+    this.props.showAtlas()
+  }
+
+  clearActiveAtlasEntry () {
+    this.toggleFab()
+    this.props.clearActiveAtlasEntry()
+  }
+
   render() {
-    let pauseButton = null
-    let cameraButton = null
+    let pauseButton
+    let cameraButton
+    let atlasButton
+
+    if (this.state.fabActive) {
+      if (this.props.activeAtlasEntry) {
+        atlasButton = (
+          <Button style={{ backgroundColor: orange }} onPress={this.clearActiveAtlasEntry}>
+            <FabImage source={require('../../img/noAtlas.png')} height={30} width={30} />
+          </Button>
+        )
+      } else {
+        atlasButton = (
+          <Button style={{ backgroundColor: orange }} onPress={this.showAtlas}>
+            <FabImage source={require('../../img/atlas.png')} height={30} width={30} />
+          </Button>
+        )
+      }
+    }
     if (this.state.fabActive && this.props.lastLocation) {
       cameraButton = (
         <Button style={{ backgroundColor: orange }} onPress={this.showCamera}>
@@ -165,6 +194,7 @@ export default class RideRecorder extends PureComponent {
         <View style={{flex: 1}}>
           <View style={{flex: 5}}>
             <RidingMap
+              activeAtlasEntry={this.props.activeAtlasEntry}
               currentRideCoordinates={this.props.currentRideCoordinates}
               heading={this.state.heading}
               centerCoordinate={this.state.centerCoordinate ? this.state.centerCoordinate : this.state.nullMapLocation}
@@ -184,6 +214,7 @@ export default class RideRecorder extends PureComponent {
                 onPress={this.toggleFab}
               >
                 <Text>...</Text>
+                { atlasButton }
                 { pauseButton }
                 { cameraButton }
               </Fab>

@@ -59,6 +59,7 @@ import {
   newLocation,
   newNetworkState,
   replaceLastLocation,
+  rideAtlasEntryUpdated,
   rideCoordinatesLoaded,
   rideCarrotCreated,
   rideCarrotSaved,
@@ -89,7 +90,7 @@ export const DB_SYNCED = 'DB_SYNCED'
 function cb(action, mixpanel=false) {
   logInfo('functionalAction: ' + action)
   captureBreadcrumb(action, 'functionalAction')
-  if (mixpanel) {
+  if (mixpanel  && ENV !== 'local') {
     Mixpanel.track(action)
   }
 }
@@ -189,6 +190,31 @@ export function checkFCMPermission () {
   }
 }
 
+export function createRideAtlasEntry(name, userID, ride, rideCoordinates, rideElevations) {
+  cb('createRideAtlasEntry', true)
+  return (dispatch, getState) => {
+    const entryID = `${userID}_${ride.get('_id')}_${unixTimeNow()}`
+    const newAtlasEntry = fromJS({
+      _id: entryID,
+      name,
+      ride,
+      rideCoordinates: {
+        rideCoordinates: rideCoordinates.get('rideCoordinates').toJS(),
+      },
+      rideElevations: {
+        elevations: rideElevations.get('elevations').toJS(),
+      },
+      type: 'rideAtlasEntry'
+    })
+    dispatch(rideAtlasEntryUpdated(newAtlasEntry))
+    return PouchCouch.saveRide(newAtlasEntry.toJS()).then(doc => {
+      const afterSave = getState().getIn(['pouchRecords', 'rideAtlasEntries', entryID])
+      dispatch(rideAtlasEntryUpdated(afterSave.set('_rev', doc.rev)))
+      dispatch(doSync())
+    }).catch(catchAsyncError(dispatch))
+  }
+}
+
 export function createRideComment(commentData) {
   cb('createRideComment', true)
   return (dispatch, getState) => {
@@ -221,6 +247,20 @@ export function deleteHorseUser (horseUserID) {
     }
     theHorseUser = theHorseUser.set('deleted', true)
     dispatch(horseUserUpdated(theHorseUser))
+  }
+}
+
+export function deleteRideAtlasEntry (entryID) {
+  cb('deleteRideAtlasEntry', true)
+  return (dispatch, getState) => {
+    const theRideAtlasEntry = getState().getIn (['pouchRecords', 'rideAtlasEntries', entryID])
+    const deleted = theRideAtlasEntry.set('deleted', true)
+    dispatch(rideAtlasEntryUpdated(deleted))
+    return PouchCouch.saveRide(deleted.toJS()).then(doc => {
+      const afterSave = getState().getIn(['pouchRecords', 'rideAtlasEntries', entryID])
+      dispatch(rideAtlasEntryUpdated(afterSave.set('_rev', doc.rev)))
+      return dispatch(doSync())
+    }).catch(catchAsyncError(dispatch))
   }
 }
 

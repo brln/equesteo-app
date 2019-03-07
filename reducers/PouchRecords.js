@@ -16,6 +16,7 @@ import {
   HORSE_USER_UPDATED,
   HORSE_UPDATED,
   LOCAL_DATA_LOADED,
+  RIDE_ATLAS_ENTRY_UPDATED,
   RIDE_COMMENT_UPDATED,
   RIDE_CARROT_CREATED,
   RIDE_CARROT_SAVED,
@@ -260,6 +261,7 @@ export default function PouchRecordsReducer(state=initialState, action) {
 
         horsePhotos: fromJS(action.localData.horsePhotos),
         rides: fromJS(action.localData.rides),
+        rideAtlasEntries: fromJS(action.localData.rideAtlasEntries),
         rideCarrots: fromJS(action.localData.rideCarrots),
         rideComments: fromJS(action.localData.rideComments),
         rideHorses: fromJS(action.localData.rideHorses),
@@ -269,6 +271,8 @@ export default function PouchRecordsReducer(state=initialState, action) {
         userPhotos: fromJS(action.localData.userPhotos),
         leaderboards: fromJS(action.localData.leaderboards)
       }))
+    case RIDE_ATLAS_ENTRY_UPDATED:
+      return state.setIn(['rideAtlasEntries', action.rideAtlasEntry.get('_id')], action.rideAtlasEntry)
     case RIDE_CARROT_CREATED:
       return state.setIn(['rideCarrots', action.carrotData.get('_id')], action.carrotData)
     case RIDE_CARROT_SAVED:

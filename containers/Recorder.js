@@ -8,7 +8,7 @@ import { BackHandler } from 'react-native'
 import {
   createRide,
   discardCurrentRide,
-  pauseLocationTracking,
+  pauseLocationTracking, setActiveAtlasEntry,
   startRide,
   stashNewLocations,
   stopStashNewLocations,
@@ -21,7 +21,7 @@ import {
 import { brand } from '../colors'
 import RideRecorder from '../components/RideRecorder/RideRecorder'
 import { isAndroid, logRender, unixTimeNow } from '../helpers'
-import { CAMERA, UPDATE_RIDE, UPDATE_NEW_RIDE_ID } from "../screens"
+import { CAMERA, RIDE_ATLAS, UPDATE_RIDE, UPDATE_NEW_RIDE_ID } from "../screens"
 
 class RecorderContainer extends PureComponent {
   static options() {
@@ -55,12 +55,14 @@ class RecorderContainer extends PureComponent {
     }
 
     this.backToFeed = this.backToFeed.bind(this)
+    this.clearActiveAtlasEntry = this.clearActiveAtlasEntry.bind(this)
     this.closeDiscardModal = this.closeDiscardModal.bind(this)
     this.discardRide = this.discardRide.bind(this)
     this.goBack = this.goBack.bind(this)
     this.handleBackPress = this.handleBackPress.bind(this)
     this.finishRide = this.finishRide.bind(this)
     this.pauseLocationTracking = this.pauseLocationTracking.bind(this)
+    this.showAtlas = this.showAtlas.bind(this)
     this.showCamera = this.showCamera.bind(this)
     this.showUpdateRide = this.showUpdateRide.bind(this)
     this.startRide = this.startRide.bind(this)
@@ -205,6 +207,19 @@ class RecorderContainer extends PureComponent {
     })
   }
 
+  showAtlas () {
+    Navigation.push(this.props.componentId, {
+      component: {
+        name: RIDE_ATLAS,
+        id: RIDE_ATLAS,
+      }
+    })
+  }
+
+  clearActiveAtlasEntry () {
+    this.props.dispatch(setActiveAtlasEntry(null))
+  }
+
   finishRide () {
     if (this.props.currentRideCoordinates.get('rideCoordinates').count() > 0) {
       this.props.dispatch(stashNewLocations())
@@ -263,7 +278,9 @@ class RecorderContainer extends PureComponent {
     logRender('RecorderContainer')
     return (
       <RideRecorder
+        activeAtlasEntry={this.props.activeAtlasEntry}
         appState={this.props.appState}
+        clearActiveAtlasEntry={this.clearActiveAtlasEntry}
         closeDiscardModal={this.closeDiscardModal}
         currentRide={this.props.currentRide}
         currentRideCoordinates={this.props.currentRideCoordinates}
@@ -275,6 +292,7 @@ class RecorderContainer extends PureComponent {
         nullMapLocation={this.props.nullMapLocation}
         refiningLocation={this.props.refiningLocation}
         pauseLocationTracking={this.pauseLocationTracking}
+        showAtlas={this.showAtlas}
         showCamera={this.showCamera}
         showGPSBar={this.state.showGPSBar}
         showUpdateRide={this.showUpdateRide}
@@ -290,6 +308,7 @@ function mapStateToProps (state) {
   const currentRideState = state.get('currentRide')
   const userID = localState.get('userID')
   return {
+    activeAtlasEntry: pouchState.getIn(['rideAtlasEntries', localState.get('activeAtlasEntry')]),
     activeComponent: localState.get('activeComponent'),
     appState: localState.get('appState'),
     currentRide: currentRideState.get('currentRide'),

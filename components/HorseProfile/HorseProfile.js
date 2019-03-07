@@ -202,7 +202,6 @@ export default class HorseProfile extends PureComponent {
   }
 
   render() {
-    logDebug(this.props.trainings)
     return (
       <ScrollView>
         {this.renderDeleteModal()}

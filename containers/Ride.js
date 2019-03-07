@@ -69,6 +69,7 @@ class RideContainer extends PureComponent {
           name: RIDE_TOOLS,
           passProps: {
             rideID: this.props.ride.get('_id'),
+            rideUserID: this.props.ride.get('userID'),
             popBackTo: this.props.componentId
           },
         },
@@ -100,14 +101,6 @@ class RideContainer extends PureComponent {
     this.viewRideCharts = this.viewRideCharts.bind(this)
 
     Navigation.events().bindComponent(this);
-
-    if (props.userID !== props.rideUser.get('_id')) {
-      Navigation.mergeOptions(this.props.componentId, {
-        topBar: {
-          rightButtons: []
-        }
-      })
-    }
 
     this.memoRideCarrots = memoizeOne(this.rideCarrots.bind(this))
     this.memoRideComments = memoizeOne(this.rideComments.bind(this))

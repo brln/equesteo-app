@@ -10,10 +10,12 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
+import AtlasEntryModal from '../components/RideTools/AtlasEntryModal'
 import { brand, darkGrey, lightGrey } from '../colors'
 import { logRender } from '../helpers'
-import { BARN, FEEDBACK, FIND_PEOPLE, SHARE_RIDE, UPDATE_RIDE } from '../screens'
+import { SHARE_RIDE, UPDATE_RIDE } from '../screens'
 import DeleteModal from '../components/Shared/DeleteModal'
+import { createRideAtlasEntry } from "../actions/functional"
 import Thumbnail from '../components/Images/Thumbnail'
 import {
   rideUpdated,
@@ -50,13 +52,19 @@ class RideToolsContainer extends Component {
   constructor (props) {
     super(props)
     this.state = {
+      atlasEntryName: props.ride.get('name'),
       deleteModalOpen: false,
+      atlasEntryModalOpen: false,
     }
+    this.changeAtlasEntryName = this.changeAtlasEntryName.bind(this)
+    this.closeAtlasEntryModal = this.closeAtlasEntryModal.bind(this)
+    this.closeDeleteModal = this.closeDeleteModal.bind(this)
+    this.createRideAtlasEntry = this.createRideAtlasEntry.bind(this)
     this.deleteRide = this.deleteRide.bind(this)
+    this.menuItems = this.menuItems.bind(this)
     this.shareRide = this.shareRide.bind(this)
-    this.showBarn = this.showBarn.bind(this)
+    this.showAtlasEntryModal = this.showAtlasEntryModal.bind(this)
     this.showDeleteModal = this.showDeleteModal.bind(this)
-    this.showFindFriends = this.showFindFriends.bind(this)
     this.updateRide = this.updateRide.bind(this)
   }
 
@@ -66,32 +74,31 @@ class RideToolsContainer extends Component {
     })
   }
 
+  createRideAtlasEntry () {
+    return this.props.dispatch(createRideAtlasEntry(
+      this.state.atlasEntryName,
+      this.props.userID,
+      this.props.ride,
+      this.props.rideCoordinates,
+      this.props.rideElevations,
+    ))
+  }
+
   deleteRide () {
     this.props.dispatch(rideUpdated(this.props.ride.set('deleted', true)))
     this.props.dispatch(persistRide(this.props.ride.get('_id'), false, [], [], null, List()))
     Navigation.popToRoot(this.props.componentId)
   }
 
+  showAtlasEntryModal () {
+    this.setState({
+      atlasEntryModalOpen: true
+    })
+  }
+
   showDeleteModal () {
     this.setState({
       deleteModalOpen: true
-    })
-  }
-
-  showBarn () {
-    Navigation.push(this.props.activeComponent, {
-      component: {
-        name: BARN,
-      }
-    })
-  }
-
-  showFindFriends() {
-    Navigation.push(this.props.activeComponent, {
-      component: {
-        name: FIND_PEOPLE,
-        title: 'Find Friends',
-      }
     })
   }
 
@@ -116,6 +123,16 @@ class RideToolsContainer extends Component {
         }
       }
     })
+  }
+
+  closeAtlasEntryModal () {
+    this.setState({
+      atlasEntryModalOpen: false
+    })
+  }
+
+  changeAtlasEntryName (atlasEntryName) {
+    this.setState({ atlasEntryName })
   }
 
   renderMenuItem ({ item }) {
@@ -143,31 +160,38 @@ class RideToolsContainer extends Component {
     )
   }
 
-  render() {
-    logRender('RideTools container')
-    const menuItems = [
+  menuItems () {
+    let menuItems = [
       {
-        name: 'Share',
-        icon: require('../img/rideTools/share.png'),
-        onPress: this.shareRide
-      },
-      {
-        name: 'Edit',
-        icon: require('../img/rideTools/edit.png'),
-        onPress: this.updateRide
-      },
-      {
-        name: 'Save to My Rides',
+        name: 'Save to My Ride Atlas',
         icon: require('../img/rideTools/bookmark.png'),
-        onPress: () => {}
-      },
-      {
-        name: 'Delete',
-        icon: require('../img/rideTools/delete.png'),
-        onPress: this.showDeleteModal
+        onPress: this.showAtlasEntryModal
       }
     ]
+    if (this.props.userID === this.props.rideUserID) {
+      menuItems = menuItems.concat([
+        {
+          name: 'Share',
+          icon: require('../img/rideTools/share.png'),
+          onPress: this.shareRide
+        },
+        {
+          name: 'Edit',
+          icon: require('../img/rideTools/edit.png'),
+          onPress: this.updateRide
+        },
+        {
+          name: 'Delete',
+          icon: require('../img/rideTools/delete.png'),
+          onPress: this.showDeleteModal
+        }
+      ])
+    }
+    return menuItems
+  }
 
+  render() {
+    logRender('RideTools container')
     return (
       <View>
         <View style={{backgroundColor: lightGrey, height: 30}} />
@@ -177,10 +201,17 @@ class RideToolsContainer extends Component {
           deleteFunc={this.deleteRide}
           text={"Are you sure you want to delete this ride?"}
         />
+        <AtlasEntryModal
+          modalOpen={this.state.atlasEntryModalOpen}
+          closeModal={this.closeAtlasEntryModal}
+          name={this.state.atlasEntryName}
+          changeName={this.changeAtlasEntryName}
+          createRideAtlasEntry={this.createRideAtlasEntry}
+        />
         <FlatList
           keyExtractor={i => i.name}
           containerStyle={{marginTop: 0}}
-          data={menuItems}
+          data={this.menuItems()}
           renderItem={this.renderMenuItem}
           style={{height: '100%', borderTopWidth: 1, borderTopColor: darkGrey, backgroundColor: lightGrey}}
         />
@@ -196,7 +227,11 @@ function mapStateToProps (state, passedProps) {
   return {
     activeComponent,
     ride: pouchState.getIn(['rides', passedProps.rideID]),
-    rideID: passedProps.rideID
+    rideCoordinates: pouchState.get('selectedRideCoordinates'),
+    rideElevations: pouchState.get('selectedRideElevations'),
+    rideID: passedProps.rideID,
+    rideUserID: passedProps.rideUserID,
+    userID: localState.get('userID')
   }
 }
 

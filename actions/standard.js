@@ -37,6 +37,7 @@ import {
   POP_SHOW_RIDE_SHOWN,
   REMOVE_STASHED_RIDE_PHOTO,
   REPLACE_LAST_LOCATION,
+  RIDE_ATLAS_ENTRY_UPDATED,
   RIDE_CARROT_CREATED,
   RIDE_CARROT_SAVED,
   RIDE_COMMENT_UPDATED,
@@ -46,6 +47,7 @@ import {
   RIDE_PHOTO_UPDATED,
   RIDE_UPDATED,
   SAVE_USER_ID,
+  SET_ACTIVE_ATLAS_ENTRY,
   SET_ACTIVE_COMPONENT,
   SET_FEED_MESSAGE,
   SET_FIRST_START_HORSE_ID,
@@ -174,6 +176,13 @@ export function createRide (
     rideID,
     userID,
     mixpanel: true
+  }
+}
+
+export function rideAtlasEntryUpdated (rideAtlasEntry) {
+  return {
+    type: RIDE_ATLAS_ENTRY_UPDATED,
+    rideAtlasEntry
   }
 }
 
@@ -416,6 +425,13 @@ export function ridePhotoUpdated (ridePhoto) {
   return {
     type: RIDE_PHOTO_UPDATED,
     ridePhoto
+  }
+}
+
+export function setActiveAtlasEntry (id) {
+  return {
+    type: SET_ACTIVE_ATLAS_ENTRY,
+    id
   }
 }
 

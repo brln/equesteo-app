@@ -19,6 +19,7 @@ import { connect } from 'react-redux'
 import ApiClient from '../services/ApiClient'
 import Button from '../components/Button'
 import { brand, darkBrand, lightGrey } from '../colors'
+import { logError, logInfo } from '../helpers'
 import UserAPI from '../services/UserApi'
 import URIImage from '../components/Images/URIImage'
 
@@ -139,10 +140,9 @@ class ShareRideContainer extends PureComponent {
   }
 
   shareMap () {
-    Share.share({message: this.state.shareLink, title: 'I went for a ride on Equesteo'}).then(() => {
-      logDebug('shared')
-    })
+    Share.share({message: this.state.shareLink, title: 'I went for a ride on Equesteo'})
   }
+
 
   askToDownloadMap () {
     PermissionsAndroid.request(
@@ -158,7 +158,7 @@ class ShareRideContainer extends PureComponent {
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         this.downloadMap()
       } else {
-        console.log('Camera permission denied');
+        logInfo('Camera permission denied');
       }
     }).catch((err) => {
       throw err
@@ -168,14 +168,13 @@ class ShareRideContainer extends PureComponent {
   downloadMap () {
     this.setState({ loading: true, loadingMessage: DOWNLOADING_MESSAGE })
     ApiClient.downloadImage(this.state.mapURL).then(url => {
-      console.log(url)
       return CameraRoll.saveToCameraRoll(`file://${url}`)
     }).then(newURI => {
       this.setState({ loading: false })
       Linking.openURL(newURI)
     }).catch(e => {
       this.setState({ loading: false })
-      console.log(e)
+      logError(e)
     })
   }
 

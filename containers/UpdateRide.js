@@ -15,6 +15,7 @@ import {
   rideElevationsLoaded,
   rideHorseUpdated,
   rideUpdated,
+  setActiveAtlasEntry,
   setPopShowRide,
   stopStashNewLocations,
   stashRidePhoto,
@@ -171,9 +172,11 @@ class UpdateRideContainer extends BackgroundComponent {
           this.props.dispatch(clearPausedLocations())
           this.props.dispatch(stopLocationTracking())
           this.props.dispatch(discardCurrentRide())
+          this.props.dispatch(setActiveAtlasEntry(null))
         })
       } else if (buttonId === 'discard') {
         this.setDiscardModalOpen(true)
+        this.props.dispatch(setActiveAtlasEntry(null))
       } else if (buttonId === 'back') {
         Navigation.pop(this.props.componentId).then(() => {
           this.props.dispatch(deleteUnpersistedRide(this.props.ride.get('_id')))

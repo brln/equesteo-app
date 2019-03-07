@@ -103,7 +103,6 @@ export default class ApiClient {
         return json
       })
     }).catch(e => {
-      console.log(e)
       if (e instanceof SyntaxError) {
         logError(e, 'ApiClient.request')
         logInfo(rawResp)

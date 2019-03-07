@@ -29,6 +29,7 @@ import {
   SET_POP_SHOW_RIDE,
   SET_REMOTE_PERSIST,
   SET_SHOWING_RIDE,
+  SET_ACTIVE_ATLAS_ENTRY,
   SET_AWAITING_PW_CHANGE,
   SET_DOING_INITIAL_LOAD,
   SET_SIGNING_OUT,
@@ -40,6 +41,7 @@ import {
 } from '../constants'
 
 export const initialState = Map({
+  activeAtlasEntry: null,
   activeComponent: null,
   appState: appStates.active,
   awaitingPWChange: false,
@@ -121,6 +123,8 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.deleteIn(['ridePhotoStash', action.stashKey, action.photoID])
     case SAVE_USER_ID:
       return state.set('userID', action.userID)
+    case SET_ACTIVE_ATLAS_ENTRY:
+      return state.set('activeAtlasEntry', action.id)
     case SET_ACTIVE_COMPONENT:
       return state.set('activeComponent', action.componentID)
     case SET_FEED_MESSAGE:

@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
 import {
-  Button,
   Dimensions,
   StyleSheet
 } from 'react-native'
@@ -51,4 +50,4 @@ const styles = StyleSheet.create({
     height: height / 3,
     width: width * .8,
   },
-});
+})
