@@ -22,7 +22,6 @@ import { brand } from '../colors'
 import RideRecorder from '../components/RideRecorder/RideRecorder'
 import { isAndroid, logRender, unixTimeNow } from '../helpers'
 import { captureException } from '../services/Sentry'
-import { CAMERA, UPDATE_RIDE, UPDATE_NEW_RIDE_ID } from "../screens"
 import { CAMERA, RIDE_ATLAS, UPDATE_RIDE, UPDATE_NEW_RIDE_ID } from "../screens"
 
 class RecorderContainer extends PureComponent {

@@ -1,8 +1,7 @@
 import React, { PureComponent } from 'react'
-import { API_URL } from 'react-native-dotenv'
 
 import { logError } from '../../helpers'
-import { MAPBOX_TOKEN } from 'react-native-dotenv'
+import { API_URL } from '../../dotEnv'
 import URIImage from '../Images/URIImage'
 
 export default class RideMapImage extends PureComponent {

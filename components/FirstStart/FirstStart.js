@@ -1,8 +1,10 @@
 import React, { PureComponent } from 'react'
 import {
   Dimensions,
+  ScrollView,
   View
 } from 'react-native'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import BuildImage from '../Images/BuildImage'
 import { logRender } from '../../helpers'
@@ -91,39 +93,35 @@ export default class FirstStart extends PureComponent {
     return (
       <View>
         <View style={{height: height - 56, position: 'absolute'}}>
-          <View style={{flex: 1, justifyContent: 'space-between'}}>
-            <View style={{
-              alignItems: 'center',
-              flexDirection: 'column',
-              backgroundColor: 'white',
-              flex: 2,
-              paddingTop: 20
-            }}>
-              <BuildImage
-                source={require('../../img/logo250.png')}
-                style={{
-                  width: 60,
-                  height: 60,
-                  alignItems: 'center',
-
-                }}
-              />
-            </View>
-            <View style={{flex: 3, justifyContent: 'flex-end', backgroundColor: 'white'}}>
-              <BuildImage
-                source={require('../../img/firstStart.jpg')}
-                style={{
-                  width,
-                  height: width,
-                  resizeMode: 'cover',
-                }}
-              />
-            </View>
+          <View style={{flex: 3, justifyContent: 'flex-end', backgroundColor: 'white'}}>
+            <BuildImage
+              source={require('../../img/firstStart.jpg')}
+              style={{
+                width,
+                height: width,
+                resizeMode: 'cover',
+              }}
+            />
           </View>
         </View>
-        <View style={{paddingTop: 90, height: '100%', backgroundColor: 'transparent'}}>
+        <KeyboardAwareScrollView style={{backgroundColor: 'transparent'}}>
+          <View style={{
+            alignItems: 'center',
+            flexDirection: 'column',
+            backgroundColor: 'white',
+            paddingTop: 20,
+          }}>
+            <BuildImage
+              source={require('../../img/logo250.png')}
+              style={{
+                width: 60,
+                height: 60,
+                alignItems: 'center',
+              }}
+            />
+          </View>
           {this.pickPage()}
-        </View>
+        </KeyboardAwareScrollView>
       </View>
     )
   }

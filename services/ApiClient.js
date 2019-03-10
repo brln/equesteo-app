@@ -1,6 +1,6 @@
 import RNFetchBlob from 'rn-fetch-blob'
 
-import { API_URL } from 'react-native-dotenv'
+import { API_URL } from '../dotEnv'
 import { logError, logInfo } from '../helpers'
 import {
   BadRequestError,
@@ -10,7 +10,6 @@ import {
 } from '../errors'
 import LocalStorage from './LocalStorage'
 import { captureException, captureMessage } from './Sentry'
-
 
 let token = null
 

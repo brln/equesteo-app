@@ -2,7 +2,8 @@ import { List, Map } from 'immutable'
 import moment from 'moment'
 import mbxStatic from '@mapbox/mapbox-sdk/services/static'
 import { Platform } from 'react-native'
-import { MAPBOX_TOKEN } from 'react-native-dotenv'
+
+import { MAPBOX_TOKEN } from './dotEnv'
 
 
 const toRad = (deg) => {

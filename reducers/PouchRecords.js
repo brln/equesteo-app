@@ -50,6 +50,7 @@ export const initialState = Map({
   rideCarrots: Map(),
   selectedRideCoordinates: null,
   selectedRideElevations: null,
+  rideAtlasEntries: Map(),
   rideComments: Map(),
   rideHorses: Map(),
   ridePhotos: Map(),

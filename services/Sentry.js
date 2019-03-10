@@ -1,5 +1,5 @@
 import { Sentry } from 'react-native-sentry'
-import { DISTRIBUTION, ENV, RELEASE, SENTRY_DSN } from 'react-native-dotenv'
+import { DISTRIBUTION, ENV, RELEASE, SENTRY_DSN } from '../dotEnv'
 
 import { logError } from '../helpers'
 

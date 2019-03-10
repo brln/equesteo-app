@@ -1,15 +1,15 @@
 import ImagePicker from 'react-native-image-crop-picker'
 import { fromJS, Map  } from 'immutable'
 import { AppState, NetInfo, Platform } from 'react-native'
-import { DISTRIBUTION } from 'react-native-dotenv'
+
 import BackgroundGeolocation from 'react-native-mauron85-background-geolocation'
-import { ENV } from 'react-native-dotenv'
 import firebase from 'react-native-firebase'
 import  Mixpanel from 'react-native-mixpanel'
 import { Navigation } from 'react-native-navigation'
 import PushNotification from 'react-native-push-notification'
 
 import ApiClient from '../services/ApiClient'
+import { DISTRIBUTION, ENV } from '../dotEnv'
 import kalmanFilter from '../services/Kalman'
 import { captureBreadcrumb, captureException, setUserContext } from "../services/Sentry"
 import { handleNotification } from '../services/PushNotificationHandler'

@@ -12,6 +12,7 @@ import {
 import { brand } from '../../colors'
 import { logRender } from '../../helpers'
 import Button from '../Button'
+import HorseForm from './HorseForm'
 
 const { height, width } = Dimensions.get('window')
 
@@ -27,6 +28,7 @@ export default class FirstHorsePage extends PureComponent {
   }
 
   next () {
+    Keyboard.dismiss()
     this.props.nextPage()
   }
 
@@ -46,39 +48,13 @@ export default class FirstHorsePage extends PureComponent {
           </Text>
         </View>
         <View style={{flex: 1, alignItems: 'center'}}>
-          <View style={{paddingTop: 30, paddingLeft: 10, paddingRight: 10, width: width * .66}}>
-            <Text style={{fontSize: 12}}>Name</Text>
-            <TextInput
-              value={this.props.horse.get('name')}
-              underlineColorAndroid={brand}
-              blurOnSubmit={false}
-              keyboardType={'email-address'}
-              onChangeText={this.props.changeHorseName}
-              onSubmitEditing={() => {this.props.inputs['breed'].focus()}}
-              style={{
-                backgroundColor: 'transparent',
-                height: 50,
-              }}
-              maxLength={200}
-            />
-
-            <Text style={{fontSize: 12}}>Breed</Text>
-            <TextInput
-              value={this.props.horse.get('breed')}
-              underlineColorAndroid={brand}
-              blurOnSubmit={false}
-              keyboardType={'email-address'}
-              onChangeText={this.props.changeHorseBreed}
-              ref={(i) => this.props.inputs['breed'] = i}
-              onSubmitEditing={() => {Keyboard.dismiss()}}
-              style={{
-                backgroundColor: 'transparent',
-                height: 50,
-              }}
-              maxLength={200}
-            />
-          </View>
-
+          <HorseForm
+            changeHorseBreed={this.props.changeHorseBreed}
+            changeHorseName={this.props.changeHorseName}
+            horse={this.props.horse}
+            inputs={this.props.inputs}
+            next={this.next}
+          />
 
           <View style={{paddingTop: 20}}>
             <Button

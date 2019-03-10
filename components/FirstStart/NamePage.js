@@ -1,18 +1,15 @@
-import { Navigation } from 'react-native-navigation'
 import React, { PureComponent } from 'react'
 import {
-  Dimensions,
-  StyleSheet,
+  ScrollView,
   Text,
-  TextInput,
   View
 } from 'react-native'
 
 import { brand } from '../../colors'
 import { logRender } from '../../helpers'
 import Button from '../Button'
+import NameForm from './NameForm'
 
-const { height, width } = Dimensions.get('window')
 
 export default class NamePage extends PureComponent {
   constructor () {
@@ -52,43 +49,14 @@ export default class NamePage extends PureComponent {
           </Text>
         </View>
         <View style={{flex: 1, alignItems: 'center'}}>
-          <View style={{paddingTop: 30, paddingLeft: 10, paddingRight: 10, width: width * .66}}>
-            <Text style={{fontSize: 12}}>First</Text>
-            <TextInput
-              maxLength={40}
-              value={this.props.user.get('firstName')}
-              underlineColorAndroid={brand}
-              autoFocus={true}
-              blurOnSubmit={false}
-              keyboardType={'email-address'}
-              onChangeText={this.changeFirstName}
-              onSubmitEditing={() => {this.props.inputs['lastName'].focus()}}
-              ref={(i) => this.props.inputs['firstName'] = i}
-              style={{
-                backgroundColor: 'transparent',
-                height: 50,
-              }}
-              maxLength={200}
-            />
-
-            <Text style={{fontSize: 12}}>Last</Text>
-            <TextInput
-              maxLength={40}
-              value={this.props.user.get('lastName')}
-              underlineColorAndroid={brand}
-              blurOnSubmit={false}
-              keyboardType={'email-address'}
-              onChangeText={this.changeLastName}
-              onSubmitEditing={this.nextPage}
-              ref={(i) => this.props.inputs['lastName'] = i}
-              style={{
-                backgroundColor: 'transparent',
-                height: 50,
-              }}
-              maxLength={200}
-            />
-          </View>
-          <View style={{paddingTop: 20}}>
+          <NameForm
+            changeFirstName={this.changeFirstName}
+            changeLastName={this.changeLastName}
+            nextPage={this.nextPage}
+            inputs={this.props.inputs}
+            user={this.props.user}
+          />
+          <View style={{flex: 1, paddingTop: 20}}>
             <Button
               color={brand}
               text={"Go On"}
@@ -100,6 +68,3 @@ export default class NamePage extends PureComponent {
     )
   }
 }
-
-const styles = StyleSheet.create({
-});

@@ -1,12 +1,15 @@
 import React, { PureComponent } from 'react';
 import {
   ActivityIndicator,
+  Dimensions,
   StyleSheet,
   Text,
   TouchableOpacity,
   View
 } from 'react-native';
 import { CheckBox } from 'native-base'
+
+const { width } = Dimensions.get('window')
 
 import Button from '../Button'
 import { brand, darkBrand } from '../../colors'
@@ -107,8 +110,11 @@ export default class SignupPage extends PureComponent {
                 onPress={this.toggleTOS}
               />
             </View>
-            <TouchableOpacity onPress={this.showTOS}>
-              <Text>I accept the Equesteo <Text style={styles.underlineText}>Terms of Service.</Text></Text>
+            <TouchableOpacity style={{flex: 1}} onPress={this.showTOS}>
+              <View style={{flex: 1, flexDirection: 'row', maxWidth: width}}>
+                <Text style={{flex: 1}}>I accept the Equesteo <Text style={styles.underlineText}>Terms of Service.</Text></Text>
+
+              </View>
             </TouchableOpacity>
           </View>
           <Button text={'Submit'} color={brand} onPress={this.submitSignup} disabled={!this.state.tosAccepted}/>
@@ -158,5 +164,7 @@ const styles = StyleSheet.create({
   },
   underlineText: {
     textDecorationLine: 'underline',
+    flexWrap: 'wrap',
+    flex: 1
   },
 });

@@ -19,7 +19,7 @@ import { connect } from 'react-redux'
 import ApiClient from '../services/ApiClient'
 import Button from '../components/Button'
 import { brand, darkBrand, lightGrey } from '../colors'
-import { logError, logInfo } from '../helpers'
+import { isAndroid, logError, logInfo } from '../helpers'
 import UserAPI from '../services/UserApi'
 import URIImage from '../components/Images/URIImage'
 
@@ -83,15 +83,21 @@ class ShareRideContainer extends PureComponent {
       this.props.ride,
       this.props.rideCoordinates,
     ).then(resp => {
+      logDebug(resp, 'resp')
       this.setState({
         mapURL: resp.mapURL,
         shareLink: resp.shareLink,
       })
-    }).catch(() => {
+    }).catch(e => {
+      logError(e)
       this.setState({
         loading: false
       })
     })
+  }
+
+  imageError (e) {
+    logError(e)
   }
 
   imageLoaded () {
@@ -145,37 +151,48 @@ class ShareRideContainer extends PureComponent {
 
 
   askToDownloadMap () {
-    PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-      {
-        title: 'Save to your Camera Roll',
-        message: 'To download your map you must let us write to external storage',
-        buttonNeutral: 'Ask Me Later',
-        buttonNegative: 'Cancel',
-        buttonPositive: 'OK',
-      },
-    ).then(granted => {
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        this.downloadMap()
-      } else {
-        logInfo('Camera permission denied');
-      }
-    }).catch((err) => {
-      throw err
-    })
+    if (isAndroid()) {
+      PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        {
+          title: 'Save to your Camera Roll',
+          message: 'To download your map you must let us write to external storage',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      ).then(granted => {
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          this.downloadMap()
+        } else {
+          logInfo('Camera permission denied');
+        }
+      }).catch((err) => {
+        throw err
+      })
+    } else {
+      this.downloadMap()
+    }
   }
 
   downloadMap () {
     this.setState({ loading: true, loadingMessage: DOWNLOADING_MESSAGE })
-    ApiClient.downloadImage(this.state.mapURL).then(url => {
-      return CameraRoll.saveToCameraRoll(`file://${url}`)
-    }).then(newURI => {
-      this.setState({ loading: false })
-      Linking.openURL(newURI)
-    }).catch(e => {
-      this.setState({ loading: false })
-      logError(e)
-    })
+    if (isAndroid()) {
+      ApiClient.downloadImage(this.state.mapURL).then(url => {
+        return CameraRoll.saveToCameraRoll(`file://${url}`)
+      }).then(newURI => {
+        this.setState({ loading: false })
+        Linking.openURL(newURI)
+      }).catch(e => {
+        this.setState({ loading: false })
+        logError(e)
+      })
+    } else {
+      CameraRoll.saveToCameraRoll(this.state.mapURL).then(url => {
+        Linking.openURL('photos-redirect://')
+      })
+
+    }
   }
 
   _renderLoading () {
@@ -185,7 +202,7 @@ class ShareRideContainer extends PureComponent {
         <Text style={{textAlign: 'center', color: darkBrand}}>{this.state.loadingMessage}</Text>
         {
           this.state.mapURL ?
-          <Image style={{height: 0, width: 0}} source={{uri: this.state.mapURL }} onLoadEnd={this.imageLoaded} /> :
+          <Image style={{height: 1, width: 1}} source={{uri: this.state.mapURL }} onLoadEnd={this.imageLoaded} onError={this.imageError}/> :
           null
         }
       </View>

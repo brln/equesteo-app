@@ -1,6 +1,5 @@
 import PouchDB from 'pouchdb-react-native'
-import { API_URL } from 'react-native-dotenv'
-
+import { API_URL } from '../dotEnv'
 
 import { NotConnectedError } from "../errors"
 import { logError, logInfo } from '../helpers'

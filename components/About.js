@@ -1,6 +1,4 @@
 import React, { PureComponent } from 'react'
-import { RELEASE } from 'react-native-dotenv'
-
 import {
   StyleSheet,
   Text,
@@ -8,6 +6,7 @@ import {
 } from 'react-native';
 
 import { brand, lightGrey } from '../colors'
+import { RELEASE } from '../dotEnv'
 import BuildImage from './Images/BuildImage'
 
 

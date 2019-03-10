@@ -16,6 +16,7 @@
 		8968ADBD22125F4300345955 /* libRNMixpanel.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8968ADBA22125F1100345955 /* libRNMixpanel.a */; };
 		89B7E29B2218655600B6FF2D /* libRNSentry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 89B7E2982218652600B6FF2D /* libRNSentry.a */; };
 		89D75AEC22149ADE003EF395 /* Montserrat-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 89D75AC022149ADE003EF395 /* Montserrat-Regular.otf */; };
+		89D782EF2231AB7C009EE914 /* libRNFetchBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 89D782EE2231AB1C009EE914 /* libRNFetchBlob.a */; };
 		A721BE372146C0DF00AE909D /* libRCTBackgroundGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A721BE362146BF8300AE909D /* libRCTBackgroundGeolocation.a */; };
 		A721BE392146C7BF00AE909D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A721BE382146C7BE00AE909D /* GoogleService-Info.plist */; };
 		A7307D192149BA2F00D9CDC4 /* Panama-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = A7307D182149BA2F00D9CDC4 /* Panama-Light.otf */; };
@@ -80,6 +81,13 @@
 			proxyType = 2;
 			remoteGlobalIDString = 274692C321B4414400BF91A8;
 			remoteInfo = "RNSentry-tvOS";
+		};
+		89D782ED2231AB1C009EE914 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 89D782E92231AB1C009EE914 /* RNFetchBlob.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A15C300E1CD25C330074CB35;
+			remoteInfo = RNFetchBlob;
 		};
 		A721BE352146BF8300AE909D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -394,6 +402,7 @@
 		8968AD8B22125F1000345955 /* RNMixpanel.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNMixpanel.xcodeproj; path = "../node_modules/react-native-mixpanel/RNMixpanel.xcodeproj"; sourceTree = "<group>"; };
 		89B7E2662218652500B6FF2D /* RNSentry.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNSentry.xcodeproj; path = "../node_modules/react-native-sentry/ios/RNSentry.xcodeproj"; sourceTree = "<group>"; };
 		89D75AC022149ADE003EF395 /* Montserrat-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Montserrat-Regular.otf"; path = "../../assets/fonts/Montserrat-Regular.otf"; sourceTree = "<group>"; };
+		89D782E92231AB1C009EE914 /* RNFetchBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNFetchBlob.xcodeproj; path = "../node_modules/rn-fetch-blob/ios/RNFetchBlob.xcodeproj"; sourceTree = "<group>"; };
 		89E592B52FB948D1919982A3 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/native-base/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
 		943830C8F774413E97EC8F3A /* RNFirebase.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNFirebase.xcodeproj; path = "../node_modules/react-native-firebase/ios/RNFirebase.xcodeproj"; sourceTree = "<group>"; };
 		9D651CB9B10E41259B3DD607 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/native-base/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
@@ -441,6 +450,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				89D782EF2231AB7C009EE914 /* libRNFetchBlob.a in Frameworks */,
 				890CBC9222186DE300843B7A /* libRCTCameraRoll.a in Frameworks */,
 				89B7E29B2218655600B6FF2D /* libRNSentry.a in Frameworks */,
 				8968ADBD22125F4300345955 /* libRNMixpanel.a in Frameworks */,
@@ -542,6 +552,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				89D782E92231AB1C009EE914 /* RNFetchBlob.xcodeproj */,
 				89B7E2662218652500B6FF2D /* RNSentry.xcodeproj */,
 				8968AD8B22125F1000345955 /* RNMixpanel.xcodeproj */,
 				A74F92842153EA8000AE0E34 /* RCTAnimation.xcodeproj */,
@@ -611,6 +622,14 @@
 			children = (
 				89B7E2982218652600B6FF2D /* libRNSentry.a */,
 				89B7E29A2218652600B6FF2D /* libRNSentry-tvOS.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		89D782EA2231AB1C009EE914 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				89D782EE2231AB1C009EE914 /* libRNFetchBlob.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -823,7 +842,7 @@
 				ORGANIZATIONNAME = Facebook;
 				TargetAttributes = {
 					13B07F861A680F5B00A75B9A = {
-						DevelopmentTeam = R9ML8SK9A9;
+						DevelopmentTeam = 4M4TMZLLJC;
 					};
 				};
 			};
@@ -900,6 +919,10 @@
 					ProjectRef = A74F8CB621514E5400AE0E34 /* ReactNativeNavigation.xcodeproj */;
 				},
 				{
+					ProductGroup = 89D782EA2231AB1C009EE914 /* Products */;
+					ProjectRef = 89D782E92231AB1C009EE914 /* RNFetchBlob.xcodeproj */;
+				},
+				{
 					ProductGroup = A74F91D821531F2E00AE0E34 /* Products */;
 					ProjectRef = 943830C8F774413E97EC8F3A /* RNFirebase.xcodeproj */;
 				},
@@ -953,6 +976,13 @@
 			fileType = archive.ar;
 			path = "libRNSentry-tvOS.a";
 			remoteRef = 89B7E2992218652600B6FF2D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		89D782EE2231AB1C009EE914 /* libRNFetchBlob.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRNFetchBlob.a;
+			remoteRef = 89D782ED2231AB1C009EE914 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		A721BE362146BF8300AE909D /* libRCTBackgroundGeolocation.a */ = {
@@ -1283,7 +1313,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
+			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
 		442107296DA8632BF7B3145B /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1443,7 +1473,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
-				DEVELOPMENT_TEAM = R9ML8SK9A9;
+				DEVELOPMENT_TEAM = 4M4TMZLLJC;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../ios/Pods/Headers/Public/**",
@@ -1461,6 +1491,7 @@
 					"-ObjC",
 					"-lc++",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.equesteo;
 				PRODUCT_NAME = equesteo;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -1472,7 +1503,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = R9ML8SK9A9;
+				DEVELOPMENT_TEAM = 4M4TMZLLJC;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../ios/Pods/Headers/Public/**",
@@ -1490,6 +1521,7 @@
 					"-ObjC",
 					"-lc++",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.equesteo;
 				PRODUCT_NAME = equesteo;
 				VERSIONING_SYSTEM = "apple-generic";
 			};

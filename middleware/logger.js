@@ -1,7 +1,8 @@
 import { logInfo } from '../helpers'
 import { captureBreadcrumb } from '../services/Sentry'
 import  Mixpanel from 'react-native-mixpanel'
-import { ENV } from 'react-native-dotenv'
+
+import { ENV } from '../dotEnv'
 
 export default logger = store => dispatch => action => {
   const toLog = {'action': action.type}
