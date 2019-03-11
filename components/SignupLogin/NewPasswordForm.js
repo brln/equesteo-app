@@ -83,6 +83,7 @@ export default class NewPasswordForm extends MultiPlatform {
           }}
           maxLength={200}
           value={this.props.pw2}
+          onSubmitEditing={this.props.submitNewPassword}
         />
         <Button text={'Change Password'} color={brand} onPress={this.props.submitNewPassword}/>
       </View>

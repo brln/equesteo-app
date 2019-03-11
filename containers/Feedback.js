@@ -3,14 +3,13 @@ import React, { PureComponent } from 'react'
 import {
   Dimensions,
   Keyboard,
-  Platform,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View
 } from 'react-native'
 import { connect } from 'react-redux'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import Button from '../components/Button'
 import { brand, darkBrand } from '../colors'
@@ -88,11 +87,11 @@ class FeedbackContainer extends PureComponent {
 
   render() {
     const unsubmitted = (
-      <ScrollView>
+      <View>
         <TextInput
           style={{
             width: width * 0.8,
-            height: Platform.select({ios: "100%", android: height * 0.6}),
+            height: height * 0.6,
             padding: 10,
             borderColor: darkBrand,
             borderWidth: 1,
@@ -108,7 +107,7 @@ class FeedbackContainer extends PureComponent {
         <View style={{paddingBottom: 10}}>
           <Button color={brand} text="Submit" onPress={this.submit} />
         </View>
-      </ScrollView>
+      </View>
     )
 
     const submitted = (
@@ -117,12 +116,12 @@ class FeedbackContainer extends PureComponent {
       </View>
     )
     return (
-      <View style={{flex: 1}}>
+      <KeyboardAwareScrollView style={{height}} enableAutomaticScroll={false}>
         { this.state.error ? <View style={styles.errorBox}><Text style={{textAlign: 'center'}}>{this.state.error}</Text></View> : null }
-        <View style={{flex: 1, alignItems: 'center', marginTop: 20}}>
+        <View style={{flex: 1, alignItems: 'center', marginTop: 20, height: height + 60}}>
           { this.state.submitted ? submitted : unsubmitted }
         </View>
-      </View>
+      </KeyboardAwareScrollView>
     )
   }
 }

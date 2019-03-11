@@ -17,6 +17,7 @@ import {
   goodConnection,
   haversine,
   horsePhotoURL,
+  isAndroid,
   logError,
   logInfo,
   ridePhotoURL,
@@ -182,15 +183,17 @@ export function appInitialized () {
 export function checkFCMPermission () {
   cb('checkFCMPermission')
   return () => {
-    firebase.messaging().hasPermission().then(enabled => {
-      if (!enabled) {
-        return firebase.messaging().requestPermission().catch((error) => {
-          alert('FCM Permission must be enabled')
-        })
-      }
-    }).catch(e => {
-      logError(e, 'checkFCMPermission')
-    })
+    if (isAndroid()) {
+      firebase.messaging().hasPermission().then(enabled => {
+        if (!enabled) {
+          return firebase.messaging().requestPermission().catch((error) => {
+            alert('FCM Permission must be enabled')
+          })
+        }
+      }).catch(e => {
+        logError(e, 'checkFCMPermission')
+      })
+    }
   }
 }
 

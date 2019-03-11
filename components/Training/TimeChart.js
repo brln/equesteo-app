@@ -1,3 +1,4 @@
+import memoizeOne from 'memoize-one'
 import moment from 'moment'
 import React, { PureComponent } from 'react'
 import {
@@ -20,11 +21,12 @@ import { rideColor } from '../../modelHelpers/training'
 export default class TimeChart extends PureComponent {
   constructor (props) {
     super(props)
-    this.data = this.data.bind(this)
     this.days = this.days.bind(this)
     this.months = this.months.bind(this)
     this.weeks = this.weeks.bind(this)
     this.yMeta = this.yMeta.bind(this)
+
+    this.memoizeData = memoizeOne(this.data.bind(this))
   }
 
   days () {
@@ -246,7 +248,7 @@ export default class TimeChart extends PureComponent {
             barWidth={xMetaData.barWidth}
             categories={{x: xMetaData.categories}}
             style={{ data: { fill: x => x.fill, stroke: darkGrey }}}
-            data={this.data()[xMetaData.dataTimeframe]}
+            data={this.memoizeData()[xMetaData.dataTimeframe]}
           />
           <VictoryAxis
             label={xMetaData.label}

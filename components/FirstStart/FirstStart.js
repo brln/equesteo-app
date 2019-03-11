@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react'
 import {
   Dimensions,
-  ScrollView,
   View
 } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'

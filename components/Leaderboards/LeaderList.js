@@ -65,7 +65,7 @@ export default class LeaderList extends PureComponent {
     return (
       <View style={{flex: 1}}>
         <View
-          style={{height: 80}}
+          style={{height: width / 4.5}}
         >
           <View style={{flex: 1, flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: darkGrey, padding: 10}}>
             <View style={{flex: 1, flexDirection: 'row', justifyContent:'center', alignItems: 'center'}}>
@@ -105,7 +105,7 @@ export default class LeaderList extends PureComponent {
               </View>
 
               <View style={{flex: 2}}>
-                <Text>{this.stat(item)}</Text>
+                <Text style={{fontSize: 20}}>{this.stat(item)}</Text>
               </View>
 
             </View>

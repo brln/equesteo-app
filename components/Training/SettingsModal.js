@@ -41,7 +41,14 @@ export default class SettingsModal extends PureComponent {
           value={this.props.chosenHorseID}
           items={items}
           onValueChange={this.props.pickHorse}
-          style={{inputIOS: {fontSize: 20, fontWeight: 'bold', textAlign: 'center', paddingTop: 10}, underline: { borderTopWidth: 0 }}}
+          style={{inputIOS: {
+            fontSize: 20,
+            fontWeight: 'bold',
+            textAlign: 'center',
+            paddingTop: 10,
+            height: 50
+            },
+            underline: { borderTopWidth: 0 }}}
           placeholder={{
             label: 'All Horses',
             value: this.props.types.SHOW_ALL_HORSES,
@@ -62,7 +69,13 @@ export default class SettingsModal extends PureComponent {
             {label: 'Elevation Gain', value: this.props.types.TYPE_GAIN}
           ]}
           onValueChange={this.props.pickType}
-          style={{inputIOS: {fontSize: 20, fontWeight: 'bold', textAlign: 'center', paddingTop: 10}, underline: { borderTopWidth: 0 }}}
+          style={{inputIOS: {
+            fontSize: 20,
+            fontWeight: 'bold',
+            textAlign: 'center',
+            paddingTop: 10,
+            height: 50
+          }, underline: { borderTopWidth: 0 }}}
         />
       </View>
     )
@@ -84,7 +97,14 @@ export default class SettingsModal extends PureComponent {
           value={this.props.chosenUserID}
           items={allItems}
           onValueChange={this.props.pickRider}
-          style={{inputIOS: {fontSize: 20, fontWeight: 'bold', textAlign: 'center', paddingTop: 10}, underline: { borderTopWidth: 0 }}}
+          style={{inputIOS: {
+            fontSize: 20,
+            fontWeight: 'bold',
+            textAlign: 'center',
+            paddingTop: 10,
+            height: 50,
+            borderRadius: 4,
+          }, underline: { borderTopWidth: 0 }}}
           placeholder={{
             label: 'All Riders',
             value: this.props.types.SHOW_ALL_RIDERS,

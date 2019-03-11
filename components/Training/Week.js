@@ -1,3 +1,4 @@
+import memoizeOne from 'memoize-one'
 import moment from 'moment'
 import React, { Component } from 'react'
 import {
@@ -118,8 +119,9 @@ function ZeroDay (props) {
 export default class Week extends Component {
   constructor (props) {
     super(props)
-    this.days = this.days.bind(this)
     this.showRide = this.showRide.bind(this)
+
+    this.memoizeDays = memoizeOne(this.days.bind(this))
   }
 
   showRide (ride) {
@@ -193,7 +195,7 @@ export default class Week extends Component {
   }
 
   render () {
-    const weekData = this.days(this.props.mondayString)
+    const weekData = this.memoizeDays(this.props.mondayString)
     return (
       <View style={{flex: 1, flexDirection: 'column', paddingTop: 10, paddingBottom: 10, marginBottom: 10, backgroundColor: lightGrey}}>
         <View style={{flex: 1}}>

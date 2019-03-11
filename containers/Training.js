@@ -48,6 +48,7 @@ class TrainingContainer extends PureComponent {
     this.showRide = this.showRide.bind(this)
     this.memoTrainings = memoizeOne(this.trainings.bind(this))
     this.memoAllRidersButYou = memoizeOne(this.allRidersButYou.bind(this))
+    this.memoRideHorses = memoizeOne(this.rideHorses.bind(this))
 
     Navigation.events().bindComponent(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
@@ -110,7 +111,7 @@ class TrainingContainer extends PureComponent {
       <Training
         horses={this.props.horses}
         horseUsers={this.props.horseUsers}
-        rideHorses={this.rideHorses(this.props.rideHorses)}
+        rideHorses={this.memoRideHorses(this.props.rideHorses)}
         riders={this.memoAllRidersButYou(this.props.trainings, this.props.users, this.props.userID)}
         settingsModalOpen={this.state.settingsModalOpen}
         settingsModalToggle={this.settingsModalToggle}

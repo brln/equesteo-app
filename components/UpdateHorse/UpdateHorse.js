@@ -1,7 +1,8 @@
 import React, { PureComponent } from 'react';
 import ImagePicker from 'react-native-image-crop-picker'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+
 import {
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -264,7 +265,7 @@ export default class UpdateHorse extends PureComponent {
           modalOpen={this.props.colorModalOpen}
           onClosed={this.props.onColorModalClosed}
         />
-        <ScrollView keyboardShouldPersistTaps={'always'}>
+        <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'}>
           <View style={styles.container}>
             <View style={{flex: 1, padding: 5}}>
               <Card>
@@ -394,7 +395,7 @@ export default class UpdateHorse extends PureComponent {
               </Card>
             </View>
           </View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
         <PhotoMenu
           changeProfilePhotoID={this.changeProfilePhotoID}
           clearPhotoMenu={this.props.clearPhotoMenu}

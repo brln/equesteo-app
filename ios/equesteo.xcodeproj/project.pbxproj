@@ -1491,7 +1491,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.equesteo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.equesteo.equesteo;
 				PRODUCT_NAME = equesteo;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -1521,7 +1521,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.equesteo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.equesteo.equesteo;
 				PRODUCT_NAME = equesteo;
 				VERSIONING_SYSTEM = "apple-generic";
 			};

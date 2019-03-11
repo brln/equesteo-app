@@ -113,9 +113,11 @@ export default class RideStats extends PureComponent {
               borderLeftWidth: 2
             }]}>
               <Text style={styles.statName}>Distance</Text>
-              <Text style={styles.statFont}>
-                {distance.toFixed(2)} <Text style={styles.unitsFont}>mi</Text>
-              </Text>
+              <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                <Text style={styles.statFont}>
+                  {distance.toFixed(2)} <Text style={styles.unitsFont}>mi</Text>
+                </Text>
+              </View>
             </View>
             <View style={[styles.statBox, {
               borderTopWidth: 1,
@@ -124,7 +126,9 @@ export default class RideStats extends PureComponent {
               borderLeftWidth: 2
             }]}>
               <Text style={styles.statName}>Current Speed</Text>
-              <Text style={styles.statFont}>{speed} <Text style={styles.unitsFont}>mi/h</Text></Text>
+              <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                <Text style={styles.statFont}>{speed} <Text style={styles.unitsFont}>mi/h</Text></Text>
+              </View>
             </View>
             <View style={[styles.statBox, {
               borderTopWidth: 1,
@@ -133,8 +137,10 @@ export default class RideStats extends PureComponent {
               borderLeftWidth: 2
             }]}>
               <Text style={styles.statName}>Altitude</Text>
-              <Text style={styles.statFont}>{this.memoCurrentAltitude(this.props.lastElevation)} <Text
-                style={styles.unitsFont}>ft</Text></Text>
+              <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                <Text style={styles.statFont}>{this.memoCurrentAltitude(this.props.lastElevation)} <Text
+                  style={styles.unitsFont}>ft</Text></Text>
+              </View>
             </View>
           </View>
           <View style={{flex: 1}}>
@@ -145,7 +151,9 @@ export default class RideStats extends PureComponent {
               borderLeftWidth: 1
             }]}>
               <Text style={styles.statName}>Total Time</Text>
-              <Text style={styles.statFont}>{this.elapsedAsString()}</Text>
+              <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                <Text style={styles.statFont}>{this.elapsedAsString()}</Text>
+              </View>
             </View>
             <View style={[styles.statBox, {
               borderTopWidth: 1,
@@ -154,9 +162,11 @@ export default class RideStats extends PureComponent {
               borderLeftWidth: 1
             }]}>
               <Text style={styles.statName}>Avg. Speed</Text>
-              <Text style={styles.statFont}>
-                {this.memoAvgSpeed(this.state.elapsedTime, distance)} <Text style={styles.unitsFont}>mi/h</Text>
-              </Text>
+              <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                <Text style={styles.statFont}>
+                  {this.memoAvgSpeed(this.state.elapsedTime, distance)} <Text style={styles.unitsFont}>mi/h</Text>
+                </Text>
+              </View>
             </View>
             <View style={[styles.statBox, {
               borderTopWidth: 1,
@@ -165,10 +175,12 @@ export default class RideStats extends PureComponent {
               borderLeftWidth: 1
             }]}>
               <Text style={styles.statName}>Elevation Gain</Text>
-              <Text style={styles.statFont}>
-                {Math.round(metersToFeet(this.props.currentRideElevations.get('elevationGain')))} <Text
-                style={styles.unitsFont}>ft</Text>
-              </Text>
+              <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                <Text style={styles.statFont}>
+                  {Math.round(metersToFeet(this.props.currentRideElevations.get('elevationGain')))} <Text
+                  style={styles.unitsFont}>ft</Text>
+                </Text>
+              </View>
             </View>
           </View>
         </View>

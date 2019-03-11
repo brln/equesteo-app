@@ -1,13 +1,12 @@
 import React, { PureComponent } from 'react'
-import memoizeOne from 'memoize-one';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import memoizeOne from 'memoize-one'
 import moment from 'moment'
 import {
   ActivityIndicator,
   Clipboard,
   Dimensions,
-  Keyboard,
   Platform,
-  ScrollView,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -296,7 +295,7 @@ export default class Ride extends PureComponent {
     let elevationGain = this.props.rideElevations ? this.props.rideElevations.get('elevationGain') : 0
     const height = (width * 9 / 16) + 54
     return (
-      <ScrollView
+      <KeyboardAwareScrollView
         keyboardShouldPersistTaps={'always'}
         ref={(i) => this.scrollable = i}
         style={{flex: 1}}
@@ -418,7 +417,7 @@ export default class Ride extends PureComponent {
             </Card>
           </View>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     )
   }
 

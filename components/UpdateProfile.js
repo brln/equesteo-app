@@ -1,11 +1,12 @@
 import React, { PureComponent } from 'react'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+
 import {
   Card,
   CardItem,
   CheckBox,
 } from 'native-base'
 import {
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -81,7 +82,7 @@ export default class UpdateProfile extends PureComponent {
     const hasPictures = this.props.userPhotos.count() > 0
     return (
       <View>
-        <ScrollView keyboardShouldPersistTaps={'always'}>
+        <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'}>
           <View style={styles.container}>
             <View style={{flex: 1, padding: 5}}>
               { hasPictures ? <Card>
@@ -198,7 +199,7 @@ export default class UpdateProfile extends PureComponent {
               </Card>
             </View>
           </View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
         <PhotoMenu
           changeProfilePhotoID={this.changeProfilePhotoID}
           deletePhoto={this.deletePhoto}
