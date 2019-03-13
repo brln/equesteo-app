@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>equesteo</string>
+	<string>Equesteo</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -17,13 +17,13 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.53.0</string>
+	<string>0.53.1</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>91</string>
+	<string>92</string>
 	<key>LSApplicationCategoryType</key>
-	<string></string>
+	<string>public.app-category.sports</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -38,21 +38,21 @@
 		</dict>
 	</dict>
 	<key>NSAppleMusicUsageDescription</key>
-	<string>App requires Media Library access to save to camera roll.</string>
+	<string>Allow Equesteo Media Library access to save pictures to your camera roll.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>To take pictures to post with your rides, you must allow access to the camera.</string>
+	<string>Allow Equesteo to use your camera to add pictures to your rides.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>App requires background tracking</string>
+	<string>Allow Equesteo to access your location so you can track your rides.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>App requires background tracking</string>
+	<string>Allow Equesteo to access your location so you can track your rides.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>App requires background tracking</string>
+	<string>Allow Equesteo to access your location so you can track your rides.</string>
 	<key>NSMotionUsageDescription</key>
-	<string>App requires motion tracking</string>
+	<string>Allow Equesteo to track your motion to preserve battery when using GPS.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>App requires Media Library access.</string>
+	<string>Allow Equesteo to save photos from the in-app camera.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>To share pictures, we must be able to access them.</string>
+	<string>Allow Equesteo to access the photo library to add your photos to rides.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Entypo.ttf</string>

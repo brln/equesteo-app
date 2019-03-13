@@ -131,6 +131,7 @@
    </AnalyzeAction>
    <ArchiveAction
       buildConfiguration = "Release"
+      customArchiveName = "firstTry"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>

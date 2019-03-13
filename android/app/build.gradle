@@ -103,8 +103,8 @@ android {
         minSdkVersion 21
         targetSdkVersion 26
         missingDimensionStrategy "RNN.reactNativeVersion", "reactNative55"
-        versionCode 91
-        versionName "0.53.0"
+        versionCode 92
+        versionName "0.53.1"
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
@@ -154,6 +154,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-device-info')
     compile project(':rn-fetch-blob')
     compile project(':react-native-webview')
     implementation project(':react-native-camera')

@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   modal3: {
-    marginTop: 30,
+    marginTop: height / 6,
     height: height / 4,
     width: width * .8,
   },

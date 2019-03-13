@@ -16,7 +16,6 @@
 		8968ADBD22125F4300345955 /* libRNMixpanel.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8968ADBA22125F1100345955 /* libRNMixpanel.a */; };
 		89B7E29B2218655600B6FF2D /* libRNSentry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 89B7E2982218652600B6FF2D /* libRNSentry.a */; };
 		89D75AEC22149ADE003EF395 /* Montserrat-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 89D75AC022149ADE003EF395 /* Montserrat-Regular.otf */; };
-		89D782EF2231AB7C009EE914 /* libRNFetchBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 89D782EE2231AB1C009EE914 /* libRNFetchBlob.a */; };
 		A721BE372146C0DF00AE909D /* libRCTBackgroundGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A721BE362146BF8300AE909D /* libRCTBackgroundGeolocation.a */; };
 		A721BE392146C7BF00AE909D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A721BE382146C7BE00AE909D /* GoogleService-Info.plist */; };
 		A7307D192149BA2F00D9CDC4 /* Panama-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = A7307D182149BA2F00D9CDC4 /* Panama-Light.otf */; };
@@ -450,7 +449,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				89D782EF2231AB7C009EE914 /* libRNFetchBlob.a in Frameworks */,
 				890CBC9222186DE300843B7A /* libRCTCameraRoll.a in Frameworks */,
 				89B7E29B2218655600B6FF2D /* libRNSentry.a in Frameworks */,
 				8968ADBD22125F4300345955 /* libRNMixpanel.a in Frameworks */,

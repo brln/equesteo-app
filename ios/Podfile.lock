@@ -105,6 +105,10 @@ PODS:
     - React/Core
     - React/fishhook
     - React/RCTBlob
+  - rn-fetch-blob (0.10.6):
+    - React/Core
+  - RNDeviceInfo (0.21.5):
+    - React
   - RNFirebase (4.3.8):
     - Firebase/Core
     - React
@@ -144,6 +148,8 @@ DEPENDENCIES:
   - React/RCTText (from `../node_modules/react-native`)
   - React/RCTVibration (from `../node_modules/react-native`)
   - React/RCTWebSocket (from `../node_modules/react-native`)
+  - rn-fetch-blob (from `../node_modules/rn-fetch-blob`)
+  - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - RNFirebase (from `../node_modules/react-native-firebase/ios`)
   - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
   - RNSVG (from `../node_modules/react-native-svg`)
@@ -179,6 +185,10 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@mapbox/react-native-mapbox-gl"
   react-native-webview:
     :path: "../node_modules/react-native-webview"
+  rn-fetch-blob:
+    :path: "../node_modules/rn-fetch-blob"
+  RNDeviceInfo:
+    :path: "../node_modules/react-native-device-info"
   RNFirebase:
     :path: "../node_modules/react-native-firebase/ios"
   RNImageCropPicker:
@@ -209,6 +219,8 @@ SPEC CHECKSUMS:
   react-native-camera: eac1e8cc7523273a2a11956d0e5dac08296cf4b0
   react-native-mapbox-gl: b42480060cdcc515dfa3d8e403fb4dd32466a1b9
   react-native-webview: a42108b827082f8f0333529b0772102031d5960d
+  rn-fetch-blob: 76a8f798dae965bbcd146a2438f2e1d381c91ae3
+  RNDeviceInfo: 568c5641057313b4912d08a7742ff0b2f753ed5c
   RNFirebase: 2b25fd2e60269f26bb0a76c71dcc942b35a77df0
   RNImageCropPicker: 32ca4b9fef4e1b7b85ba69494242122948117e06
   RNSVG: 6252323c0312735f0af5f58b5adf2965b6a9ffbf
@@ -216,6 +228,6 @@ SPEC CHECKSUMS:
   RSKImageCropper: 98296ad26b41753f796b6898d015509598f13d97
   yoga: a23273df0088bf7f2bb7e5d7b00044ea57a2a54a
 
-PODFILE CHECKSUM: c4eb9b453a839d8979251414d1636cec7bb2fae4
+PODFILE CHECKSUM: 9d4da570f369c19a7eb9ff18ddc443c3bf9aa7ee
 
 COCOAPODS: 1.5.3
