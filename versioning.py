@@ -26,16 +26,16 @@ for line in fileinput.input('./android/app/build.gradle', inplace=True):
 
 for line in fileinput.input('./.env.production', inplace=True):
     if line.strip().startswith('DISTRIBUTION'):
-        sys.stdout.write('DISTRIBUTION={}\n'.format(newCode))
-    elif line.strip().startswith('RELEASE'):
-        sys.stdout.write('RELEASE="com.equesteo-{}"\n'.format(newName))
+        sys.stdout.write('distribution={}\n'.format(newCode))
+    elif line.strip().startswith('release'):
+        sys.stdout.write('release="com.equesteo-{}"\n'.format(newName))
     else:
         sys.stdout.write(line)
 
 for line in fileinput.input('./.env', inplace=True):
-    if line.strip().startswith('DISTRIBUTION'):
-        sys.stdout.write('DISTRIBUTION={}\n'.format(newCode))
-    elif line.strip().startswith('RELEASE'):
-        sys.stdout.write('RELEASE="com.equesteo-{}"\n'.format(newName))
+    if line.strip().startswith('distribution'):
+        sys.stdout.write('distribution={}\n'.format(newCode))
+    elif line.strip().startswith('release'):
+        sys.stdout.write('release="com.equesteo-{}"\n'.format(newName))
     else:
         sys.stdout.write(line)
