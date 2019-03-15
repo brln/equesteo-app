@@ -27,6 +27,7 @@ export default class RidingMap extends PureComponent {
       mapType: 'map'
     }
     this.fitToElements = this.fitToElements.bind(this)
+    this.gpsIndicator = this.gpsIndicator.bind(this)
     this.gpsStatusImage = this.gpsStatusImage.bind(this)
     this.mapTypeMap = this.mapTypeMap.bind(this)
     this.mapTypePhoto = this.mapTypePhoto.bind(this)
@@ -116,21 +117,17 @@ export default class RidingMap extends PureComponent {
   }
 
   gpsStatusImage () {
-    if (this.props.lastLocation) {
-      switch (true) {
-        case this.props.lastLocation.get('accuracy') < 10:
-          return require('../../img/gps/gps5.png')
-        case this.props.lastLocation.get('accuracy') < 20:
-          return require('../../img/gps/gps4.png')
-        case this.props.lastLocation.get('accuracy') < 30:
-          return require('../../img/gps/gps3.png')
-        case this.props.lastLocation.get('accuracy') < 40:
-          return require('../../img/gps/gps2.png')
-        default:
-          return require('../../img/gps/gps1.png')
-      }
-    } else {
-      return null
+    switch (true) {
+      case this.props.lastLocation.get('accuracy') < 10:
+        return require('../../img/gps/gps5.png')
+      case this.props.lastLocation.get('accuracy') < 20:
+        return require('../../img/gps/gps4.png')
+      case this.props.lastLocation.get('accuracy') < 30:
+        return require('../../img/gps/gps3.png')
+      case this.props.lastLocation.get('accuracy') < 40:
+        return require('../../img/gps/gps2.png')
+      default:
+        return require('../../img/gps/gps1.png')
     }
   }
 
@@ -234,9 +231,35 @@ export default class RidingMap extends PureComponent {
     }
   }
 
+  gpsIndicator () {
+    if (this.props.lastLocation) {
+      const buttonWidth = this.state.showingMaptypes ? width / 2 : 40
+      return (
+        <View style={{
+          position: 'absolute',
+          left: 10,
+          top: 10,
+          width: buttonWidth,
+        }}>
+          <View style={{flex: 1, flexDirection: 'row', backgroundColor: 'white', borderRadius: 4, alignItems: 'center', justifyContent: 'center'}}>
+            <TouchableOpacity style={{flex: 1}} onPress={this.showMaptypeButtons}>
+              <BuildImage
+                source={this.gpsStatusImage()}
+                style={{width: 40, height: 40, marginRight: 5}}
+                onError={(e) => { logError('there was an error loading RidingMap image') }}
+              />
+            </TouchableOpacity>
+            { this.renderMaptypeButtons() }
+          </View>
+        </View>
+      )
+    } else {
+      return null
+    }
+  }
+
   render() {
     logRender('RideRecorder.RidingMap')
-    const buttonWidth = this.state.showingMaptypes ? width / 2 : 40
     const mapCoords = RidingMap.mapCoordinates(this.props.currentRideCoordinates)
     const mapStyleURL = this.state.mapType === 'map' ? "mapbox://styles/equesteo/cjopu37k3fm442smn4ncz3x9m" : "mapbox://styles/equesteo/cjoug4j877tc82ro2l2p3n1q2"
     return (
@@ -251,7 +274,6 @@ export default class RidingMap extends PureComponent {
             heading={this.props.heading}
             ref={ref => (this.props.setMapRef(ref))}
             styleURL={mapStyleURL}
-            // onDidFinishLoadingMap={this.fitToElements}
             style={styles.map}
             zoomLevel={this.props.zoomLevel}
             rotateEnabled={true}
@@ -272,23 +294,7 @@ export default class RidingMap extends PureComponent {
             </MapboxGL.ShapeSource>
           </MapboxGL.MapView>
         </View>
-        <View style={{
-          position: 'absolute',
-          left: 10,
-          top: 10,
-          width: buttonWidth,
-        }}>
-          <View style={{flex: 1, flexDirection: 'row', backgroundColor: 'white', borderRadius: 4, alignItems: 'center', justifyContent: 'center'}}>
-            <TouchableOpacity style={{flex: 1}} onPress={this.showMaptypeButtons}>
-              <BuildImage
-                source={this.gpsStatusImage()}
-                style={{width: 40, height: 40, marginRight: 5}}
-                onError={(e) => { logError('there was an error loading RidingMap image') }}
-              />
-            </TouchableOpacity>
-            { this.renderMaptypeButtons() }
-          </View>
-        </View>
+        { this.gpsIndicator() }
         { this.recenterButton() }
       </View>
     )

@@ -118,7 +118,7 @@ export default class UpdateRide extends PureComponent {
           style={{ backgroundColor: brand }}
           position="bottomRight"
           onPress={this.startTrim}>
-          <FabImage source={require('../../img/trim.png')} height={30} width={30} />
+          <Text style={{fontSize: 12}}>Trim</Text>
         </Fab>
       )
       let trimmer = null
