@@ -130,7 +130,7 @@ export default class Week extends Component {
     }
   }
 
-  days (mondayString) {
+  days (mondayString, rides, horses, rideHorses, chosenType, chosenHorseID, chosenUserID) {
     const days = []
     const start = moment(new Date(mondayString))
     let totalDistance = 0.0
@@ -139,7 +139,7 @@ export default class Week extends Component {
     for (let i = 0; i < 7; i++) {
       const eachDay = moment(start).add(i, 'days')
       const daysRides = []
-      for (let ride of this.props.rides) {
+      for (let ride of rides) {
         // @TODO: oof, super inefficient
         if (this.props.rideShouldShow(ride, eachDay)) {
           daysRides.push(ride)
@@ -154,26 +154,26 @@ export default class Week extends Component {
       } else if (daysRides.length === 1) {
         days.push(
           <RideDay
-            horses={this.props.horses}
+            horses={horses}
             key={i}
             ride={daysRides[0]}
-            rideHorses={this.props.rideHorses}
+            rideHorses={rideHorses}
             showRide={this.showRide}
             types={this.props.types}
-            chosenType={this.props.chosenType}
+            chosenType={chosenType}
             timeString={this.timeString}
           />
         )
       } else if (daysRides.length > 1) {
         days.push(
           <MultiRideDay
-            horses={this.props.horses}
+            horses={horses}
             key={i}
             rides={daysRides}
-            rideHorses={this.props.rideHorses}
+            rideHorses={rideHorses}
             showRide={this.showRide}
             types={this.props.types}
-            chosenType={this.props.chosenType}
+            chosenType={chosenType}
             timeString={this.timeString}
           />
         )
@@ -195,7 +195,15 @@ export default class Week extends Component {
   }
 
   render () {
-    const weekData = this.memoizeDays(this.props.mondayString)
+    const weekData = this.memoizeDays(
+      this.props.mondayString,
+      this.props.rides,
+      this.props.horses,
+      this.props.rideHorses,
+      this.props.chosenType,
+      this.props.chosenHorseID,
+      this.props.chosenUserID,
+    )
     return (
       <View style={{flex: 1, flexDirection: 'column', paddingTop: 10, paddingBottom: 10, marginBottom: 10, backgroundColor: lightGrey}}>
         <View style={{flex: 1}}>
