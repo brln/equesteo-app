@@ -39,3 +39,23 @@ for line in fileinput.input('./.env', inplace=True):
         sys.stdout.write('release="com.equesteo-{}"\n'.format(newName))
     else:
         sys.stdout.write(line)
+
+
+next_is_short_version = False
+next_is_bundle_version = False
+for line in fileinput.input('./ios/equesteo/Info.plist', inplace=True):
+    if not next_is_short_version and not next_is_bundle_version:
+        sys.stdout.write(line)
+    elif next_is_short_version:
+        sys.stdout.write('       <string>{}</string>\n'.format(newName))
+        next_is_short_version = False
+    elif next_is_bundle_version:
+        sys.stdout.write('       <string>{}</string>\n'.format(newCode))
+        next_is_bundle_version = False
+
+    if line.strip() == '<key>CFBundleShortVersionString</key>':
+        next_is_short_version = True
+    elif line.strip() == '<key>CFBundleVersion</key>':
+        next_is_bundle_version = True
+
+
