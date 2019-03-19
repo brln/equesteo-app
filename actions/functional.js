@@ -845,9 +845,11 @@ export function startNetworkTracking () {
 export function startListeningFCM () {
   cb('startListeningFCM')
   return (dispatch) => {
-    firebase.messaging().onMessage((m) => {
-      handleNotification(dispatch, m._data, false)
-    })
+    if (isAndroid()) {
+      firebase.messaging().onMessage((m) => {
+        handleNotification(dispatch, m._data, false)
+      })
+    }
   }
 }
 
@@ -855,14 +857,16 @@ let FCMTokenRefreshListenerRemover = null
 export function startListeningFCMTokenRefresh () {
   cb('startListeningFCMTokenRefresh')
   return (dispatch) => {
-    firebase.messaging().getToken().then(newToken => {
-      if (newToken) {
+    if (isAndroid()) {
+      firebase.messaging().getToken().then(newToken => {
+        if (newToken) {
+          dispatch(setFCMTokenOnServer(newToken))
+        }
+      })
+      FCMTokenRefreshListenerRemover = firebase.messaging().onTokenRefresh((newToken) => {
         dispatch(setFCMTokenOnServer(newToken))
-      }
-    })
-    FCMTokenRefreshListenerRemover = firebase.messaging().onTokenRefresh((newToken) => {
-      dispatch(setFCMTokenOnServer(newToken))
-    })
+      })
+    }
   }
 }
 

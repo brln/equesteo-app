@@ -58,6 +58,8 @@ target 'equesteo' do
 
   pod 'RNDeviceInfo', :path => '../node_modules/react-native-device-info'
 
+  pod 'SentryReactNative', :path => '../node_modules/react-native-sentry/SentryReactNative.podspec' # or your path to node_modules
+
 end
 
 # also from https://github.com/ivpusic/react-native-image-crop-picker

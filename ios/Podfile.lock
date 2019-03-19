@@ -121,6 +121,12 @@ PODS:
   - RNVectorIcons (4.6.0):
     - React
   - RSKImageCropper (2.2.1)
+  - Sentry (4.1.3):
+    - Sentry/Core (= 4.1.3)
+  - Sentry/Core (4.1.3)
+  - SentryReactNative (0.40.3):
+    - React
+    - Sentry (~> 4.1.3)
   - yoga (0.55.4.React)
 
 DEPENDENCIES:
@@ -154,6 +160,7 @@ DEPENDENCIES:
   - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
+  - SentryReactNative (from `../node_modules/react-native-sentry/SentryReactNative.podspec`)
   - yoga (from `../node_modules/react-native/ReactCommon/yoga/yoga.podspec`)
 
 SPEC REPOS:
@@ -171,6 +178,7 @@ SPEC REPOS:
     - Protobuf
     - QBImagePickerController
     - RSKImageCropper
+    - Sentry
 
 EXTERNAL SOURCES:
   DoubleConversion:
@@ -197,6 +205,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-svg"
   RNVectorIcons:
     :path: "../node_modules/react-native-vector-icons"
+  SentryReactNative:
+    :path: "../node_modules/react-native-sentry/SentryReactNative.podspec"
   yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga/yoga.podspec"
 
@@ -226,8 +236,10 @@ SPEC CHECKSUMS:
   RNSVG: 6252323c0312735f0af5f58b5adf2965b6a9ffbf
   RNVectorIcons: c0dbfbf6068fefa240c37b0f71bd03b45dddac44
   RSKImageCropper: 98296ad26b41753f796b6898d015509598f13d97
+  Sentry: 4e8a17b61ddd116f89536cc81d567fdee1ebca96
+  SentryReactNative: 4c4ac0518ba34bb90832af4ceb8f2e9db861c1ed
   yoga: a23273df0088bf7f2bb7e5d7b00044ea57a2a54a
 
-PODFILE CHECKSUM: 9d4da570f369c19a7eb9ff18ddc443c3bf9aa7ee
+PODFILE CHECKSUM: 1c05f916a2aafa7c93a4d24dcf5f315d1257d486
 
 COCOAPODS: 1.5.3
