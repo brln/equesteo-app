@@ -47,7 +47,7 @@ export default class CarrotCard extends PureComponent {
                   style={{flex: 1, height: iconWidth, width: iconWidth, resizeMode: 'contain'}}
                 />
               </View>
-              <View style={{flex: 5}}>
+              <View style={{flex: 5, justifyContent: 'center'}}>
                 <Text style={{color: darkBrand }}>Carrots</Text>
               </View>
             </View>

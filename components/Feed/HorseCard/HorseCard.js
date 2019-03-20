@@ -6,12 +6,12 @@ import {
 } from 'native-base';
 import {
   Dimensions,
+  ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
 } from 'react-native';
 import moment from 'moment'
-import Swiper from 'react-native-swiper';
 
 import Headline from './Headline'
 import Thumbnail from '../../Images/Thumbnail'
@@ -95,7 +95,7 @@ export default class HorseCard extends PureComponent {
         const photo = photos.get(id)
         const thisImage = (
           <MedImage
-            style={{height: swiperHeight, width: null}}
+            style={{height: swiperHeight, width: width - 5}}
             key={photo.get('uri')}
             source={{uri: photo.get('uri')}}
             onError={e => logError("Can't load HorseCard image")}
@@ -111,14 +111,16 @@ export default class HorseCard extends PureComponent {
       }, images)
       images.unshift(coverImage)
       return (
-        <Swiper
-          loop={false}
-          showsPagination={false}
-          showsButtons={true}
-          style={{height: swiperHeight}}
+        <ScrollView
+          showsHorizontalScrollIndicator={false}
+          horizontal={true}
+          pagingEnabled={true}
+          style={{height: 250}}
         >
-          { images }
-        </Swiper>
+          <View style={{flex: 1, flexDirection: 'row'}}>
+            {images}
+          </View>
+        </ScrollView>
       )
     } else {
       return null
@@ -131,14 +133,15 @@ export default class HorseCard extends PureComponent {
         <CardItem header>
           <View style={{flex: 1}}>
             <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
-
-              <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', paddingRight: 10}}>
-                { this.userAvatar() }
-                <View>
-                  <Text style={{fontSize: 14}}>{this.userName()}</Text>
-                  <Text style={{fontSize: 12, fontWeight: 'normal', color: darkGrey}}>{this.createTime()}</Text>
+              <TouchableOpacity style={styles.cardHeaderTouch} onPress={this.showProfile}>
+                <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', paddingRight: 10}}>
+                  { this.userAvatar() }
+                  <View>
+                    <Text style={{fontSize: 14}}>{this.userName()}</Text>
+                    <Text style={{fontSize: 12, fontWeight: 'normal', color: darkGrey}}>{this.createTime()}</Text>
+                  </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             </View>
             <TouchableOpacity onPress={this.showHorseProfile}>
               <View style={{flex: 1, flexDirection: 'row', paddingTop: 15, paddingBottom: 15}}>

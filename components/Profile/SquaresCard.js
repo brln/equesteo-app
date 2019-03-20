@@ -73,7 +73,9 @@ export default class SquaresCard extends PureComponent {
 
   componentDidMount () {
     setTimeout(() => {
-      this.squaresContainer.scrollToEnd()
+      if (this.squaresContainer) {
+        this.squaresContainer.scrollToEnd()
+      }
     }, 600)
   }
 

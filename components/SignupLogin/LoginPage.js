@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import {
   ActivityIndicator,
+  Dimensions,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -10,6 +11,8 @@ import {
 import Button from '../Button'
 import { brand, darkBrand } from '../../colors'
 import LoginForm from './LoginForm'
+
+const { height } = Dimensions.get('window')
 
 export default class LoginPage extends PureComponent {
   constructor (props) {
@@ -59,8 +62,12 @@ export default class LoginPage extends PureComponent {
   }
 
   _renderLoginForm () {
+    const paddingTop = height - 590 > 0 ? (height - 590) / 3 : 0
     return (
       <View>
+        <View style={{paddingBottom: 20, alignItems: 'center', paddingTop}}>
+          <Text style={{fontFamily: 'Montserrat-Regular', fontSize: 20, textAlign: 'center'}}>Log In</Text>
+        </View>
         <LoginForm
           changeEmail={this.changeEmail}
           changePassword={this.changePassword}
@@ -91,7 +98,7 @@ export default class LoginPage extends PureComponent {
 
   _renderLoading () {
     return (
-      <View>
+      <View style={{paddingTop: height / 3}}>
         <ActivityIndicator size="large" color={darkBrand} />
         <Text style={{textAlign: 'center', color: darkBrand}}>Loading Data...</Text>
       </View>
@@ -110,12 +117,13 @@ export default class LoginPage extends PureComponent {
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    top: 20,
     width: "100%",
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'stretch',
-    padding: 30,
+    paddingTop: 10,
+    paddingLeft: 30,
+    paddingRight: 30,
   },
   switchup: {
     paddingTop: 10,

@@ -136,8 +136,8 @@ export default class Ride extends PureComponent {
     let lastPoint = null
     const paceBuckets = [
       {x: 1, min: 0, max: 6, distance: 0, time: 0, color: speedGradient(1), label: "Walk"},
-      {x: 2, min: 6, max: 12, distance: 0, time: 0, color: speedGradient(6), label: "Trot"},
-      {x: 3, min: 12, max: 24, distance: 0, time: 0, color: speedGradient(12), label: "Canter"},
+      {x: 2, min: 6, max: 10, distance: 0, time: 0, color: speedGradient(6), label: "Trot"},
+      {x: 3, min: 10, max: 24, distance: 0, time: 0, color: speedGradient(12), label: "Canter"},
       {x: 4, min: 24, max: 1000, distance: 0, time: 0, color: speedGradient(24), label: "Gallop"}
     ]
 
@@ -399,7 +399,7 @@ export default class Ride extends PureComponent {
                       style={{flex: 1, height: iconWidth, width: iconWidth, resizeMode: 'contain'}}
                     />
                   </View>
-                  <View style={{flex: 5}}>
+                  <View style={{flex: 5, justifyContent: 'center'}}>
                     <Text style={{color: darkBrand }}>Comments</Text>
                   </View>
                 </View>
@@ -408,6 +408,7 @@ export default class Ride extends PureComponent {
                 <RideComments
                   newComment={this.props.newComment}
                   rideComments={this.props.rideComments}
+                  showProfile={this.props.showProfile}
                   submitComment={this.props.submitComment}
                   updateNewComment={this.props.updateNewComment}
                   users={this.props.users}

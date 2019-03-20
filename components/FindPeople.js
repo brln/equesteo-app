@@ -86,11 +86,13 @@ export default class FindPeople extends PureComponent {
               <Icon name="ios-search" />
               <Input
                 autoFocus={true}
-                onChangeText={this.changeSearchPhrase} // <-- Here
+                onChangeText={this.changeSearchPhrase}
                 onSubmitEditing={this.search}
                 placeholder="Search by name"
               />
-              <Icon name="ios-people" />
+              <TouchableOpacity onPress={this.search}>
+                <Icon name="ios-people" />
+              </TouchableOpacity>
             </Item>
           </Header>
           <FlatList

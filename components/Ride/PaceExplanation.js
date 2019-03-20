@@ -30,9 +30,9 @@ export default class PaceExplanationModal extends PureComponent {
           <Text style={{textAlign: 'center'}}>The gait speeds are estimated as follows:</Text>
           <Text />
           <Text style={{textAlign: 'center'}}>Walk: 0 - 6 mph</Text>
-          <Text style={{textAlign: 'center'}}>Trot: 6 - 12 mph</Text>
-          <Text style={{textAlign: 'center'}}>Canter: 12 - 25 mph</Text>
-          <Text style={{textAlign: 'center'}}>Gallop: > 25 mph</Text>
+          <Text style={{textAlign: 'center'}}>Trot: 6 - 10 mph</Text>
+          <Text style={{textAlign: 'center'}}>Canter: 10 - 24 mph</Text>
+          <Text style={{textAlign: 'center'}}>Gallop: > 24 mph</Text>
           <Text />
           <Text style={{textAlign: 'center'}}>If you think we're wrong, or have strong feelings about this, we'd love to hear about it. info@equesteo.com</Text>
         </View>

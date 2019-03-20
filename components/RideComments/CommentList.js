@@ -5,14 +5,15 @@ import {
   FlatList,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
-
-const { width } = Dimensions.get('window')
 
 import { darkGrey } from '../../colors'
 import { userName } from '../../modelHelpers/user'
 import Thumbnail from '../Images/Thumbnail'
+
+const { width } = Dimensions.get('window')
 
 export default class CommentList extends PureComponent {
   constructor (props) {
@@ -29,21 +30,29 @@ export default class CommentList extends PureComponent {
     return profilePhotoURL
   }
 
+  showProfile (user) {
+    return () => {
+      this.props.showProfile(user)
+    }
+  }
+
   singleComment({item}) {
     const rideComment = item
     const commentUser = this.props.users.get(rideComment.userID)
     const commentProfilePhotoURL = this.commentProfilePhotoURL(commentUser)
     return (
       <View style={{flex: 1, flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: darkGrey, padding: 20}} key={rideComment._id}>
-        <Thumbnail
-          source={{uri: commentProfilePhotoURL}}
-          emptySource={require('../../img/empty.png')}
-          empty={!commentProfilePhotoURL}
-          height={width / 9}
-          width={width/ 9}
-          round={true}
-          padding={5}
-        />
+        <TouchableOpacity onPress={this.showProfile(commentUser)}>
+          <Thumbnail
+            source={{uri: commentProfilePhotoURL}}
+            emptySource={require('../../img/empty.png')}
+            empty={!commentProfilePhotoURL}
+            height={width / 9}
+            width={width/ 9}
+            round={true}
+            padding={5}
+          />
+        </TouchableOpacity>
         <View style={{flex: 6}}>
           <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
             <View style={{flex: 1}}>

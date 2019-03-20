@@ -10,11 +10,11 @@ import {
 import {
   Dimensions,
   StyleSheet,
+  ScrollView,
   TouchableOpacity,
   View,
 } from 'react-native'
 import moment from 'moment'
-import Swiper from 'react-native-swiper'
 
 import BuildImage from '../Images/BuildImage'
 import { brand, darkGrey } from '../../colors'
@@ -145,7 +145,7 @@ export default class RideCard extends PureComponent {
       <TouchableOpacity onPress={() => {this.showRide(false)}} style={{flex: 1}} key="map">
         <RideMapImage
           uri={this.props.ride.get('mapURL')}
-          style={{height: swiperHeight, width: null, flex: 1}}
+          style={{height: swiperHeight, width: width, flex: 1}}
         />
       </TouchableOpacity>
     )
@@ -155,7 +155,7 @@ export default class RideCard extends PureComponent {
       this.props.ridePhotos.reduce((accum, photo) => {
         const thisImage = (
           <MedImage
-            style={{height: swiperHeight, width: null}}
+            style={{height: swiperHeight, width: width - 5}}
             key={photo.get('uri')}
             source={{uri: photo.get('uri')}}
             onError={(e) => { logError('there was an error loading RideCard image') }}
@@ -173,13 +173,16 @@ export default class RideCard extends PureComponent {
       images.push(mapImage)
       if (coverImage) images.unshift(coverImage)
       return (
-        <Swiper
-          loop={false}
-          showsPagination={true}
-          style={{height: swiperHeight}}
+        <ScrollView
+          showsHorizontalScrollIndicator={false}
+          horizontal={true}
+          pagingEnabled={true}
+          style={{height: 250}}
         >
-          { images }
-        </Swiper>
+          <View style={{flex: 1, flexDirection: 'row'}}>
+            {images}
+          </View>
+        </ScrollView>
       )
     } else {
       return mapImage

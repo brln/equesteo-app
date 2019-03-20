@@ -25,6 +25,7 @@ export default class RideComments extends PureComponent {
         <View style={{flex: 1, borderTopWidth: 2, borderTopColor: lightGrey}}>
           <CommentList
             rideComments={this.props.rideComments}
+            showProfile={this.props.showProfile}
             users={this.props.users}
             userPhotos={this.props.userPhotos}
           />

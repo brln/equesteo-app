@@ -1,6 +1,5 @@
 import { Map } from 'immutable'
 import React, { PureComponent } from 'react';
-import Swiper from 'react-native-swiper';
 import ImagePicker from 'react-native-image-crop-picker'
 import {
   Card,
@@ -219,9 +218,7 @@ export default class Profile extends PureComponent {
     return (
       <View>
         <View style={{height: ((height / 2) - 20)}}>
-          <Swiper loop={false} showsPagination={false}>
-            {this.renderProfileImage()}
-          </Swiper>
+          {this.renderProfileImage()}
           { fab }
           <View style={{position: 'absolute', width: 150, bottom: 10, right: 10}}>
             { followButton }

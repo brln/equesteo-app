@@ -812,6 +812,9 @@ export function startNetworkTracking () {
     if (networkListenerRemover) {
       networkListenerRemover.remove()
     }
+
+
+
     networkListenerRemover = NetInfo.addEventListener(
       'connectionChange',
       (connectionInfo) => {
@@ -820,6 +823,7 @@ export function startNetworkTracking () {
           connectionInfo.effectiveType,
           currentlyUsingOnlyWifi()
         )
+        logDebug(gc, 'startNetworkTracking')
         dispatch(newNetworkState(gc))
         if (gc) {
           dispatch(runPhotoQueue())
@@ -831,14 +835,20 @@ export function startNetworkTracking () {
       }
     )
 
-    return NetInfo.getConnectionInfo().then((connectionInfo) => {
-      const gc = goodConnection(
-        connectionInfo.type,
-        connectionInfo.effectiveType,
-        currentlyUsingOnlyWifi(),
-      )
-      dispatch(newNetworkState(gc))
+    // First attempt to fails without this on IOS:
+    // https://github.com/facebook/react-native/issues/8615
+    return NetInfo.getConnectionInfo().then(() => {
+      return NetInfo.getConnectionInfo().then((connectionInfo) => {
+        logDebug(connectionInfo, 'initialCall')
+        const gc = goodConnection(
+          connectionInfo.type,
+          connectionInfo.effectiveType,
+          currentlyUsingOnlyWifi(),
+        )
+        dispatch(newNetworkState(gc))
+      })
     }).catch(catchAsyncError(dispatch))
+
   }
 }
 
@@ -955,6 +965,7 @@ export function doSync (syncData={}, showProgress=true) {
       }
     }
 
+    logDebug(getState().getIn(['localState', 'goodConnection']), 'doSync')
     if (getState().getIn(['localState', 'goodConnection'])) {
       dispatch(runPhotoQueue())
 

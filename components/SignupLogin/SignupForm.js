@@ -46,6 +46,7 @@ export default class SignupForm extends MultiPlatform {
           ref={(i) => this.props.inputs['pw2'] = i}
           underlineColorAndroid="black"
           maxLength={200}
+          returnKeyType="send"
         />
       </View>
     )

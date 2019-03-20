@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { CheckBox } from 'native-base'
 
-const { width } = Dimensions.get('window')
+const { height, width } = Dimensions.get('window')
 
 import Button from '../Button'
 import { brand, darkBrand } from '../../colors'
@@ -88,22 +88,33 @@ export default class SignupPage extends PureComponent {
   }
 
   _renderSignupForm () {
+    const TOSStyle = {flex: 1, justifyContent: 'flex-start', flexDirection: 'row'}
+    if (width > 320) {
+      TOSStyle.paddingLeft = (width - 320) / 1.5
+      TOSStyle.paddingRight = (width - 320) / 1.5
+    }
+    const paddingTop = height - 590 > 0 ? (height - 590) / 3 : 0
     return (
       <View>
         <TOSModal
           modalOpen={this.state.showTOS}
           onClosed={this.showTOS}
         />
-        <SignupForm
-          changeEmail={this.changeEmail}
-          changePassword1={this.changePassword1}
-          changePassword2={this.changePassword2}
-          inputs={this.inputs}
-          moveToPassword={this.moveToPassword}
-          moveToPassword2={this.moveToPassword2}
-        />
+        <View style={{paddingBottom: 20, alignItems: 'center', paddingTop}}>
+          <Text style={{fontFamily: 'Montserrat-Regular', fontSize: 20, textAlign: 'center'}}>Sign Up</Text>
+        </View>
+        <View style={{paddingLeft: 20, paddingRight: 20}}>
+          <SignupForm
+            changeEmail={this.changeEmail}
+            changePassword1={this.changePassword1}
+            changePassword2={this.changePassword2}
+            inputs={this.inputs}
+            moveToPassword={this.moveToPassword}
+            moveToPassword2={this.moveToPassword2}
+          />
+        </View>
         <View style={styles.switchup}>
-          <View style={{flex: 1, justifyContent: 'flex-start', flexDirection: 'row'}}>
+          <View style={TOSStyle}>
             <View style={{paddingRight: 20}}>
               <CheckBox
                 checked={this.state.tosAccepted}
@@ -113,7 +124,6 @@ export default class SignupPage extends PureComponent {
             <TouchableOpacity style={{flex: 1}} onPress={this.showTOS}>
               <View style={{flex: 1, flexDirection: 'row', maxWidth: width}}>
                 <Text style={{flex: 1}}>I accept the Equesteo <Text style={styles.underlineText}>Terms of Service.</Text></Text>
-
               </View>
             </TouchableOpacity>
           </View>
@@ -128,7 +138,7 @@ export default class SignupPage extends PureComponent {
 
   _renderLoading () {
     return (
-      <View>
+      <View style={{paddingTop: height / 3}}>
         <ActivityIndicator size="large" color={darkBrand} />
         <Text style={{textAlign: 'center', color: darkBrand}}>Loading Data...</Text>
       </View>
@@ -147,12 +157,13 @@ export default class SignupPage extends PureComponent {
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    top: 20,
     width: "100%",
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'stretch',
-    padding: 30,
+    paddingTop: 10,
+    paddingLeft: 10,
+    paddingRight: 10,
   },
   switchup: {
     paddingTop: 10,

@@ -11,8 +11,7 @@ import {
   mixpanel_token,
 } from 'react-native-dotenv'
 
-const API_URL_IOS = api_url_ios
-const API_URL_ANDROID = api_url_android
+
 export const API_URL = Platform.select({ios: api_url_ios, android: api_url_android})
 
 export const ENV = env
