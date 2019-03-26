@@ -16,7 +16,6 @@ import {
   rideHorseUpdated,
   rideUpdated,
   setActiveAtlasEntry,
-  setPopShowRide,
   stopStashNewLocations,
   stashRidePhoto,
 } from '../actions/standard'
@@ -40,6 +39,8 @@ import {
   unixTimeNow
 } from '../helpers'
 import UpdateRide from '../components/UpdateRide/UpdateRide'
+import { RIDE } from '../screens'
+import { catchAsyncError } from '../actions/functional'
 
 class UpdateRideContainer extends BackgroundComponent {
   static options() {
@@ -167,13 +168,25 @@ class UpdateRideContainer extends BackgroundComponent {
           this.state.trimValues,
           this.memoizedRideHorses(this.props.rideHorses, this.props.rideID),
         ))
-        this.props.dispatch(setPopShowRide(this.props.ride.get('_id'), true, false))
         Navigation.popToRoot(this.props.componentId).then(() => {
           this.props.dispatch(clearPausedLocations())
           this.props.dispatch(stopLocationTracking())
           this.props.dispatch(discardCurrentRide())
           this.props.dispatch(setActiveAtlasEntry(null))
-        })
+        }).then(() => {
+          setTimeout(() => {
+            // Because otherwise it doesn't show the ride on iOS.
+            Navigation.push(this.props.activeComponent, {
+              component: {
+                name: RIDE,
+                passProps: {
+                  rideID: this.props.rideID,
+                  skipToComments: false,
+                }
+              }
+            })
+          })
+        }).catch(catchAsyncError(this.props.dispatch))
       } else if (buttonId === 'discard') {
         this.setDiscardModalOpen(true)
         this.props.dispatch(setActiveAtlasEntry(null))

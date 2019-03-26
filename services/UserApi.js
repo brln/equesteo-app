@@ -38,8 +38,8 @@ export default class UserAPI {
     return ApiClient.post('/users/exchangePWCode', { email, code })
   }
 
-  static setFCMToken (id, token) {
-    return ApiClient.post('/users/setFCMToken', { id, token })
+  static setFCMToken (id, token, platform) {
+    return ApiClient.post('/users/setFCMToken', { id, token, platform })
   }
 
   static setDistribution (id, distribution) {

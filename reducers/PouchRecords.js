@@ -16,6 +16,7 @@ import {
   HORSE_USER_UPDATED,
   HORSE_UPDATED,
   LOCAL_DATA_LOADED,
+  NOTIFICATION_UPDATED,
   RIDE_ATLAS_ENTRY_UPDATED,
   RIDE_COMMENT_UPDATED,
   RIDE_CARROT_CREATED,
@@ -46,6 +47,7 @@ export const initialState = Map({
   horseUsers: Map(),
   follows: Map(),
   leaderboards: Map(),
+  notifications: Map(),
   rides: Map(),
   rideCarrots: Map(),
   selectedRideCoordinates: null,
@@ -269,7 +271,14 @@ export default function PouchRecordsReducer(state=initialState, action) {
         trainings: state.get('trainings').merge(fromJS(action.localData.trainings)),
         users: state.get('users').merge(fromJS(action.localData.users)),
         userPhotos: state.get('userPhotos').merge(fromJS(action.localData.userPhotos)),
+
+        // Note that you want to keep the local changes here or the notifications will magically
+        // re-appear when the sync from a first delete comes back. This might actually be the case
+        // for the other types too, but I don't have time to test them all right now.
+        notifications: fromJS(action.localData.notifications).merge(state.get('notifications')),
       }))
+    case NOTIFICATION_UPDATED:
+      return state.setIn(['notifications', action.notification.get('_id')], action.notification)
     case RIDE_ATLAS_ENTRY_UPDATED:
       return state.setIn(['rideAtlasEntries', action.rideAtlasEntry.get('_id')], action.rideAtlasEntry)
     case RIDE_CARROT_CREATED:

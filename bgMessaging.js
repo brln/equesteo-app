@@ -1,9 +1,9 @@
 
 import  Mixpanel from 'react-native-mixpanel'
 
-import { handleNotification } from './services/PushNotificationHandler'
 import { MIXPANEL_TOKEN } from './dotEnv'
-import {tryToLoadStateFromDisk} from "./actions/helpers"
+import { tryToLoadStateFromDisk } from "./actions/helpers"
+import { doSync, showLocalNotifications } from './actions/functional'
 
 export default (store) => {
   return (m) => {
@@ -11,7 +11,9 @@ export default (store) => {
     return Mixpanel.sharedInstanceWithToken(MIXPANEL_TOKEN).then(() => {
       return tryToLoadStateFromDisk(store.dispatch)
     }).then(() => {
-      handleNotification(store.dispatch, m.data, true)
+      return store.dispatch(doSync())
+    }).then(() => {
+      return store.dispatch(showLocalNotifications())
     })
   }
 }

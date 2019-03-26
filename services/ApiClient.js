@@ -75,6 +75,23 @@ export default class ApiClient {
     return ApiClient.request(PUT, endpoint, body)
   }
 
+  static checkConnection() {
+    return Promise.race([
+      new Promise((res, rej) => {
+        return ApiClient.request(GET, '/checkConnection').then(resp => {
+          res(resp)
+        }).catch(e => {
+          res({connected: false})
+        })
+      }),
+      new Promise((res) => {
+        setTimeout(() => {
+          res({connected: false})
+        }, 3000)
+      })
+    ])
+  }
+
   static request (method, endpoint, body, isJSON=true) {
     if (isJSON) {
       body = body ? JSON.stringify(body) : undefined

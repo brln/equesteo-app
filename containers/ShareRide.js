@@ -83,7 +83,6 @@ class ShareRideContainer extends PureComponent {
       this.props.ride,
       this.props.rideCoordinates,
     ).then(resp => {
-      logDebug(resp, 'resp')
       this.setState({
         mapURL: resp.mapURL,
         shareLink: resp.shareLink,

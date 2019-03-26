@@ -178,25 +178,6 @@ export default class UpdateProfile extends PureComponent {
                   </View>
                 </CardItem>
               </Card>
-
-              <Card>
-                <CardItem header>
-                  <Text style={{color: darkBrand }}>Settings:</Text>
-                </CardItem>
-                <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
-                  <View style={{flex: 1, flexDirection: 'row'}}>
-                    <View style={{flex: 1}}>
-                      <CheckBox
-                        checked={this.props.user.get('onlyUseWifi')}
-                        onPress={this.changeOnlyUseWifi}
-                      />
-                    </View>
-                    <View style={{flex: 6, justifyContent: 'center'}}>
-                      <Text>Only use wifi (no cellular).</Text>
-                    </View>
-                  </View>
-                </CardItem>
-              </Card>
             </View>
           </View>
         </KeyboardAwareScrollView>

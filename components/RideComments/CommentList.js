@@ -41,7 +41,7 @@ export default class CommentList extends PureComponent {
     const commentUser = this.props.users.get(rideComment.userID)
     const commentProfilePhotoURL = this.commentProfilePhotoURL(commentUser)
     return (
-      <View style={{flex: 1, flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: darkGrey, padding: 20}} key={rideComment._id}>
+      <View style={{flex: 1, flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: darkGrey, padding: 10}} key={rideComment._id}>
         <TouchableOpacity onPress={this.showProfile(commentUser)}>
           <Thumbnail
             source={{uri: commentProfilePhotoURL}}
@@ -53,20 +53,22 @@ export default class CommentList extends PureComponent {
             padding={5}
           />
         </TouchableOpacity>
-        <View style={{flex: 6}}>
+        <View style={{flex: 6, justifyContent: 'flex-start'}}>
           <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
             <View style={{flex: 1}}>
-            <Text
-              style={{fontWeight: 'bold', color: 'black'}}
-            >
-              { userName(commentUser) }
-            </Text>
+              <Text
+                style={{fontWeight: 'bold', color: 'black'}}
+              >
+                { userName(commentUser) }
+              </Text>
             </View>
-            <View style={{flex: 1, alignItems: 'flex-end'}}>
+            <View style={{flex: 2, alignItems: 'flex-end'}}>
               <Text>{moment(rideComment.timestamp).format('MM/DD h:mm a')}</Text>
             </View>
           </View>
-          <Text note>{rideComment.comment}</Text>
+          <View style={{flex: 2}}>
+            <Text note>{rideComment.comment}</Text>
+          </View>
         </View>
       </View>
     )

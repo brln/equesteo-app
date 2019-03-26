@@ -16,11 +16,9 @@ import {
   DISMISS_ERROR,
   ENQUEUE_PHOTO,
   ERROR_OCCURRED,
-  INITIAL_SYNC_COMPLETE,
   LOAD_LOCAL_STATE,
   NEW_APP_STATE,
   NEW_NETWORK_STATE,
-  POP_SHOW_RIDE_SHOWN,
   REMOVE_STASHED_RIDE_PHOTO,
   SAVE_USER_ID,
   SET_ACTIVE_COMPONENT,
@@ -28,18 +26,16 @@ import {
   SET_FIRST_START_HORSE_ID,
   SET_FULL_SYNC_FAIL,
   SET_LOCATION_RETRY,
-  SET_POP_SHOW_RIDE,
   SET_REMOTE_PERSIST,
-  SET_SHOWING_RIDE,
   SET_ACTIVE_ATLAS_ENTRY,
   SET_AWAITING_PW_CHANGE,
   SET_DOING_INITIAL_LOAD,
   SET_SIGNING_OUT,
-  SHOW_POP_SHOW_RIDE,
+  SET_SHOWING_RIDE,
   STASH_RIDE_PHOTO,
   SYNC_COMPLETE,
   UPDATE_PHOTO_STATUS,
-  USER_SEARCH_RETURNED,
+  USER_SEARCH_RETURNED
 } from '../constants'
 
 export const initialState = Map({
@@ -60,11 +56,9 @@ export const initialState = Map({
   locationRetry: false,
   needsRemotePersist: DB_SYNCED,
   photoQueue: Map(),
-  popShowRide: null,
-  popShowRideNow: null,
   ridePhotoStash: Map(),
   root: SIGNUP_LOGIN,
-  showingRideID: null,
+  showingRide: null,
   signingOut: false,
   userID: null,
   userSearchResults: List(),
@@ -99,18 +93,14 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.set('error', action.message)
     case SET_FULL_SYNC_FAIL:
       return state.set('fullSyncFail', action.status)
-    case POP_SHOW_RIDE_SHOWN:
-      return state.set('popShowRide', null).set('popShowRideNow', null)
     case LOAD_LOCAL_STATE:
-      const loadedState = action.localState
+      const loadedState = initialState.merge(action.localState)
       return loadedState.set(
         'carrotMutex', false,
       ).set(
         'feedMessage', null
       ).set(
         'doingInitialLoad', false
-      ).set(
-        'showingRideID', null
       ).set(
         'signingOut', false
       ).set(
@@ -136,18 +126,10 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.set('firstStartHorseID', Map({ horseID: action.horseID, horseUserID: action.horseUserID }))
     case SET_LOCATION_RETRY:
       return state.set('locationRetry', action.newVal)
-    case SET_POP_SHOW_RIDE:
-      return state.set(
-        'popShowRide', Map({rideID: action.rideID, scrollToComments: action.scrollToComments})
-      ).set(
-        'popShowRideNow', action.showRideNow
-      )
     case SET_SHOWING_RIDE:
-      return state.set('showingRideID', action.rideID)
+      return state.set('showingRide', action.rideID)
     case SET_SIGNING_OUT:
       return state.set('signingOut', action.value)
-    case SHOW_POP_SHOW_RIDE:
-      return state.set('popShowRideNow', true)
     case SYNC_COMPLETE:
       return state.set(
         'lastFullSync', new Date()

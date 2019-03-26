@@ -8,12 +8,14 @@ import { pulldownSync, toggleRideCarrot } from "../../actions/functional"
 import BackgroundComponent from '../../components/BackgroundComponent'
 import { brand } from '../../colors'
 import Feed from '../../components/Feed/Feed'
-import { logRender } from '../../helpers'
+import { logError, logRender } from '../../helpers'
 import {
   FIRST_START,
   HORSE_PROFILE,
   LEADERBOARDS,
   MORE,
+  NOTIFICATION_BUTTON,
+  NOTIFICATIONS_LIST,
   PROFILE,
   RECORDER,
   RIDE,
@@ -56,8 +58,9 @@ class FeedContainer extends BackgroundComponent {
       lastFullSync: null,
       firstStartPopped: false,
       ridePopped: false,
-      debounce: false,
     }
+    this.debounce = false
+    this.db = this.db.bind(this)
 
     this.followIDs = this.followIDs.bind(this)
     this.followingRides = this.followingRides.bind(this)
@@ -72,6 +75,7 @@ class FeedContainer extends BackgroundComponent {
     this.toggleCarrot = this.toggleCarrot.bind(this)
     this.openLeaderboards = this.openLeaderboards.bind(this)
     this.openMore = this.openMore.bind(this)
+    this.openNotifications = this.openNotifications.bind(this)
     this.openRecorder = this.openRecorder.bind(this)
     this.openTraining = this.openTraining.bind(this)
     this.yourRides = this.yourRides.bind(this)
@@ -90,98 +94,110 @@ class FeedContainer extends BackgroundComponent {
       Platform.select({
         android: {
           topBar: {
-            rightButtons: [{
-              component: {
-                id: RIDE_BUTTON,
-                name: RIDE_BUTTON,
-                passProps: {
-                  onPress: this.openRecorder,
+            rightButtons: [
+              {
+                component: {
+                  id: RIDE_BUTTON,
+                  name: RIDE_BUTTON,
+                  passProps: {
+                    onPress: this.openRecorder,
+                  }
                 }
-              }
-            }],
+              },
+              {
+                component: {
+                  id: NOTIFICATION_BUTTON,
+                  name: NOTIFICATION_BUTTON,
+                  passProps: {
+                    onPress: this.openNotifications,
+                  }
+                }
+              },
+            ],
+          }
+        },
+        ios: {
+          topBar: {
+            rightButtons: [
+              {
+                id: 'some random ID',
+                component: {
+                  id: NOTIFICATION_BUTTON,
+                  name: NOTIFICATION_BUTTON,
+                  passProps: {
+                    onPress: this.openNotifications,
+                  }
+                }
+              },
+            ],
           }
         },
       })
     )
   }
 
-  openRecorder () {
-    if (!this.state.debounce) {
-      this.setState({
-        debounce: true
+  db (func) {
+    if (!this.debounce) {
+      this.debounce = true
+      func.then(() => {
+        this.debounce = false
       })
-      Navigation.push(this.props.activeComponent, {
+    }
+  }
+
+  openRecorder () {
+    this.db(Navigation.push(this.props.activeComponent, {
         component: {
           name: RECORDER,
           id: RECORDER
         }
       }).then(() => {
-        Navigation.mergeOptions(this.props.componentId, {
-          sideMenu: {
-            left: {
-              visible: false,
-            }
-          }
-        })
-        this.setState({
-          debounce: false
-        })
+        this.makeSureDrawerClosed()
+      }).catch(e => {
+        logError(e)
       })
-    }
+    )
   }
 
+  openNotifications () {
+    this.db(Navigation.push(this.props.activeComponent, {
+      component: {
+        name: NOTIFICATIONS_LIST,
+        id: NOTIFICATIONS_LIST,
+      }
+    }).then(() => {
+      this.makeSureDrawerClosed()
+    }).catch(e => {
+      logError(e)
+    }))
+  }
+
+
   openTraining () {
-    if (!this.state.debounce) {
-      this.setState({
-        debounce: true
-      })
-      Navigation.push(this.props.activeComponent, {
-        component: {
-          name: TRAINING,
-          id: TRAINING
-        }
-      }).then(() => {
-        this.setState({
-          debounce: false
-        })
-      })
-    }
+    this.db(Navigation.push(this.props.activeComponent, {
+      component: {
+        name: TRAINING,
+        id: TRAINING
+      }
+    }))
   }
 
   openLeaderboards () {
-    if (!this.state.debounce) {
-      this.setState({
-        debounce: true
-      })
-      Navigation.push(this.props.activeComponent, {
-        component: {
-          name: LEADERBOARDS,
-          id: LEADERBOARDS
-        }
-      }).then(() => {
-        this.setState({
-          debounce: false
-        })
-      })
-    }
+    this.db(Navigation.push(this.props.activeComponent, {
+      component: {
+        name: LEADERBOARDS,
+        id: LEADERBOARDS
+      }
+    }))
   }
   
   openMore () {
-    if (!this.state.debounce) {
-      this.setState({
-        debounce: true
-      })
-      Navigation.push(this.props.activeComponent, {
-        component: {
-          name: MORE,
-          id: MORE,
-        }
-      }).then(() => {
-        this.setState({
-          debounce: false
-        })
-      })
-    }
+    this.db(Navigation.push(this.props.activeComponent, {
+      component: {
+        name: MORE,
+        id: MORE,
+      }
+    }))
   }
 
   navigationButtonPressed({ buttonId }) {
@@ -206,22 +222,6 @@ class FeedContainer extends BackgroundComponent {
   }
 
   componentDidUpdate () {
-    if (this.props.popShowRideNow && this.props.popShowRide && this.props.popShowRide.get('rideID')) {
-      const showRide = this.props.rides.get(this.props.popShowRide.get('rideID'))
-      if (showRide && !this.state.ridePopped) {
-        // PushNotification.showNotification gets called when it shouldn't if the app reboots unexpectedly.
-        // This makes popShowRideNow get set when it shouldn't, so make sure we have a ride to show here.
-        this.showRide(showRide, this.props.popShowRide.get('scrollToComments'), true)
-        this.setState({
-          ridePopped: true
-        })
-      }
-    } else if (this.state.ridePopped) {
-      this.setState({
-        ridePopped: false
-      })
-    }
-
     if (this.props.user && (!this.state.firstStartPopped && !this.props.user.get('finishedFirstStart'))) {
       this.showFirstStart()
       this.setState({
@@ -276,14 +276,13 @@ class FeedContainer extends BackgroundComponent {
     })
   }
 
-  showRide (ride, skipToComments, isPopShow) {
+  showRide (ride, skipToComments) {
     Navigation.push(this.props.componentId, {
       component: {
         name: RIDE,
         passProps: {
           rideID: ride.get('_id'),
           skipToComments,
-          isPopShow,
         }
       }
     }).then(() => {
@@ -409,8 +408,6 @@ function mapStateToProps (state) {
     horseUsers: pouchState.get('horseUsers'),
     justFinishedRide: localState.get('justFinishedRide'),
     lastFullSync: localState.get('lastFullSync'),
-    popShowRide: localState.get('popShowRide'),
-    popShowRideNow: localState.get('popShowRideNow'),
     rides: pouchState.get('rides'),
     rideCarrots: pouchState.get('rideCarrots'),
     rideComments: pouchState.get('rideComments'),

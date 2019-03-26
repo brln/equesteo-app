@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import {
   Image
 } from 'react-native'
+import PropTypes from 'prop-types'
 
 export default class BuildImage extends PureComponent {
   render () {
@@ -14,4 +15,11 @@ export default class BuildImage extends PureComponent {
       />
     )
   }
+}
+
+BuildImage.propTypes = {
+  resizeMode: PropTypes.string,
+  source: PropTypes.number.isRequired,
+  style: PropTypes.oneOfType([PropTypes.number, PropTypes.object, null]),
+  error: PropTypes.func,
 }

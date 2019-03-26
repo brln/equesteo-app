@@ -8,11 +8,11 @@ import { connect } from 'react-redux';
 import Ride from '../components/Ride/Ride'
 import {
   clearSelectedRideCoordinates,
-  popShowRideShown,
   rideUpdated,
   setShowingRide,
 } from '../actions/standard'
 import {
+  clearRideNotifications,
   createRideComment,
   loadRideCoordinates,
   loadRideElevations,
@@ -109,6 +109,14 @@ class RideContainer extends PureComponent {
     this.memoHorseOwnerIDs = memoizeOne(this.horseOwnerIDs.bind(this))
   }
 
+  componentDidAppear () {
+    this.props.dispatch(setShowingRide(this.props.ride.get('_id')))
+  }
+
+  componentDidDisappear () {
+    this.props.dispatch(setShowingRide(null))
+  }
+
   viewRideCharts () {
     Navigation.push(this.props.componentId, {
       component: {
@@ -161,14 +169,7 @@ class RideContainer extends PureComponent {
       this.props.dispatch(loadRideCoordinates(this.props.ride.get('_id')))
       this.props.dispatch(loadRideElevations(this.props.ride.get('_id')))
     }
-    this.props.dispatch(setShowingRide(this.props.ride.get('_id')))
-    if (this.props.isPopShow) {
-      this.props.dispatch(popShowRideShown())
-    }
-  }
-
-  componentWillUnmount () {
-    this.props.dispatch(setShowingRide(null))
+    this.props.dispatch(clearRideNotifications(this.props.ride.get('_id')))
   }
 
   deleteRide () {
@@ -176,7 +177,6 @@ class RideContainer extends PureComponent {
     this.props.dispatch(persistRide(this.props.ride.get('_id'), false, [], [], null, List()))
     Navigation.pop(this.props.componentId)
   }
-
 
 
   showPhotoLightbox (sources) {
@@ -304,7 +304,6 @@ function mapStateToProps (state, passedProps) {
     horses: pouchState.get('horses'),
     horsePhotos: pouchState.get('horsePhotos'),
     horseUsers: pouchState.get('horseUsers'),
-    isPopShow: passedProps.isPopShow,
     ride,
     rideCarrots: pouchState.get('rideCarrots'),
     rideComments: pouchState.get('rideComments'),

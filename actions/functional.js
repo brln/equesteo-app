@@ -12,7 +12,6 @@ import ApiClient from '../services/ApiClient'
 import { DISTRIBUTION, ENV } from '../dotEnv'
 import kalmanFilter from '../services/Kalman'
 import { captureBreadcrumb, captureException, setUserContext } from "../services/Sentry"
-import { handleNotification } from '../services/PushNotificationHandler'
 import {
   goodConnection,
   haversine,
@@ -30,18 +29,17 @@ import {
   loginAndSync,
   tryToLoadStateFromDisk
 } from './helpers'
-import { appStates } from '../helpers'
 import {
-  CAMERA,
   DRAWER,
   FEED,
   NEEDS_SYNC,
-  RECORDER,
+  NOTIFICATION_BUTTON,
+  RIDE,
   RIDE_BUTTON,
   SIGNUP_LOGIN,
-  UPDATE_NEW_RIDE_ID
 } from '../screens'
 import { LocalStorage, PouchCouch, RidePersister, UserAPI } from '../services'
+import { makeMessage } from '../modelHelpers/notification'
 import {
   carrotMutex,
   clearLastLocation,
@@ -60,6 +58,7 @@ import {
   newAppState,
   newLocation,
   newNetworkState,
+  notificationUpdated,
   replaceLastLocation,
   rideAtlasEntryUpdated,
   rideCoordinatesLoaded,
@@ -68,14 +67,12 @@ import {
   rideCommentUpdated,
   rideElevationsLoaded,
   ridePhotoUpdated,
-  setPopShowRide,
   setRemotePersist,
   setFeedMessage,
   setFullSyncFail,
   setSigningOut,
   setActiveComponent,
   setLocationRetry,
-  showPopShowRide,
   syncComplete,
   updatePhotoStatus,
   userPhotoUpdated,
@@ -183,16 +180,26 @@ export function appInitialized () {
 export function checkFCMPermission () {
   cb('checkFCMPermission')
   return () => {
-    if (isAndroid()) {
-      firebase.messaging().hasPermission().then(enabled => {
-        if (!enabled) {
-          return firebase.messaging().requestPermission().catch((error) => {
-            alert('FCM Permission must be enabled')
-          })
-        }
-      }).catch(e => {
-        logError(e, 'checkFCMPermission')
-      })
+    firebase.messaging().hasPermission().then(enabled => {
+      if (!enabled) {
+        return firebase.messaging().requestPermission().catch((error) => {
+          logError(error)
+        })
+      }
+    }).catch(e => {
+      logError(e, 'checkFCMPermission')
+    })
+  }
+}
+
+export function clearRideNotifications (rideID) {
+  cb('clearRideNotifications')
+  return (dispatch, getState) => {
+    const unseenNotifications = getState().getIn(['pouchRecords', 'notifications']).valueSeq().filter(n => {
+      return n.get('seen') !== true && n.get('rideID') === rideID
+    }).toList()
+    for (let notification of unseenNotifications) {
+      dispatch(markNotificationSeen(notification))
     }
   }
 }
@@ -308,6 +315,31 @@ export function loadRideElevations (rideID) {
         catchAsyncError(dispatch)
       }
     })
+  }
+}
+
+export function markNotificationSeen (notification) {
+  cb('markNotificationSeen')
+  return (dispatch, getState) => {
+    const markSeen = notification.set('popped').set('seen', true).set('deleted', true)
+    dispatch(notificationUpdated(markSeen))
+    PouchCouch.saveNotification(markSeen.toJS()).then(({rev}) => {
+      let foundAfterSave = getState().getIn(['pouchRecords', 'notifications', notification.get('_id')])
+      dispatch(notificationUpdated(foundAfterSave.set('_rev', rev)))
+      return dispatch(doSync({}, false))
+    }).catch(catchAsyncError(dispatch))
+  }
+}
+
+export function markNotificationPopped (notification) {
+  cb('markNotificationSeen')
+  return (dispatch, getState) => {
+    const markPopped = notification.set('popped', true)
+    dispatch(notificationUpdated(markPopped))
+    PouchCouch.saveNotification(markPopped.toJS()).then(({rev}) => {
+      let foundAfterSave = getState().getIn(['pouchRecords', 'notifications', notification.get('_id')])
+      dispatch(notificationUpdated(foundAfterSave.set('_rev', rev)))
+    }).catch(catchAsyncError(dispatch))
   }
 }
 
@@ -616,7 +648,7 @@ export function setFCMTokenOnServer (token) {
   return (dispatch, getState) => {
     const currentUserID = getState().getIn(['localState', 'userID'])
     logInfo('setting fcm token')
-    UserAPI.setFCMToken(currentUserID, token).then(() => {
+    UserAPI.setFCMToken(currentUserID, token, Platform.OS).then(() => {
       logInfo('FCM token set')
     }).catch(catchAsyncError(dispatch))
   }
@@ -662,32 +694,44 @@ export function signOut () {
   }
 }
 
-export function showLocalNotification (message, background, rideID, scrollToComments) {
+export function showLocalNotifications () {
   cb('showLocalNotification')
   return (dispatch, getState) => {
     PushNotification.configure({
-      onNotification: ({ userInteraction }) => {
-        if (userInteraction) {
-          const activeComponent = getState().getIn(['localState', 'activeComponent'])
-          let upNext = Promise.resolve()
-          if (activeComponent !== FEED) {
-            upNext = Navigation.popToRoot(activeComponent)
+      onNotification: (meta) => {
+        if (meta.userInteraction) {
+          let notification = getState().getIn(['pouchRecords', 'notifications']).filter(n => {
+            return n.get('notificationID') === meta.id
+          }).first()
+          const skipToComments = notification.get('notificationType') === 'newComment'
+          dispatch(markNotificationSeen(notification))
+
+          const currentlyViewing = getState().getIn(['localState', 'showingRide'])
+          if (currentlyViewing !== notification.get('rideID')) {
+            Navigation.push(getState().getIn(['localState', 'activeComponent']), {
+              component: {
+                name: RIDE,
+                passProps: {
+                  rideID: notification.get('rideID'),
+                  skipToComments,
+                }
+              }
+            })
           }
-          upNext.then(() => {
-            dispatch(showPopShowRide())
-          })
         }
       }
     })
-    dispatch(doSync()).then(() => {
-      const showingRideID = getState().getIn(['localState', 'showingRideID'])
-      if (background || showingRideID !== rideID) {
-        dispatch(setPopShowRide(rideID, background, scrollToComments))
-        PushNotification.localNotification({
-          message: message,
-        })
-      }
-    }).catch(catchAsyncError(dispatch))
+    const unpoppedNotifications = getState().getIn(['pouchRecords', 'notifications']).valueSeq().filter(n => {
+      return n.get('popped') !== true
+    }).toList()
+    for (let notification of unpoppedNotifications) {
+      const message = makeMessage(notification.toJS())
+      PushNotification.localNotification({
+        id: notification.get('notificationID'),
+        message,
+      })
+      dispatch(markNotificationPopped(notification))
+    }
   }
 }
 
@@ -797,69 +841,44 @@ let networkListenerRemover = null
 export function startNetworkTracking () {
   cb('startNetworkTracking')
   return (dispatch, getState) => {
-    function currentlyUsingOnlyWifi () {
-      let useOnlyWifi = false
-      const currentUserID = getState().getIn(['localState', 'userID'])
-      if (currentUserID) {
-        const currentUser = getState().getIn(['pouchRecords', 'users', currentUserID])
-        if (currentUser) {
-          useOnlyWifi = currentUser.get('onlyUseWifi')
-        }
-      }
-      return useOnlyWifi
-    }
-
     if (networkListenerRemover) {
       networkListenerRemover.remove()
     }
 
-
-
-    networkListenerRemover = NetInfo.addEventListener(
-      'connectionChange',
-      (connectionInfo) => {
-        const gc = goodConnection(
-          connectionInfo.type,
-          connectionInfo.effectiveType,
-          currentlyUsingOnlyWifi()
-        )
-        logDebug(gc, 'startNetworkTracking')
-        dispatch(newNetworkState(gc))
-        if (gc) {
-          dispatch(runPhotoQueue())
-          const needsPersist = getState().getIn(['localState', 'needsRemotePersist']) === DB_NEEDS_SYNC
-          if (needsPersist) {
-            dispatch(doSync()).catch(catchAsyncError(dispatch))
+    const listener = () => {
+      setTimeout (() => {
+        ApiClient.checkConnection().then(resp => {
+          dispatch(newNetworkState(resp.connected))
+          if (resp.connected) {
+            dispatch(runPhotoQueue())
+            const needsPersist = getState().getIn(['localState', 'needsRemotePersist']) === DB_NEEDS_SYNC
+            if (needsPersist) {
+              dispatch(doSync()).catch(catchAsyncError(dispatch))
+            }
           }
-        }
-      }
-    )
+        })
+      }, 2000)
+    }
 
-    // First attempt to fails without this on IOS:
-    // https://github.com/facebook/react-native/issues/8615
-    return NetInfo.getConnectionInfo().then(() => {
-      return NetInfo.getConnectionInfo().then((connectionInfo) => {
-        logDebug(connectionInfo, 'initialCall')
-        const gc = goodConnection(
-          connectionInfo.type,
-          connectionInfo.effectiveType,
-          currentlyUsingOnlyWifi(),
-        )
-        dispatch(newNetworkState(gc))
-      })
-    }).catch(catchAsyncError(dispatch))
-
+    networkListenerRemover = NetInfo.addEventListener('connectionChange', listener)
+    listener()
   }
 }
 
 export function startListeningFCM () {
   cb('startListeningFCM')
-  return (dispatch) => {
-    if (isAndroid()) {
-      firebase.messaging().onMessage((m) => {
-        handleNotification(dispatch, m._data, false)
-      })
-    }
+  return (dispatch, getState) => {
+    firebase.messaging().onMessage((m) => {
+      const inForeground = getState().getIn(['localState', 'appState']) === 'active'
+      if (isAndroid() || inForeground) {
+        dispatch(doSync({}, false)).then(() => {
+          dispatch(showLocalNotifications())
+        })
+      }
+    })
+    firebase.notifications().onNotificationOpened(() => {
+      dispatch(doSync())
+    })
   }
 }
 
@@ -867,16 +886,14 @@ let FCMTokenRefreshListenerRemover = null
 export function startListeningFCMTokenRefresh () {
   cb('startListeningFCMTokenRefresh')
   return (dispatch) => {
-    if (isAndroid()) {
-      firebase.messaging().getToken().then(newToken => {
-        if (newToken) {
-          dispatch(setFCMTokenOnServer(newToken))
-        }
-      })
-      FCMTokenRefreshListenerRemover = firebase.messaging().onTokenRefresh((newToken) => {
+    firebase.messaging().getToken().then(newToken => {
+      if (newToken) {
         dispatch(setFCMTokenOnServer(newToken))
-      })
-    }
+      }
+    })
+    FCMTokenRefreshListenerRemover = firebase.messaging().onTokenRefresh((newToken) => {
+      dispatch(setFCMTokenOnServer(newToken))
+    })
   }
 }
 
@@ -884,7 +901,7 @@ function startActiveComponentListener () {
   cb('startActiveComponentListener')
   return (dispatch, getState) => {
     Navigation.events().registerComponentDidAppearListener( ( { componentId } ) => {
-      if (componentId !== DRAWER && componentId !== RIDE_BUTTON) {
+      if (componentId !== DRAWER && componentId !== RIDE_BUTTON && componentId !== NOTIFICATION_BUTTON) {
         dispatch(setActiveComponent(componentId))
       }
     })
@@ -905,25 +922,9 @@ export function stopLocationTracking (clearLast=true) {
 
 function startAppStateTracking () {
   cb('startAppStateTracking')
-  return (dispatch, getState) => {
+  return (dispatch) => {
     AppState.addEventListener('change', (nextAppState) => {
       dispatch(newAppState(nextAppState))
-      const onRide = Boolean(getState().getIn(['currentRide', 'currentRide']))
-      if (onRide && nextAppState === appStates.active) {
-        const activeComponent = getState().getIn(['localState', 'activeComponent'])
-        const popShowRideActive = getState().getIn(['localState', 'popShowRide'])
-        if (activeComponent !== RECORDER
-          && activeComponent !== UPDATE_NEW_RIDE_ID
-          && activeComponent !== CAMERA
-          && !popShowRideActive) {
-          Navigation.push(activeComponent, {
-            component: {
-              name: RECORDER,
-              id: RECORDER
-            }
-          });
-        }
-      }
     })
   }
 }
@@ -965,7 +966,6 @@ export function doSync (syncData={}, showProgress=true) {
       }
     }
 
-    logDebug(getState().getIn(['localState', 'goodConnection']), 'doSync')
     if (getState().getIn(['localState', 'goodConnection'])) {
       dispatch(runPhotoQueue())
 

@@ -6,10 +6,12 @@ import { logError, logInfo } from '../helpers'
 import ApiClient from './ApiClient'
 
 const horsesDBName = 'horses'
+const notificationsDBName = 'notifications'
 const ridesDBName = 'rides'
 const usersDBName = 'users'
 
 let localHorsesDB = new PouchDB(horsesDBName, {auto_compaction: true})
+let localNotificationsDB = new PouchDB(notificationsDBName, {auto_compaction: true})
 let localRidesDB = new PouchDB(ridesDBName, {auto_compaction: true})
 let localUsersDB = new PouchDB(usersDBName, {auto_compaction: true})
 
@@ -47,6 +49,10 @@ export default class PouchCouch {
     return localUsersDB.put(userData)
   }
 
+  static saveNotification (notificationData) {
+    return localNotificationsDB.put(notificationData)
+  }
+
   static deleteRide (id, rev) {
     return localRidesDB.remove(id, rev)
   }
@@ -64,6 +70,10 @@ export default class PouchCouch {
       {
         local: localUsersDB,
         remote: `${API_URL}/couchproxy/${usersDBName}`
+      },
+      {
+        local: localNotificationsDB,
+        remote: `${API_URL}/couchproxy/${notificationsDBName}`
       }
     ]
     return PouchCouch.preReplicate().then(options => {
@@ -110,6 +120,7 @@ export default class PouchCouch {
     }).then((leaderboardIDs) => {
       return Promise.all([
         PouchCouch.localReplicateHorses(options, [ownUserID, ...followingUserIDs, ...followerUserIDs, ...leaderboardIDs]),
+        PouchCouch.localReplicateNotifications(options, ownUserID),
         PouchCouch.localReplicateRides(options, ownUserID, [ownUserID, ...followingUserIDs], followerUserIDs),
         PouchCouch.localReplicateUsers(options, ownUserID, leaderboardIDs),
       ])
@@ -141,6 +152,26 @@ export default class PouchCouch {
           query_params: {
             userIDs: userIDs.join(','),
             followerUserIDs: followerUserIDs.join(','),
+            ownUserID,
+          }
+        }
+      ).on('complete', (resp) => {
+        resolve(resp)
+      }).on('error', PouchCouch.errorHandler(reject))
+    })
+  }
+
+  static localReplicateNotifications (options, ownUserID) {
+    return new Promise((resolve, reject) => {
+      const remoteNotificationsDB = new PouchDB(`${API_URL}/couchproxy/${notificationsDBName}`, options)
+      PouchDB.replicate(
+        remoteNotificationsDB,
+        localNotificationsDB,
+        {
+          batch_size: 500,
+          live: false,
+          filter: 'notifications/byUserIDs',
+          query_params: {
             ownUserID,
           }
         }
@@ -225,10 +256,12 @@ export default class PouchCouch {
     logInfo('deleting all local DBs')
     return Promise.all([
       localHorsesDB.destroy(),
-      localUsersDB.destroy(),
+      localNotificationsDB.destroy(),
       localRidesDB.destroy(),
+      localUsersDB.destroy(),
     ]).then(() => {
       localHorsesDB = new PouchDB(horsesDBName)
+      localNotificationsDB = new PouchDB(notificationsDBName)
       localRidesDB = new PouchDB(ridesDBName)
       localUsersDB = new PouchDB(usersDBName)
     })
@@ -237,14 +270,16 @@ export default class PouchCouch {
   static localLoad () {
     return Promise.all([
       localHorsesDB.allDocs(),
+      localNotificationsDB.allDocs(),
       localRidesDB.allDocs(),
       localUsersDB.allDocs(),
-    ]).then(([horsesResp, ridesResp, usersResp]) => {
+    ]).then(([horsesResp, notificationsResp, ridesResp, usersResp]) => {
       const parsed = {
         horses: {},
         horsePhotos: {},
         horseUsers: {},
         follows: {},
+        notifications: {},
         rideAtlasEntries: {},
         rideCarrots: {},
         rideCoordinates: {},
@@ -260,71 +295,86 @@ export default class PouchCouch {
       }
 
       for (let horseDoc of horsesResp.rows) {
-        switch (horseDoc.doc.type) {
-          case 'horse':
-            parsed.horses[horseDoc.doc._id] = horseDoc.doc
-            break
-          case 'horsePhoto':
-            parsed.horsePhotos[horseDoc.doc._id] = horseDoc.doc
-            break
-          case 'horseUser':
-            parsed.horseUsers[horseDoc.doc._id] = horseDoc.doc
-            break
+        if (horseDoc.doc.deleted !== true) {
+          switch (horseDoc.doc.type) {
+            case 'horse':
+              parsed.horses[horseDoc.doc._id] = horseDoc.doc
+              break
+            case 'horsePhoto':
+              parsed.horsePhotos[horseDoc.doc._id] = horseDoc.doc
+              break
+            case 'horseUser':
+              parsed.horseUsers[horseDoc.doc._id] = horseDoc.doc
+              break
+          }
         }
       }
 
       for (let userDoc of usersResp.rows) {
-        const doc = userDoc.doc
-        const id = doc._id
-        switch (userDoc.doc.type) {
-          case 'follow':
-            parsed.follows[id] = doc
-            break
-          case 'user':
-            parsed.users[id] = doc
-            break
-          case 'userPhoto':
-            parsed.userPhotos[id] = doc
-            break
-          case 'training':
-            parsed.trainings[id] = doc
-            break
-          case 'leaderboards':
-            parsed.leaderboards = doc
-            break
+        if (userDoc.doc.deleted !== true) {
+          const doc = userDoc.doc
+          const id = doc._id
+          switch (userDoc.doc.type) {
+            case 'follow':
+              parsed.follows[id] = doc
+              break
+            case 'user':
+              parsed.users[id] = doc
+              break
+            case 'userPhoto':
+              parsed.userPhotos[id] = doc
+              break
+            case 'training':
+              parsed.trainings[id] = doc
+              break
+            case 'leaderboards':
+              parsed.leaderboards = doc
+              break
+          }
         }
       }
 
       for (let rideDoc of ridesResp.rows) {
-        const doc = rideDoc.doc
-        const id = doc._id
-        switch (rideDoc.doc.type) {
-          case 'carrot':
-            parsed.rideCarrots[id] = doc
-            break
-          case 'rideCoordinates':
-            parsed.rideCoordinates[id] = doc
-            break
-          case 'comment':
-            parsed.rideComments[id] = doc
-            break
-          case 'rideAtlasEntry':
-            parsed.rideAtlasEntries[id] = doc
-            break
-          case 'rideElevations':
-            parsed.rideElevations[id] = doc
-            break
-          case 'ridePhoto':
-            parsed.ridePhotos[id] = doc
-            break
-          case 'rideHorse':
-            parsed.rideHorses[id] = doc
-            break
-          case 'ride':
-            parsed.rides[id] = doc
-            break
+        if (rideDoc.doc.deleted !== true) {
+          const doc = rideDoc.doc
+          const id = doc._id
+          switch (rideDoc.doc.type) {
+            case 'carrot':
+              parsed.rideCarrots[id] = doc
+              break
+            case 'rideCoordinates':
+              parsed.rideCoordinates[id] = doc
+              break
+            case 'comment':
+              parsed.rideComments[id] = doc
+              break
+            case 'rideAtlasEntry':
+              parsed.rideAtlasEntries[id] = doc
+              break
+            case 'rideElevations':
+              parsed.rideElevations[id] = doc
+              break
+            case 'ridePhoto':
+              parsed.ridePhotos[id] = doc
+              break
+            case 'rideHorse':
+              parsed.rideHorses[id] = doc
+              break
+            case 'ride':
+              parsed.rides[id] = doc
+              break
+          }
         }
       }
+
+      for (let notificationDoc of notificationsResp.rows) {
+        if (notificationDoc.deleted !== true) {
+          const doc = notificationDoc.doc
+          const id = doc._id
+          parsed.notifications[id] = doc
+        }
+      }
+
       return parsed
     })
   }

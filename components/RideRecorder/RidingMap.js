@@ -219,7 +219,6 @@ export default class RidingMap extends PureComponent {
 
   activeAtlasEntry () {
     if (this.props.activeAtlasEntry) {
-      console.log(this.props.activeAtlasEntry.toJSON())
       const mapCoords = RidingMap.mapCoordinates(this.props.activeAtlasEntry.get('rideCoordinates'))
       return (
         <MapboxGL.ShapeSource id="atlasSource" shape={mapCoords}>

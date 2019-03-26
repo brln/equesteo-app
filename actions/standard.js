@@ -26,7 +26,6 @@ import {
   HORSE_UPDATED,
   HORSE_PHOTO_UPDATED,
   HORSE_USER_UPDATED,
-  INITIAL_SYNC_COMPLETE,
   LOAD_CURRENT_RIDE_STATE,
   LOAD_LOCAL_STATE,
   LOCAL_DATA_LOADED,
@@ -34,8 +33,8 @@ import {
   NEW_LOCATION,
   NEW_APP_STATE,
   NEW_NETWORK_STATE,
+  NOTIFICATION_UPDATED,
   PAUSE_LOCATION_TRACKING,
-  POP_SHOW_RIDE_SHOWN,
   REMOVE_STASHED_RIDE_PHOTO,
   REPLACE_LAST_LOCATION,
   RIDE_ATLAS_ENTRY_UPDATED,
@@ -54,9 +53,8 @@ import {
   SET_FIRST_START_HORSE_ID,
   SET_FULL_SYNC_FAIL,
   SET_LOCATION_RETRY,
-  SET_POP_SHOW_RIDE,
   SET_REMOTE_PERSIST,
-  SHOW_POP_SHOW_RIDE,
+  SET_SHOWING_RIDE,
   SET_SIGNING_OUT,
   START_RIDE,
   STASH_NEW_LOCATIONS,
@@ -65,7 +63,6 @@ import {
   SYNC_COMPLETE,
   SET_AWAITING_PW_CHANGE,
   SET_DOING_INITIAL_LOAD,
-  SET_SHOWING_RIDE,
   UNPAUSE_LOCATION_TRACKING,
   UPDATE_PHOTO_STATUS,
   USER_PHOTO_UPDATED,
@@ -340,19 +337,19 @@ export function newNetworkState (goodConnection) {
   return {
     type: NEW_NETWORK_STATE,
     goodConnection,
-    logData: ['connectionType', 'effectiveConnectionType'],
+  }
+}
+
+export function notificationUpdated (notification) {
+  return {
+    type: NOTIFICATION_UPDATED,
+    notification,
   }
 }
 
 export function pauseLocationTracking () {
   return {
     type: PAUSE_LOCATION_TRACKING
-  }
-}
-
-export function popShowRideShown () {
-  return {
-    type: POP_SHOW_RIDE_SHOWN
   }
 }
 
@@ -437,20 +434,18 @@ export function setActiveAtlasEntry (id) {
   }
 }
 
-export function setPopShowRide (rideID, showRideNow, scrollToComments) {
-  return {
-    type: SET_POP_SHOW_RIDE,
-    rideID,
-    showRideNow,
-    scrollToComments,
-  }
-}
-
 export function setRemotePersist (value) {
   return {
     type: SET_REMOTE_PERSIST,
     value,
     logData: ['value']
+  }
+}
+
+export function setShowingRide (rideID) {
+  return {
+    type: SET_SHOWING_RIDE,
+    rideID,
   }
 }
 
@@ -467,20 +462,6 @@ export function setFullSyncFail (status) {
     type: SET_FULL_SYNC_FAIL,
     status,
     logData: ['status'],
-  }
-}
-
-export function setShowingRide (rideID) {
-  return {
-    type: SET_SHOWING_RIDE,
-    rideID,
-    mixpanel: true
-  }
-}
-
-export function showPopShowRide () {
-  return {
-    type: SHOW_POP_SHOW_RIDE,
   }
 }
 

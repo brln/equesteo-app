@@ -52,7 +52,6 @@ class RecorderContainer extends PureComponent {
       showGPSBar: true,
       discardModalOpen: false,
       navDebounce: false,
-      _isMounted: false,
     }
 
     this.clearActiveAtlasEntry = this.clearActiveAtlasEntry.bind(this)
@@ -91,32 +90,24 @@ class RecorderContainer extends PureComponent {
   }
 
   goBack () {
-    this.setState({
-      _isMounted: false
-    })
     return Navigation.pop(this.props.componentId)
   }
 
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.lastLocation && !this.gpsTimeout) {
+  componentDidAppear () {
+    if (!this.gpsTimeout) {
       this.gpsTimeout = setTimeout(() => {
-        if (this.state._isMounted) {
-          this.setState({showGPSBar: false})
-        }
+        this.setState({showGPSBar: false})
       }, 2000)
     }
   }
 
-  componentWillUnmount () {
-    this.setState({
-      _isMounted: false
-    })
+  componentDidDisappear () {
     BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
     clearTimeout(this.gpsTimeout)
   }
 
   navigationButtonPressed ({ buttonId }) {
-    if (!this.state.navDebounce && this.state._isMounted) {
+    if (!this.state.navDebounce) {
       this.setState({
         navDebounce: true
       })
@@ -127,11 +118,9 @@ class RecorderContainer extends PureComponent {
         nextScreen = this.goBack()
       }
       nextScreen.then(() => {
-        if (this.state._isMounted) {
-          this.setState({
-            navDebounce: false
-          })
-        }
+        this.setState({
+          navDebounce: false
+        })
       })
     }
   }
@@ -143,9 +132,6 @@ class RecorderContainer extends PureComponent {
   }
 
   componentDidMount () {
-    this.setState({
-      _isMounted: true
-    })
     BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
     if (isAndroid()) {
       LocationServicesDialogBox.checkLocationServicesIsEnabled({
@@ -169,11 +155,9 @@ class RecorderContainer extends PureComponent {
   }
 
   closeDiscardModal () {
-    if (this.state._isMounted) {
-      this.setState({
-        discardModalOpen: false
-      })
-    }
+    this.setState({
+      discardModalOpen: false
+    })
   }
 
   startRide () {
@@ -220,11 +204,9 @@ class RecorderContainer extends PureComponent {
       return this.showUpdateRide()
     } else {
       return new Promise((res) => {
-        if (this.state._isMounted) {
-          this.setState({
-            discardModalOpen: true
-          }, res())
-        }
+        this.setState({
+          discardModalOpen: true
+        }, res())
       })
 
     }

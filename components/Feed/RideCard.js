@@ -48,7 +48,7 @@ export default class RideCard extends PureComponent {
   }
 
   showRide (skipToComments) {
-    this.props.showRide(this.props.ride, skipToComments, false)
+    this.props.showRide(this.props.ride, skipToComments)
   }
 
   showHorseProfile () {

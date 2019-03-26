@@ -13,8 +13,10 @@ import FollowListContainer from './containers/FollowList'
 import HorseProfileContainer from './containers/HorseProfile'
 import LeaderboardsContainer from './containers/Leaderboards'
 import MapContainer from './containers/Map'
-import NeedsSyncContainer from './containers/NeedsSyncContainer'
 import MoreContainer from './containers/More'
+import NeedsSyncContainer from './containers/NeedsSyncContainer'
+import NotificationsListContainer from './containers/NotificationsList'
+import NotificationButton from './containers/Feed/NotificationButton'
 import PhotoLightboxContainer from './containers/PhotoLightbox'
 import ProfileContainer from './containers/Profile'
 import RecorderContainer from './containers/Recorder'
@@ -43,6 +45,8 @@ export const LEADERBOARDS = 'equesteo.Leaderboards'
 export const MAP = 'equesteo.ViewingMap'
 export const NEEDS_SYNC = 'equesteo.NeedsSync'
 export const MORE = 'equesteo.More'
+export const NOTIFICATION_BUTTON = 'equesteo.NotificationButton'
+export const NOTIFICATIONS_LIST = 'equesteo.NotificationsList'
 export const PHOTO_LIGHTBOX = 'equesteo.PhotoLightbox'
 export const PROFILE = 'equesteo.Profile'
 export const RECORDER = 'equesteo.Recorder'
@@ -74,6 +78,8 @@ export function registerScreens(store, Provider) {
   Navigation.registerComponentWithRedux(LEADERBOARDS, () => LeaderboardsContainer, Provider, store)
   Navigation.registerComponentWithRedux(MAP, () => MapContainer, Provider, store)
   Navigation.registerComponentWithRedux(NEEDS_SYNC, () => NeedsSyncContainer, Provider, store)
+  Navigation.registerComponentWithRedux(NOTIFICATION_BUTTON, () => NotificationButton, Provider, store)
+  Navigation.registerComponentWithRedux(NOTIFICATIONS_LIST, () => NotificationsListContainer, Provider, store)
   Navigation.registerComponentWithRedux(MORE, () => MoreContainer, Provider, store)
   Navigation.registerComponentWithRedux(PHOTO_LIGHTBOX, () => PhotoLightboxContainer, Provider, store)
   Navigation.registerComponentWithRedux(PROFILE, () => ProfileContainer, Provider, store)
