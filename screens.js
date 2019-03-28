@@ -24,6 +24,7 @@ import RideChartsContainer from './containers/RideCharts'
 import RideContainer from './containers/Ride'
 import RideAtlasContainer from './containers/RideAtlas'
 import RideToolsContainer from './containers/RideTools'
+import SettingsContainer from './containers/Settings'
 import ShareRideContainer from './containers/ShareRide'
 import SignupLoginContainer from './containers/SignupLogin'
 import TrainingContainer from './containers/Training'
@@ -55,6 +56,7 @@ export const RIDE_ATLAS = 'equesteo.RideAtlas'
 export const RIDE_BUTTON = 'equesteo.RideButton'
 export const RIDE_CHARTS = 'equesteo.RideCharts'
 export const RIDE_TOOLS = 'equesteo.RideTools'
+export const SETTINGS = 'equesteo.Settings'
 export const SHARE_RIDE = 'equesteo.ShareRide'
 export const SIGNUP_LOGIN = 'equesteo.SignupLogin'
 export const TRAINING = 'equesteo.Training'
@@ -89,6 +91,7 @@ export function registerScreens(store, Provider) {
   Navigation.registerComponentWithRedux(RIDE_BUTTON, () => RideButton, Provider, store)
   Navigation.registerComponentWithRedux(RIDE_CHARTS, () => RideChartsContainer, Provider, store)
   Navigation.registerComponentWithRedux(RIDE_TOOLS, () => RideToolsContainer, Provider, store)
+  Navigation.registerComponentWithRedux(SETTINGS, () => SettingsContainer, Provider, store)
   Navigation.registerComponentWithRedux(UPDATE_RIDE, () => UpdateRideContainer, Provider, store)
   Navigation.registerComponentWithRedux(SHARE_RIDE, () => ShareRideContainer, Provider, store)
   Navigation.registerComponentWithRedux(SIGNUP_LOGIN, () => SignupLoginContainer, Provider, store)

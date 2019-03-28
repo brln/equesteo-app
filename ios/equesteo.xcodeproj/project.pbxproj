@@ -52,6 +52,20 @@
 			remoteGlobalIDString = 58B5115D1A9E6B3D00147676;
 			remoteInfo = RCTCameraRoll;
 		};
+		89122D4C224D308E00E44B6B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A74F921B2153E3D400AE0E34 /* RCTPushNotification.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 89122D3C224D2A1D00E44B6B;
+			remoteInfo = "RCTPushNotification-tvOS";
+		};
+		89122D50224D308E00E44B6B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 89C3A139224AE35D003C7F5E /* RCTPushNotification.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 89122D3C224D2A1D00E44B6B;
+			remoteInfo = "RCTPushNotification-tvOS";
+		};
 		8968ADB922125F1100345955 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 8968AD8B22125F1000345955 /* RNMixpanel.xcodeproj */;
@@ -86,13 +100,6 @@
 			proxyType = 2;
 			remoteGlobalIDString = 134814201AA4EA6300B7C361;
 			remoteInfo = RCTPushNotification;
-		};
-		89C3A140224AE35D003C7F5E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 89C3A139224AE35D003C7F5E /* RCTPushNotification.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 3D05745F1DE6004600184BB4;
-			remoteInfo = "RCTPushNotification-tvOS";
 		};
 		89D782ED2231AB1C009EE914 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -275,13 +282,6 @@
 			proxyType = 2;
 			remoteGlobalIDString = 134814201AA4EA6300B7C361;
 			remoteInfo = RCTPushNotification;
-		};
-		A74F92232153E3D500AE0E34 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = A74F921B2153E3D400AE0E34 /* RCTPushNotification.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 3D05745F1DE6004600184BB4;
-			remoteInfo = "RCTPushNotification-tvOS";
 		};
 		A74F92422153E64200AE0E34 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -637,7 +637,7 @@
 			isa = PBXGroup;
 			children = (
 				89C3A13F224AE35D003C7F5E /* libRCTPushNotification.a */,
-				89C3A141224AE35D003C7F5E /* libRCTPushNotification-tvOS.a */,
+				89122D51224D308E00E44B6B /* libRCTPushNotification-tvOS.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -741,7 +741,7 @@
 			isa = PBXGroup;
 			children = (
 				A74F92222153E3D500AE0E34 /* libRCTPushNotification.a */,
-				A74F92242153E3D500AE0E34 /* libRCTPushNotification-tvOS.a */,
+				89122D4D224D308E00E44B6B /* libRCTPushNotification-tvOS.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -984,6 +984,20 @@
 			remoteRef = 890CBC9022186D5700843B7A /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		89122D4D224D308E00E44B6B /* libRCTPushNotification-tvOS.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libRCTPushNotification-tvOS.a";
+			remoteRef = 89122D4C224D308E00E44B6B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		89122D51224D308E00E44B6B /* libRCTPushNotification-tvOS.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libRCTPushNotification-tvOS.a";
+			remoteRef = 89122D50224D308E00E44B6B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		8968ADBA22125F1100345955 /* libRNMixpanel.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -1017,13 +1031,6 @@
 			fileType = archive.ar;
 			path = libRCTPushNotification.a;
 			remoteRef = 89C3A13E224AE35D003C7F5E /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		89C3A141224AE35D003C7F5E /* libRCTPushNotification-tvOS.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = "libRCTPushNotification-tvOS.a";
-			remoteRef = 89C3A140224AE35D003C7F5E /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		89D782EE2231AB1C009EE914 /* libRNFetchBlob.a */ = {
@@ -1206,13 +1213,6 @@
 			fileType = archive.ar;
 			path = libRCTPushNotification.a;
 			remoteRef = A74F92212153E3D500AE0E34 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		A74F92242153E3D500AE0E34 /* libRCTPushNotification-tvOS.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = "libRCTPushNotification-tvOS.a";
-			remoteRef = A74F92232153E3D500AE0E34 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		A74F92432153E64200AE0E34 /* libRCTNetwork.a */ = {
@@ -1523,6 +1523,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 4M4TMZLLJC;
+				ENABLE_BITCODE = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../ios/Pods/Headers/Public/**",
@@ -1554,6 +1555,7 @@
 				CODE_SIGN_ENTITLEMENTS = equesteo/equesteo.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 4M4TMZLLJC;
+				ENABLE_BITCODE = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../ios/Pods/Headers/Public/**",

@@ -18,6 +18,7 @@ import {
   FEEDBACK,
   FIND_PEOPLE,
   LEADERBOARDS,
+  MORE,
   PROFILE,
   TRAINING,
 } from '../screens'
@@ -38,11 +39,24 @@ class DrawerContainer extends Component {
     this.openFeedback = this.openFeedback.bind(this)
     this.openFindFriends = this.openFindFriends.bind(this)
     this.openLeaderboards = this.openLeaderboards.bind(this)
+    this.openMore = this.openMore.bind(this)
     this.openTraining = this.openTraining.bind(this)
   }
 
   shouldComponentUpdate () {
     return false
+  }
+
+  openMore () {
+    this.toggleDrawer()
+    if (this.props.activeComponent === FEED) {
+      EqNavigation.push(this.props.activeComponent, {
+        component: {
+          name: MORE,
+          title: 'More',
+        }
+      })
+    }
   }
 
   openAccount () {
@@ -204,14 +218,14 @@ class DrawerContainer extends Component {
                 </View>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={this.openAccount}>
+              <TouchableOpacity onPress={this.openMore}>
                 <View style={styles.drawerListItem}>
                   <BuildImage
-                    source={require('../img/mainMenus/profile_wt.png')}
+                    source={require('../img/mainMenus/more_wt.png')}
                     style={styles.icon}
                   />
                   <Text style={styles.drawerListItemText}>
-                    My Account
+                    More
                   </Text>
                 </View>
               </TouchableOpacity>

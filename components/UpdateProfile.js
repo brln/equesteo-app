@@ -22,11 +22,8 @@ export default class UpdateProfile extends PureComponent {
     super(props)
     this.inputs = {}
     this.changeAboutMe = this.changeAboutMe.bind(this)
-    this.changeDefaultPublic = this.changeDefaultPublic.bind(this)
-    this.changeLeaderboardOptOut = this.changeLeaderboardOptOut.bind(this)
     this.changeFirstName = this.changeFirstName.bind(this)
     this.changeLastName = this.changeLastName.bind(this)
-    this.changeOnlyUseWifi = this.changeOnlyUseWifi.bind(this)
     this.changeProfilePhotoID = this.changeProfilePhotoID.bind(this)
     this.deletePhoto = this.deletePhoto.bind(this)
     this.moveToLastName = this.moveToLastName.bind(this)
@@ -36,19 +33,6 @@ export default class UpdateProfile extends PureComponent {
   deletePhoto () {
     this.props.markPhotoDeleted(this.props.selectedPhotoID)
     this.props.clearPhotoMenu()
-  }
-
-  changeDefaultPublic () {
-    this.props.changeAccountDetails(this.props.user.set('ridesDefaultPublic', !this.props.user.get('ridesDefaultPublic')))
-  }
-
-  changeLeaderboardOptOut () {
-    this.props.changeAccountDetails(this.props.user.set('leaderboardOptOut', !this.props.user.get('leaderboardOptOut')))
-  }
-
-  changeOnlyUseWifi () {
-    this.props.changeAccountDetails(this.props.user.set('onlyUseWifi', !this.props.user.get('onlyUseWifi')))
-    this.props.restartNetworkListener()
   }
 
   moveToLastName () {

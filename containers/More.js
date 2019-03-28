@@ -1,17 +1,17 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Navigation } from 'react-native-navigation'
 
 import {
   Dimensions,
   FlatList,
+  Platform,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native'
 import { brand, darkGrey, lightGrey } from '../colors'
 import { logRender } from '../helpers'
-import { BARN, FEEDBACK, FIND_PEOPLE, PROFILE } from '../screens'
+import { BARN, FEEDBACK, FIND_PEOPLE, PROFILE, SETTINGS } from '../screens'
 import Thumbnail from '../components/Images/Thumbnail'
 import { EqNavigation } from '../services'
 
@@ -46,6 +46,7 @@ class MoreContainer extends Component {
     this.showFeedback = this.showFeedback.bind(this)
     this.showFindFriends = this.showFindFriends.bind(this)
     this.showMyAccount = this.showMyAccount.bind(this)
+    this.showSettings = this.showSettings.bind(this)
   }
 
   shouldComponentUpdate () {
@@ -89,6 +90,15 @@ class MoreContainer extends Component {
     })
   }
 
+  showSettings () {
+    EqNavigation.push(this.props.activeComponent, {
+      component: {
+        name: SETTINGS,
+        title: 'Settings',
+      }
+    })
+  }
+
   renderMenuItem ({ item }) {
     return (
       <View style={{flex: 1}}>
@@ -116,32 +126,54 @@ class MoreContainer extends Component {
 
   render() {
     logRender('MoreContainer')
-    const menuItems = [
-      {
-        name: 'My Barn',
-        screen: BARN,
-        icon: require('../img/mainMenus/barn_wt.png'),
-        onPress: this.showBarn
-      },
-      {
-        name: 'Find Friends',
-        screen: FIND_PEOPLE,
-        icon: require('../img/mainMenus/findPeople_wt.png'),
-        onPress: this.showFindFriends
-      },
-      {
-        name: 'My Account',
-        screen: PROFILE,
-        icon: require('../img/mainMenus/profile_wt.png'),
-        onPress: this.showMyAccount
-      },
-      {
-        name: 'Feedback',
-        screen: FEEDBACK,
-        icon: require('../img/mainMenus/feedback.png'),
-        onPress: this.showFeedback
-      }
-    ]
+    const menuItems = Platform.select({
+      ios: [
+        {
+          name: 'My Barn',
+          screen: BARN,
+          icon: require('../img/mainMenus/barn_wt.png'),
+          onPress: this.showBarn
+        },
+        {
+          name: 'Find Friends',
+          screen: FIND_PEOPLE,
+          icon: require('../img/mainMenus/findPeople_wt.png'),
+          onPress: this.showFindFriends
+        },
+        {
+          name: 'My Account',
+          screen: PROFILE,
+          icon: require('../img/mainMenus/profile_wt.png'),
+          onPress: this.showMyAccount
+        },
+        {
+          name: 'Settings',
+          screen: PROFILE,
+          icon: require('../img/mainMenus/settings_wt.png'),
+          onPress: this.showSettings
+        },
+        {
+          name: 'Feedback',
+          screen: FEEDBACK,
+          icon: require('../img/mainMenus/feedback.png'),
+          onPress: this.showFeedback
+        }
+      ],
+      android: [
+        {
+          name: 'My Account',
+          screen: PROFILE,
+          icon: require('../img/mainMenus/profile_wt.png'),
+          onPress: this.showMyAccount
+        },
+        {
+          name: 'Settings',
+          screen: PROFILE,
+          icon: require('../img/mainMenus/settings_wt.png'),
+          onPress: this.showSettings
+        },
+      ]
+    })
 
     return (
       <View>
