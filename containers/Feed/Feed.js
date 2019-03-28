@@ -22,6 +22,7 @@ import {
   RIDE_BUTTON,
   TRAINING,
 } from '../../screens'
+import { EqNavigation } from '../../services'
 
 class FeedContainer extends BackgroundComponent {
    static options() {
@@ -59,8 +60,6 @@ class FeedContainer extends BackgroundComponent {
       firstStartPopped: false,
       ridePopped: false,
     }
-    this.debounce = false
-    this.db = this.db.bind(this)
 
     this.followIDs = this.followIDs.bind(this)
     this.followingRides = this.followingRides.bind(this)
@@ -136,45 +135,35 @@ class FeedContainer extends BackgroundComponent {
     )
   }
 
-  db (func) {
-    if (!this.debounce) {
-      this.debounce = true
-      func.then(() => {
-        this.debounce = false
-      })
-    }
+  openScreen (openPromise) {
+    openPromise.then(() => {
+      this.makeSureDrawerClosed()
+    }).catch(e => {
+      logError(e)
+    })
   }
 
   openRecorder () {
-    this.db(Navigation.push(this.props.activeComponent, {
-        component: {
-          name: RECORDER,
-          id: RECORDER
-        }
-      }).then(() => {
-        this.makeSureDrawerClosed()
-      }).catch(e => {
-        logError(e)
-      })
-    )
+    this.openScreen(EqNavigation.push(this.props.activeComponent, {
+      component: {
+        name: RECORDER,
+        id: RECORDER
+      }
+    }))
   }
 
   openNotifications () {
-    this.db(Navigation.push(this.props.activeComponent, {
+    this.openScreen(EqNavigation.push(this.props.activeComponent, {
       component: {
         name: NOTIFICATIONS_LIST,
         id: NOTIFICATIONS_LIST,
       }
-    }).then(() => {
-      this.makeSureDrawerClosed()
-    }).catch(e => {
-      logError(e)
     }))
   }
 
 
   openTraining () {
-    this.db(Navigation.push(this.props.activeComponent, {
+    this.openScreen(EqNavigation.push(this.props.activeComponent, {
       component: {
         name: TRAINING,
         id: TRAINING
@@ -183,7 +172,7 @@ class FeedContainer extends BackgroundComponent {
   }
 
   openLeaderboards () {
-    this.db(Navigation.push(this.props.activeComponent, {
+    this.openScreen(EqNavigation.push(this.props.activeComponent, {
       component: {
         name: LEADERBOARDS,
         id: LEADERBOARDS
@@ -192,10 +181,54 @@ class FeedContainer extends BackgroundComponent {
   }
   
   openMore () {
-    this.db(Navigation.push(this.props.activeComponent, {
+    this.openScreen(EqNavigation.push(this.props.activeComponent, {
       component: {
         name: MORE,
         id: MORE,
+      }
+    }))
+  }
+
+  showHorseProfile (horse, ownerID) {
+    this.openScreen(EqNavigation.push(this.props.componentId, {
+      component: {
+        name: HORSE_PROFILE,
+        title: horse.get('name'),
+        passProps: {
+          horse,
+          ownerID
+        }
+      }
+    }))
+  }
+
+  showFirstStart () {
+     this.openScreen(EqNavigation.push(this.props.componentId, {
+       component: {
+         name: FIRST_START,
+       }
+     }))
+  }
+
+  showProfile (user) {
+    this.openScreen(EqNavigation.push(this.props.componentId, {
+      component: {
+        name: PROFILE,
+        passProps: {
+          profileUser: user,
+        }
+      }
+    }))
+  }
+
+  showRide (ride, skipToComments) {
+    this.openScreen(EqNavigation.push(this.props.componentId, {
+      component: {
+        name: RIDE,
+        passProps: {
+          rideID: ride.get('_id'),
+          skipToComments,
+        }
       }
     }))
   }
@@ -240,55 +273,7 @@ class FeedContainer extends BackgroundComponent {
     })
   }
 
-  showHorseProfile (horse, ownerID) {
-    Navigation.push(this.props.componentId, {
-      component: {
-        name: HORSE_PROFILE,
-        title: horse.get('name'),
-        passProps: {
-          horse,
-          ownerID
-        }
-      }
-    }).then(() => {
-      this.makeSureDrawerClosed()
-    })
-  }
 
-  showFirstStart () {
-     Navigation.push(this.props.componentId, {
-       component: {
-         name: FIRST_START,
-       }
-     })
-  }
-
-  showProfile (user) {
-    Navigation.push(this.props.componentId, {
-      component: {
-        name: PROFILE,
-        passProps: {
-          profileUser: user,
-        }
-      }
-    }).then(() => {
-      this.makeSureDrawerClosed()
-    })
-  }
-
-  showRide (ride, skipToComments) {
-    Navigation.push(this.props.componentId, {
-      component: {
-        name: RIDE,
-        passProps: {
-          rideID: ride.get('_id'),
-          skipToComments,
-        }
-      }
-    }).then(() => {
-      this.makeSureDrawerClosed()
-    })
-  }
 
   syncDB () {
     this.setState({

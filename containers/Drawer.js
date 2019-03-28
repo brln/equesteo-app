@@ -24,6 +24,7 @@ import {
 import BuildImage from '../components/Images/BuildImage'
 import { brand, lightGrey } from '../colors'
 import { logRender } from '../helpers'
+import { EqNavigation } from '../services'
 
 
 const { height, width } = Dimensions.get('window')
@@ -47,7 +48,7 @@ class DrawerContainer extends Component {
   openAccount () {
     this.toggleDrawer()
     if (this.props.activeComponent === FEED) {
-      Navigation.push(this.props.activeComponent, {
+      EqNavigation.push(this.props.activeComponent, {
         component: {
           name: PROFILE,
           title: 'My Account',
@@ -62,7 +63,7 @@ class DrawerContainer extends Component {
 	openFindFriends () {
     this.toggleDrawer()
     if (this.props.activeComponent === FEED) {
-      Navigation.push(this.props.activeComponent, {
+      EqNavigation.push(this.props.activeComponent, {
         component: {
           name: FIND_PEOPLE,
           title: 'Find Friends',
@@ -74,7 +75,7 @@ class DrawerContainer extends Component {
   openBarn () {
     this.toggleDrawer()
     if (this.props.activeComponent === FEED) {
-      Navigation.push(this.props.activeComponent, {
+      EqNavigation.push(this.props.activeComponent, {
         component: {
           name: BARN,
         }
@@ -85,7 +86,7 @@ class DrawerContainer extends Component {
   openTraining () {
     this.toggleDrawer()
     if (this.props.activeComponent === FEED) {
-      Navigation.push(this.props.activeComponent, {
+      EqNavigation.push(this.props.activeComponent, {
         component: {
           name: TRAINING,
         }
@@ -96,7 +97,7 @@ class DrawerContainer extends Component {
   openLeaderboards () {
     this.toggleDrawer()
     if (this.props.activeComponent === FEED) {
-      Navigation.push(this.props.activeComponent, {
+      EqNavigation.push(this.props.activeComponent, {
         component: {
           name: LEADERBOARDS,
         }
@@ -107,7 +108,7 @@ class DrawerContainer extends Component {
   openFeedback () {
     this.toggleDrawer()
     if (this.props.activeComponent === FEED) {
-      Navigation.push(this.props.activeComponent, {
+      EqNavigation.push(this.props.activeComponent, {
         component: {
           name: FEEDBACK,
         }

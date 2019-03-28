@@ -19,6 +19,7 @@ import { brand } from '../colors'
 import { generateUUID, logRender, unixTimeNow } from '../helpers'
 import { PHOTO_LIGHTBOX, PROFILE, UPDATE_HORSE } from '../screens'
 import HorseProfile from '../components/HorseProfile/HorseProfile'
+import { EqNavigation } from '../services'
 
 
 class HorseProfileContainer extends BackgroundComponent {
@@ -92,7 +93,7 @@ class HorseProfileContainer extends BackgroundComponent {
   }
 
   showPhotoLightbox (sources) {
-    Navigation.push(this.props.componentId, {
+    EqNavigation.push(this.props.componentId, {
       component: {
         name: PHOTO_LIGHTBOX,
         passProps: {
@@ -123,7 +124,7 @@ class HorseProfileContainer extends BackgroundComponent {
 
   navigationButtonPressed ({ buttonId }) {
     if (buttonId === 'edit') {
-      Navigation.push(this.props.componentId, {
+      EqNavigation.push(this.props.componentId, {
         component: {
           name: UPDATE_HORSE,
           title: "Update Horse",
@@ -140,7 +141,7 @@ class HorseProfileContainer extends BackgroundComponent {
   }
 
   showRiderProfile (rider) {
-    Navigation.push(this.props.componentId, {
+    EqNavigation.push(this.props.componentId, {
       component: {
         name: PROFILE,
         passProps: {
@@ -160,7 +161,7 @@ class HorseProfileContainer extends BackgroundComponent {
     const horseUser = this.horseUser()
     this.props.dispatch(deleteHorseUser(horseUser.get('_id')))
     this.props.dispatch(persistHorseUser(horseUser.get('_id')))
-    Navigation.pop(this.props.componentId)
+    EqNavigation.pop(this.props.componentId)
   }
 
   uploadPhoto (location) {

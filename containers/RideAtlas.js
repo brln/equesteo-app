@@ -7,6 +7,7 @@ import { logRender } from '../helpers'
 import RideAtlas from '../components/RideAtlas/RideAtlas'
 import { deleteRideAtlasEntry } from "../actions/functional"
 import {setActiveAtlasEntry} from "../actions/standard"
+import { EqNavigation } from '../services'
 
 class RideAtlasContainer extends PureComponent {
   static options() {
@@ -45,7 +46,7 @@ class RideAtlasContainer extends PureComponent {
 
   navigationButtonPressed ({ buttonId }) {
     if (buttonId === 'back') {
-      Navigation.pop(this.props.componentId)
+      EqNavigation.pop(this.props.componentId)
       if (this.props.onClose) {
         this.props.onClose()
       }
@@ -55,7 +56,7 @@ class RideAtlasContainer extends PureComponent {
   setActiveAtlasEntry (id) {
     return () => {
       this.props.dispatch(setActiveAtlasEntry(id))
-      Navigation.pop(this.props.componentId)
+      EqNavigation.pop(this.props.componentId)
     }
   }
 

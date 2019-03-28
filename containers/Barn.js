@@ -8,6 +8,7 @@ import BackgroundComponent from '../components/BackgroundComponent'
 import { brand } from '../colors'
 import { logRender } from '../helpers'
 import { HORSE_PROFILE, UPDATE_HORSE } from '../screens'
+import { EqNavigation } from '../services'
 
 class BarnContainer extends BackgroundComponent {
   static options() {
@@ -40,7 +41,7 @@ class BarnContainer extends BackgroundComponent {
   }
 
   horseProfile (horse, ownerID) {
-    Navigation.push(this.props.componentId, {
+    EqNavigation.push(this.props.componentId, {
       component: {
         name: HORSE_PROFILE,
         title: horse.get('name'),
@@ -56,7 +57,7 @@ class BarnContainer extends BackgroundComponent {
     const horseID = `${this.props.userID.toString()}_${(new Date).getTime().toString()}`
     const horseUserID = `${this.props.userID}_${horseID}`
     this.props.dispatch(createHorse(horseID, horseUserID, this.props.userID))
-    Navigation.push(this.props.componentId, {
+    EqNavigation.push(this.props.componentId, {
       component: {
         name: UPDATE_HORSE,
         title: 'New Horse',

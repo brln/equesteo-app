@@ -5,6 +5,7 @@ import { Keyboard } from 'react-native'
 
 import { brand } from '../colors'
 import RideCharts from '../components/RideCharts/RideCharts'
+import { EqNavigation } from '../services'
 
 class RideChartsContainer extends PureComponent {
   static options() {
@@ -36,7 +37,7 @@ class RideChartsContainer extends PureComponent {
 
   navigationButtonPressed({ buttonId }) {
     if (buttonId === 'back') {
-      Navigation.pop(this.props.componentId)
+      EqNavigation.pop(this.props.componentId)
     }
     Keyboard.dismiss()
   }

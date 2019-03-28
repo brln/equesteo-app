@@ -16,6 +16,7 @@ import {
 import { persistHorseUpdate } from '../actions/functional'
 import { brand } from '../colors'
 import { generateUUID, logRender, unixTimeNow } from '../helpers'
+import { EqNavigation } from '../services'
 
 class UpdateHorseContainer extends PureComponent {
   static options() {
@@ -171,7 +172,7 @@ class UpdateHorseContainer extends PureComponent {
   navigationButtonPressed ({ buttonId }) {
     Keyboard.dismiss()
     if (buttonId === 'save') {
-      Navigation.pop(this.props.componentId).then(() => {
+      EqNavigation.pop(this.props.componentId).then(() => {
         this.props.dispatch(persistHorseUpdate(
           this.props.horse.get('_id'),
           this.props.horseUser.get('_id'),
@@ -187,14 +188,14 @@ class UpdateHorseContainer extends PureComponent {
 
   goBack () {
     if (this.props.newHorse) {
-      Navigation.pop(this.props.componentId).then(() => {
+      EqNavigation.pop(this.props.componentId).then(() => {
         this.props.dispatch(deleteUnpersistedHorse(
           this.props.horseID,
           this.props.horseUserID
         ))
       })
     } else {
-      Navigation.pop(this.props.componentId).then(() => {
+      EqNavigation.pop(this.props.componentId).then(() => {
         this.props.dispatch(horseUpdated(this.state.cachedHorse))
         this.props.dispatch(horseUserUpdated(this.state.cachedHorseUser))
       })

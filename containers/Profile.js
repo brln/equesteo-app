@@ -4,6 +4,7 @@ import moment from 'moment'
 import React from 'react'
 import { connect } from 'react-redux';
 import { Navigation } from 'react-native-navigation'
+
 import BackgroundComponent from '../components/BackgroundComponent'
 import Profile from '../components/Profile/Profile'
 import {
@@ -28,6 +29,7 @@ import {
   UPDATE_PROFILE
 } from '../screens'
 import { generateUUID, logRender, unixTimeNow } from '../helpers'
+import { EqNavigation } from '../services'
 
 class ProfileContainer extends BackgroundComponent {
   static options() {
@@ -103,7 +105,7 @@ class ProfileContainer extends BackgroundComponent {
   }
 
   showPhotoLightbox (sources) {
-    Navigation.push(this.props.componentId, {
+    EqNavigation.push(this.props.componentId, {
       component: {
         name: PHOTO_LIGHTBOX,
         passProps: {
@@ -114,7 +116,7 @@ class ProfileContainer extends BackgroundComponent {
   }
 
   showAboutPage () {
-    Navigation.push(this.props.componentId, {
+    EqNavigation.push(this.props.componentId, {
       component: {
         name: ABOUT_PAGE,
       }
@@ -123,7 +125,7 @@ class ProfileContainer extends BackgroundComponent {
 
   navigationButtonPressed ({ buttonId }) {
     if (buttonId === 'edit') {
-      Navigation.push(this.props.componentId, {
+      EqNavigation.push(this.props.componentId, {
         component: {
           name: UPDATE_PROFILE,
           screen: UPDATE_PROFILE,
@@ -174,7 +176,7 @@ class ProfileContainer extends BackgroundComponent {
 
   showUserList (followRecords, followingOrFollower) {
     const userIDs = followRecords.valueSeq().map((f) => f.get(followingOrFollower))
-    Navigation.push(this.props.componentId, {
+    EqNavigation.push(this.props.componentId, {
       component: {
         name: FOLLOW_LIST,
         passProps: {
@@ -185,7 +187,7 @@ class ProfileContainer extends BackgroundComponent {
   }
 
   showHorseProfile (horse, ownerID) {
-    Navigation.push(this.props.componentId, {
+    EqNavigation.push(this.props.componentId, {
       component: {
         name: HORSE_PROFILE,
         title: horse.get('name'),

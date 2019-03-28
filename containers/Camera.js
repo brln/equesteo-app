@@ -9,6 +9,7 @@ import Camera from '../components/Camera'
 import { brand } from '../colors'
 import { generateUUID, unixTimeNow } from '../helpers'
 import { PHOTO_LIGHTBOX } from '../screens'
+import { EqNavigation } from '../services'
 
 
 class CameraContainer extends Component {
@@ -48,7 +49,7 @@ class CameraContainer extends Component {
 
   navigationButtonPressed ({ buttonId }) {
     if (buttonId === 'back') {
-      Navigation.pop(this.props.componentId)
+      EqNavigation.pop(this.props.componentId)
     }
   }
 
@@ -65,7 +66,7 @@ class CameraContainer extends Component {
     this.setState({
       showCam: false
     })
-    Navigation.push(this.props.componentId, {
+    EqNavigation.push(this.props.componentId, {
       component: {
         name: PHOTO_LIGHTBOX,
         passProps: {
@@ -83,7 +84,7 @@ class CameraContainer extends Component {
   }
 
   close () {
-    Navigation.pop(this.props.componentId)
+    EqNavigation.pop(this.props.componentId)
   }
 
   stashNewRidePhoto(uri) {

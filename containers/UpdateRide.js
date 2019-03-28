@@ -41,6 +41,7 @@ import {
 import UpdateRide from '../components/UpdateRide/UpdateRide'
 import { RIDE } from '../screens'
 import { catchAsyncError } from '../actions/functional'
+import { EqNavigation } from '../services'
 
 class UpdateRideContainer extends BackgroundComponent {
   static options() {
@@ -168,7 +169,7 @@ class UpdateRideContainer extends BackgroundComponent {
           this.state.trimValues,
           this.memoizedRideHorses(this.props.rideHorses, this.props.rideID),
         ))
-        Navigation.popToRoot(this.props.componentId).then(() => {
+        EqNavigation.popToRoot(this.props.componentId).then(() => {
           this.props.dispatch(clearPausedLocations())
           this.props.dispatch(stopLocationTracking())
           this.props.dispatch(discardCurrentRide())
@@ -176,7 +177,7 @@ class UpdateRideContainer extends BackgroundComponent {
         }).then(() => {
           setTimeout(() => {
             // Because otherwise it doesn't show the ride on iOS.
-            Navigation.push(this.props.activeComponent, {
+            EqNavigation.push(this.props.activeComponent, {
               component: {
                 name: RIDE,
                 passProps: {
@@ -191,7 +192,7 @@ class UpdateRideContainer extends BackgroundComponent {
         this.setDiscardModalOpen(true)
         this.props.dispatch(setActiveAtlasEntry(null))
       } else if (buttonId === 'back') {
-        Navigation.pop(this.props.componentId).then(() => {
+        EqNavigation.pop(this.props.componentId).then(() => {
           this.props.dispatch(deleteUnpersistedRide(this.props.ride.get('_id')))
           this.props.dispatch(stopStashNewLocations())
           this.props.dispatch(mergeStashedLocations())
@@ -211,7 +212,7 @@ class UpdateRideContainer extends BackgroundComponent {
           ))
         })
       } else if (buttonId === 'back' || buttonId === 'discard') {
-        Navigation.pop(this.props.componentId).then(() => {
+        EqNavigation.pop(this.props.componentId).then(() => {
           this.props.dispatch(rideUpdated(this.state.cachedRide))
           this.props.dispatch(clearRidePhotoStash(this.stashedRidePhotoKey()))
         })
@@ -227,7 +228,7 @@ class UpdateRideContainer extends BackgroundComponent {
   }
 
   discardRide () {
-    Navigation.popToRoot(this.props.componentId).then(() => {
+    EqNavigation.popToRoot(this.props.componentId).then(() => {
       this.props.dispatch(clearPausedLocations())
       this.props.dispatch(clearRidePhotoStash(this.stashedRidePhotoKey()))
       this.props.dispatch(stopLocationTracking())

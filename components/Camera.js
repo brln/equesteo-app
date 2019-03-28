@@ -63,7 +63,7 @@ export default class Camera extends Component {
             })
           },
           (error) => {
-            logError(error.message, 'Camera.ImageEditor.cropImage');
+            logError(error, 'Camera.ImageEditor.cropImage');
           },
         );
 

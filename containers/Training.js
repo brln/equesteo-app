@@ -8,6 +8,7 @@ import { brand } from '../colors'
 import Training from '../components/Training/Training'
 import { logRender } from '../helpers'
 import { RIDE } from '../screens'
+import { EqNavigation } from '../services'
 
 class TrainingContainer extends PureComponent {
   static options() {
@@ -69,7 +70,7 @@ class TrainingContainer extends PureComponent {
 
   showRide (ride) {
     if (this.props.rides.get(ride.get('rideID'))) {
-      Navigation.push(this.props.componentId, {
+      EqNavigation.push(this.props.componentId, {
         component: {
           name: RIDE,
           passProps: {rideID: ride.get('rideID')}

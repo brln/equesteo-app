@@ -6,6 +6,7 @@ import { brand } from '../colors'
 import ViewingMap from '../components/Ride/ViewingMap'
 import { logRender } from '../helpers'
 import { PHOTO_LIGHTBOX } from '../screens'
+import { EqNavigation } from '../services'
 
 class MapContainer extends PureComponent {
   static options() {
@@ -31,7 +32,7 @@ class MapContainer extends PureComponent {
   }
 
   showPhotoLightbox (sources) {
-    Navigation.push(this.props.componentId, {
+    EqNavigation.push(this.props.componentId, {
       component: {
         name: PHOTO_LIGHTBOX,
         passProps: {

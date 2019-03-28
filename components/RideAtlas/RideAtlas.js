@@ -54,18 +54,26 @@ export default class RideAtlas extends PureComponent {
   }
 
   render() {
-    return (
-      <View style={styles.container}>
-        <ScrollView style={{flex: 1}}>
-          <FlatList
-            keyExtractor={(u) => u._id}
-            containerStyle={{marginTop: 0}}
-            data={this.props.rideAtlasEntries}
-            renderItem={this.renderResult}
-          />
-        </ScrollView>
-      </View>
-    )
+    if (this.props.rideAtlasEntries.length) {
+      return (
+        <View style={styles.container}>
+          <ScrollView style={{flex: 1}}>
+            <FlatList
+              keyExtractor={(u) => u._id}
+              containerStyle={{marginTop: 0}}
+              data={this.props.rideAtlasEntries}
+              renderItem={this.renderResult}
+            />
+          </ScrollView>
+        </View>
+      )
+    } else {
+      return (
+        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', padding: 20}}>
+          <Text style={{textAlign: 'center'}}>You have no atlas entries. To view another map while you're riding, save it to your Atlas from the 'Tools' menu on that ride.</Text>
+        </View>
+      )
+    }
   }
 }
 

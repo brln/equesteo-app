@@ -8,6 +8,7 @@ import { brand } from '../colors'
 import { logRender } from '../helpers'
 import Leaderboards from '../components/Leaderboards/Leaderboards'
 import { HORSE_PROFILE, PROFILE } from '../screens'
+import { EqNavigation } from '../services'
 
 class LeaderboardsContainer extends BackgroundComponent {
   static options() {
@@ -43,7 +44,7 @@ class LeaderboardsContainer extends BackgroundComponent {
   }
 
   showHorseProfile (horse, ownerID) {
-    Navigation.push(this.props.componentId, {
+    EqNavigation.push(this.props.componentId, {
       component: {
         name: HORSE_PROFILE,
         passProps: {
@@ -55,7 +56,7 @@ class LeaderboardsContainer extends BackgroundComponent {
   }
 
   showProfile (profileUser) {
-    Navigation.push(this.props.componentId, {
+    EqNavigation.push(this.props.componentId, {
       component: {
         name: PROFILE,
         passProps: {

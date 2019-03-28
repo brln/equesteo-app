@@ -1,7 +1,6 @@
 import ImagePicker from 'react-native-image-crop-picker'
 import { fromJS, Map  } from 'immutable'
 import { AppState, NetInfo, Platform } from 'react-native'
-
 import BackgroundGeolocation from 'react-native-mauron85-background-geolocation'
 import firebase from 'react-native-firebase'
 import  Mixpanel from 'react-native-mixpanel'
@@ -38,7 +37,13 @@ import {
   RIDE_BUTTON,
   SIGNUP_LOGIN,
 } from '../screens'
-import { LocalStorage, PouchCouch, RidePersister, UserAPI } from '../services'
+import {
+  EqNavigation,
+  LocalStorage,
+  PouchCouch,
+  RidePersister,
+  UserAPI
+} from '../services'
 import { makeMessage } from '../modelHelpers/notification'
 import {
   carrotMutex,
@@ -321,7 +326,7 @@ export function loadRideElevations (rideID) {
 export function markNotificationSeen (notification) {
   cb('markNotificationSeen')
   return (dispatch, getState) => {
-    const markSeen = notification.set('popped').set('seen', true).set('deleted', true)
+    const markSeen = notification.set('popped', true).set('seen', true).set('deleted', true)
     dispatch(notificationUpdated(markSeen))
     PouchCouch.saveNotification(markSeen.toJS()).then(({rev}) => {
       let foundAfterSave = getState().getIn(['pouchRecords', 'notifications', notification.get('_id')])
@@ -708,7 +713,7 @@ export function showLocalNotifications () {
 
           const currentlyViewing = getState().getIn(['localState', 'showingRide'])
           if (currentlyViewing !== notification.get('rideID')) {
-            Navigation.push(getState().getIn(['localState', 'activeComponent']), {
+            EqNavigation.push(getState().getIn(['localState', 'activeComponent']), {
               component: {
                 name: RIDE,
                 passProps: {

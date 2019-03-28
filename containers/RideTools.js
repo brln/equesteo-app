@@ -23,6 +23,7 @@ import {
 import {
   persistRide,
 } from '../actions/functional'
+import { EqNavigation } from '../services'
 
 const { width } = Dimensions.get('window')
 
@@ -87,23 +88,25 @@ class RideToolsContainer extends Component {
   deleteRide () {
     this.props.dispatch(rideUpdated(this.props.ride.set('deleted', true)))
     this.props.dispatch(persistRide(this.props.ride.get('_id'), false, [], [], null, List()))
-    Navigation.popToRoot(this.props.componentId)
+    EqNavigation.popToRoot(this.props.componentId)
   }
 
   showAtlasEntryModal () {
+    // @TODO debounce
     this.setState({
       atlasEntryModalOpen: true
     })
   }
 
   showDeleteModal () {
+    // @TODO debounce
     this.setState({
       deleteModalOpen: true
     })
   }
 
   updateRide () {
-    Navigation.push(this.props.componentId, {
+    EqNavigation.push(this.props.componentId, {
       component: {
         name: UPDATE_RIDE,
         passProps: {
@@ -115,7 +118,7 @@ class RideToolsContainer extends Component {
   }
 
   shareRide () {
-    Navigation.push(this.props.componentId, {
+    EqNavigation.push(this.props.componentId, {
       component: {
         name: SHARE_RIDE,
         passProps: {

@@ -14,6 +14,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import Button from '../components/Button'
 import { brand, darkBrand } from '../colors'
 import UserAPI from '../services/UserApi'
+import { EqNavigation } from '../services'
 
 const { width, height } = Dimensions.get('window')
 
@@ -58,7 +59,7 @@ class FeedbackContainer extends PureComponent {
   navigationButtonPressed({ buttonId }) {
     if (buttonId === 'back') {
       Keyboard.dismiss()
-      Navigation.popToRoot(this.props.componentId)
+      EqNavigation.popToRoot(this.props.componentId)
     }
   }
 

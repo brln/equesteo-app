@@ -23,6 +23,7 @@ import RideRecorder from '../components/RideRecorder/RideRecorder'
 import { isAndroid, logRender, unixTimeNow } from '../helpers'
 import { captureException } from '../services/Sentry'
 import { CAMERA, RIDE_ATLAS, UPDATE_RIDE, UPDATE_NEW_RIDE_ID } from "../screens"
+import { EqNavigation } from '../services'
 
 class RecorderContainer extends PureComponent {
   static options() {
@@ -51,7 +52,6 @@ class RecorderContainer extends PureComponent {
     this.state = {
       showGPSBar: true,
       discardModalOpen: false,
-      navDebounce: false,
     }
 
     this.clearActiveAtlasEntry = this.clearActiveAtlasEntry.bind(this)
@@ -90,38 +90,19 @@ class RecorderContainer extends PureComponent {
   }
 
   goBack () {
-    return Navigation.pop(this.props.componentId)
+    return EqNavigation.pop(this.props.componentId)
   }
 
-  componentDidAppear () {
-    if (!this.gpsTimeout) {
-      this.gpsTimeout = setTimeout(() => {
-        this.setState({showGPSBar: false})
-      }, 2000)
-    }
-  }
-
-  componentDidDisappear () {
+  componentWillUnmount () {
     BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
     clearTimeout(this.gpsTimeout)
   }
 
   navigationButtonPressed ({ buttonId }) {
-    if (!this.state.navDebounce) {
-      this.setState({
-        navDebounce: true
-      })
-      let nextScreen
-      if (buttonId === 'finishRide') {
-        nextScreen = this.finishRide()
-      } else if (buttonId === 'back') {
-        nextScreen = this.goBack()
-      }
-      nextScreen.then(() => {
-        this.setState({
-          navDebounce: false
-        })
-      })
+    if (buttonId === 'finishRide') {
+      this.finishRide()
+    } else if (buttonId === 'back') {
+      this.goBack()
     }
   }
 
@@ -132,6 +113,11 @@ class RecorderContainer extends PureComponent {
   }
 
   componentDidMount () {
+    if (!this.gpsTimeout) {
+      this.gpsTimeout = setTimeout(() => {
+        this.setState({showGPSBar: false})
+      }, 2000)
+    }
     BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
     if (isAndroid()) {
       LocationServicesDialogBox.checkLocationServicesIsEnabled({
@@ -177,7 +163,7 @@ class RecorderContainer extends PureComponent {
   }
 
   showCamera () {
-    Navigation.push(this.props.componentId, {
+    EqNavigation.push(this.props.componentId, {
       component: {
         name: CAMERA,
         id: CAMERA,
@@ -186,7 +172,7 @@ class RecorderContainer extends PureComponent {
   }
 
   showAtlas () {
-    Navigation.push(this.props.componentId, {
+    EqNavigation.push(this.props.componentId, {
       component: {
         name: RIDE_ATLAS,
         id: RIDE_ATLAS,
@@ -213,7 +199,7 @@ class RecorderContainer extends PureComponent {
   }
 
   discardRide () {
-    Navigation.popToRoot(this.props.componentId).then(() => {
+    EqNavigation.popToRoot(this.props.componentId).then(() => {
       this.props.dispatch(discardCurrentRide())
       this.props.dispatch(stopLocationTracking())
     })
@@ -229,7 +215,7 @@ class RecorderContainer extends PureComponent {
       this.props.currentRideCoordinates,
       this.props.currentRidePhotos,
     ))
-    return Navigation.push(this.props.componentId, {
+    return EqNavigation.push(this.props.componentId, {
       component: {
         name: UPDATE_RIDE,
         id: UPDATE_NEW_RIDE_ID,

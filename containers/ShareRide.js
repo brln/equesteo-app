@@ -22,6 +22,7 @@ import { brand, darkBrand, lightGrey } from '../colors'
 import { isAndroid, logError, logInfo } from '../helpers'
 import UserAPI from '../services/UserApi'
 import URIImage from '../components/Images/URIImage'
+import { EqNavigation } from '../services'
 
 const { width } = Dimensions.get('window')
 
@@ -58,7 +59,7 @@ class ShareRideContainer extends PureComponent {
   navigationButtonPressed({ buttonId }) {
     if (buttonId === 'back') {
       Keyboard.dismiss()
-      Navigation.pop(this.props.componentId)
+      EqNavigation.pop(this.props.componentId)
     }
   }
 

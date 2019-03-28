@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import PhotoLightbox from '../components/PhotoLightbox'
 
 import { logRender } from '../helpers'
+import { EqNavigation } from '../services'
 
 class PhotoLightboxContainer extends PureComponent {
   static options() {
@@ -38,7 +39,7 @@ class PhotoLightboxContainer extends PureComponent {
 
   navigationButtonPressed ({ buttonId }) {
     if (buttonId === 'back') {
-      Navigation.pop(this.props.componentId)
+      EqNavigation.pop(this.props.componentId)
       if (this.props.onClose) {
         this.props.onClose()
       }

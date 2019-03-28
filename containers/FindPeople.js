@@ -9,6 +9,7 @@ import { brand } from '../colors'
 import { logError, logRender } from '../helpers'
 import { PROFILE } from '../screens'
 import FindPeople from '../components/FindPeople'
+import { EqNavigation } from '../services'
 
 class FindPeopleContainer extends PureComponent {
   static options() {
@@ -52,7 +53,7 @@ class FindPeopleContainer extends PureComponent {
   navigationButtonPressed ({ buttonId }) {
     if (buttonId === 'back') {
       Keyboard.dismiss()
-      Navigation.pop(this.props.componentId).then(() => {
+      EqNavigation.pop(this.props.componentId).then(() => {
         this.props.dispatch(clearSearch())
       }).catch(e => logError(e, 'FindPeople.navigationButtonPressed'))
     }
@@ -63,7 +64,7 @@ class FindPeopleContainer extends PureComponent {
     if (!showUser) {
       showUser = profileUser
     }
-    Navigation.push(this.props.componentId, {
+    EqNavigation.push(this.props.componentId, {
       component: {
         name: PROFILE,
         passProps: {

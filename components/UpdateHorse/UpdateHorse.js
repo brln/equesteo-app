@@ -40,16 +40,24 @@ export default class UpdateHorse extends PureComponent {
     this.deletePhoto = this.deletePhoto.bind(this)
     this.pickPhoto = this.pickPhoto.bind(this)
     this.renderHandsPicker = this.renderHandsPicker.bind(this)
+
+    this.debounce = false
   }
 
   pickPhoto () {
-    ImagePicker.openPicker({
-      width: 1080,
-      height: 1080,
-      cropping: true
-    }).then(image => {
-      this.props.stashPhoto(image.path)
-    }).catch(() => {})
+    if (!this.debounce) {
+      this.debounce = true
+      ImagePicker.openPicker({
+        width: 1080,
+        height: 1080,
+        cropping: true,
+      }).then(image => {
+        this.debounce = false
+        this.props.stashPhoto(image.path)
+      }).catch(() => {
+        this.debounce = false
+      })
+    }
   }
 
   changeHorseDetails (newDetails) {

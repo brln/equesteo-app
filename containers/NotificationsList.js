@@ -12,6 +12,7 @@ import { markNotificationSeen } from "../actions/functional"
 import { logRender } from '../helpers'
 import NotificationList from '../components/NotificationsList/NotificationsList'
 import { RIDE } from '../screens'
+import { EqNavigation } from '../services'
 
 class NotificationsListContainer extends PureComponent {
   static options() {
@@ -50,7 +51,7 @@ class NotificationsListContainer extends PureComponent {
 
 
   showRide (rideID, skipToComments) {
-    Navigation.push(this.props.componentId, {
+    EqNavigation.push(this.props.componentId, {
       component: {
         name: RIDE,
         passProps: {

@@ -13,6 +13,7 @@ import { brand, darkGrey, lightGrey } from '../colors'
 import { logRender } from '../helpers'
 import { BARN, FEEDBACK, FIND_PEOPLE, PROFILE } from '../screens'
 import Thumbnail from '../components/Images/Thumbnail'
+import { EqNavigation } from '../services'
 
 const { width } = Dimensions.get('window')
 
@@ -52,7 +53,7 @@ class MoreContainer extends Component {
   }
 
   showFeedback () {
-    Navigation.push(this.props.activeComponent, {
+    EqNavigation.push(this.props.activeComponent, {
       component: {
         name: FEEDBACK,
       }
@@ -60,7 +61,7 @@ class MoreContainer extends Component {
   }
 
   showBarn () {
-    Navigation.push(this.props.activeComponent, {
+    EqNavigation.push(this.props.activeComponent, {
       component: {
         name: BARN,
       }
@@ -68,7 +69,7 @@ class MoreContainer extends Component {
   }
 
   showFindFriends() {
-    Navigation.push(this.props.activeComponent, {
+    EqNavigation.push(this.props.activeComponent, {
       component: {
         name: FIND_PEOPLE,
         title: 'Find Friends',
@@ -77,7 +78,7 @@ class MoreContainer extends Component {
   }
 
   showMyAccount () {
-    Navigation.push(this.props.activeComponent, {
+    EqNavigation.push(this.props.activeComponent, {
       component: {
         name: PROFILE,
         title: 'My Account',

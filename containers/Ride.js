@@ -28,6 +28,7 @@ import {
   RIDE_CHARTS,
   RIDE_TOOLS,
 } from '../screens'
+import { EqNavigation } from '../services'
 
 class RideContainer extends PureComponent {
   static options() {
@@ -64,7 +65,7 @@ class RideContainer extends PureComponent {
 
   navigationButtonPressed({ buttonId }) {
     if (buttonId === 'tools') {
-      Navigation.push(this.props.componentId, {
+      EqNavigation.push(this.props.componentId, {
         component: {
           name: RIDE_TOOLS,
           passProps: {
@@ -76,7 +77,7 @@ class RideContainer extends PureComponent {
       })
     } else if (buttonId === 'back') {
       Keyboard.dismiss()
-      Navigation.pop(this.props.componentId).then(() => {
+      EqNavigation.pop(this.props.componentId).then(() => {
         this.props.dispatch(clearSelectedRideCoordinates())
       })
     }
@@ -118,7 +119,7 @@ class RideContainer extends PureComponent {
   }
 
   viewRideCharts () {
-    Navigation.push(this.props.componentId, {
+    EqNavigation.push(this.props.componentId, {
       component: {
         name: RIDE_CHARTS,
         passProps: {
@@ -148,7 +149,7 @@ class RideContainer extends PureComponent {
   }
 
   showProfile (user) {
-    Navigation.push(this.props.componentId, {
+    EqNavigation.push(this.props.componentId, {
       component: {
         name: PROFILE,
         passProps: {
@@ -175,12 +176,12 @@ class RideContainer extends PureComponent {
   deleteRide () {
     this.props.dispatch(rideUpdated(this.props.ride.set('deleted', true)))
     this.props.dispatch(persistRide(this.props.ride.get('_id'), false, [], [], null, List()))
-    Navigation.pop(this.props.componentId)
+    EqNavigation.pop(this.props.componentId)
   }
 
 
   showPhotoLightbox (sources) {
-    Navigation.push(this.props.componentId, {
+    EqNavigation.push(this.props.componentId, {
       component: {
         name: PHOTO_LIGHTBOX,
         passProps: {
@@ -191,7 +192,7 @@ class RideContainer extends PureComponent {
   }
 
   showFullscreenMap (rideID) {
-    Navigation.push(this.props.componentId, {
+    EqNavigation.push(this.props.componentId, {
       component: {
         name: MAP,
         passProps: { rideID }
@@ -200,7 +201,7 @@ class RideContainer extends PureComponent {
   }
 
   showHorseProfile (horse, ownerID) {
-    Navigation.push(this.props.componentId, {
+    EqNavigation.push(this.props.componentId, {
       component: {
         name: HORSE_PROFILE,
         title: horse.get('name'),

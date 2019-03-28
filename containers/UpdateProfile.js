@@ -13,6 +13,7 @@ import {
 } from "../actions/functional"
 import { brand } from '../colors'
 import { logRender } from '../helpers'
+import { EqNavigation } from '../services'
 import UpdateProfile from '../components/UpdateProfile'
 
 class UpdateProfileContainer extends PureComponent {
@@ -85,7 +86,7 @@ class UpdateProfileContainer extends PureComponent {
   navigationButtonPressed ({ buttonId }) {
     Keyboard.dismiss()
     if (buttonId === 'save') {
-      Navigation.pop(this.props.componentId)
+      EqNavigation.pop(this.props.componentId)
       this.props.dispatch(persistUserUpdate(this.props.user.get('_id'), this.state.deletedPhotoIDs))
     } else if (buttonId === 'back') {
       this.goBack()
@@ -132,7 +133,7 @@ class UpdateProfileContainer extends PureComponent {
 
   goBack () {
     this.props.dispatch(userUpdated(this.state.cachedUser))
-    Navigation.pop(this.props.componentId)
+    EqNavigation.pop(this.props.componentId)
   }
 
   componentDidAppear() {

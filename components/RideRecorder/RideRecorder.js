@@ -125,7 +125,7 @@ export default class RideRecorder extends PureComponent {
       ]).then((granted) => {
         const show = Object.values(granted).filter(p => {
           return p !== PermissionsAndroid.RESULTS.GRANTED
-        }).length > 0
+        }).length === 0
         if (show) {
           this.props.showCamera()
         } else {

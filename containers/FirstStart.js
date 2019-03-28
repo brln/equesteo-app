@@ -19,6 +19,7 @@ import {
 import { brand } from '../colors'
 import { generateUUID, logRender, unixTimeNow } from '../helpers'
 import FirstStart from '../components/FirstStart/FirstStart'
+import { EqNavigation } from '../services'
 
 class FirstStartContainer extends PureComponent {
   static options() {
@@ -163,7 +164,7 @@ class FirstStartContainer extends PureComponent {
     } else if (this.props.horse) {
       this.props.dispatch(deleteUnpersistedHorse(this.props.horse.get('_id'), this.props.horseUser.get('_id')))
     }
-    Navigation.pop(this.props.componentId)
+    EqNavigation.pop(this.props.componentId)
   }
 
   setSkip (pageName, then) {
