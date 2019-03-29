@@ -133,7 +133,7 @@ export default class Ride extends PureComponent {
   }
 
   getPaces (paceHorse) {
-    const speedSource = paceHorse.get('gaitSpeeds') ? paceHorse.get('gaitSpeeds') : DEFAULT_HORSE_SPEEDS
+    const speedSource = paceHorse && paceHorse.get('gaitSpeeds') ? paceHorse.get('gaitSpeeds') : DEFAULT_HORSE_SPEEDS
     return {
       walk: speedSource.get('walk'),
       trot: speedSource.get('trot'),

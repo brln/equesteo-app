@@ -40,7 +40,7 @@ import {
   unixTimeNow
 } from '../helpers'
 import UpdateRide from '../components/UpdateRide/UpdateRide'
-import { RIDE } from '../screens'
+import { PHOTO_LIGHTBOX, RIDE } from '../screens'
 import { catchAsyncError } from '../actions/functional'
 import { EqNavigation } from '../services'
 
@@ -87,6 +87,7 @@ class UpdateRideContainer extends BackgroundComponent {
     this.rideHorses = this.rideHorses.bind(this)
     this.selectHorse = this.selectHorse.bind(this)
     this.setDiscardModalOpen = this.setDiscardModalOpen.bind(this)
+    this.showPhotoLightbox = this.showPhotoLightbox.bind(this)
     this.stashedRidePhotoKey = this.stashedRidePhotoKey.bind(this)
     this.trimRide = this.trimRide.bind(this)
     this.unselectHorse = this.unselectHorse.bind(this)
@@ -411,6 +412,17 @@ class UpdateRideContainer extends BackgroundComponent {
     )
   }
 
+  showPhotoLightbox (sources) {
+    EqNavigation.push(this.props.componentId, {
+      component: {
+        name: PHOTO_LIGHTBOX,
+        passProps: {
+          sources
+        }
+      },
+    })
+  }
+
   horses () {
     return this.props.horseUsers.valueSeq().filter((hu) => {
       return (hu.get('userID') === this.props.userID) && hu.get('deleted') !== true
@@ -518,6 +530,7 @@ class UpdateRideContainer extends BackgroundComponent {
         selectedHorseID={this.state.selectedHorseID}
         selectHorse={this.selectHorse}
         setDiscardModalOpen={this.setDiscardModalOpen}
+        showPhotoLightbox={this.showPhotoLightbox}
         showPhotoMenu={this.state.showPhotoMenu}
         showSelectHorseMenu={this.state.showSelectHorseMenu}
         trimRide={this.trimRide}

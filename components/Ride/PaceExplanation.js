@@ -17,7 +17,7 @@ const { height, width } = Dimensions.get('window')
 export default class PaceExplanationModal extends PureComponent {
   render () {
     let setExplanation = null
-    if (!this.props.paceHorse.get('gaitSpeeds')) {
+    if (!this.props.paceHorse || !this.props.paceHorse.get('gaitSpeeds')) {
       setExplanation = (
         <Text style={{textAlign: 'center'}}>You can set the speeds for your particular horse by going to 'Edit' on their profile.</Text>
       )

@@ -134,7 +134,7 @@ export default class GaitSpeedCard extends PureComponent {
         customMarkerRight={GaitMarkerRight}
         isMarkersSeparated={true}
         ref={r => this.refs[refName] = this}
-        sliderLength={width * (2.1 / 3)}
+        sliderLength={width * (2 / 3)}
         values={this.props.gaitSpeeds.get(refName).toJS()}
         min={0}
         max={30}

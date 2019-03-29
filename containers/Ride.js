@@ -246,16 +246,18 @@ class RideContainer extends PureComponent {
 
   paceHorse (horses, allRideHorses) {
     const rideHorses = this.memoRideHorses(allRideHorses).valueSeq()
-    let paceHorse = horses.get(rideHorses.first().get('horseID'))
-    if (rideHorses.count() > 1) {
-      for (let rideHorse of rideHorses) {
-        if (rideHorse.get('rideHorseType') === 'rider') {
-          paceHorse = horses.get(rideHorse.get('horseID'))
-          break
+    if (rideHorses.count()) {
+      let paceHorse = horses.get(rideHorses.first().get('horseID'))
+      if (rideHorses.count() > 1) {
+        for (let rideHorse of rideHorses) {
+          if (rideHorse.get('rideHorseType') === 'rider') {
+            paceHorse = horses.get(rideHorse.get('horseID'))
+            break
+          }
         }
       }
+      return paceHorse
     }
-    return paceHorse
   }
 
   render() {
