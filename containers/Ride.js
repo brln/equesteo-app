@@ -231,24 +231,9 @@ class RideContainer extends PureComponent {
   }
 
   rideHorses (rideHorses) {
-    // remove this when you've created rideHorses for all old rides and everyone's on > 43
-    let horses = rideHorses.filter(rh => {
+    return rideHorses.filter(rh => {
       return rh.get('rideID') === this.props.ride.get('_id') && rh.get('deleted') !== true
     })
-    if (this.props.ride.get('horseID') && !rideHorses.count()) {
-      horses = fromJS({
-        'a fake ID': {
-        _id: 'a fake ID',
-        rideID: this.props.ride.get('_id'),
-        horseID: this.props.ride.get('horseID'),
-        rideHorseType: 'rider',
-        type: 'rideHorse',
-        timestamp: unixTimeNow(),
-        userID: this.props.userID,
-      }})
-    }
-    // remove this when you've created rideHorses for all old rides and everyone's on > 43
-    return horses
   }
 
   horseOwnerIDs (horseUsers) {
@@ -257,6 +242,20 @@ class RideContainer extends PureComponent {
     }).mapEntries(([horseUserID, horseUser]) => {
       return [horseUser.get('horseID'), horseUser.get('userID')]
     })
+  }
+
+  paceHorse (horses, allRideHorses) {
+    const rideHorses = this.memoRideHorses(allRideHorses).valueSeq()
+    let paceHorse = horses.get(rideHorses.first().get('horseID'))
+    if (rideHorses.count() > 1) {
+      for (let rideHorse of rideHorses) {
+        if (rideHorse.get('rideHorseType') === 'rider') {
+          paceHorse = horses.get(rideHorse.get('horseID'))
+          break
+        }
+      }
+    }
+    return paceHorse
   }
 
   render() {
@@ -270,6 +269,7 @@ class RideContainer extends PureComponent {
         horseOwnerIDs={this.memoHorseOwnerIDs(this.props.horseUsers)}
         modalOpen={this.state.modalOpen}
         newComment={this.state.newComment}
+        paceHorse={this.paceHorse(this.props.horses, this.props.rideHorses)}
         ride={this.props.ride}
         rideUser={this.props.rideUser}
         rideCarrots={this.memoRideCarrots(this.props.rideCarrots)}

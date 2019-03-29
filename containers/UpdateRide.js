@@ -4,6 +4,7 @@ import { Navigation } from 'react-native-navigation'
 import { Keyboard } from 'react-native'
 import React from 'react'
 import { connect } from 'react-redux';
+
 import {
   clearRidePhotoStash,
   clearPausedLocations,

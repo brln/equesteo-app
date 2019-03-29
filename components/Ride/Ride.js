@@ -23,6 +23,7 @@ import CarrotCard from './CarrotCard'
 import { brand, darkBrand, darkGrey } from '../../colors'
 import HorseCard from './HorseCard'
 import {
+  DEFAULT_HORSE_SPEEDS,
   haversine,
   logRender,
   logInfo,
@@ -131,14 +132,25 @@ export default class Ride extends PureComponent {
     }
   }
 
+  getPaces (paceHorse) {
+    const speedSource = paceHorse.get('gaitSpeeds') ? paceHorse.get('gaitSpeeds') : DEFAULT_HORSE_SPEEDS
+    return {
+      walk: speedSource.get('walk'),
+      trot: speedSource.get('trot'),
+      canter: speedSource.get('canter'),
+      gallop: speedSource.get('gallop'),
+    }
+  }
 
-  parsePaceData (rideCoordinates) {
+
+  parsePaceData (rideCoordinates, paceHorse) {
     let lastPoint = null
+    const paces = this.getPaces(paceHorse)
     const paceBuckets = [
-      {x: 1, min: 0, max: 6, distance: 0, time: 0, color: speedGradient(1), label: "Walk"},
-      {x: 2, min: 6, max: 10, distance: 0, time: 0, color: speedGradient(6), label: "Trot"},
-      {x: 3, min: 10, max: 24, distance: 0, time: 0, color: speedGradient(12), label: "Canter"},
-      {x: 4, min: 24, max: 1000, distance: 0, time: 0, color: speedGradient(24), label: "Gallop"}
+      {x: 1, min: 0, max: paces.walk.get(1), distance: 0, time: 0, color: speedGradient(0), label: "Walk"},
+      {x: 2, min: paces.trot.get(0), max: paces.trot.get(1), distance: 0, time: 0, color: speedGradient(paces.trot.get(0)), label: "Trot"},
+      {x: 3, min: paces.canter.get(0), max: paces.canter.get(1), distance: 0, time: 0, color: speedGradient(paces.canter.get(0)), label: "Canter"},
+      {x: 4, min: paces.gallop.get(0), max: 1000, distance: 0, time: 0, color: speedGradient(paces.gallop.get(0)), label: "Gallop"}
     ]
 
     for (let rideCoord of rideCoordinates) {
@@ -267,7 +279,7 @@ export default class Ride extends PureComponent {
         <Text>Not enough data for pace chart.</Text>
       </View>
     )
-    let speedData = this.memoizedParsePaceData(this.props.rideCoordinates.get('rideCoordinates'))
+    let speedData = this.memoizedParsePaceData(this.props.rideCoordinates.get('rideCoordinates'), this.props.paceHorse)
     if (this.props.rideCoordinates.get('rideCoordinates').count() >= 5) {
       paceChart = (
         <PaceChart
@@ -303,6 +315,8 @@ export default class Ride extends PureComponent {
         <PaceExplanationModal
           modalOpen={this.state.paceExplanationOpen}
           closeModal={this.setPaceModalOpen(false)}
+          paces={this.getPaces(this.props.paceHorse)}
+          paceHorse={this.props.paceHorse}
         />
         <DeleteModal
           modalOpen={this.props.modalOpen}

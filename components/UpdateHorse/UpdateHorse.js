@@ -21,7 +21,8 @@ import { brand, darkBrand } from '../../colors'
 import PhotoFab from './PhotoFab'
 import PhotosByTimestamp from '../PhotosByTimestamp'
 import PhotoMenu from '../PhotoMenu'
-
+import GaitSpeedCard from './GaitSpeedCard'
+import { DEFAULT_HORSE_SPEEDS } from "../../helpers"
 
 export default class UpdateHorse extends PureComponent {
   constructor (props) {
@@ -32,6 +33,7 @@ export default class UpdateHorse extends PureComponent {
     this.changeHorseBreed = this.changeHorseBreed.bind(this)
     this.changeHorseDescription = this.changeHorseDescription.bind(this)
     this.changeHorseDetails = this.changeHorseDetails.bind(this)
+    this.changeHorseGaitSpeeds = this.changeHorseGaitSpeeds.bind(this)
     this.changeHorseHeightInches = this.changeHorseHeightInches.bind(this)
     this.changeHorseHeightHands = this.changeHorseHeightHands.bind(this)
     this.changeHorseName = this.changeHorseName.bind(this)
@@ -74,6 +76,10 @@ export default class UpdateHorse extends PureComponent {
   deletePhoto () {
     this.props.markPhotoDeleted(this.props.selectedPhotoID)
     this.props.clearPhotoMenu()
+  }
+
+  changeHorseGaitSpeeds (newSpeeds) {
+    this.changeHorseDetails({gaitSpeeds: newSpeeds})
   }
 
   changeHorseBirthDay (birthDay) {
@@ -335,7 +341,7 @@ export default class UpdateHorse extends PureComponent {
                 </CardItem>
                 <CardItem cardBody style={{marginLeft: 20, marginRight: 20}}>
                   <TouchableOpacity
-                    style={{height: 40, width: '100%', backgroundColor: this.props.horse.get('color') || brand}}
+                    style={{height: 40, width: '100%', backgroundColor: this.props.horse.get('color') || brand, borderRadius: 4}}
                     onPress={this.props.openColorModal(true)}
                   />
                 </CardItem>
@@ -382,6 +388,11 @@ export default class UpdateHorse extends PureComponent {
                   </View>
                 </CardItem>
               </Card>
+
+              <GaitSpeedCard
+                changeHorseGaitSpeeds={this.changeHorseGaitSpeeds}
+                gaitSpeeds={this.props.horse.get('gaitSpeeds') || DEFAULT_HORSE_SPEEDS}
+              />
 
               <Card>
                 <CardItem header>

@@ -16,6 +16,12 @@ const { height, width } = Dimensions.get('window')
 
 export default class PaceExplanationModal extends PureComponent {
   render () {
+    let setExplanation = null
+    if (!this.props.paceHorse.get('gaitSpeeds')) {
+      setExplanation = (
+        <Text style={{textAlign: 'center'}}>You can set the speeds for your particular horse by going to 'Edit' on their profile.</Text>
+      )
+    }
     return (
       <Modal
         coverScreen={true}
@@ -25,16 +31,16 @@ export default class PaceExplanationModal extends PureComponent {
         onClosed={this.props.closeModal}
       >
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', paddingLeft: 20, paddingRight: 20}}>
-          <Text style={{textAlign: 'center'}}>This is not a fancy gait analysis, just an estimate based on your speed.</Text>
+          <Text style={{textAlign: 'center'}}>This is an estimate of gait based on speed.</Text>
           <Text />
-          <Text style={{textAlign: 'center'}}>The gait speeds are estimated as follows:</Text>
+          { setExplanation }
           <Text />
-          <Text style={{textAlign: 'center'}}>Walk: 0 - 6 mph</Text>
-          <Text style={{textAlign: 'center'}}>Trot: 6 - 10 mph</Text>
-          <Text style={{textAlign: 'center'}}>Canter: 10 - 24 mph</Text>
-          <Text style={{textAlign: 'center'}}>Gallop: > 24 mph</Text>
+          <Text style={{textAlign: 'center'}}>The gait speeds for this horse are set to:</Text>
           <Text />
-          <Text style={{textAlign: 'center'}}>If you think we're wrong, or have strong feelings about this, we'd love to hear about it. info@equesteo.com</Text>
+          <Text style={{textAlign: 'center'}}>Walk: 0 - {this.props.paces.walk.get(1)} mph</Text>
+          <Text style={{textAlign: 'center'}}>Trot: {this.props.paces.trot.get(0)} - {this.props.paces.trot.get(1)}mph</Text>
+          <Text style={{textAlign: 'center'}}>Canter: {this.props.paces.canter.get(0)} - {this.props.paces.canter.get(1)} mph</Text>
+          <Text style={{textAlign: 'center'}}>Gallop: > {this.props.paces.gallop.get(0)} mph</Text>
         </View>
       </Modal>
     )

@@ -5,6 +5,13 @@ import { Platform } from 'react-native'
 
 import { MAPBOX_TOKEN } from './dotEnv'
 
+export const DEFAULT_HORSE_SPEEDS = Map({
+  walk: List([0, 6]),
+  trot: List([6, 12]),
+  canter: List([12, 25]),
+  gallop: List([25, 30]),
+})
+
 
 const toRad = (deg) => {
   return deg * Math.PI / 180;
@@ -278,6 +285,8 @@ export function boundingBox (rideCoordinates) {
 
 export function speedGradient (speed) {
   switch (Math.floor(speed)) {
+    case 0:
+      return "#5A35DE"
     case 1:
       return "#5A35DE"
     case 2:

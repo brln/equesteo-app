@@ -101,16 +101,3 @@ export default class Feed extends PureComponent {
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'stretch',
-    backgroundColor: '#F5FCFF',
-  },
-  header: {
-    padding: 20,
-    fontSize: 24,
-    fontWeight: 'bold'
-  }
-})
