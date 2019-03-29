@@ -16,6 +16,7 @@ import {
   Fab,
 } from 'native-base'
 import ImagePicker from 'react-native-image-crop-picker'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import MultiSlider from '@ptomasroos/react-native-multi-slider'
 
@@ -156,7 +157,7 @@ export default class UpdateRide extends PureComponent {
             text={"Are you sure you want to discard this ride?"}
             deleteFunc={this.props.discardRide}
           />
-          <ScrollView>
+          <KeyboardAwareScrollView>
             <View style={styles.container}>
               <Card style={{flex: 1}}>
                 <CardItem header style={{padding: 5}}>
@@ -286,7 +287,7 @@ export default class UpdateRide extends PureComponent {
                 </View>
               </Card>
             </View>
-          </ScrollView>
+          </KeyboardAwareScrollView>
           <PhotoMenu
             changeProfilePhotoID={this.changeCoverPhoto}
             deletePhoto={this.deletePhoto}

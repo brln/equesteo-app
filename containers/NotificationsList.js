@@ -1,7 +1,6 @@
 import memoizeOne from 'memoize-one'
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
-import { Navigation } from 'react-native-navigation'
 import { View, Text } from 'react-native'
 import PushNotification from 'react-native-push-notification'
 import firebase from 'react-native-firebase'
@@ -75,19 +74,19 @@ class NotificationsListContainer extends PureComponent {
     this.props.dispatch(markNotificationSeen(theNotification))
   }
 
-  allNotifications (notifications) {
+  allNotifications (notifications, rides) {
     return notifications.valueSeq().filter(n => {
-      return n.get('seen') !== true
+      return n.get('seen') !== true && rides.get(n.get('rideID'))
     })
   }
 
   render() {
     logRender('NotificationsListContainer')
-    if (this.memoAllNotifications(this.props.notifications).count()) {
+    if (this.memoAllNotifications(this.props.notifications, this.props.rides).count()) {
       return (
         <NotificationList
           justClear={this.justClear}
-          notifications={this.memoAllNotifications(this.props.notifications)}
+          notifications={this.memoAllNotifications(this.props.notifications, this.props.rides)}
           showAndClear={this.showAndClear}
         />
       )
@@ -104,7 +103,8 @@ class NotificationsListContainer extends PureComponent {
 function mapStateToProps (state, passedProps) {
   const pouchState = state.get('pouchRecords')
   return {
-    notifications: pouchState.get('notifications')
+    notifications: pouchState.get('notifications'),
+    rides: pouchState.get('rides'),
   }
 }
 

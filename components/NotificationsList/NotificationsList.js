@@ -43,14 +43,14 @@ export default class NotificationsList extends PureComponent {
     return (
       <TouchableOpacity key={item._id} onPress={onPress} style={styles.rowFront}>
         <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
-          <View style={{flex: 1, paddingRight: 20}}>
+          <View style={{flex: 1, paddingRight: 20, paddingTop: 10}}>
             <BuildImage
               source={icon}
               style={{width: height / 18, height: height / 18}}
             />
           </View>
           <View style={{flex: 8, justifyContent: 'center'}}>
-            <Text style={{flex: 1, flexWrap: 'wrap'}}>{message}</Text>
+            <Text style={{flex: 1, flexWrap: 'wrap', textAlignVertical: 'center'}}>{message}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -95,8 +95,8 @@ const styles = StyleSheet.create({
 		borderBottomColor: 'black',
 		borderBottomWidth: 1,
 		justifyContent: 'center',
-		height: height / 9,
-		padding: 20
+		minHeight: height / 10,
+		padding: 10
 	},
 	rowBack: {
 		alignItems: 'center',
