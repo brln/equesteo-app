@@ -906,7 +906,6 @@ function startActiveComponentListener () {
   cb('startActiveComponentListener')
   return (dispatch, getState) => {
     Navigation.events().registerComponentDidAppearListener( ( { componentId } ) => {
-      logDebug(componentId, 'registerCDAL')
       if (componentId !== DRAWER && componentId !== RIDE_BUTTON && componentId !== NOTIFICATION_BUTTON) {
         dispatch(setActiveComponent(componentId))
       }

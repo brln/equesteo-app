@@ -28,7 +28,10 @@ export default class CarrotCard extends PureComponent {
     })
     return (
       <CarrotList
+        rideCarrots={this.props.rideCarrots}
         showProfile={this.props.showProfile}
+        toggleCarrot={this.props.toggleCarrot}
+        userID={this.props.userID}
         users={carrotUsers}
         userPhotos={this.props.userPhotos}
       />
@@ -36,30 +39,26 @@ export default class CarrotCard extends PureComponent {
   }
 
   render () {
-    if (this.props.rideCarrots.count() > 0) {
-      return (
-        <Card style={{flex: 1}}>
-          <CardItem header style={{padding: 5}}>
-            <View style={{paddingLeft: 5, flex: 1, flexDirection: 'row'}}>
-              <View style={{flex: 1}}>
-                <BuildImage
-                  source={require('../../img/carrot.png')}
-                  style={{flex: 1, height: iconWidth, width: iconWidth, resizeMode: 'contain'}}
-                />
-              </View>
-              <View style={{flex: 5, justifyContent: 'center'}}>
-                <Text style={{color: darkBrand }}>Carrots</Text>
-              </View>
+    return (
+      <Card style={{flex: 1}}>
+        <CardItem header style={{padding: 5}}>
+          <View style={{paddingLeft: 5, flex: 1, flexDirection: 'row'}}>
+            <View style={{flex: 1}}>
+              <BuildImage
+                source={require('../../img/carrot.png')}
+                style={{flex: 1, height: iconWidth, width: iconWidth, resizeMode: 'contain'}}
+              />
             </View>
-          </CardItem>
-          <CardItem cardBody style={{ flex: 1 }}>
-            { this.carrots() }
-          </CardItem>
-        </Card>
-      )
-    } else {
-      return null
-    }
+            <View style={{flex: 5, justifyContent: 'center'}}>
+              <Text style={{color: darkBrand }}>Carrots</Text>
+            </View>
+          </View>
+        </CardItem>
+        <CardItem cardBody style={{ flex: 1 }}>
+          { this.carrots() }
+        </CardItem>
+      </Card>
+    )
   }
 }
 

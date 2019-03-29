@@ -17,6 +17,7 @@ import {
   loadRideCoordinates,
   loadRideElevations,
   persistRide,
+  toggleRideCarrot,
 } from '../actions/functional'
 import { brand } from '../colors'
 import { logRender, unixTimeNow } from '../helpers'
@@ -98,6 +99,7 @@ class RideContainer extends PureComponent {
     this.showPhotoLightbox = this.showPhotoLightbox.bind(this)
     this.showProfile = this.showProfile.bind(this)
     this.submitComment = this.submitComment.bind(this)
+    this.toggleCarrot = this.toggleCarrot.bind(this)
     this.updateNewComment = this.updateNewComment.bind(this)
     this.viewRideCharts = this.viewRideCharts.bind(this)
 
@@ -225,9 +227,11 @@ class RideContainer extends PureComponent {
   }
 
   rideCarrots (rideCarrots) {
-    return rideCarrots.valueSeq().filter(
-      (rc) => rc.get('rideID') === this.props.ride.get('_id')
+    const carrots = rideCarrots.valueSeq().filter(
+      (rc) => rc.get('rideID') === this.props.ride.get('_id') && rc.get('deleted') !== true
     ).toList()
+    console.log(carrots.toJSON())
+    return carrots
   }
 
   rideHorses (rideHorses) {
@@ -260,6 +264,10 @@ class RideContainer extends PureComponent {
     }
   }
 
+  toggleCarrot () {
+    this.props.dispatch(toggleRideCarrot(this.props.ride.get('_id')))
+  }
+
   render() {
     logRender('RideContainer')
     return (
@@ -286,6 +294,7 @@ class RideContainer extends PureComponent {
         showProfile={this.showProfile}
         skipToComments={this.props.skipToComments}
         submitComment={this.submitComment}
+        toggleCarrot={this.toggleCarrot}
         updateNewComment={this.updateNewComment}
         userID={this.props.userID}
         userPhotos={this.props.userPhotos}

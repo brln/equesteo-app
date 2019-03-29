@@ -29,11 +29,15 @@ export default class CarrotList extends PureComponent {
   }
 
   renderResult ({item}) {
+    let toDo = this.showProfile(item)
+    if (item._id === this.props.userID) {
+      toDo = this.props.toggleCarrot
+    }
     return (
       <View style={{flex: 1}}>
         <TouchableOpacity
           style={{height: 80}}
-          onPress={this.showProfile(item)}
+          onPress={toDo}
         >
           <View style={{flex: 1, flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: darkGrey, padding: 20}}>
             <View style={{flex: 1, justifyContent:'center'}}>
@@ -55,7 +59,39 @@ export default class CarrotList extends PureComponent {
     )
   }
 
+  giveCarrot () {
+    const hasGiven = this.props.rideCarrots.filter(rc => {
+      return rc.get('userID') === this.props.userID && rc.deleted !== true
+    }).count() > 0
+    if (!hasGiven) {
+      return (
+        <View style={{flex: 1}}>
+          <TouchableOpacity
+            style={{height: 80}}
+            onPress={this.props.toggleCarrot}
+          >
+            <View style={{flex: 1, flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: darkGrey, padding: 20}}>
+              <View style={{flex: 1, justifyContent:'center'}}>
+                <Thumbnail
+                  emptySource={require('../../img/plus.png')}
+                  empty={true}
+                  height={width / 7}
+                  width={width/ 7}
+                  round={true}
+                />
+              </View>
+              <View style={{flex: 3, justifyContent: 'center'}}>
+                <Text>Give Carrot</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
+      )
+    }
+  }
+
   render() {
+    console.log(this.props.rideCarrots.toJSON())
     return (
       <View style={styles.container}>
         <ScrollView style={{flex: 1, borderTopWidth: 2, borderTopColor: lightGrey}}>
@@ -65,6 +101,7 @@ export default class CarrotList extends PureComponent {
             data={this.props.users.toJS()}
             renderItem={this.renderResult}
           />
+          { this.giveCarrot() }
         </ScrollView>
       </View>
     )

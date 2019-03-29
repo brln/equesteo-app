@@ -400,8 +400,10 @@ export default class Ride extends PureComponent {
             <CarrotCard
               rideCarrots={this.props.rideCarrots}
               showProfile={this.props.showProfile}
+              toggleCarrot={this.props.toggleCarrot}
               users={this.props.users}
               userPhotos={this.props.userPhotos}
+              userID={this.props.userID}
             />
 
             <Card style={{flex: 1}}>
