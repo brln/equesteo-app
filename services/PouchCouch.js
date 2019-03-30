@@ -112,17 +112,17 @@ export default class PouchCouch {
     return ApiClient.checkAuth()
   }
 
-  static localReplicateDBs (ownUserID, followingUserIDs, followerUserIDs) {
+  static localReplicateDBs (ownUserID, followingUserIDs, followerUserIDs, progress) {
     let options
     return PouchCouch.preReplicate().then(_options => {
       options = _options
       return PouchCouch.getLeaderboardIDs(options)
     }).then((leaderboardIDs) => {
       return Promise.all([
-        PouchCouch.localReplicateHorses(options, [ownUserID, ...followingUserIDs, ...followerUserIDs, ...leaderboardIDs]),
-        PouchCouch.localReplicateNotifications(options, ownUserID),
-        PouchCouch.localReplicateRides(options, ownUserID, [ownUserID, ...followingUserIDs], followerUserIDs),
-        PouchCouch.localReplicateUsers(options, ownUserID, leaderboardIDs),
+        PouchCouch.localReplicateHorses(options, [ownUserID, ...followingUserIDs, ...followerUserIDs, ...leaderboardIDs], progress),
+        PouchCouch.localReplicateNotifications(options, ownUserID, progress),
+        PouchCouch.localReplicateRides(options, ownUserID, [ownUserID, ...followingUserIDs], followerUserIDs, progress),
+        PouchCouch.localReplicateUsers(options, ownUserID, leaderboardIDs, progress),
       ])
     }).then(() => {
       return PouchCouch.postReplicate()
@@ -139,116 +139,153 @@ export default class PouchCouch {
     })
   }
 
-  static localReplicateRides (options, ownUserID, userIDs, followerUserIDs) {
+  static localReplicateRides (options, ownUserID, userIDs, followerUserIDs, progress) {
+    const remoteRidesDB = new PouchDB(`${API_URL}/couchproxy/${ridesDBName}`, options)
     return new Promise((resolve, reject) => {
-      const remoteRidesDB = new PouchDB(`${API_URL}/couchproxy/${ridesDBName}`, options)
-      PouchDB.replicate(
-        remoteRidesDB,
-        localRidesDB,
-        {
-          batch_size: 500,
-          live: false,
-          filter: 'rides/byUserIDs',
-          query_params: {
-            userIDs: userIDs.join(','),
-            followerUserIDs: followerUserIDs.join(','),
-            ownUserID,
-          }
-        }
-      ).on('complete', (resp) => {
-        resolve(resp)
-      }).on('error', PouchCouch.errorHandler(reject))
-    })
-  }
-
-  static localReplicateNotifications (options, ownUserID) {
-    return new Promise((resolve, reject) => {
-      const remoteNotificationsDB = new PouchDB(`${API_URL}/couchproxy/${notificationsDBName}`, options)
-      PouchDB.replicate(
-        remoteNotificationsDB,
-        localNotificationsDB,
-        {
-          batch_size: 500,
-          live: false,
-          filter: 'notifications/byUserIDs',
-          query_params: {
-            ownUserID,
-          }
-        }
-      ).on('complete', (resp) => {
-        resolve(resp)
-      }).on('error', PouchCouch.errorHandler(reject))
-    })
-  }
-
-  static localReplicateUsers (options, ownUserID, userIDs) {
-    return new Promise((resolve, reject) => {
-      const remoteUsersDB = new PouchDB(`${API_URL}/couchproxy/${usersDBName}`, options)
-      const firstFetchIDs = userIDs
-      remoteUsersDB.query('users/relevantFollows', {key: ownUserID}).then((resp) => {
-        resp.rows.reduce((fetchIDs, row) => {
-          if (fetchIDs.indexOf(row.value[0]) < 0) {
-            fetchIDs.push(row.value[0])
-          }
-          return fetchIDs
-        }, firstFetchIDs)
-        return remoteUsersDB.query('users/relevantFollows', {keys: firstFetchIDs})
-      }).then(resp2 => {
-        const fetchIDs = resp2.rows.reduce((fetchIDs, row) => {
-          if (fetchIDs.indexOf(row.value[0]) < 0) {
-            fetchIDs.push(row.value[0])
-          }
-          return fetchIDs
-        }, [])
-        return PouchDB.replicate(
-          remoteUsersDB,
-          localUsersDB,
+      remoteRidesDB.info().then(resp => {
+        console.log(resp)
+        const docs = parseInt(resp.update_seq.split('-')[0])
+        logDebug(docs, 'ridesTotal')
+        progress.moreDocsFunc(docs)
+        PouchDB.replicate(
+          remoteRidesDB,
+          localRidesDB,
           {
-            batch_size: 500,
+            batch_size: 1000,
             live: false,
-            filter: 'users/byUserIDs2',
+            filter: 'rides/byUserIDs',
+            query_params: {
+              userIDs: userIDs.join(','),
+              followerUserIDs: followerUserIDs.join(','),
+              ownUserID,
+            }
+          }
+        ).on('complete', (resp) => {
+          resolve(resp)
+        }).on('change', (info) => {
+          const docs = parseInt(info.last_seq.split('-')[0])
+          logDebug(docs, 'ridesDocs')
+          progress.doneDocsFunc(docs, 'rides')
+        }).on('error', PouchCouch.errorHandler(reject))
+      })
+    })
+  }
+
+  static localReplicateNotifications (options, ownUserID, progress) {
+    const remoteNotificationsDB = new PouchDB(`${API_URL}/couchproxy/${notificationsDBName}`, options)
+    return new Promise((resolve, reject) => {
+      remoteNotificationsDB.info().then(resp => {
+        const docs = parseInt(resp.update_seq.split('-')[0])
+        logDebug(docs, 'notTotal')
+        progress.moreDocsFunc(docs)
+        PouchDB.replicate(
+          remoteNotificationsDB,
+          localNotificationsDB,
+          {
+            batch_size: 1000,
+            live: false,
+            filter: 'notifications/byUserIDs',
             query_params: {
               ownUserID,
-              userIDs: fetchIDs.concat(firstFetchIDs)
             }
           }
-        ).on('complete', () => {
-          resolve()
+        ).on('complete', (resp) => {
+          resolve(resp)
+        }).on('change', (info) => {
+          // @TODO this sends the total number, not the number each change
+          const docs = parseInt(info.last_seq.split('-')[0])
+          logDebug(docs, 'notDocs')
+          progress.doneDocsFunc(docs, 'notifications')
         }).on('error', PouchCouch.errorHandler(reject))
-      }).catch(PouchCouch.errorHandler(reject))
+      })
     })
   }
 
-  static localReplicateHorses (options, userIDs) {
+  static localReplicateUsers (options, ownUserID, userIDs, progress) {
+    const remoteUsersDB = new PouchDB(`${API_URL}/couchproxy/${usersDBName}`, options)
     return new Promise((resolve, reject) => {
-      const remoteHorsesDB = new PouchDB(`${API_URL}/couchproxy/${horsesDBName}`, options)
-      remoteHorsesDB.query('horses/allJoins', {keys: userIDs}).then((resp) => {
-        const fetchIDs = []
-        for (let row of resp.rows) {
-          const joinID = row.id
-          const userID = row.key
-          const horseID = row.value
-          if (userIDs.indexOf(userID) >= 0) {
-            fetchIDs.push(joinID)
-            if (fetchIDs.indexOf(horseID) < 0) {
-              fetchIDs.push(horseID)
+      remoteUsersDB.info().then(resp => {
+        const docs = parseInt(resp.update_seq.split('-')[0])
+        logDebug(docs, 'usersTotal')
+        progress.moreDocsFunc(docs)
+        const firstFetchIDs = userIDs
+        remoteUsersDB.query('users/relevantFollows', {key: ownUserID}).then((resp) => {
+          resp.rows.reduce((fetchIDs, row) => {
+            if (fetchIDs.indexOf(row.value[0]) < 0) {
+              fetchIDs.push(row.value[0])
+            }
+            return fetchIDs
+          }, firstFetchIDs)
+          return remoteUsersDB.query('users/relevantFollows', {keys: firstFetchIDs})
+        }).then(resp2 => {
+          const fetchIDs = resp2.rows.reduce((fetchIDs, row) => {
+            if (fetchIDs.indexOf(row.value[0]) < 0) {
+              fetchIDs.push(row.value[0])
+            }
+            return fetchIDs
+          }, [])
+          return PouchDB.replicate(
+            remoteUsersDB,
+            localUsersDB,
+            {
+              batch_size: 1000,
+              live: false,
+              filter: 'users/byUserIDs2',
+              query_params: {
+                ownUserID,
+                userIDs: fetchIDs.concat(firstFetchIDs)
+              }
+            }
+          ).on('complete', () => {
+            resolve()
+          }).on('change', (info) => {
+            const docs = parseInt(info.last_seq.split('-')[0])
+            progress.doneDocsFunc(docs, 'users')
+          }).on('error', PouchCouch.errorHandler(reject))
+        }).catch(PouchCouch.errorHandler(reject))
+      })
+    })
+  }
+
+  static localReplicateHorses (options, userIDs, progress) {
+    const remoteHorsesDB = new PouchDB(`${API_URL}/couchproxy/${horsesDBName}`, options)
+    return new Promise((resolve, reject) => {
+      remoteHorsesDB.info().then(resp => {
+        const docs = parseInt(resp.update_seq.split('-')[0])
+        logDebug(docs, 'horsesTotal')
+        progress.moreDocsFunc(docs)
+        remoteHorsesDB.query('horses/allJoins', {keys: userIDs}).then((resp) => {
+          const fetchIDs = []
+          for (let row of resp.rows) {
+            const joinID = row.id
+            const userID = row.key
+            const horseID = row.value
+            if (userIDs.indexOf(userID) >= 0) {
+              fetchIDs.push(joinID)
+              if (fetchIDs.indexOf(horseID) < 0) {
+                fetchIDs.push(horseID)
+              }
             }
           }
-        }
-        return fetchIDs
-      }).then(fetchIDs => {
-        PouchDB.replicate(
-          remoteHorsesDB,
-          localHorsesDB,
-          {
-            batch_size: 500,
-            live: false,
-            doc_ids: fetchIDs,
-          }
-        ).on('complete', () => {
-          resolve()
-        }).on('error', PouchCouch.errorHandler(reject))
-      }).catch(PouchCouch.errorHandler(reject))
+          return fetchIDs
+        }).then(fetchIDs => {
+          PouchDB.replicate(
+            remoteHorsesDB,
+            localHorsesDB,
+            {
+              batch_size: 1000,
+              live: false,
+              doc_ids: fetchIDs,
+            }
+          ).on('complete', () => {
+            resolve()
+          }).on('change', (info) => {
+            const docs = parseInt(info.last_seq.split('-')[0])
+            logDebug(docs, 'horsesDocs')
+            progress.doneDocsFunc(docs, 'horses')
+          }).on('error', PouchCouch.errorHandler(reject))
+        }).catch(PouchCouch.errorHandler(reject))
+      })
     })
   }
 

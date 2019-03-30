@@ -5,7 +5,9 @@ import { appStates, logError, unixTimeNow } from '../helpers'
 import { DB_NEEDS_SYNC, DB_SYNCING, DB_SYNCED } from "../actions/functional"
 
 import {
+  ADD_DOCS_TO_DOWNLOAD,
   CARROT_MUTEX,
+  CLEAR_DOCS_NUMBERS,
   CLEAR_FEED_MESSAGE,
   CLEAR_RIDE_PHOTO_FROM_STASH,
   CLEAR_RIDE_PHOTO_STASH,
@@ -35,8 +37,15 @@ import {
   STASH_RIDE_PHOTO,
   SYNC_COMPLETE,
   UPDATE_PHOTO_STATUS,
-  USER_SEARCH_RETURNED
+  USER_SEARCH_RETURNED, ADD_DOCS_DOWNLOADED,
 } from '../constants'
+
+const initialDocsDownloaded = Map({
+  'horses': 0,
+  'rides': 0,
+  'users': 0,
+  'notifications': 0,
+})
 
 export const initialState = Map({
   activeAtlasEntry: null,
@@ -45,6 +54,8 @@ export const initialState = Map({
   awaitingPWChange: false,
   carrotMutex: false,
   currentScreen: FEED,
+  docsToDownload: 0,
+  docsDownloaded: initialDocsDownloaded,
   doingInitialLoad: false,
   error: null,
   feedMessage: null,
@@ -66,6 +77,12 @@ export const initialState = Map({
 
 export default function LocalStateReducer(state=initialState, action) {
   switch (action.type) {
+    case ADD_DOCS_DOWNLOADED:
+      return state.setIn(['docsDownloaded', action.db], action.num)
+    case ADD_DOCS_TO_DOWNLOAD:
+      return state.set('docsToDownload', state.get('docsToDownload') + action.num)
+    case CLEAR_DOCS_NUMBERS:
+      return state.set('docsToDownload', 0).set('docsDownloaded', initialDocsDownloaded)
     case CARROT_MUTEX:
       return state.set('carrotMutex', action.value)
     case CLEAR_FEED_MESSAGE:

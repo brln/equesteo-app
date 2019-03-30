@@ -46,7 +46,10 @@ import {
 } from '../services'
 import { makeMessage } from '../modelHelpers/notification'
 import {
+  addDocsDownloaded,
+  addDocsToDownload,
   carrotMutex,
+  clearDocsNumbers,
   clearLastLocation,
   clearFeedMessage,
   clearState,
@@ -971,7 +974,18 @@ export function doSync (syncData={}, showProgress=true) {
       }
     }
 
+    const progress = {
+      doneDocsFunc: (num, db) => {
+        dispatch(addDocsDownloaded(num, db))
+      },
+      moreDocsFunc: (num) => {
+        dispatch(addDocsToDownload(num))
+      }
+    }
+
+
     if (getState().getIn(['localState', 'goodConnection'])) {
+      dispatch(clearDocsNumbers())
       dispatch(runPhotoQueue())
 
       const remotePersistStatus = getState().getIn(['localState', 'needsRemotePersist'])
@@ -1010,7 +1024,7 @@ export function doSync (syncData={}, showProgress=true) {
           ).toJS()
         }
         feedMessage('Downloading...', warning, null)
-        return PouchCouch.localReplicateDBs(userID, followingIDs, followerIDs)
+        return PouchCouch.localReplicateDBs(userID, followingIDs, followerIDs, progress)
       }).then(() => {
         feedMessage('Calculating...', warning, null)
         return PouchCouch.localLoad()

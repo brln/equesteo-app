@@ -33,6 +33,7 @@
     "react-native-modalbox": "^1.5.0",
     "react-native-navigation": "^2.10.0",
     "react-native-picker-select": "^4.4.0",
+    "react-native-progress": "^3.6.0",
     "react-native-push-notification": "3.1.1",
     "react-native-sentry": "^0.40.2",
     "react-native-svg": "^6.5.0",

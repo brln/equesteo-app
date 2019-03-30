@@ -1,5 +1,8 @@
 import {
+  ADD_DOCS_DOWNLOADED,
+  ADD_DOCS_TO_DOWNLOAD,
   CARROT_MUTEX,
+  CLEAR_DOCS_NUMBERS,
   CLEAR_FEED_MESSAGE,
   CLEAR_LAST_LOCATION,
   CLEAR_PAUSED_LOCATIONS,
@@ -69,6 +72,27 @@ import {
   USER_SEARCH_RETURNED,
   USER_UPDATED,
 } from '../constants'
+
+export function addDocsDownloaded (num, db) {
+  return {
+    type: ADD_DOCS_DOWNLOADED,
+    num,
+    db
+  }
+}
+
+export function addDocsToDownload (num) {
+  return {
+    type: ADD_DOCS_TO_DOWNLOAD,
+    num
+  }
+}
+
+export function clearDocsNumbers () {
+  return {
+    type: CLEAR_DOCS_NUMBERS,
+  }
+}
 
 export function carrotMutex (value) {
   return {

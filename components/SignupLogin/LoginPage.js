@@ -7,10 +7,12 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import * as Progress from 'react-native-progress';
 
 import Button from '../Button'
 import { brand, darkBrand } from '../../colors'
 import LoginForm from './LoginForm'
+
 
 const { height } = Dimensions.get('window')
 
@@ -97,9 +99,16 @@ export default class LoginPage extends PureComponent {
   }
 
   _renderLoading () {
+    const outOf = this.props.docsToDownload
+    const done = this.props.docsDownloaded.valueSeq().reduce((a, x) => a + x, 0)
+    logDebug(outOf, 'outOf')
+    logDebug(done, 'done')
+    logDebug((done / outOf) || 0)
     return (
-      <View style={{paddingTop: height / 3}}>
-        <ActivityIndicator size="large" color={darkBrand} />
+      <View style={{paddingTop: height / 3, alignItems: 'center'}}>
+        <View style={{paddingBottom: 20}}>
+          <Progress.Pie color={brand} indeterminate={outOf === 0} progress={(done / outOf) || 0} size={50} />
+        </View>
         <Text style={{textAlign: 'center', color: darkBrand}}>Loading Data...</Text>
       </View>
     )

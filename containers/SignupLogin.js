@@ -11,6 +11,7 @@ import {
   View
 } from 'react-native';
 
+import { RELEASE } from '../dotEnv'
 import {
   dismissError,
   errorOccurred,
@@ -170,8 +171,11 @@ class SignupLoginContainer extends PureComponent {
       />
     )
     if (this.state.login) {
+      console.log(this.props.docsDownloaded.toJSON())
       form = (
         <LoginPage
+          docsToDownload={this.props.docsToDownload}
+          docsDownloaded={this.props.docsDownloaded}
           doingInitialLoad={this.props.doingInitialLoad}
           submitLogin={this.submitLogin}
           showSignup={this.showSignup}
@@ -210,6 +214,9 @@ class SignupLoginContainer extends PureComponent {
               {form}
             </View>
           </ScrollView>
+          <View style={{position: 'absolute', bottom: 5, left: 5, width}}>
+            <Text style={{color: '#b8b8b8', fontSize: 8}}>Version { RELEASE.split('-')[1] }</Text>
+          </View>
       </View>
     )
   }
@@ -236,6 +243,8 @@ function mapStateToProps (state) {
     awaitingPWChange: localState.get('awaitingPWChange'),
     doingInitialLoad: localState.get('doingInitialLoad'),
     error: localState.get('error'),
+    docsToDownload: localState.get('docsToDownload'),
+    docsDownloaded: localState.get('docsDownloaded'),
   }
 }
 
