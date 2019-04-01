@@ -22,7 +22,7 @@ export default class Leaderboards extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      selectedTime: TIME_MONTH,
+      selectedTime: TIME_WEEK,
       selectedStat: STAT_DISTANCE
     }
 
@@ -67,17 +67,17 @@ export default class Leaderboards extends PureComponent {
             paddingRight: 20,
           }}>
             <Button
-              color={this.state.selectedTime === TIME_WEEK ? darkBrand : brand}
+              color={this.state.selectedTime === TIME_WEEK ? brand : darkBrand}
               text={'Week'}
               onPress={this.changeTime(TIME_WEEK)}
             />
             <Button
-              color={this.state.selectedTime === TIME_MONTH ? darkBrand : brand}
+              color={this.state.selectedTime === TIME_MONTH ? brand : darkBrand}
               text='Month'
               onPress={this.changeTime(TIME_MONTH)}
             />
             <Button
-              color={this.state.selectedTime === TIME_YEAR ? darkBrand : brand}
+              color={this.state.selectedTime === TIME_YEAR ? brand : darkBrand}
               text='Year'
               onPress={this.changeTime(TIME_YEAR)}
             />
@@ -92,17 +92,17 @@ export default class Leaderboards extends PureComponent {
             paddingBottom: 10,
           }}>
             <Button
-              color={this.state.selectedStat === STAT_DISTANCE ? darkBrand : brand}
+              color={this.state.selectedStat === STAT_DISTANCE ? brand : darkBrand}
               text={'Distance'}
               onPress={this.changeStat(STAT_DISTANCE)}
             />
             <Button
-              color={this.state.selectedStat === STAT_TIME ? darkBrand : brand}
+              color={this.state.selectedStat === STAT_TIME ? brand : darkBrand}
               text='Time'
               onPress={this.changeStat(STAT_TIME)}
             />
             <Button
-              color={this.state.selectedStat === STAT_ASCENT ? darkBrand : brand}
+              color={this.state.selectedStat === STAT_ASCENT ? brand : darkBrand}
               text='Ascent'
               onPress={this.changeStat(STAT_ASCENT)}
             />

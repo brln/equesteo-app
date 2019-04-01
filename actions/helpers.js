@@ -45,8 +45,11 @@ export function loginAndSync(loginFunc, loginArgs, dispatch, getState) {
   }).then(() => {
     const syncFail = getState().getIn(['localState', 'fullSyncFail'])
     if (!syncFail) {
-      dispatch(switchRoot(FEED))
-      dispatch(startListeningFCM())
+      setTimeout(() => {
+        dispatch(switchRoot(FEED))
+        dispatch(startListeningFCM())
+      }, 100)
+
     } else {
       dispatch(switchRoot(NEEDS_SYNC))
     }

@@ -165,6 +165,8 @@ class SignupLoginContainer extends PureComponent {
     let form = (
       <SignupPage
         doingInitialLoad={this.props.doingInitialLoad}
+        docsToDownload={this.props.docsToDownload}
+        docsDownloaded={this.props.docsDownloaded}
         errorOccurred={this.errorOccurred}
         submitSignup={this.submitSignup}
         showLogin={this.showLogin}

@@ -1,16 +1,15 @@
 import React, { PureComponent } from 'react';
 import {
-  ActivityIndicator,
   Dimensions,
   StyleSheet,
   Text,
   TouchableOpacity,
   View
 } from 'react-native';
-import * as Progress from 'react-native-progress';
 
 import Button from '../Button'
 import { brand, darkBrand } from '../../colors'
+import Loader from './Loader'
 import LoginForm from './LoginForm'
 
 
@@ -29,7 +28,6 @@ export default class LoginPage extends PureComponent {
     this.changeEmail = this.changeEmail.bind(this);
     this.changePassword = this.changePassword.bind(this)
     this.moveToPassword = this.moveToPassword.bind(this)
-    this._renderLoading = this._renderLoading.bind(this)
     this._renderLoginForm = this._renderLoginForm.bind(this)
     this.submitLogin = this.submitLogin.bind(this)
     this.togglePasswordVisible = this.togglePasswordVisible.bind(this)
@@ -57,7 +55,6 @@ export default class LoginPage extends PureComponent {
   submitLogin () {
     this.props.submitLogin(this.state.email, this.state.password)
   }
-
 
   moveToPassword (e) {
     this.inputs['password'].focus()
@@ -98,26 +95,16 @@ export default class LoginPage extends PureComponent {
     )
   }
 
-  _renderLoading () {
-    const outOf = this.props.docsToDownload
-    const done = this.props.docsDownloaded.valueSeq().reduce((a, x) => a + x, 0)
-    logDebug(outOf, 'outOf')
-    logDebug(done, 'done')
-    logDebug((done / outOf) || 0)
-    return (
-      <View style={{paddingTop: height / 3, alignItems: 'center'}}>
-        <View style={{paddingBottom: 20}}>
-          <Progress.Pie color={brand} indeterminate={outOf === 0} progress={(done / outOf) || 0} size={50} />
-        </View>
-        <Text style={{textAlign: 'center', color: darkBrand}}>Loading Data...</Text>
-      </View>
-    )
-  }
-
   render() {
     return (
       <View style={styles.container}>
-        { this.props.doingInitialLoad ? this._renderLoading() : this._renderLoginForm() }
+        { this.props.doingInitialLoad ?
+            <Loader
+              docsToDownload={this.props.docsToDownload}
+              docsDownloaded={this.props.docsDownloaded}
+            />
+          : this._renderLoginForm()
+        }
       </View>
     );
   }

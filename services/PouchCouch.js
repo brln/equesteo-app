@@ -119,10 +119,10 @@ export default class PouchCouch {
       return PouchCouch.getLeaderboardIDs(options)
     }).then((leaderboardIDs) => {
       return Promise.all([
-        PouchCouch.localReplicateHorses(options, [ownUserID, ...followingUserIDs, ...followerUserIDs, ...leaderboardIDs], progress),
-        PouchCouch.localReplicateNotifications(options, ownUserID, progress),
         PouchCouch.localReplicateRides(options, ownUserID, [ownUserID, ...followingUserIDs], followerUserIDs, progress),
+        PouchCouch.localReplicateHorses(options, [ownUserID, ...followingUserIDs, ...followerUserIDs, ...leaderboardIDs], progress),
         PouchCouch.localReplicateUsers(options, ownUserID, leaderboardIDs, progress),
+        PouchCouch.localReplicateNotifications(options, ownUserID, progress),
       ])
     }).then(() => {
       return PouchCouch.postReplicate()
@@ -143,9 +143,7 @@ export default class PouchCouch {
     const remoteRidesDB = new PouchDB(`${API_URL}/couchproxy/${ridesDBName}`, options)
     return new Promise((resolve, reject) => {
       remoteRidesDB.info().then(resp => {
-        console.log(resp)
         const docs = parseInt(resp.update_seq.split('-')[0])
-        logDebug(docs, 'ridesTotal')
         progress.moreDocsFunc(docs)
         PouchDB.replicate(
           remoteRidesDB,
@@ -160,11 +158,12 @@ export default class PouchCouch {
               ownUserID,
             }
           }
-        ).on('complete', (resp) => {
+        ).on('complete', info => {
+          const docs = parseInt(info.last_seq.split('-')[0])
+          progress.doneDocsFunc(docs, 'rides')
           resolve(resp)
         }).on('change', (info) => {
           const docs = parseInt(info.last_seq.split('-')[0])
-          logDebug(docs, 'ridesDocs')
           progress.doneDocsFunc(docs, 'rides')
         }).on('error', PouchCouch.errorHandler(reject))
       })
@@ -176,7 +175,6 @@ export default class PouchCouch {
     return new Promise((resolve, reject) => {
       remoteNotificationsDB.info().then(resp => {
         const docs = parseInt(resp.update_seq.split('-')[0])
-        logDebug(docs, 'notTotal')
         progress.moreDocsFunc(docs)
         PouchDB.replicate(
           remoteNotificationsDB,
@@ -189,12 +187,12 @@ export default class PouchCouch {
               ownUserID,
             }
           }
-        ).on('complete', (resp) => {
+        ).on('complete', info => {
+          const docs = parseInt(info.last_seq.split('-')[0])
+          progress.doneDocsFunc(docs, 'notifications')
           resolve(resp)
         }).on('change', (info) => {
-          // @TODO this sends the total number, not the number each change
           const docs = parseInt(info.last_seq.split('-')[0])
-          logDebug(docs, 'notDocs')
           progress.doneDocsFunc(docs, 'notifications')
         }).on('error', PouchCouch.errorHandler(reject))
       })
@@ -206,7 +204,6 @@ export default class PouchCouch {
     return new Promise((resolve, reject) => {
       remoteUsersDB.info().then(resp => {
         const docs = parseInt(resp.update_seq.split('-')[0])
-        logDebug(docs, 'usersTotal')
         progress.moreDocsFunc(docs)
         const firstFetchIDs = userIDs
         remoteUsersDB.query('users/relevantFollows', {key: ownUserID}).then((resp) => {
@@ -236,7 +233,9 @@ export default class PouchCouch {
                 userIDs: fetchIDs.concat(firstFetchIDs)
               }
             }
-          ).on('complete', () => {
+          ).on('complete', info => {
+            const docs = parseInt(info.last_seq.split('-')[0])
+            progress.doneDocsFunc(docs, 'users')
             resolve()
           }).on('change', (info) => {
             const docs = parseInt(info.last_seq.split('-')[0])
@@ -252,7 +251,6 @@ export default class PouchCouch {
     return new Promise((resolve, reject) => {
       remoteHorsesDB.info().then(resp => {
         const docs = parseInt(resp.update_seq.split('-')[0])
-        logDebug(docs, 'horsesTotal')
         progress.moreDocsFunc(docs)
         remoteHorsesDB.query('horses/allJoins', {keys: userIDs}).then((resp) => {
           const fetchIDs = []
@@ -277,11 +275,12 @@ export default class PouchCouch {
               live: false,
               doc_ids: fetchIDs,
             }
-          ).on('complete', () => {
+          ).on('complete', (info) => {
+            const docs = parseInt(info.last_seq.split('-')[0])
+            progress.doneDocsFunc(docs, 'horses')
             resolve()
           }).on('change', (info) => {
             const docs = parseInt(info.last_seq.split('-')[0])
-            logDebug(docs, 'horsesDocs')
             progress.doneDocsFunc(docs, 'horses')
           }).on('error', PouchCouch.errorHandler(reject))
         }).catch(PouchCouch.errorHandler(reject))

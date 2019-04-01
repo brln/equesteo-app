@@ -8,6 +8,7 @@ import {
   View
 } from 'react-native';
 import { CheckBox } from 'native-base'
+import Loader from './Loader'
 
 const { height, width } = Dimensions.get('window')
 
@@ -148,7 +149,14 @@ export default class SignupPage extends PureComponent {
   render() {
     return (
       <View style={styles.container}>
-        { this.props.doingInitialLoad ? this._renderLoading() : this._renderSignupForm() }
+        {
+          this.props.doingInitialLoad ?
+            <Loader
+              docsToDownload={this.props.docsToDownload}
+              docsDownloaded={this.props.docsDownloaded}
+            />
+          : this._renderSignupForm()
+        }
       </View>
     )
   }

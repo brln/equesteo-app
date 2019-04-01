@@ -55,6 +55,8 @@ PODS:
     - React
   - react-native-webview (4.0.0):
     - React
+  - React/ART (0.55.4):
+    - React/Core
   - React/Core (0.55.4):
     - yoga (= 0.55.4.React)
   - React/CxxBridge (0.55.4):
@@ -138,6 +140,7 @@ DEPENDENCIES:
   - react-native-camera (from `../node_modules/react-native-camera`)
   - "react-native-mapbox-gl (from `../node_modules/@mapbox/react-native-mapbox-gl`)"
   - react-native-webview (from `../node_modules/react-native-webview`)
+  - React/ART (from `../node_modules/react-native`)
   - React/Core (from `../node_modules/react-native`)
   - React/CxxBridge (from `../node_modules/react-native`)
   - React/DevSupport (from `../node_modules/react-native`)
@@ -240,6 +243,6 @@ SPEC CHECKSUMS:
   SentryReactNative: 4c4ac0518ba34bb90832af4ceb8f2e9db861c1ed
   yoga: a23273df0088bf7f2bb7e5d7b00044ea57a2a54a
 
-PODFILE CHECKSUM: 1c05f916a2aafa7c93a4d24dcf5f315d1257d486
+PODFILE CHECKSUM: 96a367e77e9f87c297407b525499c16b6a1bbdc2
 
 COCOAPODS: 1.5.3
