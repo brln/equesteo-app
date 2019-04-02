@@ -86,7 +86,7 @@ class NeedsSyncContainer extends PureComponent {
           </Text>
         </View>
         <View style={styles.container}>
-          <View style={{flex: 1}}>
+          <View style={{flex: 1, padding: 20}}>
             <Text style={{textAlign: 'center', fontSize: 25}}>Oh No!</Text>
             <Text style={{textAlign: 'center', fontSize: 14, paddingTop: 10}}>When you sign up, the app has to download some data, and we're having problems finishing that. Please try again when you have better service (or WiFi works best!).</Text>
             <Text style={{textAlign: 'center', fontSize: 14, paddingTop: 10}}>If you continue to have problems, please get in touch!</Text>

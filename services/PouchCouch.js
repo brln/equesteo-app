@@ -142,7 +142,7 @@ export default class PouchCouch {
   static localReplicateRides (options, ownUserID, userIDs, followerUserIDs, progress) {
     const remoteRidesDB = new PouchDB(`${API_URL}/couchproxy/${ridesDBName}`, options)
     return new Promise((resolve, reject) => {
-      remoteRidesDB.info().then(resp => {
+      return remoteRidesDB.info().then(resp => {
         const docs = parseInt(resp.update_seq.split('-')[0])
         progress.moreDocsFunc(docs)
         PouchDB.replicate(
@@ -166,14 +166,14 @@ export default class PouchCouch {
           const docs = parseInt(info.last_seq.split('-')[0])
           progress.doneDocsFunc(docs, 'rides')
         }).on('error', PouchCouch.errorHandler(reject))
-      })
+      }).catch(PouchCouch.errorHandler(reject))
     })
   }
 
   static localReplicateNotifications (options, ownUserID, progress) {
     const remoteNotificationsDB = new PouchDB(`${API_URL}/couchproxy/${notificationsDBName}`, options)
     return new Promise((resolve, reject) => {
-      remoteNotificationsDB.info().then(resp => {
+      return remoteNotificationsDB.info().then(resp => {
         const docs = parseInt(resp.update_seq.split('-')[0])
         progress.moreDocsFunc(docs)
         PouchDB.replicate(
@@ -195,7 +195,7 @@ export default class PouchCouch {
           const docs = parseInt(info.last_seq.split('-')[0])
           progress.doneDocsFunc(docs, 'notifications')
         }).on('error', PouchCouch.errorHandler(reject))
-      })
+      }).catch(PouchCouch.errorHandler(reject))
     })
   }
 
@@ -206,7 +206,7 @@ export default class PouchCouch {
         const docs = parseInt(resp.update_seq.split('-')[0])
         progress.moreDocsFunc(docs)
         const firstFetchIDs = userIDs
-        remoteUsersDB.query('users/relevantFollows', {key: ownUserID}).then((resp) => {
+        return remoteUsersDB.query('users/relevantFollows', {key: ownUserID}).then((resp) => {
           resp.rows.reduce((fetchIDs, row) => {
             if (fetchIDs.indexOf(row.value[0]) < 0) {
               fetchIDs.push(row.value[0])
@@ -241,8 +241,8 @@ export default class PouchCouch {
             const docs = parseInt(info.last_seq.split('-')[0])
             progress.doneDocsFunc(docs, 'users')
           }).on('error', PouchCouch.errorHandler(reject))
-        }).catch(PouchCouch.errorHandler(reject))
-      })
+        })
+      }).catch(PouchCouch.errorHandler(reject))
     })
   }
 
@@ -252,7 +252,7 @@ export default class PouchCouch {
       remoteHorsesDB.info().then(resp => {
         const docs = parseInt(resp.update_seq.split('-')[0])
         progress.moreDocsFunc(docs)
-        remoteHorsesDB.query('horses/allJoins', {keys: userIDs}).then((resp) => {
+        return remoteHorsesDB.query('horses/allJoins', {keys: userIDs}).then((resp) => {
           const fetchIDs = []
           for (let row of resp.rows) {
             const joinID = row.id
@@ -283,8 +283,8 @@ export default class PouchCouch {
             const docs = parseInt(info.last_seq.split('-')[0])
             progress.doneDocsFunc(docs, 'horses')
           }).on('error', PouchCouch.errorHandler(reject))
-        }).catch(PouchCouch.errorHandler(reject))
-      })
+        })
+      }).catch(PouchCouch.errorHandler(reject))
     })
   }
 
