@@ -26,6 +26,7 @@ import {
   FOLLOW_LIST,
   HORSE_PROFILE,
   PHOTO_LIGHTBOX,
+  PROFILE,
   UPDATE_PROFILE
 } from '../screens'
 import { generateUUID, logRender, unixTimeNow } from '../helpers'
@@ -69,6 +70,7 @@ class ProfileContainer extends BackgroundComponent {
     this.setLogoutModalOpen = this.setLogoutModalOpen.bind(this)
     this.showAboutPage = this.showAboutPage.bind(this)
     this.showHorseProfile = this.showHorseProfile.bind(this)
+    this.showProfile = this.showProfile.bind(this)
     this.showPhotoLightbox = this.showPhotoLightbox.bind(this)
     this.showUserList = this.showUserList.bind(this)
     this.thisUsersPhotos = this.thisUsersPhotos.bind(this)
@@ -174,6 +176,19 @@ class ProfileContainer extends BackgroundComponent {
     this.props.dispatch(persistUserWithPhoto(userID, photoID))
   }
 
+  showProfile (profileUser) {
+    return () => {
+      EqNavigation.push(this.props.activeComponent, {
+        component: {
+          name: PROFILE,
+          passProps: {
+            profileUser,
+          }
+        }
+      })
+    }
+  }
+
   showUserList (followRecords, followingOrFollower) {
     const userIDs = followRecords.valueSeq().map((f) => f.get(followingOrFollower))
     EqNavigation.push(this.props.componentId, {
@@ -181,6 +196,7 @@ class ProfileContainer extends BackgroundComponent {
         name: FOLLOW_LIST,
         passProps: {
           userIDs: userIDs.toJS(),
+          onPress: this.showProfile
         }
       }
     })

@@ -188,14 +188,14 @@ export function createRide (
   currentRide,
   currentRideElevations,
   currentRideCoordinates,
-  currentRidePhotos,
+  duplicateFrom,
 ) {
   return {
     type: CREATE_RIDE,
     currentRide,
     currentRideCoordinates,
     currentRideElevations,
-    currentRidePhotos,
+    duplicateFrom,
     rideID,
     userID,
     mixpanel: true

@@ -1,7 +1,7 @@
+import memoizeOne from 'memoize-one'
 import { List } from 'immutable'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Navigation } from 'react-native-navigation'
 
 import {
   Dimensions,
@@ -13,11 +13,16 @@ import {
 import AtlasEntryModal from '../components/RideTools/AtlasEntryModal'
 import { brand, darkGrey, lightGrey } from '../colors'
 import { logRender } from '../helpers'
-import { SHARE_RIDE, UPDATE_RIDE } from '../screens'
+import {
+  FOLLOW_LIST,
+  SHARE_RIDE,
+  UPDATE_RIDE
+} from '../screens'
 import DeleteModal from '../components/Shared/DeleteModal'
 import { createRideAtlasEntry } from "../actions/functional"
 import Thumbnail from '../components/Images/Thumbnail'
 import {
+  createRide,
   rideUpdated,
 } from '../actions/standard'
 import {
@@ -62,6 +67,8 @@ class RideToolsContainer extends Component {
     this.closeDeleteModal = this.closeDeleteModal.bind(this)
     this.createRideAtlasEntry = this.createRideAtlasEntry.bind(this)
     this.deleteRide = this.deleteRide.bind(this)
+    this.duplicateRide = this.duplicateRide.bind(this)
+    this.memoFollowings = memoizeOne(this.followings.bind(this))
     this.menuItems = this.menuItems.bind(this)
     this.shareRide = this.shareRide.bind(this)
     this.showAtlasEntryModal = this.showAtlasEntryModal.bind(this)
@@ -128,6 +135,33 @@ class RideToolsContainer extends Component {
     })
   }
 
+  duplicateRide () {
+    const doDupe  = (userID) => {
+      const rideID = `${userID.toString()}_${(new Date).getTime().toString()}`
+      this.props.dispatch(createRide(
+        rideID,
+        userID,
+        this.props.ride,
+        this.props.rideElevations,
+        this.props.rideCoordinates,
+        this.props.ride.get('_id')
+      ))
+      this.props.dispatch(persistRide(rideID, true, [], [], false, []))
+    }
+
+
+    EqNavigation.push(this.props.componentId, {
+      component: {
+        name: FOLLOW_LIST,
+        passProps: {
+          duplicateRide: doDupe,
+          userIDs: this.memoFollowings(this.props.follows, this.props.userID),
+          localCallbackName: 'duplicateRide',
+        }
+      }
+    })
+  }
+
   closeAtlasEntryModal () {
     this.setState({
       atlasEntryModalOpen: false
@@ -163,6 +197,15 @@ class RideToolsContainer extends Component {
     )
   }
 
+  followings (follows, userID) {
+    return follows.filter(f =>
+      !f.get('deleted') && f.get('followerID') === userID
+    ).valueSeq().map(f => {
+      return f.get('followingID')
+    }).toJS()
+  }
+
+
   menuItems () {
     let menuItems = [
       {
@@ -173,6 +216,11 @@ class RideToolsContainer extends Component {
     ]
     if (this.props.userID === this.props.rideUserID) {
       menuItems = menuItems.concat([
+        {
+          name: 'Duplicate to Another User',
+          icon: require('../img/rideTools/duplicate.png'),
+          onPress: this.duplicateRide
+        },
         {
           name: 'Share',
           icon: require('../img/rideTools/share.png'),
@@ -192,6 +240,7 @@ class RideToolsContainer extends Component {
     }
     return menuItems
   }
+
 
   render() {
     logRender('RideTools container')
@@ -229,6 +278,7 @@ function mapStateToProps (state, passedProps) {
   const activeComponent = localState.get('activeComponent')
   return {
     activeComponent,
+    follows: pouchState.get('follows'),
     ride: pouchState.getIn(['rides', passedProps.rideID]),
     rideCoordinates: pouchState.get('selectedRideCoordinates'),
     rideElevations: pouchState.get('selectedRideElevations'),

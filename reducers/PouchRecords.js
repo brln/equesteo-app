@@ -135,22 +135,35 @@ export default function PouchRecordsReducer(state=initialState, action) {
     case CREATE_RIDE:
       let newState = state
       const startTime = action.currentRide.get('startTime')
-      const now = new Date()
+
+      let finishTime = new Date()
+      let pausedTime = action.currentRide.get('pausedTime')
+      let lastPausedTime = action.currentRide.get('lastPauseStart')
+      if (action.duplicateFrom) {
+        finishTime = new Date(action.currentRide.get('startTime'))
+        finishTime.setSeconds(action.currentRide.get('elapsedTimeSecs'))
+        pausedTime = 0
+        lastPausedTime = false
+      }
+
       const elapsed = elapsedTime(
         startTime,
-        now,
-        action.currentRide.get('pausedTime'),
-        action.currentRide.get('lastPauseStart')
+        finishTime,
+        pausedTime,
+        lastPausedTime
       )
+      logDebug(elapsed, 'elapsed')
 
       const name = newRideName(action.currentRide)
 
       let defaultID = null
-      state.get('horseUsers').valueSeq().forEach((hu) => {
-        if (hu.get('userID') === action.userID && hu.get('rideDefault')) {
-          defaultID = hu.get('horseID')
-        }
-      })
+      if (!action.duplicateFrom) {
+        state.get('horseUsers').valueSeq().forEach((hu) => {
+          if (hu.get('userID') === action.userID && hu.get('rideDefault')) {
+            defaultID = hu.get('horseID')
+          }
+        })
+      }
 
       if (defaultID) {
         const recordID = `${action.rideID}_${defaultID}_${'rider'}`
@@ -185,10 +198,10 @@ export default function PouchRecordsReducer(state=initialState, action) {
         startTime: action.currentRide.get('startTime'),
         type: 'ride',
         userID: action.userID,
+        duplicateFrom: action.duplicateFrom,
       }
 
 
-      // @TODO: go into old records and re-parse the elevation data.
       const simplifiedElevationData = parseElevationData(
         simplifiedCoords,
         action.currentRideElevations.get('elevations')

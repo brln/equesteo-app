@@ -6,8 +6,7 @@ import { connect } from 'react-redux';
 import { brand } from '../colors'
 import { userName } from '../modelHelpers/user'
 import { logRender } from '../helpers'
-import { PROFILE } from '../screens'
-import FollowList from '../components/FollowList'
+import FollowList from '../components/FollowList/FollowList'
 import { EqNavigation } from '../services'
 
 class FollowListContainer extends PureComponent {
@@ -33,18 +32,27 @@ class FollowListContainer extends PureComponent {
 
   constructor (props) {
     super(props)
-    this.showProfile = this.showProfile.bind(this)
+    this.state = {
+      duplicateModalOpen: false,
+      transferUserID: null,
+    }
+
+    this.duplicateRide = this.duplicateRide.bind(this)
     this.memoUsers = memoizeOne(this.users.bind(this))
+    this.closeDuplicateModal = this.closeDuplicateModal.bind(this)
+    this.openDuplicateModal = this.openDuplicateModal.bind(this)
   }
 
-  showProfile (profileUser) {
-    EqNavigation.push(this.props.componentId, {
-      component: {
-        name: PROFILE,
-        passProps: {
-          profileUser,
-        }
-      }
+  openDuplicateModal (transferUser) {
+    this.setState({
+      duplicateModalOpen: true,
+      transferUserID: transferUser.get('_id'),
+    })
+  }
+
+  closeDuplicateModal () {
+    this.setState({
+      duplicateModalOpen: false
     })
   }
 
@@ -57,11 +65,29 @@ class FollowListContainer extends PureComponent {
     })
   }
 
+  localCallback (localCallbackName) {
+    if (localCallbackName === 'duplicateRide') {
+      return (user) => {
+        return () => {
+          return this.openDuplicateModal(user)
+        }
+      }
+    }
+  }
+
+  duplicateRide () {
+    this.props.duplicateRide(this.state.transferUserID)
+    EqNavigation.popToRoot(this.props.componentId)
+  }
+
   render() {
     logRender('FollowListContainer')
     return (
       <FollowList
-        showProfile={this.showProfile}
+        closeDuplicateModal={this.closeDuplicateModal}
+        duplicateModalOpen={this.state.duplicateModalOpen}
+        duplicateModalYes={this.duplicateRide}
+        onPress={this.props.onPress || this.localCallback(this.props.localCallbackName)}
         users={this.memoUsers(this.props.users, this.props.userIDs)}
         userPhotos={this.props.userPhotos}
       />
@@ -73,6 +99,9 @@ function mapStateToProps (state, passedProps) {
   const userIDs = passedProps.userIDs
   const pouchState = state.get('pouchRecords')
   return {
+    duplicateRide: passedProps.duplicateRide,
+    localCallbackName: passedProps.localCallbackName,
+    onPress: passedProps.onPress,
     userIDs,
     users: pouchState.get('users'),
     userPhotos: pouchState.get('userPhotos'),

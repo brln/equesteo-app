@@ -130,38 +130,6 @@ export default class UpdateProfile extends PureComponent {
                   />
                 </CardItem>
               </Card>
-
-              <Card>
-                <CardItem header>
-                  <Text style={{color: darkBrand }}>Privacy:</Text>
-                </CardItem>
-                <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
-                  <View style={{flex: 1, flexDirection: 'row'}}>
-                    <View style={{flex: 1}}>
-                      <CheckBox
-                        checked={this.props.user.get('ridesDefaultPublic')}
-                        onPress={this.changeDefaultPublic}
-                      />
-                    </View>
-                    <View style={{flex: 6, justifyContent: 'center'}}>
-                      <Text>Default my rides to publicly viewable.</Text>
-                    </View>
-                  </View>
-                </CardItem>
-                <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
-                  <View style={{flex: 1, flexDirection: 'row'}}>
-                    <View style={{flex: 1}}>
-                      <CheckBox
-                        checked={this.props.user.get('leaderboardOptOut')}
-                        onPress={this.changeLeaderboardOptOut}
-                      />
-                    </View>
-                    <View style={{flex: 6, justifyContent: 'center'}}>
-                      <Text>Opt-out of leaderboards.</Text>
-                    </View>
-                  </View>
-                </CardItem>
-              </Card>
             </View>
           </View>
         </KeyboardAwareScrollView>
