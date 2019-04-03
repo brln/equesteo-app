@@ -33,7 +33,6 @@ const { height, width } = Dimensions.get('window')
 class DrawerContainer extends Component {
   constructor (props) {
     super(props)
-    this.toggleDrawer = this.toggleDrawer.bind(this)
     this.openAccount = this.openAccount.bind(this)
     this.openBarn = this.openBarn.bind(this)
     this.openFeedback = this.openFeedback.bind(this)
@@ -54,6 +53,13 @@ class DrawerContainer extends Component {
         component: {
           name: MORE,
           title: 'More',
+        },
+        options: {
+          sideMenu: {
+            left: {
+              visible: false
+            }
+          }
         }
       })
     }
@@ -68,6 +74,13 @@ class DrawerContainer extends Component {
           title: 'My Account',
           passProps: {
             profileUser: this.props.user,
+          },
+          options: {
+            sideMenu: {
+              left: {
+                visible: false
+              }
+            }
           }
         }
       })
@@ -81,6 +94,13 @@ class DrawerContainer extends Component {
         component: {
           name: FIND_PEOPLE,
           title: 'Find Friends',
+          options: {
+            sideMenu: {
+              left: {
+                visible: false
+              }
+            }
+          }
         }
       })
     }
@@ -92,6 +112,13 @@ class DrawerContainer extends Component {
       EqNavigation.push(this.props.activeComponent, {
         component: {
           name: BARN,
+          options: {
+            sideMenu: {
+              left: {
+                visible: false
+              }
+            }
+          }
         }
       })
     }
@@ -103,6 +130,13 @@ class DrawerContainer extends Component {
       EqNavigation.push(this.props.activeComponent, {
         component: {
           name: TRAINING,
+          options: {
+            sideMenu: {
+              left: {
+                visible: false
+              }
+            }
+          }
         }
       })
     }
@@ -114,7 +148,15 @@ class DrawerContainer extends Component {
       EqNavigation.push(this.props.activeComponent, {
         component: {
           name: LEADERBOARDS,
-        }
+          options: {
+            sideMenu: {
+              left: {
+                visible: false
+              }
+            }
+          }
+        },
+
       })
     }
   }
@@ -125,19 +167,28 @@ class DrawerContainer extends Component {
       EqNavigation.push(this.props.activeComponent, {
         component: {
           name: FEEDBACK,
+          options: {
+            sideMenu: {
+              left: {
+                visible: false
+              }
+            }
+          }
         }
       })
     }
   }
 
   toggleDrawer() {
-    return Navigation.mergeOptions(FEED, {
-      sideMenu: {
-        left: {
-          visible: false,
+    setTimeout(() => {
+      return Navigation.mergeOptions(FEED, {
+        sideMenu: {
+          left: {
+            visible: false,
+          }
         }
-      }
-    })
+      })
+    }, 500)
   }
 
   render() {

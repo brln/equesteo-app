@@ -178,8 +178,9 @@ class UpdateRideContainer extends BackgroundComponent {
           this.props.dispatch(setActiveAtlasEntry(null))
         }).then(() => {
           setTimeout(() => {
-            // Because otherwise it doesn't show the ride on iOS.
-            EqNavigation.push(this.props.activeComponent, {
+            // Because otherwise it doesn't show the ride on iOS. Also, do
+            // not debounce or does not show up on iOS.
+            Navigation.push(this.props.activeComponent, {
               component: {
                 name: RIDE,
                 passProps: {

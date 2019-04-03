@@ -63,6 +63,7 @@ export default class NotificationsList extends PureComponent {
       <View style={styles.container}>
         <ScrollView style={{flex: 1}} bounces={false}>
           <SwipeListView
+            swipeRowStyle={{flex: 1}}
             useFlatList
             keyExtractor={(u) => u._id}
             data={this.props.notifications.toJS()}
@@ -105,6 +106,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		paddingLeft: 15,
+    minHeight: height / 10,
 },
 })
 

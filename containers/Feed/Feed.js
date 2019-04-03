@@ -137,7 +137,7 @@ class FeedContainer extends BackgroundComponent {
 
   openScreen (openPromise) {
     openPromise.then(() => {
-      this.makeSureDrawerClosed()
+      return this.makeSureDrawerClosed()
     }).catch(e => {
       logError(e)
     })
@@ -235,6 +235,7 @@ class FeedContainer extends BackgroundComponent {
 
   navigationButtonPressed({ buttonId }) {
     if (buttonId === 'sideMenu') {
+      logDebug('set back to visible!')
       Navigation.mergeOptions(this.props.componentId, {
         sideMenu: {
           left: {

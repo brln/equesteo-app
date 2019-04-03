@@ -7,7 +7,6 @@ export default class EqNavigation {
   static push (currentComponent, opts) {
     if (!EqNavigation.debounce) {
       EqNavigation.debounce = true
-      console.log('debounce')
       return Navigation.push(currentComponent, opts).then(() => {
         setTimeout(() => {
           EqNavigation.debounce = false

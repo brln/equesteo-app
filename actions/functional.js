@@ -1,7 +1,7 @@
 import ImagePicker from 'react-native-image-crop-picker'
 import { fromJS, Map  } from 'immutable'
 import { AppState, NetInfo, Platform } from 'react-native'
-import BackgroundGeolocation from 'react-native-mauron85-background-geolocation'
+import BackgroundGeolocation from '@mauron85/react-native-background-geolocation'
 import firebase from 'react-native-firebase'
 import  Mixpanel from 'react-native-mixpanel'
 import { Navigation } from 'react-native-navigation'

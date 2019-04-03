@@ -41,7 +41,7 @@ export default class RideRecorder extends PureComponent {
 
   static getDerivedStateFromProps (props, state) {
     const newState = {...state}
-    if (!state.userControlledMap && props.currentRideCoordinates) {
+    if (!state.userControlledMap && props.currentRideCoordinates && props.lastLocation) {
       newState.centerCoordinate = RideRecorder.centerCoordinate(props.lastLocation)
       newState.heading = RideRecorder.currentHeading(
         props.currentRideCoordinates.get('rideCoordinates'),
