@@ -16,9 +16,9 @@
 		8968ADBD22125F4300345955 /* libRNMixpanel.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8968ADBA22125F1100345955 /* libRNMixpanel.a */; };
 		899D411F225258D30054499A /* libART.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 899D40EB225258C30054499A /* libART.a */; };
 		899F34C92254FDE500BFAD02 /* sentry.properties in Resources */ = {isa = PBXBuildFile; fileRef = 899F34C82254FDE400BFAD02 /* sentry.properties */; };
+		899F355E225506E300BFAD02 /* libRCTBackgroundGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 899F355D225506B900BFAD02 /* libRCTBackgroundGeolocation.a */; };
 		89C3A144224BB954003C7F5E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 89C3A143224BB954003C7F5E /* GoogleService-Info.plist */; };
 		89D75AEC22149ADE003EF395 /* Montserrat-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 89D75AC022149ADE003EF395 /* Montserrat-Regular.otf */; };
-		A721BE372146C0DF00AE909D /* libRCTBackgroundGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A721BE362146BF8300AE909D /* libRCTBackgroundGeolocation.a */; };
 		A7307D192149BA2F00D9CDC4 /* Panama-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = A7307D182149BA2F00D9CDC4 /* Panama-Light.otf */; };
 		A7307D322149D61300D9CDC4 /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A7307D312149D61300D9CDC4 /* MaterialIcons.ttf */; };
 		A7307D4B2149D75E00D9CDC4 /* Entypo.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A7307D412149D75D00D9CDC4 /* Entypo.ttf */; };
@@ -96,6 +96,13 @@
 			remoteGlobalIDString = 323A12871E5F266B004975B8;
 			remoteInfo = "ART-tvOS";
 		};
+		899F355C225506B900BFAD02 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 899F3557225506B900BFAD02 /* RCTBackgroundGeolocation.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 418F75461D02DC3D0045FEA0;
+			remoteInfo = RCTBackgroundGeolocation;
+		};
 		89B7E2972218652600B6FF2D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 89B7E2662218652500B6FF2D /* RNSentry.xcodeproj */;
@@ -123,13 +130,6 @@
 			proxyType = 2;
 			remoteGlobalIDString = A15C300E1CD25C330074CB35;
 			remoteInfo = RNFetchBlob;
-		};
-		A721BE352146BF8300AE909D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = A721BE302146BF8300AE909D /* RCTBackgroundGeolocation.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 418F75461D02DC3D0045FEA0;
-			remoteInfo = RCTBackgroundGeolocation;
 		};
 		A74F8CBB21514E5400AE0E34 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -429,6 +429,7 @@
 		8968AD8B22125F1000345955 /* RNMixpanel.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNMixpanel.xcodeproj; path = "../node_modules/react-native-mixpanel/RNMixpanel.xcodeproj"; sourceTree = "<group>"; };
 		899D40E5225258C30054499A /* ART.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ART.xcodeproj; path = "../node_modules/react-native/Libraries/ART/ART.xcodeproj"; sourceTree = "<group>"; };
 		899F34C82254FDE400BFAD02 /* sentry.properties */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = sentry.properties; path = ../sentry.properties; sourceTree = "<group>"; };
+		899F3557225506B900BFAD02 /* RCTBackgroundGeolocation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTBackgroundGeolocation.xcodeproj; path = "../node_modules/@mauron85/react-native-background-geolocation/ios/RCTBackgroundGeolocation.xcodeproj"; sourceTree = "<group>"; };
 		89B7E2662218652500B6FF2D /* RNSentry.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNSentry.xcodeproj; path = "../node_modules/react-native-sentry/ios/RNSentry.xcodeproj"; sourceTree = "<group>"; };
 		89C3A136224AE25E003C7F5E /* equesteo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = equesteo.entitlements; path = equesteo/equesteo.entitlements; sourceTree = "<group>"; };
 		89C3A139224AE35D003C7F5E /* RCTPushNotification.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTPushNotification.xcodeproj; path = "../node_modules/react-native/Libraries/PushNotificationIOS/RCTPushNotification.xcodeproj"; sourceTree = "<group>"; };
@@ -440,7 +441,6 @@
 		943830C8F774413E97EC8F3A /* RNFirebase.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNFirebase.xcodeproj; path = "../node_modules/react-native-firebase/ios/RNFirebase.xcodeproj"; sourceTree = "<group>"; };
 		9D651CB9B10E41259B3DD607 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/native-base/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
 		A6AADBBD1DE9461A961A0631 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/native-base/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
-		A721BE302146BF8300AE909D /* RCTBackgroundGeolocation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTBackgroundGeolocation.xcodeproj; path = "../node_modules/react-native-mauron85-background-geolocation/ios/RCTBackgroundGeolocation.xcodeproj"; sourceTree = "<group>"; };
 		A7307D182149BA2F00D9CDC4 /* Panama-Light.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Panama-Light.otf"; path = "../../android/app/src/main/assets/fonts/Panama-Light.otf"; sourceTree = "<group>"; };
 		A7307D312149D61300D9CDC4 /* MaterialIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = MaterialIcons.ttf; sourceTree = "<group>"; };
 		A7307D412149D75D00D9CDC4 /* Entypo.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Entypo.ttf; sourceTree = "<group>"; };
@@ -483,6 +483,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				899F355E225506E300BFAD02 /* libRCTBackgroundGeolocation.a in Frameworks */,
 				899D411F225258D30054499A /* libART.a in Frameworks */,
 				A74F923C2153E3F600AE0E34 /* libRCTPushNotification.a in Frameworks */,
 				890CBC9222186DE300843B7A /* libRCTCameraRoll.a in Frameworks */,
@@ -499,7 +500,6 @@
 				A74F91322152CB4700AE0E34 /* libRCTWebSocket.a in Frameworks */,
 				A74F90DA2152AFE500AE0E34 /* libReact.a in Frameworks */,
 				A74F8CBF21514E7900AE0E34 /* libReactNativeNavigation.a in Frameworks */,
-				A721BE372146C0DF00AE909D /* libRCTBackgroundGeolocation.a in Frameworks */,
 				33F82E2ABF779443FB7D8810 /* libPods-equesteo.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -576,6 +576,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				899F3557225506B900BFAD02 /* RCTBackgroundGeolocation.xcodeproj */,
 				899D40E5225258C30054499A /* ART.xcodeproj */,
 				89C3A139224AE35D003C7F5E /* RCTPushNotification.xcodeproj */,
 				89D782E92231AB1C009EE914 /* RNFetchBlob.xcodeproj */,
@@ -594,7 +595,6 @@
 				A74F91232152CB2300AE0E34 /* RCTWebSocket.xcodeproj */,
 				A74F904E2152A06F00AE0E34 /* React.xcodeproj */,
 				A74F8CB621514E5400AE0E34 /* ReactNativeNavigation.xcodeproj */,
-				A721BE302146BF8300AE909D /* RCTBackgroundGeolocation.xcodeproj */,
 				943830C8F774413E97EC8F3A /* RNFirebase.xcodeproj */,
 			);
 			name = Libraries;
@@ -654,6 +654,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		899F3558225506B900BFAD02 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				899F355D225506B900BFAD02 /* libRCTBackgroundGeolocation.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		89B7E2672218652500B6FF2D /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -676,14 +684,6 @@
 			isa = PBXGroup;
 			children = (
 				89D782EE2231AB1C009EE914 /* libRNFetchBlob.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		A721BE312146BF8300AE909D /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				A721BE362146BF8300AE909D /* libRCTBackgroundGeolocation.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -932,8 +932,8 @@
 					ProjectRef = A74F92842153EA8000AE0E34 /* RCTAnimation.xcodeproj */;
 				},
 				{
-					ProductGroup = A721BE312146BF8300AE909D /* Products */;
-					ProjectRef = A721BE302146BF8300AE909D /* RCTBackgroundGeolocation.xcodeproj */;
+					ProductGroup = 899F3558225506B900BFAD02 /* Products */;
+					ProjectRef = 899F3557225506B900BFAD02 /* RCTBackgroundGeolocation.xcodeproj */;
 				},
 				{
 					ProductGroup = 890CBC8D22186D5700843B7A /* Products */;
@@ -1061,6 +1061,13 @@
 			remoteRef = 899D40EC225258C30054499A /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		899F355D225506B900BFAD02 /* libRCTBackgroundGeolocation.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRCTBackgroundGeolocation.a;
+			remoteRef = 899F355C225506B900BFAD02 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		89B7E2982218652600B6FF2D /* libRNSentry.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -1087,13 +1094,6 @@
 			fileType = archive.ar;
 			path = libRNFetchBlob.a;
 			remoteRef = 89D782ED2231AB1C009EE914 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		A721BE362146BF8300AE909D /* libRCTBackgroundGeolocation.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libRCTBackgroundGeolocation.a;
-			remoteRef = A721BE352146BF8300AE909D /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		A74F8CBC21514E5400AE0E34 /* libReactNativeNavigation.a */ = {
@@ -1460,7 +1460,7 @@
 		};
 		899F34342254F2FA00BFAD02 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 12;
+			buildActionMask = 8;
 			files = (
 			);
 			inputFileListPaths = (
@@ -1471,7 +1471,7 @@
 			);
 			outputPaths = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
 			shellScript = "export SENTRY_PROPERTIES=../sentry.properties\n\n\n# Setup nvm and set node\n[ -z \"$NVM_DIR\" ] && export NVM_DIR=\"$HOME/.nvm\"\n\nif [[ -s \"$HOME/.nvm/nvm.sh\" ]]; then\n. \"$HOME/.nvm/nvm.sh\"\nelif [[ -x \"$(command -v brew)\" && -s \"$(brew --prefix nvm)/nvm.sh\" ]]; then\n. \"$(brew --prefix nvm)/nvm.sh\"\nfi\n\n# Set up the nodenv node version manager if present\nif [[ -x \"$HOME/.nodenv/bin/nodenv\" ]]; then\neval \"$(\"$HOME/.nodenv/bin/nodenv\" init -)\"\nfi\n\n# Trying notion\nif [ -z \"$NODE_BINARY\" ]; then\nif [[ -s \"$HOME/.notion/bin/node\" ]]; then\nexport NODE_BINARY=\"$HOME/.notion/bin/node\"\nfi\nfi\n\n[ -z \"$NODE_BINARY\" ] && export NODE_BINARY=\"node\"\n\n$NODE_BINARY ../node_modules/@sentry/cli/bin/sentry-cli react-native xcode \\\n../node_modules/react-native/scripts/react-native-xcode.sh\n\n";
 		};
