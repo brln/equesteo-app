@@ -208,12 +208,12 @@ class SignupLoginContainer extends PureComponent {
             keyboardShouldPersistTaps={'always'}
           >
             <View style={{height: height - StatusBar.currentHeight}}>
-              {error}
               <BuildImage
                 source={require('../img/loginbg4.jpg')}
                 style={{ width, height, resizeMode: 'cover' }}
               />
               {form}
+              {error}
             </View>
           </ScrollView>
           <View style={{position: 'absolute', bottom: 5, left: 5, width}}>
@@ -236,6 +236,9 @@ const styles = StyleSheet.create({
     paddingTop: 5,
     paddingBottom: 5,
     backgroundColor: 'red',
+    position: 'absolute',
+    top: 0,
+    width
   }
 });
 
