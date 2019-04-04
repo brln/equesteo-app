@@ -32,7 +32,7 @@ export default class PouchCouch {
       if (e.status === 0) {
         reject(new NotConnectedError('Cannot find the database'))
       } else {
-        reject(new Error(JSON.stringify(e)))
+        reject(e)
       }
     }
   }
@@ -145,28 +145,40 @@ export default class PouchCouch {
       return remoteRidesDB.info().then(resp => {
         const docs = parseInt(resp.update_seq.split('-')[0])
         progress.moreDocsFunc(docs)
-        PouchDB.replicate(
-          remoteRidesDB,
-          localRidesDB,
-          {
-            batch_size: 1000,
-            live: false,
-            filter: 'rides/byUserIDs',
-            query_params: {
-              userIDs: userIDs.join(','),
-              followerUserIDs: followerUserIDs.join(','),
-              ownUserID,
+        const allDocIDs = {}
+        return remoteRidesDB.query('rides/followingRideDocIDs', {keys: userIDs}).then((resp) => {
+          resp.rows.map(row => {
+            allDocIDs[row.id] = 0
+          })
+          return remoteRidesDB.query('rides/followerRideDocIDs', {keys: followerUserIDs})
+        }).then(resp2 => {
+          resp2.rows.map(row => {
+            allDocIDs[row.id] = 0
+          })
+          return remoteRidesDB.query('rides/atlasEntryDocIDs', {key: ownUserID})
+        }).then((resp3) => {
+          resp3.rows.map(row => {
+            allDocIDs[row.id] = 0
+          })
+        }).then(() => {
+          PouchDB.replicate(
+            remoteRidesDB,
+            localRidesDB,
+            {
+              batch_size: 1000,
+              live: false,
+              doc_ids: Object.keys(allDocIDs)
             }
-          }
-        ).on('complete', info => {
-          const docs = parseInt(info.last_seq.split('-')[0])
-          progress.doneDocsFunc(docs, 'rides')
-          resolve(resp)
-        }).on('change', (info) => {
-          const docs = parseInt(info.last_seq.split('-')[0])
-          progress.doneDocsFunc(docs, 'rides')
-        }).on('error', PouchCouch.errorHandler(reject))
-      }).catch(PouchCouch.errorHandler(reject))
+          ).on('complete', info => {
+            const docs = parseInt(info.last_seq.split('-')[0])
+            progress.doneDocsFunc(docs, 'rides')
+            resolve(resp)
+          }).on('change', (info) => {
+            const docs = parseInt(info.last_seq.split('-')[0])
+            progress.doneDocsFunc(docs, 'rides')
+          }).on('error', PouchCouch.errorHandler(reject))
+        }).catch(PouchCouch.errorHandler(reject))
+      })
     })
   }
 
@@ -215,23 +227,28 @@ export default class PouchCouch {
           }, firstFetchIDs)
           return remoteUsersDB.query('users/relevantFollows', {keys: firstFetchIDs})
         }).then(resp2 => {
-          const fetchIDs = resp2.rows.reduce((fetchIDs, row) => {
-            if (fetchIDs.indexOf(row.value[0]) < 0) {
-              fetchIDs.push(row.value[0])
+          const fetchIDs = resp2.rows.reduce((accum, row) => {
+            if (accum.indexOf(row.value[0]) < 0) {
+              accum.push(row.value[0])
             }
-            return fetchIDs
+            return accum
           }, [])
+          return remoteUsersDB.query('users/userDocIDs', {keys: fetchIDs})
+        }).then(resp3 => {
+          const allDocIDs = resp3.rows.reduce((accum, row) => {
+            if (accum.indexOf(row.id) < 0) {
+              accum.push(row.id)
+            }
+            return accum
+          }, [])
+          allDocIDs.push('leaderboards')
           return PouchDB.replicate(
             remoteUsersDB,
             localUsersDB,
             {
               batch_size: 1000,
               live: false,
-              filter: 'users/byUserIDs2',
-              query_params: {
-                ownUserID,
-                userIDs: fetchIDs.concat(firstFetchIDs)
-              }
+              doc_ids: allDocIDs
             }
           ).on('complete', info => {
             const docs = parseInt(info.last_seq.split('-')[0])

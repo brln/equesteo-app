@@ -2,13 +2,13 @@ import { Platform } from 'react-native'
 import {
   api_url_ios,
   api_url_android,
-  env,
-  static_maps_api_key,
-  sentry_dsn,
-  release,
   distribution,
+  env,
+  release,
   mapbox_token,
   mixpanel_token,
+  static_maps_api_key,
+  sentry_dsn,
 } from 'react-native-dotenv'
 
 
