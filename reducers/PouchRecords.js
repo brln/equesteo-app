@@ -270,8 +270,9 @@ export default function PouchRecordsReducer(state=initialState, action) {
       return state.setIn(['horsePhotos', action.horsePhoto.get('_id')], action.horsePhoto)
     case LOCAL_DATA_LOADED:
       return state.merge(Map({
-        leaderboards: fromJS(action.localData.leaderboards).merge(state.get('leaderboards')),
-        trainings: fromJS(action.localData.trainings).merge(state.get('trainings')),
+        leaderboards: fromJS(action.localData.leaderboards),
+        trainings: fromJS(action.localData.trainings),
+
         follows: fromJS(action.localData.follows).merge(state.get('follows')),
         horses: fromJS(action.localData.horses).merge(state.get('horses')),
         horsePhotos: fromJS(action.localData.horsePhotos).merge(state.get('horsePhotos')),
