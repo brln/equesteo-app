@@ -17,7 +17,7 @@ import {
 import BackgroundComponent from '../components/BackgroundComponent'
 import { brand } from '../colors'
 import { generateUUID, logRender, unixTimeNow } from '../helpers'
-import { PHOTO_LIGHTBOX, PROFILE, UPDATE_HORSE } from '../screens'
+import { HORSE_TOOLS, PHOTO_LIGHTBOX, PROFILE, UPDATE_HORSE } from '../screens'
 import HorseProfile from '../components/HorseProfile/HorseProfile'
 import { EqNavigation } from '../services'
 
@@ -45,11 +45,7 @@ class HorseProfileContainer extends BackgroundComponent {
 
   constructor (props) {
     super(props)
-    this.state = {
-      modalOpen: false
-    }
     this.addRider = this.addRider.bind(this)
-    this.closeDeleteModal = this.closeDeleteModal.bind(this)
     this.deleteHorse = this.deleteHorse.bind(this)
     this.horseUser = this.horseUser.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
@@ -67,26 +63,11 @@ class HorseProfileContainer extends BackgroundComponent {
         topBar: {
           rightButtons: [
             {
-              id: 'archive',
-              text: 'Archive',
+              id: 'tools',
+              text: 'Tools',
               color: 'white'
             },
-            {
-              id: 'edit',
-              text: 'Edit',
-              color: 'white'
-            }
           ]
-        }
-      })
-    } else if (this.thisHorsesRiders().indexOf(props.user) >= 0) {
-      Navigation.mergeOptions(props.componentId, {
-        topBar: {
-          rightButtons: [{
-            id: 'archive',
-            text: 'Archive',
-            color: 'white'
-          }]
         }
       })
     }
@@ -105,38 +86,20 @@ class HorseProfileContainer extends BackgroundComponent {
 
   addRider () {
     this.props.dispatch(addHorseUser(this.props.horse, this.props.user))
-    Navigation.mergeOptions(this.props.componentId, {
-      topBar: {
-        rightButtons: [{
-          id: 'archive',
-          text: 'Archive',
-          color: 'white'
-        }]
-      }
-    })
-  }
-
-  closeDeleteModal () {
-    this.setState({
-      modalOpen: false
-    })
   }
 
   navigationButtonPressed ({ buttonId }) {
-    if (buttonId === 'edit') {
+    if (buttonId === 'tools') {
       EqNavigation.push(this.props.componentId, {
         component: {
-          name: UPDATE_HORSE,
-          title: "Update Horse",
+          name: HORSE_TOOLS,
           passProps: {
+            barnComponentID: this.props.barnComponentID,
             horseID: this.props.horse.get('_id'),
             horseUserID: this.horseUser().get('_id'),
-            newHorse: false
           },
         }
       })
-    } else if (buttonId === 'archive') {
-      this.setState({modalOpen: true})
     }
   }
 
@@ -223,7 +186,6 @@ class HorseProfileContainer extends BackgroundComponent {
         horse={this.props.horse}
         horseOwner={this.props.owner}
         horsePhotos={this.thisHorsesPhotos()}
-        modalOpen={this.state.modalOpen}
         rides={this.thisHorsesRides()}
         riders={this.thisHorsesRiders()}
         showRiderProfile={this.showRiderProfile}
@@ -242,6 +204,7 @@ function mapStateToProps (state, passedProps) {
   const localState = state.get('localState')
   return {
     activeComponent: localState.get('activeComponent'),
+    barnComponentID: passedProps.barnComponentID,
     horseUsers: pouchState.get('horseUsers'),
     horses: pouchState.get('horses'),
     horsePhotos: pouchState.get('horsePhotos'),

@@ -119,7 +119,6 @@ export function catchAsyncError (dispatch, sentry=true) {
   }
 }
 
-
 export function addHorseUser (horse, user) {
   cb('addHorseUser', true)
   return (dispatch, getState) => {
@@ -182,6 +181,38 @@ export function appInitialized () {
         dispatch(switchRoot(SIGNUP_LOGIN))
       }
     }).catch(catchAsyncError(dispatch))
+  }
+}
+
+export function changeHorseOwner (horse, newOwnerID) {
+  cb('addHorseUser', true)
+  return (dispatch, getState) => {
+    let oldOwnerHorseUser = getState().getIn(['pouchRecords', 'horseUsers']).filter(hu => {
+      return hu.get('horseID') === horse.get('_id') && hu.get('owner') === true
+    }).first()
+    oldOwnerHorseUser = oldOwnerHorseUser.set('owner', false).set('deleted', true)
+    dispatch(horseUserUpdated(oldOwnerHorseUser))
+    dispatch(persistHorseUser(oldOwnerHorseUser.get('_id', false)))
+
+    const id = `${newOwnerID}_${horse.get('_id')}`
+    let newHorseUser = getState().getIn(['pouchRecords', 'horseUsers', id])
+    if (newHorseUser) {
+      newHorseUser = newHorseUser.set('deleted', false).set('owner', true)
+    } else {
+      newHorseUser = Map({
+        _id: id,
+        type: 'horseUser',
+        horseID: horse.get('_id'),
+        userID: newOwnerID,
+        owner: true,
+        createTime: unixTimeNow(),
+        deleted: false,
+      })
+    }
+    dispatch(horseUserUpdated(newHorseUser))
+    dispatch(persistHorseUser(id))
+
+
   }
 }
 
@@ -508,17 +539,19 @@ export function persistHorseUpdate (horseID, horseUserID, deletedPhotoIDs, newPh
   }
 }
 
-export function persistHorseUser (horseUserID) {
+export function persistHorseUser (horseUserID, runSyncNow=true) {
   cb('persistHorseUser', true)
   return (dispatch, getState) => {
     const theHorseUser = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
     if (!theHorseUser) {
       throw new Error('no horse user with that ID')
     }
-    PouchCouch.saveHorse(theHorseUser.toJS()).then(({ rev }) => {
+    return PouchCouch.saveHorse(theHorseUser.toJS()).then(({ rev }) => {
       const theHorseUserAfterSave = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
       dispatch(horseUserUpdated(theHorseUserAfterSave.set('_rev', rev)))
-      return dispatch(doSync())
+      if (runSyncNow) {
+        return dispatch(doSync())
+      }
     }).catch(catchAsyncError(dispatch))
   }
 }

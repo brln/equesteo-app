@@ -47,7 +47,8 @@ class BarnContainer extends BackgroundComponent {
         title: horse.get('name'),
         passProps: {
           horse,
-          ownerID
+          ownerID,
+          barnComponentID: this.props.componentId
         },
       }
     })

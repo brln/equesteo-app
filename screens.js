@@ -11,6 +11,7 @@ import FindPeopleContainer from './containers/FindPeople'
 import FirstStartContainer from './containers/FirstStart'
 import FollowListContainer from './containers/FollowList'
 import HorseProfileContainer from './containers/HorseProfile'
+import HorseToolsContainer from './containers/HorseTools'
 import LeaderboardsContainer from './containers/Leaderboards'
 import MapContainer from './containers/Map'
 import MoreContainer from './containers/More'
@@ -41,6 +42,7 @@ export const FEEDBACK = 'equesteo.Feedback'
 export const FIRST_START = 'equesteo.FirstStart'
 export const FOLLOW_LIST = 'equesteo.FollowList'
 export const HORSE_PROFILE = 'equesteo.HorseProfile'
+export const HORSE_TOOLS = 'equesteo.HorseTools'
 export const FIND_PEOPLE = 'equesteo.FindPeople'
 export const LEADERBOARDS = 'equesteo.Leaderboards'
 export const MAP = 'equesteo.ViewingMap'
@@ -77,6 +79,7 @@ export function registerScreens(store, Provider) {
   Navigation.registerComponentWithRedux(FIRST_START, () => FirstStartContainer, Provider, store)
   Navigation.registerComponentWithRedux(FOLLOW_LIST, () => FollowListContainer, Provider, store)
   Navigation.registerComponentWithRedux(HORSE_PROFILE, () => HorseProfileContainer, Provider, store)
+  Navigation.registerComponentWithRedux(HORSE_TOOLS, () => HorseToolsContainer, Provider, store)
   Navigation.registerComponentWithRedux(LEADERBOARDS, () => LeaderboardsContainer, Provider, store)
   Navigation.registerComponentWithRedux(MAP, () => MapContainer, Provider, store)
   Navigation.registerComponentWithRedux(NEEDS_SYNC, () => NeedsSyncContainer, Provider, store)

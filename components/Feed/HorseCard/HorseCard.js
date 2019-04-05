@@ -78,10 +78,9 @@ export default class HorseCard extends PureComponent {
     return name
   }
 
-  createTime () {
-    const t = this.props.horse.get('createTime')
-    if (t) {
-      return `${moment(t).format('MMMM Do YYYY')} at ${moment(t).format('h:mm a')}`
+  createTime (timestamp) {
+    if (timestamp) {
+      return `${moment(timestamp).format('MMMM Do YYYY')} at ${moment(timestamp).format('h:mm a')}`
     }
   }
 
@@ -138,7 +137,7 @@ export default class HorseCard extends PureComponent {
                   { this.userAvatar() }
                   <View>
                     <Text style={{fontSize: 14}}>{this.userName()}</Text>
-                    <Text style={{fontSize: 12, fontWeight: 'normal', color: darkGrey}}>{this.createTime()}</Text>
+                    <Text style={{fontSize: 12, fontWeight: 'normal', color: darkGrey}}>{this.createTime(this.props.createTime)}</Text>
                   </View>
                 </View>
               </TouchableOpacity>

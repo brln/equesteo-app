@@ -41,14 +41,7 @@ export default class SettingsModal extends PureComponent {
           value={this.props.chosenHorseID}
           items={items}
           onValueChange={this.props.pickHorse}
-          style={{inputIOS: {
-            fontSize: 20,
-            fontWeight: 'bold',
-            textAlign: 'center',
-            paddingTop: 10,
-            height: 50
-            },
-            underline: { borderTopWidth: 0 }}}
+          style={pickerSelectStyles}
           placeholder={{
             label: 'All Horses',
             value: this.props.types.SHOW_ALL_HORSES,
@@ -69,13 +62,7 @@ export default class SettingsModal extends PureComponent {
             {label: 'Elevation Gain', value: this.props.types.TYPE_GAIN}
           ]}
           onValueChange={this.props.pickType}
-          style={{inputIOS: {
-            fontSize: 20,
-            fontWeight: 'bold',
-            textAlign: 'center',
-            paddingTop: 10,
-            height: 50
-          }, underline: { borderTopWidth: 0 }}}
+          style={pickerSelectStyles}
         />
       </View>
     )
@@ -97,14 +84,7 @@ export default class SettingsModal extends PureComponent {
           value={this.props.chosenUserID}
           items={allItems}
           onValueChange={this.props.pickRider}
-          style={{inputIOS: {
-            fontSize: 20,
-            fontWeight: 'bold',
-            textAlign: 'center',
-            paddingTop: 10,
-            height: 50,
-            borderRadius: 4,
-          }, underline: { borderTopWidth: 0 }}}
+          style={pickerSelectStyles}
           placeholder={{
             label: 'All Riders',
             value: this.props.types.SHOW_ALL_RIDERS,
@@ -161,4 +141,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: height * 0.15,
   },
+});
+
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    color: 'black',
+    paddingRight: 30, // to ensure the text is never behind the icon
+  },
+  inputAndroid: {
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderWidth: 0.5,
+    borderColor: brand,
+    borderRadius: 8,
+    color: 'black',
+    paddingRight: 30, // to ensure the text is never behind the icon
+  },
+  placeholder: {}
 });

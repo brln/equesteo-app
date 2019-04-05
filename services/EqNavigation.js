@@ -10,7 +10,7 @@ export default class EqNavigation {
       return Navigation.push(currentComponent, opts).then(() => {
         setTimeout(() => {
           EqNavigation.debounce = false
-        }, 100)
+        })
       }).catch(e => {
         EqNavigation.debounce = false
         logError(e)
@@ -26,7 +26,23 @@ export default class EqNavigation {
       return Navigation.pop(currentComponent).then(() => {
         setTimeout(() => {
           EqNavigation.debounce = false
-        }, 100)
+        }, 50)
+      }).catch(e => {
+        EqNavigation.debounce = false
+        logError(e)
+      })
+    } else {
+      return Promise.resolve()
+    }
+  }
+
+  static popTo (componentID) {
+    if (!EqNavigation.debounce) {
+      EqNavigation.debounce = true
+      return Navigation.popTo(componentID).then(() => {
+        setTimeout(() => {
+          EqNavigation.debounce = false
+        }, 50)
       }).catch(e => {
         EqNavigation.debounce = false
         logError(e)
@@ -42,7 +58,7 @@ export default class EqNavigation {
       return Navigation.popToRoot(currentComponent).then(() => {
         setTimeout(() => {
           EqNavigation.debounce = false
-        }, 100)
+        }, 50)
       }).catch(e => {
         EqNavigation.debounce = false
         logError(e)

@@ -14,6 +14,7 @@ import { darkGrey }  from '../../colors'
 import { userName } from '../../modelHelpers/user'
 import Thumbnail from '../Images/Thumbnail'
 import DuplicateModal from './DuplicateModal'
+import TransferModal from './TransferModal'
 
 const { width } = Dimensions.get('window')
 
@@ -57,6 +58,11 @@ export default class FollowList extends PureComponent {
           duplicateModalYes={this.props.duplicateModalYes}
           modalOpen={this.props.duplicateModalOpen}
           closeModal={this.props.closeDuplicateModal}
+        />
+        <TransferModal
+          transferModalYes={this.props.transferModalYes}
+          modalOpen={this.props.transferModalOpen}
+          closeModal={this.props.closeTransferModal}
         />
         <ScrollView style={{flex: 1}}>
           <FlatList

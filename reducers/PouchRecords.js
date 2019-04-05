@@ -270,25 +270,21 @@ export default function PouchRecordsReducer(state=initialState, action) {
       return state.setIn(['horsePhotos', action.horsePhoto.get('_id')], action.horsePhoto)
     case LOCAL_DATA_LOADED:
       return state.merge(Map({
-        follows: state.get('follows').merge(fromJS(action.localData.follows)),
-        horses: state.get('horses').merge(fromJS(action.localData.horses)),
-        horseUsers: state.get('horseUsers').merge(fromJS(action.localData.horseUsers)),
-        horsePhotos: state.get('horsePhotos').merge(fromJS(action.localData.horsePhotos)),
-        leaderboards: state.get('leaderboards').merge(fromJS(action.localData.leaderboards)),
-        rides: state.get('rides').merge(fromJS(action.localData.rides)),
-        rideAtlasEntries: state.get('rideAtlasEntries').merge(fromJS(action.localData.rideAtlasEntries)),
-        rideCarrots: state.get('rideCarrots').merge(fromJS(action.localData.rideCarrots)),
-        rideComments: state.get('rideComments').merge(fromJS(action.localData.rideComments)),
-        rideHorses: state.get('rideHorses').merge(fromJS(action.localData.rideHorses)),
-        ridePhotos: state.get('ridePhotos').merge(fromJS(action.localData.ridePhotos)),
-        trainings: state.get('trainings').merge(fromJS(action.localData.trainings)),
-        users: state.get('users').merge(fromJS(action.localData.users)),
-        userPhotos: state.get('userPhotos').merge(fromJS(action.localData.userPhotos)),
-
-        // Note that you want to keep the local changes here or the notifications will magically
-        // re-appear when the sync from a first delete comes back. This might actually be the case
-        // for the other types too, but I don't have time to test them all right now.
+        leaderboards: fromJS(action.localData.leaderboards).merge(state.get('leaderboards')),
+        trainings: fromJS(action.localData.trainings).merge(state.get('trainings')),
+        follows: fromJS(action.localData.follows).merge(state.get('follows')),
+        horses: fromJS(action.localData.horses).merge(state.get('horses')),
+        horsePhotos: fromJS(action.localData.horsePhotos).merge(state.get('horsePhotos')),
+        horseUsers: fromJS(action.localData.horseUsers).merge(state.get('horseUsers')),
         notifications: fromJS(action.localData.notifications).merge(state.get('notifications')),
+        rides: fromJS(action.localData.rides).merge(state.get('rides')),
+        rideComments: fromJS(action.localData.rideComments).merge(state.get('rideComments')),
+        rideHorses: fromJS(action.localData.rideHorses).merge(state.get('rideHorses')),
+        rideCarrots: fromJS(action.localData.rideCarrots).merge(state.get('rideCarrots')),
+        ridePhotos: fromJS(action.localData.ridePhotos).merge(state.get('ridePhotos')),
+        rideAtlasEntries: fromJS(action.localData.rideAtlasEntries).merge(state.get('rideAtlasEntries')),
+        users: fromJS(action.localData.users).merge(state.get('users')),
+        userPhotos: fromJS(action.localData.userPhotos).merge(state.get('userPhotos')),
       }))
     case NOTIFICATION_UPDATED:
       return state.setIn(['notifications', action.notification.get('_id')], action.notification)

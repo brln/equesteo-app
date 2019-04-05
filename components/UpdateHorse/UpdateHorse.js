@@ -147,7 +147,7 @@ export default class UpdateHorse extends PureComponent {
           value={this.props.horse.get('birthMonth')}
           items={items}
           onValueChange={onValueChange}
-          style={{inputIOS: {fontSize: 25, fontWeight: 'bold', textAlign: 'center', paddingTop: 10}}}
+          style={pickerSelectStyles}
           placeholder={{
             label: 'MM',
             value: null,
@@ -167,7 +167,7 @@ export default class UpdateHorse extends PureComponent {
         <RNPickerSelect
           value={this.props.horse.get('birthDay')}
           items={allDays}
-          style={{inputIOS: {fontSize: 25, fontWeight: 'bold', textAlign: 'center', paddingTop: 10}}}
+          style={pickerSelectStyles}
           onValueChange={onValueChange}
           placeholder={{
             label: 'DD',
@@ -189,7 +189,7 @@ export default class UpdateHorse extends PureComponent {
         <RNPickerSelect
           items={allYears}
           value={this.props.horse.get('birthYear')}
-          style={{inputIOS: {fontSize: 25, fontWeight: 'bold', textAlign: 'center', paddingTop: 10}}}
+          style={pickerSelectStyles}
           onValueChange={onValueChange}
           placeholder={{
             label: 'YYYY',
@@ -213,7 +213,7 @@ export default class UpdateHorse extends PureComponent {
           value={this.props.horse.get('sex')}
           onValueChange={onValueChange}
           items={items}
-          style={{inputIOS: {fontSize: 25, fontWeight: 'bold', textAlign: 'center', paddingTop: 10}}}
+          style={pickerSelectStyles}
           placeholder={{
             label: 'None',
             value: null,
@@ -246,7 +246,7 @@ export default class UpdateHorse extends PureComponent {
             value={this.props.horse.get('heightHands')}
             onValueChange={this.changeHorseHeightHands}
             items={handsItems}
-            style={{inputIOS: {fontSize: 25, fontWeight: 'bold', textAlign: 'center', paddingTop: 10}}}
+            style={pickerSelectStyles}
             placeholder={{
               label: 'Hands',
               value: null,
@@ -256,15 +256,16 @@ export default class UpdateHorse extends PureComponent {
         <View style={{flex: 2, height: 50, borderColor: darkBrand, borderWidth: 1, borderRadius: 4}}>
           <RNPickerSelect
             value={this.props.horse.get('heightInches')}
-            style={{inputIOS: {fontSize: 25, fontWeight: 'bold', textAlign: 'center', paddingTop: 10}}}
+            style={pickerSelectStyles}
             onValueChange={this.changeHorseHeightInches}
             items={inchesItems}
             placeholder={{
               label: 'Inches',
               value: null,
             }}
-          >
-          </RNPickerSelect>
+          />
+
+
         </View>
       </View>
     )
@@ -446,6 +447,26 @@ const styles = StyleSheet.create({
   },
   profileButton: {
     width: 130,
-    paddingTop: 2,
+    paddingTop: 2
+    ,
   }
+});
+
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    color: 'black',
+    paddingRight: 30, // to ensure the text is never behind the icon
+  },
+  inputAndroid: {
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderWidth: 0.5,
+    borderColor: brand,
+    borderRadius: 8,
+    color: 'black',
+    paddingRight: 30, // to ensure the text is never behind the icon
+  },
+  placeholder: {}
 });

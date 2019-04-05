@@ -17,7 +17,6 @@ import BuildImage from '../Images/BuildImage'
 import { userName } from '../../modelHelpers/user'
 import { brand, darkBrand } from '../../colors'
 import { logError, MONTHS } from '../../helpers'
-import DeleteModal from '../Shared/DeleteModal'
 import RidersCard from './RidersCard'
 import FabImage from '../FabImage'
 import TrainingCard from './TrainingCard'
@@ -35,7 +34,6 @@ export default class HorseProfile extends PureComponent {
     this.makeBirthday = this.makeBirthday.bind(this)
     this.photoSources = this.photoSources.bind(this)
     this.renderOwner = this.renderOwner.bind(this)
-    this.renderDeleteModal = this.renderDeleteModal.bind(this)
     this.renderImageSwiper = this.renderImageSwiper.bind(this)
     this.showRiderProfile = this.showRiderProfile.bind(this)
     this.uploadPhoto = this.uploadPhoto.bind(this)
@@ -186,25 +184,9 @@ export default class HorseProfile extends PureComponent {
     return ownerSection
   }
 
-  renderDeleteModal () {
-    let text = "Are you sure you want to archive this horse?"
-    if (this.props.horseOwner !== this.props.user) {
-      text = "Are you sure you want to remove this horse from your barn? It will not be deleted from the owner's barn."
-    }
-    return (
-       <DeleteModal
-        modalOpen={this.props.modalOpen}
-        closeDeleteModal={this.props.closeDeleteModal}
-        deleteFunc={this.props.deleteHorse}
-        text={text}
-      />
-    )
-  }
-
   render() {
     return (
       <ScrollView>
-        {this.renderDeleteModal()}
         {this.renderImageSwiper()}
 
         <SquaresCard

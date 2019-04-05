@@ -26,7 +26,7 @@ import { EqNavigation } from '../services'
 
 const { width } = Dimensions.get('window')
 
-const LOADING_MESSAGE = 'Generating sharable map...'
+const LOADING_MESSAGE = 'Generating sharable map. This can take 30 seconds or more. Sorry it\'s so slow, we\'re working on it.'
 const DOWNLOADING_MESSAGE = 'Downloading map to phone...'
 
 class ShareRideContainer extends PureComponent {
@@ -197,7 +197,7 @@ class ShareRideContainer extends PureComponent {
 
   _renderLoading () {
     return (
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', padding: 30}}>
         <ActivityIndicator size="large" color={darkBrand} />
         <Text style={{textAlign: 'center', color: darkBrand}}>{this.state.loadingMessage}</Text>
         {

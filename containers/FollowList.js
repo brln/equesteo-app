@@ -34,12 +34,16 @@ class FollowListContainer extends PureComponent {
     super(props)
     this.state = {
       duplicateModalOpen: false,
+      transferModalOpen: false,
       transferUserID: null,
     }
 
+    this.closeDuplicateModal = this.closeDuplicateModal.bind(this)
+    this.closeTransferModal = this.closeTransferModal.bind(this)
+    this.doTransfer = this.doTransfer.bind(this)
     this.duplicateRide = this.duplicateRide.bind(this)
     this.memoUsers = memoizeOne(this.users.bind(this))
-    this.closeDuplicateModal = this.closeDuplicateModal.bind(this)
+    this.openTransferModal = this.openTransferModal.bind(this)
     this.openDuplicateModal = this.openDuplicateModal.bind(this)
   }
 
@@ -50,9 +54,22 @@ class FollowListContainer extends PureComponent {
     })
   }
 
+  openTransferModal (transferUser) {
+    this.setState({
+      transferModalOpen: true,
+      transferUserID: transferUser.get('_id'),
+    })
+  }
+
   closeDuplicateModal () {
     this.setState({
       duplicateModalOpen: false
+    })
+  }
+
+  closeTransferModal () {
+    this.setState({
+      transferModalOpen: false
     })
   }
 
@@ -72,6 +89,12 @@ class FollowListContainer extends PureComponent {
           return this.openDuplicateModal(user)
         }
       }
+    } else if (localCallbackName === 'transferHorse') {
+      return (user) => {
+        return () => {
+          return this.openTransferModal(user)
+        }
+      }
     }
   }
 
@@ -80,14 +103,22 @@ class FollowListContainer extends PureComponent {
     EqNavigation.popToRoot(this.props.componentId)
   }
 
+  doTransfer () {
+    this.props.doTransfer(this.state.transferUserID)
+    EqNavigation.popToRoot(this.props.componentId)
+  }
+
   render() {
     logRender('FollowListContainer')
     return (
       <FollowList
         closeDuplicateModal={this.closeDuplicateModal}
+        closeTransferModal={this.closeTransferModal}
         duplicateModalOpen={this.state.duplicateModalOpen}
         duplicateModalYes={this.duplicateRide}
+        transferModalYes={this.doTransfer}
         onPress={this.props.onPress || this.localCallback(this.props.localCallbackName)}
+        transferModalOpen={this.state.transferModalOpen}
         users={this.memoUsers(this.props.users, this.props.userIDs)}
         userPhotos={this.props.userPhotos}
       />
@@ -99,6 +130,7 @@ function mapStateToProps (state, passedProps) {
   const userIDs = passedProps.userIDs
   const pouchState = state.get('pouchRecords')
   return {
+    doTransfer: passedProps.doTransfer,
     duplicateRide: passedProps.duplicateRide,
     localCallbackName: passedProps.localCallbackName,
     onPress: passedProps.onPress,

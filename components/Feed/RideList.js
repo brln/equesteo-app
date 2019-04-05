@@ -103,6 +103,7 @@ export default class RideList extends PureComponent {
       })
       return (
         <HorseCard
+          createTime={item.sortTime}
           horse={item.childData}
           horsePhotos={horsePhotos}
           ownerID={this.props.horseOwnerIDs.get(item.childData.get('_id'))}
