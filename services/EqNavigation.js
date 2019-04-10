@@ -16,7 +16,7 @@ export default class EqNavigation {
         logError(e)
       })
     } else {
-      return Promise.resolve()
+      return Promise.reject()
     }
   }
 
@@ -32,7 +32,7 @@ export default class EqNavigation {
         logError(e)
       })
     } else {
-      return Promise.resolve()
+      return Promise.reject()
     }
   }
 
@@ -48,7 +48,7 @@ export default class EqNavigation {
         logError(e)
       })
     } else {
-      return Promise.resolve()
+      return Promise.reject()
     }
   }
 
@@ -64,7 +64,7 @@ export default class EqNavigation {
         logError(e)
       })
     } else {
-      return Promise.resolve()
+      return Promise.reject()
     }
   }
 }
