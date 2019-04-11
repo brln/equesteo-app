@@ -235,7 +235,6 @@ class FeedContainer extends BackgroundComponent {
 
   navigationButtonPressed({ buttonId }) {
     if (buttonId === 'sideMenu') {
-      logDebug('set back to visible!')
       Navigation.mergeOptions(this.props.componentId, {
         sideMenu: {
           left: {
@@ -336,8 +335,8 @@ class FeedContainer extends BackgroundComponent {
     })
   }
 
-  rideHorses (rideHorses) {
-    return rideHorses.filter(rh => {
+  rideHorses (rHorses) {
+    return rHorses.filter(rh => {
       return rh.get('deleted') !== true
     })
   }
@@ -364,7 +363,6 @@ class FeedContainer extends BackgroundComponent {
         rideComments={this.props.rideComments.toList()}
         ridePhotos={this.props.ridePhotos}
         showHorseProfile={this.showHorseProfile}
-        showComments={this.showComments}
         showProfile={this.showProfile}
         showRide={this.showRide}
         syncDB={this.syncDB}

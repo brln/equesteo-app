@@ -54,6 +54,7 @@ import {
   SET_ACTIVE_COMPONENT,
   SET_FEED_MESSAGE,
   SET_FIRST_START_HORSE_ID,
+  SET_FOLLOWING_SYNC_RUNNING,
   SET_FULL_SYNC_FAIL,
   SET_LOCATION_RETRY,
   SET_REMOTE_PERSIST,
@@ -455,6 +456,13 @@ export function setActiveAtlasEntry (id) {
   return {
     type: SET_ACTIVE_ATLAS_ENTRY,
     id
+  }
+}
+
+export function setFollowingSyncRunning (value) {
+  return {
+    type: SET_FOLLOWING_SYNC_RUNNING,
+    value
   }
 }
 

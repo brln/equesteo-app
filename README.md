@@ -28,3 +28,6 @@ adb install android/app/build/outputs/apk/release/app-release.apk
 # fix glog
 cd node_modules/react-native ; ./scripts/ios-install-third-party.sh ; cd ../../
 cd node_modules/react-native/third-party/glog-0.3.4/ ; sh ../../scripts/ios-configure-glog.sh ; cd ../../../../a
+
+# follow couchdb on docker logs:
+docker logs --follow 8ab154e4f90a

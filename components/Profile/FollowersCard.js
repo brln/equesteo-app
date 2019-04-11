@@ -18,22 +18,24 @@ export default class FollowersCard extends PureComponent {
         <Card>
           <CardItem>
             <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
-              <View style={{flex: 1}} />
               <TouchableOpacity
                 onPress={this.props.showUserList(this.props.followers, 'followerID')}
-                style={{flex: 2, paddingLeft: 5, flexDirection: 'row', alignItems: 'center'}}
+                style={{flex: 2, paddingLeft: 20, flexDirection: 'row', alignItems: 'center'}}
               >
                 <Text style={{color: darkBrand, paddingRight: 10}}>Followers:</Text>
-                <Text style={{fontSize: 24}}>{this.props.followers.count()}</Text>
+                <View>
+                  <Text style={{fontSize: 24}}>{this.props.followers.count()}</Text>
+                </View>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={this.props.showUserList(this.props.followings, 'followingID')}
-                style={{flex: 2, paddingLeft: 5, flexDirection: 'row', alignItems: 'center'}}
+                style={{flex: 2, paddingRight: 20, flexDirection: 'row', alignItems: 'center'}}
               >
                 <Text style={{color: darkBrand, paddingRight: 10}}>Following:</Text>
-                <Text style={{fontSize: 24}}>{this.props.followings.count()}</Text>
+                <View>
+                  <Text style={{fontSize: 24}}>{this.props.followings.count()}</Text>
+                </View>
               </TouchableOpacity>
-              <View style={{flex: 1}} />
             </View>
           </CardItem>
         </Card>

@@ -211,31 +211,34 @@ export default class PouchCouch {
     })
   }
 
-  static localReplicateUsers (options, ownUserID, userIDs, progress) {
+  static localReplicateUsers (options, ownUserID, leaderboardIDs, progress) {
     const remoteUsersDB = new PouchDB(`${API_URL}/couchproxy/${usersDBName}`, options)
     return new Promise((resolve, reject) => {
       remoteUsersDB.info().then(resp => {
         const docs = parseInt(resp.update_seq.split('-')[0])
         progress.moreDocsFunc(docs)
-        const firstFetchIDs = userIDs
+        let fetchUserIDs = [ownUserID]
         return remoteUsersDB.query('users/relevantFollows', {key: ownUserID}).then((resp) => {
-          resp.rows.reduce((fetchIDs, row) => {
-            if (fetchIDs.indexOf(row.value[0]) < 0) {
-              fetchIDs.push(row.value[0])
-            }
-            return fetchIDs
-          }, firstFetchIDs)
-          return remoteUsersDB.query('users/relevantFollows', {keys: firstFetchIDs})
-        }).then(resp2 => {
-          const fetchIDs = resp2.rows.reduce((accum, row) => {
+          // First degree follower/following
+          fetchUserIDs = resp.rows.reduce((accum, row) => {
             if (accum.indexOf(row.value[0]) < 0) {
               accum.push(row.value[0])
             }
             return accum
-          }, [])
-          return remoteUsersDB.query('users/userDocIDs', {keys: fetchIDs})
+          }, fetchUserIDs)
+          return remoteUsersDB.query('users/relevantFollows', {keys: fetchUserIDs})
+        }).then(resp2 => {
+          // Second degree follower/following
+          fetchUserIDs = resp2.rows.reduce((accum, row) => {
+            if (accum.indexOf(row.value[0]) < 0) {
+              accum.push(row.value[0])
+            }
+            return accum
+          }, fetchUserIDs)
+          fetchUserIDs = fetchUserIDs.concat(leaderboardIDs)
+          return remoteUsersDB.query('users/userDocIDs', {keys: fetchUserIDs})
         }).then(resp3 => {
-          const allDocIDs = resp3.rows.reduce((accum, row) => {
+          let allDocIDs = resp3.rows.reduce((accum, row) => {
             if (accum.indexOf(row.id) < 0) {
               accum.push(row.id)
             }
@@ -347,76 +350,73 @@ export default class PouchCouch {
         leaderboards: null
       }
 
+      // Don't filter these for deleted because then you have docs in your
+      // db that aren't in your state, and if you re-create them (i.e. new follow)
+      // and try to save you'll get a conflict.
       for (let horseDoc of horsesResp.rows) {
-        if (horseDoc.doc.deleted !== true) {
-          switch (horseDoc.doc.type) {
-            case 'horse':
-              parsed.horses[horseDoc.doc._id] = horseDoc.doc
-              break
-            case 'horsePhoto':
-              parsed.horsePhotos[horseDoc.doc._id] = horseDoc.doc
-              break
-            case 'horseUser':
-              parsed.horseUsers[horseDoc.doc._id] = horseDoc.doc
-              break
-          }
+        switch (horseDoc.doc.type) {
+          case 'horse':
+            parsed.horses[horseDoc.doc._id] = horseDoc.doc
+            break
+          case 'horsePhoto':
+            parsed.horsePhotos[horseDoc.doc._id] = horseDoc.doc
+            break
+          case 'horseUser':
+            parsed.horseUsers[horseDoc.doc._id] = horseDoc.doc
+            break
         }
       }
 
       for (let userDoc of usersResp.rows) {
-        if (userDoc.doc.deleted !== true) {
-          const doc = userDoc.doc
-          const id = doc._id
-          switch (userDoc.doc.type) {
-            case 'follow':
-              parsed.follows[id] = doc
-              break
-            case 'user':
-              parsed.users[id] = doc
-              break
-            case 'userPhoto':
-              parsed.userPhotos[id] = doc
-              break
-            case 'training':
-              parsed.trainings[id] = doc
-              break
-            case 'leaderboards':
-              parsed.leaderboards = doc
-              break
-          }
+        const doc = userDoc.doc
+        const id = doc._id
+        switch (userDoc.doc.type) {
+          case 'follow':
+            parsed.follows[id] = doc
+            break
+          case 'user':
+            parsed.users[id] = doc
+            break
+          case 'userPhoto':
+            parsed.userPhotos[id] = doc
+            break
+          case 'training':
+            parsed.trainings[id] = doc
+            break
+          case 'leaderboards':
+            parsed.leaderboards = doc
+            break
         }
       }
 
       for (let rideDoc of ridesResp.rows) {
-        if (rideDoc.doc.deleted !== true) {
-          const doc = rideDoc.doc
-          const id = doc._id
-          switch (rideDoc.doc.type) {
-            case 'carrot':
-              parsed.rideCarrots[id] = doc
-              break
-            case 'rideCoordinates':
-              parsed.rideCoordinates[id] = doc
-              break
-            case 'comment':
-              parsed.rideComments[id] = doc
-              break
-            case 'rideAtlasEntry':
-              parsed.rideAtlasEntries[id] = doc
-              break
-            case 'rideElevations':
-              parsed.rideElevations[id] = doc
-              break
-            case 'ridePhoto':
-              parsed.ridePhotos[id] = doc
-              break
-            case 'rideHorse':
-              parsed.rideHorses[id] = doc
-              break
-            case 'ride':
-              parsed.rides[id] = doc
-              break
-          }
+        const doc = rideDoc.doc
+        const id = doc._id
+        switch (rideDoc.doc.type) {
+          case 'carrot':
+            parsed.rideCarrots[id] = doc
+            break
+          case 'rideCoordinates':
+            parsed.rideCoordinates[id] = doc
+            break
+          case 'comment':
+            parsed.rideComments[id] = doc
+            break
+          case 'rideAtlasEntry':
+            parsed.rideAtlasEntries[id] = doc
+            break
+          case 'rideElevations':
+            parsed.rideElevations[id] = doc
+            break
+          case 'ridePhoto':
+            parsed.ridePhotos[id] = doc
+            break
+          case 'rideHorse':
+            parsed.rideHorses[id] = doc
+            break
+          case 'ride':
+            parsed.rides[id] = doc
+            break
         }
       }
 

@@ -105,6 +105,7 @@ class RideContainer extends PureComponent {
 
     Navigation.events().bindComponent(this);
 
+    this.memoPaceHorse = memoizeOne(this.paceHorse.bind(this))
     this.memoRideCarrots = memoizeOne(this.rideCarrots.bind(this))
     this.memoRideComments = memoizeOne(this.rideComments.bind(this))
     this.memoRideHorses = memoizeOne(this.rideHorses.bind(this))
@@ -279,7 +280,7 @@ class RideContainer extends PureComponent {
         horseOwnerIDs={this.memoHorseOwnerIDs(this.props.horseUsers)}
         modalOpen={this.state.modalOpen}
         newComment={this.state.newComment}
-        paceHorse={this.paceHorse(this.props.horses, this.props.rideHorses)}
+        paceHorse={this.memoPaceHorse(this.props.horses, this.props.rideHorses)}
         ride={this.props.ride}
         rideUser={this.props.rideUser}
         rideCarrots={this.memoRideCarrots(this.props.rideCarrots)}

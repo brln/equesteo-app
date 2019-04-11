@@ -78,7 +78,9 @@ export default class TrainingCard extends PureComponent {
   }
 
   render() {
-
+    if (!this.props.trainings || !this.props.visible) {
+      return null
+    }
     const calcs = this.calcs()
     return (
       <Card style={{flex: 1}}>

@@ -26,6 +26,7 @@ import {
   SET_ACTIVE_COMPONENT,
   SET_FEED_MESSAGE,
   SET_FIRST_START_HORSE_ID,
+  SET_FOLLOWING_SYNC_RUNNING,
   SET_FULL_SYNC_FAIL,
   SET_LOCATION_RETRY,
   SET_REMOTE_PERSIST,
@@ -69,6 +70,7 @@ export const initialState = Map({
   photoQueue: Map(),
   ridePhotoStash: Map(),
   root: SIGNUP_LOGIN,
+  followingSyncRunning: false,
   showingRide: null,
   signingOut: false,
   userID: null,
@@ -157,6 +159,8 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.set('awaitingPWChange', action.newVal)
     case SET_DOING_INITIAL_LOAD:
       return state.set('doingInitialLoad', action.newVal)
+    case SET_FOLLOWING_SYNC_RUNNING:
+      return state.set('followingSyncRunning', action.value)
     case STASH_RIDE_PHOTO:
       let newState = state
       if (!state.getIn(['ridePhotoStash', action.stashKey])) {

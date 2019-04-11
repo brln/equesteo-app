@@ -58,7 +58,6 @@ export default class FirstStart extends PureComponent {
           <FirstHorsePage
             changeHorseName={this.props.changeHorseName}
             changeHorseBreed={this.props.changeHorseBreed}
-            deleteHorse={this.props.deleteHorse}
             horse={this.props.horse}
             inputs={this.inputs}
             newHorse={this.props.newHorse}

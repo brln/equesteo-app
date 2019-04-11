@@ -276,7 +276,6 @@ class UpdateHorseContainer extends PureComponent {
         clearPhotoMenu={this.clearPhotoMenu}
         closeDeleteModal={this.closeDeleteModal}
         colorModalOpen={this.state.colorModalOpen}
-        deleteHorse={this.deleteHorse}
         horse={this.props.horse}
         horsePhotos={horsePhotos}
         horseUpdated={this.horseUpdated}

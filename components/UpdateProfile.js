@@ -121,7 +121,7 @@ export default class UpdateProfile extends PureComponent {
                 <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
                   <TextInput
                     multiline={true}
-                    style={{width: '100%', height: 50, padding: 10, borderColor: darkBrand, borderWidth: 1}}
+                    style={{width: '100%', height: 150, padding: 10, borderColor: darkBrand, borderWidth: 1}}
                     underlineColorAndroid={'transparent'}
                     onChangeText={this.changeAboutMe}
                     value={this.props.user.get('aboutMe')}

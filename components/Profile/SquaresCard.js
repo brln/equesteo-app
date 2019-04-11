@@ -129,21 +129,25 @@ export default class SquaresCard extends PureComponent {
   }
 
   render() {
-    return (
-      <Card>
-        <CardItem header>
-          <View style={{paddingLeft: 5}}>
-            <Text style={{color: darkBrand}}>Ride History</Text>
-          </View>
-        </CardItem>
-        <CardItem>
-          <ScrollView horizontal={true} ref={x => this.squaresContainer = x}>
-            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
-              { this.generateSquares() }
+    if (this.props.trainings && this.props.visible) {
+      return (
+        <Card>
+          <CardItem header>
+            <View style={{paddingLeft: 5}}>
+              <Text style={{color: darkBrand}}>Ride History</Text>
             </View>
-          </ScrollView>
-        </CardItem>
-      </Card>
-    )
+          </CardItem>
+          <CardItem>
+            <ScrollView horizontal={true} ref={x => this.squaresContainer = x}>
+              <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+                { this.generateSquares() }
+              </View>
+            </ScrollView>
+          </CardItem>
+        </Card>
+      )
+    } else {
+      return null
+    }
   }
 }

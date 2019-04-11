@@ -69,6 +69,7 @@ class FindPeopleContainer extends PureComponent {
         name: PROFILE,
         passProps: {
           profileUser: showUser,
+          profilePhotoURL: profileUser.get('profilePhotoURL')
         }
       }
     })

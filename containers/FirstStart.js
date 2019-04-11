@@ -222,7 +222,6 @@ class FirstStartContainer extends PureComponent {
         changeHorseBreed={this.changeHorseBreed}
         commitUpdateUser={this.commitUpdateUser}
         currentPage={this.state.currentPage}
-        deleteHorse={this.deleteHorse}
         done={this.done}
         horse={this.props.horse}
         horsePhotos={this.props.horsePhotos}

@@ -146,13 +146,13 @@ export default class HorseProfile extends PureComponent {
           borderBottomWidth: this.props.horse.get('color') ? 3 : null
         }}>
           {this.renderProfileImage()}
-          <Fab
+          { this.props.owner ? <Fab
             direction="up"
             style={{ backgroundColor: brand }}
             position="bottomRight"
             onPress={this.uploadPhoto}>
             <FabImage source={require('../../img/addphoto.png')} height={30} width={30} />
-          </Fab>
+          </Fab> : null }
         </View>
         <PhotoFilmstrip
           photosByID={this.props.horsePhotos}
@@ -165,7 +165,7 @@ export default class HorseProfile extends PureComponent {
 
   renderOwner () {
     let ownerSection = null
-    if (this.props.horseOwner !== this.props.user) {
+    if (this.props.horseOwner && this.props.horseOwner !== this.props.user) {
        ownerSection = (
         <View>
         <CardItem header style={{padding: 5}}>
@@ -191,10 +191,12 @@ export default class HorseProfile extends PureComponent {
 
         <SquaresCard
           trainings={this.props.trainings}
+          visible={true}
         />
 
         <TrainingCard
           trainings={this.props.trainings}
+          visible={true}
         />
 
         <View style={{flex: 1}}>
@@ -245,14 +247,14 @@ export default class HorseProfile extends PureComponent {
               </View>
             </CardItem>
           </Card>
-          <RidersCard
-            addRider={this.props.addRider}
-            deleteHorse={this.props.deleteHorse}
-            riders={this.props.riders}
-            showRiderProfile={this.showRiderProfile}
-            user={this.props.user}
-            userPhotos={this.props.userPhotos}
-          />
+          { this.props.owner ? <RidersCard
+              addRider={this.props.addRider}
+              deleteHorse={this.props.deleteHorse}
+              riders={this.props.riders}
+              showRiderProfile={this.showRiderProfile}
+              user={this.props.user}
+              userPhotos={this.props.userPhotos}
+            /> : null }
         </View>
       </ScrollView>
     )

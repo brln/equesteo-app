@@ -1,3 +1,4 @@
+import memoizeOne from 'memoize-one'
 import moment from 'moment'
 import React from 'react'
 import { connect } from 'react-redux';
@@ -51,12 +52,12 @@ class HorseProfileContainer extends BackgroundComponent {
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
     this.showPhotoLightbox = this.showPhotoLightbox.bind(this)
     this.showRiderProfile = this.showRiderProfile.bind(this)
-    this.thisHorsesPhotos = this.thisHorsesPhotos.bind(this)
-    this.thisHorsesRides = this.thisHorsesRides.bind(this)
-    this.thisHorsesRiders = this.thisHorsesRiders.bind(this)
     this.uploadPhoto = this.uploadPhoto.bind(this)
 
     Navigation.events().bindComponent(this);
+
+    this.memoThisHorsesPhotos = memoizeOne(this.thisHorsesPhotos.bind(this))
+    this.memoThisHorsesRiders = memoizeOne(this.thisHorsesRiders.bind(this))
 
     if (props.ownerID === props.userID) {
       Navigation.mergeOptions(props.componentId, {
@@ -145,34 +146,35 @@ class HorseProfileContainer extends BackgroundComponent {
     this.props.dispatch(persistHorseWithPhoto(this.props.horse.get('_id'), photoID))
   }
 
-  thisHorsesPhotos () {
-    return this.props.horsePhotos.filter((photo) => {
-      return photo.get('deleted') !== true && photo.get('horseID') === this.props.horse.get('_id')
+  thisHorsesPhotos (horsePhotos, horse) {
+    return horsePhotos.filter((photo) => {
+      return photo.get('deleted') !== true && photo.get('horseID') === horse.get('_id')
     })
   }
 
-  thisHorsesRides () {
-    return this.props.rides.valueSeq().filter((r) => {
-      return r.get('horseID') === this.props.horse.get('_id')
-    }).toList()
-  }
-
-  thisHorsesRiders () {
-    return this.props.horseUsers.valueSeq().filter((hu) => {
-      return (hu.get('horseID') === this.props.horse.get('_id')) && hu.get('deleted') !== true
+  thisHorsesRiders (horseUsers, horse, users) {
+    return horseUsers.valueSeq().filter((hu) => {
+      return (hu.get('horseID') === horse.get('_id')) && hu.get('deleted') !== true
     }).map((hu) => {
-      return this.props.users.get(hu.get('userID'))
+      return users.get(hu.get('userID'))
     })
   }
 
-  trainings (trainings, ownerID, horseID) {
-    return trainings.getIn([`${ownerID}_training`, 'rides']).filter(t => {
-      return t.get('deleted') !== true && (t.get('horseIDs').indexOf(horseID) >= 0)
-    }).reduce((accum, t) => {
-      const day = moment(t.get('startTime')).hour(0).minute(0).second(0).millisecond(0).toISOString()
-      accum.get(day) ? accum = accum.set(day, accum.get(day).push(t)) : accum = accum.set(day, List([t]))
-      return accum
-    }, Map())
+  trainings (trainings, owner, horse) {
+    const ownerID = owner && owner.get('_id')
+    const horseID = horse && horse.get('_id')
+    if (ownerID && horseID) {
+      // If an owner that you're following transfers the horse to a user you aren't following,
+      // you won't have the owner record or trainings locally, but the ride is still available to
+      // look at on the feed.
+      return trainings.getIn([`${ownerID}_training`, 'rides']).filter(t => {
+        return t.get('deleted') !== true && (t.get('horseIDs').indexOf(horseID) >= 0)
+      }).reduce((accum, t) => {
+        const day = moment(t.get('startTime')).hour(0).minute(0).second(0).millisecond(0).toISOString()
+        accum.get(day) ? accum = accum.set(day, accum.get(day).push(t)) : accum = accum.set(day, List([t]))
+        return accum
+      }, Map())
+    }
   }
 
   render() {
@@ -185,12 +187,12 @@ class HorseProfileContainer extends BackgroundComponent {
         deleteHorse={this.deleteHorse}
         horse={this.props.horse}
         horseOwner={this.props.owner}
-        horsePhotos={this.thisHorsesPhotos()}
-        rides={this.thisHorsesRides()}
-        riders={this.thisHorsesRiders()}
+        horsePhotos={this.memoThisHorsesPhotos(this.props.horsePhotos, this.props.horse)}
+        owner={this.props.owner}
+        riders={this.memoThisHorsesRiders(this.props.horseUsers, this.props.horse, this.props.users)}
         showRiderProfile={this.showRiderProfile}
         showPhotoLightbox={this.showPhotoLightbox}
-        trainings={this.trainings(this.props.trainings, this.props.owner.get('_id'), this.props.horse.get('_id'))}
+        trainings={this.trainings(this.props.trainings, this.props.owner, this.props.horse)}
         uploadPhoto={this.uploadPhoto}
         user={this.props.user}
         userPhotos={this.props.userPhotos}

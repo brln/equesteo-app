@@ -7,6 +7,7 @@ import {
   Fab,
 } from 'native-base';
 import {
+  ActivityIndicator,
   Clipboard,
   Dimensions,
   FlatList,
@@ -37,34 +38,14 @@ const { width, height } = Dimensions.get('window')
 export default class Profile extends PureComponent {
   constructor (props) {
     super(props)
-    this.state = {
-      touches: 0
-    }
     this.follow = this.follow.bind(this)
     this.unfollow = this.unfollow.bind(this)
     this.horseProfile = this.horseProfile.bind(this)
     this.horsesCard = this.horsesCard.bind(this)
-    this.maybeShowID = this.maybeShowID.bind(this)
     this.photoSources = this.photoSources.bind(this)
     this.renderHorse = this.renderHorse.bind(this)
     this.showUserList = this.showUserList.bind(this)
     this.uploadProfile = this.uploadProfile.bind(this)
-  }
-
-  maybeShowID () {
-    if (this.state.touches === 5) {
-      const id = this.props.profileUser.get('_id')
-      alert(id)
-      Clipboard.setString(id)
-      logInfo(id)
-      this.setState({
-        touches: 0
-      })
-    } else {
-      this.setState({
-        touches: this.state.touches + 1
-      })
-    }
   }
 
   uploadProfile () {
@@ -148,29 +129,42 @@ export default class Profile extends PureComponent {
   renderProfileImage () {
     const images = []
     const user = this.props.profileUser
-    if (user.get('profilePhotoID')) {
-      const profileSource = {uri: this.props.userPhotos.getIn([user.get('profilePhotoID'), 'uri'])}
-      const profileSources = this.photoSources(user.get('profilePhotoID'))
+    if (this.props.profilePhotoURL) {
+      // got here from FindPeople
       images.push(
         <MedImage
-          onPress={() => {this.props.showPhotoLightbox(profileSources)}}
+          onPress={() => {this.props.showPhotoLightbox([this.props.profilePhotoURL])}}
           key={"profile"}
           style={{width: '100%', height: '100%'}}
-          source={profileSource}
+          source={{uri: this.props.profilePhotoURL}}
           onError={e => logError("Can't load Profile image")}
-          showSource={true}
         />
       )
     } else {
-      images.push(
-        <View style={styles.slide} key={"empty"}>
-          <BuildImage
+      if (user.get('profilePhotoID')) {
+        const profileSource = {uri: this.props.userPhotos.getIn([user.get('profilePhotoID'), 'uri'])}
+        const profileSources = this.photoSources(user.get('profilePhotoID'))
+        images.push(
+          <MedImage
+            onPress={() => {this.props.showPhotoLightbox(profileSources)}}
+            key={"profile"}
             style={{width: '100%', height: '100%'}}
-            source={require('../../img/emptyProfile.png')}
-            onError={e => logError("Can't load empty profile image")}
+            source={profileSource}
+            onError={e => logError("Can't load Profile image")}
+            showSource={true}
           />
-        </View>
-      )
+        )
+      } else {
+        images.push(
+          <View style={styles.slide} key={"empty"}>
+            <BuildImage
+              style={{width: '100%', height: '100%'}}
+              source={require('../../img/emptyProfile.png')}
+              onError={e => logError("Can't load empty profile image")}
+            />
+          </View>
+        )
+      }
     }
     return images
   }
@@ -189,28 +183,41 @@ export default class Profile extends PureComponent {
         </Fab>
       )
     } else {
-      followButton = (
-        <TouchableOpacity
-          style={styles.followButton}
-          onPress={this.follow}
-          underlayColor={green}
-        >
-          <Text style={styles.followText}>Follow</Text>
-        </TouchableOpacity>
-      )
-      for (let follow of this.props.followers.valueSeq()) {
-        if (follow.get('followingID') === this.props.profileUser.get('_id')
-          && follow.get('followerID') === this.props.userID) {
-          followButton = (
-            <TouchableOpacity
-              style={styles.unfollowButton}
-              onPress={this.unfollow}
-              underlayColor={danger}
-            >
-              <Text style={styles.followText}>Unfollow</Text>
-            </TouchableOpacity>
-          )
-          break
+      if (this.props.followingSyncRunning) {
+        followButton = (
+          <View style={styles.followButton}>
+            <View style={{flex: 1, flexDirection: 'row'}}>
+              <View style={{paddingLeft: 10}}>
+                <ActivityIndicator color="white"/>
+              </View>
+              <Text style={[styles.followText]}>Loading User Data...</Text>
+            </View>
+          </View>
+        )
+      } else {
+        followButton = (
+          <TouchableOpacity
+            style={styles.followButton}
+            onPress={this.follow}
+            underlayColor={green}
+          >
+            <Text style={styles.followText}>Follow</Text>
+          </TouchableOpacity>
+        )
+        for (let follow of this.props.followers.valueSeq()) {
+          if (follow.get('followingID') === this.props.profileUser.get('_id')
+            && follow.get('followerID') === this.props.userID) {
+            followButton = (
+              <TouchableOpacity
+                style={styles.unfollowButton}
+                onPress={this.unfollow}
+                underlayColor={danger}
+              >
+                <Text style={styles.followText}>Unfollow</Text>
+              </TouchableOpacity>
+            )
+            break
+          }
         }
       }
     }
@@ -220,7 +227,7 @@ export default class Profile extends PureComponent {
         <View style={{height: ((height / 2) - 20)}}>
           {this.renderProfileImage()}
           { fab }
-          <View style={{position: 'absolute', width: 150, bottom: 10, right: 10}}>
+          <View style={{position: 'absolute', bottom: 10, right: 10}}>
             { followButton }
           </View>
         </View>
@@ -234,7 +241,7 @@ export default class Profile extends PureComponent {
   }
 
   horsesCard () {
-    if (this.props.horses.count() > 0) {
+    if (this.props.horses.count() > 0 && this.props.oneDegreeUser) {
       return (
         <Card>
           <CardItem header style={{padding: 5}}>
@@ -292,20 +299,20 @@ export default class Profile extends PureComponent {
           />
           <SquaresCard
             trainings={this.props.trainings}
+            visible={this.props.oneDegreeUser}
           />
 
           <TrainingCard
             trainings={this.props.trainings}
+            visible={this.props.oneDegreeUser}
           />
 
           <Card>
             <CardItem header style={{padding: 5}}>
               <View style={{paddingLeft: 5}}>
-                <TouchableWithoutFeedback onPress={this.maybeShowID}>
-                  <View>
-                    <Text style={{color: darkBrand}}>Name</Text>
-                  </View>
-                </TouchableWithoutFeedback>
+                <View>
+                  <Text style={{color: darkBrand}}>Name</Text>
+                </View>
               </View>
             </CardItem>
             <CardItem cardBody style={{marginLeft: 20, marginRight: 20}}>
@@ -337,13 +344,7 @@ const styles = StyleSheet.create({
     alignItems: 'stretch',
     backgroundColor: '#F5FCFF',
   },
-  profileButton: {
-    width: 130,
-    paddingTop: 2,
-  },
   unfollowButton:{
-    marginRight:20,
-    marginLeft:20,
     marginTop:10,
     paddingTop:10,
     paddingBottom:10,
@@ -353,8 +354,6 @@ const styles = StyleSheet.create({
     borderColor: '#fff'
   },
   followButton:{
-    marginRight:40,
-    marginLeft:40,
     marginTop:10,
     paddingTop:10,
     paddingBottom:10,

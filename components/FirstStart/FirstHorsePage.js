@@ -14,8 +14,6 @@ import { logRender } from '../../helpers'
 import Button from '../Button'
 import HorseForm from './HorseForm'
 
-const { height, width } = Dimensions.get('window')
-
 export default class FirstHorsePage extends PureComponent {
   constructor (props) {
     super(props)

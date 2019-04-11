@@ -75,6 +75,7 @@ import {
   rideCommentUpdated,
   rideElevationsLoaded,
   ridePhotoUpdated,
+  setFollowingSyncRunning,
   setRemotePersist,
   setFeedMessage,
   setFullSyncFail,
@@ -110,6 +111,7 @@ export function catchAsyncError (dispatch, sentry=true) {
         dispatch(signOut())
       }
       if (sentry) {
+        captureBreadcrumb(JSON.stringify(e))
         captureException(e)
       }
       if (ENV === 'local') {
@@ -298,7 +300,7 @@ export function deleteHorseUser (horseUserID) {
     if (!theHorseUser) {
       throw Error('Could not find horseUser')
     }
-    theHorseUser = theHorseUser.set('deleted', true)
+    theHorseUser = theHorseUser.set('deleted', true).set('rideDefault', false)
     dispatch(horseUserUpdated(theHorseUser))
   }
 }
@@ -389,15 +391,17 @@ export function newPassword (password) {
   }
 }
 
-export function persistFollow (followID) {
+export function persistFollow (followID, creating) {
   cb('persistFollow')
   return (dispatch, getState) => {
     const theFollow = getState().getIn(['pouchRecords', 'follows', followID])
     if (!theFollow) {
       throw new Error('no follow with that ID')
     }
-
-    PouchCouch.saveUser(theFollow.toJS()).then(({ rev }) => {
+    if (creating) {
+      dispatch(setFollowingSyncRunning(true))
+    }
+    return PouchCouch.saveUser(theFollow.toJS()).then(({ rev }) => {
       let foundAfterSave = getState().getIn(['pouchRecords', 'follows', followID])
       dispatch(followUpdated(foundAfterSave.set('_rev', rev)))
       return dispatch(doSync())
@@ -1066,6 +1070,7 @@ export function doSync (syncData={}, showProgress=true) {
         dispatch(setRemotePersist(DB_SYNCED))
         dispatch(syncComplete())
         dispatch(setFullSyncFail(false))
+        dispatch(setFollowingSyncRunning(false))
         feedMessage('Sync Complete', green, 3000)
       }).catch((e) => {
         dispatch(setFullSyncFail(true))
