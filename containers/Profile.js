@@ -298,6 +298,7 @@ class ProfileContainer extends BackgroundComponent {
           horses={this.memoProfileUserHorses(this.props.horseUsers, this.props.profileUser, this.props.horses)}
           horseOwnerIDs={this.memoHorseOwnerIDs(this.props.horseUsers)}
           horsePhotos={this.props.horsePhotos}
+          leaderboardProfile={this.props.leaderboardProfile}
           logoutModalOpen={this.state.logoutModalOpen}
           oneDegreeUser={this.memoOneDegreeUser(this.props.profileUser, this.props.userID, this.props.follows)}
           profilePhotoURL={this.props.profilePhotoURL}
@@ -333,6 +334,7 @@ function mapStateToProps (state, passedProps) {
     horseUsers: pouchState.get('horseUsers'),
     horses: pouchState.get('horses'),
     horsePhotos: pouchState.get('horsePhotos'),
+    leaderboardProfile: passedProps.leaderboardProfile,
     needsRemotePersist: localState.get('needsRemotePersist'),
     photoQueue: localState.get('photoQueue'),
     profilePhotoURL: passedProps.profilePhotoURL,

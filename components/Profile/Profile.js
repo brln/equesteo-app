@@ -299,12 +299,12 @@ export default class Profile extends PureComponent {
           />
           <SquaresCard
             trainings={this.props.trainings}
-            visible={this.props.oneDegreeUser}
+            visible={this.props.oneDegreeUser || this.props.leaderboardProfile}
           />
 
           <TrainingCard
             trainings={this.props.trainings}
-            visible={this.props.oneDegreeUser}
+            visible={this.props.oneDegreeUser || this.props.leaderboardProfile}
           />
 
           <Card>

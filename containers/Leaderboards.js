@@ -61,6 +61,7 @@ class LeaderboardsContainer extends BackgroundComponent {
         name: PROFILE,
         passProps: {
           profileUser,
+          leaderboardProfile: true
         }
       }
     })
