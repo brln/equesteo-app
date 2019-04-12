@@ -16,13 +16,6 @@ class PhotoLightboxContainer extends PureComponent {
         backButton: {
           color: 'white'
         },
-        leftButtons: [
-          {
-            id: 'back',
-            icon: require('../img/back-arrow.png'),
-            color: 'white'
-          }
-        ],
         elevation: 0
       },
       layout: {
@@ -33,16 +26,12 @@ class PhotoLightboxContainer extends PureComponent {
 
   constructor (props) {
     super(props)
-    this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
     Navigation.events().bindComponent(this);
   }
 
-  navigationButtonPressed ({ buttonId }) {
-    if (buttonId === 'back') {
-      EqNavigation.pop(this.props.componentId)
-      if (this.props.onClose) {
-        this.props.onClose()
-      }
+  componentWillUnmount () {
+    if (this.props.onClose) {
+      this.props.onClose()
     }
   }
 

@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 import {
   Dimensions,
   FlatList,
+  Keyboard,
   Text,
   TouchableOpacity,
   View,
@@ -116,6 +117,9 @@ class RideToolsContainer extends Component {
     EqNavigation.push(this.props.componentId, {
       component: {
         name: UPDATE_RIDE,
+        options: {
+          blurOnUnmount: true
+        },
         passProps: {
           rideID: this.props.rideID,
           popBackTo: this.props.popBackTo
@@ -128,6 +132,9 @@ class RideToolsContainer extends Component {
     EqNavigation.push(this.props.componentId, {
       component: {
         name: SHARE_RIDE,
+        options: {
+          blurOnUnmount: true
+        },
         passProps: {
           rideID: this.props.rideID,
         }

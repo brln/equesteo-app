@@ -34,13 +34,6 @@ class UpdateHorseContainer extends PureComponent {
           color: 'white'
         },
         elevation: 0,
-        leftButtons: [
-          {
-            id: 'back',
-            icon: require('../img/back-arrow.png'),
-            color: 'white'
-          }
-        ],
         rightButtons: [
           {
             id: 'save',
@@ -60,6 +53,7 @@ class UpdateHorseContainer extends PureComponent {
     this.state = {
       cachedHorse: null,
       cachedHorseUser: null,
+      doRevert: true,
       newPhotoIDs: [],
       deletedPhotoIDs: [],
       showPhotoMenu: false,
@@ -143,13 +137,6 @@ class UpdateHorseContainer extends PureComponent {
   replaceMenuItems () {
     Navigation.mergeOptions(this.props.componentId, {
       topBar: {
-        leftButtons: [
-          {
-            id: 'back',
-            icon: require('../img/back-arrow.png'),
-            color: 'white'
-          }
-        ],
         rightButtons: [
           {
             id: 'save',
@@ -170,8 +157,10 @@ class UpdateHorseContainer extends PureComponent {
   }
 
   navigationButtonPressed ({ buttonId }) {
-    Keyboard.dismiss()
     if (buttonId === 'save') {
+      this.setState({
+        doRevert: false,
+      })
       EqNavigation.pop(this.props.componentId).then(() => {
         this.props.dispatch(persistHorseUpdate(
           this.props.horse.get('_id'),
@@ -181,24 +170,24 @@ class UpdateHorseContainer extends PureComponent {
           this.state.cachedHorseUser.get('rideDefault')
         ))
       })
-    } else if (buttonId === 'back') {
-      this.goBack()
     }
   }
 
+  componentWillUnmount () {
+    this.goBack()
+  }
+
   goBack () {
-    if (this.props.newHorse) {
-      EqNavigation.pop(this.props.componentId).then(() => {
+    if (this.state.doRevert) {
+      if (this.props.newHorse) {
         this.props.dispatch(deleteUnpersistedHorse(
           this.props.horseID,
           this.props.horseUserID
         ))
-      })
-    } else {
-      EqNavigation.pop(this.props.componentId).then(() => {
+      } else {
         this.props.dispatch(horseUpdated(this.state.cachedHorse))
         this.props.dispatch(horseUserUpdated(this.state.cachedHorseUser))
-      })
+      }
     }
   }
 

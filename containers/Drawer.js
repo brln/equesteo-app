@@ -168,6 +168,7 @@ class DrawerContainer extends Component {
         component: {
           name: FEEDBACK,
           options: {
+            blurOnUnmount: true,
             sideMenu: {
               left: {
                 visible: false

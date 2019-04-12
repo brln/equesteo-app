@@ -33,13 +33,9 @@ class RecorderContainer extends PureComponent {
           color: brand,
         },
         elevation: 0,
-        leftButtons: [
-          {
-            id: 'back',
-            icon: require('../img/back-arrow.png'),
-            color: 'white'
-          }
-        ],
+        backButton: {
+          color: 'white',
+        }
       },
       layout: {
         orientation: ['portrait']

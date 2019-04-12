@@ -22,13 +22,9 @@ class RideAtlasContainer extends PureComponent {
           color: brand,
         },
         elevation: 0,
-        leftButtons: [
-          {
-            id: 'back',
-            icon: require('../img/back-arrow.png'),
-            color: 'white'
-          }
-        ],
+        backButton: {
+          color: 'white'
+        }
       },
       layout: {
         orientation: ['portrait']
@@ -39,18 +35,8 @@ class RideAtlasContainer extends PureComponent {
   constructor (props) {
     super(props)
     this.deleteRideAtlasEntry = this.deleteRideAtlasEntry.bind(this)
-    this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
     this.setActiveAtlasEntry = this.setActiveAtlasEntry.bind(this)
     Navigation.events().bindComponent(this);
-  }
-
-  navigationButtonPressed ({ buttonId }) {
-    if (buttonId === 'back') {
-      EqNavigation.pop(this.props.componentId)
-      if (this.props.onClose) {
-        this.props.onClose()
-      }
-    }
   }
 
   setActiveAtlasEntry (id) {

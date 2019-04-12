@@ -43,20 +43,14 @@ class RideContainer extends PureComponent {
           color: 'white',
           fontSize: 20
         },
-        leftButtons: [
-          {
-            id: 'back',
-            icon: require('../img/back-arrow.png'),
-            color: 'white'
-          }
-        ],
-        rightButtons: [
-          {
-            id: 'tools',
-            text: 'Tools',
-            color: 'white'
-          }
-        ]
+        backButton: {
+          color: 'white'
+        },
+        rightButtons: [{
+          id: 'tools',
+          text: 'Tools',
+          color: 'white'
+        }]
       },
       layout: {
         orientation: ['portrait']
@@ -75,11 +69,6 @@ class RideContainer extends PureComponent {
             popBackTo: this.props.componentId
           },
         },
-      })
-    } else if (buttonId === 'back') {
-      Keyboard.dismiss()
-      EqNavigation.pop(this.props.componentId).then(() => {
-        this.props.dispatch(clearSelectedRideCoordinates())
       })
     }
   }
@@ -119,6 +108,10 @@ class RideContainer extends PureComponent {
 
   componentDidDisappear () {
     this.props.dispatch(setShowingRide(null))
+  }
+
+  componentWillUnmount () {
+    this.props.dispatch(clearSelectedRideCoordinates())
   }
 
   viewRideCharts () {

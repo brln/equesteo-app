@@ -20,13 +20,9 @@ class CameraContainer extends Component {
           color: brand,
         },
         elevation: 0,
-        leftButtons: [
-          {
-            id: 'back',
-            icon: require('../img/back-arrow.png'),
-            color: 'white'
-          }
-        ]
+        backButton: {
+          color: 'white',
+        }
       },
       layout: {
         orientation: ['portrait']
@@ -39,18 +35,10 @@ class CameraContainer extends Component {
     this.state = {
       showCam: true
     }
-    this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
     this.onViewerClose = this.onViewerClose.bind(this)
     this.photoSources = this.photoSources.bind(this)
     this.showRecentPhoto = this.showRecentPhoto.bind(this)
     this.stashNewRidePhoto = this.stashNewRidePhoto.bind(this)
-    Navigation.events().bindComponent(this);
-  }
-
-  navigationButtonPressed ({ buttonId }) {
-    if (buttonId === 'back') {
-      EqNavigation.pop(this.props.componentId)
-    }
   }
 
   photoSources () {

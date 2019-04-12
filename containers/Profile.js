@@ -56,15 +56,11 @@ class ProfileContainer extends BackgroundComponent {
 
   constructor (props) {
     super(props)
-    this.state = {
-      logoutModalOpen: false
-    }
     this.createFollow = this.createFollow.bind(this)
     this.deleteFollow = this.deleteFollow.bind(this)
     this.doLogout = this.doLogout.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
     this.oneDegreeUser = this.oneDegreeUser.bind(this)
-    this.setLogoutModalOpen = this.setLogoutModalOpen.bind(this)
     this.showAboutPage = this.showAboutPage.bind(this)
     this.showHorseProfile = this.showHorseProfile.bind(this)
     this.showProfile = this.showProfile.bind(this)
@@ -83,29 +79,26 @@ class ProfileContainer extends BackgroundComponent {
     Navigation.events().bindComponent(this);
 
     if (props.userID === props.profileUser.get('_id')) {
-      Navigation.mergeOptions(props.componentId, {
+      const newOptions = {
         topBar: {
           rightButtons: [
             {
               id: 'edit',
               text: 'Edit',
               color: 'white'
-            },
-            {
-              id: 'logout',
-              text: 'Log Out',
-              color: 'white'
             }
           ]
         }
-      })
+      }
+      if (props.needsRemotePersist === 'DB_SYNCED') {
+        newOptions.topBar.rightButtons.push({
+          id: 'logout',
+          text: 'Log Out',
+          color: 'white'
+        })
+      }
+      Navigation.mergeOptions(props.componentId, newOptions)
     }
-  }
-
-  setLogoutModalOpen (open) {
-    this.setState({
-      logoutModalOpen: open
-    })
   }
 
   showPhotoLightbox (sources) {
@@ -137,12 +130,7 @@ class ProfileContainer extends BackgroundComponent {
         }
       });
     } else if (buttonId === 'logout') {
-      const needsAnyPersist = this.props.needsRemotePersist  === DB_NEEDS_SYNC
-      if (needsAnyPersist || this.props.photoQueue.count() > 0) {
-        this.setLogoutModalOpen(true)
-      } else {
-        this.doLogout()
-      }
+      this.doLogout()
     }
   }
 
@@ -299,11 +287,9 @@ class ProfileContainer extends BackgroundComponent {
           horseOwnerIDs={this.memoHorseOwnerIDs(this.props.horseUsers)}
           horsePhotos={this.props.horsePhotos}
           leaderboardProfile={this.props.leaderboardProfile}
-          logoutModalOpen={this.state.logoutModalOpen}
           oneDegreeUser={this.memoOneDegreeUser(this.props.profileUser, this.props.userID, this.props.follows)}
           profilePhotoURL={this.props.profilePhotoURL}
           profileUser={this.props.profileUser}
-          setLogoutModalOpen={this.setLogoutModalOpen}
           showAboutPage={this.showAboutPage}
           showHorseProfile={this.showHorseProfile}
           showPhotoLightbox={this.showPhotoLightbox}

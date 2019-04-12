@@ -75,6 +75,8 @@ export default class NotificationsList extends PureComponent {
             rightOpenValue={-1 * width}
             onRowDidOpen={(notificationID) => {this.props.justClear(notificationID)}}
             swipeToOpenPercent={10}
+            swipeToOpenVelocityContribution={15}
+            bounces={false}
           />
         </ScrollView>
       </View>
@@ -88,7 +90,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'stretch',
     backgroundColor: '#F5FCFF',
-    width: '100%'
+    width: '100%',
   },
   rowFront: {
 		alignItems: 'center',

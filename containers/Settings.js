@@ -32,13 +32,6 @@ class SettingsContainer extends BackgroundComponent {
           fontSize: 20,
           text: "Settings"
         },
-        leftButtons: [
-          {
-            id: 'back',
-            icon: require('../img/back-arrow.png'),
-            color: 'white'
-          }
-        ],
         rightButtons: [
           {
             id: 'save',
@@ -57,11 +50,11 @@ class SettingsContainer extends BackgroundComponent {
     super(props)
     this.state = {
       cachedUser: null,
+      doRevert: true,
     }
     this.changeAccountDetails = this.changeAccountDetails.bind(this)
     this.changeLeaderboardOptOut = this.changeLeaderboardOptOut.bind(this)
     this.changeDefaultPublic = this.changeDefaultPublic.bind(this)
-    this.goBack = this.goBack.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
 
     Navigation.events().bindComponent(this);
@@ -80,14 +73,16 @@ class SettingsContainer extends BackgroundComponent {
     if (buttonId === 'save') {
       EqNavigation.pop(this.props.componentId)
       this.props.dispatch(persistUserUpdate(this.props.user.get('_id'), []))
-    } else if (buttonId === 'back') {
-      this.goBack()
+      this.setState({
+        doRevert: false,
+      })
     }
   }
 
-  goBack () {
-    this.props.dispatch(userUpdated(this.state.cachedUser))
-    EqNavigation.pop(this.props.componentId)
+  componentWillUnmount () {
+    if (this.state.doRevert) {
+      this.props.dispatch(userUpdated(this.state.cachedUser))
+    }
   }
 
   changeAccountDetails (user) {

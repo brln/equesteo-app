@@ -25,18 +25,14 @@ class FeedbackContainer extends PureComponent {
         background: {
           color: brand,
         },
+        backButton: {
+          color: 'white'
+        },
         elevation: 0,
         title: {
           color: 'white',
           fontSize: 20
         },
-        leftButtons: [
-          {
-            id: 'back',
-            icon: require('../img/back-arrow.png'),
-            color: 'white'
-          }
-        ],
       },
       layout: {
         orientation: ['portrait']
@@ -52,15 +48,6 @@ class FeedbackContainer extends PureComponent {
     }
     this.changeFeedback = this.changeFeedback.bind(this)
     this.submit = this.submit.bind(this)
-
-    Navigation.events().bindComponent(this);
-  }
-
-  navigationButtonPressed({ buttonId }) {
-    if (buttonId === 'back') {
-      Keyboard.dismiss()
-      EqNavigation.popToRoot(this.props.componentId)
-    }
   }
 
   changeFeedback (e) {

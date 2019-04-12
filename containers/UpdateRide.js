@@ -51,6 +51,9 @@ class UpdateRideContainer extends BackgroundComponent {
         background: {
           color: brand,
         },
+        backButton: {
+          color: 'white'
+        },
         elevation: 0,
       },
       layout: {
@@ -64,6 +67,7 @@ class UpdateRideContainer extends BackgroundComponent {
     this.state = {
       cachedRide: null,
       deletedPhotoIDs: [],
+      doRevert: true,
       discardModalOpen: false,
       showPhotoMenu: false,
       showSelectHorseMenu: false,
@@ -105,13 +109,6 @@ class UpdateRideContainer extends BackgroundComponent {
     if (props.newRide) {
       Navigation.mergeOptions(props.componentId, {
         topBar: {
-          leftButtons: [
-            {
-              id: 'back',
-              icon: require('../img/back-arrow.png'),
-              color: 'white'
-            }
-          ],
           rightButtons: [
             {
               id: 'save',
@@ -129,13 +126,6 @@ class UpdateRideContainer extends BackgroundComponent {
     } else {
       Navigation.mergeOptions(props.componentId, {
         topBar: {
-          leftButtons: [
-            {
-              id: 'back',
-              icon: require('../img/back-arrow.png'),
-              color: 'white'
-            }
-          ],
           rightButtons: [
             {
               id: 'save',
@@ -161,6 +151,9 @@ class UpdateRideContainer extends BackgroundComponent {
   navigationButtonPressed({ buttonId }) {
     if (this.props.newRide) {
       if (buttonId === 'save') {
+        this.setState({
+          doRevert: false
+        })
         Navigation.mergeOptions(this.props.componentId, {topBar: {rightButtons: []}})
         this.updateLocalRideCoords()
         this.props.dispatch(persistRide(
@@ -194,15 +187,12 @@ class UpdateRideContainer extends BackgroundComponent {
       } else if (buttonId === 'discard') {
         this.setDiscardModalOpen(true)
         this.props.dispatch(setActiveAtlasEntry(null))
-      } else if (buttonId === 'back') {
-        EqNavigation.pop(this.props.componentId).then(() => {
-          this.props.dispatch(deleteUnpersistedRide(this.props.ride.get('_id')))
-          this.props.dispatch(stopStashNewLocations())
-          this.props.dispatch(mergeStashedLocations())
-        })
       }
     } else {
       if (buttonId === 'save') {
+        this.setState({
+          doRevert: false
+        })
         Navigation.popTo(this.props.popBackTo).then(() => {
           this.updateLocalRideCoords()
           this.props.dispatch(persistRide(
@@ -214,14 +204,23 @@ class UpdateRideContainer extends BackgroundComponent {
             this.memoizedRideHorses(this.props.rideHorses, this.props.rideID),
           ))
         })
-      } else if (buttonId === 'back' || buttonId === 'discard') {
-        EqNavigation.pop(this.props.componentId).then(() => {
-          this.props.dispatch(rideUpdated(this.state.cachedRide))
-          this.props.dispatch(clearRidePhotoStash(this.stashedRidePhotoKey()))
-        })
+      } else if (buttonId === 'discard') {
+        EqNavigation.pop(this.props.componentId)
       }
     }
-    Keyboard.dismiss()
+  }
+
+  componentWillUnmount () {
+    if (this.state.doRevert) {
+      if (this.props.newRide) {
+        this.props.dispatch(deleteUnpersistedRide(this.props.ride.get('_id')))
+        this.props.dispatch(stopStashNewLocations())
+        this.props.dispatch(mergeStashedLocations())
+      } else {
+        this.props.dispatch(rideUpdated(this.state.cachedRide))
+        this.props.dispatch(clearRidePhotoStash(this.stashedRidePhotoKey()))
+      }
+    }
   }
 
   setDiscardModalOpen (open) {

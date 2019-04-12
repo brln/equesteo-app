@@ -11,13 +11,9 @@ class RideChartsContainer extends PureComponent {
   static options() {
     return {
       topBar: {
-        leftButtons: [
-          {
-            id: 'back',
-            icon: require('../img/back-arrow.png'),
-            color: 'white'
-          }
-        ],
+        backButton: {
+          color: 'white'
+        },
         background: {
           color: brand,
         },
@@ -31,15 +27,6 @@ class RideChartsContainer extends PureComponent {
 
   constructor (props) {
     super(props)
-    this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
-    Navigation.events().bindComponent(this);
-  }
-
-  navigationButtonPressed({ buttonId }) {
-    if (buttonId === 'back') {
-      EqNavigation.pop(this.props.componentId)
-    }
-    Keyboard.dismiss()
   }
 
   render() {

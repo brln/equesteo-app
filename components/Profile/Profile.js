@@ -283,12 +283,6 @@ export default class Profile extends PureComponent {
 
     return (
       <ScrollView>
-        <DeleteModal
-          modalOpen={this.props.logoutModalOpen}
-          closeDeleteModal={() => {this.props.setLogoutModalOpen(false)}}
-          text={'You have data or photos that haven\'t been saved to the server. If you log out now, these will be lost forever. Are you sure?'}
-          deleteFunc={this.props.doLogout}
-        />
         {this.renderImageSwiper()}
         <View style={{flex: 1}}>
           <FollowersCard

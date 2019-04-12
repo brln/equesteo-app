@@ -1,20 +1,18 @@
-import { Navigation } from 'react-native-navigation'
 import React, { PureComponent } from 'react'
 import {
   ActivityIndicator,
   CameraRoll,
   Dimensions,
   Image,
-  Keyboard,
   Linking,
   PermissionsAndroid,
-  ScrollView,
   Share,
   Text,
   TextInput,
   View
 } from 'react-native'
 import { connect } from 'react-redux'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import ApiClient from '../services/ApiClient'
 import Button from '../components/Button'
@@ -22,7 +20,6 @@ import { brand, darkBrand, lightGrey } from '../colors'
 import { isAndroid, logError, logInfo } from '../helpers'
 import UserAPI from '../services/UserApi'
 import URIImage from '../components/Images/URIImage'
-import { EqNavigation } from '../services'
 
 const { width } = Dimensions.get('window')
 
@@ -42,24 +39,13 @@ class ShareRideContainer extends PureComponent {
           fontSize: 20,
           text: 'Share Ride'
         },
-        leftButtons: [
-          {
-            id: 'back',
-            icon: require('../img/back-arrow.png'),
-            color: 'white'
-          }
-        ],
+        backButton: {
+          color: 'white'
+        }
       },
       layout: {
         orientation: ['portrait']
       }
-    }
-  }
-
-  navigationButtonPressed({ buttonId }) {
-    if (buttonId === 'back') {
-      Keyboard.dismiss()
-      EqNavigation.pop(this.props.componentId)
     }
   }
 
@@ -72,7 +58,6 @@ class ShareRideContainer extends PureComponent {
       loadingMessage: LOADING_MESSAGE,
     }
 
-    Navigation.events().bindComponent(this);
     this.askToDownloadMap = this.askToDownloadMap.bind(this)
     this.imageLoaded = this.imageLoaded.bind(this)
     this.downloadMap = this.downloadMap.bind(this)
@@ -108,7 +93,7 @@ class ShareRideContainer extends PureComponent {
 
   _renderMap () {
     return (
-      <ScrollView>
+      <KeyboardAwareScrollView>
         <View style={{flex: 1, alignItems: 'center'}}>
           <View style={{height: 20, backgroundColor: lightGrey}} />
           <URIImage
@@ -141,7 +126,7 @@ class ShareRideContainer extends PureComponent {
             </View>
           </View>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     )
   }
 

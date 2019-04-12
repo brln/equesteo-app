@@ -32,13 +32,6 @@ class UpdateProfileContainer extends PureComponent {
           color: 'white'
         },
         elevation: 0,
-        leftButtons: [
-          {
-            id: 'back',
-            icon: require('../img/back-arrow.png'),
-            color: 'white'
-          }
-        ],
         rightButtons: [
           {
             id: 'save',
@@ -67,6 +60,7 @@ class UpdateProfileContainer extends PureComponent {
     this.state = {
       cachedUser: null,
       deletedPhotoIDs: [],
+      doRevert: true,
       showPhotoMenu: false,
       selectedPhotoID: null
     }
@@ -86,10 +80,11 @@ class UpdateProfileContainer extends PureComponent {
   navigationButtonPressed ({ buttonId }) {
     Keyboard.dismiss()
     if (buttonId === 'save') {
+      this.setState({
+        doRevert: false
+      })
       EqNavigation.pop(this.props.componentId)
       this.props.dispatch(persistUserUpdate(this.props.user.get('_id'), this.state.deletedPhotoIDs))
-    } else if (buttonId === 'back') {
-      this.goBack()
     }
   }
 
@@ -100,13 +95,6 @@ class UpdateProfileContainer extends PureComponent {
     })
     Navigation.mergeOptions(this.props.componentId, {
       topBar: {
-        leftButtons: [
-          {
-            id: 'back',
-            icon: require('../img/back-arrow.png'),
-            color: 'white'
-          }
-        ],
         rightButtons: [
           {
             id: 'save',
@@ -131,9 +119,14 @@ class UpdateProfileContainer extends PureComponent {
     })
   }
 
+  componentWillUnmount () {
+    this.goBack()
+  }
+
   goBack () {
-    this.props.dispatch(userUpdated(this.state.cachedUser))
-    EqNavigation.pop(this.props.componentId)
+    if (this.state.doRevert) {
+      this.props.dispatch(userUpdated(this.state.cachedUser))
+    }
   }
 
   componentDidAppear() {

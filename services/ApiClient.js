@@ -79,7 +79,11 @@ export default class ApiClient {
     return Promise.race([
       new Promise((res, rej) => {
         return ApiClient.request(GET, '/checkConnection').then(resp => {
-          res(resp)
+          if (resp) {
+            res(resp)
+          } else {
+            res({connected: false})
+          }
         }).catch(e => {
           res({connected: false})
         })

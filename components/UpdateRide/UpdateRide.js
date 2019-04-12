@@ -3,7 +3,6 @@ import React, { PureComponent } from 'react';
 import {
   BackHandler,
   Dimensions,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -157,7 +156,8 @@ export default class UpdateRide extends PureComponent {
             text={"Are you sure you want to discard this ride?"}
             deleteFunc={this.props.discardRide}
           />
-          <KeyboardAwareScrollView>
+          <KeyboardAwareScrollView
+          >
             <View style={styles.container}>
               <Card style={{flex: 1}}>
                 <CardItem header style={{padding: 5}}>

@@ -1,6 +1,6 @@
 import memoizeOne from 'memoize-one'
 import React from 'react'
-import { Platform } from 'react-native'
+import { Keyboard, Platform } from 'react-native'
 import { connect } from 'react-redux'
 import { Navigation } from 'react-native-navigation'
 
@@ -50,6 +50,10 @@ class FeedContainer extends BackgroundComponent {
         orientation: ['portrait']
       }
     };
+  }
+
+  componentDidAppear() {
+    Keyboard.dismiss();
   }
 
   constructor (props) {
