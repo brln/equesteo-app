@@ -4,7 +4,7 @@ import { Keyboard, Platform } from 'react-native'
 import { connect } from 'react-redux'
 import { Navigation } from 'react-native-navigation'
 
-import { pulldownSync, toggleRideCarrot } from "../../actions/functional"
+import {checkFCMPermission, pulldownSync, toggleRideCarrot} from "../../actions/functional"
 import BackgroundComponent from '../../components/BackgroundComponent'
 import { brand } from '../../colors'
 import Feed from '../../components/Feed/Feed'
@@ -137,6 +137,7 @@ class FeedContainer extends BackgroundComponent {
         },
       })
     )
+    props.dispatch(checkFCMPermission())
   }
 
   openScreen (openPromise) {

@@ -219,7 +219,10 @@ class RecorderContainer extends PureComponent {
           rideID,
           newRide: true,
           currentRidePhotos: this.props.currentRidePhotos.keySeq().toList(),
-        }
+        },
+        options: {
+          blurOnUnmount: true
+        },
       }
     })
   }

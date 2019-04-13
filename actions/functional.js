@@ -150,7 +150,6 @@ export function appInitialized () {
     tryToLoadStateFromDisk(dispatch).then(() => {
       dispatch(startActiveComponentListener())
       dispatch(dismissError())
-      dispatch(checkFCMPermission())
       dispatch(startAppStateTracking())
 
       // Just in case app died, this will clear the notification
