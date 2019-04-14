@@ -230,6 +230,9 @@ class UpdateRideContainer extends BackgroundComponent {
   }
 
   discardRide () {
+    this.setState({
+      doRevert: false
+    })
     EqNavigation.popToRoot(this.props.componentId).then(() => {
       this.props.dispatch(clearPausedLocations())
       this.props.dispatch(clearRidePhotoStash(this.stashedRidePhotoKey()))
