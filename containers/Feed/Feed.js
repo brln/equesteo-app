@@ -107,15 +107,6 @@ class FeedContainer extends BackgroundComponent {
                   }
                 }
               },
-              {
-                component: {
-                  id: NOTIFICATION_BUTTON,
-                  name: NOTIFICATION_BUTTON,
-                  passProps: {
-                    onPress: this.openNotifications,
-                  }
-                }
-              },
             ],
           }
         },
@@ -360,6 +351,7 @@ class FeedContainer extends BackgroundComponent {
         horseUsers={this.memoizeFilteredHorseUsers(this.props.follows, this.props.userID, this.props.horseUsers)}
         openLeaderboards={this.openLeaderboards}
         openMore={this.openMore}
+        openNotifications={this.openNotifications}
         openRecorder={this.openRecorder}
         openTraining={this.openTraining}
         rideHorses={this.memoizeRideHorses(this.props.rideHorses)}

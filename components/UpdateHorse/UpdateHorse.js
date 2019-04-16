@@ -3,6 +3,7 @@ import ImagePicker from 'react-native-image-crop-picker'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import {
+  Picker,
   StyleSheet,
   Text,
   TextInput,
@@ -14,9 +15,9 @@ import {
   CheckBox,
   CardItem,
 } from 'native-base';
-import RNPickerSelect from 'react-native-picker-select';
 
 import ColorModal from './ColorModal'
+import EqPicker from '../EqPicker'
 import { brand, darkBrand } from '../../colors'
 import PhotoFab from './PhotoFab'
 import PhotosByTimestamp from '../PhotosByTimestamp'
@@ -128,6 +129,7 @@ export default class UpdateHorse extends PureComponent {
 
   monthPicker (onValueChange) {
     const items = [
+      { label: 'MM', value: null},
       { label: "Jan", value: "1" },
       { label: "Feb", value: "2" },
       { label: "Mar", value: "3" },
@@ -142,37 +144,27 @@ export default class UpdateHorse extends PureComponent {
       { label: "Dec", value: "12" },
     ]
     return (
-      <View style={{flex: 3, height: 50, borderColor: darkBrand, borderWidth: 1, marginRight: 10, borderRadius: 4}}>
-        <RNPickerSelect
+      <View style={{flex: 3, marginRight: 10}}>
+        <EqPicker
           value={this.props.horse.get('birthMonth')}
           items={items}
           onValueChange={onValueChange}
-          style={pickerSelectStyles}
-          placeholder={{
-            label: 'MM',
-            value: null,
-          }}
         />
       </View>
     )
   }
 
   dayPicker (onValueChange) {
-    const allDays = []
+    const allDays = [{label: 'DD', value: null}]
     for (let i = 1; i <= 31; i++) {
       allDays.push({ label: i.toString(), value: i.toString() })
     }
     return (
-      <View style={{flex: 2.5, height: 50, borderColor: darkBrand, borderWidth: 1, marginRight: 10, borderRadius: 4}}>
-        <RNPickerSelect
+      <View style={{flex: 2.5, marginRight: 10}}>
+        <EqPicker
           value={this.props.horse.get('birthDay')}
-          items={allDays}
-          style={pickerSelectStyles}
           onValueChange={onValueChange}
-          placeholder={{
-            label: 'DD',
-            value: null,
-          }}
+          items={allDays}
         />
       </View>
     )
@@ -180,21 +172,16 @@ export default class UpdateHorse extends PureComponent {
 
   yearPicker (onValueChange) {
     const startYear = 1980
-    const allYears = []
+    const allYears = [{label: 'YYYY', value: null}]
     for (let i = startYear; i <= 2018; i++) {
       allYears.push({label: i.toString(), value: i.toString()})
     }
     return (
-      <View style={{flex: 3, height: 50, borderColor: darkBrand, borderWidth: 1, borderRadius: 4}}>
-        <RNPickerSelect
-          items={allYears}
+      <View style={{flex: 3}}>
+        <EqPicker
           value={this.props.horse.get('birthYear')}
-          style={pickerSelectStyles}
           onValueChange={onValueChange}
-          placeholder={{
-            label: 'YYYY',
-            value: null,
-          }}
+          items={allYears}
         />
       </View>
     )
@@ -202,22 +189,18 @@ export default class UpdateHorse extends PureComponent {
 
   sexPicker (onValueChange) {
     const items = [
+      {label: "None", value: null},
       {label: "Mare", value: "Mare"},
       {label: "Stallion", value: "Stallion"},
       {label: "Gelding", value: "Gelding"},
       {label: "Other", value: "Other"},
     ]
     return (
-      <View style={{flex: 1, height: 50, borderColor: darkBrand, borderWidth: 1, borderRadius: 4}}>
-        <RNPickerSelect
+      <View style={{flex: 1}}>
+        <EqPicker
           value={this.props.horse.get('sex')}
-          onValueChange={onValueChange}
           items={items}
-          style={pickerSelectStyles}
-          placeholder={{
-            label: 'None',
-            value: null,
-          }}
+          onValueChange={onValueChange}
         />
       </View>
     )
@@ -225,6 +208,7 @@ export default class UpdateHorse extends PureComponent {
 
   renderHandsPicker () {
     const handsItems = [
+      { label: "Hands", value: null },
       { label: "11", value: "11" },
       { label: "12", value: "12" },
       { label: "13", value: "13" },
@@ -234,6 +218,7 @@ export default class UpdateHorse extends PureComponent {
       { label: "17", value: "17" },
     ]
     const inchesItems = [
+      { label: "Inches", value: null },
       { label: "0", value: "0" },
       { label: "1", value: "1" },
       { label: "2", value: "2" },
@@ -241,31 +226,19 @@ export default class UpdateHorse extends PureComponent {
     ]
     return (
       <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
-        <View style={{flex: 3, height: 50, borderColor: darkBrand, borderWidth: 1, marginRight: 10, borderRadius: 4}}>
-          <RNPickerSelect
+        <View style={{flex: 3, marginRight: 10}}>
+          <EqPicker
             value={this.props.horse.get('heightHands')}
             onValueChange={this.changeHorseHeightHands}
             items={handsItems}
-            style={pickerSelectStyles}
-            placeholder={{
-              label: 'Hands',
-              value: null,
-            }}
           />
         </View>
-        <View style={{flex: 2, height: 50, borderColor: darkBrand, borderWidth: 1, borderRadius: 4}}>
-          <RNPickerSelect
+        <View style={{flex: 2}}>
+          <EqPicker
             value={this.props.horse.get('heightInches')}
-            style={pickerSelectStyles}
             onValueChange={this.changeHorseHeightInches}
             items={inchesItems}
-            placeholder={{
-              label: 'Inches',
-              value: null,
-            }}
           />
-
-
         </View>
       </View>
     )

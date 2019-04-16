@@ -2,10 +2,10 @@ import PropTypes from 'prop-types'
 import React, { PureComponent } from 'react'
 import {
   Dimensions,
+  Picker,
   StyleSheet
 } from 'react-native'
 import Modal from 'react-native-modalbox';
-import RNPickerSelect from 'react-native-picker-select';
 
 import {
   Text,
@@ -14,6 +14,7 @@ import {
 
 import Button from '../Button'
 import { brand, darkBrand, lightGrey } from '../../colors'
+import EqPicker from '../EqPicker'
 import { userName } from '../../modelHelpers/user'
 
 const { height, width } = Dimensions.get('window')
@@ -33,43 +34,34 @@ export default class SettingsModal extends PureComponent {
         a.push({ label: horse.get('name'), value: horse.get('_id') })
       }
       return a
-    }, [])
+    }, [{ label: 'All Horses', value: this.props.types.SHOW_ALL_HORSES }])
     items.push({ label: "Rides With No Horse", value: this.props.types.NO_HORSE })
     return (
-      <View style={{borderWidth: 1, borderColor: darkBrand}}>
-        <RNPickerSelect
+        <EqPicker
           value={this.props.chosenHorseID}
           items={items}
           onValueChange={this.props.pickHorse}
-          style={pickerSelectStyles}
-          placeholder={{
-            label: 'All Horses',
-            value: this.props.types.SHOW_ALL_HORSES,
-          }}
         />
-      </View>
     )
   }
 
   typePicker () {
     return (
-      <View style={{borderWidth: 1, borderColor: darkBrand}}>
-        <RNPickerSelect
-          value={this.props.chosenType}
-          items={[
-            {label: 'Distance', value: this.props.types.DISTANCE},
-            {label: 'Time', value: this.props.types.TYPE_TIME},
-            {label: 'Elevation Gain', value: this.props.types.TYPE_GAIN}
-          ]}
-          onValueChange={this.props.pickType}
-          style={pickerSelectStyles}
-        />
-      </View>
+      <EqPicker
+        value={this.props.chosenType}
+        items={[
+          {label: 'Distance', value: this.props.types.DISTANCE},
+          {label: 'Time', value: this.props.types.TYPE_TIME},
+          {label: 'Elevation Gain', value: this.props.types.TYPE_GAIN}
+        ]}
+        onValueChange={this.props.pickType}
+      />
     )
   }
 
   userPicker () {
     const items = [
+      {label: 'Show All Riders', value: this.props.types.SHOW_ALL_RIDERS},
       {label: 'Only You', value: this.props.userID}
     ]
     const userItems = this.props.riders.valueSeq().reduce((a, r) => {
@@ -77,20 +69,12 @@ export default class SettingsModal extends PureComponent {
       return a
     }, [])
     const allItems = [...items, ...userItems]
-
     return (
-      <View style={{borderWidth: 1, borderColor: darkBrand}}>
-        <RNPickerSelect
-          value={this.props.chosenUserID}
-          items={allItems}
-          onValueChange={this.props.pickRider}
-          style={pickerSelectStyles}
-          placeholder={{
-            label: 'All Riders',
-            value: this.props.types.SHOW_ALL_RIDERS,
-          }}
-        />
-      </View>
+      <EqPicker
+        value={this.props.chosenUserID}
+        items={allItems}
+        onValueChange={this.props.pickRider}
+      />
     )
   }
 
@@ -141,23 +125,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: height * 0.15,
   },
-});
-
-const pickerSelectStyles = StyleSheet.create({
-  inputIOS: {
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    color: 'black',
-    paddingRight: 30, // to ensure the text is never behind the icon
-  },
-  inputAndroid: {
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderWidth: 0.5,
-    borderColor: brand,
-    borderRadius: 8,
-    color: 'black',
-    paddingRight: 30, // to ensure the text is never behind the icon
-  },
-  placeholder: {}
 });

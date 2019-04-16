@@ -259,6 +259,7 @@ class UpdateHorseContainer extends PureComponent {
   render() {
     logRender('UpdateHorseContainer')
     const horsePhotos = this.memoThisHorsesPhotos(this.props.horsePhotos, this.state.deletedPhotoIDs)
+    logDebug(this.props.horse.toJSON())
     return (
       <UpdateHorse
         changeColor={this.changeColor}

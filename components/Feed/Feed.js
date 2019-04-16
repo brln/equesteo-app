@@ -10,6 +10,7 @@ import RideList from './RideList'
 import { brand } from '../../colors'
 import SyncingStatus from './SyncingStatus'
 import TabBar from './TabBar'
+import NotificationButton from '../../containers/Feed/NotificationButton'
 
 export default class Feed extends PureComponent {
   constructor (props) {
@@ -89,6 +90,9 @@ export default class Feed extends PureComponent {
             { this.renderRideList(true, this.props.yourRides) }
           </Tab>
         </Tabs>
+        <NotificationButton
+          onPress={this.props.openNotifications}
+        />
         <TabBar
           currentRide={this.props.currentRide}
           openLeaderboards={this.props.openLeaderboards}
