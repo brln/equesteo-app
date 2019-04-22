@@ -44,7 +44,8 @@ class FeedbackContainer extends PureComponent {
     super(props)
     this.state = {
       feedback: null,
-      submitted: false
+      submitted: false,
+      disableSubmit: true
     }
     this.changeFeedback = this.changeFeedback.bind(this)
     this.submit = this.submit.bind(this)
@@ -52,18 +53,23 @@ class FeedbackContainer extends PureComponent {
 
   changeFeedback (e) {
     this.setState({
-      feedback: e
+      feedback: e,
+      disableSubmit: false,
     })
   }
 
   submit () {
+    this.setState({
+      disableSubmit: true
+    })
     UserAPI.sendFeedback(this.props.userID, this.state.feedback).then(() => {
       this.setState({
         submitted: true
       })
     }).catch(() => {
       this.setState({
-        error: "Couldn't send. Maybe you don't have service?"
+        error: "Couldn't send. Maybe you don't have service?",
+        disableSubmit: false
       })
       setTimeout(() => {
         this.setState({
@@ -93,7 +99,7 @@ class FeedbackContainer extends PureComponent {
           placeholder={"Let us know what you think. Likes, dislikes, problems, feature requests, musings, anecdotes, stories, we'd love to hear it.\n\nIt sends a message straight to our phones.\n\nIf you want to hear back, let us know the best way to get in touch. Email, facebook, phone number, etc.\n\nOr come to Ben Lomond and ride with us!"}
         />
         <View style={{paddingBottom: 10}}>
-          <Button color={brand} text="Submit" onPress={this.submit} />
+          <Button disabled={this.state.disableSubmit} color={brand} text="Submit" onPress={this.submit} />
         </View>
       </View>
     )

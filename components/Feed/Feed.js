@@ -1,10 +1,7 @@
-import memoizeOne from 'memoize-one'
-import LoggedPureComponent from '../LoggedPureComponent'
 import React, { PureComponent } from 'react';
 import { Container, Tab, Tabs } from 'native-base';
 import {
   StatusBar,
-  StyleSheet,
 } from 'react-native';
 
 import { isAndroid } from '../../helpers'
@@ -14,23 +11,18 @@ import SyncingStatus from './SyncingStatus'
 import TabBar from './TabBar'
 import NotificationButton from '../../containers/Feed/NotificationButton'
 
-export default class Feed extends LoggedPureComponent {
+export default class Feed extends PureComponent {
   constructor (props) {
     super(props)
     this.renderRideList = this.renderRideList.bind(this)
     this.startRefresh = this.startRefresh.bind(this)
-    this.memoRideHorses = memoizeOne(this.rideHorses)
   }
 
   startRefresh () {
     this.props.syncDB()
   }
 
-  rideHorses (rides, horses) {
-
-  }
-
-  renderRideList (ownRideList, rides) {
+  renderRideList (ownRideList, rides, rideHorses) {
     return (
       <RideList
         horses={this.props.horses}
@@ -42,7 +34,7 @@ export default class Feed extends LoggedPureComponent {
         rides={rides}
         rideCarrots={this.props.rideCarrots}
         rideComments={this.props.rideComments}
-        rideHorses={this.props.rideHorses}
+        rideHorses={rideHorses}
         ridePhotos={this.props.ridePhotos}
         showComments={this.props.showComments}
         showHorseProfile={this.props.showHorseProfile}
@@ -81,7 +73,7 @@ export default class Feed extends LoggedPureComponent {
               feedMessage={this.props.feedMessage}
               visible={this.props.feedMessage}
             />
-            { this.renderRideList(false, this.props.followingRides) }
+            { this.renderRideList(false, this.props.followingRides, this.props.followingRideHorses) }
           </Tab>
           <Tab
             tabStyle={{backgroundColor: brand}}
@@ -94,7 +86,7 @@ export default class Feed extends LoggedPureComponent {
               feedMessage={this.props.feedMessage}
               visible={this.props.feedMessage}
             />
-            { this.renderRideList(true, this.props.yourRides) }
+            { this.renderRideList(true, this.props.yourRides, this.props.yourRideHorses) }
           </Tab>
         </Tabs>
         <NotificationButton

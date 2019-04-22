@@ -8,7 +8,7 @@ import {
 
 import { getMonday, logInfo } from '../../helpers'
 import HorseCard from './HorseCard/HorseCard'
-import RideCard from './RideCard'
+import RideCard from './RideCard/RideCard'
 import SectionHeader from './SectionHeader'
 
 
@@ -16,24 +16,9 @@ export default class RideList extends PureComponent {
   constructor (props) {
     super(props)
     this.getUserProfilePhotoURL = this.getUserProfilePhotoURL.bind(this)
-    this.getUser = this.getUser.bind(this)
     this._renderCard = this._renderCard.bind(this)
-    this._makeSections = this._makeSections.bind(this)
 
-    this.memoGetHorses = memoizeOne(this.getHorses.bind(this))
-  }
-
-  getUser (item) {
-    if (!item.get('userID')) {
-      throw Error(`Item does not have userID: ${item.get('type')} ${item.get('_id')}` )
-    }
-    const user = this.props.users.get(item.get('userID'))
-    if (!user) {
-      logInfo(item.get('userID'))
-      logInfo(Object.keys(this.props.users.toJS()))
-      throw Error(`User ${item.get('userID')} does not exist.`)
-    }
-    return user
+    this.memoMakeSections = memoizeOne(this.makeSections)
   }
 
   getUserProfilePhotoURL (user) {
@@ -45,20 +30,6 @@ export default class RideList extends PureComponent {
     return profilePhotoURL
   }
 
-  getHorses (ride, rideHorses, horses) {
-    return rideHorses.valueSeq().filter(rh => {
-      return rh.get('rideID') === ride.get('_id') && rh.get('deleted') !== true
-    }).sort((a, b) => {
-      if (a.get('rideHorseType' === 'rider')) {
-        return 1
-      } else {
-        return a.get('timestamp') - b.get('timestamp')
-      }
-    }).map(rh => {
-      return horses.get(rh.get('horseID'))
-    })
-  }
-
   _renderCard ({item}) {
     if (item.type === 'ride') {
       const childFilter = (item) => {
@@ -68,9 +39,7 @@ export default class RideList extends PureComponent {
       }
       return (
         <RideCard
-          // @TODO this memoization isnt' doing anything. sort all this shit out for all
-          // rides once at the beginning
-          horses={this.memoGetHorses(item.childData, this.props.rideHorses, this.props.horses)}
+          horses={this.props.rideHorses.get(item.childData.get('_id'))}
           horsePhotos={this.props.horsePhotos}
           ownRideList={this.props.ownRideList}
           ride={item.childData}
@@ -111,19 +80,19 @@ export default class RideList extends PureComponent {
     }
   }
 
-  _makeSections () {
+  makeSections (horseUsers, horses, ownRideList, userID, users, rides) {
     const allFeedItems = []
-    for (let horseUser of this.props.horseUsers.valueSeq()) {
-      const horse = this.props.horses.get(horseUser.get('horseID'))
+    for (let horseUser of horseUsers.valueSeq()) {
+      const horse = horses.get(horseUser.get('horseID'))
       if (!horse) {
         throw Error("Should have a horse here.")
       }
       if (horseUser.get('deleted') !== true
         && (
-          !this.props.ownRideList ||
-          (this.props.ownRideList && horseUser.get('userID') === this.props.userID)
+          !ownRideList ||
+          (ownRideList && horseUser.get('userID') === userID)
         )) {
-        const rider = this.props.users.get(horseUser.get('userID'))
+        const rider = users.get(horseUser.get('userID'))
         allFeedItems.push(
           new FeedItem(
             horse,
@@ -136,8 +105,11 @@ export default class RideList extends PureComponent {
       }
     }
 
-    for (let ride of this.props.rides) {
-      const user = this.getUser(ride)
+    for (let ride of rides) {
+      const user = users.get(ride.get('userID'))
+      if (!user) {
+        throw Error('no user found!')
+      }
       allFeedItems.push(new FeedItem(ride, ride.get('startTime'), user, 'ride', ride.get('_id')))
     }
 
@@ -175,7 +147,14 @@ export default class RideList extends PureComponent {
         refreshing={this.props.refreshing}
         renderItem={this._renderCard}
         renderSectionHeader={this._renderSectionHeader}
-        sections={this._makeSections()}
+        sections={this.memoMakeSections(
+          this.props.horseUsers,
+          this.props.horses,
+          this.props.ownRideList,
+          this.props.userID,
+          this.props.users,
+          this.props.rides
+        )}
         stickySectionHeadersEnabled={false}
       />
     )
