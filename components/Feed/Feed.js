@@ -1,3 +1,5 @@
+import memoizeOne from 'memoize-one'
+import LoggedPureComponent from '../LoggedPureComponent'
 import React, { PureComponent } from 'react';
 import { Container, Tab, Tabs } from 'native-base';
 import {
@@ -12,15 +14,20 @@ import SyncingStatus from './SyncingStatus'
 import TabBar from './TabBar'
 import NotificationButton from '../../containers/Feed/NotificationButton'
 
-export default class Feed extends PureComponent {
+export default class Feed extends LoggedPureComponent {
   constructor (props) {
     super(props)
     this.renderRideList = this.renderRideList.bind(this)
     this.startRefresh = this.startRefresh.bind(this)
+    this.memoRideHorses = memoizeOne(this.rideHorses)
   }
 
   startRefresh () {
     this.props.syncDB()
+  }
+
+  rideHorses (rides, horses) {
+
   }
 
   renderRideList (ownRideList, rides) {

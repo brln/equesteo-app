@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import LoggedPureComponent from '../LoggedPureComponent'
 import {
   SectionList,
   StyleSheet,
@@ -11,7 +12,7 @@ import RideCard from './RideCard'
 import SectionHeader from './SectionHeader'
 
 
-export default class RideList extends PureComponent {
+export default class RideList extends LoggedPureComponent {
   constructor (props) {
     super(props)
     this.getHorse = this.getHorse.bind(this)

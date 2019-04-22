@@ -1,3 +1,4 @@
+
 import memoizeOne from 'memoize-one'
 import React from 'react'
 import { Keyboard, Platform } from 'react-native'
@@ -58,6 +59,7 @@ class FeedContainer extends BackgroundComponent {
 
   constructor (props) {
     super(props)
+
     this.state = {
       refreshing: false,
       lastFullSync: null,
