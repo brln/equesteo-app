@@ -1,5 +1,5 @@
+import memoizeOne from 'memoize-one'
 import React, { PureComponent } from 'react'
-import LoggedPureComponent from '../LoggedPureComponent'
 import {
   SectionList,
   StyleSheet,
@@ -12,14 +12,15 @@ import RideCard from './RideCard'
 import SectionHeader from './SectionHeader'
 
 
-export default class RideList extends LoggedPureComponent {
+export default class RideList extends PureComponent {
   constructor (props) {
     super(props)
-    this.getHorse = this.getHorse.bind(this)
     this.getUserProfilePhotoURL = this.getUserProfilePhotoURL.bind(this)
     this.getUser = this.getUser.bind(this)
     this._renderCard = this._renderCard.bind(this)
     this._makeSections = this._makeSections.bind(this)
+
+    this.memoGetHorses = memoizeOne(this.getHorses.bind(this))
   }
 
   getUser (item) {
@@ -44,27 +45,18 @@ export default class RideList extends LoggedPureComponent {
     return profilePhotoURL
   }
 
-  getHorse (ride) {
-    const rideHorses = this.props.rideHorses.filter(rh => {
-      return rh.get('rideID') === ride.get('_id')
-    })
-    if (rideHorses.count()) {
-      let feedHorse = null
-      const sorted = rideHorses.valueSeq().sort((a, b) => a.get('timestamp') - b.get('timestamp'))
-      sorted.forEach(rh => {
-        if (!feedHorse && rh.get('rideHorseType') === 'rider') {
-          feedHorse = this.props.horses.get(rh.get('horseID'))
-        }
-      })
-      if (!feedHorse && sorted.count() > 0) {
-        feedHorse = this.props.horses.get(sorted.first().get('horseID'))
+  getHorses (ride, rideHorses, horses) {
+    return rideHorses.valueSeq().filter(rh => {
+      return rh.get('rideID') === ride.get('_id') && rh.get('deleted') !== true
+    }).sort((a, b) => {
+      if (a.get('rideHorseType' === 'rider')) {
+        return 1
+      } else {
+        return a.get('timestamp') - b.get('timestamp')
       }
-      return feedHorse
-    } else if (ride.get('horseID')) {
-      // remove this when you've created rideHorses for all old rides and everyone's on > 43
-
-      return this.props.horses.get(ride.get('horseID'))
-    }
+    }).map(rh => {
+      return horses.get(rh.get('horseID'))
+    })
   }
 
   _renderCard ({item}) {
@@ -74,14 +66,13 @@ export default class RideList extends LoggedPureComponent {
           return r.get('rideID') === item.get('_id') && r.get('deleted') !== true
         }
       }
-      const horse = this.getHorse(item.childData)
-      let ownerID = horse ? this.props.horseOwnerIDs.get(horse.get('_id')) : null
       return (
         <RideCard
-          horse={horse}
+          // @TODO this memoization isnt' doing anything. sort all this shit out for all
+          // rides once at the beginning
+          horses={this.memoGetHorses(item.childData, this.props.rideHorses, this.props.horses)}
           horsePhotos={this.props.horsePhotos}
           ownRideList={this.props.ownRideList}
-          ownerID={ownerID}
           ride={item.childData}
           rideCarrots={this.props.rideCarrots.filter(childFilter(item.childData))}
           rideComments={this.props.rideComments.filter(childFilter(item.childData))}
@@ -132,17 +123,17 @@ export default class RideList extends LoggedPureComponent {
           !this.props.ownRideList ||
           (this.props.ownRideList && horseUser.get('userID') === this.props.userID)
         )) {
-          const rider = this.props.users.get(horseUser.get('userID'))
-          allFeedItems.push(
-            new FeedItem(
-              horse,
-              horseUser.get('createTime'),
-              rider,
-              'horse',
-              horseUser.get('_id')
-            )
+        const rider = this.props.users.get(horseUser.get('userID'))
+        allFeedItems.push(
+          new FeedItem(
+            horse,
+            horseUser.get('createTime'),
+            rider,
+            'horse',
+            horseUser.get('_id')
           )
-        }
+        )
+      }
     }
 
     for (let ride of this.props.rides) {
@@ -208,3 +199,5 @@ const styles = StyleSheet.create({
     fontSize: 24
   }
 });
+
+
