@@ -461,7 +461,23 @@ class UpdateRideContainer extends BackgroundComponent {
 
   selectHorse (selectionType, horseID) {
     let foundRideHorse
-    this.memoizedRideHorses(this.props.rideHorses, this.props.rideID).valueSeq().forEach((rideHorse) => {
+    const rideHorses = this.memoizedRideHorses(this.props.rideHorses, this.props.rideID)
+
+    if (selectionType === 'rider' && rideHorses.count() > 0) {
+      let foundRiderHorse
+      rideHorses.valueSeq().forEach((rideHorse) => {
+        if (rideHorse.get('rideID') === this.props.ride.get('_id')
+          && rideHorse.get('rideHorseType') === 'rider') {
+          foundRiderHorse = rideHorse
+        }
+      })
+      if (foundRiderHorse) {
+        foundRiderHorse = foundRiderHorse.set('deleted', true)
+        this.props.dispatch(rideHorseUpdated(foundRiderHorse))
+      }
+    }
+
+    rideHorses.valueSeq().forEach((rideHorse) => {
       if (rideHorse.get('horseID') === horseID
         && rideHorse.get('rideID') === this.props.ride.get('_id')
         && rideHorse.get('rideHorseType') === selectionType) {
@@ -479,12 +495,10 @@ class UpdateRideContainer extends BackgroundComponent {
         userID: this.props.userID,
       })
     }
-    if (selectionType === 'rider') {
-      // remove this after everyone on version > 43
-      this.props.dispatch(rideUpdated(this.props.ride.set('horseID', horseID)))
-    }
     foundRideHorse = foundRideHorse.set('deleted', false)
     this.props.dispatch(rideHorseUpdated(foundRideHorse))
+
+
     this.clearMenus()
   }
 

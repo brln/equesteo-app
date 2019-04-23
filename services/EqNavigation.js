@@ -7,6 +7,10 @@ export default class EqNavigation {
   static push (currentComponent, opts) {
     if (!EqNavigation.debounce) {
       EqNavigation.debounce = true
+      if (!opts.component.options) {
+        opts.component.options = {}
+      }
+      opts.component.options.blurOnUnmount = true
       return Navigation.push(currentComponent, opts).then(() => {
         setTimeout(() => {
           EqNavigation.debounce = false

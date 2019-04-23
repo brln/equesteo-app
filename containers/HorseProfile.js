@@ -148,7 +148,7 @@ class HorseProfileContainer extends BackgroundComponent {
 
   thisHorsesPhotos (horsePhotos, horse) {
     return horsePhotos.filter((photo) => {
-      return photo.get('deleted') !== true && photo.get('horseID') === horse.get('_id')
+      return photo.get('horseID') === horse.get('_id') && photo.get('deleted') !== true
     })
   }
 

@@ -176,7 +176,7 @@ export function appInitialized () {
           }
           return dispatch(startNetworkTracking())
         }).then(() => {
-          return dispatch(doSync())
+          return dispatch(doSync({}, true, false))
         })
       } else {
         dispatch(switchRoot(SIGNUP_LOGIN))
@@ -881,6 +881,22 @@ export function startLocationTracking () {
   }
 }
 
+export function checkNetworkConnection () {
+  cb('startListeningFCM')
+  return (dispatch, getState) => {
+    ApiClient.checkConnection().then(resp => {
+      dispatch(newNetworkState(resp.connected))
+      if (resp.connected) {
+        dispatch(runPhotoQueue())
+        const needsPersist = getState().getIn(['localState', 'needsRemotePersist']) === DB_NEEDS_SYNC
+        if (needsPersist) {
+          dispatch(doSync()).catch(catchAsyncError(dispatch))
+        }
+      }
+    })
+  }
+}
+
 let networkListenerRemover = null
 export function startNetworkTracking () {
   cb('startNetworkTracking')
@@ -891,16 +907,7 @@ export function startNetworkTracking () {
 
     const listener = () => {
       setTimeout (() => {
-        ApiClient.checkConnection().then(resp => {
-          dispatch(newNetworkState(resp.connected))
-          if (resp.connected) {
-            dispatch(runPhotoQueue())
-            const needsPersist = getState().getIn(['localState', 'needsRemotePersist']) === DB_NEEDS_SYNC
-            if (needsPersist) {
-              dispatch(doSync()).catch(catchAsyncError(dispatch))
-            }
-          }
-        })
+        dispatch(checkNetworkConnection())
       }, 2000)
     }
 
@@ -989,11 +996,11 @@ export function submitSignup (email, password) {
 
 export function pulldownSync () {
   return (dispatch) => {
-    dispatch(doSync()).catch(catchAsyncError(dispatch))
+    dispatch(doSync({}, true, false)).catch(catchAsyncError(dispatch))
   }
 }
 
-export function doSync (syncData={}, showProgress=true) {
+export function doSync (syncData={}, showProgress=true, doUpload=true) {
   cb('doSync', true)
   return (dispatch, getState) => {
     function feedMessage(message, color, timeout) {
@@ -1039,8 +1046,12 @@ export function doSync (syncData={}, showProgress=true) {
       }
 
       dispatch(setFullSyncFail(true))
-      feedMessage('Uploading...', warning, null)
-      return PouchCouch.remoteReplicateDBs().then(() => {
+      let upload = Promise.resolve()
+      if (remotePersistStatus === DB_NEEDS_SYNC || doUpload) {
+        feedMessage('Uploading...', warning, null)
+        upload = PouchCouch.remoteReplicateDBs()
+      }
+      return upload.then(() => {
         let userID = syncData.userID
         let followingIDs = syncData.followingIDs
         let followerIDs = syncData.followerIDs
@@ -1083,6 +1094,7 @@ export function doSync (syncData={}, showProgress=true) {
     } else {
       dispatch(setFullSyncFail(true))
       feedMessage('No Internet Connection', warning, 10000)
+      dispatch(checkNetworkConnection())
       return Promise.resolve()
     }
   }

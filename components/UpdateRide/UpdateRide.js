@@ -230,7 +230,6 @@ export default class UpdateRide extends PureComponent {
                 <View style={{marginLeft: 20, marginBottom: 30}}>
                   <HorseSelector
                     changeHorseID={this.props.changeHorseID}
-                    horseID={this.props.ride.get('horseID')} // remove when everyone version > 43
                     horses={this.props.horses}
                     horsePhotos={this.props.horsePhotos}
                     openSelectHorseMenu={this.props.openSelectHorseMenu}

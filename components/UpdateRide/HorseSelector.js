@@ -32,16 +32,12 @@ export default class HorseSelector extends PureComponent {
 
   isChosen (horse) {
     let chosen = false
-    if (this.props.horseID === horse.get('_id')) {
-      chosen = true
-    } else {
-      this.props.rideHorses.valueSeq().forEach(rideHorse => {
-        if (rideHorse.get('deleted') !== true
-          && rideHorse.get('horseID') === horse.get('_id'))    {
-            chosen = true
-          }
-      })
-    }
+    this.props.rideHorses.valueSeq().forEach(rideHorse => {
+      if (rideHorse.get('deleted') !== true
+        && rideHorse.get('horseID') === horse.get('_id'))    {
+          chosen = true
+        }
+    })
     return chosen
   }
 

@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { View, Text } from 'react-native'
 import PushNotification from 'react-native-push-notification'
 import firebase from 'react-native-firebase'
-
+import { Navigation } from 'react-native-navigation'
 
 import { brand } from '../colors'
 import { markNotificationSeen } from "../actions/functional"
@@ -27,7 +27,14 @@ class NotificationsListContainer extends PureComponent {
         title: {
           color: 'white',
           text: 'Notifications'
-        }
+        },
+        rightButtons: [
+          {
+            id: 'clearAll',
+            text: 'Clear All',
+            color: 'white'
+          },
+        ]
       },
       layout: {
         orientation: ['portrait']
@@ -38,9 +45,21 @@ class NotificationsListContainer extends PureComponent {
   constructor (props) {
     super(props)
     this.memoAllNotifications = memoizeOne(this.allNotifications.bind(this))
+    this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
     this.justClear = this.justClear.bind(this)
     this.showRide = this.showRide.bind(this)
     this.showAndClear = this.showAndClear.bind(this)
+
+    Navigation.events().bindComponent(this);
+  }
+
+  navigationButtonPressed ({ buttonId }) {
+    if (buttonId === 'clearAll') {
+      const notifications = this.memoAllNotifications(this.props.notifications, this.props.rides)
+      for (let notification of notifications) {
+        this.justClear(notification.get('_id'))
+      }
+    }
   }
 
   componentDidMount() {
