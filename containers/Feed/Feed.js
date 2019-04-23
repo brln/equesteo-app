@@ -1,4 +1,4 @@
-import { Map } from 'immutable'
+import { fromJS, List, Map } from 'immutable'
 import memoizeOne from 'memoize-one'
 import React from 'react'
 import { Keyboard, Platform } from 'react-native'
@@ -290,18 +290,27 @@ class FeedContainer extends BackgroundComponent {
       (r) => r.get('userID') === userID && r.get('deleted') !== true
     ).sort((a, b) =>
       b.get('startTime') - a.get('startTime')
-    ).toList().slice(0, 30)
+    ).slice(0, 30)
   }
 
   yourRideHorses (yourRides, rideHorses, horses) {
     const yourRideIDs = yourRides.map(r => r.get('_id'))
 
-    let allRideHorses = Map()
-    const rideHorseVal = rideHorses.valueSeq()
+    let rideHorsesByRide = Map()
+    for (let rideHorse of rideHorses.valueSeq()) {
+      if (!rideHorse.get('deleted')) {
+        if (!rideHorsesByRide.get(rideHorse.get('rideID'))) {
+          rideHorsesByRide = rideHorsesByRide.set(rideHorse.get('rideID'), List())
+        }
+        const rideList = rideHorsesByRide.get(rideHorse.get('rideID'))
+        rideHorsesByRide = rideHorsesByRide.set(rideHorse.get('rideID'), rideList.push(rideHorse))
+      }
+    }
+
+    let yourRideHorses = Map()
     for (let rideID of yourRideIDs) {
-      const thisRidesHorses = rideHorseVal.filter(rh => {
-        return rh.get('rideID') === rideID && rh.get('deleted') !== true
-      }).sort((a, b) => {
+      let rideHorseSet = rideHorsesByRide.get(rideID) || List()
+      rideHorseSet = rideHorseSet.sort((a, b) => {
         if (a.get('rideHorseType' === 'rider')) {
           return 1
         } else {
@@ -310,21 +319,29 @@ class FeedContainer extends BackgroundComponent {
       }).map(rh => {
         return horses.get(rh.get('horseID'))
       })
-
-      allRideHorses = allRideHorses.set(rideID, thisRidesHorses)
+      yourRideHorses = yourRideHorses.set(rideID, rideHorseSet)
     }
-    return allRideHorses
+    return yourRideHorses
   }
 
   followingRideHorses (followingRides, rideHorses, horses) {
-    // copypasta so memoizeone works for both
-    const followingRideIDs = followingRides.map(r => r.get('_id'))
-    let allRideHorses = Map()
-    const rideHorseVal = rideHorses.valueSeq()
-    for (let rideID of followingRideIDs) {
-      const thisRidesHorses = rideHorseVal.filter(rh => {
-        return rh.get('rideID') === rideID && rh.get('deleted') !== true
-      }).sort((a, b) => {
+    const yourRideIDs = followingRides.map(r => r.get('_id'))
+
+    let rideHorsesByRide = Map()
+    for (let rideHorse of rideHorses.valueSeq()) {
+      if (!rideHorse.get('deleted')) {
+        if (!rideHorsesByRide.get(rideHorse.get('rideID'))) {
+          rideHorsesByRide = rideHorsesByRide.set(rideHorse.get('rideID'), List())
+        }
+        const rideList = rideHorsesByRide.get(rideHorse.get('rideID'))
+        rideHorsesByRide = rideHorsesByRide.set(rideHorse.get('rideID'), rideList.push(rideHorse))
+      }
+    }
+
+    let followingRideHorses = Map()
+    for (let rideID of yourRideIDs) {
+      let rideHorseSet = rideHorsesByRide.get(rideID) || List()
+      rideHorseSet = rideHorseSet.sort((a, b) => {
         if (a.get('rideHorseType' === 'rider')) {
           return 1
         } else {
@@ -333,40 +350,41 @@ class FeedContainer extends BackgroundComponent {
       }).map(rh => {
         return horses.get(rh.get('horseID'))
       })
-      allRideHorses = allRideHorses.set(rideID, thisRidesHorses)
+      followingRideHorses = followingRideHorses.set(rideID, rideHorseSet)
     }
-    return allRideHorses
+    return followingRideHorses
   }
 
   followIDs (follows, userID) {
     return follows.valueSeq().filter(
       f => f.get('deleted') !== true && f.get('followerID') === userID
-    ).map(
-      f => f.get('followingID')
-    ).toList()
+    ).reduce((accum, f) => {
+      return accum.set(f.get('followingID'), true)
+    }, Map())
   }
 
   followingRides (follows, userID, rides) {
     return rides.valueSeq().filter(
       r => r.get('isPublic') === true // is a public ride
         && r.get('deleted') !== true // hasn't been deleted
-        && (r.get('userID') === userID || this.memoizeFollowIDs(follows, userID).indexOf(r.get('userID')) >= 0) // user hasn't removed follow
+        && (r.get('userID') === userID || this.memoizeFollowIDs(follows, userID).get((r.get('userID')))) // user hasn't removed follow
     ).sort(
       (a, b) => b.get('startTime') - a.get('startTime')
-    ).toList().slice(0, 50)
+    ).slice(0, 50)
   }
 
   filteredHorses (follows, userID, horseUsers, horses) {
     return horseUsers.filter(h => {
-      return this.memoizeFollowIDs(follows, userID).indexOf(h.get('userID')) >= 0 || h.get('userID') === userID
+      return this.memoizeFollowIDs(follows, userID).get(h.get('userID')) || h.get('userID') === userID
     }).mapEntries(([horseUserID, horseUser]) => {
       return [horseUser.get('horseID'), horses.get(horseUser.get('horseID'))]
     })
   }
 
   filteredHorseUsers (follows, userID, horseUsers) {
+    const followIDs = this.memoizeFollowIDs(follows, userID)
     return horseUsers.filter(h => {
-      return this.memoizeFollowIDs(follows, userID).indexOf(h.get('userID')) >= 0 || h.get('userID') === userID
+      return h.get('deleted') !== true && (h.get('userID') === userID || followIDs.get(h.get('userID')))
     })
   }
 
@@ -385,6 +403,7 @@ class FeedContainer extends BackgroundComponent {
     const yourRideHorses = this.memoizeYourRideHorses(yourRides, this.props.rideHorses, this.props.horses)
     const followingRides = this.memoizeFollowingRides(this.props.follows, this.props.userID, this.props.rides)
     const followingRideHorses = this.memoizeFollowingRideHorses(followingRides, this.props.rideHorses, this.props.horses)
+    const horses = this.memoizeFilteredHorses(this.props.follows, this.props.userID, this.props.horseUsers, this.props.horses)
     return (
       <Feed
         currentRide={this.props.currentRide}
@@ -392,7 +411,7 @@ class FeedContainer extends BackgroundComponent {
         feedMessage={this.props.feedMessage}
         followingRides={followingRides}
         followingRideHorses={followingRideHorses}
-        horses={this.memoizeFilteredHorses(this.props.follows, this.props.userID, this.props.horseUsers, this.props.horses)}
+        horses={horses}
         horsePhotos={this.props.horsePhotos}
         horseOwnerIDs={this.memoizeHorseOwnerIDs(this.props.horseUsers)}
         horseUsers={this.memoizeFilteredHorseUsers(this.props.follows, this.props.userID, this.props.horseUsers)}

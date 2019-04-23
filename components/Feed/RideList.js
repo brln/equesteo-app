@@ -82,6 +82,7 @@ export default class RideList extends PureComponent {
 
   makeSections (horseUsers, horses, ownRideList, userID, users, rides) {
     const allFeedItems = []
+
     for (let horseUser of horseUsers.valueSeq()) {
       const horse = horses.get(horseUser.get('horseID'))
       if (!horse) {

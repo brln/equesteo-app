@@ -43,7 +43,6 @@ class FindPeopleContainer extends PureComponent {
   }
 
   componentWillUnmount () {
-    logDebug('unmounting!')
     Keyboard.dismiss()
   }
 

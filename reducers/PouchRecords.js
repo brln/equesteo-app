@@ -152,8 +152,6 @@ export default function PouchRecordsReducer(state=initialState, action) {
         pausedTime,
         lastPausedTime
       )
-      logDebug(elapsed, 'elapsed')
-
       const name = newRideName(action.currentRide)
 
       let defaultID = null
