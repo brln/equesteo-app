@@ -358,14 +358,23 @@ export function loadRideElevations (rideID) {
   }
 }
 
-export function markNotificationSeen (notification) {
+export function markNotificationsSeen (notificationIDs) {
   cb('markNotificationSeen')
   return (dispatch, getState) => {
-    const markSeen = notification.set('popped', true).set('seen', true).set('deleted', true)
-    dispatch(notificationUpdated(markSeen))
-    PouchCouch.saveNotification(markSeen.toJS()).then(({rev}) => {
-      let foundAfterSave = getState().getIn(['pouchRecords', 'notifications', notification.get('_id')])
-      dispatch(notificationUpdated(foundAfterSave.set('_rev', rev)))
+    let nextUp = Promise.resolve()
+    for (let notificationID of notificationIDs) {
+      const notification = getState().getIn(['pouchRecords', 'notifications', notificationID])
+      const markSeen = notification.set('popped', true).set('seen', true).set('deleted', true)
+      dispatch(notificationUpdated(markSeen))
+      nextUp = nextUp.then(() => {
+        return PouchCouch.saveNotification(markSeen.toJS()).then(({rev}) => {
+          let foundAfterSave = getState().getIn(['pouchRecords', 'notifications', notification.get('_id')])
+          logDebug(foundAfterSave.toJSON())
+          dispatch(notificationUpdated(foundAfterSave.set('_rev', rev)))
+        })
+      })
+    }
+    nextUp.then(() => {
       return dispatch(doSync({}, false))
     }).catch(catchAsyncError(dispatch))
   }

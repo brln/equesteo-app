@@ -116,7 +116,7 @@ export default class HorseCard extends PureComponent {
           pagingEnabled={true}
           style={{height: 250}}
         >
-          <View style={{flex: 1, flexDirection: 'row'}}>
+          <View style={{flex: 1, flexDirection: 'row', width}}>
             {images}
           </View>
         </ScrollView>
