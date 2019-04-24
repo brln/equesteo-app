@@ -91,7 +91,6 @@ export default class CarrotList extends PureComponent {
   }
 
   render() {
-    console.log(this.props.rideCarrots.toJSON())
     return (
       <View style={styles.container}>
         <ScrollView style={{flex: 1, borderTopWidth: 2, borderTopColor: lightGrey}}>

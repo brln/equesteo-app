@@ -7,7 +7,6 @@ import { doSync, showLocalNotifications } from './actions/functional'
 
 export default (store) => {
   return (m) => {
-    console.log("STARTING BG MESSAGING FUNCTION")
     return Mixpanel.sharedInstanceWithToken(MIXPANEL_TOKEN).then(() => {
       return tryToLoadStateFromDisk(store.dispatch)
     }).then(() => {

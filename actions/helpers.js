@@ -21,7 +21,7 @@ import {
   switchRoot,
 } from './functional'
 import { logError, logInfo } from '../helpers'
-import { FEED, NEEDS_SYNC } from '../screens'
+import { FEED, NEEDS_SYNC } from '../screens/main'
 import { LocalStorage } from '../services'
 
 import { setUserContext } from "../services/Sentry"

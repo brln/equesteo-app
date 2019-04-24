@@ -98,7 +98,6 @@ class SettingsContainer extends BackgroundComponent {
   }
 
   render() {
-    console.log(this.props.user.toJSON())
     return (
       <View>
         <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'}>

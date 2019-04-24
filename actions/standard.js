@@ -1,7 +1,10 @@
 import {
   ADD_DOCS_DOWNLOADED,
   ADD_DOCS_TO_DOWNLOAD,
+  ADD_NEW_CARE_HORSE_ID,
+  CARE_EVENT_UPDATED,
   CARROT_MUTEX,
+  CLEAR_CURRENT_CARE_EVENT,
   CLEAR_DOCS_NUMBERS,
   CLEAR_FEED_MESSAGE,
   CLEAR_LAST_LOCATION,
@@ -26,6 +29,7 @@ import {
   ENQUEUE_PHOTO,
   ERROR_OCCURRED,
   FOLLOW_UPDATED,
+  HORSE_CARE_EVENT_UPDATED,
   HORSE_UPDATED,
   HORSE_PHOTO_UPDATED,
   HORSE_USER_UPDATED,
@@ -38,6 +42,7 @@ import {
   NEW_NETWORK_STATE,
   NOTIFICATION_UPDATED,
   PAUSE_LOCATION_TRACKING,
+  REMOVE_NEW_CARE_HORSE_ID,
   REMOVE_STASHED_RIDE_PHOTO,
   REPLACE_LAST_LOCATION,
   RIDE_ATLAS_ENTRY_UPDATED,
@@ -72,6 +77,10 @@ import {
   USER_PHOTO_UPDATED,
   USER_SEARCH_RETURNED,
   USER_UPDATED,
+  SET_CARE_EVENT_DATE,
+  SET_MAIN_CARE_EVENT_TYPE,
+  SET_SECONDARY_CARE_EVENT_TYPE,
+  SET_CARE_EVENT_SPECIFIC_DATA,
 } from '../constants'
 
 export function addDocsDownloaded (num, db) {
@@ -95,10 +104,30 @@ export function clearDocsNumbers () {
   }
 }
 
+export function addNewCareHorseID (horseID) {
+  return {
+    type: ADD_NEW_CARE_HORSE_ID,
+    horseID
+  }
+}
+
+export function careEventUpdated (careEvent) {
+  return {
+    type: CARE_EVENT_UPDATED,
+    careEvent
+  }
+}
+
 export function carrotMutex (value) {
   return {
     type: CARROT_MUTEX,
     value,
+  }
+}
+
+export function clearCurrentCareEvent () {
+  return {
+    type: CLEAR_CURRENT_CARE_EVENT
   }
 }
 
@@ -286,6 +315,13 @@ export function errorOccurred (message) {
   }
 }
 
+export function horseCareEventUpdated (horseCareEvent) {
+  return {
+    type: HORSE_CARE_EVENT_UPDATED,
+    horseCareEvent,
+  }
+}
+
 export function horsePhotoUpdated (horsePhoto) {
   return {
     type: HORSE_PHOTO_UPDATED,
@@ -375,6 +411,13 @@ export function notificationUpdated (notification) {
 export function pauseLocationTracking () {
   return {
     type: PAUSE_LOCATION_TRACKING
+  }
+}
+
+export function removeNewCareHorseID (horseID) {
+  return {
+    type: REMOVE_NEW_CARE_HORSE_ID,
+    horseID
   }
 }
 
@@ -529,6 +572,36 @@ export function setActiveComponent (componentID) {
     logData: ['componentID'],
     type: SET_ACTIVE_COMPONENT,
     componentID
+  }
+}
+
+export function setCareEventDate (date) {
+  return {
+    type: SET_CARE_EVENT_DATE,
+    date
+  }
+}
+
+export function setMainCareEventType (eventType) {
+  return {
+    type: SET_MAIN_CARE_EVENT_TYPE,
+    eventType,
+    logData: ['eventType']
+  }
+}
+
+export function setSecondaryCareEventType (eventType) {
+  return {
+    type: SET_SECONDARY_CARE_EVENT_TYPE,
+    eventType,
+    logData: ['eventType']
+  }
+}
+
+export function setCareEventSpecificData (data) {
+  return {
+    type: SET_CARE_EVENT_SPECIFIC_DATA,
+    data
   }
 }
 

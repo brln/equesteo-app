@@ -1,7 +1,6 @@
 import { fromJS, Map } from 'immutable'
 import memoizeOne from 'memoize-one';
 import { Navigation } from 'react-native-navigation'
-import { Keyboard } from 'react-native'
 import React from 'react'
 import { connect } from 'react-redux';
 
@@ -40,7 +39,7 @@ import {
   unixTimeNow
 } from '../helpers'
 import UpdateRide from '../components/UpdateRide/UpdateRide'
-import { PHOTO_LIGHTBOX, RIDE } from '../screens'
+import { PHOTO_LIGHTBOX, RIDE } from '../screens/main'
 import { catchAsyncError } from '../actions/functional'
 import { EqNavigation } from '../services'
 
@@ -426,11 +425,11 @@ class UpdateRideContainer extends BackgroundComponent {
     })
   }
 
-  horses () {
-    return this.props.horseUsers.valueSeq().filter((hu) => {
-      return (hu.get('userID') === this.props.userID) && hu.get('deleted') !== true
+  horses (horseUsers, horses, userID) {
+    return horseUsers.valueSeq().filter((hu) => {
+      return (hu.get('userID') === userID) && hu.get('deleted') !== true
     }).map((hu) => {
-      return this.props.horses.get(hu.get('horseID'))
+      return horses.get(hu.get('horseID'))
     })
   }
 
@@ -530,7 +529,7 @@ class UpdateRideContainer extends BackgroundComponent {
         createPhoto={this.createPhoto}
         discardRide={this.discardRide}
         discardModalOpen={this.state.discardModalOpen}
-        horses={this.memoizedHorses()}
+        horses={this.memoizedHorses(this.props.horseUsers, this.props.horses, this.props.userID)}
         horsePhotos={this.props.horsePhotos}
         markPhotoDeleted={this.markPhotoDeleted}
         rideCoordinates={this.props.rideCoordinates}

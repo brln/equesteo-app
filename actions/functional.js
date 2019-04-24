@@ -36,7 +36,7 @@ import {
   RIDE,
   RIDE_BUTTON,
   SIGNUP_LOGIN,
-} from '../screens'
+} from '../screens/main'
 import {
   EqNavigation,
   LocalStorage,
@@ -48,7 +48,9 @@ import { makeMessage } from '../modelHelpers/notification'
 import {
   addDocsDownloaded,
   addDocsToDownload,
+  careEventUpdated,
   carrotMutex,
+  clearCurrentCareEvent,
   clearDocsNumbers,
   clearLastLocation,
   clearFeedMessage,
@@ -58,6 +60,7 @@ import {
   dismissError,
   enqueuePhoto,
   errorOccurred,
+  horseCareEventUpdated,
   horsePhotoUpdated,
   horseUpdated,
   followUpdated,
@@ -86,7 +89,7 @@ import {
   updatePhotoStatus,
   userPhotoUpdated,
   userSearchReturned,
-  userUpdated,
+  userUpdated
 } from './standard'
 import { NotConnectedError } from "../errors"
 
@@ -237,6 +240,55 @@ export function clearRideNotifications (rideID) {
   }
 }
 
+export function createCareEvent () {
+  cb('createCareEvent')
+  return (dispatch, getState) => {
+    const currentUserID = getState().getIn(['localState', 'userID'])
+    const careEventID = `${currentUserID}_${(new Date).getTime().toString()}`
+    const newCareEvent = getState().getIn(['localState', 'newCareEvent'])
+    const newCareHorseIDs = getState().getIn(['localState', 'newCareHorseIDs'])
+    const permaCareEvent = {
+      _id: careEventID,
+      type: 'careEvent',
+      date: newCareEvent.get('date'),
+      mainEventType: newCareEvent.get('mainEventType'),
+      secondaryEventType: newCareEvent.get('secondaryEventType'),
+      eventSpecificData: newCareEvent.get('eventSpecificData'),
+      userID: currentUserID,
+    }
+    const asMap = Map(permaCareEvent)
+    dispatch(careEventUpdated(asMap))
+    PouchCouch.saveHorse(permaCareEvent).then(doc => {
+      const afterSave = getState().getIn(['pouchRecords', 'careEvents', careEventID])
+      dispatch(careEventUpdated(afterSave.set('_rev', doc.rev)))
+
+      let nextSave = Promise.resolve()
+      for (let horseID of newCareHorseIDs) {
+        const horseCareEventID = `${careEventID}_${horseID}`
+        const permaHorseCareEvent = {
+          _id: horseCareEventID,
+          type: 'horseCareEvent',
+          careEventID,
+          horseID,
+          userID: currentUserID,
+        }
+        const asMap = Map(permaHorseCareEvent)
+        dispatch(horseCareEventUpdated(asMap))
+        nextSave = nextSave.then(() => {
+          PouchCouch.saveHorse(permaHorseCareEvent).then(doc => {
+            const afterSave = getState().getIn(['pouchRecords', 'horseCareEvents', horseCareEventID])
+            dispatch(horseCareEventUpdated(afterSave.set('_rev', doc.rev)))
+          })
+        })
+      }
+      nextSave.then(() => {
+        dispatch(clearCurrentCareEvent())
+        dispatch(doSync())
+      })
+    })
+  }
+}
+
 export function createRideAtlasEntry(name, userID, ride, rideCoordinates, rideElevations) {
   cb('createRideAtlasEntry', true)
   return (dispatch, getState) => {
@@ -282,6 +334,19 @@ export function createRideComment(commentData) {
       dispatch(rideCommentUpdated(afterSave.set('_rev', doc.rev)))
       return dispatch(doSync())
     }).catch(catchAsyncError(dispatch))
+  }
+}
+
+export function deleteCareEvent (careEvent) {
+  cb('deleteCareEvent')
+  return (dispatch, getState) => {
+    const deleted = careEvent.set('deleted', true)
+    dispatch(careEventUpdated(deleted))
+    PouchCouch.saveHorse(deleted.toJS()).then(doc => {
+      const afterSave = getState().getIn(['pouchRecords', 'careEvents', careEvent.get('_id')])
+      dispatch(careEventUpdated(afterSave.set('_rev', doc.rev)))
+      dispatch(doSync())
+    })
   }
 }
 

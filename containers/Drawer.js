@@ -16,12 +16,14 @@ import {
   BARN,
   FEED,
   FEEDBACK,
-  FIND_PEOPLE,
   LEADERBOARDS,
   MORE,
   PROFILE,
   TRAINING,
-} from '../screens'
+} from '../screens/main'
+import {
+  EVENT_LIST
+} from '../screens/care'
 import BuildImage from '../components/Images/BuildImage'
 import { brand, lightGrey } from '../colors'
 import { logRender } from '../helpers'
@@ -35,8 +37,8 @@ class DrawerContainer extends Component {
     super(props)
     this.openAccount = this.openAccount.bind(this)
     this.openBarn = this.openBarn.bind(this)
+    this.openCareCalendar = this.openCareCalendar.bind(this)
     this.openFeedback = this.openFeedback.bind(this)
-    this.openFindFriends = this.openFindFriends.bind(this)
     this.openLeaderboards = this.openLeaderboards.bind(this)
     this.openMore = this.openMore.bind(this)
     this.openTraining = this.openTraining.bind(this)
@@ -87,13 +89,12 @@ class DrawerContainer extends Component {
     }
 	}
 
-	openFindFriends () {
+	openCareCalendar () {
     this.toggleDrawer()
     if (this.props.activeComponent === FEED) {
       EqNavigation.push(this.props.activeComponent, {
         component: {
-          name: FIND_PEOPLE,
-          title: 'Find Friends',
+          name: EVENT_LIST,
           options: {
             sideMenu: {
               left: {
@@ -168,7 +169,6 @@ class DrawerContainer extends Component {
         component: {
           name: FEEDBACK,
           options: {
-            blurOnUnmount: true,
             sideMenu: {
               left: {
                 visible: false
@@ -258,14 +258,14 @@ class DrawerContainer extends Component {
                 </View>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={this.openFindFriends}>
+              <TouchableOpacity onPress={this.openCareCalendar}>
                 <View style={styles.drawerListItem}>
                   <BuildImage
-                    source={require('../img/mainMenus/findPeople_wt.png')}
+                    source={require('../img/mainMenus/calendar.png')}
                     style={styles.icon}
                   />
                   <Text style={styles.drawerListItemText} onTouch>
-                    Find Friends
+                    Care Calendar
                   </Text>
                 </View>
               </TouchableOpacity>

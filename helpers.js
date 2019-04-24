@@ -47,6 +47,10 @@ export const unixTimeNow = () => {
   return Math.floor(new Date().getTime())
 }
 
+export const toUnixTime = (date) => {
+  return Math.floor(date.getTime())
+}
+
 export const profilePhotoURL = (id) => {
   return `https://equesteo-profile-photos-2.s3.amazonaws.com/${id}.jpg`
 }
@@ -218,7 +222,8 @@ export function elapsedTime (startTime, currentTime, pausedTime, lastPauseStart)
   }
   const totalElapsed = moment(currentTime).diff(moment(startTime), 'seconds', true)
   const withoutOldPauses = totalElapsed - pausedTime
-  return withoutOldPauses - nowPausedTime
+  const netElapsed = withoutOldPauses - nowPausedTime
+  return netElapsed < 0 ? 0 : netElapsed
 }
 
 function leftPad(num) {

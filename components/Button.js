@@ -14,7 +14,7 @@ export default class Button extends PureComponent {
     if (this.props.disabled) {
       return (
         <View
-          style={[{backgroundColor: lightGrey}, styles.button]}
+          style={[{width: this.props.width, backgroundColor: lightGrey}, styles.button]}
         >
           <Text style={[styles.text, {color: darkGrey}]}>{this.props.text}</Text>
         </View>
@@ -22,7 +22,7 @@ export default class Button extends PureComponent {
     } else {
       return (
         <TouchableOpacity
-          style={[{backgroundColor: this.props.color, borderColor: this.props.borderColor, borderWidth: this.props.borderColor ? 1 : null}, styles.button]}
+          style={[{width: this.props.width, backgroundColor: this.props.color, borderColor: this.props.borderColor, borderWidth: this.props.borderColor ? 1 : null}, styles.button]}
           onPress={this.props.onPress}
         >
           <Text style={[styles.text, this.props.otherTextStyle]}>{this.props.text}</Text>

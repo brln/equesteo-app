@@ -7,7 +7,7 @@ import { Navigation } from 'react-native-navigation'
 import { brand } from '../colors'
 import Training from '../components/Training/Training'
 import { logRender } from '../helpers'
-import { RIDE } from '../screens'
+import { RIDE } from '../screens/main'
 import { EqNavigation } from '../services'
 
 class TrainingContainer extends PureComponent {

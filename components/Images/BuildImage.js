@@ -19,7 +19,7 @@ export default class BuildImage extends PureComponent {
 
 BuildImage.propTypes = {
   resizeMode: PropTypes.string,
-  source: PropTypes.number.isRequired,
+  source: PropTypes.number,
   style: PropTypes.oneOfType([PropTypes.number, PropTypes.object, null]),
   error: PropTypes.func,
 }

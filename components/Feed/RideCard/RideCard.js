@@ -8,7 +8,6 @@ import {
   Text,
 } from 'native-base'
 import {
-  Dimensions,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -16,11 +15,11 @@ import {
 import moment from 'moment'
 
 import BuildImage from '../../Images/BuildImage'
-import { brand, darkGrey } from '../../../colors'
-import { userName } from '../../../modelHelpers/user'
 import HorseThumbnails from '../../Shared/HorseThumbnails'
 import Swiper from "./Swiper"
 import UserAvatar from './UserAvatar'
+import { brand, darkGrey } from '../../../colors'
+import { userName } from '../../../modelHelpers/user'
 
 
 export default class RideCard extends PureComponent {

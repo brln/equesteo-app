@@ -7,7 +7,7 @@ import Barn from '../components/Barn/Barn'
 import BackgroundComponent from '../components/BackgroundComponent'
 import { brand } from '../colors'
 import { logRender } from '../helpers'
-import { HORSE_PROFILE, UPDATE_HORSE } from '../screens'
+import { HORSE_PROFILE, UPDATE_HORSE } from '../screens/main'
 import { EqNavigation } from '../services'
 
 class BarnContainer extends BackgroundComponent {

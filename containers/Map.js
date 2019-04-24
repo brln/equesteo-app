@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { brand } from '../colors'
 import ViewingMap from '../components/Ride/ViewingMap'
 import { logRender } from '../helpers'
-import { PHOTO_LIGHTBOX } from '../screens'
+import { PHOTO_LIGHTBOX } from '../screens/main'
 import { EqNavigation } from '../services'
 
 class MapContainer extends PureComponent {

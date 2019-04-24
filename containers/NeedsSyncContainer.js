@@ -12,7 +12,7 @@ import Button from '../components/Button'
 import { brand, lightGrey } from '../colors'
 import BuildImage from '../components/Images/BuildImage'
 import { doSync, startListeningFCM, switchRoot } from '../actions/functional'
-import { FEED } from '../screens'
+import { FEED } from '../screens/main'
 
 
 class NeedsSyncContainer extends PureComponent {

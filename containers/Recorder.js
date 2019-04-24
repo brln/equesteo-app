@@ -22,7 +22,7 @@ import { brand } from '../colors'
 import RideRecorder from '../components/RideRecorder/RideRecorder'
 import { isAndroid, logRender, unixTimeNow } from '../helpers'
 import { captureException } from '../services/Sentry'
-import { CAMERA, RIDE_ATLAS, UPDATE_RIDE, UPDATE_NEW_RIDE_ID } from "../screens"
+import { CAMERA, RIDE_ATLAS, UPDATE_RIDE, UPDATE_NEW_RIDE_ID } from "../screens/main"
 import { EqNavigation } from '../services'
 
 class RecorderContainer extends PureComponent {
@@ -219,9 +219,6 @@ class RecorderContainer extends PureComponent {
           rideID,
           newRide: true,
           currentRidePhotos: this.props.currentRidePhotos.keySeq().toList(),
-        },
-        options: {
-          blurOnUnmount: true
         },
       }
     })

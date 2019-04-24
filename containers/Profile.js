@@ -28,7 +28,7 @@ import {
   PHOTO_LIGHTBOX,
   PROFILE,
   UPDATE_PROFILE
-} from '../screens'
+} from '../screens/main'
 import { generateUUID, logRender, unixTimeNow } from '../helpers'
 import { EqNavigation } from '../services'
 

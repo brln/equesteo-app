@@ -11,7 +11,7 @@ import {
 } from 'react-native'
 import { brand, darkGrey, lightGrey } from '../colors'
 import { logRender } from '../helpers'
-import { BARN, FEEDBACK, FIND_PEOPLE, PROFILE, SETTINGS } from '../screens'
+import { BARN, FEEDBACK, FIND_PEOPLE, PROFILE, SETTINGS } from '../screens/main'
 import Thumbnail from '../components/Images/Thumbnail'
 import { EqNavigation } from '../services'
 
@@ -99,6 +99,15 @@ class MoreContainer extends Component {
     })
   }
 
+  showFindFriends () {
+    EqNavigation.push(this.props.activeComponent, {
+      component: {
+        name: FIND_PEOPLE,
+        title: 'Find Friends',
+      }
+    })
+  }
+
   renderMenuItem ({ item }) {
     return (
       <View style={{flex: 1}}>
@@ -160,6 +169,12 @@ class MoreContainer extends Component {
         }
       ],
       android: [
+        {
+          name: 'Find Friends',
+          screen: FIND_PEOPLE,
+          icon: require('../img/mainMenus/findPeople_wt.png'),
+          onPress: this.showFindFriends
+        },
         {
           name: 'My Account',
           screen: PROFILE,

@@ -13,7 +13,7 @@ import { brand, darkGrey, lightGrey } from '../colors'
 import { logRender } from '../helpers'
 import DeleteModal from '../components/Shared/DeleteModal'
 import Thumbnail from '../components/Images/Thumbnail'
-import { FOLLOW_LIST, UPDATE_HORSE } from '../screens'
+import { FOLLOW_LIST, UPDATE_HORSE } from '../screens/main'
 import { EqNavigation } from '../services'
 import {
   changeHorseOwner,

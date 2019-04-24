@@ -272,16 +272,16 @@ export default class PouchCouch {
       remoteHorsesDB.info().then(resp => {
         const docs = parseInt(resp.update_seq.split('-')[0])
         progress.moreDocsFunc(docs)
-        return remoteHorsesDB.query('horses/allJoins', {keys: userIDs}).then((resp) => {
+        return remoteHorsesDB.query('horses/allJoins2', {keys: userIDs}).then((resp) => {
           const fetchIDs = []
           for (let row of resp.rows) {
             const joinID = row.id
             const userID = row.key
-            const horseID = row.value
+            const joinedID = row.value
             if (userIDs.indexOf(userID) >= 0) {
               fetchIDs.push(joinID)
-              if (fetchIDs.indexOf(horseID) < 0) {
-                fetchIDs.push(horseID)
+              if (fetchIDs.indexOf(joinedID) < 0) {
+                fetchIDs.push(joinedID)
               }
             }
           }
@@ -331,6 +331,8 @@ export default class PouchCouch {
       localUsersDB.allDocs(),
     ]).then(([horsesResp, notificationsResp, ridesResp, usersResp]) => {
       const parsed = {
+        careEvents: {},
+        horseCareEvents: {},
         horses: {},
         horsePhotos: {},
         horseUsers: {},
@@ -355,8 +357,14 @@ export default class PouchCouch {
       // and try to save you'll get a conflict.
       for (let horseDoc of horsesResp.rows) {
         switch (horseDoc.doc.type) {
+          case 'careEvent':
+            parsed.careEvents[horseDoc.doc._id] = horseDoc.doc
+            break
           case 'horse':
             parsed.horses[horseDoc.doc._id] = horseDoc.doc
+            break
+          case 'horseCareEvent':
+            parsed.horseCareEvents[horseDoc.doc._id] = horseDoc.doc
             break
           case 'horsePhoto':
             parsed.horsePhotos[horseDoc.doc._id] = horseDoc.doc

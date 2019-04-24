@@ -22,7 +22,7 @@ import {
   RIDE,
   RIDE_BUTTON,
   TRAINING,
-} from '../../screens'
+} from '../../screens/main'
 import { EqNavigation } from '../../services'
 
 class FeedContainer extends BackgroundComponent {
@@ -131,7 +131,7 @@ class FeedContainer extends BackgroundComponent {
         },
       })
     )
-    props.dispatch(checkFCMPermission())
+    // props.dispatch(checkFCMPermission())
   }
 
   openScreen (openPromise) {

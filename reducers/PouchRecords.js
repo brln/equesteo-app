@@ -1,5 +1,6 @@
 import { fromJS, Map } from 'immutable'
 import {
+  CARE_EVENT_UPDATED,
   CLEAR_SELECTED_RIDE_COORDINATES,
   CLEAR_STATE,
   CREATE_FOLLOW,
@@ -12,6 +13,7 @@ import {
   DELETE_UNPERSISTED_RIDE,
   DELETE_UNPERSISTED_PHOTO,
   FOLLOW_UPDATED,
+  HORSE_CARE_EVENT_UPDATED,
   HORSE_PHOTO_UPDATED,
   HORSE_USER_UPDATED,
   HORSE_UPDATED,
@@ -42,10 +44,12 @@ import {
 import { simplifyLine } from '../services/DouglasPeucker'
 
 export const initialState = Map({
+  careEvents: Map(),
   horses: Map(),
   horsePhotos: Map(),
   horseUsers: Map(),
   follows: Map(),
+  horseCareEvents: Map(),
   leaderboards: Map(),
   notifications: Map(),
   rides: Map(),
@@ -61,67 +65,205 @@ export const initialState = Map({
   userPhotos: Map(),
 })
 
+const createHorse = (action, state) => {
+  const newHorse = {
+    _id: action.horseID,
+    breed: null,
+    birthDay: null,
+    birthMonth: null,
+    birthYear: null,
+    createTime: unixTimeNow(),
+    description: null,
+    heightHands: null,
+    heightInches: null,
+    name: null,
+    profilePhotoID: null ,
+    photosByID: Map(),
+    sex: null ,
+    type: 'horse',
+  }
+
+  let isFirstHorse = state.get('horseUsers').valueSeq().filter((hu) => {
+    return hu.get('userID') === action.userID && hu.get('deleted') !== true
+  }).count() === 0
+  const newHorseUser = {
+    _id: action.horseUserID,
+    type: 'horseUser',
+    horseID: newHorse._id,
+    userID: action.userID,
+    owner: true,
+    createTime: unixTimeNow(),
+    deleted: false,
+    rideDefault: isFirstHorse,
+  }
+  return state.setIn(
+    ['horses', newHorse._id],
+    Map(newHorse)
+  ).setIn(
+    ['horseUsers', newHorseUser._id],
+    Map(newHorseUser)
+  )
+}
+
+const createFollow = (action, state) => {
+  let found = state.getIn(['follows', action.followID])
+  if (!found) {
+    found = Map({
+      _id: action.followID,
+      followingID: action.followingID,
+      followerID: action.followerID,
+      deleted: false,
+      type: "follow"
+    })
+  } else {
+    found = found.set('deleted', false)
+  }
+  return state.setIn(
+    ['follows', action.followID],
+    found
+  )
+}
+
+const createRide = (action, state) => {
+  let newState = state
+  const startTime = action.currentRide.get('startTime')
+
+  let finishTime = new Date()
+  let pausedTime = action.currentRide.get('pausedTime')
+  let lastPausedTime = action.currentRide.get('lastPauseStart')
+  if (action.duplicateFrom) {
+    finishTime = new Date(action.currentRide.get('startTime'))
+    finishTime.setSeconds(action.currentRide.get('elapsedTimeSecs'))
+    pausedTime = 0
+    lastPausedTime = false
+  }
+
+  const elapsed = elapsedTime(
+    startTime,
+    finishTime,
+    pausedTime,
+    lastPausedTime
+  )
+
+  const name = newRideName(action.currentRide)
+
+  let defaultID = null
+  if (!action.duplicateFrom) {
+    state.get('horseUsers').valueSeq().forEach((hu) => {
+      if (hu.get('userID') === action.userID && hu.get('rideDefault')) {
+        defaultID = hu.get('horseID')
+      }
+    })
+  }
+
+  if (defaultID) {
+    const recordID = `${action.rideID}_${defaultID}_${'rider'}`
+    const newRideHorse = Map({
+      _id: recordID,
+      rideID: action.rideID,
+      horseID: defaultID,
+      rideHorseType: 'rider',
+      type: 'rideHorse',
+      timestamp: unixTimeNow(),
+      userID: action.userID,
+    })
+    newState = newState.setIn(['rideHorses', recordID], newRideHorse)
+  }
+
+  const TEN_FEET_AS_DEG_LATITUDE = 0.0000274
+  const simplifiedCoords = simplifyLine(
+    TEN_FEET_AS_DEG_LATITUDE,
+    action.currentRideCoordinates.get('rideCoordinates')
+  )
+
+  const theRide = {
+    _id: action.rideID,
+    coverPhotoID: null,
+    distance: action.currentRide.get('distance') ,
+    elapsedTimeSecs: elapsed,
+    horseID: defaultID,
+    isPublic: state.getIn(['users', action.userID, 'ridesDefaultPublic']),
+    name,
+    notes: null,
+    photosByID: Map({}),
+    startTime: action.currentRide.get('startTime'),
+    type: 'ride',
+    userID: action.userID,
+    duplicateFrom: action.duplicateFrom,
+  }
+
+
+  const simplifiedElevationData = parseElevationData(
+    simplifiedCoords,
+    action.currentRideElevations.get('elevations')
+  )
+  const elevationGain = feetToMeters(simplifiedElevationData[simplifiedElevationData.length - 1].gain)
+  const elevationData = {
+    _id: action.rideID + '_elevations',
+    rideID: theRide._id,
+    elevationGain,
+    elevations: action.currentRideElevations.get('elevations'),
+    type: 'rideElevations',
+    userID: action.userID,
+  }
+
+  const coordinateData = {
+    _id: action.rideID + '_coordinates',
+    rideID: theRide._id,
+    userID: action.userID,
+    type: 'rideCoordinates',
+    rideCoordinates: simplifiedCoords,
+  }
+  theRide.mapURL = staticMap(theRide, coordinateData.rideCoordinates)
+
+  const coordMap = Map(coordinateData)
+  const elevMap = Map(elevationData)
+  return newState.setIn(
+    ['rides', theRide._id], Map(theRide)
+  ).set(
+    'selectedRideCoordinates',
+    coordMap
+  ).set(
+    'selectedRideElevations',
+    elevMap
+  )
+}
+
+const localDataLoaded = (action, state) => {
+  return state.merge(Map({
+    leaderboards: fromJS(action.localData.leaderboards),
+    trainings: fromJS(action.localData.trainings),
+
+    careEvents: fromJS(action.localData.careEvents).merge(state.get('careEvents')),
+    follows: fromJS(action.localData.follows).merge(state.get('follows')),
+    horseCareEvents: fromJS(action.localData.horseCareEvents).merge(state.get('horseCareEvents')),
+    horses: fromJS(action.localData.horses).merge(state.get('horses')),
+    horsePhotos: fromJS(action.localData.horsePhotos).merge(state.get('horsePhotos')),
+    horseUsers: fromJS(action.localData.horseUsers).merge(state.get('horseUsers')),
+    notifications: fromJS(action.localData.notifications).merge(state.get('notifications')),
+    rides: fromJS(action.localData.rides).merge(state.get('rides')),
+    rideComments: fromJS(action.localData.rideComments).merge(state.get('rideComments')),
+    rideHorses: fromJS(action.localData.rideHorses).merge(state.get('rideHorses')),
+    rideCarrots: fromJS(action.localData.rideCarrots).merge(state.get('rideCarrots')),
+    ridePhotos: fromJS(action.localData.ridePhotos).merge(state.get('ridePhotos')),
+    rideAtlasEntries: fromJS(action.localData.rideAtlasEntries).merge(state.get('rideAtlasEntries')),
+    users: fromJS(action.localData.users).merge(state.get('users')),
+    userPhotos: fromJS(action.localData.userPhotos).merge(state.get('userPhotos')),
+  }))
+}
+
 export default function PouchRecordsReducer(state=initialState, action) {
   switch (action.type) {
+    case CARE_EVENT_UPDATED:
+      return state.setIn(['careEvents', action.careEvent.get('_id')], action.careEvent)
     case CLEAR_SELECTED_RIDE_COORDINATES:
       return state.set('selectedRideCoordinates', null)
     case CLEAR_STATE:
       return initialState
     case CREATE_FOLLOW:
-      let found = state.getIn(['follows', action.followID])
-      if (!found) {
-        found = Map({
-          _id: action.followID,
-          followingID: action.followingID,
-          followerID: action.followerID,
-          deleted: false,
-          type: "follow"
-        })
-      } else {
-        found = found.set('deleted', false)
-      }
-      return state.setIn(
-        ['follows', action.followID],
-        found
-      )
+      return createFollow(action, state)
     case CREATE_HORSE:
-      const newHorse = {
-        _id: action.horseID,
-        breed: null,
-        birthDay: null,
-        birthMonth: null,
-        birthYear: null,
-        createTime: unixTimeNow(),
-        description: null,
-        heightHands: null,
-        heightInches: null,
-        name: null,
-        profilePhotoID: null ,
-        photosByID: Map(),
-        sex: null ,
-        type: 'horse',
-      }
-
-      let isFirstHorse = state.get('horseUsers').valueSeq().filter((hu) => {
-        return hu.get('userID') === action.userID && hu.get('deleted') !== true
-      }).count() === 0
-      const newHorseUser = {
-        _id: action.horseUserID,
-        type: 'horseUser',
-        horseID: newHorse._id,
-        userID: action.userID,
-        owner: true,
-        createTime: unixTimeNow(),
-        deleted: false,
-        rideDefault: isFirstHorse,
-      }
-      return state.setIn(
-        ['horses', newHorse._id],
-        Map(newHorse)
-      ).setIn(
-        ['horseUsers', newHorseUser._id],
-        Map(newHorseUser)
-      )
+      return createHorse(action, state)
     case CREATE_HORSE_PHOTO:
       const newPhoto = {
         _id: action.photoData._id,
@@ -133,107 +275,7 @@ export default function PouchRecordsReducer(state=initialState, action) {
       }
       return state.setIn(['horsePhotos', action.photoData._id], Map(newPhoto))
     case CREATE_RIDE:
-      let newState = state
-      const startTime = action.currentRide.get('startTime')
-
-      let finishTime = new Date()
-      let pausedTime = action.currentRide.get('pausedTime')
-      let lastPausedTime = action.currentRide.get('lastPauseStart')
-      if (action.duplicateFrom) {
-        finishTime = new Date(action.currentRide.get('startTime'))
-        finishTime.setSeconds(action.currentRide.get('elapsedTimeSecs'))
-        pausedTime = 0
-        lastPausedTime = false
-      }
-
-      const elapsed = elapsedTime(
-        startTime,
-        finishTime,
-        pausedTime,
-        lastPausedTime
-      )
-      const name = newRideName(action.currentRide)
-
-      let defaultID = null
-      if (!action.duplicateFrom) {
-        state.get('horseUsers').valueSeq().forEach((hu) => {
-          if (hu.get('userID') === action.userID && hu.get('rideDefault')) {
-            defaultID = hu.get('horseID')
-          }
-        })
-      }
-
-      if (defaultID) {
-        const recordID = `${action.rideID}_${defaultID}_${'rider'}`
-        const newRideHorse = Map({
-          _id: recordID,
-          rideID: action.rideID,
-          horseID: defaultID,
-          rideHorseType: 'rider',
-          type: 'rideHorse',
-          timestamp: unixTimeNow(),
-          userID: action.userID,
-        })
-        newState = newState.setIn(['rideHorses', recordID], newRideHorse)
-      }
-
-      const TEN_FEET_AS_DEG_LATITUDE = 0.0000274
-      const simplifiedCoords = simplifyLine(
-        TEN_FEET_AS_DEG_LATITUDE,
-        action.currentRideCoordinates.get('rideCoordinates')
-      )
-
-      const theRide = {
-        _id: action.rideID,
-        coverPhotoID: null,
-        distance: action.currentRide.get('distance') ,
-        elapsedTimeSecs: elapsed,
-        horseID: defaultID,
-        isPublic: state.getIn(['users', action.userID, 'ridesDefaultPublic']),
-        name,
-        notes: null,
-        photosByID: Map({}),
-        startTime: action.currentRide.get('startTime'),
-        type: 'ride',
-        userID: action.userID,
-        duplicateFrom: action.duplicateFrom,
-      }
-
-
-      const simplifiedElevationData = parseElevationData(
-        simplifiedCoords,
-        action.currentRideElevations.get('elevations')
-      )
-      const elevationGain = feetToMeters(simplifiedElevationData[simplifiedElevationData.length - 1].gain)
-      const elevationData = {
-        _id: action.rideID + '_elevations',
-        rideID: theRide._id,
-        elevationGain,
-        elevations: action.currentRideElevations.get('elevations'),
-        type: 'rideElevations',
-        userID: action.userID,
-      }
-
-      const coordinateData = {
-        _id: action.rideID + '_coordinates',
-        rideID: theRide._id,
-        userID: action.userID,
-        type: 'rideCoordinates',
-        rideCoordinates: simplifiedCoords,
-      }
-      theRide.mapURL = staticMap(theRide, coordinateData.rideCoordinates)
-
-      const coordMap = Map(coordinateData)
-      const elevMap = Map(elevationData)
-      return newState.setIn(
-        ['rides', theRide._id], Map(theRide)
-      ).set(
-        'selectedRideCoordinates',
-        coordMap
-      ).set(
-        'selectedRideElevations',
-        elevMap
-      )
+      return createRide(action, state)
     case CREATE_USER_PHOTO:
       const newUserPhoto = {
         _id: action.photoData._id,
@@ -260,6 +302,8 @@ export default function PouchRecordsReducer(state=initialState, action) {
       return state.deleteIn([action.photoSection, action.photoID])
     case FOLLOW_UPDATED:
       return state.setIn(['follows', action.follow.get('_id')], action.follow)
+    case HORSE_CARE_EVENT_UPDATED:
+      return state.setIn(['horseCareEvents', action.horseCareEvent.get('_id')], action.horseCareEvent)
     case HORSE_UPDATED:
       return state.setIn(['horses', action.horse.get('_id')], action.horse)
     case HORSE_USER_UPDATED:
@@ -267,24 +311,7 @@ export default function PouchRecordsReducer(state=initialState, action) {
     case HORSE_PHOTO_UPDATED:
       return state.setIn(['horsePhotos', action.horsePhoto.get('_id')], action.horsePhoto)
     case LOCAL_DATA_LOADED:
-      return state.merge(Map({
-        leaderboards: fromJS(action.localData.leaderboards),
-        trainings: fromJS(action.localData.trainings),
-
-        follows: fromJS(action.localData.follows).merge(state.get('follows')),
-        horses: fromJS(action.localData.horses).merge(state.get('horses')),
-        horsePhotos: fromJS(action.localData.horsePhotos).merge(state.get('horsePhotos')),
-        horseUsers: fromJS(action.localData.horseUsers).merge(state.get('horseUsers')),
-        notifications: fromJS(action.localData.notifications).merge(state.get('notifications')),
-        rides: fromJS(action.localData.rides).merge(state.get('rides')),
-        rideComments: fromJS(action.localData.rideComments).merge(state.get('rideComments')),
-        rideHorses: fromJS(action.localData.rideHorses).merge(state.get('rideHorses')),
-        rideCarrots: fromJS(action.localData.rideCarrots).merge(state.get('rideCarrots')),
-        ridePhotos: fromJS(action.localData.ridePhotos).merge(state.get('ridePhotos')),
-        rideAtlasEntries: fromJS(action.localData.rideAtlasEntries).merge(state.get('rideAtlasEntries')),
-        users: fromJS(action.localData.users).merge(state.get('users')),
-        userPhotos: fromJS(action.localData.userPhotos).merge(state.get('userPhotos')),
-      }))
+      return localDataLoaded(action, state)
     case NOTIFICATION_UPDATED:
       return state.setIn(['notifications', action.notification.get('_id')], action.notification)
     case RIDE_ATLAS_ENTRY_UPDATED:

@@ -1,12 +1,14 @@
 import { List, Map } from 'immutable'
 
-import { FEED, SIGNUP_LOGIN } from '../screens'
-import { appStates, logError, unixTimeNow } from '../helpers'
+import { FEED, SIGNUP_LOGIN } from '../screens/main'
+import { appStates, logError, toUnixTime, unixTimeNow } from '../helpers'
 import { DB_NEEDS_SYNC, DB_SYNCING, DB_SYNCED } from "../actions/functional"
 
 import {
   ADD_DOCS_TO_DOWNLOAD,
+  ADD_NEW_CARE_HORSE_ID,
   CARROT_MUTEX,
+  CLEAR_CURRENT_CARE_EVENT,
   CLEAR_DOCS_NUMBERS,
   CLEAR_FEED_MESSAGE,
   CLEAR_RIDE_PHOTO_FROM_STASH,
@@ -21,9 +23,14 @@ import {
   LOAD_LOCAL_STATE,
   NEW_APP_STATE,
   NEW_NETWORK_STATE,
+  REMOVE_NEW_CARE_HORSE_ID,
   REMOVE_STASHED_RIDE_PHOTO,
   SAVE_USER_ID,
   SET_ACTIVE_COMPONENT,
+  SET_CARE_EVENT_DATE,
+  SET_CARE_EVENT_SPECIFIC_DATA,
+  SET_MAIN_CARE_EVENT_TYPE,
+  SET_SECONDARY_CARE_EVENT_TYPE,
   SET_FEED_MESSAGE,
   SET_FIRST_START_HORSE_ID,
   SET_FOLLOWING_SYNC_RUNNING,
@@ -67,6 +74,8 @@ export const initialState = Map({
   locationStashingActive: false,
   locationRetry: false,
   needsRemotePersist: DB_SYNCED,
+  newCareEvent: Map(),
+  newCareHorseIDs: List(),
   photoQueue: Map(),
   ridePhotoStash: Map(),
   root: SIGNUP_LOGIN,
@@ -83,6 +92,11 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.setIn(['docsDownloaded', action.db], action.num)
     case ADD_DOCS_TO_DOWNLOAD:
       return state.set('docsToDownload', state.get('docsToDownload') + action.num)
+    case ADD_NEW_CARE_HORSE_ID:
+      const newIDs = state.get('newCareHorseIDs').push(action.horseID)
+      return state.set('newCareHorseIDs', newIDs)
+    case CLEAR_CURRENT_CARE_EVENT:
+      return state.set('newCareHorseIDs', List()).set('newCareEvent', Map())
     case CLEAR_DOCS_NUMBERS:
       return state.set('docsToDownload', 0).set('docsDownloaded', initialDocsDownloaded)
     case CARROT_MUTEX:
@@ -131,6 +145,12 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.set('appState', action.newState)
     case NEW_NETWORK_STATE:
       return state.set('goodConnection', action.goodConnection)
+    case REMOVE_NEW_CARE_HORSE_ID:
+      const i = state.get('newCareHorseIDs').indexOf(action.horseID)
+      if (i >= 0) {
+        const newIDs = state.get('newCareHorseIDs').remove(i)
+        return state.set('newCareHorseIDs', newIDs)
+      }
     case REMOVE_STASHED_RIDE_PHOTO:
       return state.deleteIn(['ridePhotoStash', action.stashKey, action.photoID])
     case SAVE_USER_ID:
@@ -145,6 +165,12 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.set('firstStartHorseID', Map({ horseID: action.horseID, horseUserID: action.horseUserID }))
     case SET_LOCATION_RETRY:
       return state.set('locationRetry', action.newVal)
+    case SET_MAIN_CARE_EVENT_TYPE:
+      const withMainType = state.get('newCareEvent').set('mainEventType', action.eventType)
+      return state.set('newCareEvent', withMainType)
+    case SET_SECONDARY_CARE_EVENT_TYPE:
+      const withSecondaryType = state.get('newCareEvent').set('secondaryEventType', action.eventType)
+      return state.set('newCareEvent', withSecondaryType)
     case SET_SHOWING_RIDE:
       return state.set('showingRide', action.rideID)
     case SET_SIGNING_OUT:
@@ -157,6 +183,12 @@ export default function LocalStateReducer(state=initialState, action) {
       )
     case SET_AWAITING_PW_CHANGE:
       return state.set('awaitingPWChange', action.newVal)
+    case SET_CARE_EVENT_DATE:
+      const withDate = state.get('newCareEvent').set('date', action.date)
+      return state.set('newCareEvent', withDate)
+    case SET_CARE_EVENT_SPECIFIC_DATA:
+      const withEventSpecificData = state.get('newCareEvent').set('eventSpecificData', action.data)
+      return state.set('newCareEvent', withEventSpecificData)
     case SET_DOING_INITIAL_LOAD:
       return state.set('doingInitialLoad', action.newVal)
     case SET_FOLLOWING_SYNC_RUNNING:

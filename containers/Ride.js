@@ -28,7 +28,7 @@ import {
   PROFILE,
   RIDE_CHARTS,
   RIDE_TOOLS,
-} from '../screens'
+} from '../screens/main'
 import { EqNavigation } from '../services'
 
 class RideContainer extends PureComponent {
@@ -224,7 +224,6 @@ class RideContainer extends PureComponent {
     const carrots = rideCarrots.valueSeq().filter(
       (rc) => rc.get('rideID') === this.props.ride.get('_id') && rc.get('deleted') !== true
     ).toList()
-    console.log(carrots.toJSON())
     return carrots
   }
 

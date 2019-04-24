@@ -40,10 +40,10 @@ export default class FinalPage extends PureComponent {
           </View>
           <View style={{flex: 4}}>
             <View>
-              <Text style={{textAlign: 'center', fontSize: 20, padding: 20}}>If you need any help, have ideas or concerns about the app, or just want to talk horses, email us!</Text>
+              <Text style={{textAlign: 'center', fontSize: 20, padding: 20}}>If you need any help, have ideas or concerns about the app, or just want to talk horses, email me!</Text>
             </View>
             <View>
-              <Text style={{textAlign: 'center', fontSize: 20}}>info@equesteo.com</Text>
+              <Text style={{textAlign: 'center', fontSize: 20}}>nicole@equesteo.com</Text>
               <View style={{paddingTop: 20, marginRight: 40, marginLeft: 40}}>
                 <Button
                   color={brand}

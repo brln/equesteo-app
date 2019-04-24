@@ -13,7 +13,8 @@ import { appInitialized } from "./actions/functional"
 import { logDebug } from './helpers'
 import logger from './middleware/logger'
 import storeLocalState from './middleware/localstate'
-import { registerScreens } from './screens'
+import { registerScreens } from './screens/main'
+import { registerCareScreens } from './screens/care'
 
 import CurrentRideReducer from './reducers/CurrentRide'
 import LocalStateReducer from './reducers/LocalState'
@@ -53,6 +54,7 @@ Mapbox.setAccessToken(MAPBOX_TOKEN)
 
 export default function start () {
   registerScreens(store, Provider)
+  registerCareScreens(store, Provider)
   Navigation.events().registerAppLaunchedListener(() => {
     Mixpanel.sharedInstanceWithToken(MIXPANEL_TOKEN).then(() => {
       store.dispatch(appInitialized())

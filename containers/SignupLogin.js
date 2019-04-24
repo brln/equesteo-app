@@ -173,7 +173,6 @@ class SignupLoginContainer extends PureComponent {
       />
     )
     if (this.state.login) {
-      console.log(this.props.docsDownloaded.toJSON())
       form = (
         <LoginPage
           docsToDownload={this.props.docsToDownload}

@@ -18,7 +18,7 @@ import {
   FOLLOW_LIST,
   SHARE_RIDE,
   UPDATE_RIDE
-} from '../screens'
+} from '../screens/main'
 import DeleteModal from '../components/Shared/DeleteModal'
 import { createRideAtlasEntry } from "../actions/functional"
 import Thumbnail from '../components/Images/Thumbnail'
@@ -117,9 +117,6 @@ class RideToolsContainer extends Component {
     EqNavigation.push(this.props.componentId, {
       component: {
         name: UPDATE_RIDE,
-        options: {
-          blurOnUnmount: true
-        },
         passProps: {
           rideID: this.props.rideID,
           popBackTo: this.props.popBackTo
@@ -132,9 +129,6 @@ class RideToolsContainer extends Component {
     EqNavigation.push(this.props.componentId, {
       component: {
         name: SHARE_RIDE,
-        options: {
-          blurOnUnmount: true
-        },
         passProps: {
           rideID: this.props.rideID,
         }

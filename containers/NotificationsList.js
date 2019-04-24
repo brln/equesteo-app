@@ -10,7 +10,7 @@ import { brand } from '../colors'
 import { markNotificationsSeen } from "../actions/functional"
 import { logRender } from '../helpers'
 import NotificationList from '../components/NotificationsList/NotificationsList'
-import { RIDE } from '../screens'
+import { RIDE } from '../screens/main'
 import { EqNavigation } from '../services'
 
 class NotificationsListContainer extends PureComponent {
