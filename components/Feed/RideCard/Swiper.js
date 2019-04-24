@@ -17,18 +17,11 @@ const swiperHeight = width * (2/3)
 export default class Swiper extends PureComponent {
   constructor (props) {
     super(props)
-    this.showRide = this.showRide.bind(this)
-  }
-
-
-  showRide (skipToComments) {
-    this.props.showRide(this.props.ride, skipToComments)
   }
 
   render () {
-
     const mapImage = (
-      <TouchableOpacity onPress={() => {this.showRide(false)}} style={{flex: 1}} key="map">
+      <TouchableOpacity onPress={this.props.showRide(false)} style={{flex: 1}} key="map">
         <RideMapImage
           uri={this.props.ride.get('mapURL')}
           style={{height: swiperHeight, width: width, flex: 1}}
@@ -46,7 +39,7 @@ export default class Swiper extends PureComponent {
             source={{uri: photo.get('uri')}}
             onError={(e) => { logError('there was an error loading RideCard image') }}
             showSource={true}
-            onPress={() => {this.showRide(false)}}
+            onPress={this.props.showRide(false)}
           />
         )
         if (photo.get('_id') !== this.props.ride.get('coverPhotoID')) {

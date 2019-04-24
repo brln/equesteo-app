@@ -39,7 +39,9 @@ export default class RideCard extends PureComponent {
   }
 
   showRide (skipToComments) {
-    this.props.showRide(this.props.ride, skipToComments)
+    return () => {
+      this.props.showRide(this.props.ride, skipToComments)
+    }
   }
 
   showProfile () {
@@ -88,7 +90,7 @@ export default class RideCard extends PureComponent {
                 </View>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => {this.showRide(false)}}>
+            <TouchableOpacity onPress={this.showRide(false)}>
               <View style={{flex: 1, paddingTop: 15, paddingBottom: 15}}>
                 <Text style={{fontSize: 20}}>{this.props.ride.get('name') || 'No Name'}</Text>
               </View>
@@ -130,24 +132,30 @@ export default class RideCard extends PureComponent {
           />
         </CardItem>
         <CardItem footer>
-          <Left>
-            <Button transparent onPress={this.toggleCarrot}>
-              <BuildImage
-                source={require('../../../img/carrot.png')}
-                style={{height: 20, width: 20}}
-              />
-              <Text style={{color: brand}}>{this.props.rideCarrots.count()} Carrots</Text>
-            </Button>
-          </Left>
-          <Right>
-            <Button transparent onPress={() => {this.showRide(true)}}>
-              <BuildImage
-                source={require('../../../img/comment.png')}
-                style={{height: 20, width: 20}}
-              />
-              <Text style={{color: brand}}>{this.props.rideComments.count()} comments</Text>
-            </Button>
-          </Right>
+          <View style={{flex: 1, flexDirection: 'row'}}>
+            <TouchableOpacity style={{flex: 1, flexDirection: 'row', paddingLeft: 20}} onPress={this.toggleCarrot}>
+              <View style={{flex: 1}}>
+                <BuildImage
+                  source={require('../../../img/carrot.png')}
+                  style={{height: 20, width: 20}}
+                />
+              </View>
+              <View style={{flex: 5, flexDirection: 'row' }}>
+                <Text style={{color: brand, fontWeight: 'normal'}}>{this.props.rideCarrots.count()} carrots</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity style={{flex: 1, flexDirection: 'row'}} onPress={this.showRide(true)}>
+              <View style={{flex: 1}}>
+                <BuildImage
+                  source={require('../../../img/comment.png')}
+                  style={{height: 20, width: 20}}
+                />
+              </View>
+              <View style={{flex: 4, flexDirection: 'row' }}>
+                <Text style={{color: brand, fontWeight: 'normal'}}>{this.props.rideComments.count()} comments</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
         </CardItem>
       </Card>
     )
