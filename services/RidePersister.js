@@ -125,7 +125,7 @@ export default class RidePersister {
       )
     }
 
-    docSaves.then(() => {
+    return docSaves.then(() => {
       return this.saveRide()
     }).then(() => {
       return Promise.all(rideHorseSaves)

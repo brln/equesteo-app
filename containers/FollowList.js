@@ -33,6 +33,7 @@ class FollowListContainer extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
+      duplicationInProgress: false,
       duplicateModalOpen: false,
       transferModalOpen: false,
       transferUserID: null,
@@ -99,8 +100,15 @@ class FollowListContainer extends PureComponent {
   }
 
   duplicateRide () {
-    this.props.duplicateRide(this.state.transferUserID)
-    EqNavigation.popToRoot(this.props.componentId)
+    this.setState({
+      duplicationInProgress: true
+    })
+    this.props.duplicateRide(this.state.transferUserID).then(() => {
+      EqNavigation.popToRoot(this.props.componentId)
+    }).catch(() => {
+      EqNavigation.popToRoot(this.props.componentId)
+    })
+
   }
 
   doTransfer () {
@@ -114,6 +122,7 @@ class FollowListContainer extends PureComponent {
       <FollowList
         closeDuplicateModal={this.closeDuplicateModal}
         closeTransferModal={this.closeTransferModal}
+        duplicationInProgress={this.state.duplicationInProgress}
         duplicateModalOpen={this.state.duplicateModalOpen}
         duplicateModalYes={this.duplicateRide}
         transferModalYes={this.doTransfer}

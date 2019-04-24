@@ -479,7 +479,7 @@ export function persistRide (rideID, newRide, stashedPhotos, deletedPhotoIDs, tr
   cb('persistRide', true)
   return (dispatch, getState) => {
     const ridePersister = new RidePersister(dispatch, getState, rideID)
-    ridePersister.persistRide(newRide, stashedPhotos, deletedPhotoIDs, trimValues, rideHorses)
+    return ridePersister.persistRide(newRide, stashedPhotos, deletedPhotoIDs, trimValues, rideHorses)
   }
 }
 

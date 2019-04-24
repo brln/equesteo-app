@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import {
+  ActivityIndicator,
   Dimensions,
   StyleSheet
 } from 'react-native'
@@ -18,14 +19,8 @@ const { height, width } = Dimensions.get('window')
 
 export default class DuplicateModal extends PureComponent {
   render () {
-    return (
-      <Modal
-        coverScreen={true}
-        style={[styles.modal, styles.modal3]}
-        position={"top"}
-        isOpen={this.props.modalOpen}
-        onClosed={this.props.closeModal}
-      >
+    let main = (
+      <View>
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', paddingLeft: 20, paddingRight: 20}}>
           <Text style={{textAlign: 'center'}}>This feature is for when you ride with someone who forgot to record their ride, or they dropped their phone in a creek. Are you sure you want to duplicate this ride into their account?</Text>
         </View>
@@ -39,6 +34,25 @@ export default class DuplicateModal extends PureComponent {
             </View>
           </View>
         </View>
+      </View>
+    )
+    if (this.props.duplicationInProgress) {
+      main = (
+        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+          <ActivityIndicator />
+        </View>
+      )
+    }
+
+    return (
+      <Modal
+        coverScreen={true}
+        style={[styles.modal, styles.modal3]}
+        position={"top"}
+        isOpen={this.props.modalOpen}
+        onClosed={this.props.closeModal}
+      >
+        { main }
       </Modal>
     )
   }

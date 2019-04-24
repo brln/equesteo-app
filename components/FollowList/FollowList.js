@@ -55,6 +55,7 @@ export default class FollowList extends PureComponent {
     return (
       <View style={styles.container}>
         <DuplicateModal
+          duplicationInProgress={this.props.duplicationInProgress}
           duplicateModalYes={this.props.duplicateModalYes}
           modalOpen={this.props.duplicateModalOpen}
           closeModal={this.props.closeDuplicateModal}
