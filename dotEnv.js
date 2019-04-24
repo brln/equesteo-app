@@ -11,7 +11,6 @@ import {
   sentry_dsn,
 } from 'react-native-dotenv'
 
-
 export const API_URL = Platform.select({ios: api_url_ios, android: api_url_android})
 
 export const ENV = env

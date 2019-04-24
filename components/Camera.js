@@ -39,33 +39,37 @@ export default class Camera extends Component {
         fixOrientation: true,
         pauseAfterCapture: true,
       }).then((data) => {
-        const cropData = {
-          offset: {
-            x: 0,
-            y: 0,
-          },
-          size: {
-            width: data.width,
-            height: data.width,
-          },
-        };
-        ImageEditor.cropImage(
-          data.uri,
-          cropData,
-          (successURI) => {
-            ImagePicker.cleanSingle(data.uri).catch(e => logError(e, 'Camera.ImagePicker.cleanSingle'))
-            CameraRoll.saveToCameraRoll(successURI).then((newURI) => {
-              ImagePicker.cleanSingle(successURI).catch(e => logError(e, 'Camera.ImagePicker.cleanSingle2'))
-              if (this.camera) {
-                this.camera.resumePreview()
-              }
-              this.props.stashNewRidePhoto(newURI)
-            })
-          },
-          (error) => {
-            logError(error, 'Camera.ImageEditor.cropImage');
-          },
-        );
+        this.props.stashNewRidePhoto(data.uri)
+        this.camera.resumePreview()
+
+        // Leave this out until you can figure out how to crop async, it's too slow to do in realtime
+        // const cropData = {
+        //   offset: {
+        //     x: 0,
+        //     y: 0,
+        //   },
+        //   size: {
+        //     width: data.width,
+        //     height: data.width,
+        //   },
+        // };
+        // ImageEditor.cropImage(
+        //   data.uri,
+        //   cropData,
+        //   (successURI) => {
+        //     ImagePicker.cleanSingle(data.uri).catch(e => logError(e, 'Camera.ImagePicker.cleanSingle'))
+        //     CameraRoll.saveToCameraRoll(successURI).then((newURI) => {
+        //       ImagePicker.cleanSingle(successURI).catch(e => logError(e, 'Camera.ImagePicker.cleanSingle2'))
+        //       if (this.camera) {
+
+        //       }
+        //       this.props.stashNewRidePhoto(newURI)
+        //     })
+        //   },
+        //   (error) => {
+        //     logError(error, 'Camera.ImageEditor.cropImage');
+        //   },
+        // );
 
       }).catch((e) => { logError(e, 'Camera.takePicture.takePictureAsync') })
     }
@@ -77,7 +81,7 @@ export default class Camera extends Component {
       lastPhoto = (
         <View style={{margin: 15}}>
           <URIImage
-            resizeMode={'center'}
+            resizeMode={'cover'}
             source={{uri: this.props.mostRecentPhoto.get('uri')}}
             style={{height: '100%', borderRadius: 10}}
           />

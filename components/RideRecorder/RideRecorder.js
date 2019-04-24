@@ -2,12 +2,11 @@ import React, { PureComponent } from 'react';
 import {
   PermissionsAndroid,
   StyleSheet,
-  Text,
   View
 } from 'react-native';
 import { Button, Fab } from 'native-base'
 
-import { black, brand, green, white, orange, danger } from '../../colors'
+import { black, brand, green, white, orange, danger, warning } from '../../colors'
 import { heading, isAndroid, parseRideCoordinate } from '../../helpers'
 import FabImage from '../FabImage'
 import GPSStatus from './GPSStatus'
@@ -158,33 +157,47 @@ export default class RideRecorder extends PureComponent {
     let cameraButton
     let atlasButton
 
-    if (this.state.fabActive) {
-      if (this.props.activeAtlasEntry) {
-        atlasButton = (
-          <Button style={{ backgroundColor: orange }} onPress={this.clearActiveAtlasEntry}>
-            <FabImage source={require('../../img/noAtlas.png')} height={30} width={30} />
+    if (this.props.activeAtlasEntry) {
+      atlasButton = (
+        <View style={{padding: 5}}>
+          <Button style={{ backgroundColor: warning, width: 40, height: 40 }} onPress={this.clearActiveAtlasEntry}>
+            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+              <FabImage source={require('../../img/noAtlas.png')} height={20} width={30} />
+            </View>
           </Button>
-        )
-      } else {
-        atlasButton = (
-          <Button style={{ backgroundColor: orange }} onPress={this.showAtlas}>
-            <FabImage source={require('../../img/atlas.png')} height={30} width={30} />
+        </View>
+      )
+    } else {
+      atlasButton = (
+        <View style={{padding: 5}}>
+          <Button style={{ backgroundColor: warning, borderRadius: 20, width: 40, height: 40 }} onPress={this.showAtlas}>
+            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+              <FabImage source={require('../../img/atlas.png')} height={30} width={30} />
+            </View>
           </Button>
-        )
-      }
-    }
-    if (this.state.fabActive && this.props.lastLocation) {
-      cameraButton = (
-        <Button style={{ backgroundColor: orange }} onPress={this.showCamera}>
-          <FabImage source={require('../../img/camera.png')} height={30} width={30} />
-        </Button>
+        </View>
       )
     }
-    if (this.state.fabActive && !this.props.currentRide.get('lastPauseStart')) {
+    if (this.props.lastLocation) {
+      cameraButton = (
+        <View style={{padding: 5}}>
+          <Button style={{ backgroundColor: orange, borderRadius: 20, width: 40, height: 40}} onPress={this.showCamera}>
+            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+              <FabImage source={require('../../img/camera.png')} height={30} width={30} />
+            </View>
+          </Button>
+        </View>
+      )
+    }
+    if (this.props.currentRide && !this.props.currentRide.get('lastPauseStart')) {
       pauseButton = (
-        <Button style={{ backgroundColor: danger }} onPress={this.hitPause}>
-          <FabImage source={require('../../img/pause.png')} height={30} width={30} />
-        </Button>
+        <View style={{padding: 5}}>
+          <Button style={{ backgroundColor: danger, borderRadius: 20, width: 40, height: 40 }} onPress={this.hitPause}>
+            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+              <FabImage source={require('../../img/pause.png')} height={30} width={30} />
+            </View>
+          </Button>
+        </View>
       )
     }
     return (
@@ -215,19 +228,12 @@ export default class RideRecorder extends PureComponent {
               userControlledMap={this.state.userControlledMap}
               zoomLevel={this.state.zoomLevel}
             />
-            <View>
-              <Fab
-                active={this.state.fabActive}
-                direction="up"
-                style={{ backgroundColor: brand }}
-                position="bottomRight"
-                onPress={this.toggleFab}
-              >
-                <Text>...</Text>
+            <View style={{position: 'absolute', bottom: 10, right: 10}}>
+              <View style={{flex: 1}}>
                 { atlasButton }
                 { pauseButton }
                 { cameraButton }
-              </Fab>
+              </View>
             </View>
             <PlayButton
               visible={Boolean(this.props.currentRide && this.props.currentRide.get('lastPauseStart'))}
@@ -260,9 +266,9 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   startText: {
-    borderRadius: 30,
+    borderRadius: 40,
     color: white,
-    fontSize: 30,
+    fontSize: 40,
     textAlign: 'center',
     borderWidth: 1,
     borderColor: black,

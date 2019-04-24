@@ -110,8 +110,13 @@ class RecorderContainer extends PureComponent {
 
   componentDidMount () {
     if (!this.gpsTimeout) {
-      this.gpsTimeout = setTimeout(() => {
-        this.setState({showGPSBar: false})
+      this.gpsTimeout = setInterval(() => {
+        if (this.props.lastLocation) {
+           clearInterval(this.gpsTimeout)
+           this.gpsTimeout = setTimeout(() => {
+              this.setState({showGPSBar: false})
+           })
+        }
       }, 2000)
     }
     BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
