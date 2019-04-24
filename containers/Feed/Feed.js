@@ -272,8 +272,6 @@ class FeedContainer extends BackgroundComponent {
     })
   }
 
-
-
   syncDB () {
     this.setState({
       refreshing: true

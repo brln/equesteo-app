@@ -220,14 +220,8 @@ export function changeHorseOwner (horse, newOwnerID) {
 export function checkFCMPermission () {
   cb('checkFCMPermission')
   return () => {
-    firebase.messaging().hasPermission().then(enabled => {
-      if (!enabled) {
-        return firebase.messaging().requestPermission().catch((error) => {
-          logError(error)
-        })
-      }
-    }).catch(e => {
-      logError(e, 'checkFCMPermission')
+    return firebase.messaging().requestPermission().catch((error) => {
+      logError(error)
     })
   }
 }
@@ -238,9 +232,8 @@ export function clearRideNotifications (rideID) {
     const unseenNotifications = getState().getIn(['pouchRecords', 'notifications']).valueSeq().filter(n => {
       return n.get('seen') !== true && n.get('rideID') === rideID
     }).toList()
-    for (let notification of unseenNotifications) {
-      dispatch(markNotificationSeen(notification))
-    }
+    const ids = unseenNotifications.map(n => n.get('_id'))
+    dispatch(markNotificationsSeen(ids))
   }
 }
 
@@ -359,7 +352,7 @@ export function loadRideElevations (rideID) {
 }
 
 export function markNotificationsSeen (notificationIDs) {
-  cb('markNotificationSeen')
+  cb('markNotificationsSeen')
   return (dispatch, getState) => {
     let nextUp = Promise.resolve()
     for (let notificationID of notificationIDs) {
@@ -381,7 +374,7 @@ export function markNotificationsSeen (notificationIDs) {
 }
 
 export function markNotificationPopped (notification) {
-  cb('markNotificationSeen')
+  cb('markNotificationPopped')
   return (dispatch, getState) => {
     const markPopped = notification.set('popped', true)
     dispatch(notificationUpdated(markPopped))
@@ -757,7 +750,7 @@ export function showLocalNotifications () {
             return n.get('notificationID') === meta.id
           }).first()
           const skipToComments = notification.get('notificationType') === 'newComment'
-          dispatch(markNotificationSeen(notification))
+          dispatch(markNotificationsSeen([notification.get('_id')]))
 
           const currentlyViewing = getState().getIn(['localState', 'showingRide'])
           if (currentlyViewing !== notification.get('rideID')) {
