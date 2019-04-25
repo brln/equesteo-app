@@ -99,7 +99,6 @@ class GroundworkPage extends Component {
 
   recalcTime () {
     const startTime = this.props.newCareEvent.getIn(['eventSpecificData', 'startTime'])
-    logDebug(startTime, 'recalcTime')
     const lastPauseStart = this.props.newCareEvent.getIn(['eventSpecificData', 'lastPauseStart'])
     const pausedTime = this.props.newCareEvent.getIn(['eventSpecificData', 'pausedTime']) || 0
     const now = new Date()

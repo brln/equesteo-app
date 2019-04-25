@@ -149,14 +149,23 @@ class CareEvent extends Component {
   renderHorses (horses) {
     if (horses.count() > 0) {
       return (
-        <View style={{flex: 1, borderTopWidth: 2, borderTopColor: lightGrey}}>
-          <FlatList
-            data={horses.toJS()}
-            renderItem={this.renderHorse}
-            keyExtractor={(i) => i._id}
-            ItemSeparatorComponent={null}
-          />
-        </View>
+        <Card>
+          <CardItem header style={{padding: 5}}>
+            <View style={{paddingLeft: 5}}>
+              <Text style={{color: darkBrand}}>Horses</Text>
+            </View>
+          </CardItem>
+          <CardItem cardBody>
+            <View style={{flex: 1, borderTopWidth: 2, borderTopColor: lightGrey}}>
+              <FlatList
+                data={horses.toJS()}
+                renderItem={this.renderHorse}
+                keyExtractor={(i) => i._id}
+                ItemSeparatorComponent={null}
+              />
+            </View>
+          </CardItem>
+        </Card>
       )
     }
   }
@@ -214,17 +223,7 @@ class CareEvent extends Component {
             </Card>
           </View> : null }
 
-          <Card>
-            <CardItem header style={{padding: 5}}>
-              <View style={{paddingLeft: 5}}>
-                <Text style={{color: darkBrand}}>Horses</Text>
-              </View>
-            </CardItem>
-            <CardItem cardBody>
-              {this.renderHorses(this.memoHorses(this.props.careEvent, this.props.horseCareEvents, this.props.horses))}
-            </CardItem>
-          </Card>
-
+          {this.renderHorses(this.memoHorses(this.props.careEvent, this.props.horseCareEvents, this.props.horses))}
 
         </View>
       </KeyboardAwareScrollView>

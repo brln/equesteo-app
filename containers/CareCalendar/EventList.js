@@ -119,14 +119,14 @@ class EventListContainer extends Component {
       past: {},
       future: {},
     }
+
+    let foundIDs = {}
     for (let hce of hces) {
       const careEventID = hce.get('careEventID')
+      foundIDs[careEventID] = true
       const careEvent = careEvents.get(careEventID).toJS()
       if (careEvent.deleted !== true) {
-        let pastOrFuture = 'past'
-        if (moment(careEvent.date) > moment()) {
-          pastOrFuture = 'future'
-        }
+        let pastOrFuture = moment(careEvent.date) > moment() ? 'future' : 'past'
 
         if (!allCareEvents[pastOrFuture][careEventID]) {
           allCareEvents[pastOrFuture][careEventID] = {
@@ -137,12 +137,33 @@ class EventListContainer extends Component {
         allCareEvents[pastOrFuture][careEventID].horses = allCareEvents[pastOrFuture][careEventID].horses.push(horses.get(hce.get('horseID')))
       }
     }
-    allCareEvents.past = Object.values(allCareEvents.past).sort((a, b) => {
+
+    for (let ce of careEvents.valueSeq()) {
+      const careEvent = ce.toJS()
+      const careEventID = careEvent._id
+      if (careEvent.userID === userID && careEvent.deleted !== true && !foundIDs[careEventID]) {
+        let pastOrFuture = moment(careEvent.date) > moment() ? 'future' : 'past'
+        if (!allCareEvents[pastOrFuture][careEventID]) {
+          allCareEvents[pastOrFuture][careEventID] = {
+            careEvent: careEvent,
+            horses: List()
+          }
+        }
+      }
+    }
+
+    const toSortPast = Object.values(allCareEvents.past)
+    toSortPast.sort((a, b) => {
+      logDebug(b.careEvent.date)
       return b.careEvent.date - a.careEvent.date
     })
-    allCareEvents.future = Object.values(allCareEvents.future).sort((a, b) => {
+    allCareEvents.past = toSortPast
+
+    const toSortFuture = Object.values(allCareEvents.future)
+    toSortFuture.sort((a, b) => {
       return a.careEvent.date - b.careEvent.date
     })
+    allCareEvents.future = toSortFuture
     return allCareEvents
   }
 

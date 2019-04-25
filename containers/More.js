@@ -12,6 +12,7 @@ import {
 import { brand, darkGrey, lightGrey } from '../colors'
 import { logRender } from '../helpers'
 import { BARN, FEEDBACK, FIND_PEOPLE, PROFILE, SETTINGS } from '../screens/main'
+import { EVENT_LIST } from '../screens/care'
 import Thumbnail from '../components/Images/Thumbnail'
 import { EqNavigation } from '../services'
 
@@ -43,6 +44,7 @@ class MoreContainer extends Component {
   constructor (props) {
     super(props)
     this.showBarn = this.showBarn.bind(this)
+    this.showCareCalendar = this.showCareCalendar.bind(this)
     this.showFeedback = this.showFeedback.bind(this)
     this.showFindFriends = this.showFindFriends.bind(this)
     this.showMyAccount = this.showMyAccount.bind(this)
@@ -108,6 +110,14 @@ class MoreContainer extends Component {
     })
   }
 
+  showCareCalendar () {
+    EqNavigation.push(this.props.activeComponent, {
+      component: {
+        name: EVENT_LIST,
+      }
+    })
+  }
+
   renderMenuItem ({ item }) {
     return (
       <View style={{flex: 1}}>
@@ -138,32 +148,32 @@ class MoreContainer extends Component {
     const menuItems = Platform.select({
       ios: [
         {
+          name: 'Care Calendar',
+          icon: require('../img/mainMenus/calendar.png'),
+          onPress: this.showCareCalendar
+        },
+        {
           name: 'My Barn',
-          screen: BARN,
           icon: require('../img/mainMenus/barn_wt.png'),
           onPress: this.showBarn
         },
         {
           name: 'Find Friends',
-          screen: FIND_PEOPLE,
           icon: require('../img/mainMenus/findPeople_wt.png'),
           onPress: this.showFindFriends
         },
         {
           name: 'My Account',
-          screen: PROFILE,
           icon: require('../img/mainMenus/profile_wt.png'),
           onPress: this.showMyAccount
         },
         {
           name: 'Settings',
-          screen: PROFILE,
           icon: require('../img/mainMenus/settings_wt.png'),
           onPress: this.showSettings
         },
         {
           name: 'Feedback',
-          screen: FEEDBACK,
           icon: require('../img/mainMenus/feedback.png'),
           onPress: this.showFeedback
         }
@@ -171,19 +181,16 @@ class MoreContainer extends Component {
       android: [
         {
           name: 'Find Friends',
-          screen: FIND_PEOPLE,
           icon: require('../img/mainMenus/findPeople_wt.png'),
           onPress: this.showFindFriends
         },
         {
           name: 'My Account',
-          screen: PROFILE,
           icon: require('../img/mainMenus/profile_wt.png'),
           onPress: this.showMyAccount
         },
         {
           name: 'Settings',
-          screen: PROFILE,
           icon: require('../img/mainMenus/settings_wt.png'),
           onPress: this.showSettings
         },

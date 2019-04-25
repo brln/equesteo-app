@@ -32,24 +32,26 @@ export default class HorseThumbnails extends PureComponent {
   oneHorse (horse) {
     const horseProfileURL = this.horseProfileURL(horse, this.props.horsePhotos)
     return (
-      <TouchableOpacity
-        key={horse.get('_id')}
-        style={{flex: 1, alignItems: 'flex-end', justifyContent: 'center'}}
-        onPress={this.showHorseProfile(horse)}
-      >
-        <View style={{flex: 1, alignItems: 'center'}}>
-          <Text numberOfLines={1} style={{color: darkGrey, fontSize: 12, textAlign: 'center'}}>{horse.get('name')}</Text>
-          <Thumbnail
-            source={{uri: horseProfileURL}}
-            emptySource={require('../../img/breed.png')}
-            empty={!horseProfileURL}
-            height={width / 10}
-            width={width / 10}
-            round={true}
-            borderColor={horse.get('color') || null}
-          />
-        </View>
-      </TouchableOpacity>
+      <View style={{flex: 1, alignItems: 'flex-end', justifyContent: 'center'}}>
+        <TouchableOpacity
+          key={horse.get('_id')}
+          style={{flex: 1}}
+          onPress={this.showHorseProfile(horse)}
+        >
+          <View style={{flex: 1, alignItems: 'center'}}>
+            <Text numberOfLines={1} style={{color: darkGrey, fontSize: 12, textAlign: 'center'}}>{horse.get('name')}</Text>
+            <Thumbnail
+              source={{uri: horseProfileURL}}
+              emptySource={require('../../img/breed.png')}
+              empty={!horseProfileURL}
+              height={width / 10}
+              width={width / 10}
+              round={true}
+              borderColor={horse.get('color') || null}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
     )
   }
 

@@ -45,11 +45,17 @@ class Calendar extends Component {
     this.openTimePicker = this.openTimePicker.bind(this)
     this.selectDate = this.selectDate.bind(this)
     this.setTime = this.setTime.bind(this)
-    this.memoMarkedDates = memoizeOne(this.markedDates.bind(this))
+    this.memoMarkedDates = memoizeOne(this.markedDates)
   }
 
   selectDate (day) {
-    const marked = this.memoMarkedDates(this.props.careEvents)[day.dateString]
+    const markedDates = this.memoMarkedDates(
+      this.props.careEvents,
+      this.props.horseUsers,
+      this.props.horseCareEvents,
+      this.props.userID
+    )
+    const marked = markedDates[day.dateString]
     if (this.props.showDay && marked && marked.careEvents.length > 0) {
       if (marked.careEvents.length === 1) {
         EqNavigation.push(this.props.activeComponent, {
@@ -61,11 +67,21 @@ class Calendar extends Component {
           },
         })
       } else if (marked.careEvents.length > 1) {
+        const title = moment(day.dateString, 'YYYY-MM-DD').format('MMM Do')
         EqNavigation.push(this.props.activeComponent, {
           component: {
             name: DAY,
+            options: {
+              topBar: {
+                title: {
+                  text: title,
+                  color: 'white',
+                  fontSize: 20
+                },
+              }
+            },
             passProps: {
-              day: moment(day.timestamp).format('YYYY-MM-DD'),
+              day: day.dateString,
             }
           },
         })
@@ -78,7 +94,7 @@ class Calendar extends Component {
     }
   }
 
-  markedDates (careEvents) {
+  markedDates (careEvents, horseUsers, horseCareEvents, userID) {
     const ferrierDot = {key:'ferrier', color: ferrier}
     const groundworkDot = {key:'groundwork', color: groundwork}
     const veterinaryDot = {key:'veterinary', color: veterinary}
@@ -90,9 +106,39 @@ class Calendar extends Component {
       'Farrier': ferrierDot,
     }
 
+    // Get all the users horses
+    const horseIDs = horseUsers.valueSeq().filter((hu) => {
+      return hu.get('userID') === userID && hu.get('deleted') !== true
+    }).map((hu) => {
+      return hu.get('horseID')
+    })
+
+    // Get all the care events for those horses
+    const hces = horseCareEvents.valueSeq().filter(hce => {
+      return horseIDs.indexOf(hce.get('horseID')) >= 0
+    })
+
     const allDots = {}
-    for (let careEvent of careEvents.valueSeq()) {
+    const foundIDs = {}
+    for (let horseCareEvent of hces.valueSeq()) {
+      const careEvent = careEvents.get(horseCareEvent.get('careEventID'))
+      foundIDs[careEvent.get('_id')] = true
       if (careEvent.get('deleted') !== true) {
+        const dateKey = moment(careEvent.get('date')).format('YYYY-MM-DD')
+        if (!allDots[dateKey]) {
+          allDots[dateKey] = {dots: [], careEvents: []}
+        }
+        allDots[dateKey].careEvents = [...allDots[dateKey].careEvents, careEvent.get('_id')]
+        const dotObj = dotMap[careEvent.get('mainEventType')]
+        if (dotObj && allDots[dateKey].dots.indexOf(dotObj) < 0) {
+          allDots[dateKey].dots.push(dotObj)
+        }
+      }
+    }
+
+    for (let careEvent of careEvents.valueSeq()) {
+      const careEventID = careEvent._id
+      if (careEvent.get('userID') === userID && careEvent.get('deleted') !== true && !foundIDs[careEventID]) {
         const dateKey = moment(careEvent.get('date')).format('YYYY-MM-DD')
         if (!allDots[dateKey]) {
           allDots[dateKey] = {dots: [], careEvents: []}
@@ -121,10 +167,11 @@ class Calendar extends Component {
 
   setTime (time) {
     this.closeTimePicker()
-    const timestamp = moment(time).format('x')
-    const justTime = timestamp - moment(time).startOf('day')
-    const dateTime = this.state.chosenDay.add(justTime / 1000, 'seconds')
-    this.props.dispatch(setCareEventDate(dateTime))
+    const justTime = (moment(time).hours() * 3600) + (moment(time).minutes() * 60) + moment(time).seconds()
+    const dateTime = moment(this.state.chosenDay)
+    dateTime.add(justTime, 'seconds')
+    dateTime.add((new Date()).getTimezoneOffset(), 'minutes')
+    this.props.dispatch(setCareEventDate(dateTime.valueOf()))
 
     EqNavigation.push(this.props.activeComponent, {
       component: {
@@ -149,7 +196,12 @@ class Calendar extends Component {
         />
         <CalendarList
           firstDay={1}
-          markedDates={this.memoMarkedDates(this.props.careEvents)}
+          markedDates={this.memoMarkedDates(
+            this.props.careEvents,
+            this.props.horseUsers,
+            this.props.horseCareEvents,
+            this.props.userID
+          )}
           onDayPress={this.selectDate}
           theme={{
             todayTextColor: routeLine
@@ -168,10 +220,13 @@ function mapStateToProps (state, passedProps) {
   return {
     activeComponent,
     careEvents: pouchState.get('careEvents'),
+    horseCareEvents: pouchState.get('horseCareEvents'),
+    horseUsers: pouchState.get('horseUsers'),
     popWhenDoneID: passedProps.popWhenDoneID,
     newCareEvent: localState.get('newCareEvent'),
     startedHere: passedProps.startedHere,
-    showDay: passedProps.showDay
+    showDay: passedProps.showDay,
+    userID: localState.get('userID')
   }
 }
 

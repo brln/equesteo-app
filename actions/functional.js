@@ -247,6 +247,7 @@ export function createCareEvent () {
     const careEventID = `${currentUserID}_${(new Date).getTime().toString()}`
     const newCareEvent = getState().getIn(['localState', 'newCareEvent'])
     const newCareHorseIDs = getState().getIn(['localState', 'newCareHorseIDs'])
+    logDebug(newCareEvent.get('date'))
     const permaCareEvent = {
       _id: careEventID,
       type: 'careEvent',
@@ -427,7 +428,6 @@ export function markNotificationsSeen (notificationIDs) {
       nextUp = nextUp.then(() => {
         return PouchCouch.saveNotification(markSeen.toJS()).then(({rev}) => {
           let foundAfterSave = getState().getIn(['pouchRecords', 'notifications', notification.get('_id')])
-          logDebug(foundAfterSave.toJSON())
           dispatch(notificationUpdated(foundAfterSave.set('_rev', rev)))
         })
       })

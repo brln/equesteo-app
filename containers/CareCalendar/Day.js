@@ -20,11 +20,6 @@ class EventListContainer extends Component {
   static options() {
     return {
       topBar: {
-        title: {
-          text: "Care Calendar",
-          color: 'white',
-          fontSize: 20
-        },
         background: {
           color: brand,
         },
@@ -49,7 +44,7 @@ class EventListContainer extends Component {
     this.renderBottomButtons = this.renderBottomButtons.bind(this)
     this.showHorseProfile = this.showHorseProfile.bind(this)
 
-    this.memoDayCareEvents = memoizeOne(this.dayCareEvents.bind(this))
+    this.memoDayCareEvents = memoizeOne(this.dayCareEvents)
 
   }
 
@@ -68,16 +63,28 @@ class EventListContainer extends Component {
   dayCareEvents (day, horses, horseUsers, careEvents, horseCareEvents, userID) {
     const asDate = moment(day, 'YYYY-MM-DD')
 
+    const horseIDs = horseUsers.valueSeq().filter((hu) => {
+      return hu.get('userID') === userID && hu.get('deleted') !== true
+    }).map((hu) => {
+      return hu.get('horseID')
+    })
 
     const sortedHCEs = horseCareEvents.valueSeq().reduce((accum, hce) => {
-      if (!accum.get(hce.get('careEventID'))) {
-        accum = accum.set(hce.get('careEventID'), List())
+      if (horseIDs.contains(hce.get('horseID'))) {
+        if (!accum.get(hce.get('careEventID'))) {
+          accum = accum.set(hce.get('careEventID'), List())
+        }
+        return accum.set(hce.get('careEventID'), accum.get(hce.get('careEventID')).push(hce))
+      } else {
+        return accum
       }
-      return accum.set(hce.get('careEventID'), accum.get(hce.get('careEventID')).push(hce))
     }, Map())
+    const relevantCareEvents = sortedHCEs.keySeq()
 
     const dayCareEvents = careEvents.valueSeq().filter(ce => {
-      return ce.get('deleted') !== true && moment(ce.get('date')).isSame(asDate, 'day')
+      return ce.get('deleted') !== true
+        && (relevantCareEvents.contains(ce.get('_id')) || ce.get('userID') === userID)
+        && moment(ce.get('date')).format('YYYY-MM-DD') === asDate.format('YYYY-MM-DD')
     }).map(ce => {
       const hasHorses = sortedHCEs.get(ce.get('_id'))
       const eventHorses = hasHorses ? hasHorses.map(hce => horses.get(hce.get('horseID'))) : List()

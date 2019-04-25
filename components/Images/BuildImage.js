@@ -20,6 +20,6 @@ export default class BuildImage extends PureComponent {
 BuildImage.propTypes = {
   resizeMode: PropTypes.string,
   source: PropTypes.number,
-  style: PropTypes.oneOfType([PropTypes.number, PropTypes.object, null]),
+  style: PropTypes.oneOfType([PropTypes.number, PropTypes.object, PropTypes.null]),
   error: PropTypes.func,
 }

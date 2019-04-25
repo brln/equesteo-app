@@ -109,7 +109,6 @@ class NotificationsListContainer extends PureComponent {
   }
 
   allNotifications (notifications, rides, deleted) {
-    logDebug(deleted)
     return notifications.valueSeq().filter(n => {
       return n.get('seen') !== true && rides.get(n.get('rideID')) && deleted.indexOf(n.get('_id')) < 0
     })

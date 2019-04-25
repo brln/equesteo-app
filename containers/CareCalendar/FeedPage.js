@@ -1,6 +1,7 @@
 import { Map, fromJS } from 'immutable'
 import React, { Component } from 'react'
 import {
+  Keyboard,
   ScrollView,
 } from 'react-native';
 import { connect } from 'react-redux'
@@ -62,6 +63,7 @@ class FeedEvent extends Component {
 
   navigationButtonPressed ({ buttonId }) {
     if (buttonId === 'chooseHorses') {
+      Keyboard.dismiss()
       EqNavigation.push(this.props.activeComponent, {
         component: {
           name: HORSE_PICKER,
