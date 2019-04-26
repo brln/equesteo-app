@@ -23,6 +23,7 @@ export default class FeedRow extends PureComponent {
           underlineColorAndroid={'transparent'}
           maxLength={20}
           selectTextOnFocus={true}
+          keyboardType={'numeric'}
         />
       </View>
     )
@@ -55,6 +56,7 @@ export default class FeedRow extends PureComponent {
       { label: 'Alfalfa', value: 'alfalfa' },
       { label: 'Beet Pulp', value: 'beet pulp' },
       { label: 'Rice Bran', value: 'rice bran' },
+      { label: 'Grain', value: 'grain' },
     ]
     return (
       <View style={{flex: 1}}>

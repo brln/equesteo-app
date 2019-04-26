@@ -8,6 +8,7 @@ import {
   ADD_DOCS_TO_DOWNLOAD,
   ADD_NEW_CARE_HORSE_ID,
   CARROT_MUTEX,
+  CHANGE_CARE_CALENDAR_TAB,
   CLEAR_CURRENT_CARE_EVENT,
   CLEAR_DOCS_NUMBERS,
   CLEAR_FEED_MESSAGE,
@@ -60,6 +61,7 @@ export const initialState = Map({
   activeComponent: null,
   appState: appStates.active,
   awaitingPWChange: false,
+  careCalendarTab: 0,
   carrotMutex: false,
   currentScreen: FEED,
   docsToDownload: 0,
@@ -95,6 +97,8 @@ export default function LocalStateReducer(state=initialState, action) {
     case ADD_NEW_CARE_HORSE_ID:
       const newIDs = state.get('newCareHorseIDs').push(action.horseID)
       return state.set('newCareHorseIDs', newIDs)
+    case CHANGE_CARE_CALENDAR_TAB:
+      return state.set('careCalendarTab', action.tabVal)
     case CLEAR_CURRENT_CARE_EVENT:
       return state.set('newCareHorseIDs', List()).set('newCareEvent', Map())
     case CLEAR_DOCS_NUMBERS:

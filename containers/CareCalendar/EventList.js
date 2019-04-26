@@ -17,7 +17,7 @@ import {CARE_CALENDAR, CARE_EVENT, NEW_MAIN_EVENT_MENU} from '../../screens/care
 import { HORSE_PROFILE } from '../../screens/main'
 import EqNavigation from '../../services/EqNavigation'
 import EventList from '../../components/CareCalendar/EventList'
-import { setCareEventDate } from '../../actions/standard'
+import {changeCareCalendarTab, setCareEventDate} from '../../actions/standard'
 import { unixTimeNow } from '../../helpers'
 import Calendar from './Calendar'
 
@@ -46,9 +46,6 @@ class EventListContainer extends Component {
 
   constructor (props) {
     super(props)
-    this.state = {
-      activeTab: 0
-    }
     this.newFeedEventNow = this.newFeedEventNow.bind(this)
     this.openCalendar = this.openCalendar.bind(this)
     this.openEventType = this.openEventType.bind(this)
@@ -154,7 +151,6 @@ class EventListContainer extends Component {
 
     const toSortPast = Object.values(allCareEvents.past)
     toSortPast.sort((a, b) => {
-      logDebug(b.careEvent.date)
       return b.careEvent.date - a.careEvent.date
     })
     allCareEvents.past = toSortPast
@@ -179,9 +175,7 @@ class EventListContainer extends Component {
   }
 
   onChangeTab (a) {
-    this.setState({
-      activeTab: a.i
-    })
+    this.props.dispatch(changeCareCalendarTab(a.i))
   }
 
   horseOwnerIDs (horseUsers) {
@@ -225,12 +219,13 @@ class EventListContainer extends Component {
 
 
   render() {
+    logDebug(this.props.careCalendarTab)
     return (
       <View style={{flex: 1}}>
         <Tabs
-          initialPage={0}
           locked={true}
           onChangeTab={this.onChangeTab}
+          page={this.props.careCalendarTab}
           tabBarUnderlineStyle={{backgroundColor: 'white'}}
           style={{flex: 10}}
         >
@@ -317,6 +312,7 @@ function mapStateToProps (state) {
   const pouchState = state.get('pouchRecords')
   return {
     activeComponent,
+    careCalendarTab: localState.get('careCalendarTab'),
     careEvents: pouchState.get('careEvents'),
     horseUsers: pouchState.get('horseUsers'),
     horses: pouchState.get('horses'),

@@ -1,4 +1,5 @@
 import memoizeOne from 'memoize-one'
+import moment from 'moment'
 import React, { PureComponent } from 'react'
 import {
   Dimensions,
@@ -11,7 +12,7 @@ import { Navigation } from 'react-native-navigation'
 import Thumbnail from '../../components/Images/Thumbnail'
 import { brand, orange, darkGrey } from '../../colors'
 import { createCareEvent } from '../../actions/functional'
-import { addNewCareHorseID, removeNewCareHorseID } from "../../actions/standard"
+import {addNewCareHorseID, changeCareCalendarTab, removeNewCareHorseID} from "../../actions/standard"
 import EqNavigation from '../../services/EqNavigation'
 
 const { width } = Dimensions.get('window')
@@ -58,6 +59,11 @@ class HorsePicker extends PureComponent {
   navigationButtonPressed ({ buttonId }) {
     if (buttonId === 'saveEvent') {
       this.props.dispatch(createCareEvent())
+      if (moment(this.props.newCareEvent.get('date')) < moment()) {
+        this.props.dispatch(changeCareCalendarTab(1))
+      } else {
+        this.props.dispatch(changeCareCalendarTab(0))
+      }
       EqNavigation.popTo(this.props.popWhenDoneID)
     }
   }

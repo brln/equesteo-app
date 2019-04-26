@@ -32,9 +32,8 @@ export default class HorseThumbnails extends PureComponent {
   oneHorse (horse) {
     const horseProfileURL = this.horseProfileURL(horse, this.props.horsePhotos)
     return (
-      <View style={{flex: 1, alignItems: 'flex-end', justifyContent: 'center'}}>
+      <View key={horse.get('_id')} style={{flex: 1, alignItems: 'flex-end', justifyContent: 'center'}}>
         <TouchableOpacity
-          key={horse.get('_id')}
           style={{flex: 1}}
           onPress={this.showHorseProfile(horse)}
         >
@@ -58,7 +57,7 @@ export default class HorseThumbnails extends PureComponent {
   andMore () {
     if (this.props.horses.count() > 2) {
       return (
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <View key={'num'} style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           <Text style={{fontSize: 18}}>+{this.props.horses.count() - 2}</Text>
         </View>
       )

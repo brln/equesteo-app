@@ -3,6 +3,9 @@ import React, { Component } from 'react'
 import {
   Keyboard,
   ScrollView,
+  Text,
+  TextInput,
+  View,
 } from 'react-native';
 import { connect } from 'react-redux'
 import { Navigation } from 'react-native-navigation'
@@ -46,6 +49,7 @@ class FeedEvent extends Component {
   constructor (props) {
     super(props)
 
+    this.changeNotes = this.changeNotes.bind(this)
     this.removeFeedRow = this.removeFeedRow.bind(this)
     this.addFeedRow = this.addFeedRow.bind(this)
     this.updateFeedRow = this.updateFeedRow.bind(this)
@@ -96,6 +100,12 @@ class FeedEvent extends Component {
     this.props.dispatch(setCareEventSpecificData(newESData))
   }
 
+  changeNotes (newVal) {
+    this.props.dispatch(setCareEventSpecificData(
+      this.props.newCareEvent.get('eventSpecificData').set('notes', newVal)
+    ))
+  }
+
   render () {
     const feedRows = this.props.newCareEvent.getIn(['eventSpecificData', 'feedRows'])
     let displayRows
@@ -116,9 +126,22 @@ class FeedEvent extends Component {
     }
     return (
       <ScrollView style={{flex: 1}}>
+        <View style={{flex: 1, padding: 10, borderBottomWidth: 2, borderBottomColor: darkGrey, paddingBottom: 20}}>
+          <Text style={{color: darkBrand }}>Notes</Text>
+          <TextInput
+            multiline={true}
+            style={{width: '100%', height: 150, padding: 10, borderColor: darkBrand, borderWidth: 1, textAlignVertical: "top", borderRadius: 4 }}
+            underlineColorAndroid={'transparent'}
+            onChangeText={this.changeNotes}
+            value={this.props.newCareEvent.getIn(['eventSpecificData', 'notes'])}
+            maxLength={2000}
+          />
+        </View>
+        <View style={{flex: 2}}>
         { displayRows }
+        </View>
         <Button
-          text={'New Item'}
+          text={'Add Row'}
           onPress={this.addFeedRow}
           color={brand}
         />

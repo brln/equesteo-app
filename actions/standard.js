@@ -80,7 +80,7 @@ import {
   SET_CARE_EVENT_DATE,
   SET_MAIN_CARE_EVENT_TYPE,
   SET_SECONDARY_CARE_EVENT_TYPE,
-  SET_CARE_EVENT_SPECIFIC_DATA,
+  SET_CARE_EVENT_SPECIFIC_DATA, CHANGE_CARE_CALENDAR_TAB,
 } from '../constants'
 
 export function addDocsDownloaded (num, db) {
@@ -122,6 +122,13 @@ export function carrotMutex (value) {
   return {
     type: CARROT_MUTEX,
     value,
+  }
+}
+
+export function changeCareCalendarTab (tabVal) {
+  return {
+    type: CHANGE_CARE_CALENDAR_TAB,
+    tabVal: tabVal
   }
 }
 
