@@ -35,42 +35,17 @@ export default class Camera extends Component {
 
   takePicture () {
     if (this.camera) {
+      let tempURI
       this.camera.takePictureAsync({
         fixOrientation: true,
         pauseAfterCapture: true,
       }).then((data) => {
-        this.props.stashNewRidePhoto(data.uri)
+        tempURI = data.uri
+        return CameraRoll.saveToCameraRoll(tempURI)
+      }).then((permURI) => {
+        this.props.stashNewRidePhoto(permURI)
         this.camera.resumePreview()
-
-        // Leave this out until you can figure out how to crop async, it's too slow to do in realtime
-        // const cropData = {
-        //   offset: {
-        //     x: 0,
-        //     y: 0,
-        //   },
-        //   size: {
-        //     width: data.width,
-        //     height: data.width,
-        //   },
-        // };
-        // ImageEditor.cropImage(
-        //   data.uri,
-        //   cropData,
-        //   (successURI) => {
-        //     ImagePicker.cleanSingle(data.uri).catch(e => logError(e, 'Camera.ImagePicker.cleanSingle'))
-        //     CameraRoll.saveToCameraRoll(successURI).then((newURI) => {
-        //       ImagePicker.cleanSingle(successURI).catch(e => logError(e, 'Camera.ImagePicker.cleanSingle2'))
-        //       if (this.camera) {
-
-        //       }
-        //       this.props.stashNewRidePhoto(newURI)
-        //     })
-        //   },
-        //   (error) => {
-        //     logError(error, 'Camera.ImageEditor.cropImage');
-        //   },
-        // );
-
+        ImagePicker.cleanSingle(tempURI).catch(e => logError(e, 'Camera.ImagePicker.cleanSingle'))
       }).catch((e) => { logError(e, 'Camera.takePicture.takePictureAsync') })
     }
   }

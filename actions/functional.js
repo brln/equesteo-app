@@ -95,7 +95,6 @@ import { NotConnectedError } from "../errors"
 
 export const DB_NEEDS_SYNC = 'DB_NEEDS_SYNC'
 export const DB_SYNCING = 'DB_SYNCING'
-export const DB_SYNCING_AND_ENQUEUED = 'DB_SYNCING_AND_ENQUEUED'
 export const DB_SYNCED = 'DB_SYNCED'
 
 
@@ -708,7 +707,7 @@ export function uploadPhoto (type, photoLocation, photoID) {
             return PouchCouch.saveHorse(horsePhoto.toJS()).then((doc) => {
               const theHorsePhotoAfterSave = getState().getIn(['pouchRecords', 'horsePhotos', photoID])
               dispatch(horsePhotoUpdated(theHorsePhotoAfterSave.set('_rev', doc.rev)))
-              return dispatch(doSync({}, false))
+              return dispatch(doSync())
             })
           case 'ride':
             const uploadedRideURI = ridePhotoURL(photoID)
@@ -717,7 +716,7 @@ export function uploadPhoto (type, photoLocation, photoID) {
             return PouchCouch.saveRide(ridePhoto.toJS()).then((doc) => {
               const theRidePhotoAfterSave = getState().getIn(['pouchRecords', 'ridePhotos', photoID])
               dispatch(ridePhotoUpdated(theRidePhotoAfterSave.set('_rev', doc.rev)))
-              return dispatch(doSync({}, false))
+              return dispatch(doSync())
             })
           case 'user':
             const uploadedUserPhotoURI = profilePhotoURL(photoID)
@@ -726,7 +725,7 @@ export function uploadPhoto (type, photoLocation, photoID) {
             return PouchCouch.saveUser(userPhoto.toJS()).then((doc) => {
               const theUserPhotoAfterSave = getState().getIn(['pouchRecords', 'userPhotos', photoID])
               dispatch(userPhotoUpdated(theUserPhotoAfterSave.set('_rev', doc.rev)))
-              return dispatch(doSync({}, false))
+              return dispatch(doSync())
             })
           default:
             throw Error('cant persist type I don\'t know about')
@@ -1067,6 +1066,7 @@ export function pulldownSync () {
   }
 }
 
+let enqueuedSync = null
 export function doSync (syncData={}, showProgress=true, doUpload=true) {
   cb('doSync', true)
   return (dispatch, getState) => {
@@ -1100,13 +1100,14 @@ export function doSync (syncData={}, showProgress=true, doUpload=true) {
 
       const remotePersistStatus = getState().getIn(['localState', 'needsRemotePersist'])
       if (remotePersistStatus === DB_SYNCING) {
-        // If a sync has already started, wait 5 seconds then run another one.
+        // If a sync has already started, wait 10 seconds then run another one.
         // This gives time for everything (photo uploads, mostly) to settle,
         // then they can all go with one sync.
-        dispatch(setRemotePersist(DB_SYNCING_AND_ENQUEUED))
-        setTimeout(() => {
+        clearTimeout(enqueuedSync)
+        enqueuedSync = setTimeout(() => {
           dispatch(doSync(syncData, showProgress)).catch(catchAsyncError(dispatch))
-        }, 5000)
+          enqueuedSync = null
+        }, 10000)
         return Promise.resolve()
       } else {
         dispatch(setRemotePersist(DB_SYNCING))

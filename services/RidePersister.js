@@ -92,48 +92,42 @@ export default class RidePersister {
         return this.saveRide()
       })
     }
-
-    const rideHorseSaves = []
-    rideHorses.forEach((rideHorse) => {
-      rideHorseSaves.push(this.saveRideHorse(rideHorse))
+    docSaves = docSaves.then(() => {
+      return this.saveRide()
     })
 
-    const newPhotoSaves = []
+    rideHorses.forEach((rideHorse) => {
+      docSaves = docSaves.then(() => {
+        return this.saveRideHorse(rideHorse)
+      })
+    })
+
     stashedPhotos.forEach((stashedPhoto, photoID) => {
       const toSave = stashedPhoto.merge(Map({
         type: 'ridePhoto',
         rideID: this.rideID,
       }))
       this.dispatch(ridePhotoUpdated(toSave))
-      newPhotoSaves.push(
-        PouchCouch.saveRide(toSave.toJS()).then(rideDoc => {
+      docSaves = docSaves.then(() => {
+        return PouchCouch.saveRide(toSave.toJS()).then(rideDoc => {
           this.dispatch(photoNeedsUpload('ride', stashedPhoto.get('uri'), photoID))
           this.dispatch(ridePhotoUpdated(this.getRidePhoto(photoID).set('_rev', rideDoc.rev)))
           this.dispatch(clearRidePhotoFromStash(this.rideID, photoID))
         })
-      )
+      })
     })
 
-    const deletedPhotoSaves = []
     for (let deletedPhotoID of deletedPhotoIDs) {
       const deleted = this.getRidePhoto(deletedPhotoID).set('deleted', true)
       this.dispatch(ridePhotoUpdated(deleted))
-      deletedPhotoSaves.push(
-        PouchCouch.saveRide(deleted.toJS()).then(rideDoc => {
+      docSaves = docSaves.then(() => {
+        return PouchCouch.saveRide(deleted.toJS()).then(rideDoc => {
           this.dispatch(ridePhotoUpdated(this.getRidePhoto(deletedPhotoID).set('_rev', rideDoc.rev)))
         })
-      )
+      })
     }
 
     return docSaves.then(() => {
-      return this.saveRide()
-    }).then(() => {
-      return Promise.all(rideHorseSaves)
-    }).then(() => {
-      return Promise.all(newPhotoSaves)
-    }).then(() => {
-      return Promise.all(deletedPhotoSaves)
-    }).then(() => {
       return this.dispatch(doSync())
     }).catch(catchAsyncError(this.dispatch))
   }
