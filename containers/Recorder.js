@@ -46,16 +46,19 @@ class RecorderContainer extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
+      hoofTracksModalOpen: false,
       showGPSBar: true,
       discardModalOpen: false,
     }
 
     this.clearActiveAtlasEntry = this.clearActiveAtlasEntry.bind(this)
     this.closeDiscardModal = this.closeDiscardModal.bind(this)
+    this.closeHoofTracksModal = this.closeHoofTracksModal.bind(this)
     this.discardRide = this.discardRide.bind(this)
     this.goBack = this.goBack.bind(this)
     this.handleBackPress = this.handleBackPress.bind(this)
     this.finishRide = this.finishRide.bind(this)
+    this.openHoofTracksModal = this.openHoofTracksModal.bind(this)
     this.pauseLocationTracking = this.pauseLocationTracking.bind(this)
     this.showAtlas = this.showAtlas.bind(this)
     this.showCamera = this.showCamera.bind(this)
@@ -144,6 +147,18 @@ class RecorderContainer extends PureComponent {
   closeDiscardModal () {
     this.setState({
       discardModalOpen: false
+    })
+  }
+
+  closeHoofTracksModal () {
+    this.setState({
+      hoofTracksModalOpen: false
+    })
+  }
+
+  openHoofTracksModal () {
+    this.setState({
+      hoofTracksModalOpen: true
     })
   }
 
@@ -245,14 +260,17 @@ class RecorderContainer extends PureComponent {
         appState={this.props.appState}
         clearActiveAtlasEntry={this.clearActiveAtlasEntry}
         closeDiscardModal={this.closeDiscardModal}
+        closeHoofTracksModal={this.closeHoofTracksModal}
         currentRide={this.props.currentRide}
         currentRideCoordinates={this.props.currentRideCoordinates}
         currentRideElevations={this.props.currentRideElevations}
         discardRide={this.discardRide}
         discardModalOpen={this.state.discardModalOpen}
+        hoofTracksModalOpen={this.state.hoofTracksModalOpen}
         lastElevation={this.props.lastElevation}
         lastLocation={this.props.lastLocation}
         nullMapLocation={this.props.nullMapLocation}
+        openHoofTracksModal={this.openHoofTracksModal}
         refiningLocation={this.props.refiningLocation}
         pauseLocationTracking={this.pauseLocationTracking}
         showAtlas={this.showAtlas}

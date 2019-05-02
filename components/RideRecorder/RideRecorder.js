@@ -4,13 +4,13 @@ import {
   StyleSheet,
   View
 } from 'react-native';
-import { Button, Fab } from 'native-base'
 
 import { black, brand, green, white, orange, danger, warning } from '../../colors'
 import { heading, isAndroid, parseRideCoordinate } from '../../helpers'
-import FabImage from '../FabImage'
 import GPSStatus from './GPSStatus'
 import DiscardModal from './DiscardModal'
+import HoofTracksModal from './HoofTracksModal'
+import MapButton from './MapButton'
 import RidingMap from './RidingMap'
 import RideStats from './RideStats'
 import PlayButton from './PlayButton'
@@ -156,48 +156,48 @@ export default class RideRecorder extends PureComponent {
     let pauseButton
     let cameraButton
     let atlasButton
+    let hoofTracksButton
 
     if (this.props.activeAtlasEntry) {
       atlasButton = (
-        <View style={{padding: 5}}>
-          <Button style={{ backgroundColor: warning, width: 40, height: 40 }} onPress={this.clearActiveAtlasEntry}>
-            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-              <FabImage source={require('../../img/noAtlas.png')} height={20} width={30} />
-            </View>
-          </Button>
-        </View>
+        <MapButton
+          color={warning}
+          icon={require('../../img/noAtlas.png')}
+          onPress={this.clearActiveAtlasEntry}
+        />
       )
     } else {
       atlasButton = (
-        <View style={{padding: 5}}>
-          <Button style={{ backgroundColor: warning, borderRadius: 20, width: 40, height: 40 }} onPress={this.showAtlas}>
-            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-              <FabImage source={require('../../img/atlas.png')} height={30} width={30} />
-            </View>
-          </Button>
-        </View>
+        <MapButton
+          color={warning}
+          icon={require('../../img/atlas.png')}
+          onPress={this.showAtlas}
+        />
       )
     }
     if (this.props.lastLocation) {
       cameraButton = (
-        <View style={{padding: 5}}>
-          <Button style={{ backgroundColor: orange, borderRadius: 20, width: 40, height: 40}} onPress={this.showCamera}>
-            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-              <FabImage source={require('../../img/camera.png')} height={30} width={30} />
-            </View>
-          </Button>
-        </View>
+        <MapButton
+          color={orange}
+          icon={require('../../img/camera.png')}
+          onPress={this.showCamera}
+        />
+      )
+      hoofTracksButton = (
+        <MapButton
+          color={green}
+          icon={require('../../img/radio.png')}
+          onPress={this.props.openHoofTracksModal}
+        />
       )
     }
     if (this.props.currentRide && !this.props.currentRide.get('lastPauseStart')) {
       pauseButton = (
-        <View style={{padding: 5}}>
-          <Button style={{ backgroundColor: danger, borderRadius: 20, width: 40, height: 40 }} onPress={this.hitPause}>
-            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-              <FabImage source={require('../../img/pause.png')} height={30} width={30} />
-            </View>
-          </Button>
-        </View>
+        <MapButton
+          color={danger}
+          icon={require('../../img/pause.png')}
+          onPress={this.hitPause}
+        />
       )
     }
     return (
@@ -207,6 +207,11 @@ export default class RideRecorder extends PureComponent {
           closeDiscardModal={this.props.closeDiscardModal}
           discardFunc={this.props.discardRide}
           text={"You haven't gone anywhere on this ride yet. Do you want to close it?"}
+        />
+        <HoofTracksModal
+          closeModal={this.props.closeHoofTracksModal}
+          modalOpen={this.props.hoofTracksModalOpen}
+          onPress={() => {}}
         />
         <GPSStatus
           shown={this.props.showGPSBar}
@@ -231,6 +236,7 @@ export default class RideRecorder extends PureComponent {
             <View style={{position: 'absolute', bottom: 10, right: 10}}>
               <View style={{flex: 1}}>
                 { atlasButton }
+                { hoofTracksButton }
                 { pauseButton }
                 { cameraButton }
               </View>

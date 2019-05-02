@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
     fontSize: 50,
     fontFamily: 'Montserrat-Regular',
     textShadowColor: 'black',
-    textShadowRadius: 7,
+    textShadowRadius: 3,
     textShadowOffset: {width: 2, height: 1},
     textAlign: 'center',
   }
