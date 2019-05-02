@@ -59,7 +59,9 @@ class NotificationsListContainer extends PureComponent {
   }
 
   componentWillUnmount () {
-    this.props.dispatch(markNotificationsSeen(this.state.deleted))
+    if (this.state.deleted.length > 0) {
+      this.props.dispatch(markNotificationsSeen(this.state.deleted))
+    }
   }
 
   navigationButtonPressed ({ buttonId }) {

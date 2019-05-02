@@ -154,6 +154,8 @@ export default function LocalStateReducer(state=initialState, action) {
       if (i >= 0) {
         const newIDs = state.get('newCareHorseIDs').remove(i)
         return state.set('newCareHorseIDs', newIDs)
+      } else {
+        return state
       }
     case REMOVE_STASHED_RIDE_PHOTO:
       return state.deleteIn(['ridePhotoStash', action.stashKey, action.photoID])

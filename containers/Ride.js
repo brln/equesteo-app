@@ -80,6 +80,7 @@ class RideContainer extends PureComponent {
       titleTouchCount: 0,
       newComment: null
     }
+
     this.closeDeleteModal = this.closeDeleteModal.bind(this)
     this.deleteRide = this.deleteRide.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
@@ -94,6 +95,7 @@ class RideContainer extends PureComponent {
 
     Navigation.events().bindComponent(this);
 
+    this.memoAnyNotifications = memoizeOne(this.anyNotifications)
     this.memoPaceHorse = memoizeOne(this.paceHorse.bind(this))
     this.memoRideCarrots = memoizeOne(this.rideCarrots.bind(this))
     this.memoRideComments = memoizeOne(this.rideComments.bind(this))
@@ -161,12 +163,23 @@ class RideContainer extends PureComponent {
     })
   }
 
+  anyNotifications (notifications, ride) {
+    return notifications.valueSeq().filter(n => {
+      logDebug(n.toString())
+      logDebug(ride.get('_id'))
+      return n.get('seen') !== true && ride.get('_id') === n.get('rideID')
+    }).count() > 0
+  }
+
   componentDidMount () {
     if(!this.props.rideCoordinates || this.props.rideCoordinates.get('rideID') !== this.props.ride.get('_id')) {
       this.props.dispatch(loadRideCoordinates(this.props.ride.get('_id')))
       this.props.dispatch(loadRideElevations(this.props.ride.get('_id')))
     }
-    this.props.dispatch(clearRideNotifications(this.props.ride.get('_id')))
+    if (this.memoAnyNotifications(this.props.notifications, this.props.ride)) {
+      this.props.dispatch(clearRideNotifications(this.props.ride.get('_id')))
+    }
+
   }
 
   deleteRide () {
@@ -309,6 +322,7 @@ function mapStateToProps (state, passedProps) {
     horses: pouchState.get('horses'),
     horsePhotos: pouchState.get('horsePhotos'),
     horseUsers: pouchState.get('horseUsers'),
+    notifications: pouchState.get('notifications'),
     ride,
     rideCarrots: pouchState.get('rideCarrots'),
     rideComments: pouchState.get('rideComments'),

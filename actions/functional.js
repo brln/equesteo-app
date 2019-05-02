@@ -679,6 +679,7 @@ export function runPhotoQueue() {
   cb('runPhotoQueue')
   return (dispatch, getState) => {
     getState().getIn(['localState', 'photoQueue']).forEach((p) => {
+      logDebug(p.toJSON(), 'photo in queue')
       if (p.get('status') === 'enqueued'
         || p.get('status') === 'failed'
         || p.get('status') === 'uploading' && unixTimeNow() - p.get('timestamp') > 60000) {
@@ -1100,6 +1101,7 @@ export function doSync (syncData={}, showProgress=true, doUpload=true) {
 
       const remotePersistStatus = getState().getIn(['localState', 'needsRemotePersist'])
       if (remotePersistStatus === DB_SYNCING) {
+        logDebug('second sync!')
         // If a sync has already started, wait 10 seconds then run another one.
         // This gives time for everything (photo uploads, mostly) to settle,
         // then they can all go with one sync.
@@ -1110,6 +1112,7 @@ export function doSync (syncData={}, showProgress=true, doUpload=true) {
         }, 10000)
         return Promise.resolve()
       } else {
+        logDebug('first sync!')
         dispatch(setRemotePersist(DB_SYNCING))
       }
 
