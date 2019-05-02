@@ -15,7 +15,7 @@ import {
   userUpdated,
 } from "../actions/standard"
 import {
-  DB_NEEDS_SYNC,
+  DB_SYNCED,
   persistFollow,
   persistUserWithPhoto,
   signOut,
@@ -90,7 +90,7 @@ class ProfileContainer extends BackgroundComponent {
           ]
         }
       }
-      if (props.needsRemotePersist === 'DB_SYNCED') {
+      if (props.needsRemotePersist === DB_SYNCED) {
         newOptions.topBar.rightButtons.push({
           id: 'logout',
           text: 'Log Out',

@@ -52,6 +52,7 @@ class SignupLoginContainer extends PureComponent {
       forgot: false,
       forgotSubmitted: false,
       resetCodeSubmitted: false,
+      reqSubmitted: false,
     }
     this.errorOccurred = this.errorOccurred.bind(this)
     this.exchangePWCode = this.exchangePWCode.bind(this)
@@ -114,11 +115,27 @@ class SignupLoginContainer extends PureComponent {
   }
 
   submitSignup (email, password) {
-    this.props.dispatch(submitSignup(email, password))
+    this.setState({
+      reqSubmitted: true,
+    }, () => {
+      this.props.dispatch(submitSignup(email, password)).then(() => {
+        this.setState({
+          reqSubmitted: false,
+        })
+      })
+    })
   }
 
   submitLogin (email, password) {
-    this.props.dispatch(submitLogin(email, password))
+    this.setState({
+      reqSubmitted: true,
+    }, () => {
+      this.props.dispatch(submitLogin(email, password)).then(() => {
+        this.setState({
+          reqSubmitted: false,
+        })
+      })
+    })
   }
 
   getPWCode (email) {
@@ -168,6 +185,7 @@ class SignupLoginContainer extends PureComponent {
         docsToDownload={this.props.docsToDownload}
         docsDownloaded={this.props.docsDownloaded}
         errorOccurred={this.errorOccurred}
+        reqSubmitted={this.state.reqSubmitted}
         submitSignup={this.submitSignup}
         showLogin={this.showLogin}
       />
@@ -178,6 +196,7 @@ class SignupLoginContainer extends PureComponent {
           docsToDownload={this.props.docsToDownload}
           docsDownloaded={this.props.docsDownloaded}
           doingInitialLoad={this.props.doingInitialLoad}
+          reqSubmitted={this.state.reqSubmitted}
           submitLogin={this.submitLogin}
           showSignup={this.showSignup}
           showForgot={this.showForgot}
@@ -246,9 +265,9 @@ function mapStateToProps (state) {
   return {
     awaitingPWChange: localState.get('awaitingPWChange'),
     doingInitialLoad: localState.get('doingInitialLoad'),
-    error: localState.get('error'),
     docsToDownload: localState.get('docsToDownload'),
     docsDownloaded: localState.get('docsDownloaded'),
+    error: localState.get('error'),
   }
 }
 

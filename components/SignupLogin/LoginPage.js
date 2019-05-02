@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import {
+  ActivityIndicator,
   Dimensions,
   StyleSheet,
   Text,
@@ -62,6 +63,10 @@ export default class LoginPage extends PureComponent {
 
   _renderLoginForm () {
     const paddingTop = height - 590 > 0 ? (height - 590) / 3 : 0
+    let button = <ActivityIndicator />
+    if (!this.props.reqSubmitted) {
+      button = <Button text={'Submit'} color={brand} onPress={this.submitLogin}/>
+    }
     return (
       <View>
         <View style={{paddingBottom: 20, alignItems: 'center', paddingTop}}>
@@ -78,7 +83,7 @@ export default class LoginPage extends PureComponent {
           togglePasswordVisible={this.togglePasswordVisible}
         />
         <View>
-          <Button text={'Submit'} color={brand} onPress={this.submitLogin}/>
+          { button }
           <TouchableOpacity onPress={this.props.showSignup}>
             <View style={styles.switchup} >
               <Text style={styles.switchupText} >Or, <Text style={styles.underlineText}>Sign Up</Text>.</Text>
@@ -100,6 +105,8 @@ export default class LoginPage extends PureComponent {
       <View style={styles.container}>
         { this.props.doingInitialLoad ?
             <Loader
+              paddingTop={height / 3}
+              paddingBottom={20}
               docsToDownload={this.props.docsToDownload}
               docsDownloaded={this.props.docsDownloaded}
             />

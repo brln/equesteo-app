@@ -149,6 +149,7 @@ export function addHorseUser (horse, user) {
 export function appInitialized () {
   cb('appInitialized', true)
   return (dispatch, getState) => {
+    let postSync = () => {}
     tryToLoadStateFromDisk(dispatch).then(() => {
       dispatch(startActiveComponentListener())
       dispatch(dismissError())
@@ -175,10 +176,13 @@ export function appInitialized () {
             dispatch(switchRoot(FEED))
           } else {
             dispatch(switchRoot(NEEDS_SYNC))
+            postSync = () => {
+              dispatch(switchRoot(FEED))
+            }
           }
           return dispatch(startNetworkTracking())
         }).then(() => {
-          return dispatch(doSync({}, true, false))
+          return dispatch(doSync({}, true, false)).then(postSync)
         })
       } else {
         dispatch(switchRoot(SIGNUP_LOGIN))
@@ -214,8 +218,6 @@ export function changeHorseOwner (horse, newOwnerID) {
     }
     dispatch(horseUserUpdated(newHorseUser))
     dispatch(persistHorseUser(id))
-
-
   }
 }
 
@@ -1050,14 +1052,14 @@ function startAppStateTracking () {
 export function submitLogin (email, password) {
   cb('submitLogin', true)
   return (dispatch, getState) => {
-    loginAndSync(UserAPI.login, [email, password], dispatch, getState)
+    return loginAndSync(UserAPI.login, [email, password], dispatch, getState)
   }
 }
 
 export function submitSignup (email, password) {
   cb('submitSignup', true)
   return (dispatch, getState) => {
-    loginAndSync(UserAPI.signup, [email, password], dispatch, getState)
+    return loginAndSync(UserAPI.signup, [email, password], dispatch, getState)
   }
 }
 
@@ -1226,7 +1228,7 @@ export function switchRoot (newRoot) {
           },
         }
       })
-    } else if (newRoot = NEEDS_SYNC) {
+    } else if (newRoot === NEEDS_SYNC) {
       Navigation.setRoot({
         root: {
           component: {

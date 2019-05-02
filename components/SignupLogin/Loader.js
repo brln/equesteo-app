@@ -1,15 +1,11 @@
 import React, { PureComponent } from 'react';
 import {
-  Dimensions,
   Text,
   View
 } from 'react-native';
 import * as Progress from 'react-native-progress';
 
 import { brand, darkBrand } from '../../colors'
-
-
-const { height } = Dimensions.get('window')
 
 export default class Loader extends PureComponent {
   constructor () {
@@ -48,11 +44,10 @@ export default class Loader extends PureComponent {
   }
 
   render () {
-
     const progress = (this.state.done / this.state.outOf) + this.state.cheater || 0
     return (
-      <View style={{paddingTop: height / 3, alignItems: 'center'}}>
-        <View style={{paddingBottom: 20}}>
+      <View style={{paddingTop: this.props.paddingTop, alignItems: 'center'}}>
+        <View style={{paddingBottom: this.props.paddingBottom}}>
           <Progress.Pie color={brand} indeterminate={this.state.outOf === 0} progress={progress} size={50} />
         </View>
         <Text style={{textAlign: 'center', color: darkBrand}}>Loading Data...</Text>

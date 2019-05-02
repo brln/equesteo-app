@@ -27,7 +27,7 @@ import { LocalStorage } from '../services'
 import { setUserContext } from "../services/Sentry"
 
 export function loginAndSync(loginFunc, loginArgs, dispatch, getState) {
-  loginFunc(...loginArgs).then(resp => {
+  return loginFunc(...loginArgs).then(resp => {
     const userID = resp.id
     const followingIDs = resp.following
     const followerIDs = resp.followers

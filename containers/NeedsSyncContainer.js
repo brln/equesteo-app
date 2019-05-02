@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
 
 import {
-  ActivityIndicator,
   StyleSheet,
   Text,
   View
@@ -10,7 +9,9 @@ import {
 
 import Button from '../components/Button'
 import { brand, lightGrey } from '../colors'
+import { DB_SYNCING } from '../actions/functional'
 import BuildImage from '../components/Images/BuildImage'
+import Loader from '../components/SignupLogin/Loader'
 import { doSync, startListeningFCM, switchRoot } from '../actions/functional'
 import { FEED } from '../screens/main'
 
@@ -37,22 +38,13 @@ class NeedsSyncContainer extends PureComponent {
 
   constructor (props) {
     super(props)
-    this.state = {
-      trying: false
-    }
     this.doSync = this.doSync.bind(this)
   }
 
   doSync () {
-    this.setState({
-      trying: true
-    })
     this.props.dispatch(doSync()).then(() => {
-      if (this.props.syncFail) {
-        this.setState({
-          trying: false
-        })
-      } else {
+      logDebug(this.props.fullSyncFail, 'wutwut')
+      if (!this.props.fullSyncFail) {
         this.props.dispatch(switchRoot(FEED))
         this.props.dispatch(startListeningFCM())
       }
@@ -92,8 +84,13 @@ class NeedsSyncContainer extends PureComponent {
             <Text style={{textAlign: 'center', fontSize: 14, paddingTop: 10}}>If you continue to have problems, please get in touch!</Text>
             <Text style={{textAlign: 'center', fontSize: 18, paddingTop: 15}}>info@equesteo.com</Text>
             <View style={{padding: 20}}>
-              { this.state.trying ?
-                <ActivityIndicator /> :
+              { this.props.needsRemotePersist ===  DB_SYNCING ?
+                <Loader
+                  paddingTop={0}
+                  paddingBottom={0}
+                  docsToDownload={this.props.docsToDownload}
+                  docsDownloaded={this.props.docsDownloaded}
+                /> :
                 <Button
                   onPress={this.doSync}
                   color={brand}
@@ -126,8 +123,12 @@ const styles = StyleSheet.create({
 function mapStateToProps (state) {
   const localState = state.get('localState')
   return {
+    docsToDownload: localState.get('docsToDownload'),
+    docsDownloaded: localState.get('docsDownloaded'),
     error: localState.get('error'),
-    syncFail: localState.get('fullSyncFail')
+    needsRemotePersist: localState.get('needsRemotePersist'),
+    fullSyncFail: localState.get('fullSyncFail')
+
   }
 }
 

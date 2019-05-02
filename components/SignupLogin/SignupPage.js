@@ -95,6 +95,10 @@ export default class SignupPage extends PureComponent {
       TOSStyle.paddingRight = (width - 320) / 1.5
     }
     const paddingTop = height - 590 > 0 ? (height - 590) / 3 : 0
+    let button = <ActivityIndicator/>
+    if (!this.props.reqSubmitted) {
+      button = <Button text={'Submit'} color={brand} onPress={this.submitSignup} disabled={!this.state.tosAccepted}/>
+    }
     return (
       <View>
         <TOSModal
@@ -128,7 +132,7 @@ export default class SignupPage extends PureComponent {
               </View>
             </TouchableOpacity>
           </View>
-          <Button text={'Submit'} color={brand} onPress={this.submitSignup} disabled={!this.state.tosAccepted}/>
+          { button }
           <TouchableOpacity onPress={this.props.showLogin} style={{paddingTop: 10}}>
             <Text style={styles.switchupText}>Or, <Text style={styles.underlineText}>Log In</Text>.</Text>
           </TouchableOpacity>
@@ -152,6 +156,8 @@ export default class SignupPage extends PureComponent {
         {
           this.props.doingInitialLoad ?
             <Loader
+              paddingTop={height / 3}
+              paddingBottom={20}
               docsToDownload={this.props.docsToDownload}
               docsDownloaded={this.props.docsDownloaded}
             />
