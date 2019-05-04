@@ -29,7 +29,7 @@ function remoteDBOptions (token) {
 export default class PouchCouch {
   static errorHandler (reject) {
     return (e) => {
-      if (e.status === 0) {
+      if (e.status === 0 || e.status === 504) {
         reject(new NotConnectedError('Cannot find the database'))
       } else {
         reject(e)

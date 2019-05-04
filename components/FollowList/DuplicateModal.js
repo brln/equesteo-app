@@ -39,7 +39,12 @@ export default class DuplicateModal extends PureComponent {
     if (this.props.duplicationInProgress) {
       main = (
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-          <ActivityIndicator />
+          <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+            <ActivityIndicator />
+          </View>
+          <View style={{flex: 2, alignItems: 'center', justifyContent: 'center', paddingLeft: 20, paddingRight: 20}}>
+            <Text style={{textAlign: 'center'}}>The ride has been shared, but the other user won't receive it until a sync completes. This screen will close when that's done, or it's safe to close it now.</Text>
+          </View>
         </View>
       )
     }
