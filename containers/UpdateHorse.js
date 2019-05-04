@@ -51,6 +51,7 @@ class UpdateHorseContainer extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
+      backDebounce: false,
       cachedHorse: null,
       cachedHorseUser: null,
       doRevert: true,
@@ -258,15 +259,14 @@ class UpdateHorseContainer extends PureComponent {
 
   render() {
     logRender('UpdateHorseContainer')
-    const horsePhotos = this.memoThisHorsesPhotos(this.props.horsePhotos, this.state.deletedPhotoIDs)
     return (
-      <UpdateHorse
+      this.props.horse ? <UpdateHorse
         changeColor={this.changeColor}
         clearPhotoMenu={this.clearPhotoMenu}
         closeDeleteModal={this.closeDeleteModal}
         colorModalOpen={this.state.colorModalOpen}
         horse={this.props.horse}
-        horsePhotos={horsePhotos}
+        horsePhotos={this.memoThisHorsesPhotos(this.props.horsePhotos, this.state.deletedPhotoIDs)}
         horseUpdated={this.horseUpdated}
         horseUser={this.props.horseUser}
         markPhotoDeleted={this.markPhotoDeleted}
@@ -279,7 +279,7 @@ class UpdateHorseContainer extends PureComponent {
         selectedPhotoID={this.state.selectedPhotoID}
         stashPhoto={this.stashPhoto}
         userID={this.props.userID}
-      />
+      /> : null
     )
   }
 }
