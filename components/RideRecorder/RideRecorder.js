@@ -236,7 +236,6 @@ export default class RideRecorder extends PureComponent {
             <View style={{position: 'absolute', bottom: 10, right: 10}}>
               <View style={{flex: 1}}>
                 { atlasButton }
-                { hoofTracksButton }
                 { pauseButton }
                 { cameraButton }
               </View>

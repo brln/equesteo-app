@@ -112,7 +112,8 @@ class EventListContainer extends Component {
         component: {
           name: CARE_EVENT,
           passProps: {
-            careEventID
+            careEventID,
+            popAfterDeleteCompID: this.props.popWhenDoneID
           }
         }
       })
@@ -199,6 +200,7 @@ function mapStateToProps (state, passedProps) {
     horsePhotos: pouchState.get('horsePhotos'),
     horseCareEvents: pouchState.get('horseCareEvents'),
     newCareEvent: localState.get('newCareEvent'),
+    popWhenDoneID: passedProps.popWhenDoneID,
     userID: localState.get('userID')
   }
 }
