@@ -81,6 +81,9 @@ import {
   setFollowingSyncRunning,
   setRemotePersist,
   setFeedMessage,
+  setHoofTracksLastUpload,
+  setHoofTracksRunning,
+  setHoofTracksID,
   setFullSyncFail,
   setSigningOut,
   setActiveComponent,
@@ -89,7 +92,7 @@ import {
   updatePhotoStatus,
   userPhotoUpdated,
   userSearchReturned,
-  userUpdated
+  userUpdated,
 } from './standard'
 import { NotConnectedError } from "../errors"
 
@@ -148,6 +151,8 @@ export function addHorseUser (horse, user) {
 
 export function appInitialized () {
   cb('appInitialized', true)
+  // @TODO: if the app comes back online and the rider had HoofTracks running, either kill it on the
+  // @TODO: server or restart it on the app
   return (dispatch, getState) => {
     let postSync = () => {}
     tryToLoadStateFromDisk(dispatch).then(() => {
@@ -948,6 +953,54 @@ export function startLocationTracking () {
 
     }).catch(catchAsyncError(dispatch))
   }
+}
+
+let hoofTracksTimeout
+export function startHoofTracksDispatcher () {
+  cb('startHoofTracksDispatcher')
+  return (dispatch, getState) => {
+    const UPLOAD_EVERY = 20 * 1000
+    function doUpload() {
+      const startTime = getState().getIn(['currentRide', 'currentRide', 'startTime'])
+      const lastUpload = getState().getIn(['currentRide', 'lastHoofTracksUpload'])
+      const hoofTracksID = getState().getIn(['localState', 'hoofTracksID'])
+      const now = unixTimeNow()
+      const rideCoords = getState().getIn(['currentRide', 'currentRideCoordinates', 'rideCoordinates'])
+      if (rideCoords && rideCoords.count() > 0) {
+        const toUpload = rideCoords.filter(rc => {
+          const timestamp = rc.get(2)
+          return timestamp < now && (!lastUpload || timestamp > lastUpload)
+        })
+        if (toUpload.count() > 0) {
+          dispatch(setHoofTracksLastUpload(unixTimeNow()))
+          UserAPI.uploadHoofTrackCoords(hoofTracksID, toUpload, startTime).catch(() => {
+            dispatch(setHoofTracksLastUpload(lastUpload))
+          }).catch(e => logError(e))
+        }
+
+      }
+      hoofTracksTimeout = setTimeout(doUpload, UPLOAD_EVERY)
+    }
+    dispatch(setHoofTracksRunning(true))
+    doUpload()
+    hoofTracksTimeout = setTimeout(doUpload, UPLOAD_EVERY)
+  }
+}
+
+export function stopHoofTracksDispatcher () {
+ cb('stopHoofTracksDispatcher')
+ return (dispatch, getState) => {
+   const hoofTracksID = getState().getIn(['localState', 'hoofTracksID'])
+   dispatch(setHoofTracksRunning(false))
+   clearTimeout(hoofTracksTimeout)
+   if (hoofTracksID) {
+     dispatch(setHoofTracksLastUpload(null))
+     dispatch(setHoofTracksID(null))
+     UserAPI.clearHoofTrackCoords(hoofTracksID).catch(e => {
+       logError(e)
+     })
+   }
+ }
 }
 
 export function checkNetworkConnection () {

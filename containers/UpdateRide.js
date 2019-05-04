@@ -22,6 +22,7 @@ import {
 import {
   loadRideCoordinates,
   persistRide,
+  stopHoofTracksDispatcher,
   stopLocationTracking,
 } from '../actions/functional'
 import BackgroundComponent from '../components/BackgroundComponent'
@@ -40,7 +41,6 @@ import {
 } from '../helpers'
 import UpdateRide from '../components/UpdateRide/UpdateRide'
 import { PHOTO_LIGHTBOX, RIDE } from '../screens/main'
-import { catchAsyncError } from '../actions/functional'
 import { EqNavigation } from '../services'
 
 class UpdateRideContainer extends BackgroundComponent {
@@ -187,6 +187,7 @@ class UpdateRideContainer extends BackgroundComponent {
         this.setDiscardModalOpen(true)
         this.props.dispatch(setActiveAtlasEntry(null))
       }
+      this.props.dispatch(stopHoofTracksDispatcher())
     } else {
       if (buttonId === 'save') {
         this.setState({

@@ -13,17 +13,18 @@ import {
   stashNewLocations,
   stopStashNewLocations,
   unpauseLocationTracking,
-} from '../actions/standard'
+} from '../../actions/standard'
 import {
   startLocationTracking,
+  stopHoofTracksDispatcher,
   stopLocationTracking,
-} from '../actions/functional'
-import { brand } from '../colors'
-import RideRecorder from '../components/RideRecorder/RideRecorder'
-import { isAndroid, logRender, unixTimeNow } from '../helpers'
-import { captureException } from '../services/Sentry'
-import { CAMERA, RIDE_ATLAS, UPDATE_RIDE, UPDATE_NEW_RIDE_ID } from "../screens/main"
-import { EqNavigation } from '../services'
+} from '../../actions/functional'
+import { brand } from '../../colors'
+import RideRecorder from '../../components/RideRecorder/RideRecorder'
+import { isAndroid, logError, logRender, unixTimeNow } from '../../helpers'
+import { captureException } from '../../services/Sentry'
+import { CAMERA, RIDE_ATLAS, START_HOOF_TRACKS, UPDATE_RIDE, UPDATE_NEW_RIDE_ID } from "../../screens/main"
+import { EqNavigation } from '../../services'
 
 class RecorderContainer extends PureComponent {
   static options() {
@@ -63,6 +64,8 @@ class RecorderContainer extends PureComponent {
     this.showAtlas = this.showAtlas.bind(this)
     this.showCamera = this.showCamera.bind(this)
     this.showUpdateRide = this.showUpdateRide.bind(this)
+    this.startHoofTracks = this.startHoofTracks.bind(this)
+    this.stopHoofTracks = this.stopHoofTracks.bind(this)
     this.startRide = this.startRide.bind(this)
     this.unpauseLocationTracking = this.unpauseLocationTracking.bind(this)
 
@@ -162,6 +165,22 @@ class RecorderContainer extends PureComponent {
     })
   }
 
+  startHoofTracks () {
+    this.closeHoofTracksModal()
+    EqNavigation.push(this.props.componentId, {
+      component: {
+        name: START_HOOF_TRACKS,
+        id: START_HOOF_TRACKS
+      }
+    })
+  }
+
+  stopHoofTracks () {
+    this.closeHoofTracksModal()
+    this.props.dispatch(stopHoofTracksDispatcher())
+  }
+
+
   startRide () {
     Navigation.mergeOptions(this.props.componentId, {
       topBar: {
@@ -215,6 +234,7 @@ class RecorderContainer extends PureComponent {
     EqNavigation.popToRoot(this.props.componentId).then(() => {
       this.props.dispatch(discardCurrentRide())
       this.props.dispatch(stopLocationTracking())
+      this.stopHoofTracks()
     }).catch(() => {})
   }
 
@@ -263,6 +283,9 @@ class RecorderContainer extends PureComponent {
         currentRideElevations={this.props.currentRideElevations}
         discardRide={this.discardRide}
         discardModalOpen={this.state.discardModalOpen}
+        fetchHTID={this.fetchHTID}
+        hoofTracksID={this.props.hoofTracksID}
+        hoofTracksRunning={this.props.hoofTracksRunning}
         hoofTracksModalOpen={this.state.hoofTracksModalOpen}
         lastElevation={this.props.lastElevation}
         lastLocation={this.props.lastLocation}
@@ -274,6 +297,8 @@ class RecorderContainer extends PureComponent {
         showCamera={this.showCamera}
         showGPSBar={this.state.showGPSBar}
         showUpdateRide={this.showUpdateRide}
+        startHoofTracks={this.startHoofTracks}
+        stopHoofTracks={this.stopHoofTracks}
         unpauseLocationTracking={this.unpauseLocationTracking}
       />
     )
@@ -294,6 +319,8 @@ function mapStateToProps (state) {
     currentRideCoordinates: currentRideState.get('currentRideCoordinates'),
     currentRidePhotos: localState.getIn(['ridePhotoStash', 'currentRide']) || Map(),
     horseUsers: pouchState.get('horseUsers'),
+    hoofTracksID: localState.get('hoofTracksID'),
+    hoofTracksRunning: localState.get('hoofTracksRunning'),
     lastElevation: currentRideState.get('lastElevation'),
     lastLocation: currentRideState.get('lastLocation'),
     nullMapLocation: currentRideState.get('nullMapLocation'),

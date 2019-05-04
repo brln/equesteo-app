@@ -210,8 +210,12 @@ export default class RideRecorder extends PureComponent {
         />
         <HoofTracksModal
           closeModal={this.props.closeHoofTracksModal}
+          fetchHTID={this.props.fetchHTID}
+          hoofTracksID={this.props.hoofTracksID}
+          hoofTracksRunning={this.props.hoofTracksRunning}
           modalOpen={this.props.hoofTracksModalOpen}
-          onPress={() => {}}
+          startHoofTracks={this.props.startHoofTracks}
+          stopHoofTracks={this.props.stopHoofTracks}
         />
         <GPSStatus
           shown={this.props.showGPSBar}
@@ -235,6 +239,7 @@ export default class RideRecorder extends PureComponent {
             />
             <View style={{position: 'absolute', bottom: 10, right: 10}}>
               <View style={{flex: 1}}>
+                { hoofTracksButton }
                 { atlasButton }
                 { pauseButton }
                 { cameraButton }

@@ -20,7 +20,7 @@ import NotificationsListContainer from '../containers/NotificationsList'
 import NotificationButton from '../containers/Feed/NotificationButton'
 import PhotoLightboxContainer from '../containers/PhotoLightbox'
 import ProfileContainer from '../containers/Profile'
-import RecorderContainer from '../containers/Recorder'
+import RecorderContainer from '../containers/Recorder/Recorder'
 import RideChartsContainer from '../containers/RideCharts'
 import RideContainer from '../containers/Ride'
 import RideAtlasContainer from '../containers/RideAtlas'
@@ -28,6 +28,7 @@ import RideToolsContainer from '../containers/RideTools'
 import SettingsContainer from '../containers/Settings'
 import ShareRideContainer from '../containers/ShareRide'
 import SignupLoginContainer from '../containers/SignupLogin'
+import StartHoofTracksContainer from '../containers/Recorder/StartHoofTracks'
 import TrainingContainer from '../containers/Training'
 import UpdateHorseContainer from '../containers/UpdateHorse'
 import UpdateRideContainer from '../containers/UpdateRide'
@@ -61,6 +62,7 @@ export const RIDE_TOOLS = 'equesteo.RideTools'
 export const SETTINGS = 'equesteo.Settings'
 export const SHARE_RIDE = 'equesteo.ShareRide'
 export const SIGNUP_LOGIN = 'equesteo.SignupLogin'
+export const START_HOOF_TRACKS = 'equesteo.StartHoofTracks'
 export const TRAINING = 'equesteo.Training'
 export const UPDATE_HORSE = 'equesteo.Horse'
 export const UPDATE_PROFILE = 'equesteo.UpdateProfile'
@@ -95,10 +97,11 @@ export function registerScreens(store, Provider) {
   Navigation.registerComponentWithRedux(RIDE_CHARTS, () => RideChartsContainer, Provider, store)
   Navigation.registerComponentWithRedux(RIDE_TOOLS, () => RideToolsContainer, Provider, store)
   Navigation.registerComponentWithRedux(SETTINGS, () => SettingsContainer, Provider, store)
-  Navigation.registerComponentWithRedux(UPDATE_RIDE, () => UpdateRideContainer, Provider, store)
   Navigation.registerComponentWithRedux(SHARE_RIDE, () => ShareRideContainer, Provider, store)
   Navigation.registerComponentWithRedux(SIGNUP_LOGIN, () => SignupLoginContainer, Provider, store)
+  Navigation.registerComponentWithRedux(START_HOOF_TRACKS, () => StartHoofTracksContainer, Provider, store)
   Navigation.registerComponentWithRedux(TRAINING, () => TrainingContainer, Provider, store)
+  Navigation.registerComponentWithRedux(UPDATE_RIDE, () => UpdateRideContainer, Provider, store)
   Navigation.registerComponentWithRedux(UPDATE_HORSE, () => UpdateHorseContainer, Provider, store)
   Navigation.registerComponentWithRedux(UPDATE_PROFILE, () => UpdateProfileContainer, Provider, store)
 }

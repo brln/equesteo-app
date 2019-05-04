@@ -58,6 +58,18 @@ export default class UserAPI {
     return ApiClient.uploadImage('/photos/ride', photoID, imageLocation)
   }
 
+  static getHoofTracksID () {
+    return ApiClient.get(`/users/hoofTracksID`)
+  }
+
+  static uploadHoofTrackCoords (htID, coords, startTime) {
+    return ApiClient.post(`/hoofTracks/${htID}/postCoords`, { coords, startTime })
+  }
+
+  static clearHoofTrackCoords (htID) {
+    return ApiClient.post(`/hoofTracks/${htID}/deleteCoords`, {})
+  }
+
   static uploadPhoto (type, imageLocation, photoID) {
     switch (type) {
       case 'horse':

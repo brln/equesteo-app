@@ -61,6 +61,8 @@ import {
   SET_FIRST_START_HORSE_ID,
   SET_FOLLOWING_SYNC_RUNNING,
   SET_FULL_SYNC_FAIL,
+  SET_HOOF_TRACKS_ID,
+  SET_HOOF_TRACKS_LAST_UPLOAD,
   SET_LOCATION_RETRY,
   SET_REMOTE_PERSIST,
   SET_SHOWING_RIDE,
@@ -80,7 +82,7 @@ import {
   SET_CARE_EVENT_DATE,
   SET_MAIN_CARE_EVENT_TYPE,
   SET_SECONDARY_CARE_EVENT_TYPE,
-  SET_CARE_EVENT_SPECIFIC_DATA, CHANGE_CARE_CALENDAR_TAB,
+  SET_CARE_EVENT_SPECIFIC_DATA, CHANGE_CARE_CALENDAR_TAB, SET_HOOF_TRACKS_RUNNING,
 } from '../constants'
 
 export function addDocsDownloaded (num, db) {
@@ -513,6 +515,30 @@ export function setFollowingSyncRunning (value) {
   return {
     type: SET_FOLLOWING_SYNC_RUNNING,
     value
+  }
+}
+
+export function setHoofTracksID (value) {
+  return {
+    type: SET_HOOF_TRACKS_ID,
+    value,
+    logData: ['value']
+  }
+}
+
+export function setHoofTracksRunning (value) {
+  return {
+    type: SET_HOOF_TRACKS_RUNNING,
+    value,
+    logData: ['value']
+  }
+}
+
+export function setHoofTracksLastUpload (value) {
+  return {
+    type: SET_HOOF_TRACKS_LAST_UPLOAD,
+    value,
+    logData: ['value']
   }
 }
 

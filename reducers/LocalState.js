@@ -41,6 +41,8 @@ import {
   SET_ACTIVE_ATLAS_ENTRY,
   SET_AWAITING_PW_CHANGE,
   SET_DOING_INITIAL_LOAD,
+  SET_HOOF_TRACKS_ID,
+  SET_HOOF_TRACKS_RUNNING,
   SET_SIGNING_OUT,
   SET_SHOWING_RIDE,
   STASH_RIDE_PHOTO,
@@ -72,6 +74,8 @@ export const initialState = Map({
   firstStartHorseID: null,
   fullSyncFail: false,
   goodConnection: true,
+  hoofTracksID: null,
+  hoofTracksRunning: false,
   lastFullSync: null,
   locationStashingActive: false,
   locationRetry: false,
@@ -128,8 +132,6 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.setIn(['photoQueue', action.queueItem.get('photoID')], action.queueItem)
     case ERROR_OCCURRED:
       return state.set('error', action.message)
-    case SET_FULL_SYNC_FAIL:
-      return state.set('fullSyncFail', action.status)
     case LOAD_LOCAL_STATE:
       const loadedState = initialState.merge(action.localState)
       let newNeedsRemotePersist = loadedState.get('needsRemotePersist')
@@ -147,8 +149,6 @@ export default function LocalStateReducer(state=initialState, action) {
       ).set(
         'needsRemotePersist', newNeedsRemotePersist
       )
-    case SET_REMOTE_PERSIST:
-      return state.set('needsRemotePersist', action.value)
     case NEW_APP_STATE:
       return state.set('appState', action.newState)
     case NEW_NETWORK_STATE:
@@ -173,11 +173,19 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.set('feedMessage', action.message)
     case SET_FIRST_START_HORSE_ID:
       return state.set('firstStartHorseID', Map({ horseID: action.horseID, horseUserID: action.horseUserID }))
+    case SET_FULL_SYNC_FAIL:
+      return state.set('fullSyncFail', action.status)
+    case SET_HOOF_TRACKS_ID:
+      return state.set('hoofTracksID', action.value)
+    case SET_HOOF_TRACKS_RUNNING:
+      return state.set('hoofTracksRunning', action.value)
     case SET_LOCATION_RETRY:
       return state.set('locationRetry', action.newVal)
     case SET_MAIN_CARE_EVENT_TYPE:
       const withMainType = state.get('newCareEvent').set('mainEventType', action.eventType)
       return state.set('newCareEvent', withMainType)
+    case SET_REMOTE_PERSIST:
+      return state.set('needsRemotePersist', action.value)
     case SET_SECONDARY_CARE_EVENT_TYPE:
       const withSecondaryType = state.get('newCareEvent').set('secondaryEventType', action.eventType)
       return state.set('newCareEvent', withSecondaryType)
