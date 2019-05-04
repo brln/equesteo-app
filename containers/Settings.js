@@ -53,6 +53,7 @@ class SettingsContainer extends BackgroundComponent {
       doRevert: true,
     }
     this.changeAccountDetails = this.changeAccountDetails.bind(this)
+    this.changeExperimentalHoofTracks = this.changeExperimentalHoofTracks.bind(this)
     this.changeLeaderboardOptOut = this.changeLeaderboardOptOut.bind(this)
     this.changeDefaultPublic = this.changeDefaultPublic.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
@@ -93,6 +94,10 @@ class SettingsContainer extends BackgroundComponent {
     this.changeAccountDetails(this.props.user.set('leaderboardOptOut', !this.props.user.get('leaderboardOptOut')))
   }
 
+  changeExperimentalHoofTracks () {
+    this.changeAccountDetails(this.props.user.set('experimentalHoofTracks', !this.props.user.get('experimentalHoofTracks')))
+  }
+
   changeDefaultPublic () {
     this.changeAccountDetails(this.props.user.set('ridesDefaultPublic', !this.props.user.get('ridesDefaultPublic')))
   }
@@ -128,6 +133,25 @@ class SettingsContainer extends BackgroundComponent {
                 </View>
                 <View style={{flex: 6, justifyContent: 'center'}}>
                   <Text>Opt-out of leaderboards.</Text>
+                </View>
+              </View>
+            </CardItem>
+          </Card>
+
+          <Card>
+            <CardItem header>
+              <Text style={{color: darkBrand }}>Equesteo Labs:</Text>
+            </CardItem>
+            <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
+              <View style={{flex: 1, flexDirection: 'row'}}>
+                <View style={{flex: 1}}>
+                  <CheckBox
+                    checked={this.props.user.get('experimentalHoofTracks')}
+                    onPress={this.changeExperimentalHoofTracks}
+                  />
+                </View>
+                <View style={{flex: 6, justifyContent: 'center'}}>
+                  <Text>Enable experimental HoofTracks.</Text>
                 </View>
               </View>
             </CardItem>

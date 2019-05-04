@@ -62,6 +62,10 @@ export default class UserAPI {
     return ApiClient.get(`/users/hoofTracksID`)
   }
 
+  static resetHoofTracksID () {
+    return ApiClient.get(`/users/resetHoofTracksID`)
+  }
+
   static uploadHoofTrackCoords (htID, coords, startTime) {
     return ApiClient.post(`/hoofTracks/${htID}/postCoords`, { coords, startTime })
   }

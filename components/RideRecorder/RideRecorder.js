@@ -9,7 +9,6 @@ import { black, brand, green, white, orange, danger, warning } from '../../color
 import { heading, isAndroid, parseRideCoordinate } from '../../helpers'
 import GPSStatus from './GPSStatus'
 import DiscardModal from './DiscardModal'
-import HoofTracksModal from './HoofTracksModal'
 import MapButton from './MapButton'
 import RidingMap from './RidingMap'
 import RideStats from './RideStats'
@@ -183,13 +182,16 @@ export default class RideRecorder extends PureComponent {
           onPress={this.showCamera}
         />
       )
-      hoofTracksButton = (
-        <MapButton
-          color={green}
-          icon={require('../../img/radio.png')}
-          onPress={this.props.openHoofTracksModal}
-        />
-      )
+      if (this.props.user.get('experimentalHoofTracks')) {
+        hoofTracksButton = (
+          <MapButton
+            color={green}
+            icon={require('../../img/radio.png')}
+            onPress={this.props.startHoofTracks}
+          />
+        )
+      }
+
     }
     if (this.props.currentRide && !this.props.currentRide.get('lastPauseStart')) {
       pauseButton = (
@@ -207,15 +209,6 @@ export default class RideRecorder extends PureComponent {
           closeDiscardModal={this.props.closeDiscardModal}
           discardFunc={this.props.discardRide}
           text={"You haven't gone anywhere on this ride yet. Do you want to close it?"}
-        />
-        <HoofTracksModal
-          closeModal={this.props.closeHoofTracksModal}
-          fetchHTID={this.props.fetchHTID}
-          hoofTracksID={this.props.hoofTracksID}
-          hoofTracksRunning={this.props.hoofTracksRunning}
-          modalOpen={this.props.hoofTracksModalOpen}
-          startHoofTracks={this.props.startHoofTracks}
-          stopHoofTracks={this.props.stopHoofTracks}
         />
         <GPSStatus
           shown={this.props.showGPSBar}

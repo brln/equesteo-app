@@ -28,7 +28,7 @@ import RideToolsContainer from '../containers/RideTools'
 import SettingsContainer from '../containers/Settings'
 import ShareRideContainer from '../containers/ShareRide'
 import SignupLoginContainer from '../containers/SignupLogin'
-import StartHoofTracksContainer from '../containers/Recorder/StartHoofTracks'
+import HoofTracksContainer from '../containers/Recorder/HoofTracks'
 import TrainingContainer from '../containers/Training'
 import UpdateHorseContainer from '../containers/UpdateHorse'
 import UpdateRideContainer from '../containers/UpdateRide'
@@ -99,7 +99,7 @@ export function registerScreens(store, Provider) {
   Navigation.registerComponentWithRedux(SETTINGS, () => SettingsContainer, Provider, store)
   Navigation.registerComponentWithRedux(SHARE_RIDE, () => ShareRideContainer, Provider, store)
   Navigation.registerComponentWithRedux(SIGNUP_LOGIN, () => SignupLoginContainer, Provider, store)
-  Navigation.registerComponentWithRedux(START_HOOF_TRACKS, () => StartHoofTracksContainer, Provider, store)
+  Navigation.registerComponentWithRedux(START_HOOF_TRACKS, () => HoofTracksContainer, Provider, store)
   Navigation.registerComponentWithRedux(TRAINING, () => TrainingContainer, Provider, store)
   Navigation.registerComponentWithRedux(UPDATE_RIDE, () => UpdateRideContainer, Provider, store)
   Navigation.registerComponentWithRedux(UPDATE_HORSE, () => UpdateHorseContainer, Provider, store)
