@@ -51,7 +51,7 @@ class BarnContainer extends BackgroundComponent {
           barnComponentID: this.props.componentId
         },
       }
-    })
+    }).catch(() => {})
   }
 
   newHorse () {
@@ -68,7 +68,7 @@ class BarnContainer extends BackgroundComponent {
           horseUserID,
         }
       }
-    })
+    }).catch(() => {})
   }
 
   yourHorses () {

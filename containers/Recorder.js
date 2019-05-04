@@ -89,7 +89,7 @@ class RecorderContainer extends PureComponent {
   }
 
   goBack () {
-    return EqNavigation.pop(this.props.componentId)
+    return EqNavigation.pop(this.props.componentId).catch(() => {})
   }
 
   componentWillUnmount () {
@@ -184,7 +184,7 @@ class RecorderContainer extends PureComponent {
         name: CAMERA,
         id: CAMERA,
       }
-    })
+    }).catch(() => {})
   }
 
   showAtlas () {
@@ -193,7 +193,7 @@ class RecorderContainer extends PureComponent {
         name: RIDE_ATLAS,
         id: RIDE_ATLAS,
       }
-    })
+    }).catch(() => {})
   }
 
   clearActiveAtlasEntry () {
@@ -203,14 +203,11 @@ class RecorderContainer extends PureComponent {
   finishRide () {
     if (this.props.currentRideCoordinates.get('rideCoordinates').count() > 0) {
       this.props.dispatch(stashNewLocations())
-      return this.showUpdateRide()
+      this.showUpdateRide()
     } else {
-      return new Promise((res) => {
-        this.setState({
-          discardModalOpen: true
-        }, res())
+      this.setState({
+        discardModalOpen: true
       })
-
     }
   }
 
@@ -218,7 +215,7 @@ class RecorderContainer extends PureComponent {
     EqNavigation.popToRoot(this.props.componentId).then(() => {
       this.props.dispatch(discardCurrentRide())
       this.props.dispatch(stopLocationTracking())
-    })
+    }).catch(() => {})
   }
 
   showUpdateRide () {
@@ -231,7 +228,7 @@ class RecorderContainer extends PureComponent {
       this.props.currentRideCoordinates,
       null
     ))
-    return EqNavigation.push(this.props.componentId, {
+    EqNavigation.push(this.props.componentId, {
       component: {
         name: UPDATE_RIDE,
         id: UPDATE_NEW_RIDE_ID,
@@ -241,7 +238,7 @@ class RecorderContainer extends PureComponent {
           currentRidePhotos: this.props.currentRidePhotos.keySeq().toList(),
         },
       }
-    })
+    }).catch(() => {})
   }
 
   pauseLocationTracking () {

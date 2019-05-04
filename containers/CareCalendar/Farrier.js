@@ -69,7 +69,7 @@ class FarrierEvent extends Component {
             popWhenDoneID: this.props.popWhenDoneID
           }
         }
-      })
+      }).catch(() => {})
     }
   }
 

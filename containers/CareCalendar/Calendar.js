@@ -66,7 +66,7 @@ class Calendar extends Component {
               careEventID: marked.careEvents[0]
             }
           },
-        })
+        }).catch(() => {})
       } else if (marked.careEvents.length > 1) {
         const title = moment(day.dateString, 'YYYY-MM-DD').format('MMM Do')
         EqNavigation.push(this.props.activeComponent, {
@@ -86,7 +86,7 @@ class Calendar extends Component {
               popWhenDoneID: this.props.popWhenDoneID
             }
           },
-        })
+        }).catch(() => {})
       }
     } else {
       this.setState({
@@ -182,7 +182,7 @@ class Calendar extends Component {
           popWhenDoneID: this.props.popWhenDoneID
         }
       },
-    })
+    }).catch(() => {})
   }
 
 

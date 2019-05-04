@@ -64,7 +64,7 @@ class HorsePicker extends PureComponent {
       } else {
         this.props.dispatch(changeCareCalendarTab(0))
       }
-      EqNavigation.popTo(this.props.popWhenDoneID)
+      EqNavigation.popTo(this.props.popWhenDoneID).catch(() => {})
     }
   }
 

@@ -63,7 +63,7 @@ class DrawerContainer extends Component {
             }
           }
         }
-      })
+      }).catch(() => {})
     }
   }
 
@@ -85,7 +85,7 @@ class DrawerContainer extends Component {
             }
           }
         }
-      })
+      }).catch(() => {})
     }
 	}
 
@@ -103,7 +103,7 @@ class DrawerContainer extends Component {
             }
           }
         }
-      })
+      }).catch(() => {})
     }
 	}
 
@@ -121,7 +121,7 @@ class DrawerContainer extends Component {
             }
           }
         }
-      })
+      }).catch(() => {})
     }
   }
 
@@ -139,7 +139,7 @@ class DrawerContainer extends Component {
             }
           }
         }
-      })
+      }).catch(() => {})
     }
   }
 
@@ -158,7 +158,7 @@ class DrawerContainer extends Component {
           }
         },
 
-      })
+      }).catch(() => {})
     }
   }
 
@@ -176,7 +176,7 @@ class DrawerContainer extends Component {
             }
           }
         }
-      })
+      }).catch(() => {})
     }
   }
 

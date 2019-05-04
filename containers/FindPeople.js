@@ -59,7 +59,7 @@ class FindPeopleContainer extends PureComponent {
           profilePhotoURL: profileUser.get('profilePhotoURL')
         }
       }
-    })
+    }).catch(() => {})
   }
 
   search (phrase) {

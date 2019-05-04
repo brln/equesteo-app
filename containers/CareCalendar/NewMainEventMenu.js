@@ -67,7 +67,7 @@ class NewMainEventMenu extends Component {
           bgColor: feed
         }
       },
-    })
+    }).catch(() => {})
   }
 
   setMainEventType (type, bgColor) {
@@ -81,7 +81,7 @@ class NewMainEventMenu extends Component {
             bgColor,
           }
         },
-      })
+      }).catch(() => {})
     }
   }
 

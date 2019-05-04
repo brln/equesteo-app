@@ -40,24 +40,11 @@ class EventListContainer extends Component {
       activeTab: 0
     }
     this.openCareEvent = this.openCareEvent.bind(this)
-    this.openEventType = this.openEventType.bind(this)
     this.renderBottomButtons = this.renderBottomButtons.bind(this)
     this.showHorseProfile = this.showHorseProfile.bind(this)
 
     this.memoDayCareEvents = memoizeOne(this.dayCareEvents)
 
-  }
-
-
-  openEventType () {
-    EqNavigation.push(this.props.activeComponent, {
-      component: {
-        name: NEW_MAIN_EVENT_MENU,
-        passProps: {
-          popWhenDoneID: this.props.componentId,
-        }
-      },
-    })
   }
 
   dayCareEvents (day, horses, horseUsers, careEvents, horseCareEvents, userID) {
@@ -116,7 +103,7 @@ class EventListContainer extends Component {
             popAfterDeleteCompID: this.props.popWhenDoneID
           }
         }
-      })
+      }).catch(() => {})
     }
   }
 

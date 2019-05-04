@@ -39,7 +39,7 @@ class MapContainer extends PureComponent {
           sources
         }
       },
-    })
+    }).catch(() => {})
   }
 
   thisRidesPhotos (ridePhotos) {

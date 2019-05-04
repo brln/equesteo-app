@@ -80,7 +80,7 @@ class CareEvent extends Component {
             popAfterDeleteCompID: this.props.popAfterDeleteCompID
           }
         }
-      })
+      }).catch(() => {})
     }
   }
 
@@ -93,7 +93,7 @@ class CareEvent extends Component {
           title: horse.get('name'),
           passProps: {horse, ownerID},
         }
-      })
+      }).catch(() => {})
     }
   }
 

@@ -52,7 +52,7 @@ class LeaderboardsContainer extends BackgroundComponent {
           ownerID,
         }
       }
-    })
+    }).catch(() => {})
   }
 
   showProfile (profileUser) {
@@ -64,7 +64,7 @@ class LeaderboardsContainer extends BackgroundComponent {
           leaderboardProfile: true
         }
       }
-    })
+    }).catch(() => {})
   }
 
   horseOwnerIDs (horseUsers) {

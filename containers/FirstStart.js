@@ -164,7 +164,7 @@ class FirstStartContainer extends PureComponent {
     } else if (this.props.horse) {
       this.props.dispatch(deleteUnpersistedHorse(this.props.horse.get('_id'), this.props.horseUser.get('_id')))
     }
-    EqNavigation.pop(this.props.componentId)
+    EqNavigation.pop(this.props.componentId).catch(() => {})
   }
 
   setSkip (pageName, then) {

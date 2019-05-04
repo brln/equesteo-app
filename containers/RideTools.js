@@ -96,7 +96,7 @@ class RideToolsContainer extends Component {
   deleteRide () {
     this.props.dispatch(rideUpdated(this.props.ride.set('deleted', true)))
     this.props.dispatch(persistRide(this.props.ride.get('_id'), false, [], [], null, List()))
-    EqNavigation.popToRoot(this.props.componentId)
+    EqNavigation.popToRoot(this.props.componentId).catch(() => {})
   }
 
   showAtlasEntryModal () {
@@ -122,7 +122,7 @@ class RideToolsContainer extends Component {
           popBackTo: this.props.popBackTo
         },
       },
-    })
+    }).catch(() => {})
   }
 
   shareRide () {
@@ -133,7 +133,7 @@ class RideToolsContainer extends Component {
           rideID: this.props.rideID,
         }
       }
-    })
+    }).catch(() => {})
   }
 
   duplicateRide () {
@@ -160,7 +160,7 @@ class RideToolsContainer extends Component {
           localCallbackName: 'duplicateRide',
         }
       }
-    })
+    }).catch(() => {})
   }
 
   closeAtlasEntryModal () {

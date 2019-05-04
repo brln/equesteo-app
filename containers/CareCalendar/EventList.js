@@ -68,7 +68,7 @@ class EventListContainer extends Component {
             popAfterDeleteCompID: this.props.componentId,
           }
         }
-      })
+      }).catch(() => {})
     }
   }
 
@@ -80,7 +80,7 @@ class EventListContainer extends Component {
           popWhenDoneID: this.props.componentId
         }
       }
-    })
+    }).catch(() => {})
   }
 
   newFeedEventNow () {
@@ -96,7 +96,7 @@ class EventListContainer extends Component {
           popWhenDoneID: this.props.componentId,
         }
       },
-    })
+    }).catch(() => {})
   }
 
   yourCareEvents (horses, horseUsers, careEvents, horseCareEvents, userID) {
@@ -171,7 +171,7 @@ class EventListContainer extends Component {
         title: horse.get('name'),
         passProps: {horse, ownerID},
       }
-    })
+    }).catch(() => {})
   }
 
   onChangeTab (a) {

@@ -82,7 +82,7 @@ class HorseProfileContainer extends BackgroundComponent {
           sources,
         }
       }
-    })
+    }).catch(() => {})
   }
 
   addRider () {
@@ -100,7 +100,7 @@ class HorseProfileContainer extends BackgroundComponent {
             horseUserID: this.horseUser().get('_id'),
           },
         }
-      })
+      }).catch(() => {})
     }
   }
 
@@ -112,7 +112,7 @@ class HorseProfileContainer extends BackgroundComponent {
           profileUser: rider,
         }
       }
-    })
+    }).catch(() => {})
   }
 
   horseUser() {
@@ -125,7 +125,7 @@ class HorseProfileContainer extends BackgroundComponent {
     const horseUser = this.horseUser()
     this.props.dispatch(deleteHorseUser(horseUser.get('_id')))
     this.props.dispatch(persistHorseUser(horseUser.get('_id')))
-    EqNavigation.pop(this.props.componentId)
+    EqNavigation.pop(this.props.componentId).catch(() => {})
   }
 
   uploadPhoto (location) {

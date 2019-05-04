@@ -75,7 +75,7 @@ class TrainingContainer extends PureComponent {
           name: RIDE,
           passProps: {rideID: ride.get('rideID')}
         }
-      })
+      }).catch(() => {})
     } else {
       alert('Ride not loaded. Feature in progress.')
     }

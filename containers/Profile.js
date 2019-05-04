@@ -109,7 +109,7 @@ class ProfileContainer extends BackgroundComponent {
           sources,
         }
       }
-    })
+    }).catch(() => {})
   }
 
   showAboutPage () {
@@ -117,7 +117,7 @@ class ProfileContainer extends BackgroundComponent {
       component: {
         name: ABOUT_PAGE,
       }
-    })
+    }).catch(() => {})
   }
 
   navigationButtonPressed ({ buttonId }) {
@@ -128,7 +128,7 @@ class ProfileContainer extends BackgroundComponent {
           screen: UPDATE_PROFILE,
           title: 'Update Profile',
         }
-      });
+      }).catch(() => {})
     } else if (buttonId === 'logout') {
       this.doLogout()
     }
@@ -175,7 +175,7 @@ class ProfileContainer extends BackgroundComponent {
             profileUser,
           }
         }
-      })
+      }).catch(() => {})
     }
   }
 
@@ -189,7 +189,7 @@ class ProfileContainer extends BackgroundComponent {
           onPress: this.showProfile
         }
       }
-    })
+    }).catch(() => {})
   }
 
   showHorseProfile (horse, ownerID) {
@@ -199,7 +199,7 @@ class ProfileContainer extends BackgroundComponent {
         title: horse.get('name'),
         passProps: {horse, ownerID},
       }
-    })
+    }).catch(() => {})
   }
 
   profileUserHorses (horseUsers, profileUser, horses) {

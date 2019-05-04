@@ -75,7 +75,7 @@ class HorseToolsContainer extends Component {
     const horseUser = this.props.horseUser
     this.props.dispatch(deleteHorseUser(horseUser.get('_id')))
     this.props.dispatch(persistHorseUser(horseUser.get('_id')))
-    EqNavigation.popTo(this.props.barnComponentID)
+    EqNavigation.popTo(this.props.barnComponentID).catch(() => {})
   }
 
   updateHorse () {
@@ -89,7 +89,7 @@ class HorseToolsContainer extends Component {
           newHorse: false
         },
       }
-    })
+    }).catch(() => {})
   }
 
   renderMenuItem ({ item }) {
@@ -139,7 +139,7 @@ class HorseToolsContainer extends Component {
           localCallbackName: 'transferHorse',
         }
       }
-    })
+    }).catch(() => {})
   }
 
   menuItems () {

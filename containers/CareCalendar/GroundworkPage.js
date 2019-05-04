@@ -134,7 +134,7 @@ class GroundworkPage extends Component {
             popWhenDoneID: this.props.popWhenDoneID
           }
         }
-      })
+      }).catch(() => {})
     }
   }
 

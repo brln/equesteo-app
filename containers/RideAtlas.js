@@ -42,7 +42,7 @@ class RideAtlasContainer extends PureComponent {
   setActiveAtlasEntry (id) {
     return () => {
       this.props.dispatch(setActiveAtlasEntry(id))
-      EqNavigation.pop(this.props.componentId)
+      EqNavigation.pop(this.props.componentId).catch(() => {})
     }
   }
 

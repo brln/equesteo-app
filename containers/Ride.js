@@ -69,7 +69,7 @@ class RideContainer extends PureComponent {
             popBackTo: this.props.componentId
           },
         },
-      })
+      }).catch(() => {})
     }
   }
 
@@ -124,7 +124,7 @@ class RideContainer extends PureComponent {
           rideID: this.props.ride.get('_id'),
         }
       }
-    })
+    }).catch(() => {})
   }
 
   updateNewComment (newComment) {
@@ -154,7 +154,7 @@ class RideContainer extends PureComponent {
           profileUser: user,
         }
       }
-    })
+    }).catch(() => {})
   }
 
   closeDeleteModal () {
@@ -185,7 +185,7 @@ class RideContainer extends PureComponent {
   deleteRide () {
     this.props.dispatch(rideUpdated(this.props.ride.set('deleted', true)))
     this.props.dispatch(persistRide(this.props.ride.get('_id'), false, [], [], null, List()))
-    EqNavigation.pop(this.props.componentId)
+    EqNavigation.pop(this.props.componentId).catch(() => {})
   }
 
 
@@ -197,7 +197,7 @@ class RideContainer extends PureComponent {
           sources
         }
       },
-    })
+    }).catch(() => {})
   }
 
   showFullscreenMap (rideID) {
@@ -206,7 +206,7 @@ class RideContainer extends PureComponent {
         name: MAP,
         passProps: { rideID }
       }
-    })
+    }).catch(() => {})
   }
 
   showHorseProfile (horse, ownerID) {
@@ -216,7 +216,7 @@ class RideContainer extends PureComponent {
         title: horse.get('name'),
         passProps: { horse, ownerID },
       }
-    })
+    }).catch(() => {})
   }
 
   thisRidesPhotos (ridePhotos) {

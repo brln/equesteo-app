@@ -56,7 +56,7 @@ class EventToolsContainer extends Component {
     this.closeDeleteModal()
     EqNavigation.popTo(this.props.popAfterDeleteCompID).then(() => {
       this.props.dispatch(deleteCareEvent(this.props.careEvent))
-    })
+    }).catch(() => {})
   }
 
   showDeleteModal () {

@@ -60,7 +60,7 @@ class MoreContainer extends Component {
       component: {
         name: FEEDBACK,
       }
-    })
+    }).catch(() => {})
   }
 
   showBarn () {
@@ -68,7 +68,7 @@ class MoreContainer extends Component {
       component: {
         name: BARN,
       }
-    })
+    }).catch(() => {})
   }
 
   showFindFriends() {
@@ -77,7 +77,7 @@ class MoreContainer extends Component {
         name: FIND_PEOPLE,
         title: 'Find Friends',
       }
-    })
+    }).catch(() => {})
   }
 
   showMyAccount () {
@@ -89,7 +89,7 @@ class MoreContainer extends Component {
           profileUser: this.props.user,
         }
       }
-    })
+    }).catch(() => {})
   }
 
   showSettings () {
@@ -98,16 +98,7 @@ class MoreContainer extends Component {
         name: SETTINGS,
         title: 'Settings',
       }
-    })
-  }
-
-  showFindFriends () {
-    EqNavigation.push(this.props.activeComponent, {
-      component: {
-        name: FIND_PEOPLE,
-        title: 'Find Friends',
-      }
-    })
+    }).catch(() => {})
   }
 
   showCareCalendar () {
@@ -115,7 +106,7 @@ class MoreContainer extends Component {
       component: {
         name: EVENT_LIST,
       }
-    })
+    }).catch(() => {})
   }
 
   renderMenuItem ({ item }) {

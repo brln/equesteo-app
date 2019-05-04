@@ -182,7 +182,7 @@ class UpdateRideContainer extends BackgroundComponent {
               }
             })
           })
-        }).catch(catchAsyncError(this.props.dispatch))
+        }).catch(() => {})
       } else if (buttonId === 'discard') {
         this.setDiscardModalOpen(true)
         this.props.dispatch(setActiveAtlasEntry(null))
@@ -204,7 +204,7 @@ class UpdateRideContainer extends BackgroundComponent {
           ))
         })
       } else if (buttonId === 'discard') {
-        EqNavigation.pop(this.props.componentId)
+        EqNavigation.pop(this.props.componentId).catch(() => {})
       }
     }
   }
@@ -238,7 +238,7 @@ class UpdateRideContainer extends BackgroundComponent {
       this.props.dispatch(stopLocationTracking())
       this.props.dispatch(discardCurrentRide())
       this.props.dispatch(deleteUnpersistedRide(this.props.ride.get('_id')))
-    })
+    }).catch(() => {})
   }
 
   updateLocalRideCoords () {
@@ -422,7 +422,7 @@ class UpdateRideContainer extends BackgroundComponent {
           sources
         }
       },
-    })
+    }).catch(() => {})
   }
 
   horses (horseUsers, horses, userID) {

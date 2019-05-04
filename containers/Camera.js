@@ -62,17 +62,13 @@ class CameraContainer extends Component {
           onClose: this.onViewerClose
         }
       }
-    })
+    }).catch(() => {})
   }
 
   onViewerClose () {
     this.setState({
       showCam: true
     })
-  }
-
-  close () {
-    EqNavigation.pop(this.props.componentId)
   }
 
   stashNewRidePhoto(uri) {
@@ -105,7 +101,6 @@ class CameraContainer extends Component {
   render() {
     return (
       <Camera
-        close={this.close}
         mostRecentPhoto={this.mostRecentPhoto()}
         showCam={this.state.showCam}
         showRecentPhoto={this.showRecentPhoto}

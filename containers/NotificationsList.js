@@ -88,7 +88,7 @@ class NotificationsListContainer extends PureComponent {
           skipToComments,
         }
       }
-    })
+    }).catch(() => {})
   }
 
   markNotificationSeen (id) {

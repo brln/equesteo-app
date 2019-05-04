@@ -829,7 +829,7 @@ export function showLocalNotifications () {
                   skipToComments,
                 }
               }
-            })
+            }).catch(() => {})
           }
         }
       }

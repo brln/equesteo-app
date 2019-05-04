@@ -70,7 +70,7 @@ class NewSecondaryEventMenu extends Component {
             pageType,
           }
         },
-      })
+      }).catch(() => {})
     }
   }
 
@@ -86,7 +86,7 @@ class NewSecondaryEventMenu extends Component {
             popWhenDoneID: this.props.popWhenDoneID,
           }
         },
-      })
+      }).catch(() => {})
     }
   }
 
@@ -102,7 +102,7 @@ class NewSecondaryEventMenu extends Component {
             popWhenDoneID: this.props.popWhenDoneID,
           }
         },
-      })
+      }).catch(() => {})
     }
   }
 
