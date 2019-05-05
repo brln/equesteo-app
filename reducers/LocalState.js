@@ -132,6 +132,10 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.set('fullSyncFail', action.status)
     case LOAD_LOCAL_STATE:
       const loadedState = initialState.merge(action.localState)
+      let newNeedsRemotePersist = loadedState.get('needsRemotePersist')
+      if (newNeedsRemotePersist === DB_SYNCING) {
+        newNeedsRemotePersist = DB_NEEDS_SYNC
+      }
       return loadedState.set(
         'carrotMutex', false,
       ).set(
@@ -141,7 +145,7 @@ export default function LocalStateReducer(state=initialState, action) {
       ).set(
         'signingOut', false
       ).set(
-        'needsRemotePersist', loadedState.get('needsRemotePersist') === DB_SYNCING ? DB_NEEDS_SYNC : DB_SYNCED
+        'needsRemotePersist', newNeedsRemotePersist
       )
     case SET_REMOTE_PERSIST:
       return state.set('needsRemotePersist', action.value)
