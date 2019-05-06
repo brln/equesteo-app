@@ -6,11 +6,15 @@ import { Alert, Share, Text, TextInput, View } from 'react-native'
 
 import {
   setHoofTracksID,
+  setHoofTracksLastUpload,
 } from '../../actions/standard'
 import { brand, danger, darkBrand } from '../../colors'
 import { EqNavigation, UserAPI } from '../../services'
 import Button from '../../components/Button'
-import {startHoofTracksDispatcher, stopHoofTracksDispatcher} from "../../actions/functional"
+import {
+  startHoofTracksDispatcher,
+  stopHoofTracksDispatcher
+} from "../../actions/functional"
 
 class HoofTracksContainer extends PureComponent {
   static options() {
@@ -104,6 +108,7 @@ class HoofTracksContainer extends PureComponent {
         {
           text: 'OK',
           onPress: () => {
+            this.props.dispatch(setHoofTracksLastUpload(null))
             UserAPI.resetHoofTracksID().then((resp => {
               this.props.dispatch(setHoofTracksID(resp.htID))
             }))
