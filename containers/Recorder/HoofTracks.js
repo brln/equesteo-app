@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { Navigation } from 'react-native-navigation'
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
@@ -51,6 +52,8 @@ class HoofTracksContainer extends PureComponent {
 
     Navigation.events().bindComponent(this);
 
+    this.timerRefresh = null
+
     if (props.hoofTracksRunning) {
       Navigation.mergeOptions(this.props.componentId, {
         topBar: {
@@ -66,6 +69,15 @@ class HoofTracksContainer extends PureComponent {
     }
   }
 
+  componentDidMount () {
+    if (this.props.hoofTracksRunning) {
+      this.timerRefresh = setInterval(() => {
+        logDebug('ehehe')
+        this.forceUpdate()
+      }, 10000)
+    }
+  }
+
   handleBackPress () {
     this.goBack()
     return true
@@ -76,14 +88,33 @@ class HoofTracksContainer extends PureComponent {
   }
 
   componentWillUnmount () {
+    clearInterval(this.timerRefresh)
     BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
     clearTimeout(this.gpsTimeout)
   }
 
   navigationButtonPressed ({ buttonId }) {
     if (buttonId === 'startTracks') {
-      this.props.dispatch(startHoofTracksDispatcher())
-      EqNavigation.pop(this.props.componentId)
+      Alert.alert(
+        'Be Careful',
+        'This feature is for convenience, not safety. Always tell someone where you plan to go and when you\'ll be back.\n\n As with all app-based trackers, if you lose cell service, your battery dies, or servers go down, your location will not be broadcast.\n\nEven though your ride will record without cell service, your location can\'t be broadcast without it.\n\nFor safety tracking, please buy a device intended for that purpose.',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              this.props.dispatch(startHoofTracksDispatcher())
+              EqNavigation.pop(this.props.componentId)
+            },
+          },
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+        ],
+        {cancelable: false},
+      );
+
+
     } else if (buttonId === 'stopTracks') {
       this.props.dispatch(stopHoofTracksDispatcher())
       EqNavigation.pop(this.props.componentId)
@@ -93,7 +124,7 @@ class HoofTracksContainer extends PureComponent {
   componentWillMount () {
     return UserAPI.getHoofTracksID().then((resp) => {
       this.props.dispatch(setHoofTracksID(resp.htID))
-    })
+    }).catch(e => {})
   }
 
   shareLink () {
@@ -111,7 +142,7 @@ class HoofTracksContainer extends PureComponent {
             this.props.dispatch(setHoofTracksLastUpload(null))
             UserAPI.resetHoofTracksID().then((resp => {
               this.props.dispatch(setHoofTracksID(resp.htID))
-            }))
+            })).catch(e => {})
           },
         },
         {
@@ -124,15 +155,20 @@ class HoofTracksContainer extends PureComponent {
   }
 
   render() {
-    let mainText = "Your ride will be broadcast live with ID:"
+    let mainText = <Text style={{textAlign: 'center'}}>Your ride will be broadcast live with ID:</Text>
     if (this.props.hoofTracksRunning) {
-      mainText = "Your ride is currently broadcasting with ID: "
+      mainText = (
+        <View>
+          <Text style={{textAlign: 'center'}}>Broadcasting Live! Last successful update: </Text>
+          <Text style={{fontWeight: 'bold', textAlign: 'center'}}>{moment(this.props.lastHoofTracksUpload).fromNow()}</Text>
+        </View>
+      )
     }
     return (
       <View style={{flex: 1}}>
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', paddingLeft: 20, paddingRight: 20, marginTop: 20}}>
           <View style={{flex: 1, justifyContent: 'center'}}>
-            <Text style={{textAlign: 'center'}}>{ mainText }</Text>
+            { mainText }
           </View>
           <View style={{flex: 1}}>
             <View style={{flex: 1}}>
@@ -168,9 +204,11 @@ class HoofTracksContainer extends PureComponent {
 
 function mapStateToProps (state) {
   const localState = state.get('localState')
+  const currentRideState = state.get('currentRide')
   return {
     hoofTracksID: localState.get('hoofTracksID'),
     hoofTracksRunning: localState.get('hoofTracksRunning'),
+    lastHoofTracksUpload: currentRideState.get('lastHoofTracksUpload')
   }
 }
 

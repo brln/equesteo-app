@@ -4,7 +4,6 @@ import {
   Dimensions,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View
 } from 'react-native';
@@ -12,7 +11,6 @@ import {
 import { darkBrand } from '../../colors'
 import EmailInfoModal from './EmailInfoModal'
 import NewPasswordForm from './NewPasswordForm'
-import SignupForm from './SignupForm'
 import SubmittedForm from './SubmittedForm'
 import UnsubmittedForm from './UnsubmittedForm'
 

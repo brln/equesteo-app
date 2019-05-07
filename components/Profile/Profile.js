@@ -8,21 +8,18 @@ import {
 } from 'native-base';
 import {
   ActivityIndicator,
-  Clipboard,
   Dimensions,
   FlatList,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View
 } from 'react-native';
 
 import BuildImage from '../Images/BuildImage'
 import { brand, danger, darkBrand, darkGrey, green, lightGrey } from '../../colors'
 import FollowersCard from './FollowersCard'
-import DeleteModal from '../Shared/DeleteModal'
 import { logRender, logError, logInfo } from '../../helpers'
 import { userName } from '../../modelHelpers/user'
 import PhotoFilmstrip from '../Ride/PhotoFilmstrip'

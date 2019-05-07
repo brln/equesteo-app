@@ -70,6 +70,10 @@ export default class UserAPI {
     return ApiClient.post(`/hoofTracks/${htID}/postCoords`, { coords, startTime })
   }
 
+  static hoofTracksPing (htID) {
+    return ApiClient.post(`/hoofTracks/${htID}/ping`, {})
+  }
+
   static clearHoofTrackCoords (htID) {
     return ApiClient.post(`/hoofTracks/${htID}/deleteCoords`, {})
   }

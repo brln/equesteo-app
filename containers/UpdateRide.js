@@ -2,6 +2,7 @@ import { fromJS, Map } from 'immutable'
 import memoizeOne from 'memoize-one';
 import { Navigation } from 'react-native-navigation'
 import React from 'react'
+import { Alert } from 'react-native'
 import { connect } from 'react-redux';
 
 import {
@@ -89,7 +90,6 @@ class UpdateRideContainer extends BackgroundComponent {
     this.openSelectHorseMenu = this.openSelectHorseMenu.bind(this)
     this.rideHorses = this.rideHorses.bind(this)
     this.selectHorse = this.selectHorse.bind(this)
-    this.setDiscardModalOpen = this.setDiscardModalOpen.bind(this)
     this.showPhotoLightbox = this.showPhotoLightbox.bind(this)
     this.stashedRidePhotoKey = this.stashedRidePhotoKey.bind(this)
     this.trimRide = this.trimRide.bind(this)
@@ -184,8 +184,22 @@ class UpdateRideContainer extends BackgroundComponent {
           })
         }).catch(() => {})
       } else if (buttonId === 'discard') {
-        this.setDiscardModalOpen(true)
         this.props.dispatch(setActiveAtlasEntry(null))
+        Alert.alert(
+          'Discard Ride?',
+          'Are you sure you want to discard this ride?',
+          [
+            {
+              text: 'OK',
+              onPress: this.discardRide
+            },
+            {
+              text: 'Cancel',
+              style: 'cancel',
+            },
+          ],
+          {cancelable: true},
+        )
       }
       this.props.dispatch(stopHoofTracksDispatcher())
     } else {
@@ -221,12 +235,6 @@ class UpdateRideContainer extends BackgroundComponent {
         this.props.dispatch(clearRidePhotoStash(this.stashedRidePhotoKey()))
       }
     }
-  }
-
-  setDiscardModalOpen (open) {
-    this.setState({
-      discardModalOpen: open
-    })
   }
 
   discardRide () {
@@ -546,7 +554,6 @@ class UpdateRideContainer extends BackgroundComponent {
         selectedPhotoID={this.state.selectedPhotoID}
         selectedHorseID={this.state.selectedHorseID}
         selectHorse={this.selectHorse}
-        setDiscardModalOpen={this.setDiscardModalOpen}
         showPhotoLightbox={this.showPhotoLightbox}
         showPhotoMenu={this.state.showPhotoMenu}
         showSelectHorseMenu={this.state.showSelectHorseMenu}

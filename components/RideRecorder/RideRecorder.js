@@ -8,11 +8,11 @@ import {
 import { black, brand, green, white, orange, danger, warning } from '../../colors'
 import { heading, isAndroid, parseRideCoordinate } from '../../helpers'
 import GPSStatus from './GPSStatus'
-import DiscardModal from './DiscardModal'
 import MapButton from './MapButton'
 import RidingMap from './RidingMap'
 import RideStats from './RideStats'
 import PlayButton from './PlayButton'
+import Pulse from '../Shared/Pulse'
 
 
 export default class RideRecorder extends PureComponent {
@@ -183,12 +183,19 @@ export default class RideRecorder extends PureComponent {
         />
       )
       if (this.props.user.get('experimentalHoofTracks')) {
+        let pulse = null
+        if (this.props.hoofTracksRunning) {
+          pulse = <Pulse color='orange' numPulses={3} diameter={80} speed={50} duration={25000} />
+        }
         hoofTracksButton = (
-          <MapButton
-            color={green}
-            icon={require('../../img/radio.png')}
-            onPress={this.props.startHoofTracks}
-          />
+          <View>
+            { pulse }
+            <MapButton
+              color={green}
+              icon={require('../../img/radio.png')}
+              onPress={this.props.startHoofTracks}
+            />
+          </View>
         )
       }
 
@@ -204,12 +211,6 @@ export default class RideRecorder extends PureComponent {
     }
     return (
       <View style={styles.container}>
-        <DiscardModal
-          modalOpen={this.props.discardModalOpen}
-          closeDiscardModal={this.props.closeDiscardModal}
-          discardFunc={this.props.discardRide}
-          text={"You haven't gone anywhere on this ride yet. Do you want to close it?"}
-        />
         <GPSStatus
           shown={this.props.showGPSBar}
           style={styles.gpsBar}

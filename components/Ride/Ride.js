@@ -31,7 +31,6 @@ import {
   speedGradient,
 } from '../../helpers'
 import { userName } from '../../modelHelpers/user'
-import DeleteModal from '../Shared/DeleteModal'
 import PaceChart from '../RideCharts/PaceChart'
 import PaceExplanationModal from './PaceExplanation'
 import PhotoFilmstrip from './PhotoFilmstrip'
@@ -317,12 +316,6 @@ export default class Ride extends PureComponent {
           closeModal={this.setPaceModalOpen(false)}
           paces={this.getPaces(this.props.paceHorse)}
           paceHorse={this.props.paceHorse}
-        />
-        <DeleteModal
-          modalOpen={this.props.modalOpen}
-          closeDeleteModal={this.props.closeDeleteModal}
-          deleteFunc={this.props.deleteRide}
-          text={"Are you sure you want to delete this ride?"}
         />
         <View style={{flex: 1, flexDirection: 'row', paddingTop: 10, paddingBottom: 10}}>
           { this.userAvatar() }

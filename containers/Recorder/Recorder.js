@@ -3,18 +3,20 @@ import { Navigation } from 'react-native-navigation'
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import LocationServicesDialogBox from "react-native-android-location-services-dialog-box";
-import { BackHandler } from 'react-native'
+import { Alert, BackHandler } from 'react-native'
 
 import {
   createRide,
   discardCurrentRide,
-  pauseLocationTracking, setActiveAtlasEntry,
+  pauseLocationTracking,
+  setActiveAtlasEntry,
   startRide,
   stashNewLocations,
   stopStashNewLocations,
   unpauseLocationTracking,
 } from '../../actions/standard'
 import {
+  startHoofTracksDispatcher,
   startLocationTracking,
   stopHoofTracksDispatcher,
   stopLocationTracking,
@@ -52,7 +54,6 @@ class RecorderContainer extends PureComponent {
     }
 
     this.clearActiveAtlasEntry = this.clearActiveAtlasEntry.bind(this)
-    this.closeDiscardModal = this.closeDiscardModal.bind(this)
     this.discardRide = this.discardRide.bind(this)
     this.goBack = this.goBack.bind(this)
     this.handleBackPress = this.handleBackPress.bind(this)
@@ -62,7 +63,6 @@ class RecorderContainer extends PureComponent {
     this.showCamera = this.showCamera.bind(this)
     this.showUpdateRide = this.showUpdateRide.bind(this)
     this.startHoofTracks = this.startHoofTracks.bind(this)
-    this.stopHoofTracks = this.stopHoofTracks.bind(this)
     this.startRide = this.startRide.bind(this)
     this.unpauseLocationTracking = this.unpauseLocationTracking.bind(this)
 
@@ -142,12 +142,10 @@ class RecorderContainer extends PureComponent {
     } else {
       this.props.dispatch(startLocationTracking())
     }
-  }
 
-  closeDiscardModal () {
-    this.setState({
-      discardModalOpen: false
-    })
+    if (this.props.hoofTracksRunning) {
+      this.props.dispatch(startHoofTracksDispatcher())
+    }
   }
 
   startHoofTracks () {
@@ -158,12 +156,6 @@ class RecorderContainer extends PureComponent {
       }
     })
   }
-
-  stopHoofTracks () {
-    this.closeHoofTracksModal()
-    this.props.dispatch(stopHoofTracksDispatcher())
-  }
-
 
   startRide () {
     Navigation.mergeOptions(this.props.componentId, {
@@ -208,9 +200,21 @@ class RecorderContainer extends PureComponent {
       this.props.dispatch(stashNewLocations())
       this.showUpdateRide()
     } else {
-      this.setState({
-        discardModalOpen: true
-      })
+      Alert.alert(
+        'Discard Ride',
+        "You haven't gone anywhere on this ride yet. Do you want to close it?",
+        [
+          {
+            text: 'OK',
+            onPress: this.discardRide
+          },
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+        ],
+        {cancelable: true},
+      )
     }
   }
 
@@ -218,7 +222,7 @@ class RecorderContainer extends PureComponent {
     EqNavigation.popToRoot(this.props.componentId).then(() => {
       this.props.dispatch(discardCurrentRide())
       this.props.dispatch(stopLocationTracking())
-      this.stopHoofTracks()
+      this.props.dispatch(stopHoofTracksDispatcher())
     }).catch(() => {})
   }
 
@@ -260,7 +264,6 @@ class RecorderContainer extends PureComponent {
         activeAtlasEntry={this.props.activeAtlasEntry}
         appState={this.props.appState}
         clearActiveAtlasEntry={this.clearActiveAtlasEntry}
-        closeDiscardModal={this.closeDiscardModal}
         closeHoofTracksModal={this.closeHoofTracksModal}
         currentRide={this.props.currentRide}
         currentRideCoordinates={this.props.currentRideCoordinates}

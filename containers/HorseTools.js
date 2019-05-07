@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import {
+  Alert,
   Dimensions,
   FlatList,
   Text,
@@ -11,7 +12,6 @@ import {
 } from 'react-native'
 import { brand, darkGrey, lightGrey } from '../colors'
 import { logRender } from '../helpers'
-import DeleteModal from '../components/Shared/DeleteModal'
 import Thumbnail from '../components/Images/Thumbnail'
 import { FOLLOW_LIST, UPDATE_HORSE } from '../screens/main'
 import { EqNavigation } from '../services'
@@ -48,27 +48,11 @@ class HorseToolsContainer extends Component {
 
   constructor (props) {
     super(props)
-    this.state = {
-      modalOpen: false
-    }
     this.memoFollowings = memoizeOne(this.followings.bind(this))
-    this.openDeleteModal = this.openDeleteModal.bind(this)
-    this.closeDeleteModal = this.closeDeleteModal.bind(this)
+    this.confirmDelete = this.confirmDelete.bind(this)
     this.deleteHorse = this.deleteHorse.bind(this)
     this.transferHorse = this.transferHorse.bind(this)
     this.updateHorse = this.updateHorse.bind(this)
-  }
-
-  openDeleteModal () {
-    this.setState({
-      modalOpen: true
-    })
-  }
-
-  closeDeleteModal () {
-    this.setState({
-      modalOpen: false
-    })
   }
 
   deleteHorse () {
@@ -142,6 +126,24 @@ class HorseToolsContainer extends Component {
     }).catch(() => {})
   }
 
+  confirmDelete () {
+    Alert.alert(
+      'Archive Horse?',
+      'Are you sure you want to archive this horse? It won\'t appear in your barn or be selectable for new rides, but will remain on your old training records.',
+      [
+        {
+          text: 'OK',
+          onPress: this.deleteHorse
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+      ],
+      {cancelable: true},
+    )
+  }
+
   menuItems () {
     let menuItems = [
       {
@@ -150,9 +152,9 @@ class HorseToolsContainer extends Component {
         onPress: this.updateHorse
       },
       {
-        name: 'Delete',
+        name: 'Archive',
         icon: require('../img/rideTools/delete.png'),
-        onPress: this.openDeleteModal
+        onPress: this.confirmDelete
       },
       {
         name: 'Transfer to Another User',
@@ -163,28 +165,11 @@ class HorseToolsContainer extends Component {
     return menuItems
   }
 
-  renderDeleteModal () {
-    let text = "Are you sure you want to archive this horse?"
-    if (this.props.horseOwner !== this.props.user) {
-      text = "Are you sure you want to remove this horse from your barn? It will not be deleted from the owner's barn."
-    }
-    return (
-      <DeleteModal
-        modalOpen={this.state.modalOpen}
-        closeDeleteModal={this.closeDeleteModal}
-        deleteFunc={this.deleteHorse}
-        text={text}
-      />
-    )
-  }
-
-
   render() {
     logRender('RideTools container')
     return (
       <View>
         <View style={{backgroundColor: lightGrey, height: 30}} />
-        { this.renderDeleteModal() }
         <FlatList
           keyExtractor={i => i.name}
           containerStyle={{marginTop: 0}}

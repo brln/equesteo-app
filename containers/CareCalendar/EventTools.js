@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import {
+  Alert,
   Dimensions,
   FlatList,
   Text,
@@ -10,7 +11,6 @@ import {
 } from 'react-native'
 import { brand, darkGrey, lightGrey } from '../../colors'
 import { logRender } from '../../helpers'
-import DeleteModal from '../../components/Shared/DeleteModal'
 import Thumbnail from '../../components/Images/Thumbnail'
 import { deleteCareEvent } from '../../actions/functional'
 import EqNavigation from '../../services/EqNavigation'
@@ -37,32 +37,15 @@ class EventToolsContainer extends Component {
 
   constructor (props) {
     super(props)
-    this.state = {
-      deleteModalOpen: false,
-    }
-    this.closeDeleteModal = this.closeDeleteModal.bind(this)
+    this.confirmDelete = this.confirmDelete.bind(this)
     this.deleteCareEvent = this.deleteCareEvent.bind(this)
     this.menuItems = this.menuItems.bind(this)
-    this.showDeleteModal = this.showDeleteModal.bind(this)
-  }
-
-  closeDeleteModal () {
-    this.setState({
-      deleteModalOpen: false
-    })
   }
 
   deleteCareEvent () {
-    this.closeDeleteModal()
     EqNavigation.popTo(this.props.popAfterDeleteCompID).then(() => {
       this.props.dispatch(deleteCareEvent(this.props.careEvent))
     }).catch(() => {})
-  }
-
-  showDeleteModal () {
-    this.setState({
-      deleteModalOpen: true
-    })
   }
 
   renderMenuItem ({ item }) {
@@ -90,12 +73,30 @@ class EventToolsContainer extends Component {
     )
   }
 
+  confirmDelete () {
+    Alert.alert(
+      'Delete Ride?',
+      'Are you sure you want to delete this event? It will be gone forever and there is no undo.',
+      [
+        {
+          text: 'OK',
+          onPress: this.deleteCareEvent
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+      ],
+      {cancelable: true},
+    )
+  }
+
   menuItems () {
     return [
       {
         name: 'Delete',
         icon: require('../../img/rideTools/delete.png'),
-        onPress: this.showDeleteModal
+        onPress: this.confirmDelete
       }
     ]
   }
@@ -106,12 +107,6 @@ class EventToolsContainer extends Component {
     return (
       <View>
         <View style={{backgroundColor: lightGrey, height: 30}} />
-        <DeleteModal
-          modalOpen={this.state.deleteModalOpen}
-          closeDeleteModal={this.closeDeleteModal}
-          deleteFunc={this.deleteCareEvent}
-          text={"Are you sure you want to delete this care event?"}
-        />
         <FlatList
           keyExtractor={i => i.name}
           containerStyle={{marginTop: 0}}

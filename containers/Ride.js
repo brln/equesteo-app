@@ -81,7 +81,6 @@ class RideContainer extends PureComponent {
       newComment: null
     }
 
-    this.closeDeleteModal = this.closeDeleteModal.bind(this)
     this.deleteRide = this.deleteRide.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
     this.showFullscreenMap = this.showFullscreenMap.bind(this)
@@ -155,12 +154,6 @@ class RideContainer extends PureComponent {
         }
       }
     }).catch(() => {})
-  }
-
-  closeDeleteModal () {
-    this.setState({
-      modalOpen: false
-    })
   }
 
   anyNotifications (notifications, ride) {
@@ -278,7 +271,6 @@ class RideContainer extends PureComponent {
     logRender('RideContainer')
     return (
       <Ride
-        closeDeleteModal={this.closeDeleteModal}
         deleteRide={this.deleteRide}
         horses={this.props.horses}
         horsePhotos={this.props.horsePhotos}

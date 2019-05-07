@@ -185,6 +185,7 @@ export function appInitialized () {
               dispatch(switchRoot(FEED))
             }
           }
+
           return dispatch(startNetworkTracking())
         }).then(() => {
           return dispatch(doSync({}, true, false)).then(postSync)
@@ -959,30 +960,38 @@ let hoofTracksTimeout
 export function startHoofTracksDispatcher () {
   cb('startHoofTracksDispatcher')
   return (dispatch, getState) => {
-    const UPLOAD_EVERY = 20 * 1000
-    function doUpload() {
+    const UPLOAD_EVERY = 30 * 1000
+    function doUpload(recurse=true) {
       const startTime = getState().getIn(['currentRide', 'currentRide', 'startTime'])
       const lastUpload = getState().getIn(['currentRide', 'lastHoofTracksUpload'])
       const hoofTracksID = getState().getIn(['localState', 'hoofTracksID'])
-      const now = unixTimeNow()
-      const rideCoords = getState().getIn(['currentRide', 'currentRideCoordinates', 'rideCoordinates'])
-      if (rideCoords && rideCoords.count() > 0) {
-        const toUpload = rideCoords.filter(rc => {
-          const timestamp = rc.get(2)
-          return timestamp < now && (!lastUpload || timestamp > lastUpload)
-        })
-        if (toUpload.count() > 0) {
-          dispatch(setHoofTracksLastUpload(unixTimeNow()))
-          UserAPI.uploadHoofTrackCoords(hoofTracksID, toUpload, startTime).catch(() => {
-            dispatch(setHoofTracksLastUpload(lastUpload))
-          }).catch(e => logError(e))
+      if (hoofTracksID) {
+        const now = unixTimeNow()
+        const rideCoords = getState().getIn(['currentRide', 'currentRideCoordinates', 'rideCoordinates'])
+        if (rideCoords && rideCoords.count() > 0) {
+          const toUpload = rideCoords.filter(rc => {
+            const timestamp = rc.get(2)
+            return timestamp < now && (!lastUpload || timestamp > lastUpload)
+          })
+          if (toUpload.count() > 0) {
+            dispatch(setHoofTracksLastUpload(unixTimeNow()))
+            UserAPI.uploadHoofTrackCoords(hoofTracksID, toUpload, startTime).catch(() => {
+              dispatch(setHoofTracksLastUpload(lastUpload))
+            })
+          } else {
+            dispatch(setHoofTracksLastUpload(unixTimeNow()))
+            UserAPI.hoofTracksPing(hoofTracksID).catch(() => {
+              dispatch(setHoofTracksLastUpload(lastUpload))
+            })
+          }
         }
-
+        if (recurse) {
+          hoofTracksTimeout = setTimeout(doUpload, UPLOAD_EVERY)
+        }
       }
-      hoofTracksTimeout = setTimeout(doUpload, UPLOAD_EVERY)
     }
     dispatch(setHoofTracksRunning(true))
-    doUpload()
+    doUpload(false)
     hoofTracksTimeout = setTimeout(doUpload, UPLOAD_EVERY)
   }
 }

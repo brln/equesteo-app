@@ -4,9 +4,9 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 import {
+  Alert,
   Dimensions,
   FlatList,
-  Keyboard,
   Text,
   TouchableOpacity,
   View,
@@ -19,7 +19,6 @@ import {
   SHARE_RIDE,
   UPDATE_RIDE
 } from '../screens/main'
-import DeleteModal from '../components/Shared/DeleteModal'
 import { createRideAtlasEntry } from "../actions/functional"
 import Thumbnail from '../components/Images/Thumbnail'
 import {
@@ -60,12 +59,11 @@ class RideToolsContainer extends Component {
     super(props)
     this.state = {
       atlasEntryName: props.ride.get('name'),
-      deleteModalOpen: false,
       atlasEntryModalOpen: false,
     }
     this.changeAtlasEntryName = this.changeAtlasEntryName.bind(this)
     this.closeAtlasEntryModal = this.closeAtlasEntryModal.bind(this)
-    this.closeDeleteModal = this.closeDeleteModal.bind(this)
+    this.confirmDelete = this.confirmDelete.bind(this)
     this.createRideAtlasEntry = this.createRideAtlasEntry.bind(this)
     this.deleteRide = this.deleteRide.bind(this)
     this.duplicateRide = this.duplicateRide.bind(this)
@@ -73,15 +71,9 @@ class RideToolsContainer extends Component {
     this.menuItems = this.menuItems.bind(this)
     this.shareRide = this.shareRide.bind(this)
     this.showAtlasEntryModal = this.showAtlasEntryModal.bind(this)
-    this.showDeleteModal = this.showDeleteModal.bind(this)
     this.updateRide = this.updateRide.bind(this)
   }
 
-  closeDeleteModal () {
-    this.setState({
-      deleteModalOpen: false
-    })
-  }
 
   createRideAtlasEntry () {
     return this.props.dispatch(createRideAtlasEntry(
@@ -103,13 +95,6 @@ class RideToolsContainer extends Component {
     // @TODO debounce
     this.setState({
       atlasEntryModalOpen: true
-    })
-  }
-
-  showDeleteModal () {
-    // @TODO debounce
-    this.setState({
-      deleteModalOpen: true
     })
   }
 
@@ -206,6 +191,24 @@ class RideToolsContainer extends Component {
     }).toJS()
   }
 
+  confirmDelete () {
+    Alert.alert(
+      'Delete Ride?',
+      'Are you sure you want to delete this ride? It will be gone forever and there is no undo.',
+      [
+        {
+          text: 'OK',
+          onPress: this.deleteRide
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+      ],
+      {cancelable: true},
+    )
+  }
+
 
   menuItems () {
     let menuItems = [
@@ -235,7 +238,7 @@ class RideToolsContainer extends Component {
         {
           name: 'Delete',
           icon: require('../img/rideTools/delete.png'),
-          onPress: this.showDeleteModal
+          onPress: this.confirmDelete
         }
       ])
     }
@@ -248,12 +251,6 @@ class RideToolsContainer extends Component {
     return (
       <View>
         <View style={{backgroundColor: lightGrey, height: 30}} />
-        <DeleteModal
-          modalOpen={this.state.deleteModalOpen}
-          closeDeleteModal={this.closeDeleteModal}
-          deleteFunc={this.deleteRide}
-          text={"Are you sure you want to delete this ride?"}
-        />
         <AtlasEntryModal
           modalOpen={this.state.atlasEntryModalOpen}
           closeModal={this.closeAtlasEntryModal}

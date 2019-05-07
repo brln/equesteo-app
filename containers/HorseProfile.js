@@ -182,7 +182,6 @@ class HorseProfileContainer extends BackgroundComponent {
     return (
       <HorseProfile
         addRider={this.addRider}
-        closeDeleteModal={this.closeDeleteModal}
         componentId={this.props.componentId}
         deleteHorse={this.deleteHorse}
         horse={this.props.horse}

@@ -270,13 +270,15 @@ export function deleteUnpersistedHorse (horseID, horseUserID) {
     type: DELETE_UNPERSISTED_HORSE,
     horseID,
     horseUserID,
+    mixpanel: true
   }
 }
 
 export function deleteUnpersistedRide (rideID) {
   return {
     type: DELETE_UNPERSISTED_RIDE,
-    rideID
+    rideID,
+    mixpanel: true
   }
 }
 
@@ -284,7 +286,8 @@ export function deleteUnpersistedPhoto (photoSection, photoID) {
   return {
     type: DELETE_UNPERSISTED_PHOTO,
     photoSection,
-    photoID
+    photoID,
+    mixpanel: true
   }
 }
 
@@ -298,7 +301,7 @@ export function dequeuePhoto (photoID) {
 export function discardCurrentRide ()  {
   return {
     type: DISCARD_CURRENT_RIDE,
-    mixpanel: true
+    mixpanel: true,
   }
 }
 
@@ -384,6 +387,7 @@ export function localDataLoaded (localData) {
 export function mergeStashedLocations () {
   return {
     type: MERGE_STASHED_LOCATIONS,
+    mixpanel: true,
   }
 }
 
@@ -407,6 +411,8 @@ export function newNetworkState (goodConnection) {
   return {
     type: NEW_NETWORK_STATE,
     goodConnection,
+    logData: ['goodConnection'],
+    mixpanel: true,
   }
 }
 
@@ -419,7 +425,8 @@ export function notificationUpdated (notification) {
 
 export function pauseLocationTracking () {
   return {
-    type: PAUSE_LOCATION_TRACKING
+    type: PAUSE_LOCATION_TRACKING,
+    mixpanel: true,
   }
 }
 
@@ -493,7 +500,6 @@ export function rideUpdated (ride) {
   return {
     type: RIDE_UPDATED,
     ride,
-    mixpanel: true
   }
 }
 
@@ -507,7 +513,8 @@ export function ridePhotoUpdated (ridePhoto) {
 export function setActiveAtlasEntry (id) {
   return {
     type: SET_ACTIVE_ATLAS_ENTRY,
-    id
+    id,
+    mixpanel: true
   }
 }
 
@@ -522,7 +529,7 @@ export function setHoofTracksID (value) {
   return {
     type: SET_HOOF_TRACKS_ID,
     value,
-    logData: ['value']
+    logData: ['value'],
   }
 }
 
@@ -530,7 +537,8 @@ export function setHoofTracksRunning (value) {
   return {
     type: SET_HOOF_TRACKS_RUNNING,
     value,
-    logData: ['value']
+    logData: ['value'],
+    mixpanel: true,
   }
 }
 
@@ -554,6 +562,8 @@ export function setShowingRide (rideID) {
   return {
     type: SET_SHOWING_RIDE,
     rideID,
+    mixpanel: true,
+    logData: ['rideID'],
   }
 }
 
@@ -693,7 +703,8 @@ export function setSigningOut (value) {
 
 export function unpauseLocationTracking () {
   return {
-    type: UNPAUSE_LOCATION_TRACKING
+    type: UNPAUSE_LOCATION_TRACKING,
+    mixpanel: true,
   }
 }
 
@@ -724,7 +735,6 @@ export function userUpdated (userData) {
   return {
     type: USER_UPDATED,
     userData,
-    mixpanel: true
   }
 }
 
