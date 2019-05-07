@@ -57,7 +57,6 @@ class Calendar extends Component {
     )
     const marked = markedDates[day.dateString]
     if (this.props.showDay && marked && marked.careEvents.length > 0) {
-      logDebug(marked.careEvents, 'markedCareEvents')
       if (marked.careEvents.length === 1) {
         EqNavigation.push(this.props.activeComponent, {
           component: {

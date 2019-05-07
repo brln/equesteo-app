@@ -43,7 +43,6 @@ class NeedsSyncContainer extends PureComponent {
 
   doSync () {
     this.props.dispatch(doSync()).then(() => {
-      logDebug(this.props.fullSyncFail, 'wutwut')
       if (!this.props.fullSyncFail) {
         this.props.dispatch(switchRoot(FEED))
         this.props.dispatch(startListeningFCM())

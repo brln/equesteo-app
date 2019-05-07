@@ -72,7 +72,6 @@ class HoofTracksContainer extends PureComponent {
   componentDidMount () {
     if (this.props.hoofTracksRunning) {
       this.timerRefresh = setInterval(() => {
-        logDebug('ehehe')
         this.forceUpdate()
       }, 10000)
     }

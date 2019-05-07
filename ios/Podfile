@@ -61,6 +61,8 @@ target 'equesteo' do
 
   pod 'SentryReactNative', :path => '../node_modules/react-native-sentry/SentryReactNative.podspec' # or your path to node_modules
 
+  pod 'RNBackgroundFetch', :path => '../node_modules/react-native-background-fetch'
+
 end
 
 # also from https://github.com/ivpusic/react-native-image-crop-picker

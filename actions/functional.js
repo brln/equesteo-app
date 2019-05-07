@@ -6,6 +6,7 @@ import firebase from 'react-native-firebase'
 import  Mixpanel from 'react-native-mixpanel'
 import { Navigation } from 'react-native-navigation'
 import PushNotification from 'react-native-push-notification'
+import BackgroundFetch from "react-native-background-fetch"
 
 import ApiClient from '../services/ApiClient'
 import { DISTRIBUTION, ENV } from '../dotEnv'
@@ -188,7 +189,9 @@ export function appInitialized () {
 
           return dispatch(startNetworkTracking())
         }).then(() => {
-          return dispatch(doSync({}, true, false)).then(postSync)
+          return dispatch(doSync({}, true, false)).then(postSync).then(() => {
+            dispatch(startBackgroundFetch())
+          })
         })
       } else {
         dispatch(switchRoot(SIGNUP_LOGIN))
@@ -254,7 +257,6 @@ export function createCareEvent () {
     const careEventID = `${currentUserID}_${(new Date).getTime().toString()}`
     const newCareEvent = getState().getIn(['localState', 'newCareEvent'])
     const newCareHorseIDs = getState().getIn(['localState', 'newCareHorseIDs'])
-    logDebug(newCareEvent.get('date'))
     const permaCareEvent = {
       _id: careEventID,
       type: 'careEvent',
@@ -687,7 +689,6 @@ export function runPhotoQueue() {
   cb('runPhotoQueue')
   return (dispatch, getState) => {
     getState().getIn(['localState', 'photoQueue']).forEach((p) => {
-      logDebug(p.toJSON(), 'photo in queue')
       if (p.get('status') === 'enqueued'
         || p.get('status') === 'failed'
         || p.get('status') === 'uploading' && unixTimeNow() - p.get('timestamp') > 60000) {
@@ -1111,6 +1112,31 @@ function startAppStateTracking () {
   }
 }
 
+function startBackgroundFetch () {
+  cb('startBackgroundFetch')
+  return (dispatch, getState) => {
+    BackgroundFetch.configure({
+      minimumFetchInterval: 15, // <-- minutes (15 is minimum allowed)
+      stopOnTerminate: false,   // <-- Android-only,
+      startOnBoot: true         // <-- Android-only
+    }, () => {
+      logDebug('start background fetch')
+      const remotePersistStatus = getState().getIn(['localState', 'needsRemotePersist'])
+      let before = Promise.resolve()
+      let result = BackgroundFetch.FETCH_RESULT_NO_DATA
+      if (remotePersistStatus === DB_NEEDS_SYNC) {
+        result = BackgroundFetch.FETCH_RESULT_NEW_DATA
+        before = dispatch(doSync())
+      }
+      before.then(() => {
+        BackgroundFetch.finish(result)
+      })
+    }, (error) => {
+      logError("RNBackgroundFetch failed to start", error)
+    });
+  }
+}
+
 export function submitLogin (email, password) {
   cb('submitLogin', true)
   return (dispatch, getState) => {
@@ -1165,7 +1191,6 @@ export function doSync (syncData={}, showProgress=true, doUpload=true) {
 
       const remotePersistStatus = getState().getIn(['localState', 'needsRemotePersist'])
       if (remotePersistStatus === DB_SYNCING) {
-        logDebug('second sync!')
         // If a sync has already started, wait 10 seconds then run another one.
         // This gives time for everything (photo uploads, mostly) to settle,
         // then they can all go with one sync.
@@ -1176,7 +1201,6 @@ export function doSync (syncData={}, showProgress=true, doUpload=true) {
         }, 10000)
         return Promise.resolve()
       } else {
-        logDebug('first sync!')
         dispatch(setRemotePersist(DB_SYNCING))
       }
 

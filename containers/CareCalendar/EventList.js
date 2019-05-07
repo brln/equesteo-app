@@ -219,7 +219,6 @@ class EventListContainer extends Component {
 
 
   render() {
-    logDebug(this.props.careCalendarTab)
     return (
       <View style={{flex: 1}}>
         <Tabs

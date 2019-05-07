@@ -88,6 +88,8 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-background-fetch')
+    implementation project(':react-native-background-fetch')
     implementation project(':react-native-device-info')
     implementation project(':rn-fetch-blob')
     implementation project(':react-native-webview')

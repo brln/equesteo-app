@@ -22,6 +22,7 @@
     "react": "16.3.0",
     "react-native": "^0.55.4",
     "react-native-android-location-services-dialog-box": "^2.5.1",
+    "react-native-background-fetch": "^2.5.4",
     "react-native-calendars": "^1.32.0",
     "react-native-camera": "SimonErm/react-native-camera#40ca7f09c91f2a8d6230aca1008d1201cec383b0",
     "react-native-color-picker": "^0.4.0",

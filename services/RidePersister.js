@@ -45,14 +45,12 @@ export default class RidePersister {
 
   saveRide () {
     return PouchCouch.saveRide(this.getRide().toJS()).then(({ rev }) => {
-      logDebug('rideSaved')
       this.dispatch(rideUpdated(this.getRide().set('_rev', rev)))
     })
   }
 
   saveRideHorse (rideHorse) {
     return PouchCouch.saveRide(rideHorse.toJS()).then(({ rev }) => {
-      logDebug('rideHorseSaved')
       this.dispatch(rideHorseUpdated(this.getRideHorse(rideHorse.get('_id')).set('_rev', rev)))
     })
   }
@@ -105,7 +103,6 @@ export default class RidePersister {
     })
 
     stashedPhotos.forEach((stashedPhoto, photoID) => {
-      logDebug('saving stashed Photos')
       const toSave = stashedPhoto.merge(Map({
         type: 'ridePhoto',
         rideID: this.rideID,
@@ -121,7 +118,6 @@ export default class RidePersister {
     })
 
     for (let deletedPhotoID of deletedPhotoIDs) {
-      logDebug('saving deleted photos')
       const deleted = this.getRidePhoto(deletedPhotoID).set('deleted', true)
       this.dispatch(ridePhotoUpdated(deleted))
       docSaves = docSaves.then(() => {
@@ -132,7 +128,6 @@ export default class RidePersister {
     }
 
     return docSaves.then(() => {
-      logDebug('doc saves then doSync!')
       return this.dispatch(doSync())
     }).catch(catchAsyncError(this.dispatch))
   }

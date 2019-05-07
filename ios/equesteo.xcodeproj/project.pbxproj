@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
@@ -44,6 +43,8 @@
 		A74F927C2153E84300AE0E34 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A74F927B2153E83600AE0E34 /* libRCTGeolocation.a */; };
 		A74F92832153E8A200AE0E34 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A74F92822153E89500AE0E34 /* libRCTActionSheet.a */; };
 		A74F928D2153EA9300AE0E34 /* libRCTAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A74F928A2153EA8100AE0E34 /* libRCTAnimation.a */; };
+		E92AF7BB6E094E5F9FE2C31B /* TSBackgroundFetch.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A1CEA24CABF4CA9BE893D38 /* TSBackgroundFetch.framework */; };
+		9E72F842913D4B8AA32F8B50 /* RNBackgroundFetch+AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 53EDBA175EE54A15A329E152 /* RNBackgroundFetch+AppDelegate.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -476,6 +477,8 @@
 		E33D9693DA77E6729DEC06CE /* Pods-equesteo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-equesteo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-equesteo/Pods-equesteo.debug.xcconfig"; sourceTree = "<group>"; };
 		F2E94BED4718F71A697A57DE /* libPods-equesteo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-equesteo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F83A8407371546DAAF85BAF3 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/native-base/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
+		8A1CEA24CABF4CA9BE893D38 /* TSBackgroundFetch.framework */ = {isa = PBXFileReference; name = "TSBackgroundFetch.framework"; path = "../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/TSBackgroundFetch.framework"; sourceTree = SDKROOT; fileEncoding = undefined; lastKnownFileType = wrapper.framework; explicitFileType = undefined; includeInIndex = 0; };
+		53EDBA175EE54A15A329E152 /* RNBackgroundFetch+AppDelegate.m */ = {isa = PBXFileReference; name = "RNBackgroundFetch+AppDelegate.m"; path = "../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/RNBackgroundFetch+AppDelegate.m"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -501,6 +504,7 @@
 				A74F90DA2152AFE500AE0E34 /* libReact.a in Frameworks */,
 				A74F8CBF21514E7900AE0E34 /* libReactNativeNavigation.a in Frameworks */,
 				33F82E2ABF779443FB7D8810 /* libPods-equesteo.a in Frameworks */,
+				E92AF7BB6E094E5F9FE2C31B /* TSBackgroundFetch.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -557,6 +561,7 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				53EDBA175EE54A15A329E152 /* RNBackgroundFetch+AppDelegate.m */,
 			);
 			name = equesteo;
 			sourceTree = "<group>";
@@ -569,6 +574,7 @@
 				A74F91212152C95900AE0E34 /* libBackgroundGeolocation.a */,
 				2D16E6891FA4F8E400B85C8A /* libReact.a */,
 				F2E94BED4718F71A697A57DE /* libPods-equesteo.a */,
+				8A1CEA24CABF4CA9BE893D38 /* TSBackgroundFetch.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -902,6 +908,9 @@
 						SystemCapabilities = {
 							com.apple.Push = {
 								enabled = 1;
+							};
+							com.apple.BackgroundModes = {
+								enabled = true;
 							};
 						};
 					};
@@ -1564,6 +1573,7 @@
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
+				9E72F842913D4B8AA32F8B50 /* RNBackgroundFetch+AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

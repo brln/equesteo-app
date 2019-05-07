@@ -158,8 +158,6 @@ class RideContainer extends PureComponent {
 
   anyNotifications (notifications, ride) {
     return notifications.valueSeq().filter(n => {
-      logDebug(n.toString())
-      logDebug(ride.get('_id'))
       return n.get('seen') !== true && ride.get('_id') === n.get('rideID')
     }).count() > 0
   }

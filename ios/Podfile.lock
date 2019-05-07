@@ -109,6 +109,8 @@ PODS:
     - React/RCTBlob
   - rn-fetch-blob (0.10.6):
     - React/Core
+  - RNBackgroundFetch (2.5.4):
+    - React
   - RNDeviceInfo (0.21.5):
     - React
   - RNFirebase (4.3.8):
@@ -158,6 +160,7 @@ DEPENDENCIES:
   - React/RCTVibration (from `../node_modules/react-native`)
   - React/RCTWebSocket (from `../node_modules/react-native`)
   - rn-fetch-blob (from `../node_modules/rn-fetch-blob`)
+  - RNBackgroundFetch (from `../node_modules/react-native-background-fetch`)
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - RNFirebase (from `../node_modules/react-native-firebase/ios`)
   - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
@@ -198,6 +201,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-webview"
   rn-fetch-blob:
     :path: "../node_modules/rn-fetch-blob"
+  RNBackgroundFetch:
+    :path: "../node_modules/react-native-background-fetch"
   RNDeviceInfo:
     :path: "../node_modules/react-native-device-info"
   RNFirebase:
@@ -233,6 +238,7 @@ SPEC CHECKSUMS:
   react-native-mapbox-gl: b42480060cdcc515dfa3d8e403fb4dd32466a1b9
   react-native-webview: a42108b827082f8f0333529b0772102031d5960d
   rn-fetch-blob: 76a8f798dae965bbcd146a2438f2e1d381c91ae3
+  RNBackgroundFetch: 8c4f77f83c398c659bce82af2f0a885079417b9e
   RNDeviceInfo: 568c5641057313b4912d08a7742ff0b2f753ed5c
   RNFirebase: 2b25fd2e60269f26bb0a76c71dcc942b35a77df0
   RNImageCropPicker: 32ca4b9fef4e1b7b85ba69494242122948117e06
@@ -243,6 +249,6 @@ SPEC CHECKSUMS:
   SentryReactNative: 4c4ac0518ba34bb90832af4ceb8f2e9db861c1ed
   yoga: a23273df0088bf7f2bb7e5d7b00044ea57a2a54a
 
-PODFILE CHECKSUM: 96a367e77e9f87c297407b525499c16b6a1bbdc2
+PODFILE CHECKSUM: 17e8dcc89efcf00c260edf8d3d9f93cd4f2dfcea
 
 COCOAPODS: 1.5.3
