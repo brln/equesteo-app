@@ -45,6 +45,7 @@ export default class EventListRow extends PureComponent {
               <View style={{flex: 3, paddingRight: 5, paddingBottom: 5}}>
                 <HorseThumbnails
                   horses={this.props.horses}
+                  horseOwnerIDs={this.props.horseOwnerIDs}
                   horsePhotos={this.props.horsePhotos}
                   showHorseProfile={this.props.showHorseProfile}
                 />

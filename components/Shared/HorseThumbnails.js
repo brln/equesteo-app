@@ -25,7 +25,8 @@ export default class HorseThumbnails extends PureComponent {
 
   showHorseProfile (horse) {
     return () => {
-      this.props.showHorseProfile(horse)
+      const owner = this.props.horseOwnerIDs.get(horse.get('_id'))
+      this.props.showHorseProfile(horse, owner)
     }
   }
 

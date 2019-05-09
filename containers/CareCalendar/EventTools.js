@@ -75,7 +75,7 @@ class EventToolsContainer extends Component {
 
   confirmDelete () {
     Alert.alert(
-      'Delete Ride?',
+      'Delete Care Event?',
       'Are you sure you want to delete this event? It will be gone forever and there is no undo.',
       [
         {

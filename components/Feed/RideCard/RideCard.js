@@ -116,6 +116,7 @@ export default class RideCard extends PureComponent {
               <View style={{flex: 3}}>
                 <HorseThumbnails
                   horses={this.props.horses}
+                  horseOwnerIDs={this.props.horseOwnerIDs}
                   horsePhotos={this.props.horsePhotos}
                   showHorseProfile={this.props.showHorseProfile}
                 />

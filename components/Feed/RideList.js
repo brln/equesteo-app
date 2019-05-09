@@ -40,6 +40,7 @@ export default class RideList extends PureComponent {
       return (
         <RideCard
           horses={this.props.rideHorses.get(item.childData.get('_id'))}
+          horseOwnerIDs={this.props.horseOwnerIDs}
           horsePhotos={this.props.horsePhotos}
           ownRideList={this.props.ownRideList}
           ride={item.childData}

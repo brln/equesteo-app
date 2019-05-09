@@ -189,6 +189,7 @@ class FeedContainer extends BackgroundComponent {
   }
 
   showHorseProfile (horse, ownerID) {
+    logDebug(ownerID, 'ownerID')
     this.openScreen(EqNavigation.push(this.props.componentId, {
       component: {
         name: HORSE_PROFILE,

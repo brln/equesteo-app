@@ -71,7 +71,7 @@ export default class LoginForm extends MultiPlatform {
           autoCapitalize={'none'}
           onChangeText={this.props.changePassword}
           onSubmitEditing={this.props.submitLogin}
-          secureTextEntry={true}
+          secureTextEntry={!this.props.passwordVisible}
           ref={(i) => this.props.inputs['password'] = i}
           placeholder={'Password'}
           style={{
@@ -85,6 +85,11 @@ export default class LoginForm extends MultiPlatform {
           }}
           maxLength={200}
         />
+        <View style={{position: 'absolute', right: 0, bottom: 30}}>
+          <TouchableOpacity onPress={this.props.togglePasswordVisible}>
+            <BuildImage source={this.props.passwordVisible ? require('../../img/notVisible.png') : require('../../img/visible.png')} style={{width: 30, height: 30}}/>
+          </TouchableOpacity>
+        </View>
       </View>
     )
   }

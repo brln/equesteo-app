@@ -25,6 +25,7 @@ export default class EventList extends PureComponent {
       <EventListRow
         careEvent={item.careEvent}
         horses={item.horses}
+        horseOwnerIDs={this.props.horseOwnerIDs}
         horsePhotos={this.props.horsePhotos}
         openCareEvent={this.props.openCareEvent}
         showHorseProfile={this.props.showHorseProfile}

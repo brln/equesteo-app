@@ -476,7 +476,8 @@ class UpdateRideContainer extends BackgroundComponent {
       let foundRiderHorse
       rideHorses.valueSeq().forEach((rideHorse) => {
         if (rideHorse.get('rideID') === this.props.ride.get('_id')
-          && rideHorse.get('rideHorseType') === 'rider') {
+          && rideHorse.get('rideHorseType') === 'rider'
+          && rideHorse.get('deleted') !== true) {
           foundRiderHorse = rideHorse
         }
       })

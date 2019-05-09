@@ -244,6 +244,7 @@ class EventListContainer extends Component {
                   this.props.userID
                 ).future}
                 horses={this.props.horses}
+                horseOwnerIDs={this.memoHorseOwnerIDs(this.props.horseUsers)}
                 horsePhotos={this.props.horsePhotos}
                 openCareEvent={this.openCareEvent}
                 popAfterDeleteCompID={this.props.componentId}
@@ -267,6 +268,7 @@ class EventListContainer extends Component {
                   this.props.userID
                 ).past}
                 horses={this.props.horses}
+                horseOwnerIDs={this.memoHorseOwnerIDs(this.props.horseUsers)}
                 horsePhotos={this.props.horsePhotos}
                 openCareEvent={this.openCareEvent}
                 showHorseProfile={this.showHorseProfile}
