@@ -10,13 +10,13 @@ import {
   discardCurrentRide,
   pauseLocationTracking,
   setActiveAtlasEntry,
+  setHoofTracksRunning,
   startRide,
   stashNewLocations,
   stopStashNewLocations,
   unpauseLocationTracking,
 } from '../../actions/standard'
 import {
-  startHoofTracksDispatcher,
   startLocationTracking,
   stopHoofTracksDispatcher,
   stopLocationTracking,
@@ -144,7 +144,7 @@ class RecorderContainer extends PureComponent {
     }
 
     if (this.props.hoofTracksRunning) {
-      this.props.dispatch(startHoofTracksDispatcher())
+      this.props.dispatch(setHoofTracksRunning(true))
     }
   }
 

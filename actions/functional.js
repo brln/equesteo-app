@@ -948,6 +948,7 @@ export function startLocationTracking () {
           if (!replaced) {
             dispatch(newLocation(parsedLocation, parsedElevation))
           }
+          dispatch(doHoofTracksUpload())
         }
       })
 
@@ -958,43 +959,40 @@ export function startLocationTracking () {
   }
 }
 
-let hoofTracksTimeout
-export function startHoofTracksDispatcher () {
+export function doHoofTracksUpload () {
   cb('startHoofTracksDispatcher')
   return (dispatch, getState) => {
-    const UPLOAD_EVERY = 30 * 1000
-    function doUpload(recurse=true) {
-      const startTime = getState().getIn(['currentRide', 'currentRide', 'startTime'])
+    const running = getState().getIn(['localState', 'hoofTracksRunning'])
+    if (running) {
       const lastUpload = getState().getIn(['currentRide', 'lastHoofTracksUpload'])
-      const hoofTracksID = getState().getIn(['localState', 'hoofTracksID'])
-      if (hoofTracksID) {
-        const now = unixTimeNow()
-        const rideCoords = getState().getIn(['currentRide', 'currentRideCoordinates', 'rideCoordinates'])
-        if (rideCoords && rideCoords.count() > 0) {
-          const toUpload = rideCoords.filter(rc => {
-            const timestamp = rc.get(2)
-            return timestamp < now && (!lastUpload || timestamp > lastUpload)
-          })
-          if (toUpload.count() > 0) {
-            dispatch(setHoofTracksLastUpload(unixTimeNow()))
-            UserAPI.uploadHoofTrackCoords(hoofTracksID, toUpload, startTime).catch(() => {
-              dispatch(setHoofTracksLastUpload(lastUpload))
+      const timeDiff = unixTimeNow() - lastUpload
+      logDebug(timeDiff)
+      if ((!lastUpload || ((timeDiff) > 30000))) {
+        const startTime = getState().getIn(['currentRide', 'currentRide', 'startTime'])
+        const hoofTracksID = getState().getIn(['localState', 'hoofTracksID'])
+        if (hoofTracksID) {
+          const now = unixTimeNow()
+          const rideCoords = getState().getIn(['currentRide', 'currentRideCoordinates', 'rideCoordinates'])
+          if (rideCoords && rideCoords.count() > 0) {
+            const toUpload = rideCoords.filter(rc => {
+              const timestamp = rc.get(2)
+              return timestamp < now && (!lastUpload || timestamp > lastUpload)
             })
-          } else {
-            dispatch(setHoofTracksLastUpload(unixTimeNow()))
-            UserAPI.hoofTracksPing(hoofTracksID).catch(() => {
-              dispatch(setHoofTracksLastUpload(lastUpload))
-            })
+            if (toUpload.count() > 0) {
+              dispatch(setHoofTracksLastUpload(unixTimeNow()))
+              UserAPI.uploadHoofTrackCoords(hoofTracksID, toUpload, startTime).catch(() => {
+                dispatch(setHoofTracksLastUpload(lastUpload))
+              })
+            } else {
+              dispatch(setHoofTracksLastUpload(unixTimeNow()))
+              UserAPI.hoofTracksPing(hoofTracksID).catch(() => {
+                dispatch(setHoofTracksLastUpload(lastUpload))
+              })
+            }
           }
-        }
-        if (recurse) {
-          hoofTracksTimeout = setTimeout(doUpload, UPLOAD_EVERY)
         }
       }
     }
-    dispatch(setHoofTracksRunning(true))
-    doUpload(false)
-    hoofTracksTimeout = setTimeout(doUpload, UPLOAD_EVERY)
   }
 }
 
@@ -1003,7 +1001,6 @@ export function stopHoofTracksDispatcher () {
  return (dispatch, getState) => {
    const hoofTracksID = getState().getIn(['localState', 'hoofTracksID'])
    dispatch(setHoofTracksRunning(false))
-   clearTimeout(hoofTracksTimeout)
    if (hoofTracksID) {
      dispatch(setHoofTracksLastUpload(null))
      dispatch(setHoofTracksID(null))

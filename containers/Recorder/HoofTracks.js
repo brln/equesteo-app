@@ -1,21 +1,21 @@
-import moment from 'moment'
 import { Navigation } from 'react-native-navigation'
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import { BackHandler } from 'react-native'
-import { Alert, Share, Text, TextInput, View } from 'react-native'
+import { ActivityIndicator, Alert, Share, Text, TextInput, View } from 'react-native'
 
 import {
   setHoofTracksID,
   setHoofTracksLastUpload,
+  setHoofTracksRunning,
 } from '../../actions/standard'
-import { brand, danger, darkBrand } from '../../colors'
+import { brand } from '../../colors'
 import { EqNavigation, UserAPI } from '../../services'
-import Button from '../../components/Button'
 import {
-  startHoofTracksDispatcher,
+  doHoofTracksUpload,
   stopHoofTracksDispatcher
 } from "../../actions/functional"
+import HoofTracksLive from '../../components/HoofTracks/HoofTracksLive'
 
 class HoofTracksContainer extends PureComponent {
   static options() {
@@ -28,13 +28,6 @@ class HoofTracksContainer extends PureComponent {
         backButton: {
           color: 'white',
         },
-        rightButtons: [
-          {
-            id: 'startTracks',
-            text: 'Start',
-            color: 'white'
-          },
-        ]
       },
       layout: {
         orientation: ['portrait']
@@ -44,6 +37,9 @@ class HoofTracksContainer extends PureComponent {
 
   constructor (props) {
     super(props)
+    this.state = {
+      error: null
+    }
 
     this.goBack = this.goBack.bind(this)
     this.handleBackPress = this.handleBackPress.bind(this)
@@ -51,8 +47,6 @@ class HoofTracksContainer extends PureComponent {
     this.shareLink = this.shareLink.bind(this)
 
     Navigation.events().bindComponent(this);
-
-    this.timerRefresh = null
 
     if (props.hoofTracksRunning) {
       Navigation.mergeOptions(this.props.componentId, {
@@ -69,14 +63,6 @@ class HoofTracksContainer extends PureComponent {
     }
   }
 
-  componentDidMount () {
-    if (this.props.hoofTracksRunning) {
-      this.timerRefresh = setInterval(() => {
-        this.forceUpdate()
-      }, 10000)
-    }
-  }
-
   handleBackPress () {
     this.goBack()
     return true
@@ -87,7 +73,6 @@ class HoofTracksContainer extends PureComponent {
   }
 
   componentWillUnmount () {
-    clearInterval(this.timerRefresh)
     BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
     clearTimeout(this.gpsTimeout)
   }
@@ -101,7 +86,8 @@ class HoofTracksContainer extends PureComponent {
           {
             text: 'OK',
             onPress: () => {
-              this.props.dispatch(startHoofTracksDispatcher())
+              this.props.dispatch(setHoofTracksRunning(true))
+              this.props.dispatch(doHoofTracksUpload())
               EqNavigation.pop(this.props.componentId)
             },
           },
@@ -123,7 +109,24 @@ class HoofTracksContainer extends PureComponent {
   componentWillMount () {
     return UserAPI.getHoofTracksID().then((resp) => {
       this.props.dispatch(setHoofTracksID(resp.htID))
-    }).catch(e => {})
+      if (!this.props.hoofTracksRunning) {
+        Navigation.mergeOptions(this.props.componentId, {
+          topBar: {
+            rightButtons: [
+              {
+                id: 'startTracks',
+                text: 'Start',
+                color: 'white'
+              },
+            ]
+          }
+        })
+      }
+    }).catch(e => {
+      this.setState({
+        error: 'Can\'t fetch HoofTracks ID. Maybe you\'re not online? Email us with problems. info@equesteo.com'
+      })
+    })
   }
 
   shareLink () {
@@ -154,50 +157,29 @@ class HoofTracksContainer extends PureComponent {
   }
 
   render() {
-    let mainText = <Text style={{textAlign: 'center'}}>Your ride will be broadcast live with ID:</Text>
-    if (this.props.hoofTracksRunning) {
-      mainText = (
-        <View>
-          <Text style={{textAlign: 'center'}}>Broadcasting Live! Last successful update: </Text>
-          <Text style={{fontWeight: 'bold', textAlign: 'center'}}>{moment(this.props.lastHoofTracksUpload).fromNow()}</Text>
+    if (this.props.hoofTracksID) {
+      return (
+        <HoofTracksLive
+          hoofTracksRunning={this.props.hoofTracksRunning}
+          hoofTracksID={this.props.hoofTracksID}
+          lastHoofTracksUpload={this.props.lastHoofTracksUpload}
+          resetCode={this.resetCode}
+          shareLink={this.shareLink}
+        />
+      )
+    } else if (this.state.error) {
+      return (
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20}}>
+          <Text style={{textAlign: 'center'}}>{ this.state.error }</Text>
+        </View>
+      )
+    } else {
+      return (
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <ActivityIndicator />
         </View>
       )
     }
-    return (
-      <View style={{flex: 1}}>
-        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', paddingLeft: 20, paddingRight: 20, marginTop: 20}}>
-          <View style={{flex: 1, justifyContent: 'center'}}>
-            { mainText }
-          </View>
-          <View style={{flex: 1}}>
-            <View style={{flex: 1}}>
-              <Text style={{fontFamily: 'courier', fontSize: 40, textAlign: 'center'}}>{this.props.hoofTracksID}</Text>
-            </View>
-            <View style={{flex: 1}}>
-              <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', width: 300}}>
-                <View style={{marginRight: 10}} >
-                  <Button text={"Reset Code"} color={danger} onPress={this.resetCode}/>
-                </View>
-                <View style={{marginLeft: 10 }}>
-                  <Button text={"Share"} color={brand} onPress={this.shareLink}/>
-                </View>
-              </View>
-            </View>
-          </View>
-          <View style={{flex: 1, justifyContent: 'center'}}>
-            <View style={{marginBottom: 10}}>
-              <Text style={{textAlign: 'center'}}>Anyone with this id can follow your ride at: </Text>
-            </View>
-            <TextInput
-              style={{width: '100%', height: 50, padding: 10, borderColor: darkBrand, borderWidth: 1, borderRadius: 4}}
-              selectTextOnFocus={true}
-              underlineColorAndroid={'transparent'}
-              value={`https://equesteo.com/hoofTracks?c=${this.props.hoofTracksID}`}
-            />
-          </View>
-        </View>
-      </View>
-    )
   }
 }
 

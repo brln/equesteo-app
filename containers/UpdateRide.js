@@ -163,6 +163,7 @@ class UpdateRideContainer extends BackgroundComponent {
           this.state.trimValues,
           this.memoizedRideHorses(this.props.rideHorses, this.props.rideID),
         ))
+        this.props.dispatch(stopHoofTracksDispatcher())
         EqNavigation.popToRoot(this.props.componentId).then(() => {
           this.props.dispatch(clearPausedLocations())
           this.props.dispatch(stopLocationTracking())
@@ -201,7 +202,6 @@ class UpdateRideContainer extends BackgroundComponent {
           {cancelable: true},
         )
       }
-      this.props.dispatch(stopHoofTracksDispatcher())
     } else {
       if (buttonId === 'save') {
         this.setState({
@@ -238,6 +238,7 @@ class UpdateRideContainer extends BackgroundComponent {
   }
 
   discardRide () {
+    this.props.dispatch(stopHoofTracksDispatcher())
     this.setState({
       doRevert: false
     })

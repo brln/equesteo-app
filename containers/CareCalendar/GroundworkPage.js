@@ -168,12 +168,18 @@ class GroundworkPage extends Component {
   }
 
   startEditing () {
+    Navigation.mergeOptions(this.props.componentId, {
+      topBar: {
+        rightButtons: []
+      }
+    })
     const lastPauseStart = this.props.newCareEvent.getIn(['eventSpecificData', 'lastPauseStart'])
     if (this.props.newCareEvent.getIn(['eventSpecificData', 'startTime']) && !lastPauseStart) {
       this.stopTimer()
     }
 
     const { hours, minutes, seconds } = this.elapsedBreakdown(this.state.elapsedTime)
+
     this.setState({
       editMode: true,
       editValues: {
@@ -204,6 +210,17 @@ class GroundworkPage extends Component {
     this.setState({
       editMode: false,
     }, this.runTimer)
+    Navigation.mergeOptions(this.props.componentId, {
+      topBar: {
+        rightButtons: [
+          {
+            id: 'chooseHorses',
+            text: 'Choose Horses',
+            color: 'white'
+          },
+        ]
+      }
+    })
   }
 
 

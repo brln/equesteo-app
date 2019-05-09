@@ -148,6 +148,8 @@ export default function LocalStateReducer(state=initialState, action) {
         'signingOut', false
       ).set(
         'needsRemotePersist', newNeedsRemotePersist
+      ).set(
+        'hoofTracksID', null
       )
     case NEW_APP_STATE:
       return state.set('appState', action.newState)
