@@ -39,6 +39,7 @@ export default class Camera extends Component {
       this.camera.takePictureAsync({
         fixOrientation: true,
         pauseAfterCapture: true,
+        forceUpOrientation: true,
       }).then((data) => {
         tempURI = data.uri
         return CameraRoll.saveToCameraRoll(tempURI)

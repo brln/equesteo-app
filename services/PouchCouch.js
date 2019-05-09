@@ -84,7 +84,11 @@ export default class PouchCouch {
           new Promise((res, rej) => {
             PouchDB.replicate(db.local, remoteDB, { batchSize: 1000 }).on('complete', (resp) => {
               res(resp)
-            }).on('error', PouchCouch.errorHandler(rej))
+            }).on(
+              'error', PouchCouch.errorHandler(rej)
+            ).on(
+              'denied', PouchCouch.errorHandler(rej)
+            )
           })
         )
       }

@@ -56,7 +56,7 @@ export default class Swiper extends PureComponent {
           showsHorizontalScrollIndicator={false}
           horizontal={true}
           pagingEnabled={true}
-          style={{height: 250}}
+          style={{height: swiperHeight}}
         >
           <View style={{flex: 1, flexDirection: 'row'}}>
             {images}

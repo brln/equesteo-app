@@ -121,6 +121,7 @@ export function catchAsyncError (dispatch, sentry=true) {
         captureException(e)
       }
       if (ENV === 'local') {
+        alert('Async error, check logs')
         logError(e, 'catchAsyncError')
       }
     }
