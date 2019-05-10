@@ -48,7 +48,7 @@ class BarnContainer extends BackgroundComponent {
         passProps: {
           horse,
           ownerID,
-          barnComponentID: this.props.componentId
+          popBackTo: this.props.componentId
         },
       }
     }).catch(() => {})

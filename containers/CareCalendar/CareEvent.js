@@ -91,7 +91,11 @@ class CareEvent extends Component {
         component: {
           name: HORSE_PROFILE,
           title: horse.get('name'),
-          passProps: {horse, ownerID},
+          passProps: {
+            horse,
+            ownerID,
+            popBackTo: this.props.componentId
+          },
         }
       }).catch(() => {})
     }

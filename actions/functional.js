@@ -713,31 +713,46 @@ export function uploadPhoto (type, photoLocation, photoID) {
         switch (type) {
           case 'horse':
             const uploadedHorseURI = horsePhotoURL(photoID)
-            const horsePhoto = getState().getIn(['pouchRecords', 'horsePhotos', photoID]).set('uri', uploadedHorseURI)
-            dispatch(horsePhotoUpdated(horsePhoto))
-            return PouchCouch.saveHorse(horsePhoto.toJS()).then((doc) => {
-              const theHorsePhotoAfterSave = getState().getIn(['pouchRecords', 'horsePhotos', photoID])
-              dispatch(horsePhotoUpdated(theHorsePhotoAfterSave.set('_rev', doc.rev)))
-              return dispatch(doSync())
-            })
+            let horsePhoto = getState().getIn(['pouchRecords', 'horsePhotos', photoID])
+            if (horsePhoto) {
+              horsePhoto = horsePhoto.set('uri', uploadedHorseURI)
+              dispatch(horsePhotoUpdated(horsePhoto))
+              return PouchCouch.saveHorse(horsePhoto.toJS()).then((doc) => {
+                const theHorsePhotoAfterSave = getState().getIn(['pouchRecords', 'horsePhotos', photoID])
+                dispatch(horsePhotoUpdated(theHorsePhotoAfterSave.set('_rev', doc.rev)))
+                return dispatch(doSync())
+              })
+            } else {
+              return Promise.resolve()
+            }
           case 'ride':
             const uploadedRideURI = ridePhotoURL(photoID)
-            const ridePhoto = getState().getIn(['pouchRecords', 'ridePhotos', photoID]).set('uri', uploadedRideURI)
-            dispatch(ridePhotoUpdated(ridePhoto))
-            return PouchCouch.saveRide(ridePhoto.toJS()).then((doc) => {
-              const theRidePhotoAfterSave = getState().getIn(['pouchRecords', 'ridePhotos', photoID])
-              dispatch(ridePhotoUpdated(theRidePhotoAfterSave.set('_rev', doc.rev)))
-              return dispatch(doSync())
-            })
+            let ridePhoto = getState().getIn(['pouchRecords', 'ridePhotos', photoID])
+            if (ridePhoto) {
+              ridePhoto = ridePhot.set('uri', uploadedRideURI)
+              dispatch(ridePhotoUpdated(ridePhoto))
+              return PouchCouch.saveRide(ridePhoto.toJS()).then((doc) => {
+                const theRidePhotoAfterSave = getState().getIn(['pouchRecords', 'ridePhotos', photoID])
+                dispatch(ridePhotoUpdated(theRidePhotoAfterSave.set('_rev', doc.rev)))
+                return dispatch(doSync())
+              })
+            } else {
+              return Promise.resolve()
+            }
           case 'user':
             const uploadedUserPhotoURI = profilePhotoURL(photoID)
-            const userPhoto = getState().getIn(['pouchRecords', 'userPhotos', photoID]).set('uri', uploadedUserPhotoURI)
-            dispatch(userPhotoUpdated(userPhoto))
-            return PouchCouch.saveUser(userPhoto.toJS()).then((doc) => {
-              const theUserPhotoAfterSave = getState().getIn(['pouchRecords', 'userPhotos', photoID])
-              dispatch(userPhotoUpdated(theUserPhotoAfterSave.set('_rev', doc.rev)))
-              return dispatch(doSync())
-            })
+            let userPhoto = getState().getIn(['pouchRecords', 'userPhotos', photoID])
+            if (userPhoto) {
+              userPhoto = userPhoto.set('uri', uploadedUserPhotoURI)
+              dispatch(userPhotoUpdated(userPhoto))
+              return PouchCouch.saveUser(userPhoto.toJS()).then((doc) => {
+                const theUserPhotoAfterSave = getState().getIn(['pouchRecords', 'userPhotos', photoID])
+                dispatch(userPhotoUpdated(theUserPhotoAfterSave.set('_rev', doc.rev)))
+                return dispatch(doSync())
+              })
+            } else {
+              return Promise.resolve()
+            }
           default:
             throw Error('cant persist type I don\'t know about')
         }

@@ -59,7 +59,7 @@ class HorseToolsContainer extends Component {
     const horseUser = this.props.horseUser
     this.props.dispatch(deleteHorseUser(horseUser.get('_id')))
     this.props.dispatch(persistHorseUser(horseUser.get('_id')))
-    EqNavigation.popTo(this.props.barnComponentID).catch(() => {})
+    EqNavigation.popTo(this.props.popBackTo).catch(() => {})
   }
 
   updateHorse () {
@@ -189,7 +189,7 @@ function mapStateToProps (state, passedProps) {
   return {
     activeComponent,
     follows: pouchState.get('follows'),
-    barnComponentID: passedProps.barnComponentID,
+    popBackTo: passedProps.popBackTo,
     horse: pouchState.getIn(['horses', passedProps.horseID]),
     horseUser: pouchState.getIn(['horseUsers', passedProps.horseUserID]),
     userID: localState.get('userID')

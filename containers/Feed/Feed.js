@@ -196,7 +196,8 @@ class FeedContainer extends BackgroundComponent {
         title: horse.get('name'),
         passProps: {
           horse,
-          ownerID
+          ownerID,
+          popBackTo: this.props.componentId
         }
       }
     }))

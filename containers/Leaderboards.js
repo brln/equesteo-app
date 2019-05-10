@@ -50,6 +50,7 @@ class LeaderboardsContainer extends BackgroundComponent {
         passProps: {
           horse,
           ownerID,
+          popBackTo: this.props.componentId
         }
       }
     }).catch(() => {})

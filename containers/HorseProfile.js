@@ -18,7 +18,7 @@ import {
 import BackgroundComponent from '../components/BackgroundComponent'
 import { brand } from '../colors'
 import { generateUUID, logRender, unixTimeNow } from '../helpers'
-import { HORSE_TOOLS, PHOTO_LIGHTBOX, PROFILE, UPDATE_HORSE } from '../screens/main'
+import { HORSE_TOOLS, PHOTO_LIGHTBOX, PROFILE } from '../screens/main'
 import HorseProfile from '../components/HorseProfile/HorseProfile'
 import { EqNavigation } from '../services'
 
@@ -95,7 +95,7 @@ class HorseProfileContainer extends BackgroundComponent {
         component: {
           name: HORSE_TOOLS,
           passProps: {
-            barnComponentID: this.props.barnComponentID,
+            popBackTo: this.props.popBackTo,
             horseID: this.props.horse.get('_id'),
             horseUserID: this.horseUser().get('_id'),
           },
@@ -205,7 +205,7 @@ function mapStateToProps (state, passedProps) {
   const localState = state.get('localState')
   return {
     activeComponent: localState.get('activeComponent'),
-    barnComponentID: passedProps.barnComponentID,
+    popBackTo: passedProps.popBackTo,
     horseUsers: pouchState.get('horseUsers'),
     horses: pouchState.get('horses'),
     horsePhotos: pouchState.get('horsePhotos'),
