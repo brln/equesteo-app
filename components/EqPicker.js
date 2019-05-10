@@ -14,7 +14,7 @@ export default class EqPicker extends Component {
     if (Platform.OS === 'android') {
       const itemComps = this.props.items.map(i => <Picker.Item key={i.value} label={i.label} value={i.value} /> )
       return (
-         <View style={{borderColor: darkBrand, borderWidth: 1, borderRadius: 4}}>
+         <View style={{borderColor: darkBrand, borderWidth: 1, borderRadius: 4, width: this.props.width}}>
            <Picker
              selectedValue={this.props.value}
              items={itemComps}
@@ -29,7 +29,7 @@ export default class EqPicker extends Component {
       const newItems = [...this.props.items]
       const placeholder = newItems.shift()
       return (
-        <View style={{borderWidth: 1, borderColor: darkBrand, borderRadius: 4}}>
+        <View style={{borderWidth: 1, borderColor: darkBrand, borderRadius: 4, width: this.props.width}}>
           <RNPickerSelect
             value={this.props.value}
             items={newItems}

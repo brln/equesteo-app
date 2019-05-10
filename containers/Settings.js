@@ -15,6 +15,7 @@ import { brand } from '../colors'
 import { persistUserUpdate } from '../actions/functional'
 import { userUpdated } from '../actions/standard'
 import { EqNavigation } from '../services'
+import EqPicker from '../components/EqPicker'
 
 class SettingsContainer extends BackgroundComponent {
   static options() {
@@ -52,10 +53,14 @@ class SettingsContainer extends BackgroundComponent {
       cachedUser: null,
       doRevert: true,
     }
+    this.alertDistance = this.alertDistance.bind(this)
     this.changeAccountDetails = this.changeAccountDetails.bind(this)
+    this.changeAlertDistance = this.changeAlertDistance.bind(this)
+    this.changeEnableDistanceAlerts = this.changeEnableDistanceAlerts.bind(this)
     this.changeExperimentalHoofTracks = this.changeExperimentalHoofTracks.bind(this)
     this.changeLeaderboardOptOut = this.changeLeaderboardOptOut.bind(this)
     this.changeDefaultPublic = this.changeDefaultPublic.bind(this)
+    this.distancePicker = this.distancePicker.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
 
     Navigation.events().bindComponent(this);
@@ -102,6 +107,52 @@ class SettingsContainer extends BackgroundComponent {
     this.changeAccountDetails(this.props.user.set('ridesDefaultPublic', !this.props.user.get('ridesDefaultPublic')))
   }
 
+  changeEnableDistanceAlerts () {
+    this.changeAccountDetails(this.props.user.set('enableDistanceAlerts', !this.props.user.get('enableDistanceAlerts')))
+  }
+
+  changeAlertDistance (value) {
+    this.changeAccountDetails(this.props.user.set('alertDistance', value))
+  }
+
+  distancePicker (onValueChange) {
+    const items = [
+      {label: "1 mi", value: 1},
+      {label: "2 mi", value: 2},
+      {label: "3 mi", value: 3},
+      {label: "4 mi", value: 4},
+      {label: "5 mi", value: 5},
+      {label: "10 mi", value: 10},
+    ]
+    return (
+      <View style={{flex: 1}}>
+        <EqPicker
+          value={this.props.user.get('alertDistance')}
+          items={items}
+          onValueChange={onValueChange}
+          width={100}
+        />
+      </View>
+    )
+  }
+
+  alertDistance () {
+    if (this.props.user.get('enableDistanceAlerts')) {
+      return (
+        <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
+          <View style={{flex: 1, flexDirection: 'row'}}>
+            <View style={{flex: 6, justifyContent: 'center'}}>
+              <View style={{flex: 1, flexDirection: 'row', alignItems: 'center', paddingLeft: 30}}>
+                <Text>Alert every: </Text>
+                { this.distancePicker(this.changeAlertDistance) }
+              </View>
+            </View>
+          </View>
+        </CardItem>
+      )
+    }
+  }
+
   render() {
     return (
       <View>
@@ -136,6 +187,27 @@ class SettingsContainer extends BackgroundComponent {
                 </View>
               </View>
             </CardItem>
+          </Card>
+
+          <Card>
+            <CardItem header>
+              <Text style={{color: darkBrand }}>Sounds:</Text>
+            </CardItem>
+            <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
+              <View style={{flex: 1, flexDirection: 'row'}}>
+                <View style={{flex: 1}}>
+                  <CheckBox
+                    checked={this.props.user.get('enableDistanceAlerts')}
+                    onPress={this.changeEnableDistanceAlerts}
+                  />
+                </View>
+                <View style={{flex: 6, justifyContent: 'center'}}>
+                  <Text>Play distance alerts.</Text>
+                </View>
+              </View>
+            </CardItem>
+
+            { this.alertDistance() }
           </Card>
 
           <Card>

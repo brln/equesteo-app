@@ -20,7 +20,7 @@ import CurrentRideReducer from './reducers/CurrentRide'
 import LocalStateReducer from './reducers/LocalState'
 import PouchRecordsReducer from './reducers/PouchRecords'
 
-import { YellowBox } from 'react-native'
+import { NativeModules, NativeEventEmitter, YellowBox } from 'react-native'
 
 // Remove when on > 0.56
 // https://github.com/facebook/react-native/issues/17504
@@ -31,6 +31,13 @@ YellowBox.ignoreWarnings([
   'Module RCTImageLoader requires',
   'Task orphaned for request'
 ])
+
+// Install dummy handlers so we don't see the tts warnings
+// https://github.com/ak1394/react-native-tts/issues/1
+const ee = new NativeEventEmitter(NativeModules.TextToSpeech);
+ee.addListener('tts-start', () => {})
+ee.addListener('tts-finish', () => {})
+ee.addListener('tts-cancel', () => {})
 
 const store = createStore(
   combineReducers({

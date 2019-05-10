@@ -7,6 +7,7 @@ import  Mixpanel from 'react-native-mixpanel'
 import { Navigation } from 'react-native-navigation'
 import PushNotification from 'react-native-push-notification'
 import BackgroundFetch from "react-native-background-fetch"
+import Tts from 'react-native-tts';
 
 import ApiClient from '../services/ApiClient'
 import { DISTRIBUTION, ENV } from '../dotEnv'
@@ -100,6 +101,8 @@ import { NotConnectedError } from "../errors"
 export const DB_NEEDS_SYNC = 'DB_NEEDS_SYNC'
 export const DB_SYNCING = 'DB_SYNCING'
 export const DB_SYNCED = 'DB_SYNCED'
+
+Tts.setDucking(true)
 
 
 function cb(action, mixpanel=false) {
@@ -796,8 +799,6 @@ export function setDistributionOnServer () {
     const currentUserID = getState().getIn(['localState', 'userID'])
     logInfo('setting distribution')
     return UserAPI.setDistribution(currentUserID, DISTRIBUTION).then(resp => {
-      logDebug(resp.mostRecent, 'rm')
-      logDebug(DISTRIBUTION, 'dis')
       if (parseInt(resp.mostRecent) > parseInt(DISTRIBUTION)) {
         const link = Platform.select({
           ios: 'https://itunes.apple.com/us/app/equesteo/id1455843114',
@@ -939,6 +940,7 @@ export function startLocationTracking () {
         }
 
         if (!lastLocation || timeDiff > 5) {
+          const oldDistance = getState().getIn(['currentRide', 'currentRide', 'distance'])
           const refiningLocation = getState().getIn(['currentRide', 'refiningLocation'])
 
           let parsedLocation = Map({
@@ -988,6 +990,8 @@ export function startLocationTracking () {
           }
           if (!replaced) {
             dispatch(newLocation(parsedLocation, parsedElevation))
+            const newDistance = getState().getIn(['currentRide', 'currentRide', 'distance'])
+            dispatch(doSpeech(oldDistance, newDistance))
           }
           dispatch(doHoofTracksUpload())
         }
@@ -995,8 +999,28 @@ export function startLocationTracking () {
 
       BackgroundGeolocation.start()
       dispatch(retryLocationTracking())
+      dispatch(doSpeech())
 
     }).catch(catchAsyncError(dispatch))
+  }
+}
+
+export function doSpeech (oldDistance, newDistance) {
+  cb('startHoofTracksDispatcher')
+  return (_, getState) => {
+    const newMiles = Math.floor(newDistance)
+    const oldMiles = Math.floor(oldDistance)
+    if (newMiles > oldMiles) {
+      const currentUserID = getState().getIn(['localState', 'userID'])
+      const currentUser = getState().getIn(['pouchRecords', 'users', currentUserID])
+      const settingEnabled = currentUser.get('enableDistanceAlerts')
+      const alertDistance = currentUser.get('alertDistance')
+      if (settingEnabled && newMiles % alertDistance === 0) {
+        Tts.getInitStatus().then(() => {
+          Tts.speak(`You have gone ${newMiles} miles`);
+        })
+      }
+    }
   }
 }
 

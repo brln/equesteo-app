@@ -63,6 +63,8 @@ target 'equesteo' do
 
   pod 'RNBackgroundFetch', :path => '../node_modules/react-native-background-fetch'
 
+  pod 'TextToSpeech', :path => '../node_modules/react-native-tts'
+
 end
 
 # also from https://github.com/ivpusic/react-native-image-crop-picker
