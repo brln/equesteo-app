@@ -198,7 +198,8 @@ class RideToolsContainer extends Component {
       [
         {
           text: 'OK',
-          onPress: this.deleteRide
+          onPress: this.deleteRide,
+          style: 'destructive'
         },
         {
           text: 'Cancel',

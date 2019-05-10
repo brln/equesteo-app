@@ -2,8 +2,9 @@ import memoizeOne from 'memoize-one'
 import { List, Map } from 'immutable'
 import moment from 'moment'
 import React from 'react'
-import { connect } from 'react-redux';
+import { connect } from 'react-redux'
 import { Navigation } from 'react-native-navigation'
+import { Alert } from 'react-native'
 
 import BackgroundComponent from '../components/BackgroundComponent'
 import Profile from '../components/Profile/Profile'
@@ -130,7 +131,22 @@ class ProfileContainer extends BackgroundComponent {
         }
       }).catch(() => {})
     } else if (buttonId === 'logout') {
-      this.doLogout()
+      Alert.alert(
+        'Log Out?',
+        'The only reason to log out is if you\'re moving to another device.\n\n All ride data will be deleted from the device, and must be re-downloaded when you sign back in.',
+        [
+          {
+            text: 'OK',
+            onPress: this.doLogout,
+            style: 'destructive',
+          },
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+        ],
+        {cancelable: true},
+      )
     }
   }
 

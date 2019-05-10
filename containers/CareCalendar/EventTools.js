@@ -80,7 +80,8 @@ class EventToolsContainer extends Component {
       [
         {
           text: 'OK',
-          onPress: this.deleteCareEvent
+          onPress: this.deleteCareEvent,
+          style: 'destructive'
         },
         {
           text: 'Cancel',

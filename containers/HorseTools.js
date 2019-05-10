@@ -133,7 +133,8 @@ class HorseToolsContainer extends Component {
       [
         {
           text: 'OK',
-          onPress: this.deleteHorse
+          onPress: this.deleteHorse,
+          style: 'destructive'
         },
         {
           text: 'Cancel',

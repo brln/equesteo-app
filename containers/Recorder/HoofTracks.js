@@ -146,6 +146,7 @@ class HoofTracksContainer extends PureComponent {
               this.props.dispatch(setHoofTracksID(resp.htID))
             })).catch(e => {})
           },
+          style: 'destructive',
         },
         {
           text: 'Cancel',

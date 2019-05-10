@@ -192,7 +192,8 @@ class UpdateRideContainer extends BackgroundComponent {
           [
             {
               text: 'OK',
-              onPress: this.discardRide
+              onPress: this.discardRide,
+              style: 'destructive'
             },
             {
               text: 'Cancel',

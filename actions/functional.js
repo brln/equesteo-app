@@ -1,6 +1,6 @@
 import ImagePicker from 'react-native-image-crop-picker'
 import { fromJS, Map  } from 'immutable'
-import { AppState, NetInfo, Platform } from 'react-native'
+import { Alert, AppState, Linking, NetInfo, Platform } from 'react-native'
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation'
 import firebase from 'react-native-firebase'
 import  Mixpanel from 'react-native-mixpanel'
@@ -178,7 +178,6 @@ export function appInitialized () {
           dispatch(localDataLoaded(localData))
           dispatch(startListeningFCMTokenRefresh())
           dispatch(startListeningFCM())
-          dispatch(setDistributionOnServer())
           if (getState().getIn(['localState', 'lastFullSync'])) {
             dispatch(switchRoot(FEED))
           } else {
@@ -187,12 +186,13 @@ export function appInitialized () {
               dispatch(switchRoot(FEED))
             }
           }
-
           return dispatch(startNetworkTracking())
         }).then(() => {
-          return dispatch(doSync({}, true, false)).then(postSync).then(() => {
-            dispatch(startBackgroundFetch())
-          })
+          return dispatch(setDistributionOnServer())
+        }).then(() => {
+          return dispatch(doSync({}, true, false)).then(postSync)
+        }).then(() => {
+          dispatch(startBackgroundFetch())
         })
       } else {
         dispatch(switchRoot(SIGNUP_LOGIN))
@@ -729,7 +729,7 @@ export function uploadPhoto (type, photoLocation, photoID) {
             const uploadedRideURI = ridePhotoURL(photoID)
             let ridePhoto = getState().getIn(['pouchRecords', 'ridePhotos', photoID])
             if (ridePhoto) {
-              ridePhoto = ridePhot.set('uri', uploadedRideURI)
+              ridePhoto = ridePhoto.set('uri', uploadedRideURI)
               dispatch(ridePhotoUpdated(ridePhoto))
               return PouchCouch.saveRide(ridePhoto.toJS()).then((doc) => {
                 const theRidePhotoAfterSave = getState().getIn(['pouchRecords', 'ridePhotos', photoID])
@@ -795,8 +795,34 @@ export function setDistributionOnServer () {
   return (dispatch, getState) => {
     const currentUserID = getState().getIn(['localState', 'userID'])
     logInfo('setting distribution')
-    UserAPI.setDistribution(currentUserID, DISTRIBUTION).then(() => {
-      logInfo('Distribution Set')
+    return UserAPI.setDistribution(currentUserID, DISTRIBUTION).then(resp => {
+      logDebug(resp.mostRecent, 'rm')
+      logDebug(DISTRIBUTION, 'dis')
+      if (parseInt(resp.mostRecent) > parseInt(DISTRIBUTION)) {
+        const link = Platform.select({
+          ios: 'https://itunes.apple.com/us/app/equesteo/id1455843114',
+          android: 'market://details?id=com.equesteo',
+        })
+        return Linking.canOpenURL(link).then((supported) => {
+          if (supported) {
+            Alert.alert(
+              'Old Version',
+              'You\'re running an old version of Equesteo. Click here to get new features and fixes. \n\nTo never see this again, turn on auto-updates for Equesteo.',
+              [
+                {
+                  text: 'Not Now',
+                  style: 'cancel',
+                },
+                {
+                  text: 'OK',
+                  onPress: () => { Linking.openURL(link).catch(() => {}) },
+                }
+              ],
+              {cancelable: true},
+            )
+          }
+        })
+      }
     }).catch(catchAsyncError(dispatch))
   }
 }

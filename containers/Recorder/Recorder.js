@@ -206,7 +206,8 @@ class RecorderContainer extends PureComponent {
         [
           {
             text: 'OK',
-            onPress: this.discardRide
+            onPress: this.discardRide,
+            style: 'destructive'
           },
           {
             text: 'Cancel',
