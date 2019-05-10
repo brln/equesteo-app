@@ -63,5 +63,4 @@ export default class EventListRow extends PureComponent {
       </TouchableOpacity>
     )
   }
-
 }
