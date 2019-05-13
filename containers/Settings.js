@@ -108,7 +108,11 @@ class SettingsContainer extends BackgroundComponent {
   }
 
   changeEnableDistanceAlerts () {
-    this.changeAccountDetails(this.props.user.set('enableDistanceAlerts', !this.props.user.get('enableDistanceAlerts')))
+    let userToUpdate = this.props.user
+    if (!this.props.user.get('enableDistanceAlerts') && !this.props.user.get('alertDistance')) {
+      userToUpdate = userToUpdate.set('alertDistance', 1)
+    }
+    this.changeAccountDetails(userToUpdate.set('enableDistanceAlerts', !userToUpdate.get('enableDistanceAlerts')))
   }
 
   changeAlertDistance (value) {
@@ -117,6 +121,7 @@ class SettingsContainer extends BackgroundComponent {
 
   distancePicker (onValueChange) {
     const items = [
+      {label: '', value: null},
       {label: "1 mi", value: 1},
       {label: "2 mi", value: 2},
       {label: "3 mi", value: 3},
