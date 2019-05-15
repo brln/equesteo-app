@@ -310,7 +310,10 @@ class UpdateRideContainer extends BackgroundComponent {
         'elapsedTimeSecs', newTime
       ).set(
         'distance', newDistance
+      ).set(
+        'startTime', firstCoord.get('timestamp')
       )
+
 
       this.props.dispatch(rideUpdated(updatedRide))
     }

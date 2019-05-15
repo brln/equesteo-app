@@ -28,6 +28,7 @@ import PhotoMenu from '../PhotoMenu'
 import SelectHorseMenu from './SelectHorseMenu'
 import ViewingMap from '../Ride/ViewingMap'
 import Amplitude, { ADD_RIDE_PHOTO, TRIM_RIDE } from '../../services/Amplitude'
+import CustomMarker from './CustomMarker'
 
 const { width } = Dimensions.get('window')
 
@@ -131,7 +132,7 @@ export default class UpdateRide extends PureComponent {
             <View style={{paddingLeft: 5}}>
               <MultiSlider
                 sliderLength={width - 40}
-                values={[0, numCoords]}
+                values={[0, numCoords - 1]}
                 min={0}
                 max={numCoords}
                 onValuesChange={this.props.trimRide}
@@ -141,8 +142,14 @@ export default class UpdateRide extends PureComponent {
                 selectedStyle={{
                   backgroundColor: brand
                 }}
-                markerStyle={{
-                  backgroundColor: brand
+                customMarker={(e) => {
+                  return (
+                    <CustomMarker
+                      currentValue={e.currentValue}
+                      enabled={true}
+                      rideCoordinates={this.props.rideCoordinates}
+                    />
+                  )
                 }}
               />
             </View>
