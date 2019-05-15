@@ -1,5 +1,7 @@
 import amplitude from 'amplitude-js'
 
+import { AMPLITUDE_TOKEN } from "../dotEnv"
+
 export const ACTIVATE_HOOF_TRACKS = 'ACTIVATE_HOOF_TRACKS'
 export const ADD_CARE_EVENT = 'ADD_CARE_EVENT'
 export const ADD_CARE_EVENT_NOW = 'ADD_CARE_EVENT_NOW'
@@ -67,7 +69,7 @@ export const VIEW_HORSE_PROFILE = 'VIEW_HORSE_PROFILE'
 export const VIEW_RIDE_CHARTS = 'VIEW_RIDE_CHARTS'
 export const VIEW_USER_PROFILE = 'VIEW_USER_PROFILE'
 
-amplitude.getInstance().init('7fdd8b8ca4da1c601237ae07736deecb', null, {
+amplitude.getInstance().init(AMPLITUDE_TOKEN, null, {
   useNativeDeviceInfo: true
 })
 

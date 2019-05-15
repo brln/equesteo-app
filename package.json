@@ -32,7 +32,6 @@
     "react-native-image-crop-picker": "^0.22.0",
     "react-native-image-zoom-viewer": "^2.2.13",
     "react-native-keyboard-aware-scroll-view": "^0.8.0",
-    "react-native-mixpanel": "^1.1.1",
     "react-native-modal-datetime-picker": "^7.2.0",
     "react-native-modalbox": "^1.5.0",
     "react-native-navigation": "^2.10.0",

@@ -7,7 +7,7 @@ import { configure } from './services/Sentry'
 import { combineReducers } from 'redux-immutable';
 import Mapbox from '@mapbox/react-native-mapbox-gl';
 
-import { MAPBOX_TOKEN, MIXPANEL_TOKEN } from './dotEnv'
+import { MAPBOX_TOKEN } from './dotEnv'
 import { appInitialized } from "./actions/functional"
 import { logDebug } from './helpers'
 import logger from './middleware/logger'
