@@ -1,8 +1,6 @@
-import { Navigation } from 'react-native-navigation'
 import React, { PureComponent } from 'react'
 import {
   Dimensions,
-  Keyboard,
   StyleSheet,
   Text,
   TextInput,
@@ -14,7 +12,6 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import Button from '../components/Button'
 import { brand, darkBrand } from '../colors'
 import UserAPI from '../services/UserApi'
-import { EqNavigation } from '../services'
 
 const { width, height } = Dimensions.get('window')
 
@@ -96,7 +93,7 @@ class FeedbackContainer extends PureComponent {
           multiline={true}
           underlineColorAndroid="transparent"
           maxLength={5000}
-          placeholder={"Let us know what you think. Likes, dislikes, problems, feature requests, musings, anecdotes, stories, we'd love to hear it.\n\nIt sends a message straight to our phones.\n\nIf you want to hear back, let us know the best way to get in touch. Email, facebook, phone number, etc.\n\nOr come to Ben Lomond and ride with us!"}
+          placeholder={"Let us know what you think. Likes, dislikes, problems, feature requests, musings, anecdotes, stories, we'd love to hear it.\n\nIt sends a message straight to our phones.\n\nWe'll email you back at the address you signed up with, let us know if there's a better way to reach you.\n\nOr come to Ben Lomond and ride with us!"}
         />
         <View style={{paddingBottom: 10}}>
           <Button disabled={this.state.disableSubmit} color={brand} text="Submit" onPress={this.submit} />

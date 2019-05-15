@@ -12,6 +12,11 @@ import { logRender } from '../helpers'
 import NotificationList from '../components/NotificationsList/NotificationsList'
 import { RIDE } from '../screens/main'
 import { EqNavigation } from '../services'
+import Amplitude, {
+  CLEAR_ALL_NOTIFICATIONS,
+  CLEAR_ONE_NOTIFICATION,
+  VIEW_NOTIFICATION_RIDE,
+} from "../services/Amplitude"
 
 class NotificationsListContainer extends PureComponent {
   static options() {
@@ -66,9 +71,10 @@ class NotificationsListContainer extends PureComponent {
 
   navigationButtonPressed ({ buttonId }) {
     if (buttonId === 'clearAll') {
+      Amplitude.logEvent(CLEAR_ALL_NOTIFICATIONS)
       const notifications = this.memoAllNotifications(this.props.notifications, this.props.rides, this.state.deleted)
       for (let notification of notifications) {
-        this.justClear(notification.get('_id'))
+        this.justClear(notification.get('_id'), true)
       }
     }
   }
@@ -101,12 +107,16 @@ class NotificationsListContainer extends PureComponent {
 
   showAndClear (notificationID, rideID, skipToComments) {
     return () => {
+      Amplitude.logEvent(VIEW_NOTIFICATION_RIDE)
       this.markNotificationSeen(notificationID)
       this.showRide(rideID, skipToComments)
     }
   }
 
-  justClear (notificationID) {
+  justClear (notificationID, clearingMany=false) {
+    if (!clearingMany) {
+      Amplitude.logEvent(CLEAR_ONE_NOTIFICATION)
+    }
     this.markNotificationSeen(notificationID)
   }
 

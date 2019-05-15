@@ -8,6 +8,7 @@ import RideAtlas from '../components/RideAtlas/RideAtlas'
 import { deleteRideAtlasEntry } from "../actions/functional"
 import {setActiveAtlasEntry} from "../actions/standard"
 import { EqNavigation } from '../services'
+import Amplitude, { CHOOSE_RIDE_ATLAS_RIDE } from "../services/Amplitude"
 
 class RideAtlasContainer extends PureComponent {
   static options() {
@@ -41,6 +42,7 @@ class RideAtlasContainer extends PureComponent {
 
   setActiveAtlasEntry (id) {
     return () => {
+      Amplitude.logEvent(CHOOSE_RIDE_ATLAS_RIDE)
       this.props.dispatch(setActiveAtlasEntry(id))
       EqNavigation.pop(this.props.componentId).catch(() => {})
     }

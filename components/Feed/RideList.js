@@ -124,10 +124,11 @@ export default class RideList extends PureComponent {
       }
     }
 
-
-    allFeedItems.sort((a, b) => b.sortTime - a.sortTime)
-    const lastTime = allFeedItems[allFeedItems.length - 1].sortTime
-    allFeedItems.push(new FeedItem(null, lastTime - 1, null, 'endItem', 'endItem'))
+    if (allFeedItems.length > 0) {
+      allFeedItems.sort((a, b) => b.sortTime - a.sortTime)
+      const lastTime = allFeedItems[allFeedItems.length - 1].sortTime
+      allFeedItems.push(new FeedItem(null, lastTime - 1, null, 'endItem', 'endItem'))
+    }
 
     const rideWeeks = {}
     for (let feedItem of allFeedItems) {

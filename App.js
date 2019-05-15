@@ -6,7 +6,6 @@ import { Navigation } from 'react-native-navigation'
 import { configure } from './services/Sentry'
 import { combineReducers } from 'redux-immutable';
 import Mapbox from '@mapbox/react-native-mapbox-gl';
-import  Mixpanel from 'react-native-mixpanel'
 
 import { MAPBOX_TOKEN, MIXPANEL_TOKEN } from './dotEnv'
 import { appInitialized } from "./actions/functional"
@@ -63,9 +62,7 @@ export default function start () {
   registerScreens(store, Provider)
   registerCareScreens(store, Provider)
   Navigation.events().registerAppLaunchedListener(() => {
-    Mixpanel.sharedInstanceWithToken(MIXPANEL_TOKEN).then(() => {
-      store.dispatch(appInitialized())
-    })
+    store.dispatch(appInitialized())
   })
   return store
 }

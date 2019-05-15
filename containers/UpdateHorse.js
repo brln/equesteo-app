@@ -17,6 +17,11 @@ import { persistHorseUpdate } from '../actions/functional'
 import { brand } from '../colors'
 import { generateUUID, logRender, unixTimeNow } from '../helpers'
 import { EqNavigation } from '../services'
+import Amplitude, {
+  CHOOSE_HORSE_TACK_COLOR,
+  UPDATE_DEFAULT_HORSE,
+  UPDATE_GAIT_SPEEDS
+} from "../services/Amplitude"
 
 class UpdateHorseContainer extends PureComponent {
   static options() {
@@ -52,20 +57,23 @@ class UpdateHorseContainer extends PureComponent {
     super(props)
     this.state = {
       backDebounce: false,
-      cachedHorse: null,
-      cachedHorseUser: null,
-      doRevert: true,
-      newPhotoIDs: [],
-      deletedPhotoIDs: [],
-      showPhotoMenu: false,
-      selectedPhotoID: null,
       colorModalOpen: false,
       chosenColor: null,
+      cachedHorse: null,
+      cachedHorseUser: null,
+      deletedPhotoIDs: [],
+      doRevert: true,
+      gaitSpeedsUpdated: false,
+      newPhotoIDs: [],
+      selectedPhotoID: null,
+      showPhotoMenu: false,
     }
+
     this.changeColor = this.changeColor.bind(this)
     this.clearPhotoMenu = this.clearPhotoMenu.bind(this)
     this.goBack = this.goBack.bind(this)
     this.horseUpdated = this.horseUpdated.bind(this)
+    this.markGaitSpeedsUpdated = this.markGaitSpeedsUpdated.bind(this)
     this.markPhotoDeleted = this.markPhotoDeleted.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
     this.onColorModalClosed = this.onColorModalClosed.bind(this)
@@ -157,8 +165,20 @@ class UpdateHorseContainer extends PureComponent {
     this.replaceMenuItems()
   }
 
+  markGaitSpeedsUpdated () {
+    this.setState({
+      gaitSpeedsUpdated: true
+    })
+  }
+
   navigationButtonPressed ({ buttonId }) {
     if (buttonId === 'save') {
+      if (this.props.horse.get('color') !== this.state.cachedHorse.get('color')) {
+        Amplitude.logEvent(CHOOSE_HORSE_TACK_COLOR)
+      }
+      if (this.state.gaitSpeedsUpdated) {
+        Amplitude.logEvent(UPDATE_GAIT_SPEEDS)
+      }
       this.setState({
         doRevert: false,
       })
@@ -223,6 +243,7 @@ class UpdateHorseContainer extends PureComponent {
   }
 
   setDefaultHorse () {
+    Amplitude.logEvent(UPDATE_DEFAULT_HORSE)
     const newVal = !this.props.horseUser.get('rideDefault')
     this.props.dispatch(horseUserUpdated(
       this.props.horseUser.set('rideDefault', newVal)
@@ -268,6 +289,7 @@ class UpdateHorseContainer extends PureComponent {
         horsePhotos={this.memoThisHorsesPhotos(this.props.horsePhotos, this.state.deletedPhotoIDs)}
         horseUpdated={this.horseUpdated}
         horseUser={this.props.horseUser}
+        markGaitSpeedsUpdated={this.markGaitSpeedsUpdated}
         markPhotoDeleted={this.markPhotoDeleted}
         newHorse={this.props.newHorse}
         onColorModalClosed={this.onColorModalClosed}

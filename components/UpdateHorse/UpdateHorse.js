@@ -3,8 +3,8 @@ import ImagePicker from 'react-native-image-crop-picker'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import {
-  Picker,
   StyleSheet,
+  Switch,
   Text,
   TextInput,
   TouchableOpacity,
@@ -12,7 +12,6 @@ import {
 } from 'react-native';
 import {
   Card,
-  CheckBox,
   CardItem,
 } from 'native-base';
 
@@ -80,6 +79,7 @@ export default class UpdateHorse extends PureComponent {
   }
 
   changeHorseGaitSpeeds (newSpeeds) {
+    this.props.markGaitSpeedsUpdated()
     this.changeHorseDetails({gaitSpeeds: newSpeeds})
   }
 
@@ -375,9 +375,9 @@ export default class UpdateHorse extends PureComponent {
                 <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
                   <TouchableOpacity style={{flex: 1, flexDirection: 'row'}} onPress={this.props.setDefaultHorse}>
                     <View style={{flex: 1}}>
-                      <CheckBox
-                        checked={this.props.horseUser.get('rideDefault')}
-                        onPress={this.props.setDefaultHorse}
+                      <Switch
+                        value={this.props.horseUser.get('rideDefault')}
+                        onValueChange={this.props.setDefaultHorse}
                       />
                     </View>
                     <View style={{flex: 6, justifyContent: 'center'}}>

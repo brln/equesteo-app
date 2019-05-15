@@ -4,6 +4,7 @@ import {
   BackHandler,
   Dimensions,
   StyleSheet,
+  Switch,
   Text,
   TextInput,
   View
@@ -11,7 +12,6 @@ import {
 import {
   Card,
   CardItem,
-  CheckBox,
   Fab,
 } from 'native-base'
 import ImagePicker from 'react-native-image-crop-picker'
@@ -27,6 +27,7 @@ import PhotosByTimestamp from '../PhotosByTimestamp'
 import PhotoMenu from '../PhotoMenu'
 import SelectHorseMenu from './SelectHorseMenu'
 import ViewingMap from '../Ride/ViewingMap'
+import Amplitude, { ADD_RIDE_PHOTO, TRIM_RIDE } from '../../services/Amplitude'
 
 const { width } = Dimensions.get('window')
 
@@ -80,6 +81,7 @@ export default class UpdateRide extends PureComponent {
       height: 1080,
       cropping: true,
     }).then(image => {
+      Amplitude.logEvent(ADD_RIDE_PHOTO)
       this.props.createPhoto(image.path)
     }).catch((e) => {
       logError(e)
@@ -87,6 +89,7 @@ export default class UpdateRide extends PureComponent {
   }
 
   startTrim () {
+    Amplitude.logEvent(TRIM_RIDE)
     this.setState({
       trimming: true
     })
@@ -266,9 +269,9 @@ export default class UpdateRide extends PureComponent {
                 <View style={{marginLeft: 20, marginBottom: 30}}>
                   <View style={{flex: 1, flexDirection: 'row'}}>
                     <View style={{flex: 1}}>
-                      <CheckBox
-                        checked={this.props.ride.get('isPublic')}
-                        onPress={this.props.changePublic}
+                      <Switch
+                        value={this.props.ride.get('isPublic')}
+                        onValueChange={this.props.changePublic}
                       />
                     </View>
                     <View style={{flex: 6, justifyContent: 'center'}}>

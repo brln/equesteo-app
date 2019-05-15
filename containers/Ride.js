@@ -30,6 +30,10 @@ import {
   RIDE_TOOLS,
 } from '../screens/main'
 import { EqNavigation } from '../services'
+import Amplitude, {
+  ADD_COMMENT,
+  VIEW_RIDE_CHARTS,
+} from "../services/Amplitude"
 
 class RideContainer extends PureComponent {
   static options() {
@@ -116,6 +120,7 @@ class RideContainer extends PureComponent {
   }
 
   viewRideCharts () {
+    Amplitude.logEvent(VIEW_RIDE_CHARTS)
     EqNavigation.push(this.props.componentId, {
       component: {
         name: RIDE_CHARTS,
@@ -136,6 +141,7 @@ class RideContainer extends PureComponent {
 
   submitComment () {
     if (!!this.state.newComment === true) {
+      Amplitude.logEvent(ADD_COMMENT)
       this.props.dispatch(createRideComment({
         comment: this.state.newComment,
         rideID: this.props.ride.get('_id'),

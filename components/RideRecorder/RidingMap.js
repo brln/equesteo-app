@@ -14,6 +14,9 @@ import BuildImage from '../Images/BuildImage'
 import { haversine, logError, logRender, parseRideCoordinate } from '../../helpers'
 import { brand, darkGrey } from '../../colors'
 import { rainbow } from '../../services/Rainbow'
+import Amplitude, {
+  SWITCH_MAP_TYPE
+} from "../../services/Amplitude"
 
 const { width } = Dimensions.get('window')
 
@@ -29,11 +32,10 @@ export default class RidingMap extends PureComponent {
     this.fitToElements = this.fitToElements.bind(this)
     this.gpsIndicator = this.gpsIndicator.bind(this)
     this.gpsStatusImage = this.gpsStatusImage.bind(this)
-    this.mapTypeMap = this.mapTypeMap.bind(this)
-    this.mapTypePhoto = this.mapTypePhoto.bind(this)
     this.renderMaptypeButtons = this.renderMaptypeButtons.bind(this)
     this.recenterButton = this.recenterButton.bind(this)
     this.showMaptypeButtons = this.showMaptypeButtons.bind(this)
+    this.switchMapType = this.switchMapType.bind(this)
   }
 
   static mapCoordinates (rideCoordinatesRecord) {
@@ -79,18 +81,14 @@ export default class RidingMap extends PureComponent {
     return featureCollection
   }
 
-  mapTypeMap () {
-    this.setState({
-      mapType: 'map',
-      showingMaptypes: false
-    })
-  }
-
-  mapTypePhoto () {
-    this.setState({
-      mapType: 'photo',
-      showingMaptypes: false
-    })
+  switchMapType (type) {
+    return () => {
+      Amplitude.logEvent(SWITCH_MAP_TYPE)
+      this.setState({
+        mapType: type,
+        showingMaptypes: false
+      })
+    }
   }
 
   fitToElements() {
@@ -188,7 +186,7 @@ export default class RidingMap extends PureComponent {
             justifyContent: 'center',
             backgroundColor: this.state.mapType === 'map' ? chosenColor : notChosenColor
           }}
-          onPress={this.mapTypeMap}
+          onPress={this.switchMapType('map')}
           >
             <Text style={{textAlign: 'center'}}>Map</Text>
           </TouchableOpacity>,
@@ -201,7 +199,7 @@ export default class RidingMap extends PureComponent {
             borderTopRightRadius: 4,
             backgroundColor: this.state.mapType === 'photo' ? chosenColor : notChosenColor,
             borderBottomRightRadius: 4}}
-            onPress={this.mapTypePhoto}
+            onPress={this.switchMapType('photo')}
           >
             <Text style={{textAlign: 'center'}}>Photo</Text>
           </TouchableOpacity>

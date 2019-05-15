@@ -20,6 +20,7 @@ import EventList from '../../components/CareCalendar/EventList'
 import {changeCareCalendarTab, setCareEventDate} from '../../actions/standard'
 import { unixTimeNow } from '../../helpers'
 import Calendar from './Calendar'
+import Amplitude, { ADD_CARE_EVENT, ADD_CARE_EVENT_NOW } from "../../services/Amplitude"
 
 class EventListContainer extends Component {
   static options() {
@@ -73,6 +74,7 @@ class EventListContainer extends Component {
   }
 
   openCalendar () {
+    Amplitude.logEvent(ADD_CARE_EVENT)
     EqNavigation.push(this.props.componentId, {
       component: {
         name: CARE_CALENDAR,
@@ -84,6 +86,7 @@ class EventListContainer extends Component {
   }
 
   newFeedEventNow () {
+    Amplitude.logEvent(ADD_CARE_EVENT_NOW)
     this.props.dispatch(setCareEventDate(unixTimeNow()))
     this.openEventType()
   }

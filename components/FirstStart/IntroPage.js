@@ -8,8 +8,21 @@ import {
 import { brand, darkGrey, lightGrey } from '../../colors'
 import { logRender } from '../../helpers'
 import Button from '../Button'
+import Amplitude, {
+  SKIP_FIRST_START_FOREVER
+} from "../../services/Amplitude"
 
 export default class NamePage extends PureComponent {
+  constructor (props) {
+    super(props)
+    this.skipForever = this.skipForever.bind(this)
+  }
+
+  skipForever () {
+    Amplitude.logEvent(SKIP_FIRST_START_FOREVER)
+    this.props.done(true)
+  }
+
   render() {
     logRender('IntroPage')
     return (
@@ -36,7 +49,7 @@ export default class NamePage extends PureComponent {
                   color={"transparent"}
                   text={"Skip Forever"}
                   otherTextStyle={{color: darkGrey}}
-                  onPress={this.props.done}
+                  onPress={this.skipForever}
                 />
               </View>
               <View style={{padding: 5}}>

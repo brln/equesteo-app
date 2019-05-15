@@ -15,6 +15,14 @@ import { BARN, FEEDBACK, FIND_PEOPLE, PROFILE, SETTINGS } from '../screens/main'
 import { EVENT_LIST } from '../screens/care'
 import Thumbnail from '../components/Images/Thumbnail'
 import { EqNavigation } from '../services'
+import Amplitude, {
+  OPEN_BARN,
+  OPEN_CARE_CALENDAR,
+  OPEN_FEEDBACK,
+  OPEN_FIND_FRIENDS,
+  OPEN_MY_ACCOUNT,
+  OPEN_SETTINGS,
+} from "../services/Amplitude"
 
 const { width } = Dimensions.get('window')
 
@@ -56,6 +64,7 @@ class MoreContainer extends Component {
   }
 
   showFeedback () {
+    Amplitude.logEvent(OPEN_FEEDBACK)
     EqNavigation.push(this.props.activeComponent, {
       component: {
         name: FEEDBACK,
@@ -64,6 +73,7 @@ class MoreContainer extends Component {
   }
 
   showBarn () {
+    Amplitude.logEvent(OPEN_BARN)
     EqNavigation.push(this.props.activeComponent, {
       component: {
         name: BARN,
@@ -72,6 +82,7 @@ class MoreContainer extends Component {
   }
 
   showFindFriends() {
+    Amplitude.logEvent(OPEN_FIND_FRIENDS)
     EqNavigation.push(this.props.activeComponent, {
       component: {
         name: FIND_PEOPLE,
@@ -81,6 +92,7 @@ class MoreContainer extends Component {
   }
 
   showMyAccount () {
+    Amplitude.logEvent(OPEN_MY_ACCOUNT)
     EqNavigation.push(this.props.activeComponent, {
       component: {
         name: PROFILE,
@@ -93,6 +105,7 @@ class MoreContainer extends Component {
   }
 
   showSettings () {
+    Amplitude.logEvent(OPEN_SETTINGS)
     EqNavigation.push(this.props.activeComponent, {
       component: {
         name: SETTINGS,
@@ -102,6 +115,7 @@ class MoreContainer extends Component {
   }
 
   showCareCalendar () {
+    Amplitude.logEvent(OPEN_CARE_CALENDAR)
     EqNavigation.push(this.props.activeComponent, {
       component: {
         name: EVENT_LIST,

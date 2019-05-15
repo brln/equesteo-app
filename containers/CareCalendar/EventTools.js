@@ -14,6 +14,7 @@ import { logRender } from '../../helpers'
 import Thumbnail from '../../components/Images/Thumbnail'
 import { deleteCareEvent } from '../../actions/functional'
 import EqNavigation from '../../services/EqNavigation'
+import Amplitude, { DELETE_CARE_EVENT } from "../../services/Amplitude"
 
 const { width } = Dimensions.get('window')
 
@@ -43,6 +44,7 @@ class EventToolsContainer extends Component {
   }
 
   deleteCareEvent () {
+    Amplitude.logEvent(DELETE_CARE_EVENT)
     EqNavigation.popTo(this.props.popAfterDeleteCompID).then(() => {
       this.props.dispatch(deleteCareEvent(this.props.careEvent))
     }).catch(() => {})

@@ -16,6 +16,12 @@ import {
   stopHoofTracksDispatcher
 } from "../../actions/functional"
 import HoofTracksLive from '../../components/HoofTracks/HoofTracksLive'
+import Amplitude, {
+  ACTIVATE_HOOF_TRACKS,
+  DEACTIVATE_HOOF_TRACKS,
+  RESET_HOOF_TRACKS_CODE,
+  SHARE_HOOF_TRACKS_CODE
+} from "../../services/Amplitude"
 
 class HoofTracksContainer extends PureComponent {
   static options() {
@@ -86,6 +92,7 @@ class HoofTracksContainer extends PureComponent {
           {
             text: 'OK',
             onPress: () => {
+              Amplitude.logEvent(ACTIVATE_HOOF_TRACKS)
               this.props.dispatch(setHoofTracksRunning(true))
               this.props.dispatch(doHoofTracksUpload())
               EqNavigation.pop(this.props.componentId)
@@ -101,6 +108,7 @@ class HoofTracksContainer extends PureComponent {
 
 
     } else if (buttonId === 'stopTracks') {
+      Amplitude.logEvent(DEACTIVATE_HOOF_TRACKS)
       this.props.dispatch(stopHoofTracksDispatcher())
       EqNavigation.pop(this.props.componentId)
     }
@@ -130,6 +138,7 @@ class HoofTracksContainer extends PureComponent {
   }
 
   shareLink () {
+    Amplitude.logEvent(SHARE_HOOF_TRACKS_CODE)
     Share.share({message: `https://equesteo.com/hoofTracks?c=${this.props.hoofTracksID}`, title: "Follow my track on Equesteo!"})
   }
 
@@ -143,6 +152,7 @@ class HoofTracksContainer extends PureComponent {
           onPress: () => {
             this.props.dispatch(setHoofTracksLastUpload(null))
             UserAPI.resetHoofTracksID().then((resp => {
+              Amplitude.logEvent(RESET_HOOF_TRACKS_CODE)
               this.props.dispatch(setHoofTracksID(resp.htID))
             })).catch(e => {})
           },

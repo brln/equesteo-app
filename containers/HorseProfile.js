@@ -21,6 +21,11 @@ import { generateUUID, logRender, unixTimeNow } from '../helpers'
 import { HORSE_TOOLS, PHOTO_LIGHTBOX, PROFILE } from '../screens/main'
 import HorseProfile from '../components/HorseProfile/HorseProfile'
 import { EqNavigation } from '../services'
+import Amplitude, {
+  ARCHIVE_HORSE,
+  RIDE_ANOTHER_USERS_HORSE,
+  VIEW_HORSE_PROFILE,
+} from '../services/Amplitude'
 
 
 class HorseProfileContainer extends BackgroundComponent {
@@ -74,6 +79,10 @@ class HorseProfileContainer extends BackgroundComponent {
     }
   }
 
+  componentWillMount () {
+    Amplitude.logEvent(VIEW_HORSE_PROFILE)
+  }
+
   showPhotoLightbox (sources) {
     EqNavigation.push(this.props.componentId, {
       component: {
@@ -86,6 +95,7 @@ class HorseProfileContainer extends BackgroundComponent {
   }
 
   addRider () {
+    Amplitude.logEvent(RIDE_ANOTHER_USERS_HORSE)
     this.props.dispatch(addHorseUser(this.props.horse, this.props.user))
   }
 
@@ -122,6 +132,7 @@ class HorseProfileContainer extends BackgroundComponent {
   }
 
   deleteHorse () {
+    Amplitude.logEvent(ARCHIVE_HORSE)
     const horseUser = this.horseUser()
     this.props.dispatch(deleteHorseUser(horseUser.get('_id')))
     this.props.dispatch(persistHorseUser(horseUser.get('_id')))

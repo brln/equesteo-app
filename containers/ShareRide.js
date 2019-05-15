@@ -20,6 +20,7 @@ import { brand, darkBrand, lightGrey } from '../colors'
 import { isAndroid, logError, logInfo } from '../helpers'
 import UserAPI from '../services/UserApi'
 import URIImage from '../components/Images/URIImage'
+import Amplitude, { SEND_SHARE_RIDE } from "../services/Amplitude"
 
 const { width } = Dimensions.get('window')
 
@@ -131,6 +132,7 @@ class ShareRideContainer extends PureComponent {
   }
 
   shareMap () {
+    Amplitude.logEvent(SEND_SHARE_RIDE)
     Share.share({message: this.state.shareLink, title: 'I went for a ride on Equesteo'})
   }
 

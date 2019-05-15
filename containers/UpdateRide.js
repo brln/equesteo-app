@@ -43,6 +43,12 @@ import {
 import UpdateRide from '../components/UpdateRide/UpdateRide'
 import { PHOTO_LIGHTBOX, RIDE } from '../screens/main'
 import { EqNavigation } from '../services'
+import Amplitude, {
+  DISCARD_NEW_RIDE,
+  SAVE_RIDE,
+  SAVE_NEW_RIDE,
+  SET_SINGLE_RIDE_TO_PRIVATE
+} from "../services/Amplitude"
 
 class UpdateRideContainer extends BackgroundComponent {
   static options() {
@@ -150,6 +156,7 @@ class UpdateRideContainer extends BackgroundComponent {
   navigationButtonPressed({ buttonId }) {
     if (this.props.newRide) {
       if (buttonId === 'save') {
+        Amplitude.logEvent(SAVE_NEW_RIDE)
         this.setState({
           doRevert: false
         })
@@ -185,6 +192,7 @@ class UpdateRideContainer extends BackgroundComponent {
           })
         }).catch(() => {})
       } else if (buttonId === 'discard') {
+        Amplitude.logEvent(DISCARD_NEW_RIDE)
         this.props.dispatch(setActiveAtlasEntry(null))
         Alert.alert(
           'Discard Ride?',
@@ -205,6 +213,7 @@ class UpdateRideContainer extends BackgroundComponent {
       }
     } else {
       if (buttonId === 'save') {
+        Amplitude.logEvent(SAVE_RIDE)
         this.setState({
           doRevert: false
         })
@@ -377,8 +386,12 @@ class UpdateRideContainer extends BackgroundComponent {
   }
 
   changePublic () {
+    const isPublic = !this.props.ride.get('isPublic')
+    if (!isPublic) {
+      Amplitude.logEvent(SET_SINGLE_RIDE_TO_PRIVATE)
+    }
     this.props.dispatch(rideUpdated(
-      this.props.ride.set('isPublic', !this.props.ride.get('isPublic'))
+      this.props.ride.set('isPublic', isPublic)
     ))
   }
 

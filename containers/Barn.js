@@ -1,6 +1,5 @@
 import React from 'react'
 import { connect } from 'react-redux';
-import { Navigation } from 'react-native-navigation'
 
 import { createHorse } from '../actions/standard'
 import Barn from '../components/Barn/Barn'
@@ -9,6 +8,7 @@ import { brand } from '../colors'
 import { logRender } from '../helpers'
 import { HORSE_PROFILE, UPDATE_HORSE } from '../screens/main'
 import { EqNavigation } from '../services'
+import Amplitude, { ADD_HORSE } from '../services/Amplitude'
 
 class BarnContainer extends BackgroundComponent {
   static options() {
@@ -55,6 +55,7 @@ class BarnContainer extends BackgroundComponent {
   }
 
   newHorse () {
+    Amplitude.logEvent(ADD_HORSE)
     const horseID = `${this.props.userID.toString()}_${(new Date).getTime().toString()}`
     const horseUserID = `${this.props.userID}_${horseID}`
     this.props.dispatch(createHorse(horseID, horseUserID, this.props.userID))

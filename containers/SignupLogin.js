@@ -29,6 +29,10 @@ import ForgotPage from '../components/SignupLogin/ForgotPage'
 import SignupPage from '../components/SignupLogin/SignupPage'
 import LoginPage from '../components/SignupLogin/LoginPage'
 import { logRender } from '../helpers'
+import Amplitude, {
+  SIGN_UP,
+  SIGN_IN,
+} from "../services/Amplitude"
 
 const { width, height } = Dimensions.get('window')
 
@@ -115,27 +119,33 @@ class SignupLoginContainer extends PureComponent {
   }
 
   submitSignup (email, password) {
-    this.setState({
-      reqSubmitted: true,
-    }, () => {
-      this.props.dispatch(submitSignup(email, password)).then(() => {
-        this.setState({
-          reqSubmitted: false,
+    if (email && password) {
+      this.setState({
+        reqSubmitted: true,
+      }, () => {
+        Amplitude.logEvent(SIGN_UP)
+        this.props.dispatch(submitSignup(email, password)).then(() => {
+          this.setState({
+            reqSubmitted: false,
+          })
         })
       })
-    })
+    }
   }
 
   submitLogin (email, password) {
-    this.setState({
-      reqSubmitted: true,
-    }, () => {
-      this.props.dispatch(submitLogin(email, password)).then(() => {
-        this.setState({
-          reqSubmitted: false,
+    if (email && password) {
+      this.setState({
+        reqSubmitted: true,
+      }, () => {
+        Amplitude.logEvent(SIGN_IN)
+        this.props.dispatch(submitLogin(email, password)).then(() => {
+          this.setState({
+            reqSubmitted: false,
+          })
         })
       })
-    })
+    }
   }
 
   getPWCode (email) {

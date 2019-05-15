@@ -33,6 +33,12 @@ import {
 } from '../screens/main'
 import { generateUUID, logRender, unixTimeNow } from '../helpers'
 import { EqNavigation } from '../services'
+import Amplitude, {
+  DO_USER_LOGOUT,
+  HIT_LOG_OUT,
+  START_FOLLOWING_SOMEONE,
+  VIEW_USER_PROFILE,
+} from "../services/Amplitude"
 
 class ProfileContainer extends BackgroundComponent {
   static options() {
@@ -103,6 +109,12 @@ class ProfileContainer extends BackgroundComponent {
     }
   }
 
+  componentWillMount () {
+    if (this.props.userID !== this.props.profileUser.get('_id')) {
+      Amplitude.logEvent(VIEW_USER_PROFILE)
+    }
+  }
+
   showPhotoLightbox (sources) {
     EqNavigation.push(this.props.componentId, {
       component: {
@@ -132,6 +144,7 @@ class ProfileContainer extends BackgroundComponent {
         }
       }).catch(() => {})
     } else if (buttonId === 'logout') {
+      Amplitude.logEvent(HIT_LOG_OUT)
       Alert.alert(
         'Log Out?',
         'The only reason to log out is if you\'re moving to another device.\n\n All ride data will be deleted from the device, and must be re-downloaded when you sign back in.',
@@ -152,10 +165,12 @@ class ProfileContainer extends BackgroundComponent {
   }
 
   doLogout () {
+    Amplitude.logEvent(DO_USER_LOGOUT)
     this.props.dispatch(signOut())
   }
 
   createFollow (followingID) {
+    Amplitude.logEvent(START_FOLLOWING_SOMEONE)
     const followID = `${this.props.userID}_${followingID}`
     this.props.dispatch(createFollow(followID, followingID, this.props.userID))
     this.props.dispatch(persistFollow(followID, true))

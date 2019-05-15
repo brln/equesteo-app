@@ -24,6 +24,10 @@ import Stat from '../Stat'
 import PhotoFilmstrip from "../Ride/PhotoFilmstrip"
 import SquaresCard from '../Profile/SquaresCard'
 import MedImage from '../Images/MedImage'
+import Amplitude, {
+  ADD_HORSE_PHOTO_TO_OTHERS_HORSE,
+  ADD_HORSE_PHOTO_TO_OWN_HORSE,
+} from '../../services/Amplitude'
 
 const { height } = Dimensions.get('window')
 
@@ -51,6 +55,11 @@ export default class HorseProfile extends PureComponent {
       height: 1080,
       cropping: true
     }).then(image => {
+      if (this.props.horseOwner && this.props.horseOwner !== this.props.user) {
+        Amplitude.logEvent(ADD_HORSE_PHOTO_TO_OTHERS_HORSE)
+      } else {
+        Amplitude.logEvent(ADD_HORSE_PHOTO_TO_OWN_HORSE)
+      }
       this.props.uploadPhoto(image.path)
     }).catch(() => {})
   }

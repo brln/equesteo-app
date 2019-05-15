@@ -3,7 +3,6 @@ import { fromJS, Map  } from 'immutable'
 import { Alert, AppState, Linking, NetInfo, Platform } from 'react-native'
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation'
 import firebase from 'react-native-firebase'
-import  Mixpanel from 'react-native-mixpanel'
 import { Navigation } from 'react-native-navigation'
 import PushNotification from 'react-native-push-notification'
 import BackgroundFetch from "react-native-background-fetch"
@@ -12,6 +11,7 @@ import Tts from 'react-native-tts';
 import ApiClient from '../services/ApiClient'
 import { DISTRIBUTION, ENV } from '../dotEnv'
 import kalmanFilter from '../services/Kalman'
+import Amplitude, { APP_INITIALIZED, GIVE_CARROT } from "../services/Amplitude"
 import { captureBreadcrumb, captureException, setUserContext } from "../services/Sentry"
 import {
   goodConnection,
@@ -26,7 +26,6 @@ import {
 } from "../helpers"
 import { danger, green, warning } from '../colors'
 import {
-  allRideIDs,
   configureBackgroundGeolocation,
   loginAndSync,
   tryToLoadStateFromDisk
@@ -106,12 +105,9 @@ export const DB_SYNCED = 'DB_SYNCED'
 Tts.setDucking(true)
 
 
-function cb(action, mixpanel=false) {
+function cb(action) {
   logInfo('functionalAction: ' + action)
   captureBreadcrumb(action, 'functionalAction')
-  if (mixpanel  && ENV !== 'local') {
-    Mixpanel.track(action)
-  }
 }
 
 export function catchAsyncError (dispatch, sentry=true) {
@@ -133,7 +129,7 @@ export function catchAsyncError (dispatch, sentry=true) {
 }
 
 export function addHorseUser (horse, user) {
-  cb('addHorseUser', true)
+  cb('addHorseUser')
   return (dispatch, getState) => {
     const id = `${user.get('_id')}_${horse.get('_id')}`
     let newHorseUser = getState().getIn(['pouchRecords', 'horseUsers', id])
@@ -156,7 +152,7 @@ export function addHorseUser (horse, user) {
 }
 
 export function appInitialized () {
-  cb('appInitialized', true)
+  cb('appInitialized')
   // @TODO: if the app comes back online and the rider had HoofTracks running, either kill it on the
   // @TODO: server or restart it on the app
   return (dispatch, getState) => {
@@ -176,13 +172,13 @@ export function appInitialized () {
       const currentUserID = getState().getIn(['localState', 'userID'])
       if (token && currentUserID) {
         setUserContext(currentUserID)
-        Mixpanel.identify(currentUserID)
-        Mixpanel.set({id: currentUserID})
+        Amplitude.setUserID(currentUserID)
         return PouchCouch.localLoad().then((localData) => {
           dispatch(localDataLoaded(localData))
           dispatch(startListeningFCMTokenRefresh())
           dispatch(startListeningFCM())
           if (getState().getIn(['localState', 'lastFullSync'])) {
+            Amplitude.logEvent(APP_INITIALIZED)
             dispatch(switchRoot(FEED))
           } else {
             dispatch(switchRoot(NEEDS_SYNC))
@@ -206,7 +202,7 @@ export function appInitialized () {
 }
 
 export function changeHorseOwner (horse, newOwnerID) {
-  cb('addHorseUser', true)
+  cb('addHorseUser')
   return (dispatch, getState) => {
     let oldOwnerHorseUser = getState().getIn(['pouchRecords', 'horseUsers']).filter(hu => {
       return hu.get('horseID') === horse.get('_id') && hu.get('owner') === true
@@ -305,7 +301,7 @@ export function createCareEvent () {
 }
 
 export function createRideAtlasEntry(name, userID, ride, rideCoordinates, rideElevations) {
-  cb('createRideAtlasEntry', true)
+  cb('createRideAtlasEntry')
   return (dispatch, getState) => {
     const entryID = `${userID}_${ride.get('_id')}_${unixTimeNow()}`
     const newAtlasEntry = fromJS({
@@ -330,7 +326,7 @@ export function createRideAtlasEntry(name, userID, ride, rideCoordinates, rideEl
 }
 
 export function createRideComment(commentData) {
-  cb('createRideComment', true)
+  cb('createRideComment')
   return (dispatch, getState) => {
     const currentUserID = getState().getIn(['localState', 'userID'])
     const commentID = `${currentUserID}_${(new Date).getTime().toString()}`
@@ -366,7 +362,7 @@ export function deleteCareEvent (careEvent) {
 }
 
 export function deleteHorseUser (horseUserID) {
-  cb('deleteHorseUser', true)
+  cb('deleteHorseUser')
   return (dispatch, getState) => {
     let theHorseUser = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
     if (!theHorseUser) {
@@ -378,7 +374,7 @@ export function deleteHorseUser (horseUserID) {
 }
 
 export function deleteRideAtlasEntry (entryID) {
-  cb('deleteRideAtlasEntry', true)
+  cb('deleteRideAtlasEntry')
   return (dispatch, getState) => {
     const theRideAtlasEntry = getState().getIn (['pouchRecords', 'rideAtlasEntries', entryID])
     const deleted = theRideAtlasEntry.set('deleted', true)
@@ -399,7 +395,7 @@ export function exchangePWCode (email, code) {
 }
 
 export function getPWCode (email) {
-  cb('getPWCode', true)
+  cb('getPWCode')
   return (dispatch) => {
     UserAPI.getPWCode(email).catch(e => {
       dispatch(errorOccurred(e.message))
@@ -503,7 +499,7 @@ export function persistFollow (followID, creating) {
 }
 
 export function persistRide (rideID, newRide, stashedPhotos, deletedPhotoIDs, trimValues, rideHorses) {
-  cb('persistRide', true)
+  cb('persistRide')
   return (dispatch, getState) => {
     const ridePersister = new RidePersister(dispatch, getState, rideID)
     return ridePersister.persistRide(newRide, stashedPhotos, deletedPhotoIDs, trimValues, rideHorses)
@@ -511,7 +507,7 @@ export function persistRide (rideID, newRide, stashedPhotos, deletedPhotoIDs, tr
 }
 
 export function persistUserWithPhoto (userID, userPhotoID) {
-  cb('persistUserWithPhoto', true)
+  cb('persistUserWithPhoto')
   return (dispatch, getState) => {
     const theUserPhoto = getState().getIn(['pouchRecords', 'userPhotos', userPhotoID])
     if (!theUserPhoto) {
@@ -537,7 +533,7 @@ export function persistUserWithPhoto (userID, userPhotoID) {
 }
 
 export function persistHorseWithPhoto (horseID, horsePhotoID) {
-  cb('persistHorseWithPhoto', true)
+  cb('persistHorseWithPhoto')
   return (dispatch, getState) => {
     const theHorsePhoto = getState().getIn(['pouchRecords', 'horsePhotos', horsePhotoID])
     if (!theHorsePhoto) {
@@ -561,7 +557,7 @@ export function persistHorseWithPhoto (horseID, horsePhotoID) {
 }
 
 export function persistHorseUpdate (horseID, horseUserID, deletedPhotoIDs, newPhotoIDs, previousDefaultValue) {
-  cb('persistHorseUpdate', true)
+  cb('persistHorseUpdate')
   return (dispatch, getState) => {
     const theHorse = getState().getIn(['pouchRecords', 'horses', horseID])
     if (!theHorse) {
@@ -637,7 +633,7 @@ export function persistHorseUpdate (horseID, horseUserID, deletedPhotoIDs, newPh
 }
 
 export function persistHorseUser (horseUserID, runSyncNow=true) {
-  cb('persistHorseUser', true)
+  cb('persistHorseUser')
   return (dispatch, getState) => {
     const theHorseUser = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
     if (!theHorseUser) {
@@ -654,7 +650,7 @@ export function persistHorseUser (horseUserID, runSyncNow=true) {
 }
 
 export function persistUserUpdate (userID, deletedPhotoIDs) {
-  cb('persistUserUpdate', true)
+  cb('persistUserUpdate')
   return (dispatch, getState) => {
     const theUser = getState().getIn(['pouchRecords', 'users', userID])
     if (!theUser) {
@@ -689,7 +685,7 @@ export function persistUserUpdate (userID, deletedPhotoIDs) {
 }
 
 export function photoNeedsUpload (type, photoLocation, photoID) {
-  cb('photoNeedsUpload', true)
+  cb('photoNeedsUpload')
   return (dispatch) => {
     const item = Map({
       type,
@@ -721,7 +717,7 @@ export function runPhotoQueue() {
 }
 
 export function uploadPhoto (type, photoLocation, photoID) {
-  cb('uploadPhoto', true)
+  cb('uploadPhoto')
   return (dispatch, getState) => {
     const goodConnection = getState().getIn(['localState', 'goodConnection'])
     if (goodConnection) {
@@ -788,7 +784,7 @@ export function uploadPhoto (type, photoLocation, photoID) {
 }
 
 export function searchForFriends (phrase) {
-  cb('searchForFriends', true)
+  cb('searchForFriends')
   return (dispatch) => {
     UserAPI.findUser(phrase).then(resp => {
       dispatch(userSearchReturned(fromJS(resp)))
@@ -843,7 +839,7 @@ export function setDistributionOnServer () {
 }
 
 export function signOut () {
-  cb('signOut', true)
+  cb('signOut')
   return (dispatch, getState) => {
     if (!getState().getIn(['localState', 'signingOut'])) {
       dispatch(setSigningOut(true))
@@ -941,7 +937,7 @@ export function startLocationTracking () {
       })
 
       BackgroundGeolocation.on('location', (location) => {
-        if (location.accuracy > 50) {
+        if (location.accuracy > 20) {
           return
         }
 
@@ -1215,14 +1211,14 @@ function startBackgroundFetch () {
 }
 
 export function submitLogin (email, password) {
-  cb('submitLogin', true)
+  cb('submitLogin')
   return (dispatch, getState) => {
     return loginAndSync(UserAPI.login, [email, password], dispatch, getState)
   }
 }
 
 export function submitSignup (email, password) {
-  cb('submitSignup', true)
+  cb('submitSignup')
   return (dispatch, getState) => {
     return loginAndSync(UserAPI.signup, [email, password], dispatch, getState)
   }
@@ -1236,7 +1232,7 @@ export function pulldownSync () {
 
 let enqueuedSync = null
 export function doSync (syncData={}, showProgress=true, doUpload=true) {
-  cb('doSync', true)
+  cb('doSync')
   return (dispatch, getState) => {
     function feedMessage(message, color, timeout) {
       if (showProgress) {
@@ -1408,7 +1404,7 @@ export function switchRoot (newRoot) {
 }
 
 export function toggleRideCarrot (rideID) {
-  cb('toggleRideCarrot', true)
+  cb('toggleRideCarrot')
   return (dispatch, getState) => {
     const mutexSet = getState().getIn(['localState', 'carrotMutex'])
     if (!mutexSet) {
@@ -1429,6 +1425,7 @@ export function toggleRideCarrot (rideID) {
           dispatch(rideCarrotSaved(withRev))
         })
       } else {
+        Amplitude.logEvent(GIVE_CARROT)
         const carrotID = `${currentUserID}_${(new Date).getTime().toString()}`
         const newCarrot = Map({
           _id: carrotID,

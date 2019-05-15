@@ -197,7 +197,6 @@ export function createFollow (followID, followingID, followerID) {
     followID,
     followingID,
     followerID,
-    mixpanel: true
   }
 }
 
@@ -207,7 +206,6 @@ export function createHorse (horseID, horseUserID, userID) {
     horseID,
     horseUserID,
     userID,
-    mixpanel: true
   }
 }
 
@@ -217,7 +215,6 @@ export function createHorsePhoto (horseID, userID, photoData) {
     horseID,
     userID,
     photoData,
-    mixpanel: true
   }
 }
 
@@ -237,7 +234,6 @@ export function createRide (
     duplicateFrom,
     rideID,
     userID,
-    mixpanel: true
   }
 }
 
@@ -253,7 +249,6 @@ export function createUserPhoto (userID, photoData) {
     type: CREATE_USER_PHOTO,
     userID,
     photoData,
-    mixpanel: true
   }
 }
 
@@ -261,7 +256,6 @@ export function deleteFollow (followID) {
   return {
     type: DELETE_FOLLOW,
     followID,
-    mixpanel: true
   }
 }
 
@@ -270,7 +264,6 @@ export function deleteUnpersistedHorse (horseID, horseUserID) {
     type: DELETE_UNPERSISTED_HORSE,
     horseID,
     horseUserID,
-    mixpanel: true
   }
 }
 
@@ -278,7 +271,6 @@ export function deleteUnpersistedRide (rideID) {
   return {
     type: DELETE_UNPERSISTED_RIDE,
     rideID,
-    mixpanel: true
   }
 }
 
@@ -287,7 +279,6 @@ export function deleteUnpersistedPhoto (photoSection, photoID) {
     type: DELETE_UNPERSISTED_PHOTO,
     photoSection,
     photoID,
-    mixpanel: true
   }
 }
 
@@ -301,7 +292,6 @@ export function dequeuePhoto (photoID) {
 export function discardCurrentRide ()  {
   return {
     type: DISCARD_CURRENT_RIDE,
-    mixpanel: true,
   }
 }
 
@@ -323,7 +313,6 @@ export function errorOccurred (message) {
     type: ERROR_OCCURRED,
     message,
     logData: ['message'],
-    mixpanel: true
   }
 }
 
@@ -387,7 +376,6 @@ export function localDataLoaded (localData) {
 export function mergeStashedLocations () {
   return {
     type: MERGE_STASHED_LOCATIONS,
-    mixpanel: true,
   }
 }
 
@@ -412,7 +400,6 @@ export function newNetworkState (goodConnection) {
     type: NEW_NETWORK_STATE,
     goodConnection,
     logData: ['goodConnection'],
-    mixpanel: true,
   }
 }
 
@@ -426,7 +413,6 @@ export function notificationUpdated (notification) {
 export function pauseLocationTracking () {
   return {
     type: PAUSE_LOCATION_TRACKING,
-    mixpanel: true,
   }
 }
 
@@ -464,7 +450,6 @@ export function rideCarrotCreated (carrotData) {
   return {
     type: RIDE_CARROT_CREATED,
     carrotData,
-    mixpanel: true
   }
 }
 
@@ -514,7 +499,6 @@ export function setActiveAtlasEntry (id) {
   return {
     type: SET_ACTIVE_ATLAS_ENTRY,
     id,
-    mixpanel: true
   }
 }
 
@@ -538,7 +522,6 @@ export function setHoofTracksRunning (value) {
     type: SET_HOOF_TRACKS_RUNNING,
     value,
     logData: ['value'],
-    mixpanel: true,
   }
 }
 
@@ -562,7 +545,6 @@ export function setShowingRide (rideID) {
   return {
     type: SET_SHOWING_RIDE,
     rideID,
-    mixpanel: true,
     logData: ['rideID'],
   }
 }
@@ -662,14 +644,12 @@ export function startRide(firstCoord, firstElevation, startTime) {
     firstCoord,
     firstElevation,
     startTime,
-    mixpanel: true
   }
 }
 
 export function syncComplete () {
   return {
     type: SYNC_COMPLETE,
-    mixpanel: true
   }
 }
 
@@ -704,7 +684,6 @@ export function setSigningOut (value) {
 export function unpauseLocationTracking () {
   return {
     type: UNPAUSE_LOCATION_TRACKING,
-    mixpanel: true,
   }
 }
 

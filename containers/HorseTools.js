@@ -20,6 +20,7 @@ import {
   deleteHorseUser,
   persistHorseUser,
 } from '../actions/functional'
+import Amplitude, { TRANSFER_HORSE_TO_NEW_USER } from "../services/Amplitude"
 
 const { width } = Dimensions.get('window')
 
@@ -111,6 +112,7 @@ class HorseToolsContainer extends Component {
 
   transferHorse () {
     const doTransfer  = (userID) => {
+      Amplitude.logEvent(TRANSFER_HORSE_TO_NEW_USER)
       this.props.dispatch(changeHorseOwner(this.props.horse, userID))
     }
 

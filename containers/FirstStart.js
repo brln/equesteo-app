@@ -21,6 +21,7 @@ import { generateUUID, logRender, unixTimeNow } from '../helpers'
 import FirstStart from '../components/FirstStart/FirstStart'
 import { EqNavigation } from '../services'
 
+
 class FirstStartContainer extends PureComponent {
   static options() {
     return {

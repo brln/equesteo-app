@@ -1,10 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux';
-import { Text, View } from 'react-native'
+import { Switch, Text, View } from 'react-native'
 import {
   Card,
   CardItem,
-  CheckBox,
 } from 'native-base'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { Navigation } from 'react-native-navigation'
@@ -16,6 +15,12 @@ import { persistUserUpdate } from '../actions/functional'
 import { userUpdated } from '../actions/standard'
 import { EqNavigation } from '../services'
 import EqPicker from '../components/EqPicker'
+import Amplitude, {
+  ENABLE_HOOF_TRACKS,
+  MAKE_RIDES_DEFAULT_PRIVATE,
+  OPT_OUT_OF_LEADERBOARDS,
+  TURN_ON_DISTANCE_ALERTS,
+} from "../services/Amplitude"
 
 class SettingsContainer extends BackgroundComponent {
   static options() {
@@ -96,23 +101,39 @@ class SettingsContainer extends BackgroundComponent {
   }
 
   changeLeaderboardOptOut () {
-    this.changeAccountDetails(this.props.user.set('leaderboardOptOut', !this.props.user.get('leaderboardOptOut')))
+    const newVal = !this.props.user.get('leaderboardOptOut')
+    if (newVal) {
+      Amplitude.logEvent(OPT_OUT_OF_LEADERBOARDS)
+    }
+    this.changeAccountDetails(this.props.user.set('leaderboardOptOut', newVal))
   }
 
   changeExperimentalHoofTracks () {
-    this.changeAccountDetails(this.props.user.set('experimentalHoofTracks', !this.props.user.get('experimentalHoofTracks')))
+    const newVal = !this.props.user.get('experimentalHoofTracks')
+    if (newVal) {
+      Amplitude.logEvent(ENABLE_HOOF_TRACKS)
+    }
+    this.changeAccountDetails(this.props.user.set('experimentalHoofTracks', newVal))
   }
 
   changeDefaultPublic () {
-    this.changeAccountDetails(this.props.user.set('ridesDefaultPublic', !this.props.user.get('ridesDefaultPublic')))
+    const newVal = !this.props.user.get('ridesDefaultPublic')
+    if (!newVal) {
+      Amplitude.logEvent(MAKE_RIDES_DEFAULT_PRIVATE)
+    }
+    this.changeAccountDetails(this.props.user.set('ridesDefaultPublic', newVal))
   }
 
   changeEnableDistanceAlerts () {
     let userToUpdate = this.props.user
-    if (!this.props.user.get('enableDistanceAlerts') && !this.props.user.get('alertDistance')) {
+    const newVal = !this.props.user.get('enableDistanceAlerts')
+    if (newVal && !this.props.user.get('alertDistance')) {
       userToUpdate = userToUpdate.set('alertDistance', 1)
     }
-    this.changeAccountDetails(userToUpdate.set('enableDistanceAlerts', !userToUpdate.get('enableDistanceAlerts')))
+    if (newVal) {
+      Amplitude.logEvent(TURN_ON_DISTANCE_ALERTS)
+    }
+    this.changeAccountDetails(userToUpdate.set('enableDistanceAlerts', newVal))
   }
 
   changeAlertDistance (value) {
@@ -169,9 +190,9 @@ class SettingsContainer extends BackgroundComponent {
             <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
               <View style={{flex: 1, flexDirection: 'row'}}>
                 <View style={{flex: 1}}>
-                  <CheckBox
-                    checked={this.props.user.get('ridesDefaultPublic')}
-                    onPress={this.changeDefaultPublic}
+                  <Switch
+                    value={this.props.user.get('ridesDefaultPublic')}
+                    onValueChange={this.changeDefaultPublic}
                   />
                 </View>
                 <View style={{flex: 6, justifyContent: 'center'}}>
@@ -182,9 +203,9 @@ class SettingsContainer extends BackgroundComponent {
             <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
               <View style={{flex: 1, flexDirection: 'row'}}>
                 <View style={{flex: 1}}>
-                  <CheckBox
-                    checked={this.props.user.get('leaderboardOptOut')}
-                    onPress={this.changeLeaderboardOptOut}
+                  <Switch
+                    value={this.props.user.get('leaderboardOptOut')}
+                    onValueChange={this.changeLeaderboardOptOut}
                   />
                 </View>
                 <View style={{flex: 6, justifyContent: 'center'}}>
@@ -201,9 +222,9 @@ class SettingsContainer extends BackgroundComponent {
             <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
               <View style={{flex: 1, flexDirection: 'row'}}>
                 <View style={{flex: 1}}>
-                  <CheckBox
-                    checked={this.props.user.get('enableDistanceAlerts')}
-                    onPress={this.changeEnableDistanceAlerts}
+                  <Switch
+                    value={this.props.user.get('enableDistanceAlerts')}
+                    onValueChange={this.changeEnableDistanceAlerts}
                   />
                 </View>
                 <View style={{flex: 6, justifyContent: 'center'}}>
@@ -222,9 +243,9 @@ class SettingsContainer extends BackgroundComponent {
             <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
               <View style={{flex: 1, flexDirection: 'row'}}>
                 <View style={{flex: 1}}>
-                  <CheckBox
-                    checked={this.props.user.get('experimentalHoofTracks')}
-                    onPress={this.changeExperimentalHoofTracks}
+                  <Switch
+                    value={this.props.user.get('experimentalHoofTracks')}
+                    onValueChange={this.changeExperimentalHoofTracks}
                   />
                 </View>
                 <View style={{flex: 6, justifyContent: 'center'}}>

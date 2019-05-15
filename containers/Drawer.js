@@ -28,6 +28,14 @@ import BuildImage from '../components/Images/BuildImage'
 import { brand, lightGrey } from '../colors'
 import { logRender } from '../helpers'
 import { EqNavigation } from '../services'
+import Amplitude, {
+  OPEN_BARN,
+  OPEN_CARE_CALENDAR,
+  OPEN_LEADERBOARDS,
+  OPEN_MY_ACCOUNT,
+  OPEN_FEEDBACK,
+  OPEN_TRAINING_PAGE
+} from "../services/Amplitude"
 
 
 const { height, width } = Dimensions.get('window')
@@ -69,6 +77,7 @@ class DrawerContainer extends Component {
 
   openAccount () {
     this.toggleDrawer()
+    Amplitude.logEvent(OPEN_MY_ACCOUNT)
     if (this.props.activeComponent === FEED) {
       EqNavigation.push(this.props.activeComponent, {
         component: {
@@ -91,6 +100,7 @@ class DrawerContainer extends Component {
 
 	openCareCalendar () {
     this.toggleDrawer()
+    Amplitude.logEvent(OPEN_CARE_CALENDAR)
     if (this.props.activeComponent === FEED) {
       EqNavigation.push(this.props.activeComponent, {
         component: {
@@ -109,6 +119,7 @@ class DrawerContainer extends Component {
 
   openBarn () {
     this.toggleDrawer()
+    Amplitude.logEvent(OPEN_BARN)
     if (this.props.activeComponent === FEED) {
       EqNavigation.push(this.props.activeComponent, {
         component: {
@@ -127,6 +138,7 @@ class DrawerContainer extends Component {
 
   openTraining () {
     this.toggleDrawer()
+    Amplitude.logEvent(OPEN_TRAINING_PAGE)
     if (this.props.activeComponent === FEED) {
       EqNavigation.push(this.props.activeComponent, {
         component: {
@@ -145,6 +157,7 @@ class DrawerContainer extends Component {
 
   openLeaderboards () {
     this.toggleDrawer()
+    Amplitude.logEvent(OPEN_LEADERBOARDS)
     if (this.props.activeComponent === FEED) {
       EqNavigation.push(this.props.activeComponent, {
         component: {
@@ -164,6 +177,7 @@ class DrawerContainer extends Component {
 
   openFeedback () {
     this.toggleDrawer()
+    Amplitude.logEvent(OPEN_FEEDBACK)
     if (this.props.activeComponent === FEED) {
       EqNavigation.push(this.props.activeComponent, {
         component: {

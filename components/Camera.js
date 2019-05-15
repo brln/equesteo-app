@@ -13,6 +13,7 @@ import { RNCamera } from 'react-native-camera';
 import BuildImage from './Images/BuildImage'
 import URIImage from './Images/URIImage'
 import { logError } from '../helpers'
+import Amplitude, { TAKE_GEOTAGGED_PHOTO } from "../services/Amplitude"
 
 const { width } = Dimensions.get('window');
 
@@ -35,6 +36,7 @@ export default class Camera extends Component {
 
   takePicture () {
     if (this.camera) {
+      Amplitude.logEvent(TAKE_GEOTAGGED_PHOTO)
       let tempURI
       this.camera.takePictureAsync({
         fixOrientation: true,

@@ -1,10 +1,17 @@
-import { fromJS, List, Map } from 'immutable'
+import { List, Map } from 'immutable'
 import memoizeOne from 'memoize-one'
 import React from 'react'
 import { Keyboard, Platform } from 'react-native'
 import { connect } from 'react-redux'
 import { Navigation } from 'react-native-navigation'
 
+import Amplitude, {
+  OPEN_LEADERBOARDS,
+  OPEN_NOTIFICATIONS,
+  OPEN_TRAINING_PAGE,
+  PULL_DOWN_FOR_SYNC,
+  START_OR_CONTINUE_RIDE
+} from "../../services/Amplitude"
 import { pulldownSync, toggleRideCarrot} from "../../actions/functional"
 import BackgroundComponent from '../../components/BackgroundComponent'
 import { brand } from '../../colors'
@@ -133,7 +140,6 @@ class FeedContainer extends BackgroundComponent {
         },
       })
     )
-    // props.dispatch(checkFCMPermission())
   }
 
   openScreen (openPromise) {
@@ -145,6 +151,7 @@ class FeedContainer extends BackgroundComponent {
   }
 
   openRecorder () {
+    Amplitude.logEvent(START_OR_CONTINUE_RIDE)
     this.openScreen(EqNavigation.push(this.props.activeComponent, {
       component: {
         name: RECORDER,
@@ -154,6 +161,7 @@ class FeedContainer extends BackgroundComponent {
   }
 
   openNotifications () {
+    Amplitude.logEvent(OPEN_NOTIFICATIONS)
     this.openScreen(EqNavigation.push(this.props.activeComponent, {
       component: {
         name: NOTIFICATIONS_LIST,
@@ -164,6 +172,7 @@ class FeedContainer extends BackgroundComponent {
 
 
   openTraining () {
+    Amplitude.logEvent(OPEN_TRAINING_PAGE)
     this.openScreen(EqNavigation.push(this.props.activeComponent, {
       component: {
         name: TRAINING,
@@ -173,6 +182,7 @@ class FeedContainer extends BackgroundComponent {
   }
 
   openLeaderboards () {
+    Amplitude.logEvent(OPEN_LEADERBOARDS)
     this.openScreen(EqNavigation.push(this.props.activeComponent, {
       component: {
         name: LEADERBOARDS,
@@ -277,6 +287,7 @@ class FeedContainer extends BackgroundComponent {
   }
 
   syncDB () {
+    Amplitude.logEvent(PULL_DOWN_FOR_SYNC)
     this.setState({
       refreshing: true
     })

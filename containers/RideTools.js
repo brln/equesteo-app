@@ -29,6 +29,13 @@ import {
   persistRide,
 } from '../actions/functional'
 import { EqNavigation } from '../services'
+import Amplitude, {
+  DUPLICATE_RIDE_TO_ANOTHER_USER,
+  DELETE_RIDE,
+  EDIT_RIDE,
+  SAVE_RIDE_TO_ATLAS,
+  START_SHARE_RIDE,
+} from "../services/Amplitude"
 
 const { width } = Dimensions.get('window')
 
@@ -76,6 +83,7 @@ class RideToolsContainer extends Component {
 
 
   createRideAtlasEntry () {
+    Amplitude.logEvent(SAVE_RIDE_TO_ATLAS)
     return this.props.dispatch(createRideAtlasEntry(
       this.state.atlasEntryName,
       this.props.userID,
@@ -86,6 +94,7 @@ class RideToolsContainer extends Component {
   }
 
   deleteRide () {
+    Amplitude.logEvent(DELETE_RIDE)
     this.props.dispatch(rideUpdated(this.props.ride.set('deleted', true)))
     this.props.dispatch(persistRide(this.props.ride.get('_id'), false, [], [], null, List()))
     EqNavigation.popToRoot(this.props.componentId).catch(() => {})
@@ -99,6 +108,7 @@ class RideToolsContainer extends Component {
   }
 
   updateRide () {
+    Amplitude.logEvent(EDIT_RIDE)
     EqNavigation.push(this.props.componentId, {
       component: {
         name: UPDATE_RIDE,
@@ -111,6 +121,7 @@ class RideToolsContainer extends Component {
   }
 
   shareRide () {
+    Amplitude.logEvent(START_SHARE_RIDE)
     EqNavigation.push(this.props.componentId, {
       component: {
         name: SHARE_RIDE,
@@ -123,6 +134,7 @@ class RideToolsContainer extends Component {
 
   duplicateRide () {
     const doDupe  = (userID) => {
+      Amplitude.logEvent(DUPLICATE_RIDE_TO_ANOTHER_USER)
       const rideID = `${userID.toString()}_${(new Date).getTime().toString()}`
       this.props.dispatch(createRide(
         rideID,

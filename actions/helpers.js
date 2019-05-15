@@ -1,6 +1,4 @@
-
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation'
-import  Mixpanel from 'react-native-mixpanel'
 
 import {
   dismissError,
@@ -22,7 +20,7 @@ import {
 } from './functional'
 import { logError, logInfo } from '../helpers'
 import { FEED, NEEDS_SYNC } from '../screens/main'
-import { LocalStorage } from '../services'
+import { Amplitude, LocalStorage } from '../services'
 
 import { setUserContext } from "../services/Sentry"
 
@@ -36,8 +34,7 @@ export function loginAndSync(loginFunc, loginArgs, dispatch, getState) {
     dispatch(setAwaitingPasswordChange(true))
     dispatch(saveUserID(userID))
     setUserContext(userID)
-    Mixpanel.identify(userID)
-    Mixpanel.set({id: userID})
+    Amplitude.setUserID(userID)
     dispatch(startListeningFCMTokenRefresh())
     dispatch(setDistributionOnServer())
     dispatch(setDoingInitialLoad(true))

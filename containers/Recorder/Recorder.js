@@ -25,7 +25,20 @@ import { brand } from '../../colors'
 import RideRecorder from '../../components/RideRecorder/RideRecorder'
 import { isAndroid, logError, logRender, unixTimeNow } from '../../helpers'
 import { captureException } from '../../services/Sentry'
-import { CAMERA, RIDE_ATLAS, START_HOOF_TRACKS, UPDATE_RIDE, UPDATE_NEW_RIDE_ID } from "../../screens/main"
+import Amplitude, {
+  DISCARD_EMPTY_RIDE,
+  FINISH_RIDE,
+  PAUSE_RIDE,
+  RESUME_PAUSED_RIDE,
+  TURN_OFF_RIDE_ATLAS_RIDE,
+} from "../../services/Amplitude"
+import {
+  CAMERA,
+  RIDE_ATLAS,
+  START_HOOF_TRACKS,
+  UPDATE_RIDE,
+  UPDATE_NEW_RIDE_ID
+} from "../../screens/main"
 import { EqNavigation } from '../../services'
 
 class RecorderContainer extends PureComponent {
@@ -192,10 +205,12 @@ class RecorderContainer extends PureComponent {
   }
 
   clearActiveAtlasEntry () {
+    Amplitude.logEvent(TURN_OFF_RIDE_ATLAS_RIDE)
     this.props.dispatch(setActiveAtlasEntry(null))
   }
 
   finishRide () {
+    Amplitude.logEvent(FINISH_RIDE)
     if (this.props.currentRideCoordinates.get('rideCoordinates').count() > 0) {
       this.props.dispatch(stashNewLocations())
       this.showUpdateRide()
@@ -220,6 +235,7 @@ class RecorderContainer extends PureComponent {
   }
 
   discardRide () {
+    Amplitude.logEvent(DISCARD_EMPTY_RIDE)
     EqNavigation.popToRoot(this.props.componentId).then(() => {
       this.props.dispatch(discardCurrentRide())
       this.props.dispatch(stopLocationTracking())
@@ -251,10 +267,12 @@ class RecorderContainer extends PureComponent {
   }
 
   pauseLocationTracking () {
+    Amplitude.logEvent(PAUSE_RIDE)
     this.props.dispatch(pauseLocationTracking())
   }
 
   unpauseLocationTracking () {
+    Amplitude.logEvent(RESUME_PAUSED_RIDE)
     this.props.dispatch(unpauseLocationTracking())
   }
 
