@@ -226,7 +226,7 @@ export function elapsedTime (startTime, currentTime, pausedTime, lastPauseStart)
   return netElapsed < 0 ? 0 : netElapsed
 }
 
-function leftPad(num) {
+export function leftPad (num) {
   const str = num.toString()
   const pad = "00"
   return pad.substring(0, pad.length - str.length) + str
