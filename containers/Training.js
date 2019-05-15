@@ -6,9 +6,10 @@ import { Navigation } from 'react-native-navigation'
 
 import { brand } from '../colors'
 import Training from '../components/Training/Training'
+import { loadSingleRide } from '../actions/functional'
 import { logRender } from '../helpers'
 import { RIDE } from '../screens/main'
-import { EqNavigation } from '../services'
+import { EqNavigation, PouchCouch } from '../services'
 
 class TrainingContainer extends PureComponent {
   static options() {
@@ -41,7 +42,8 @@ class TrainingContainer extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      settingsModalOpen: false
+      settingsModalOpen: false,
+      loadingRide: false
     }
 
     this.rideHorses = this.rideHorses.bind(this)
@@ -77,7 +79,18 @@ class TrainingContainer extends PureComponent {
         }
       }).catch(() => {})
     } else {
-      alert('Ride not loaded. Feature in progress.')
+      this.setState({ loadingRide: true })
+      this.props.dispatch(loadSingleRide(ride.get('rideID'))).then(() => {
+        this.setState({ loadingRide: false })
+        return EqNavigation.push(this.props.componentId, {
+          component: {
+            name: RIDE,
+            passProps: {rideID: ride.get('rideID')}
+          }
+        })
+      }).catch(() => {
+        this.setState({ loadingRide: false })
+      })
     }
   }
 
@@ -112,6 +125,7 @@ class TrainingContainer extends PureComponent {
       <Training
         horses={this.props.horses}
         horseUsers={this.props.horseUsers}
+        loadingRide={this.state.loadingRide}
         rideHorses={this.memoRideHorses(this.props.rideHorses)}
         riders={this.memoAllRidersButYou(this.props.trainings, this.props.users, this.props.userID)}
         settingsModalOpen={this.state.settingsModalOpen}

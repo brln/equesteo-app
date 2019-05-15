@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 import { Navigation } from 'react-native-navigation'
 import { Alert } from 'react-native'
 
+
 import BackgroundComponent from '../components/BackgroundComponent'
 import Profile from '../components/Profile/Profile'
 import {

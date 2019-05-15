@@ -2,18 +2,19 @@ import React, { PureComponent } from 'react';
 import {
   Card,
   CardItem,
-} from 'native-base';
+} from 'native-base'
 import {
   Text,
   TouchableOpacity,
   View
-} from 'react-native';
+} from 'react-native'
+import { NICOLE_USER_ID } from '../../dotEnv'
 
 import { darkBrand } from '../../colors'
 
 export default class FollowersCard extends PureComponent {
   render() {
-    if (this.props.visible) {
+    if (this.props.visible && (this.props.profileUser.get('_id') !== NICOLE_USER_ID || this.props.userID === NICOLE_USER_ID)) {
       return (
         <Card>
           <CardItem>

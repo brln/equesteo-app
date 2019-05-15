@@ -26,6 +26,7 @@ import {
 } from "../helpers"
 import { danger, green, warning } from '../colors'
 import {
+  allRideIDs,
   configureBackgroundGeolocation,
   loginAndSync,
   tryToLoadStateFromDisk
@@ -426,6 +427,19 @@ export function loadRideElevations (rideID) {
       } else {
         catchAsyncError(dispatch)
       }
+    })
+  }
+}
+
+export function loadSingleRide (rideID) {
+  cb('loadSingleRide')
+  return (dispatch, getState) => {
+    return PouchCouch.localReplicateRide(rideID).then(() => {
+      return PouchCouch.localLoad()
+    }).then(localData => {
+      dispatch(localDataLoaded(localData))
+      loadRideCoordinates(rideID)
+      loadRideElevations(rideID)
     })
   }
 }
@@ -1293,7 +1307,8 @@ export function doSync (syncData={}, showProgress=true, doUpload=true) {
           ).toJS()
         }
         feedMessage('Downloading...', warning, null)
-        return PouchCouch.localReplicateDBs(userID, followingIDs, followerIDs, progress)
+        const lastSync = getState().getIn(['localState', 'lastFullSync'])
+        return PouchCouch.localReplicateDBs(userID, followingIDs, followerIDs, progress, lastSync)
       }).then(() => {
         feedMessage('Calculating...', warning, null)
         return PouchCouch.localLoad()

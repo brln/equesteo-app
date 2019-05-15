@@ -3,6 +3,7 @@ import React, { PureComponent } from 'react'
 import {
   SectionList,
   StyleSheet,
+  Text,
 } from 'react-native';
 
 
@@ -10,6 +11,7 @@ import { getMonday, logInfo } from '../../helpers'
 import HorseCard from './HorseCard/HorseCard'
 import RideCard from './RideCard/RideCard'
 import SectionHeader from './SectionHeader'
+import DoneCard from './DoneCard'
 
 
 export default class RideList extends PureComponent {
@@ -76,6 +78,12 @@ export default class RideList extends PureComponent {
           userProfilePhotoURL={this.getUserProfilePhotoURL(item.itemUser)}
         />
       )
+    } else if (item.type === 'endItem') {
+      return (
+        <DoneCard
+          openTraining={this.props.openTraining}
+        />
+      )
     } else {
       return null
     }
@@ -90,10 +98,9 @@ export default class RideList extends PureComponent {
         throw Error("Should have a horse here.")
       }
       if (horseUser.get('deleted') !== true
-        && (
-          !ownRideList ||
-          (ownRideList && horseUser.get('userID') === userID)
-        )) {
+        && (!ownRideList || (ownRideList && horseUser.get('userID') === userID))
+        && horseUser.get('createTime') > this.props.endOfFeed
+      ) {
         const rider = users.get(horseUser.get('userID'))
         allFeedItems.push(
           new FeedItem(
@@ -110,12 +117,17 @@ export default class RideList extends PureComponent {
     for (let ride of rides) {
       const user = users.get(ride.get('userID'))
       if (!user) {
-        throw Error('no user found!')
+        throw Error(`no user found! ${ride.get('userID')}`)
       }
-      allFeedItems.push(new FeedItem(ride, ride.get('startTime'), user, 'ride', ride.get('_id')))
+      if (ride.get('startTime') > this.props.endOfFeed) {
+        allFeedItems.push(new FeedItem(ride, ride.get('startTime'), user, 'ride', ride.get('_id')))
+      }
     }
 
+
     allFeedItems.sort((a, b) => b.sortTime - a.sortTime)
+    const lastTime = allFeedItems[allFeedItems.length - 1].sortTime
+    allFeedItems.push(new FeedItem(null, lastTime - 1, null, 'endItem', 'endItem'))
 
     const rideWeeks = {}
     for (let feedItem of allFeedItems) {

@@ -25,10 +25,12 @@ export default class Feed extends PureComponent {
   renderRideList (ownRideList, rides, rideHorses) {
     return (
       <RideList
+        endOfFeed={this.props.endOfFeed}
         horses={this.props.horses}
         horsePhotos={this.props.horsePhotos}
         horseUsers={this.props.horseUsers}
         horseOwnerIDs={this.props.horseOwnerIDs}
+        openTraining={this.props.openTraining}
         ownRideList={ownRideList}
         refreshing={this.props.refreshing}
         rides={rides}

@@ -5,11 +5,11 @@ import { Keyboard, Platform } from 'react-native'
 import { connect } from 'react-redux'
 import { Navigation } from 'react-native-navigation'
 
-import {checkFCMPermission, pulldownSync, toggleRideCarrot} from "../../actions/functional"
+import { pulldownSync, toggleRideCarrot} from "../../actions/functional"
 import BackgroundComponent from '../../components/BackgroundComponent'
 import { brand } from '../../colors'
 import Feed from '../../components/Feed/Feed'
-import { logError, logRender } from '../../helpers'
+import { logError, logRender, unixTimeNow } from '../../helpers'
 import {
   FIRST_START,
   HORSE_PROFILE,
@@ -24,6 +24,8 @@ import {
   TRAINING,
 } from '../../screens/main'
 import { EqNavigation } from '../../services'
+
+export const END_OF_FEED = unixTimeNow() - (1000 * 60 * 60 * 24 * 30)
 
 class FeedContainer extends BackgroundComponent {
    static options() {
@@ -54,7 +56,7 @@ class FeedContainer extends BackgroundComponent {
   }
 
   componentDidAppear() {
-    Keyboard.dismiss();
+    Keyboard.dismiss()
   }
 
   constructor (props) {
@@ -288,9 +290,7 @@ class FeedContainer extends BackgroundComponent {
   yourRides (rides, userID) {
     return rides.valueSeq().filter(
       (r) => r.get('userID') === userID && r.get('deleted') !== true
-    ).sort((a, b) =>
-      b.get('startTime') - a.get('startTime')
-    ).slice(0, 30)
+    )
   }
 
   yourRideHorses (yourRides, rideHorses, horses) {
@@ -365,12 +365,10 @@ class FeedContainer extends BackgroundComponent {
 
   followingRides (follows, userID, rides) {
     return rides.valueSeq().filter(
-      r => r.get('isPublic') === true // is a public ride
-        && r.get('deleted') !== true // hasn't been deleted
+      r => r.get('isPublic') === true
+        && r.get('deleted') !== true
         && (r.get('userID') === userID || this.memoizeFollowIDs(follows, userID).get((r.get('userID')))) // user hasn't removed follow
-    ).sort(
-      (a, b) => b.get('startTime') - a.get('startTime')
-    ).slice(0, 50)
+    )
   }
 
   filteredHorses (follows, userID, horseUsers, horses) {
@@ -408,6 +406,7 @@ class FeedContainer extends BackgroundComponent {
       <Feed
         currentRide={this.props.currentRide}
         deleteRide={this.deleteRide}
+        endOfFeed={END_OF_FEED}
         feedMessage={this.props.feedMessage}
         followingRides={followingRides}
         followingRideHorses={followingRideHorses}

@@ -13,7 +13,7 @@ import { formattedWeekString, metersToFeet } from "../../helpers"
 import { rideColor } from '../../modelHelpers/training'
 
 function RideDay (props) {
-  const horseColor =  rideColor(props.ride, props.rideHorses, props.horses, null)
+  const horseColor =  rideColor(props.ride, props.horses, null)
   let showString
   if (props.chosenType === props.types.DISTANCE) {
     showString = (
@@ -60,7 +60,7 @@ function MultiRideDay (props) {
     <View style={{flex: 1, justifyContent: 'center'}}>
       {
         props.rides.map((r) => {
-          const horseColor =  rideColor(r, props.rideHorses, props.horses, null)
+          const horseColor =  rideColor(r, props.horses, null)
           let showString
           if (props.chosenType === props.types.DISTANCE) {
             showString = (
@@ -136,12 +136,22 @@ export default class Week extends Component {
     let totalDistance = 0.0
     let totalTime = 0
     let totalGain = 0
+    const sortedRides = {}
+    for (let ride of rides) {
+      const rideDay = moment(ride.get('startTime')).startOf('day')
+      if (!sortedRides[rideDay]) {
+        sortedRides[rideDay] = []
+      }
+      sortedRides[rideDay].push(ride)
+    }
+
+
     for (let i = 0; i < 7; i++) {
       const eachDay = moment(start).add(i, 'days')
       const daysRides = []
-      for (let ride of rides) {
-        // @TODO: oof, super inefficient
-        if (this.props.rideShouldShow(ride, eachDay)) {
+      const day = sortedRides[eachDay] || []
+      for (let ride of day) {
+        if (this.props.rideShouldShow(ride, eachDay, chosenUserID, chosenHorseID)) {
           daysRides.push(ride)
           totalDistance += ride.get('distance')
           totalTime += ride.get('elapsedTimeSecs')

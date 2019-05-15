@@ -197,7 +197,7 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.set('signingOut', action.value)
     case SYNC_COMPLETE:
       return state.set(
-        'lastFullSync', new Date()
+        'lastFullSync', unixTimeNow()
       ).set(
         'awaitingFullSync', false
       )

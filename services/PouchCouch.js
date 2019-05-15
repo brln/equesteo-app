@@ -1,9 +1,11 @@
 import PouchDB from 'pouchdb-react-native'
-import { API_URL } from '../dotEnv'
+import { API_URL, NICOLE_USER_ID } from '../dotEnv'
 
 import { NotConnectedError } from "../errors"
-import { logError, logInfo } from '../helpers'
+import { logError, logInfo, unixTimeNow } from '../helpers'
 import ApiClient from './ApiClient'
+
+import { END_OF_FEED } from '../containers/Feed/Feed'
 
 const horsesDBName = 'horses'
 const notificationsDBName = 'notifications'
@@ -116,14 +118,14 @@ export default class PouchCouch {
     return ApiClient.checkAuth()
   }
 
-  static localReplicateDBs (ownUserID, followingUserIDs, followerUserIDs, progress) {
+  static localReplicateDBs (ownUserID, followingUserIDs, followerUserIDs, progress, lastSync) {
     let options
     return PouchCouch.preReplicate().then(_options => {
       options = _options
       return PouchCouch.getLeaderboardIDs(options)
     }).then((leaderboardIDs) => {
       return Promise.all([
-        PouchCouch.localReplicateRides(options, ownUserID, [ownUserID, ...followingUserIDs], followerUserIDs, progress),
+        PouchCouch.localReplicateRides(options, ownUserID, [ownUserID, ...followingUserIDs], progress, lastSync),
         PouchCouch.localReplicateHorses(options, [ownUserID, ...followingUserIDs, ...followerUserIDs, ...leaderboardIDs], progress),
         PouchCouch.localReplicateUsers(options, ownUserID, leaderboardIDs, progress),
         PouchCouch.localReplicateNotifications(options, ownUserID, progress),
@@ -143,28 +145,69 @@ export default class PouchCouch {
     })
   }
 
-  static localReplicateRides (options, ownUserID, userIDs, followerUserIDs, progress) {
+  static localReplicateRides (options, ownUserID, userIDs, progress, lastSync) {
+    const rideIDs = {}
+    const allDocIDs = {}
+
     const remoteRidesDB = new PouchDB(`${API_URL}/couchproxy/${ridesDBName}`, options)
     return new Promise((resolve, reject) => {
       return remoteRidesDB.info().then(resp => {
         const docs = parseInt(resp.update_seq.split('-')[0])
         progress.moreDocsFunc(docs)
-        const allDocIDs = {}
-        return remoteRidesDB.query('rides/followingRideDocIDs', {keys: userIDs}).then((resp) => {
+        return remoteRidesDB.query('rides/ridesByTimestamp', {keys: userIDs})
+      }).then(resp => {
+        const now = unixTimeNow()
+        const pullAfter = lastSync || END_OF_FEED
+        resp.rows.map(row => {
+          if (row.value > pullAfter) {
+            rideIDs[row.id] = 0
+          }
+        })
+        return localRidesDB.allDocs({ include_docs: false })
+      }).then(allLocalDocs => {
+        allLocalDocs.rows.reduce((a, d) => {
+          a[d.id] = 0
+          return a
+        }, rideIDs)
+        return remoteRidesDB.query('rides/rideJoins', {keys: Object.keys(rideIDs)})
+      }).then(resp => {
+        resp.rows.map(row => {
+          allDocIDs[row.id] = 0
+        })
+        return remoteRidesDB.query('rides/atlasEntryDocIDs', {key: ownUserID})
+      }).then((resp3) => {
+        resp3.rows.map(row => {
+          allDocIDs[row.id] = 0
+        })
+        PouchDB.replicate(
+          remoteRidesDB,
+          localRidesDB,
+          {
+            batch_size: 1000,
+            live: false,
+            doc_ids: Object.keys(allDocIDs)
+          }
+        ).on('complete', info => {
+          const docs = parseInt(info.last_seq.split('-')[0])
+          progress.doneDocsFunc(docs, 'rides')
+          resolve()
+        }).on('change', (info) => {
+          const docs = parseInt(info.last_seq.split('-')[0])
+          progress.doneDocsFunc(docs, 'rides')
+        }).on('error', PouchCouch.errorHandler(reject))
+      }).catch(PouchCouch.errorHandler(reject))
+    })
+  }
+
+  static localReplicateRide (rideID) {
+    const allDocIDs = {}
+    return new Promise((resolve, reject) => {
+      PouchCouch.preReplicate().then(options => {
+        const remoteRidesDB = new PouchDB(`${API_URL}/couchproxy/${ridesDBName}`, options)
+        remoteRidesDB.query('rides/rideJoins', {key: rideID}).then(resp => {
           resp.rows.map(row => {
             allDocIDs[row.id] = 0
           })
-          return remoteRidesDB.query('rides/followerRideDocIDs', {keys: followerUserIDs})
-        }).then(resp2 => {
-          resp2.rows.map(row => {
-            allDocIDs[row.id] = 0
-          })
-          return remoteRidesDB.query('rides/atlasEntryDocIDs', {key: ownUserID})
-        }).then((resp3) => {
-          resp3.rows.map(row => {
-            allDocIDs[row.id] = 0
-          })
-        }).then(() => {
           PouchDB.replicate(
             remoteRidesDB,
             localRidesDB,
@@ -173,18 +216,15 @@ export default class PouchCouch {
               live: false,
               doc_ids: Object.keys(allDocIDs)
             }
-          ).on('complete', info => {
-            const docs = parseInt(info.last_seq.split('-')[0])
-            progress.doneDocsFunc(docs, 'rides')
+          ).on('complete', () => {
             resolve(resp)
-          }).on('change', (info) => {
-            const docs = parseInt(info.last_seq.split('-')[0])
-            progress.doneDocsFunc(docs, 'rides')
           }).on('error', PouchCouch.errorHandler(reject))
-        }).catch(PouchCouch.errorHandler(reject))
+        })
       })
+      return PouchCouch.postReplicate()
     })
   }
+
 
   static localReplicateNotifications (options, ownUserID, progress) {
     const remoteNotificationsDB = new PouchDB(`${API_URL}/couchproxy/${notificationsDBName}`, options)
@@ -221,41 +261,44 @@ export default class PouchCouch {
       remoteUsersDB.info().then(resp => {
         const docs = parseInt(resp.update_seq.split('-')[0])
         progress.moreDocsFunc(docs)
-        let fetchUserIDs = [ownUserID]
+        let fetchUserIDs = {}
+        fetchUserIDs[ownUserID] = 0
         return remoteUsersDB.query('users/relevantFollows', {key: ownUserID}).then((resp) => {
           // First degree follower/following
-          fetchUserIDs = resp.rows.reduce((accum, row) => {
-            if (accum.indexOf(row.value[0]) < 0) {
-              accum.push(row.value[0])
+          resp.rows.reduce((accum, row) => {
+            if (row.value[0] !== NICOLE_USER_ID) {
+              accum[row.value[0]] = 0
+            } else if (row.value[0] === NICOLE_USER_ID && ownUserID === NICOLE_USER_ID) {
+              accum[row.value[0]] = 0
             }
             return accum
           }, fetchUserIDs)
-          return remoteUsersDB.query('users/relevantFollows', {keys: fetchUserIDs})
+          return remoteUsersDB.query('users/relevantFollows', {keys: Object.keys(fetchUserIDs)})
         }).then(resp2 => {
           // Second degree follower/following
-          fetchUserIDs = resp2.rows.reduce((accum, row) => {
-            if (accum.indexOf(row.value[0]) < 0) {
-              accum.push(row.value[0])
-            }
+          resp2.rows.reduce((accum, row) => {
+            accum[row.value[0]] = 0
             return accum
           }, fetchUserIDs)
-          fetchUserIDs = fetchUserIDs.concat(leaderboardIDs)
-          return remoteUsersDB.query('users/userDocIDs', {keys: fetchUserIDs})
+          for (let leaderboardID of leaderboardIDs) {
+            fetchUserIDs[leaderboardID] = 0
+          }
+          fetchUserIDs[NICOLE_USER_ID] = 0
+          return remoteUsersDB.query('users/userDocIDs', {keys: Object.keys(fetchUserIDs)})
         }).then(resp3 => {
-          let allDocIDs = resp3.rows.reduce((accum, row) => {
-            if (accum.indexOf(row.id) < 0) {
-              accum.push(row.id)
-            }
+          const allDocIDs = {}
+          allDocIDs['leaderboards'] = 0
+          resp3.rows.reduce((accum, row) => {
+            accum[row.id] = 0
             return accum
-          }, [])
-          allDocIDs.push('leaderboards')
+          }, allDocIDs)
           return PouchDB.replicate(
             remoteUsersDB,
             localUsersDB,
             {
               batch_size: 1000,
               live: false,
-              doc_ids: allDocIDs
+              doc_ids: Object.keys(allDocIDs)
             }
           ).on('complete', info => {
             const docs = parseInt(info.last_seq.split('-')[0])

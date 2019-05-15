@@ -29,34 +29,58 @@ export default class CarrotList extends PureComponent {
   }
 
   renderResult ({item}) {
-    let toDo = this.showProfile(item)
-    if (item._id === this.props.userID) {
-      toDo = this.props.toggleCarrot
-    }
-    return (
-      <View style={{flex: 1}}>
-        <TouchableOpacity
-          style={{height: 80}}
-          onPress={toDo}
-        >
+    if (item) {
+      // Now that you don't get all user records, if you go to Nicole's rides,
+      // you'll probably see carrots and comments where you don't have the user.
+      // Just skip them for now, someday fetch the users you need for these.
+      let toDo = this.showProfile(item)
+      if (item._id === this.props.userID) {
+        toDo = this.props.toggleCarrot
+      }
+      return (
+        <View style={{flex: 1}}>
+          <TouchableOpacity
+            style={{height: 80}}
+            onPress={toDo}
+          >
+            <View style={{flex: 1, flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: darkGrey, padding: 20}}>
+              <View style={{flex: 1, justifyContent:'center'}}>
+                <Thumbnail
+                  source={{uri: this.props.userPhotos.getIn([item.profilePhotoID, 'uri'])}}
+                  emptySource={require('../../img/emptyProfile.png')}
+                  empty={!this.props.userPhotos.get(item.profilePhotoID)}
+                  height={width / 7}
+                  width={width/ 7}
+                  round={true}
+                />
+              </View>
+              <View style={{flex: 3, justifyContent: 'center'}}>
+                <Text>{`${item.firstName || ''} ${item.lastName || ''}`}</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
+      )
+    } else {
+      return (
+        <View style={{flex: 1}}>
           <View style={{flex: 1, flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: darkGrey, padding: 20}}>
             <View style={{flex: 1, justifyContent:'center'}}>
               <Thumbnail
-                source={{uri: this.props.userPhotos.getIn([item.profilePhotoID, 'uri'])}}
                 emptySource={require('../../img/emptyProfile.png')}
-                empty={!this.props.userPhotos.get(item.profilePhotoID)}
+                empty={true}
                 height={width / 7}
                 width={width/ 7}
                 round={true}
               />
             </View>
             <View style={{flex: 3, justifyContent: 'center'}}>
-              <Text>{`${item.firstName || ''} ${item.lastName || ''}`}</Text>
+              <Text>Unknown User</Text>
             </View>
           </View>
-        </TouchableOpacity>
-      </View>
-    )
+        </View>
+      )
+    }
   }
 
   giveCarrot () {
@@ -95,7 +119,7 @@ export default class CarrotList extends PureComponent {
       <View style={styles.container}>
         <ScrollView style={{flex: 1, borderTopWidth: 2, borderTopColor: lightGrey}}>
           <FlatList
-            keyExtractor={(u) => u._id}
+            keyExtractor={(u) => u ? u._id : Math.random().toString()}
             containerStyle={{marginTop: 0}}
             data={this.props.users.toJS()}
             renderItem={this.renderResult}

@@ -11,7 +11,7 @@ import {
 
 import BuildImage from '../Images/BuildImage'
 import { brand } from '../../colors'
-import { logRender } from '../../helpers'
+import { logRender, logError } from '../../helpers'
 import Button from '../Button'
 import MedImage from '../Images/MedImage'
 

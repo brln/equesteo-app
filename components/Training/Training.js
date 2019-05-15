@@ -9,6 +9,7 @@ import Calendar from './Calendar'
 import Charts from './Charts'
 import { brand, lightGrey } from '../../colors'
 import SettingsModal from './SettingsModal'
+import RideLoading from './RideLoading'
 
 export default class Training extends PureComponent {
   constructor (props) {
@@ -52,12 +53,12 @@ export default class Training extends PureComponent {
     })
   }
 
-  rideShouldShow (ride, day) {
+  rideShouldShow (ride, day, chosenUserID, chosenHorseID) {
     const happenedOnDay = moment(ride.get('startTime')).isSame(day, 'day')
-    const riderShouldBeShowing = ride.get('userID') === this.state.chosenUserID
-      || this.state.chosenUserID === this.TYPES.SHOW_ALL_RIDERS
-    const horseShouldBeShowing = ride.get('horseIDs').indexOf(this.state.chosenHorseID) >= 0
-      || this.state.chosenHorseID === this.TYPES.SHOW_ALL_HORSES
+    const riderShouldBeShowing = ride.get('userID') === chosenUserID
+      || chosenUserID === this.TYPES.SHOW_ALL_RIDERS
+    const horseShouldBeShowing = ride.get('horseIDs').indexOf(chosenHorseID) >= 0
+      || chosenHorseID === this.TYPES.SHOW_ALL_HORSES
     return happenedOnDay && riderShouldBeShowing && horseShouldBeShowing
   }
 
@@ -78,6 +79,9 @@ export default class Training extends PureComponent {
           riders={this.props.riders}
           types={this.TYPES}
           userID={this.props.userID}
+        />
+        <RideLoading
+          modalOpen={this.props.loadingRide}
         />
         <Tabs
           initialPage={0}

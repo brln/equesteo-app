@@ -285,7 +285,9 @@ export default class Profile extends PureComponent {
           <FollowersCard
             followers={this.props.followers}
             followings={this.props.followings}
+            profileUser={this.props.profileUser}
             showUserList={this.showUserList}
+            userID={this.props.userID}
             visible={this.props.oneDegreeUser}
           />
           <SquaresCard

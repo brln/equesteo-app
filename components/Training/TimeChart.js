@@ -29,9 +29,9 @@ export default class TimeChart extends PureComponent {
     this.memoizeData = memoizeOne(this.data.bind(this))
   }
 
-  days () {
+  days (showDays) {
     const today = new Date()
-    const thirtyAgo = addDays(today, (-1 * this.props.showDays))
+    const thirtyAgo = addDays(today, (-1 * showDays))
     return dateArray(thirtyAgo, today).map(d => moment(d).format('M-D-YYYY'))
   }
 
@@ -55,8 +55,8 @@ export default class TimeChart extends PureComponent {
     ).sort((a, b) => moment(a, 'MM-YYYY') - moment(b, 'MM-YYYY'))
   }
 
-  data () {
-    const days = this.days()
+  data (showDays, chosenType, horses, chosenUserID, chosenHorseID) {
+    const days = this.days(showDays)
     const dailyData = {}
     const weeklyData = {}
     const monthlyData = {}
@@ -68,9 +68,9 @@ export default class TimeChart extends PureComponent {
 
       if (days.indexOf(day) >= 0) {
         const asMoment = moment(day, 'M-D-YYYY')
-        if (this.props.rideShouldShow(ride, asMoment)) {
+        if (this.props.rideShouldShow(ride, asMoment, chosenUserID, chosenHorseID)) {
           let yVal
-          switch(this.props.chosenType) {
+          switch(chosenType) {
             case this.props.types.DISTANCE:
               yVal = ride.get('distance')
               break
@@ -91,7 +91,7 @@ export default class TimeChart extends PureComponent {
             monthlyData[month] = []
           }
 
-          const horseColor = rideColor(ride, this.props.rideHorses, this.props.horses)
+          const horseColor = rideColor(ride, horses)
 
           const dailyY0 = dailyData[day].reduce((a, d) => { return a + (d.y - d.y0) }, 0)
           dailyData[day].push({x: day, y: yVal + dailyY0, y0: dailyY0, fill: horseColor})
@@ -248,7 +248,13 @@ export default class TimeChart extends PureComponent {
             barWidth={xMetaData.barWidth}
             categories={{x: xMetaData.categories}}
             style={{ data: { fill: x => x.fill, stroke: darkGrey }}}
-            data={this.memoizeData()[xMetaData.dataTimeframe]}
+            data={this.memoizeData(
+              this.props.showDays,
+              this.props.chosenType,
+              this.props.horses,
+              this.props.chosenUserID,
+              this.props.chosenHorseID,
+            )[xMetaData.dataTimeframe]}
           />
           <VictoryAxis
             label={xMetaData.label}

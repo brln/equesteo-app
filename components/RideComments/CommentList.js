@@ -39,39 +39,73 @@ export default class CommentList extends PureComponent {
   singleComment({item}) {
     const rideComment = item
     const commentUser = this.props.users.get(rideComment.userID)
-    const commentProfilePhotoURL = this.commentProfilePhotoURL(commentUser)
-    return (
-      <View style={{flex: 1, flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: darkGrey, padding: 10}} key={rideComment._id}>
-        <TouchableOpacity onPress={this.showProfile(commentUser)}>
-          <Thumbnail
-            source={{uri: commentProfilePhotoURL}}
-            emptySource={require('../../img/empty.png')}
-            empty={!commentProfilePhotoURL}
-            height={width / 9}
-            width={width/ 9}
-            round={true}
-            padding={5}
-          />
-        </TouchableOpacity>
-        <View style={{flex: 6, justifyContent: 'flex-start'}}>
-          <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
-            <View style={{flex: 1}}>
-              <Text
-                style={{fontWeight: 'bold', color: 'black'}}
-              >
-                { userName(commentUser) }
-              </Text>
+    if (commentUser) {
+      const commentProfilePhotoURL = this.commentProfilePhotoURL(commentUser)
+      return (
+        <View style={{flex: 1, flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: darkGrey, padding: 10}} key={rideComment._id}>
+          <TouchableOpacity onPress={this.showProfile(commentUser)}>
+            <Thumbnail
+              source={{uri: commentProfilePhotoURL}}
+              emptySource={require('../../img/empty.png')}
+              empty={!commentProfilePhotoURL}
+              height={width / 9}
+              width={width/ 9}
+              round={true}
+              padding={5}
+            />
+          </TouchableOpacity>
+          <View style={{flex: 6, justifyContent: 'flex-start'}}>
+            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
+              <View style={{flex: 1}}>
+                <Text
+                  style={{fontWeight: 'bold', color: 'black'}}
+                >
+                  { userName(commentUser) }
+                </Text>
+              </View>
+              <View style={{flex: 2, alignItems: 'flex-end'}}>
+                <Text>{moment(rideComment.timestamp).format('MM/DD h:mm a')}</Text>
+              </View>
             </View>
-            <View style={{flex: 2, alignItems: 'flex-end'}}>
-              <Text>{moment(rideComment.timestamp).format('MM/DD h:mm a')}</Text>
+            <View style={{flex: 2}}>
+              <Text note>{rideComment.comment}</Text>
             </View>
-          </View>
-          <View style={{flex: 2}}>
-            <Text note>{rideComment.comment}</Text>
           </View>
         </View>
-      </View>
-    )
+      )
+    } else {
+      return (
+        <View style={{flex: 1, flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: darkGrey, padding: 10}} key={rideComment._id}>
+          <View onPress={this.showProfile(commentUser)}>
+            <Thumbnail
+              emptySource={require('../../img/empty.png')}
+              empty={true}
+              height={width / 9}
+              width={width/ 9}
+              round={true}
+              padding={5}
+            />
+          </View>
+          <View style={{flex: 6, justifyContent: 'flex-start'}}>
+            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
+              <View style={{flex: 1}}>
+                <Text
+                  style={{fontWeight: 'bold', color: 'black'}}
+                >
+                  Unknown User
+                </Text>
+              </View>
+              <View style={{flex: 2, alignItems: 'flex-end'}}>
+                <Text>{moment(rideComment.timestamp).format('MM/DD h:mm a')}</Text>
+              </View>
+            </View>
+            <View style={{flex: 2}}>
+              <Text note>{rideComment.comment}</Text>
+            </View>
+          </View>
+        </View>
+      )
+    }
   }
 
   render() {
