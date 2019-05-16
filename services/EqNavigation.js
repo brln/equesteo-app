@@ -20,7 +20,7 @@ export default class EqNavigation {
         logError(e)
       })
     } else {
-      return Promise.reject()
+      return Promise.reject('debounce')
     }
   }
 

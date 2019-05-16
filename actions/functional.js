@@ -33,11 +33,12 @@ import {
 import {
   DRAWER,
   FEED,
+  LOGIN,
   NEEDS_SYNC,
   NOTIFICATION_BUTTON,
   RIDE,
   RIDE_BUTTON,
-  SIGNUP_LOGIN,
+  SIGNUP,
 } from '../screens/main'
 import {
   EqNavigation,
@@ -195,7 +196,12 @@ export function appInitialized () {
           dispatch(startBackgroundFetch())
         })
       } else {
-        dispatch(switchRoot(SIGNUP_LOGIN))
+        if (getState().getIn(['localState', 'everLoggedIn'])) {
+          dispatch(switchRoot(LOGIN))
+        } else {
+          dispatch(switchRoot(SIGNUP))
+        }
+
       }
     }).catch(catchAsyncError(dispatch))
   }
@@ -389,15 +395,15 @@ export function deleteRideAtlasEntry (entryID) {
 
 export function exchangePWCode (email, code) {
   cb('exchangePWCode')
-  return (dispatch, getState) => {
-    loginAndSync(UserAPI.exchangePWCodeForToken, [email, code], dispatch, getState)
+  return () => {
+    return UserAPI.exchangePWCodeForToken(email, code)
   }
 }
 
 export function getPWCode (email) {
   cb('getPWCode')
   return (dispatch) => {
-    UserAPI.getPWCode(email).catch(e => {
+    return UserAPI.getPWCode(email).catch(e => {
       dispatch(errorOccurred(e.message))
     })
   }
@@ -475,8 +481,8 @@ export function markNotificationPopped (notification) {
 
 export function newPassword (password) {
   cb('newPassword')
-  return (dispatch) => {
-    UserAPI.changePassword(password).catch(catchAsyncError(dispatch))
+  return (dispatch, getState) => {
+    return loginAndSync(UserAPI.changePassword, [password], dispatch, getState)
   }
 }
 
@@ -859,7 +865,7 @@ export function signOut () {
           return Navigation.popToRoot(activeComponent)
         }
       }).then(() => {
-        dispatch(switchRoot(SIGNUP_LOGIN))
+        dispatch(switchRoot(LOGIN))
         dispatch(clearState())
         dispatch(setSigningOut(false))
       }).catch(catchAsyncError(dispatch))
@@ -1379,13 +1385,36 @@ export function switchRoot (newRoot) {
           }
         })
       })
-    } else if (newRoot === SIGNUP_LOGIN) {
+    } else if (newRoot === SIGNUP) {
       Navigation.setRoot({
         root: {
-          component: {
-            name: SIGNUP_LOGIN,
-            id: SIGNUP_LOGIN
-          },
+          sideMenu: {
+            center: {
+              stack: {
+                children: [{
+                  component: {
+                    name: SIGNUP,
+                  },
+                }]
+              }
+            },
+          }
+        }
+      })
+    } else if (newRoot === LOGIN) {
+      Navigation.setRoot({
+        root: {
+          sideMenu: {
+            center: {
+              stack: {
+                children: [{
+                  component: {
+                    name: LOGIN,
+                  },
+                }]
+              }
+            },
+          }
         }
       })
     } else if (newRoot === NEEDS_SYNC) {

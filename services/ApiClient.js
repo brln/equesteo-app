@@ -111,6 +111,9 @@ export default class ApiClient {
         }
       )
     }).then(resp => {
+      if (resp.status >= 500) {
+        throw new BadResponseError('Encountered a server problem.')
+      }
       rawResp = resp
       return resp.json().then(json => {
         switch (resp.status) {
@@ -124,13 +127,14 @@ export default class ApiClient {
         return json
       })
     }).catch(e => {
+      logDebug(e, 'wutuwuwtuw')
       if (e instanceof SyntaxError) {
-        logError(e, 'ApiClient.request')
-        logInfo(rawResp)
         throw new BadResponseError('Can\'t parse response.')
       } else if (e instanceof TypeError) {
         if (e.toString() === 'TypeError: Network request failed') {
           throw new NotConnectedError('Can\'t find the internet.')
+        } else {
+          throw e
         }
       } else {
         throw e

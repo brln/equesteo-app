@@ -1,7 +1,7 @@
 import { List, Map } from 'immutable'
 
-import { FEED, SIGNUP_LOGIN } from '../screens/main'
-import { appStates, logError, toUnixTime, unixTimeNow } from '../helpers'
+import { FEED, SIGNUP } from '../screens/main'
+import { appStates, logError, unixTimeNow } from '../helpers'
 import { DB_NEEDS_SYNC, DB_SYNCING, DB_SYNCED } from "../actions/functional"
 
 import {
@@ -70,6 +70,7 @@ export const initialState = Map({
   docsDownloaded: initialDocsDownloaded,
   doingInitialLoad: false,
   error: null,
+  everLoggedIn: false,
   feedMessage: null,
   firstStartHorseID: null,
   fullSyncFail: false,
@@ -84,7 +85,7 @@ export const initialState = Map({
   newCareHorseIDs: List(),
   photoQueue: Map(),
   ridePhotoStash: Map(),
-  root: SIGNUP_LOGIN,
+  root: SIGNUP,
   followingSyncRunning: false,
   showingRide: null,
   signingOut: false,
@@ -118,7 +119,13 @@ export default function LocalStateReducer(state=initialState, action) {
     case CLEAR_SEARCH:
       return state.set('userSearchResults', List())
     case CLEAR_STATE:
-      return initialState.set('goodConnection', state.get('goodConnection'))
+      return initialState.set(
+        'goodConnection',
+        state.get('goodConnection')
+      ).set(
+        'everLoggedIn',
+        state.get('everLoggedIn')
+      )
     case DEQUEUE_PHOTO:
       return state.deleteIn(['photoQueue', action.photoID])
     case DISCARD_CURRENT_RIDE:
@@ -166,7 +173,7 @@ export default function LocalStateReducer(state=initialState, action) {
     case REMOVE_STASHED_RIDE_PHOTO:
       return state.deleteIn(['ridePhotoStash', action.stashKey, action.photoID])
     case SAVE_USER_ID:
-      return state.set('userID', action.userID)
+      return state.set('userID', action.userID).set('everLoggedIn', true)
     case SET_ACTIVE_ATLAS_ENTRY:
       return state.set('activeAtlasEntry', action.id)
     case SET_ACTIVE_COMPONENT:

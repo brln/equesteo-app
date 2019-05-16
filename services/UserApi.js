@@ -22,7 +22,7 @@ export default class UserAPI {
   }
 
   static changePassword (newPassword) {
-    return ApiClient.post('/users/changePW', {
+    return ApiClient.post('/users/changePW2', {
       password: newPassword
     })
   }
@@ -35,7 +35,7 @@ export default class UserAPI {
   }
 
   static exchangePWCodeForToken (email, code) {
-    return ApiClient.post('/users/exchangePWCode', { email, code })
+    return ApiClient.post('/users/exchangePWCode2', { email, code })
   }
 
   static setFCMToken (id, token, platform) {

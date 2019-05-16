@@ -33,10 +33,10 @@ export default class NewPasswordForm extends MultiPlatform {
           autoCorrect={false}
           onSubmitEditing={this.submitNewPassword}
           secureTextEntry={true}
-          onChangeText={this.changePassword2}
-          ref={(i) => this.inputs['pw2'] = i}
+          onChangeText={this.props.changePassword2}
+          ref={(i) => this.props.inputs['pw2'] = i}
           underlineColorAndroid="black"
-          value={this.state.pw2}
+          value={this.props.pw2}
           maxLength={200}
         />
         <Button text={'Change Password'} color={brand} onPress={this.props.submitNewPassword}/>
