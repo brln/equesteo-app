@@ -230,7 +230,7 @@ export default class RidingMap extends PureComponent {
 
   gpsIndicator () {
     if (this.props.lastLocation) {
-      const buttonWidth = this.state.showingMaptypes ? width / 2 : 40
+      const buttonWidth = this.state.showingMaptypes ? width / 2 : 46
       return (
         <View style={{
           position: 'absolute',
@@ -240,11 +240,13 @@ export default class RidingMap extends PureComponent {
         }}>
           <View style={{flex: 1, flexDirection: 'row', backgroundColor: 'white', borderRadius: 4, alignItems: 'center', justifyContent: 'center'}}>
             <TouchableOpacity style={{flex: 1}} onPress={this.showMaptypeButtons}>
-              <BuildImage
-                source={this.gpsStatusImage()}
-                style={{width: 40, height: 40, marginRight: 5}}
-                onError={(e) => { logError('there was an error loading RidingMap image') }}
-              />
+              <View style={{padding: 3}}>
+                <BuildImage
+                  source={this.gpsStatusImage()}
+                  style={{width: 40, height: 40, marginRight: 5}}
+                  onError={(e) => { logError('there was an error loading RidingMap image') }}
+                />
+              </View>
             </TouchableOpacity>
             { this.renderMaptypeButtons() }
           </View>
