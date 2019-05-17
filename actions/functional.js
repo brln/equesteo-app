@@ -967,6 +967,8 @@ export function retryLocationTracking () {
   }
 }
 
+
+let gpsLostTimeout = null
 export function startLocationTracking () {
   cb('startLocationTracking')
   return (dispatch, getState) => {
@@ -982,6 +984,10 @@ export function startLocationTracking () {
         if (location.accuracy > 25) {
           return
         }
+        clearTimeout(gpsLostTimeout)
+        gpsLostTimeout = setTimeout(() => {
+          Tts.speak('GPS signal lost.')
+        }, 30000)
 
         const lastLocation = getState().getIn(['currentRide', 'lastLocation'])
         let timeDiff = 0
