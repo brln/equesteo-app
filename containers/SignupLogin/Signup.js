@@ -20,7 +20,7 @@ import {
   dismissError,
   errorOccurred,
 } from '../../actions/standard'
-import { submitSignup } from '../../actions/functional'
+import { submitSignup, switchRoot } from '../../actions/functional'
 import Amplitude, {
   SIGN_UP,
 } from "../../services/Amplitude"
@@ -53,6 +53,7 @@ class SignupContainer extends PureComponent {
       email: null,
       password1: null,
       password2: null,
+      reqSubmitted: false,
       tosAccepted: false,
       showTOS: false,
     }
@@ -68,6 +69,14 @@ class SignupContainer extends PureComponent {
     this.submitSignup = this.submitSignup.bind(this)
     this.toggleTOS = this.toggleTOS.bind(this)
     this.inputs = {}
+  }
+
+  componentDidUpdate (nextProps) {
+    if (this.props.error) {
+      setTimeout(() => {
+        this.props.dispatch(dismissError())
+      }, 3000)
+    }
   }
 
   errorOccurred (errorText) {
@@ -147,8 +156,8 @@ class SignupContainer extends PureComponent {
       TOSStyle.paddingRight = (width - 320) / 1.5
     }
     const paddingTop = height - 590 > 0 ? (height - 590) / 3 : 0
-    let button = <ActivityIndicator/>
-    if (!this.props.reqSubmitted) {
+    let button = <ActivityIndicator color={brand}/>
+    if (!this.state.reqSubmitted) {
       button = <Button text={'Submit'} color={brand} onPress={this.submitSignup} disabled={!this.state.tosAccepted}/>
     }
     return (

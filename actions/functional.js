@@ -6,7 +6,8 @@ import firebase from 'react-native-firebase'
 import { Navigation } from 'react-native-navigation'
 import PushNotification from 'react-native-push-notification'
 import BackgroundFetch from "react-native-background-fetch"
-import Tts from 'react-native-tts';
+import Tts from 'react-native-tts'
+import URI from 'urijs'
 
 import ApiClient from '../services/ApiClient'
 import { DISTRIBUTION, ENV } from '../dotEnv'
@@ -35,6 +36,7 @@ import {
   FEED,
   LOGIN,
   NEEDS_SYNC,
+  NEW_PASSWORD,
   NOTIFICATION_BUTTON,
   RIDE,
   RIDE_BUTTON,
@@ -152,6 +154,39 @@ export function addHorseUser (horse, user) {
   }
 }
 
+let listener
+export function startForgotPWLinkListener () {
+  return (dispatch, getState) => {
+    listener = ({ url }) => {
+      const parsedURL = URI(url)
+      const token = parsedURL.search(true).t
+      const email = atob(parsedURL.search(true).e)
+      if (email && token) {
+        console.log(email)
+        console.log(token)
+        dispatch(exchangePWCode(email, token)).then(() => {
+          EqNavigation.push(getState().getIn(['localState', 'activeComponent']), {
+            component: {
+              name: NEW_PASSWORD
+            }
+          })
+        }).catch(e => {
+          dispatch(errorOccurred(e.message))
+        })
+      }
+    }
+    Linking.addEventListener('url', listener)
+  }
+}
+
+export function removeForgotPWLinkListener () {
+  return () => {
+    if (listener) {
+      Linking.removeEventListener('url', listener)
+    }
+  }
+}
+
 export function appInitialized () {
   cb('appInitialized')
   // @TODO: if the app comes back online and the rider had HoofTracks running, either kill it on the
@@ -201,7 +236,7 @@ export function appInitialized () {
         } else {
           dispatch(switchRoot(SIGNUP))
         }
-
+        dispatch(startForgotPWLinkListener())
       }
     }).catch(catchAsyncError(dispatch))
   }
@@ -435,7 +470,7 @@ export function loadRideElevations (rideID) {
 
 export function loadSingleRide (rideID) {
   cb('loadSingleRide')
-  return (dispatch, getState) => {
+  return (dispatch) => {
     return PouchCouch.localReplicateRide(rideID).then(() => {
       return PouchCouch.localLoad()
     }).then(localData => {
@@ -868,6 +903,7 @@ export function signOut () {
         dispatch(switchRoot(LOGIN))
         dispatch(clearState())
         dispatch(setSigningOut(false))
+        dispatch(startForgotPWLinkListener())
       }).catch(catchAsyncError(dispatch))
     }
   }
@@ -1385,38 +1421,6 @@ export function switchRoot (newRoot) {
           }
         })
       })
-    } else if (newRoot === SIGNUP) {
-      Navigation.setRoot({
-        root: {
-          sideMenu: {
-            center: {
-              stack: {
-                children: [{
-                  component: {
-                    name: SIGNUP,
-                  },
-                }]
-              }
-            },
-          }
-        }
-      })
-    } else if (newRoot === LOGIN) {
-      Navigation.setRoot({
-        root: {
-          sideMenu: {
-            center: {
-              stack: {
-                children: [{
-                  component: {
-                    name: LOGIN,
-                  },
-                }]
-              }
-            },
-          }
-        }
-      })
     } else if (newRoot === NEEDS_SYNC) {
       Navigation.setRoot({
         root: {
@@ -1427,7 +1431,21 @@ export function switchRoot (newRoot) {
         }
       })
     } else {
-      throw Error('That\'s a bad route, jerk.')
+      Navigation.setRoot({
+        root: {
+          sideMenu: {
+            center: {
+              stack: {
+                children: [{
+                  component: {
+                    name: newRoot,
+                  },
+                }]
+              }
+            },
+          }
+        }
+      })
     }
   }
 }

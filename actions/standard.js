@@ -60,6 +60,7 @@ import {
   SET_FEED_MESSAGE,
   SET_FIRST_START_HORSE_ID,
   SET_FOLLOWING_SYNC_RUNNING,
+  SET_FORGOT_EMAIL,
   SET_FULL_SYNC_FAIL,
   SET_HOOF_TRACKS_ID,
   SET_HOOF_TRACKS_LAST_UPLOAD,
@@ -82,7 +83,9 @@ import {
   SET_CARE_EVENT_DATE,
   SET_MAIN_CARE_EVENT_TYPE,
   SET_SECONDARY_CARE_EVENT_TYPE,
-  SET_CARE_EVENT_SPECIFIC_DATA, CHANGE_CARE_CALENDAR_TAB, SET_HOOF_TRACKS_RUNNING,
+  SET_CARE_EVENT_SPECIFIC_DATA,
+  CHANGE_CARE_CALENDAR_TAB,
+  SET_HOOF_TRACKS_RUNNING,
 } from '../constants'
 
 export function addDocsDownloaded (num, db) {
@@ -635,6 +638,13 @@ export function setFirstStartHorseID (horseID, horseUserID) {
     type: SET_FIRST_START_HORSE_ID,
     horseID,
     horseUserID
+  }
+}
+
+export function setForgotEmail (email) {
+  return {
+    type: SET_FORGOT_EMAIL,
+    email,
   }
 }
 

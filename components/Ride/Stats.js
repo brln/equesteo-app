@@ -48,7 +48,7 @@ export default class Stats extends PureComponent {
   makeAvgPace () {
     const sec = this.props.ride.get('elapsedTimeSecs')
     const el = sec / this.props.ride.get('distance')
-    if (sec === 0 && el === 0) {
+    if (sec !== 0 && this.props.ride.get('distance') !== 0) {
       const fracMinutes = el / 60
       const minutes = Math.floor(fracMinutes)
       const seconds =  Math.floor((fracMinutes - minutes) * 60)

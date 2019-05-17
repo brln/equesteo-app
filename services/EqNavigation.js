@@ -71,4 +71,20 @@ export default class EqNavigation {
       return Promise.reject()
     }
   }
+
+  static setStackRoot (currentComponent, opts) {
+    if (!EqNavigation.debounce) {
+      EqNavigation.debounce = true
+      return Navigation.setStackRoot(currentComponent, opts).then(() => {
+        setTimeout(() => {
+          EqNavigation.debounce = false
+        }, 50)
+      }).catch(e => {
+        EqNavigation.debounce = false
+        logError(e)
+      })
+    } else {
+      return Promise.reject()
+    }
+  }
 }

@@ -35,6 +35,7 @@ import {
   SET_FEED_MESSAGE,
   SET_FIRST_START_HORSE_ID,
   SET_FOLLOWING_SYNC_RUNNING,
+  SET_FORGOT_EMAIL,
   SET_FULL_SYNC_FAIL,
   SET_LOCATION_RETRY,
   SET_REMOTE_PERSIST,
@@ -72,6 +73,7 @@ export const initialState = Map({
   error: null,
   everLoggedIn: false,
   feedMessage: null,
+  forgotEmail: null,
   firstStartHorseID: null,
   fullSyncFail: false,
   goodConnection: true,
@@ -173,7 +175,7 @@ export default function LocalStateReducer(state=initialState, action) {
     case REMOVE_STASHED_RIDE_PHOTO:
       return state.deleteIn(['ridePhotoStash', action.stashKey, action.photoID])
     case SAVE_USER_ID:
-      return state.set('userID', action.userID).set('everLoggedIn', true)
+      return state.set('userID', action.userID).set('everLoggedIn', true).set('forgotEmail', null)
     case SET_ACTIVE_ATLAS_ENTRY:
       return state.set('activeAtlasEntry', action.id)
     case SET_ACTIVE_COMPONENT:
@@ -182,6 +184,8 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.set('feedMessage', action.message)
     case SET_FIRST_START_HORSE_ID:
       return state.set('firstStartHorseID', Map({ horseID: action.horseID, horseUserID: action.horseUserID }))
+    case SET_FORGOT_EMAIL:
+      return state.set('forgotEmail', action.email)
     case SET_FULL_SYNC_FAIL:
       return state.set('fullSyncFail', action.status)
     case SET_HOOF_TRACKS_ID:

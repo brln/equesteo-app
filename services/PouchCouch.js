@@ -201,8 +201,8 @@ export default class PouchCouch {
 
   static localReplicateRide (rideID) {
     const allDocIDs = {}
-    return new Promise((resolve, reject) => {
-      PouchCouch.preReplicate().then(options => {
+    return PouchCouch.preReplicate().then(options => {
+      return new Promise((resolve, reject) => {
         const remoteRidesDB = new PouchDB(`${API_URL}/couchproxy/${ridesDBName}`, options)
         remoteRidesDB.query('rides/rideJoins', {key: rideID}).then(resp => {
           resp.rows.map(row => {
@@ -221,8 +221,11 @@ export default class PouchCouch {
           }).on('error', PouchCouch.errorHandler(reject))
         })
       })
+    }).then(() => {
       return PouchCouch.postReplicate()
     })
+
+
   }
 
 

@@ -1,3 +1,4 @@
+import { Alert } from 'react-native'
 import { List, Map } from 'immutable'
 import memoizeOne from 'memoize-one'
 import React, { PureComponent } from 'react'
@@ -78,19 +79,38 @@ class TrainingContainer extends PureComponent {
           passProps: {rideID: ride.get('rideID')}
         }
       }).catch(() => {})
-    } else {
+    } else if (this.props.goodConnection) {
       this.setState({ loadingRide: true })
       this.props.dispatch(loadSingleRide(ride.get('rideID'))).then(() => {
         this.setState({ loadingRide: false })
         return EqNavigation.push(this.props.componentId, {
           component: {
             name: RIDE,
-            passProps: {rideID: ride.get('rideID')}
-          }
+            passProps: {rideID: ride.get('rideID')},
+            options: {
+              animations: {
+                push: {
+                  enabled: false
+                }
+              }
+            }
+          },
+
         })
       }).catch(() => {
         this.setState({ loadingRide: false })
       })
+    } else {
+      Alert.alert(
+        'Not Available',
+        'This ride data is not available offline. \n\n Please try again when you have service.',
+        [
+          {
+            text: 'OK',
+          },
+        ],
+        {cancelable: true}
+      )
     }
   }
 
@@ -144,6 +164,7 @@ function mapStateToProps (state) {
   const localState = state.get('localState')
   const userID = localState.get('userID')
   return {
+    goodConnection: localState.get('goodConnection'),
     horses: pouchState.get('horses'),
     horseUsers: pouchState.get('horseUsers'),
     rides: pouchState.get('rides'),

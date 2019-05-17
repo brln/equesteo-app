@@ -17,11 +17,24 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-       <string>1.5.0</string>
+       <string>1.5.2</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>equesteo</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>equesteo</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
-       <string>133</string>
+       <string>135</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.sports</string>
 	<key>LSRequiresIPhoneOS</key>

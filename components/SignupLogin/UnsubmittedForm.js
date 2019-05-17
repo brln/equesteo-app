@@ -42,7 +42,6 @@ export default class UnsubmittedForm extends MultiPlatform {
           keyboardType={'email-address'}
           onChangeText={this.props.changeEmail}
           onSubmitEditing={this.props.getPWCode}
-          ref={(i) => this.props.inputs['email'] = i}
           placeholder={'Email'}
           style={{
             backgroundColor: 'white',
@@ -52,6 +51,7 @@ export default class UnsubmittedForm extends MultiPlatform {
             borderColor: 'black'
           }}
           maxLength={200}
+          value={this.props.email}
         />
         <Button text={'Submit'} color={brand} onPress={this.props.getPWCode}/>
       </View>

@@ -13,6 +13,7 @@ import {
 import {
   catchAsyncError,
   doSync,
+  removeForgotPWLinkListener,
   startListeningFCMTokenRefresh,
   startListeningFCM,
   setDistributionOnServer,
@@ -50,6 +51,7 @@ export function loginAndSync(loginFunc, loginArgs, dispatch, getState) {
     } else {
       dispatch(switchRoot(NEEDS_SYNC))
     }
+    dispatch(removeForgotPWLinkListener())
   }).catch(e => {
     logError(e, 'loginAndSync')
     dispatch(errorOccurred(e.message))

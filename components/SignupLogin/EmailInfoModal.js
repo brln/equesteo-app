@@ -26,8 +26,6 @@ export default class EmailInfoModal extends PureComponent {
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', paddingLeft: 20, paddingRight: 20}}>
           <Text style={{textAlign: 'center'}}>Your email should arrive within 5 minutes. You may need to check your spam folder.</Text>
           <Text />
-          <Text style={{textAlign: 'center'}}>If you don't get it you can try again, but only the newest code will work.</Text>
-          <Text />
           <Text style={{textAlign: 'center'}}>Please contact us immediately with any problems, we'll get it figured out.</Text>
           <Text />
           <Text style={{textAlign: 'center'}}>info@equesteo.com</Text>

@@ -14,7 +14,7 @@ import {
   dismissError,
   errorOccurred,
 } from '../../actions/standard'
-import { exchangePWCode } from '../../actions/functional'
+import { exchangePWCode, switchRoot } from '../../actions/functional'
 import {NEW_PASSWORD} from "../../screens/main"
 import EqNavigation from '../../services/EqNavigation'
 
@@ -44,6 +44,14 @@ class ResetCodeContainer extends PureComponent {
     this.submitResetCode = this.submitResetCode.bind(this)
   }
 
+  componentDidUpdate (nextProps) {
+    if (this.props.error) {
+      setTimeout(() => {
+        this.props.dispatch(dismissError())
+      }, 3000)
+    }
+  }
+
   setEmailInfoModalOpen (value) {
     this.setState({
       emailInfoModalOpen: value
@@ -58,7 +66,7 @@ class ResetCodeContainer extends PureComponent {
 
   submitResetCode () {
     this.props.dispatch(dismissError())
-    this.props.dispatch(exchangePWCode(this.props.email, this.state.resetCode)).then(() => {
+    this.props.dispatch(exchangePWCode(this.props.forgotEmail, this.state.resetCode)).then(() => {
       EqNavigation.push(this.props.componentId, {
         component: {
           name: NEW_PASSWORD
@@ -70,7 +78,6 @@ class ResetCodeContainer extends PureComponent {
   }
 
   render() {
-    const paddingTop = height - 590 > 0 ? (height - 590) / 3 : 0
     return (
       <PageWrapper
         error={this.props.error}
@@ -81,9 +88,6 @@ class ResetCodeContainer extends PureComponent {
               modalOpen={this.state.emailInfoModalOpen}
               closeModal={() => {this.setEmailInfoModalOpen(false)}}
             />
-            <View style={{paddingBottom: 20, alignItems: 'center', paddingTop}}>
-              <Text style={{fontFamily: 'Montserrat-Regular', fontSize: 20, textAlign: 'center'}}>Reset Password</Text>
-            </View>
             <SubmittedForm
               changeResetCode={this.changeResetCode}
               resetCode={this.state.resetCode}
@@ -130,7 +134,7 @@ function mapStateToProps (state, passedProps) {
     doingInitialLoad: localState.get('doingInitialLoad'),
     docsToDownload: localState.get('docsToDownload'),
     docsDownloaded: localState.get('docsDownloaded'),
-    email: passedProps.email,
+    forgotEmail: localState.get('forgotEmail'),
     error: localState.get('error'),
   }
 }

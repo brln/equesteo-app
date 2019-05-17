@@ -15,7 +15,7 @@ export default class UnsubmittedForm extends MultiPlatform {
   renderAndroid () {
     return (
       <View>
-        <Text>Enter the reset code from your email:</Text>
+        <Text style={{textAlign: 'center'}}>Enter the reset code from your email:</Text>
         <TextInput
           autoCapitalize={'none'}
           autoCorrect={false}

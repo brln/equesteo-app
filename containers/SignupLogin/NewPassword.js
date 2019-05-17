@@ -3,16 +3,15 @@ import {
   Dimensions,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View
 } from 'react-native'
 import { connect } from 'react-redux'
 
-import EmailInfoModal from '../../components/SignupLogin/EmailInfoModal'
 import NewPasswordForm from '../../components/SignupLogin/NewPasswordForm'
 import PageWrapper from '../../components/SignupLogin/PageWrapper'
-import { errorOccurred } from '../../actions/standard'
+import { dismissError, errorOccurred } from '../../actions/standard'
 import { newPassword } from '../../actions/functional'
+import Loader from '../../components/SignupLogin/Loader'
 
 const { height, width } = Dimensions.get('window');
 
@@ -43,6 +42,14 @@ class NewPasswordContainer extends PureComponent {
     this.submitNewPassword = this.submitNewPassword.bind(this)
   }
 
+  componentDidUpdate (nextProps) {
+    if (this.props.error) {
+      setTimeout(() => {
+        this.props.dispatch(dismissError())
+      }, 3000)
+    }
+  }
+
   changePassword1 (text) {
     this.setState({
       pw1: text
@@ -69,33 +76,44 @@ class NewPasswordContainer extends PureComponent {
     this.inputs['pw2'].focus()
   }
 
-  @TODO make this show the spinner while syncing in the same way the login page does
-  @TODO: spinner on reset code page while call is being made, handle timeout
+  _renderForm () {
+    const paddingTop = height - 590 > 0 ? (height - 590) / 3 : 0
+    return (
+      <View style={styles.container}>
+        <View style={{paddingBottom: 20, alignItems: 'center', paddingTop}}>
+          <Text style={{fontFamily: 'Montserrat-Regular', fontSize: 20, textAlign: 'center'}}>Enter New Password</Text>
+        </View>
+        <NewPasswordForm
+          moveToPassword2={this.moveToPassword2}
+          changePassword1={this.changePassword1}
+          changePassword2={this.changePassword2}
+          inputs={this.inputs}
+          pw1={this.state.pw1}
+          pw2={this.state.pw2}
+          submitNewPassword={this.submitNewPassword}
+        />
+      </View>
+    )
+  }
 
   render() {
-    const paddingTop = height - 590 > 0 ? (height - 590) / 3 : 0
     return (
       <PageWrapper
         error={this.props.error}
       >
         <View style={styles.container}>
-          <View style={styles.container}>
-            <View style={{paddingBottom: 20, alignItems: 'center', paddingTop}}>
-              <Text style={{fontFamily: 'Montserrat-Regular', fontSize: 20, textAlign: 'center'}}>Reset Password</Text>
-            </View>
-            <NewPasswordForm
-              moveToPassword2={this.moveToPassword2}
-              changePassword1={this.changePassword1}
-              changePassword2={this.changePassword2}
-              inputs={this.inputs}
-              pw1={this.state.pw1}
-              pw2={this.state.pw2}
-              submitNewPassword={this.submitNewPassword}
+          { this.props.doingInitialLoad ?
+            <Loader
+              paddingTop={height / 3}
+              paddingBottom={20}
+              docsToDownload={this.props.docsToDownload}
+              docsDownloaded={this.props.docsDownloaded}
             />
-          </View>
+            : this._renderForm()
+          }
         </View>
       </PageWrapper>
-    );
+    )
   }
 }
 

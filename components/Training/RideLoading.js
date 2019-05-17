@@ -20,8 +20,10 @@ export default class RideLoading extends PureComponent {
         style={styles.modal}
         position={"top"}
         isOpen={this.props.modalOpen}
+        startOpen={true}
+        animationDuration={0}
       >
-        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 56}}>
           <ActivityIndicator size="large" color={darkBrand} />
           <Text style={{textAlign: 'center', color: darkBrand}}>Loading Ride...</Text>
         </View>
@@ -37,4 +39,4 @@ const styles = StyleSheet.create({
     height: height,
     width: width,
   },
-});
+})

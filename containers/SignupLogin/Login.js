@@ -16,7 +16,7 @@ import Loader from '../../components/SignupLogin/Loader'
 import LoginForm from '../../components/SignupLogin/LoginForm'
 import {
   dismissError,
-  errorOccurred,
+  setForgotEmail,
 } from '../../actions/standard'
 import { submitLogin } from '../../actions/functional'
 import Amplitude, {
@@ -24,7 +24,6 @@ import Amplitude, {
 } from "../../services/Amplitude"
 import EqNavigation from '../../services/EqNavigation'
 import { SIGNUP, FORGOT } from '../../screens/main'
-import { darkBrand } from '../../colors'
 
 
 const { height } = Dimensions.get('window')
@@ -48,7 +47,8 @@ class LoginContainer extends PureComponent {
       cursor: 0,
       email: null,
       password: null,
-      passwordVisible: false
+      passwordVisible: false,
+      reqSubmitted: false
     }
     this.inputs = {}
     this.changeEmail = this.changeEmail.bind(this);
@@ -59,6 +59,14 @@ class LoginContainer extends PureComponent {
     this.showSignup = this.showSignup.bind(this)
     this.submitLogin = this.submitLogin.bind(this)
     this.togglePasswordVisible = this.togglePasswordVisible.bind(this)
+  }
+
+  componentDidUpdate (nextProps) {
+    if (this.props.error) {
+      setTimeout(() => {
+        this.props.dispatch(dismissError())
+      }, 3000)
+    }
   }
 
   togglePasswordVisible () {
@@ -72,6 +80,7 @@ class LoginContainer extends PureComponent {
     this.setState({
       email: text
     })
+    this.props.dispatch(setForgotEmail(text))
   }
 
   changePassword (text) {
@@ -120,8 +129,8 @@ class LoginContainer extends PureComponent {
 
   _renderLoginForm () {
     const paddingTop = height - 590 > 0 ? (height - 590) / 3 : 0
-    let button = <ActivityIndicator />
-    if (!this.props.reqSubmitted) {
+    let button = <ActivityIndicator color={brand}/>
+    if (!this.state.reqSubmitted) {
       button = <Button text={'Submit'} color={brand} onPress={this.submitLogin}/>
     }
     return (

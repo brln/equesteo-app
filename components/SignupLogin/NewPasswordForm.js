@@ -39,7 +39,7 @@ export default class NewPasswordForm extends MultiPlatform {
           value={this.props.pw2}
           maxLength={200}
         />
-        <Button text={'Change Password'} color={brand} onPress={this.props.submitNewPassword}/>
+        <Button text={'Submit'} color={brand} onPress={this.props.submitNewPassword}/>
       </View>
     )
   }
@@ -85,7 +85,7 @@ export default class NewPasswordForm extends MultiPlatform {
           value={this.props.pw2}
           onSubmitEditing={this.props.submitNewPassword}
         />
-        <Button text={'Change Password'} color={brand} onPress={this.props.submitNewPassword}/>
+        <Button text={'Submit'} color={brand} onPress={this.props.submitNewPassword}/>
       </View>
     )
   }

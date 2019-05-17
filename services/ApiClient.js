@@ -97,6 +97,7 @@ export default class ApiClient {
   }
 
   static request (method, endpoint, body, isJSON=true) {
+    logDebug(endpoint)
     if (isJSON) {
       body = body ? JSON.stringify(body) : undefined
     }
@@ -127,7 +128,6 @@ export default class ApiClient {
         return json
       })
     }).catch(e => {
-      logDebug(e, 'wutuwuwtuw')
       if (e instanceof SyntaxError) {
         throw new BadResponseError('Can\'t parse response.')
       } else if (e instanceof TypeError) {
