@@ -90,6 +90,10 @@ class HoofTracksContainer extends PureComponent {
         'This feature is for convenience, not safety. Always tell someone where you plan to go and when you\'ll be back.\n\n As with all app-based trackers, if you lose cell service, your battery dies, or servers go down, your location will not be broadcast.\n\nEven though your ride will record without cell service, your location can\'t be broadcast without it.\n\nFor safety tracking, please buy a device intended for that purpose.',
         [
           {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
             text: 'OK',
             onPress: () => {
               Amplitude.logEvent(ACTIVATE_HOOF_TRACKS)
@@ -97,10 +101,6 @@ class HoofTracksContainer extends PureComponent {
               this.props.dispatch(doHoofTracksUpload())
               EqNavigation.pop(this.props.componentId)
             },
-          },
-          {
-            text: 'Cancel',
-            style: 'cancel',
           },
         ],
         {cancelable: false},
@@ -148,6 +148,10 @@ class HoofTracksContainer extends PureComponent {
       'If you reset the code, no one with the old code will be able to view your ride, and there\'s no way to get an old code back.',
       [
         {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
           text: 'OK',
           onPress: () => {
             this.props.dispatch(setHoofTracksLastUpload(null))
@@ -157,10 +161,6 @@ class HoofTracksContainer extends PureComponent {
             })).catch(e => {})
           },
           style: 'destructive',
-        },
-        {
-          text: 'Cancel',
-          style: 'cancel',
         },
       ],
       {cancelable: false},

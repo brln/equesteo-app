@@ -220,13 +220,13 @@ class RecorderContainer extends PureComponent {
         "You haven't gone anywhere on this ride yet. Do you want to close it?",
         [
           {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
             text: 'OK',
             onPress: this.discardRide,
             style: 'destructive'
-          },
-          {
-            text: 'Cancel',
-            style: 'cancel',
           },
         ],
         {cancelable: true},

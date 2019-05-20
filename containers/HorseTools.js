@@ -134,13 +134,13 @@ class HorseToolsContainer extends Component {
       'Are you sure you want to archive this horse? It won\'t appear in your barn or be selectable for new rides, but will remain on your old training records.',
       [
         {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
           text: 'OK',
           onPress: this.deleteHorse,
           style: 'destructive'
-        },
-        {
-          text: 'Cancel',
-          style: 'cancel',
         },
       ],
       {cancelable: true},

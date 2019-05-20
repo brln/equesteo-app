@@ -21,6 +21,7 @@ import {
   DISMISS_ERROR,
   ENQUEUE_PHOTO,
   ERROR_OCCURRED,
+  GPS_SIGNAL_LOST,
   LOAD_LOCAL_STATE,
   NEW_APP_STATE,
   NEW_NETWORK_STATE,
@@ -28,6 +29,7 @@ import {
   REMOVE_STASHED_RIDE_PHOTO,
   SAVE_USER_ID,
   SET_ACTIVE_COMPONENT,
+  SET_BACKGROUND_GEOLOCATION_RUNNING,
   SET_CARE_EVENT_DATE,
   SET_CARE_EVENT_SPECIFIC_DATA,
   SET_MAIN_CARE_EVENT_TYPE,
@@ -64,6 +66,7 @@ export const initialState = Map({
   activeComponent: null,
   appState: appStates.active,
   awaitingPWChange: false,
+  backgroundGeolocationRunning: false,
   careCalendarTab: 0,
   carrotMutex: false,
   currentScreen: FEED,
@@ -77,6 +80,7 @@ export const initialState = Map({
   firstStartHorseID: null,
   fullSyncFail: false,
   goodConnection: true,
+  gpsSignalLost: false,
   hoofTracksID: null,
   hoofTracksRunning: false,
   lastFullSync: null,
@@ -141,6 +145,8 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.setIn(['photoQueue', action.queueItem.get('photoID')], action.queueItem)
     case ERROR_OCCURRED:
       return state.set('error', action.message)
+    case GPS_SIGNAL_LOST:
+      return state.set('gpsSignalLost', action.value)
     case LOAD_LOCAL_STATE:
       const loadedState = initialState.merge(action.localState)
       let newNeedsRemotePersist = loadedState.get('needsRemotePersist')
@@ -159,6 +165,8 @@ export default function LocalStateReducer(state=initialState, action) {
         'needsRemotePersist', newNeedsRemotePersist
       ).set(
         'hoofTracksID', null
+      ).set(
+        'backgroundGeolocationRunning', false
       )
     case NEW_APP_STATE:
       return state.set('appState', action.newState)
@@ -214,6 +222,8 @@ export default function LocalStateReducer(state=initialState, action) {
       )
     case SET_AWAITING_PW_CHANGE:
       return state.set('awaitingPWChange', action.newVal)
+    case SET_BACKGROUND_GEOLOCATION_RUNNING:
+      return state.set('backgroundGeolocationRunning', action.value)
     case SET_CARE_EVENT_DATE:
       const withDate = state.get('newCareEvent').set('date', action.date)
       return state.set('newCareEvent', withDate)

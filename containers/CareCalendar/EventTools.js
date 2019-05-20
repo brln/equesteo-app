@@ -81,13 +81,13 @@ class EventToolsContainer extends Component {
       'Are you sure you want to delete this event? It will be gone forever and there is no undo.',
       [
         {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
           text: 'OK',
           onPress: this.deleteCareEvent,
           style: 'destructive'
-        },
-        {
-          text: 'Cancel',
-          style: 'cancel',
         },
       ],
       {cancelable: true},

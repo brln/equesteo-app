@@ -66,6 +66,7 @@ import {
   dismissError,
   enqueuePhoto,
   errorOccurred,
+  gpsSignalLost,
   horseCareEventUpdated,
   horsePhotoUpdated,
   horseUpdated,
@@ -98,7 +99,7 @@ import {
   updatePhotoStatus,
   userPhotoUpdated,
   userSearchReturned,
-  userUpdated,
+  userUpdated, setBackgroundGeolocationRunning,
 } from './standard'
 import { NotConnectedError } from "../errors"
 
@@ -956,7 +957,7 @@ export function retryLocationTracking () {
   return (dispatch, getState) => {
     dispatch(setLocationRetry(true))
     setTimeout(() => {
-      if(getState().getIn(['localState', 'locationRetry'])) {
+      if (getState().getIn(['localState', 'locationRetry'])) {
         const lastLocation = getState().getIn(['currentRide', 'lastLocation'])
         if (!lastLocation) {
           BackgroundGeolocation.stop()
@@ -968,20 +969,34 @@ export function retryLocationTracking () {
   }
 }
 
+export function gpsText(text) {
+  cb('gpsText')
+  return (dispatch, getState) => {
+    const currentUserID = getState().getIn(['localState', 'userID'])
+    const currentUser = getState().getIn(['pouchRecords', 'users', currentUserID])
+    if (!currentUser.get('disableGPSAlerts')) {
+      Tts.speak(text)
+    }
+  }
+}
+
 export function startGPSWatcher () {
   cb('startGPSWatcher')
   return (dispatch, getState) => {
-    logDebug('starting')
     BackgroundTimer.runBackgroundTimer(() => {
-      logDebug('running')
       const lastLocation = getState().getIn(['currentRide', 'lastLocation'])
       let timeDiff = 0
       if (lastLocation) {
         timeDiff = (unixTimeNow() / 1000) - (lastLocation.get('timestamp') / 1000)
       }
-      logDebug(timeDiff, 'timeDiff')
       if (timeDiff > 30) {
-        Tts.speak('GPS signal lost.')
+        if (getState().getIn(['localState', 'gpsSignalLost'])) {
+          dispatch(gpsText('No gps signal.'))
+        } else {
+          dispatch(gpsText('GPS signal lost.'))
+        }
+
+        dispatch(gpsSignalLost(true))
       }
     }, 30000)
   }
@@ -995,101 +1010,109 @@ export function stopGPSWatcher () {
 }
 
 
-
-
 export function startLocationTracking () {
   cb('startLocationTracking')
   return (dispatch, getState) => {
     logInfo('action: startLocationTracking')
-    return configureBackgroundGeolocation().then(() => {
-      const KALMAN_FILTER_Q = 6
-      BackgroundGeolocation.on('error', (error) => {
-        logError(error, 'BackgroundGeolocation.error')
-        captureException(error)
-      })
+    const isRunning = getState().getIn(['localState', 'backgroundGeolocationRunning'])
+    if (!isRunning) {
+      dispatch(setBackgroundGeolocationRunning(true))
+      return configureBackgroundGeolocation().then(() => {
+        const KALMAN_FILTER_Q = 6
+        BackgroundGeolocation.on('error', (error) => {
+          logError(error, 'BackgroundGeolocation.error')
+          captureException(error)
+        })
 
-      dispatch(startGPSWatcher())
-      BackgroundGeolocation.on('location', (location) => {
-        if (location.accuracy > 25) {
-          return
-        }
 
-        const lastLocation = getState().getIn(['currentRide', 'lastLocation'])
-        let timeDiff = 0
-        if (lastLocation) {
-          timeDiff = (location.time / 1000) - (lastLocation.get('timestamp') / 1000)
-        } else {
-          dispatch(setLocationRetry(false))
-        }
+        BackgroundGeolocation.on('location', (location) => {
+          logDebug('boomboom')
+          if (getState().getIn(['localState', 'gpsSignalLost'])) {
+            dispatch(gpsText('Found GPS'))
+          }
+          dispatch(gpsSignalLost(false))
+          if (location.accuracy > 25) {
+            return
+          }
 
-        if (!lastLocation || timeDiff > 5) {
-          const oldDistance = getState().getIn(['currentRide', 'currentRide', 'distance'])
-          const refiningLocation = getState().getIn(['currentRide', 'refiningLocation'])
+          const lastLocation = getState().getIn(['currentRide', 'lastLocation'])
+          let timeDiff = 0
+          if (lastLocation) {
+            timeDiff = (location.time / 1000) - (lastLocation.get('timestamp') / 1000)
+          } else {
+            dispatch(setLocationRetry(false))
+          }
 
-          let parsedLocation = Map({
-            accuracy: location.accuracy,
-            latitude: location.latitude,
-            longitude: location.longitude,
-            provider: location.provider,
-            timestamp: location.time,
-            speed: location.speed,
-          })
+          if (!lastLocation || timeDiff > 5) {
+            const oldDistance = getState().getIn(['currentRide', 'currentRide', 'distance'])
+            const refiningLocation = getState().getIn(['currentRide', 'refiningLocation'])
 
-          let parsedElevation = Map({
-            latitude: location.latitude,
-            longitude: location.longitude,
-            elevation: location.altitude,
-          })
+            let parsedLocation = Map({
+              accuracy: location.accuracy,
+              latitude: location.latitude,
+              longitude: location.longitude,
+              provider: location.provider,
+              timestamp: location.time,
+              speed: location.speed,
+            })
 
-          let replaced = false
-          if (refiningLocation && lastLocation) {
-            // If you have at least one point already recorded, run the Kalman filter
-            // on the new location coming in using the one you already have
-            parsedLocation = kalmanFilter(
-              parsedLocation,
-              lastLocation,
-              KALMAN_FILTER_Q
-            )
-            parsedElevation = parsedElevation.set(
-              'latitude', parsedLocation.get('latitude')
-            ).set(
-              'longitude', parsedLocation.get('longitude')
-            ).set(
-              'accuracy', parsedLocation.get('accuracy')
-            )
+            let parsedElevation = Map({
+              latitude: location.latitude,
+              longitude: location.longitude,
+              elevation: location.altitude,
+            })
 
-            let distance = haversine(
-              refiningLocation.get('latitude'),
-              refiningLocation.get('longitude'),
-              parsedLocation.get('latitude'),
-              parsedLocation.get('longitude')
-            )
-            if (distance < (30 / 5280)) {
-              // If you're within a 30' radius of the last place you were, don't
-              // just add the point on, replace the old one.
-              dispatch(replaceLastLocation(parsedLocation, parsedElevation))
-              replaced = true
+            let replaced = false
+            if (refiningLocation && lastLocation) {
+              // If you have at least one point already recorded, run the Kalman filter
+              // on the new location coming in using the one you already have
+              parsedLocation = kalmanFilter(
+                parsedLocation,
+                lastLocation,
+                KALMAN_FILTER_Q
+              )
+              parsedElevation = parsedElevation.set(
+                'latitude', parsedLocation.get('latitude')
+              ).set(
+                'longitude', parsedLocation.get('longitude')
+              ).set(
+                'accuracy', parsedLocation.get('accuracy')
+              )
+
+              let distance = haversine(
+                refiningLocation.get('latitude'),
+                refiningLocation.get('longitude'),
+                parsedLocation.get('latitude'),
+                parsedLocation.get('longitude')
+              )
+              if (distance < (30 / 5280)) {
+                // If you're within a 30' radius of the last place you were, don't
+                // just add the point on, replace the old one.
+                dispatch(replaceLastLocation(parsedLocation, parsedElevation))
+                replaced = true
+              }
             }
+            if (!replaced) {
+              dispatch(newLocation(parsedLocation, parsedElevation))
+              const newDistance = getState().getIn(['currentRide', 'currentRide', 'distance'])
+              dispatch(doSpeech(oldDistance, newDistance))
+            }
+            dispatch(doHoofTracksUpload())
           }
-          if (!replaced) {
-            dispatch(newLocation(parsedLocation, parsedElevation))
-            const newDistance = getState().getIn(['currentRide', 'currentRide', 'distance'])
-            dispatch(doSpeech(oldDistance, newDistance))
-          }
-          dispatch(doHoofTracksUpload())
-        }
-      })
+        })
 
-      BackgroundGeolocation.start()
-      dispatch(retryLocationTracking())
-      dispatch(doSpeech())
-
-    }).catch(catchAsyncError(dispatch))
+        dispatch(gpsSignalLost(false))
+        dispatch(startGPSWatcher())
+        BackgroundGeolocation.start()
+        dispatch(retryLocationTracking())
+        dispatch(doSpeech())
+      }).catch(catchAsyncError(dispatch))
+    }
   }
 }
 
 export function doSpeech (oldDistance, newDistance) {
-  cb('startHoofTracksDispatcher')
+  cb('startDoSpeech')
   return (_, getState) => {
     const newMiles = Math.floor(newDistance)
     const oldMiles = Math.floor(oldDistance)
@@ -1108,7 +1131,7 @@ export function doSpeech (oldDistance, newDistance) {
 }
 
 export function doHoofTracksUpload () {
-  cb('startHoofTracksDispatcher')
+  cb('doHoofTracksUpload')
   return (dispatch, getState) => {
     const running = getState().getIn(['localState', 'hoofTracksRunning'])
     if (running) {
@@ -1240,6 +1263,7 @@ function startActiveComponentListener () {
 export function stopLocationTracking (clearLast=true) {
   cb('stopLocationTracking')
   return (dispatch) => {
+    dispatch(setBackgroundGeolocationRunning(false))
     dispatch(stopGPSWatcher())
     dispatch(setLocationRetry(false))
     BackgroundGeolocation.stop()

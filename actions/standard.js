@@ -29,6 +29,7 @@ import {
   ENQUEUE_PHOTO,
   ERROR_OCCURRED,
   FOLLOW_UPDATED,
+  GPS_SIGNAL_LOST,
   HORSE_CARE_EVENT_UPDATED,
   HORSE_UPDATED,
   HORSE_PHOTO_UPDATED,
@@ -57,6 +58,7 @@ import {
   SAVE_USER_ID,
   SET_ACTIVE_ATLAS_ENTRY,
   SET_ACTIVE_COMPONENT,
+  SET_BACKGROUND_GEOLOCATION_RUNNING,
   SET_FEED_MESSAGE,
   SET_FIRST_START_HORSE_ID,
   SET_FOLLOWING_SYNC_RUNNING,
@@ -100,6 +102,14 @@ export function addDocsToDownload (num) {
   return {
     type: ADD_DOCS_TO_DOWNLOAD,
     num
+  }
+}
+
+export function setBackgroundGeolocationRunning (value) {
+  return {
+    type: SET_BACKGROUND_GEOLOCATION_RUNNING,
+    value,
+    logData: ['value'],
   }
 }
 
@@ -319,6 +329,14 @@ export function errorOccurred (message) {
   }
 }
 
+export function gpsSignalLost (value) {
+  return {
+    type: GPS_SIGNAL_LOST,
+    value,
+    logData: ['value'],
+  }
+}
+
 export function horseCareEventUpdated (horseCareEvent) {
   return {
     type: HORSE_CARE_EVENT_UPDATED,
@@ -508,7 +526,8 @@ export function setActiveAtlasEntry (id) {
 export function setFollowingSyncRunning (value) {
   return {
     type: SET_FOLLOWING_SYNC_RUNNING,
-    value
+    value,
+    logData: ['value'],
   }
 }
 
@@ -688,6 +707,7 @@ export function setSigningOut (value) {
   return {
     type: SET_SIGNING_OUT,
     value,
+    logData: ['value'],
   }
 }
 

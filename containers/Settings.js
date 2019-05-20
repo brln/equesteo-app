@@ -16,6 +16,7 @@ import { userUpdated } from '../actions/standard'
 import { EqNavigation } from '../services'
 import EqPicker from '../components/EqPicker'
 import Amplitude, {
+  DISABLE_GPS_SOUND_ALERTS,
   ENABLE_HOOF_TRACKS,
   MAKE_RIDES_DEFAULT_PRIVATE,
   OPT_OUT_OF_LEADERBOARDS,
@@ -61,6 +62,7 @@ class SettingsContainer extends BackgroundComponent {
     this.alertDistance = this.alertDistance.bind(this)
     this.changeAccountDetails = this.changeAccountDetails.bind(this)
     this.changeAlertDistance = this.changeAlertDistance.bind(this)
+    this.changeEnableGPSAlerts = this.changeEnableGPSAlerts.bind(this)
     this.changeEnableDistanceAlerts = this.changeEnableDistanceAlerts.bind(this)
     this.changeExperimentalHoofTracks = this.changeExperimentalHoofTracks.bind(this)
     this.changeLeaderboardOptOut = this.changeLeaderboardOptOut.bind(this)
@@ -134,6 +136,14 @@ class SettingsContainer extends BackgroundComponent {
       Amplitude.logEvent(TURN_ON_DISTANCE_ALERTS)
     }
     this.changeAccountDetails(userToUpdate.set('enableDistanceAlerts', newVal))
+  }
+
+  changeEnableGPSAlerts () {
+    const newVal = !this.props.user.get('disableGPSAlerts')
+    if (!newVal) {
+      Amplitude.logEvent(DISABLE_GPS_SOUND_ALERTS)
+    }
+    this.changeAccountDetails(this.props.user.set('disableGPSAlerts', newVal))
   }
 
   changeAlertDistance (value) {
@@ -234,6 +244,21 @@ class SettingsContainer extends BackgroundComponent {
             </CardItem>
 
             { this.alertDistance() }
+
+
+            <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
+              <View style={{flex: 1, flexDirection: 'row'}}>
+                <View style={{flex: 1}}>
+                  <Switch
+                    value={this.props.user.get('disableGPSAlerts')}
+                    onValueChange={this.changeEnableGPSAlerts}
+                  />
+                </View>
+                <View style={{flex: 6, justifyContent: 'center'}}>
+                  <Text>Disable gps alerts.</Text>
+                </View>
+              </View>
+            </CardItem>
           </Card>
 
           <Card>

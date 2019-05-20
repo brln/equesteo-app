@@ -150,13 +150,13 @@ class ProfileContainer extends BackgroundComponent {
         'The only reason to log out is if you\'re moving to another device.\n\n All ride data will be deleted from the device, and must be re-downloaded when you sign back in.',
         [
           {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
             text: 'OK',
             onPress: this.doLogout,
             style: 'destructive',
-          },
-          {
-            text: 'Cancel',
-            style: 'cancel',
           },
         ],
         {cancelable: true},

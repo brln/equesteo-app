@@ -230,7 +230,7 @@ export default class RidingMap extends PureComponent {
 
   gpsIndicator () {
     if (this.props.lastLocation) {
-      const buttonWidth = this.state.showingMaptypes ? width / 2 : 46
+      const buttonWidth = this.state.showingMaptypes ? width / 1.5 : 46
       return (
         <View style={{
           position: 'absolute',

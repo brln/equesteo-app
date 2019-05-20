@@ -199,13 +199,13 @@ class UpdateRideContainer extends BackgroundComponent {
           'Are you sure you want to discard this ride?',
           [
             {
+              text: 'Cancel',
+              style: 'cancel',
+            },
+            {
               text: 'OK',
               onPress: this.discardRide,
               style: 'destructive'
-            },
-            {
-              text: 'Cancel',
-              style: 'cancel',
             },
           ],
           {cancelable: true},
