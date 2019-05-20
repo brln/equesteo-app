@@ -156,8 +156,7 @@ export default class PouchCouch {
         progress.moreDocsFunc(docs)
         return remoteRidesDB.query('rides/ridesByTimestamp', {keys: userIDs})
       }).then(resp => {
-        const now = unixTimeNow()
-        const pullAfter = lastSync || END_OF_FEED
+        const pullAfter = END_OF_FEED
         resp.rows.map(row => {
           if (row.value > pullAfter) {
             rideIDs[row.id] = 0
