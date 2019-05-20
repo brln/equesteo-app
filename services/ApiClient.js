@@ -97,7 +97,6 @@ export default class ApiClient {
   }
 
   static request (method, endpoint, body, isJSON=true) {
-    logDebug(endpoint)
     if (isJSON) {
       body = body ? JSON.stringify(body) : undefined
     }

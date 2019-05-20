@@ -170,6 +170,7 @@ class ProfileContainer extends BackgroundComponent {
   }
 
   createFollow (followingID) {
+    logDebug(followingID, 'folowingID')
     Amplitude.logEvent(START_FOLLOWING_SOMEONE)
     const followID = `${this.props.userID}_${followingID}`
     this.props.dispatch(createFollow(followID, followingID, this.props.userID))

@@ -1,3 +1,4 @@
+import BackgroundTimer from 'react-native-background-timer'
 import ImagePicker from 'react-native-image-crop-picker'
 import { fromJS, Map  } from 'immutable'
 import { Alert, AppState, Linking, NetInfo, Platform } from 'react-native'
@@ -967,8 +968,35 @@ export function retryLocationTracking () {
   }
 }
 
+export function startGPSWatcher () {
+  cb('startGPSWatcher')
+  return (dispatch, getState) => {
+    logDebug('starting')
+    BackgroundTimer.runBackgroundTimer(() => {
+      logDebug('running')
+      const lastLocation = getState().getIn(['currentRide', 'lastLocation'])
+      let timeDiff = 0
+      if (lastLocation) {
+        timeDiff = (unixTimeNow() / 1000) - (lastLocation.get('timestamp') / 1000)
+      }
+      logDebug(timeDiff, 'timeDiff')
+      if (timeDiff > 30) {
+        Tts.speak('GPS signal lost.')
+      }
+    }, 30000)
+  }
+}
 
-let gpsLostTimeout = null
+export function stopGPSWatcher () {
+  cb('stopGPSWatcher')
+  return () => {
+    BackgroundTimer.stopBackgroundTimer();
+  }
+}
+
+
+
+
 export function startLocationTracking () {
   cb('startLocationTracking')
   return (dispatch, getState) => {
@@ -980,14 +1008,11 @@ export function startLocationTracking () {
         captureException(error)
       })
 
+      dispatch(startGPSWatcher())
       BackgroundGeolocation.on('location', (location) => {
         if (location.accuracy > 25) {
           return
         }
-        clearTimeout(gpsLostTimeout)
-        gpsLostTimeout = setTimeout(() => {
-          Tts.speak('GPS signal lost.')
-        }, 30000)
 
         const lastLocation = getState().getIn(['currentRide', 'lastLocation'])
         let timeDiff = 0
@@ -1215,6 +1240,7 @@ function startActiveComponentListener () {
 export function stopLocationTracking (clearLast=true) {
   cb('stopLocationTracking')
   return (dispatch) => {
+    dispatch(stopGPSWatcher())
     dispatch(setLocationRetry(false))
     BackgroundGeolocation.stop()
     BackgroundGeolocation.removeAllListeners('location')

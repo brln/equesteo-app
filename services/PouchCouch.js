@@ -150,12 +150,16 @@ export default class PouchCouch {
     const allDocIDs = {}
 
     const remoteRidesDB = new PouchDB(`${API_URL}/couchproxy/${ridesDBName}`, options)
+    logDebug(userIDs, 'userIDs')
     return new Promise((resolve, reject) => {
       return remoteRidesDB.info().then(resp => {
         const docs = parseInt(resp.update_seq.split('-')[0])
         progress.moreDocsFunc(docs)
         return remoteRidesDB.query('rides/ridesByTimestamp', {keys: userIDs})
       }).then(resp => {
+        // This has to pull all the way until end of feed, not just since last sync,
+        // because otherwise when you start following someone new it doesn't pull all their
+        // recent rides.
         const pullAfter = END_OF_FEED
         resp.rows.map(row => {
           if (row.value > pullAfter) {

@@ -64,6 +64,8 @@ target 'equesteo' do
 
   pod 'TextToSpeech', :path => '../node_modules/react-native-tts'
 
+  pod 'react-native-background-timer', :path => '../node_modules/react-native-background-timer'
+
 end
 
 # also from https://github.com/ivpusic/react-native-image-crop-picker

@@ -88,6 +88,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-background-timer')
     compile project(':react-native-tts')
     compile project(':react-native-background-fetch')
     implementation project(':react-native-background-fetch')
