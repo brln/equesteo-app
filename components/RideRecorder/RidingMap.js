@@ -115,17 +115,21 @@ export default class RidingMap extends PureComponent {
   }
 
   gpsStatusImage () {
-    switch (true) {
-      case this.props.lastLocation.get('accuracy') < 5:
-        return require('../../img/gps/gps5.png')
-      case this.props.lastLocation.get('accuracy') < 10:
-        return require('../../img/gps/gps4.png')
-      case this.props.lastLocation.get('accuracy') < 15:
-        return require('../../img/gps/gps3.png')
-      case this.props.lastLocation.get('accuracy') < 20:
-        return require('../../img/gps/gps2.png')
-      default:
-        return require('../../img/gps/gps1.png')
+    if (!this.props.gpsSignalLost) {
+      switch (true) {
+        case this.props.lastLocation.get('accuracy') < 5:
+          return require('../../img/gps/gps5.png')
+        case this.props.lastLocation.get('accuracy') < 10:
+          return require('../../img/gps/gps4.png')
+        case this.props.lastLocation.get('accuracy') < 15:
+          return require('../../img/gps/gps3.png')
+        case this.props.lastLocation.get('accuracy') < 20:
+          return require('../../img/gps/gps2.png')
+        default:
+          return require('../../img/gps/gps1.png')
+      }
+    } else {
+      return require('../../img/gps/gps0.png')
     }
   }
 

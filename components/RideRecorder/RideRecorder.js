@@ -223,6 +223,7 @@ export default class RideRecorder extends PureComponent {
               currentRideCoordinates={this.props.currentRideCoordinates}
               heading={this.state.heading}
               centerCoordinate={this.state.centerCoordinate ? this.state.centerCoordinate : this.state.nullMapLocation}
+              gpsSignalLost={this.props.gpsSignalLost}
               lastLocation={this.props.lastLocation}
               mapRegionChanged={this.mapRegionChanged}
               recenter={this.recenter}

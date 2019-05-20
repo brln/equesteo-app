@@ -39,7 +39,6 @@ import {
   SET_FOLLOWING_SYNC_RUNNING,
   SET_FORGOT_EMAIL,
   SET_FULL_SYNC_FAIL,
-  SET_LOCATION_RETRY,
   SET_REMOTE_PERSIST,
   SET_ACTIVE_ATLAS_ENTRY,
   SET_AWAITING_PW_CHANGE,
@@ -200,8 +199,6 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.set('hoofTracksID', action.value)
     case SET_HOOF_TRACKS_RUNNING:
       return state.set('hoofTracksRunning', action.value)
-    case SET_LOCATION_RETRY:
-      return state.set('locationRetry', action.newVal)
     case SET_MAIN_CARE_EVENT_TYPE:
       const withMainType = state.get('newCareEvent').set('mainEventType', action.eventType)
       return state.set('newCareEvent', withMainType)

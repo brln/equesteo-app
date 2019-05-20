@@ -94,7 +94,6 @@ import {
   setFullSyncFail,
   setSigningOut,
   setActiveComponent,
-  setLocationRetry,
   syncComplete,
   updatePhotoStatus,
   userPhotoUpdated,
@@ -955,15 +954,12 @@ export function showLocalNotifications () {
 export function retryLocationTracking () {
   cb('retryLocationTracking')
   return (dispatch, getState) => {
-    dispatch(setLocationRetry(true))
     setTimeout(() => {
-      if (getState().getIn(['localState', 'locationRetry'])) {
-        const lastLocation = getState().getIn(['currentRide', 'lastLocation'])
-        if (!lastLocation) {
-          BackgroundGeolocation.stop()
-          BackgroundGeolocation.removeAllListeners('location')
-          dispatch(startLocationTracking())
-        }
+      const lastLocation = getState().getIn(['currentRide', 'lastLocation'])
+      if (!lastLocation) {
+        dispatch(stopLocationTracking(false))
+        dispatch(startLocationTracking())
+        dispatch(retryLocationTracking())
       }
     }, 30000)
   }
@@ -1026,7 +1022,6 @@ export function startLocationTracking () {
 
 
         BackgroundGeolocation.on('location', (location) => {
-          logDebug('boomboom')
           if (getState().getIn(['localState', 'gpsSignalLost'])) {
             dispatch(gpsText('Found GPS'))
           }
@@ -1039,8 +1034,6 @@ export function startLocationTracking () {
           let timeDiff = 0
           if (lastLocation) {
             timeDiff = (location.time / 1000) - (lastLocation.get('timestamp') / 1000)
-          } else {
-            dispatch(setLocationRetry(false))
           }
 
           if (!lastLocation || timeDiff > 5) {
@@ -1265,7 +1258,6 @@ export function stopLocationTracking (clearLast=true) {
   return (dispatch) => {
     dispatch(setBackgroundGeolocationRunning(false))
     dispatch(stopGPSWatcher())
-    dispatch(setLocationRetry(false))
     BackgroundGeolocation.stop()
     BackgroundGeolocation.removeAllListeners('location')
     if (clearLast) {

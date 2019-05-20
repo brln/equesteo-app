@@ -66,7 +66,6 @@ import {
   SET_FULL_SYNC_FAIL,
   SET_HOOF_TRACKS_ID,
   SET_HOOF_TRACKS_LAST_UPLOAD,
-  SET_LOCATION_RETRY,
   SET_REMOTE_PERSIST,
   SET_SHOWING_RIDE,
   SET_SIGNING_OUT,
@@ -692,13 +691,6 @@ export function setAwaitingPasswordChange (newVal) {
 export function setDoingInitialLoad (newVal) {
   return {
     type: SET_DOING_INITIAL_LOAD,
-    newVal
-  }
-}
-
-export function setLocationRetry (newVal) {
-  return {
-    type: SET_LOCATION_RETRY,
     newVal
   }
 }

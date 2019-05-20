@@ -290,6 +290,7 @@ class RecorderContainer extends PureComponent {
         discardRide={this.discardRide}
         discardModalOpen={this.state.discardModalOpen}
         fetchHTID={this.fetchHTID}
+        gpsSignalLost={this.props.gpsSignalLost}
         hoofTracksID={this.props.hoofTracksID}
         hoofTracksRunning={this.props.hoofTracksRunning}
         lastElevation={this.props.lastElevation}
@@ -323,6 +324,7 @@ function mapStateToProps (state) {
     currentRideElevations: currentRideState.get('currentRideElevations'),
     currentRideCoordinates: currentRideState.get('currentRideCoordinates'),
     currentRidePhotos: localState.getIn(['ridePhotoStash', 'currentRide']) || Map(),
+    gpsSignalLost: localState.get('gpsSignalLost'),
     horseUsers: pouchState.get('horseUsers'),
     hoofTracksID: localState.get('hoofTracksID'),
     hoofTracksRunning: localState.get('hoofTracksRunning'),
