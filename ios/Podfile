@@ -11,7 +11,6 @@ target 'equesteo' do
   pod 'Firebase/Core', '~> 5.3.0'
   pod 'Firebase/Messaging'
   pod 'RNFirebase', :path => '../node_modules/react-native-firebase/ios'
-  pod 'Mixpanel'
 
   # from https://github.com/ivpusic/react-native-image-crop-picker
   rn_path = '../node_modules/react-native'

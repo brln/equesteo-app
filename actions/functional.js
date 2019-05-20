@@ -979,7 +979,7 @@ export function startLocationTracking () {
       })
 
       BackgroundGeolocation.on('location', (location) => {
-        if (location.accuracy > 20) {
+        if (location.accuracy > 25) {
           return
         }
 
