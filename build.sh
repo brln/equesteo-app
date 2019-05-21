@@ -1,4 +1,6 @@
 #! /bin/bash
+set -e 
+set -o pipefail
 
 cd ios && rm -rf ~/Library/Developer/Xcode/DerivedData &&  xcodebuild -workspace equesteo.xcworkspace -scheme equesteoRelease -configuration AppStoreDistribution archive -archivePath ./build/equesteo.xcarchive;
 xcodebuild -exportArchive -archivePath ./build/equesteo.xcarchive -exportOptionsPlist prodBuild.plist -exportPath ./build;
