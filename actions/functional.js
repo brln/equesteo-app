@@ -955,8 +955,9 @@ export function retryLocationTracking () {
   cb('retryLocationTracking')
   return (dispatch, getState) => {
     setTimeout(() => {
+      const currentRide = getState().getIn(['currentRide', 'currentRide'])
       const lastLocation = getState().getIn(['currentRide', 'lastLocation'])
-      if (!lastLocation) {
+      if (currentRide && !lastLocation) {
         dispatch(stopLocationTracking(false))
         dispatch(startLocationTracking())
         dispatch(retryLocationTracking())
@@ -1253,12 +1254,37 @@ function startActiveComponentListener () {
   }
 }
 
+export function shutdownBackgroundGeolocation () {
+  cb('shutdownBackgroundGeolocation')
+  return () => {
+    let numTries = 0
+    function ensureStop () {
+      numTries = numTries + 1
+      if (numTries > 5) {
+        throw new Error ('Too many tries shutting down BackgroundGeolocation')
+      }
+      setTimeout(() => {
+        BackgroundGeolocation.checkStatus((status) => {
+          console.log(status)
+          if (status.isRunning) {
+            BackgroundGeolocation.stop()
+            ensureStop()
+          }
+        }, () => {
+          ensureStop()
+        })
+      }, 2000)
+    }
+    ensureStop()
+  }
+}
+
 export function stopLocationTracking (clearLast=true) {
   cb('stopLocationTracking')
   return (dispatch) => {
     dispatch(setBackgroundGeolocationRunning(false))
     dispatch(stopGPSWatcher())
-    BackgroundGeolocation.stop()
+    dispatch(shutdownBackgroundGeolocation())
     BackgroundGeolocation.removeAllListeners('location')
     if (clearLast) {
       dispatch(clearLastLocation())
