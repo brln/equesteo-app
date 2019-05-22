@@ -14,6 +14,7 @@ import {
 
 export const API_URL = Platform.select({ios: api_url_ios, android: api_url_android})
 
+
 export const AMPLITUDE_TOKEN = amplitude_token
 export const ENV = env
 export const SENTRY_DSN = sentry_dsn

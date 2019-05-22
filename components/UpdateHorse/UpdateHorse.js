@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react';
 import ImagePicker from 'react-native-image-crop-picker'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-
 import {
+  Alert,
   StyleSheet,
   Switch,
   Text,
@@ -22,7 +22,7 @@ import PhotoFab from './PhotoFab'
 import PhotosByTimestamp from '../PhotosByTimestamp'
 import PhotoMenu from '../PhotoMenu'
 import GaitSpeedCard from './GaitSpeedCard'
-import { DEFAULT_HORSE_SPEEDS } from "../../helpers"
+import { logError, DEFAULT_HORSE_SPEEDS } from "../../helpers"
 
 export default class UpdateHorse extends PureComponent {
   constructor (props) {
@@ -56,8 +56,13 @@ export default class UpdateHorse extends PureComponent {
       }).then(image => {
         this.debounce = false
         this.props.stashPhoto(image.path)
-      }).catch(() => {
+      }).catch(e => {
         this.debounce = false
+        if (e.code && e.code === 'E_PERMISSION_MISSING') {
+          Alert.alert('Denied', 'You denied permission to access photos. Please enable via permissions settings for Equesteo.')
+        } else {
+          logError(e)
+        }
       })
     }
   }

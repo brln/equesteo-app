@@ -150,7 +150,6 @@ export default class PouchCouch {
     const allDocIDs = {}
 
     const remoteRidesDB = new PouchDB(`${API_URL}/couchproxy/${ridesDBName}`, options)
-    logDebug(userIDs, 'userIDs')
     return new Promise((resolve, reject) => {
       return remoteRidesDB.info().then(resp => {
         const docs = parseInt(resp.update_seq.split('-')[0])

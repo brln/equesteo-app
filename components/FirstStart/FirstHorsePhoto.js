@@ -2,6 +2,7 @@ import ImagePicker from 'react-native-image-crop-picker'
 
 import React, { PureComponent } from 'react'
 import {
+  Alert,
   Dimensions,
   StyleSheet,
   Text,
@@ -11,7 +12,7 @@ import {
 
 import BuildImage from '../Images/BuildImage'
 import { brand } from '../../colors'
-import { logRender } from '../../helpers'
+import { logRender, logError } from '../../helpers'
 import Button from '../Button'
 import MedImage from '../Images/MedImage'
 
@@ -31,7 +32,13 @@ export default class FirstHorsePhoto extends PureComponent {
       cropping: true
     }).then(image => {
       this.props.addHorseProfilePhoto(image.path)
-    }).catch(() => {})
+    }).catch(e => {
+      if (e.code && e.code === 'E_PERMISSION_MISSING') {
+        Alert.alert('Denied', 'You denied permission to access photos. Please enable via permissions settings for Equesteo.')
+      } else {
+        logError(e)
+      }
+    })
   }
 
   next () {

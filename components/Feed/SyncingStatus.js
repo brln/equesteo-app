@@ -30,4 +30,4 @@ const styles = StyleSheet.create({
     color: "black",
     textAlign: 'center'
   },
-});
+})

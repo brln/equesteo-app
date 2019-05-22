@@ -2,6 +2,7 @@ import ImagePicker from 'react-native-image-crop-picker'
 
 import React, { PureComponent } from 'react'
 import {
+  Alert,
   Dimensions,
   StyleSheet,
   Text,
@@ -30,7 +31,13 @@ export default class ProfilePhotoPage extends PureComponent {
       cropping: true
     }).then(image => {
       this.props.uploadProfilePhoto(image.path)
-    }).catch(() => {})
+    }).catch(e => {
+      if (e.code && e.code === 'E_PERMISSION_MISSING') {
+        Alert.alert('Denied', 'You denied permission to access photos. Please enable via permissions settings for Equesteo.')
+      } else {
+        logError(e)
+      }
+    })
   }
 
   render() {

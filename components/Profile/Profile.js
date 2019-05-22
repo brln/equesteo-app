@@ -7,6 +7,7 @@ import {
   Fab,
 } from 'native-base';
 import {
+  Alert,
   ActivityIndicator,
   Dimensions,
   FlatList,
@@ -52,7 +53,13 @@ export default class Profile extends PureComponent {
       cropping: true
     }).then(image => {
       this.props.uploadPhoto(image.path)
-    }).catch(() => {})
+    }).catch(e => {
+      if (e.code && e.code === 'E_PERMISSION_MISSING') {
+        Alert.alert('Denied', 'You denied permission to access photos. Please enable via permissions settings for Equesteo.')
+      } else {
+        logError(e)
+      }
+    })
   }
 
   follow () {

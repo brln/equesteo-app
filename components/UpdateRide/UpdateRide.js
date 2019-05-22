@@ -1,6 +1,7 @@
 import { List } from 'immutable'
 import React, { PureComponent } from 'react';
 import {
+  Alert,
   BackHandler,
   Dimensions,
   StyleSheet,
@@ -85,7 +86,11 @@ export default class UpdateRide extends PureComponent {
       Amplitude.logEvent(ADD_RIDE_PHOTO)
       this.props.createPhoto(image.path)
     }).catch((e) => {
-      logError(e)
+      if (e.code && e.code === 'E_PERMISSION_MISSING') {
+        Alert.alert('Denied', 'You denied permission to access photos. Please enable via iOS settings for Equesteo.')
+      } else {
+        logError(e)
+      }
     })
   }
 

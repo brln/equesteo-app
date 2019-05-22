@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux';
-import { Switch, Text, View } from 'react-native'
+import { StyleSheet, Switch, Text, View } from 'react-native'
 import {
   Card,
   CardItem,
@@ -199,7 +199,7 @@ class SettingsContainer extends BackgroundComponent {
             </CardItem>
             <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
               <View style={{flex: 1, flexDirection: 'row'}}>
-                <View style={{flex: 1}}>
+                <View style={styles.switch}>
                   <Switch
                     value={this.props.user.get('ridesDefaultPublic')}
                     onValueChange={this.changeDefaultPublic}
@@ -212,7 +212,7 @@ class SettingsContainer extends BackgroundComponent {
             </CardItem>
             <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
               <View style={{flex: 1, flexDirection: 'row'}}>
-                <View style={{flex: 1}}>
+                <View style={styles.switch}>
                   <Switch
                     value={this.props.user.get('leaderboardOptOut')}
                     onValueChange={this.changeLeaderboardOptOut}
@@ -231,7 +231,7 @@ class SettingsContainer extends BackgroundComponent {
             </CardItem>
             <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
               <View style={{flex: 1, flexDirection: 'row'}}>
-                <View style={{flex: 1}}>
+                <View style={styles.switch}>
                   <Switch
                     value={this.props.user.get('enableDistanceAlerts')}
                     onValueChange={this.changeEnableDistanceAlerts}
@@ -248,7 +248,7 @@ class SettingsContainer extends BackgroundComponent {
 
             <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
               <View style={{flex: 1, flexDirection: 'row'}}>
-                <View style={{flex: 1}}>
+                <View style={styles.switch}>
                   <Switch
                     value={this.props.user.get('disableGPSAlerts')}
                     onValueChange={this.changeEnableGPSAlerts}
@@ -267,7 +267,7 @@ class SettingsContainer extends BackgroundComponent {
             </CardItem>
             <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
               <View style={{flex: 1, flexDirection: 'row'}}>
-                <View style={{flex: 1}}>
+                <View style={styles.switch}>
                   <Switch
                     value={this.props.user.get('experimentalHoofTracks')}
                     onValueChange={this.changeExperimentalHoofTracks}
@@ -284,6 +284,13 @@ class SettingsContainer extends BackgroundComponent {
     )
   }
 }
+
+const styles = StyleSheet.create({
+  switch: {
+    flex: 1,
+    paddingRight: 20,
+  },
+});
 
 function mapStateToProps (state) {
   const pouchState = state.get('pouchRecords')

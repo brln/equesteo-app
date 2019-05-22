@@ -6,6 +6,7 @@ import {
   Fab,
 } from 'native-base';
 import {
+  Alert,
   Dimensions,
   ScrollView,
   StyleSheet,
@@ -61,7 +62,13 @@ export default class HorseProfile extends PureComponent {
         Amplitude.logEvent(ADD_HORSE_PHOTO_TO_OWN_HORSE)
       }
       this.props.uploadPhoto(image.path)
-    }).catch(() => {})
+    }).catch(e => {
+      if (e.code && e.code === 'E_PERMISSION_MISSING') {
+        Alert.alert('Denied', 'You denied permission to access photos. Please enable via permissions settings for Equesteo.')
+      } else {
+        logError(e)
+      }
+    })
   }
 
   makeBirthday () {

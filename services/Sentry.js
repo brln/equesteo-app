@@ -22,11 +22,14 @@ export function captureException (e) {
     try {
       if (e.stacktrace) {
         Sentry.captureException(e)
+      } else if (typeof e === 'object') {
+        Sentry.captureException(new Error(JSON.stringify(e)))
       } else {
         Sentry.captureException(new Error(e.toString()))
       }
     } catch (e) {
       logError(e, 'Sentry.captureException')
+      Sentry.captureException('Cannot capture exception')
     }
   }
 }
