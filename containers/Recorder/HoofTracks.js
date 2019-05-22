@@ -22,6 +22,7 @@ import Amplitude, {
   RESET_HOOF_TRACKS_CODE,
   SHARE_HOOF_TRACKS_CODE
 } from "../../services/Amplitude"
+import Button from '../../components/Button'
 
 class HoofTracksContainer extends PureComponent {
   static options() {
@@ -51,6 +52,7 @@ class HoofTracksContainer extends PureComponent {
     this.handleBackPress = this.handleBackPress.bind(this)
     this.resetCode = this.resetCode.bind(this)
     this.shareLink = this.shareLink.bind(this)
+    this.startHoofTracks = this.startHoofTracks.bind(this)
 
     Navigation.events().bindComponent(this);
 
@@ -83,31 +85,41 @@ class HoofTracksContainer extends PureComponent {
     clearTimeout(this.gpsTimeout)
   }
 
+  startHoofTracks () {
+    Alert.alert(
+      'Be Careful',
+      'This feature is for convenience, not safety. Always tell someone where you plan to go and when you\'ll be back.\n\n As with all app-based trackers, if you lose cell service, your battery dies, or servers go down, your location will not be broadcast.\n\nEven though your ride will record without cell service, your location can\'t be broadcast without it.\n\nFor safety tracking, please buy a device intended for that purpose.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: () => {
+            Amplitude.logEvent(ACTIVATE_HOOF_TRACKS)
+            this.props.dispatch(setHoofTracksRunning(true))
+            this.props.dispatch(doHoofTracksUpload())
+            Navigation.mergeOptions(this.props.componentId, {
+              topBar: {
+                rightButtons: [
+                  {
+                    id: 'stopTracks',
+                    text: 'Stop',
+                    color: 'white'
+                  },
+                ]
+              }
+            })
+          },
+        },
+      ],
+      {cancelable: false},
+    )
+  }
+
   navigationButtonPressed ({ buttonId }) {
-    if (buttonId === 'startTracks') {
-      Alert.alert(
-        'Be Careful',
-        'This feature is for convenience, not safety. Always tell someone where you plan to go and when you\'ll be back.\n\n As with all app-based trackers, if you lose cell service, your battery dies, or servers go down, your location will not be broadcast.\n\nEven though your ride will record without cell service, your location can\'t be broadcast without it.\n\nFor safety tracking, please buy a device intended for that purpose.',
-        [
-          {
-            text: 'Cancel',
-            style: 'cancel',
-          },
-          {
-            text: 'OK',
-            onPress: () => {
-              Amplitude.logEvent(ACTIVATE_HOOF_TRACKS)
-              this.props.dispatch(setHoofTracksRunning(true))
-              this.props.dispatch(doHoofTracksUpload())
-              EqNavigation.pop(this.props.componentId)
-            },
-          },
-        ],
-        {cancelable: false},
-      );
-
-
-    } else if (buttonId === 'stopTracks') {
+    if (buttonId === 'stopTracks') {
       Amplitude.logEvent(DEACTIVATE_HOOF_TRACKS)
       this.props.dispatch(stopHoofTracksDispatcher())
       EqNavigation.pop(this.props.componentId)
@@ -117,19 +129,6 @@ class HoofTracksContainer extends PureComponent {
   componentWillMount () {
     return UserAPI.getHoofTracksID().then((resp) => {
       this.props.dispatch(setHoofTracksID(resp.htID))
-      if (!this.props.hoofTracksRunning) {
-        Navigation.mergeOptions(this.props.componentId, {
-          topBar: {
-            rightButtons: [
-              {
-                id: 'startTracks',
-                text: 'Start',
-                color: 'white'
-              },
-            ]
-          }
-        })
-      }
     }).catch(e => {
       this.setState({
         error: 'Can\'t fetch HoofTracks ID. Maybe you\'re not online? Email us with problems. info@equesteo.com'
@@ -168,7 +167,7 @@ class HoofTracksContainer extends PureComponent {
   }
 
   render() {
-    if (this.props.hoofTracksID) {
+    if (this.props.hoofTracksRunning) {
       return (
         <HoofTracksLive
           hoofTracksRunning={this.props.hoofTracksRunning}
@@ -184,10 +183,16 @@ class HoofTracksContainer extends PureComponent {
           <Text style={{textAlign: 'center'}}>{ this.state.error }</Text>
         </View>
       )
-    } else {
+    } else if (!this.props.hoofTracksID){
       return (
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           <ActivityIndicator />
+        </View>
+      )
+    } else {
+      return (
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <Button text={"Start Hoof Tracks"} color={brand} onPress={this.startHoofTracks}/>
         </View>
       )
     }
