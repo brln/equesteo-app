@@ -42,6 +42,8 @@ PODS:
   - QBImagePickerController (3.4.0)
   - React (0.55.4):
     - React/Core (= 0.55.4)
+  - react-native-background-timer (2.1.1):
+    - React
   - react-native-camera (1.4.1):
     - React
     - react-native-camera/RCT (= 1.4.1)
@@ -139,6 +141,7 @@ DEPENDENCIES:
   - Firebase/Core (~> 5.3.0)
   - Firebase/Messaging
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
+  - react-native-background-timer (from `../node_modules/react-native-background-timer`)
   - react-native-camera (from `../node_modules/react-native-camera`)
   - "react-native-mapbox-gl (from `../node_modules/@mapbox/react-native-mapbox-gl`)"
   - react-native-webview (from `../node_modules/react-native-webview`)
@@ -193,6 +196,8 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
   React:
     :path: "../node_modules/react-native"
+  react-native-background-timer:
+    :path: "../node_modules/react-native-background-timer"
   react-native-camera:
     :path: "../node_modules/react-native-camera"
   react-native-mapbox-gl:
@@ -235,6 +240,7 @@ SPEC CHECKSUMS:
   Protobuf: 7a877b7f3e5964e3fce995e2eb323dbc6831bb5a
   QBImagePickerController: d54cf93db6decf26baf6ed3472f336ef35cae022
   React: aa2040dbb6f317b95314968021bd2888816e03d5
+  react-native-background-timer: bb7a98c8e97fc7c290de2d423dd09ddb73dcbcbb
   react-native-camera: eac1e8cc7523273a2a11956d0e5dac08296cf4b0
   react-native-mapbox-gl: b42480060cdcc515dfa3d8e403fb4dd32466a1b9
   react-native-webview: a42108b827082f8f0333529b0772102031d5960d
@@ -251,6 +257,6 @@ SPEC CHECKSUMS:
   TextToSpeech: d68418db07e7d3ce39fd3360ccca8d8165cef859
   yoga: a23273df0088bf7f2bb7e5d7b00044ea57a2a54a
 
-PODFILE CHECKSUM: 9d91656678e3b01260ea04d6456fdcd603e4fb31
+PODFILE CHECKSUM: 208f9521df9baa719761d691f60636731ae8fb72
 
 COCOAPODS: 1.5.3
