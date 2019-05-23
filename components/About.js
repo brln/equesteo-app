@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import {
   StyleSheet,
   Text,
+  TouchableWithoutFeedback,
   View
 } from 'react-native';
 
@@ -66,7 +67,7 @@ export default class About extends PureComponent {
         </View>
         <View style={styles.container}>
           <View style={{flex: 1}}>
-            <Text>Made with ♡ in Ben Lomond, CA</Text>
+            <Text>Made with <TouchableWithoutFeedback onPress={alert('boom')}>♡</TouchableWithoutFeedback> in Ben Lomond, CA</Text>
           </View>
           <View style={{flex: 3}}>
             <Text>Version { RELEASE.split('-')[1] }</Text>

@@ -1009,7 +1009,7 @@ export function startGPSWatcher () {
       if (lastLocation) {
         timeDiff = (unixTimeNow() / 1000) - (lastLocation.get('timestamp') / 1000)
       }
-      if (timeDiff > 30) {
+      if (timeDiff > 60) {
         if (getState().getIn(['localState', 'gpsSignalLost'])) {
           dispatch(gpsText('No gps signal.'))
         } else {
@@ -1018,7 +1018,7 @@ export function startGPSWatcher () {
 
         dispatch(gpsSignalLost(true))
       }
-    }, 30000)
+    }, 60000)
   }
 }
 
