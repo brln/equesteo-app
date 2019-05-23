@@ -19,13 +19,15 @@ import {
   SHARE_RIDE,
   UPDATE_RIDE
 } from '../screens/main'
-import { createRideAtlasEntry } from "../actions/functional"
 import Thumbnail from '../components/Images/Thumbnail'
 import {
   createRide,
   rideUpdated,
 } from '../actions/standard'
 import {
+  catchAsyncError,
+  createRideAtlasEntry,
+  doSync,
   persistRide,
 } from '../actions/functional'
 import { EqNavigation } from '../services'
@@ -96,8 +98,11 @@ class RideToolsContainer extends Component {
   deleteRide () {
     Amplitude.logEvent(DELETE_RIDE)
     this.props.dispatch(rideUpdated(this.props.ride.set('deleted', true)))
-    this.props.dispatch(persistRide(this.props.ride.get('_id'), false, [], [], null, List()))
-    EqNavigation.popToRoot(this.props.componentId).catch(() => {})
+    this.props.dispatch(persistRide(this.props.ride.get('_id'), false, [], [], null, List())).then(() => {
+      return EqNavigation.popToRoot(this.props.componentId).catch(() => {})
+    }).then(() => {
+      this.props.dispatch(doSync())
+    }).catch(catchAsyncError(this.props.dispatch, 'RideTools.deleteRide'))
   }
 
   showAtlasEntryModal () {

@@ -66,8 +66,10 @@ export default class About extends PureComponent {
           </Text>
         </View>
         <View style={styles.container}>
-          <View style={{flex: 1}}>
-            <Text>Made with <TouchableWithoutFeedback onPress={alert('boom')}>♡</TouchableWithoutFeedback> in Ben Lomond, CA</Text>
+          <View style={{flex: 1, flexDirection: 'row'}}>
+            <Text>Made with </Text>
+            <TouchableWithoutFeedback onPress={() => {throw new Error('error test')}}><View><Text>♡</Text></View></TouchableWithoutFeedback>
+            <Text> in Ben Lomond, CA</Text>
           </View>
           <View style={{flex: 3}}>
             <Text>Version { RELEASE.split('-')[1] }</Text>

@@ -4,6 +4,20 @@ import { logError } from '../helpers'
 export default class EqNavigation {
   static debounce = false
 
+  static wrap (navCommand) {
+    return navCommand.then(() => {
+      return new Promise(res => {
+        setTimeout(() => {
+          EqNavigation.debounce = false
+          res()
+        }, 50)
+      })
+    }) .catch(e => {
+      EqNavigation.debounce = false
+      logError(e)
+    })
+  }
+
   static push (currentComponent, opts) {
     if (!EqNavigation.debounce) {
       EqNavigation.debounce = true
@@ -11,14 +25,7 @@ export default class EqNavigation {
         opts.component.options = {}
       }
       opts.component.options.blurOnUnmount = true
-      return Navigation.push(currentComponent, opts).then(() => {
-        setTimeout(() => {
-          EqNavigation.debounce = false
-        })
-      }).catch(e => {
-        EqNavigation.debounce = false
-        logError(e)
-      })
+      return this.wrap(Navigation.push(currentComponent, opts))
     } else {
       return Promise.reject('debounce')
     }
@@ -27,14 +34,7 @@ export default class EqNavigation {
   static pop (currentComponent) {
     if (!EqNavigation.debounce) {
       EqNavigation.debounce = true
-      return Navigation.pop(currentComponent).then(() => {
-        setTimeout(() => {
-          EqNavigation.debounce = false
-        }, 50)
-      }).catch(e => {
-        EqNavigation.debounce = false
-        logError(e)
-      })
+      return this.wrap(Navigation.pop(currentComponent))
     } else {
       return Promise.reject()
     }
@@ -43,14 +43,7 @@ export default class EqNavigation {
   static popTo (componentID) {
     if (!EqNavigation.debounce) {
       EqNavigation.debounce = true
-      return Navigation.popTo(componentID).then(() => {
-        setTimeout(() => {
-          EqNavigation.debounce = false
-        }, 50)
-      }).catch(e => {
-        EqNavigation.debounce = false
-        logError(e)
-      })
+      return this.wrap(Navigation.popTo(componentID))
     } else {
       return Promise.reject()
     }
@@ -59,30 +52,7 @@ export default class EqNavigation {
   static popToRoot (currentComponent) {
     if (!EqNavigation.debounce) {
       EqNavigation.debounce = true
-      return Navigation.popToRoot(currentComponent).then(() => {
-        setTimeout(() => {
-          EqNavigation.debounce = false
-        }, 50)
-      }).catch(e => {
-        EqNavigation.debounce = false
-        logError(e)
-      })
-    } else {
-      return Promise.reject()
-    }
-  }
-
-  static setStackRoot (currentComponent, opts) {
-    if (!EqNavigation.debounce) {
-      EqNavigation.debounce = true
-      return Navigation.setStackRoot(currentComponent, opts).then(() => {
-        setTimeout(() => {
-          EqNavigation.debounce = false
-        }, 50)
-      }).catch(e => {
-        EqNavigation.debounce = false
-        logError(e)
-      })
+      return this.wrap(Navigation.popToRoot(currentComponent))
     } else {
       return Promise.reject()
     }

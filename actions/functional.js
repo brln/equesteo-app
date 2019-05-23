@@ -1383,7 +1383,7 @@ export function submitSignup (email, password) {
 
 export function pulldownSync () {
   return (dispatch) => {
-    dispatch(doSync({}, true, false)).catch(catchAsyncError(dispatch, source))
+    dispatch(doSync({}, true, false)).catch(catchAsyncError(dispatch, 'pulldownSync'))
   }
 }
 

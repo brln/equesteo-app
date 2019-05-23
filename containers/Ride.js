@@ -8,7 +8,6 @@ import { connect } from 'react-redux';
 import Ride from '../components/Ride/Ride'
 import {
   clearSelectedRideCoordinates,
-  rideUpdated,
   setShowingRide,
 } from '../actions/standard'
 import {
@@ -16,7 +15,6 @@ import {
   createRideComment,
   loadRideCoordinates,
   loadRideElevations,
-  persistRide,
   toggleRideCarrot,
 } from '../actions/functional'
 import { brand } from '../colors'
@@ -85,7 +83,6 @@ class RideContainer extends PureComponent {
       newComment: null
     }
 
-    this.deleteRide = this.deleteRide.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
     this.showFullscreenMap = this.showFullscreenMap.bind(this)
     this.showHorseProfile = this.showHorseProfile.bind(this)
@@ -178,13 +175,6 @@ class RideContainer extends PureComponent {
     }
 
   }
-
-  deleteRide () {
-    this.props.dispatch(rideUpdated(this.props.ride.set('deleted', true)))
-    this.props.dispatch(persistRide(this.props.ride.get('_id'), false, [], [], null, List()))
-    EqNavigation.pop(this.props.componentId).catch(() => {})
-  }
-
 
   showPhotoLightbox (sources) {
     EqNavigation.push(this.props.componentId, {
@@ -279,7 +269,6 @@ class RideContainer extends PureComponent {
     logRender('RideContainer')
     return (
       <Ride
-        deleteRide={this.deleteRide}
         horses={this.props.horses}
         horsePhotos={this.props.horsePhotos}
         horseOwnerIDs={this.memoHorseOwnerIDs(this.props.horseUsers)}

@@ -43,10 +43,12 @@ export function configure () {
   }
 }
 
-export function captureBreadcrumb (message, category) {
+export function captureBreadcrumb (message, category, data) {
   if (ENV !== 'local') {
-    Sentry.captureBreadcrumb(
-      { message, category }
-    )
+    const bcData = { message, category }
+    if (data) {
+      bcData[data] = data
+    }
+    Sentry.captureBreadcrumb(data)
   }
 }

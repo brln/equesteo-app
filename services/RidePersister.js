@@ -127,8 +127,6 @@ export default class RidePersister {
       })
     }
 
-    return docSaves.then(() => {
-      return this.dispatch(doSync())
-    }).catch(catchAsyncError(this.dispatch))
+    return docSaves.catch(catchAsyncError(this.dispatch))
   }
 }

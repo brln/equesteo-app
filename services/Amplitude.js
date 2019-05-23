@@ -1,6 +1,6 @@
 import amplitude from 'amplitude-js'
 
-import { AMPLITUDE_TOKEN } from "../dotEnv"
+import { AMPLITUDE_TOKEN, ENV } from "../dotEnv"
 
 export const ACTIVATE_HOOF_TRACKS = 'ACTIVATE_HOOF_TRACKS'
 export const ADD_CARE_EVENT = 'ADD_CARE_EVENT'
@@ -76,10 +76,15 @@ amplitude.getInstance().init(AMPLITUDE_TOKEN, null, {
 
 export default class AmplitudeService {
   static setUserID (id) {
-     amplitude.getInstance().setUserId(id)
+    if (ENV !== 'local') {
+      amplitude.getInstance().setUserId(id)
+    }
+
   }
 
   static logEvent (eventName, data) {
-    amplitude.getInstance().logEvent(eventName, data)
+    if (ENV !== 'local') {
+      amplitude.getInstance().logEvent(eventName, data)
+    }
   }
 }

@@ -12,6 +12,6 @@ export default logger = store => dispatch => action => {
 
   const asString = JSON.stringify(toLog)
   logInfo(asString)
-  captureBreadcrumb(asString, 'action')
+  captureBreadcrumb(asString, 'action', toLog)
   dispatch(action)
 }

@@ -12,8 +12,6 @@ import {
   discardCurrentRide,
   mergeStashedLocations,
   removeStashedRidePhoto,
-  rideCoordinatesLoaded,
-  rideElevationsLoaded,
   rideHorseUpdated,
   rideUpdated,
   setActiveAtlasEntry,
@@ -21,6 +19,8 @@ import {
   stashRidePhoto,
 } from '../actions/standard'
 import {
+  catchAsyncError,
+  doSync,
   loadRideCoordinates,
   persistRide,
   stopHoofTracksDispatcher,
@@ -162,6 +162,7 @@ class UpdateRideContainer extends BackgroundComponent {
         })
         Navigation.mergeOptions(this.props.componentId, {topBar: {rightButtons: []}})
         this.updateLocalRideCoords()
+        this.props.dispatch(stopHoofTracksDispatcher())
         this.props.dispatch(persistRide(
           this.props.ride.get('_id'),
           true,
@@ -169,28 +170,25 @@ class UpdateRideContainer extends BackgroundComponent {
           this.state.deletedPhotoIDs,
           this.state.trimValues,
           this.memoizedRideHorses(this.props.rideHorses, this.props.rideID),
-        ))
-        this.props.dispatch(stopHoofTracksDispatcher())
-        EqNavigation.popToRoot(this.props.componentId).then(() => {
+        )).then(() => {
+          return EqNavigation.popToRoot(this.props.componentId)
+        }).then(() => {
           this.props.dispatch(clearPausedLocations())
           this.props.dispatch(stopLocationTracking())
           this.props.dispatch(discardCurrentRide())
           this.props.dispatch(setActiveAtlasEntry(null))
-        }).then(() => {
-          setTimeout(() => {
-            // Because otherwise it doesn't show the ride on iOS. Also, do
-            // not debounce or does not show up on iOS.
-            Navigation.push(this.props.activeComponent, {
-              component: {
-                name: RIDE,
-                passProps: {
-                  rideID: this.props.rideID,
-                  skipToComments: false,
-                }
+          return EqNavigation.push(this.props.activeComponent, {
+            component: {
+              name: RIDE,
+              passProps: {
+                rideID: this.props.rideID,
+                skipToComments: false,
               }
-            })
+            }
           })
-        }).catch(() => {})
+        }).then(() => {
+          this.props.dispatch(doSync())
+        }).catch(catchAsyncError(this.props.dispatch, 'UpdateRide.navigationButtonPressed'))
       } else if (buttonId === 'discard') {
         Amplitude.logEvent(DISCARD_NEW_RIDE)
         this.props.dispatch(setActiveAtlasEntry(null))
@@ -217,16 +215,17 @@ class UpdateRideContainer extends BackgroundComponent {
         this.setState({
           doRevert: false
         })
-        Navigation.popTo(this.props.popBackTo).then(() => {
-          this.updateLocalRideCoords()
-          this.props.dispatch(persistRide(
-            this.props.ride.get('_id'),
-            false,
-            this.props.stashedRidePhotos,
-            this.state.deletedPhotoIDs,
-            this.state.trimValues,
-            this.memoizedRideHorses(this.props.rideHorses, this.props.rideID),
-          ))
+        this.props.dispatch(persistRide(
+          this.props.ride.get('_id'),
+          false,
+          this.props.stashedRidePhotos,
+          this.state.deletedPhotoIDs,
+          this.state.trimValues,
+          this.memoizedRideHorses(this.props.rideHorses, this.props.rideID),
+        )).then(() => {
+          Navigation.popTo(this.props.popBackTo).then(() => {
+            this.updateLocalRideCoords()
+          })
         })
       } else if (buttonId === 'discard') {
         EqNavigation.pop(this.props.componentId).catch(() => {})
@@ -266,7 +265,7 @@ class UpdateRideContainer extends BackgroundComponent {
       const rideCoords = this.props.rideCoordinates.get('rideCoordinates').toJS()
       const spliced = coordSplice(rideCoords, this.state.trimValues)
       const updatedCoords = this.props.rideCoordinates.set('rideCoordinates', fromJS(spliced))
-      this.props.dispatch(rideCoordinatesLoaded(updatedCoords))
+      this.props.dispatch(rideCoordinatesToSave(updatedCoords))
 
       const justCoords = updatedCoords.get('rideCoordinates')
       const firstCoord = parseRideCoordinate(justCoords.first())
@@ -302,7 +301,7 @@ class UpdateRideContainer extends BackgroundComponent {
       )
       const newTotalGain = feetToMeters(newElevationData[newElevationData.length - 1].gain)
       const updatedElevation = this.props.rideElevations.set('elevationGain', newTotalGain)
-      this.props.dispatch(rideElevationsLoaded(updatedElevation))
+      this.props.dispatch(rideElevationsToSave(updatedElevation))
 
       const updatedRide = this.props.ride.set(
         'mapURL', staticMap(this.props.ride, updatedCoords.get('rideCoordinates'))
@@ -546,41 +545,48 @@ class UpdateRideContainer extends BackgroundComponent {
 
   render() {
     logRender('rendering UpdateRideContainer')
-    return (
-      <UpdateRide
-        changeCoverPhoto={this.changeCoverPhoto}
-        changeRideName={this.changeRideName}
-        changeRideNotes={this.changeRideNotes}
-        changeHorseID={this.changeHorseID}
-        changePublic={this.changePublic}
-        clearMenus={this.clearMenus}
-        createPhoto={this.createPhoto}
-        discardRide={this.discardRide}
-        discardModalOpen={this.state.discardModalOpen}
-        horses={this.memoizedHorses(this.props.horseUsers, this.props.horses, this.props.userID)}
-        horsePhotos={this.props.horsePhotos}
-        markPhotoDeleted={this.markPhotoDeleted}
-        rideCoordinates={this.props.rideCoordinates}
-        openPhotoMenu={this.openPhotoMenu}
-        openSelectHorseMenu={this.openSelectHorseMenu}
-        ride={this.props.ride}
-        ridePhotos={this.memoizedAllPhotos(
-          this.props.ridePhotos,
-          this.props.stashedRidePhotos,
-          this.state.deletedPhotoIDs)
-        }
-        rideHorses={this.memoizedRideHorses(this.props.rideHorses, this.props.rideID)}
-        selectedPhotoID={this.state.selectedPhotoID}
-        selectedHorseID={this.state.selectedHorseID}
-        selectHorse={this.selectHorse}
-        showPhotoLightbox={this.showPhotoLightbox}
-        showPhotoMenu={this.state.showPhotoMenu}
-        showSelectHorseMenu={this.state.showSelectHorseMenu}
-        trimRide={this.trimRide}
-        trimValues={this.state.trimValues}
-        unselectHorse={this.unselectHorse}
-      />
-    )
+    if (this.props.ride && this.props.rideCoordinates && this.props.rideElevations) {
+      // Sometimes (I think) this component sticks around after it should, then the
+      // currentRideCoordinates get cleared, and it borks up because it's trying to
+      // operate on that data.
+      return (
+        <UpdateRide
+          changeCoverPhoto={this.changeCoverPhoto}
+          changeRideName={this.changeRideName}
+          changeRideNotes={this.changeRideNotes}
+          changeHorseID={this.changeHorseID}
+          changePublic={this.changePublic}
+          clearMenus={this.clearMenus}
+          createPhoto={this.createPhoto}
+          discardRide={this.discardRide}
+          discardModalOpen={this.state.discardModalOpen}
+          horses={this.memoizedHorses(this.props.horseUsers, this.props.horses, this.props.userID)}
+          horsePhotos={this.props.horsePhotos}
+          markPhotoDeleted={this.markPhotoDeleted}
+          rideCoordinates={this.props.rideCoordinates}
+          openPhotoMenu={this.openPhotoMenu}
+          openSelectHorseMenu={this.openSelectHorseMenu}
+          ride={this.props.ride}
+          ridePhotos={this.memoizedAllPhotos(
+            this.props.ridePhotos,
+            this.props.stashedRidePhotos,
+            this.state.deletedPhotoIDs)
+          }
+          rideHorses={this.memoizedRideHorses(this.props.rideHorses, this.props.rideID)}
+          selectedPhotoID={this.state.selectedPhotoID}
+          selectedHorseID={this.state.selectedHorseID}
+          selectHorse={this.selectHorse}
+          showPhotoLightbox={this.showPhotoLightbox}
+          showPhotoMenu={this.state.showPhotoMenu}
+          showSelectHorseMenu={this.state.showSelectHorseMenu}
+          trimRide={this.trimRide}
+          trimValues={this.state.trimValues}
+          unselectHorse={this.unselectHorse}
+        />
+      )
+    } else {
+      return null
+    }
   }
 }
 
