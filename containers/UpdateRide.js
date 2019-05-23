@@ -12,6 +12,8 @@ import {
   discardCurrentRide,
   mergeStashedLocations,
   removeStashedRidePhoto,
+  rideCoordinatesLoaded,
+  rideElevationsLoaded,
   rideHorseUpdated,
   rideUpdated,
   setActiveAtlasEntry,
@@ -265,7 +267,7 @@ class UpdateRideContainer extends BackgroundComponent {
       const rideCoords = this.props.rideCoordinates.get('rideCoordinates').toJS()
       const spliced = coordSplice(rideCoords, this.state.trimValues)
       const updatedCoords = this.props.rideCoordinates.set('rideCoordinates', fromJS(spliced))
-      this.props.dispatch(rideCoordinatesToSave(updatedCoords))
+      this.props.dispatch(rideCoordinatesLoaded(updatedCoords))
 
       const justCoords = updatedCoords.get('rideCoordinates')
       const firstCoord = parseRideCoordinate(justCoords.first())
@@ -301,7 +303,7 @@ class UpdateRideContainer extends BackgroundComponent {
       )
       const newTotalGain = feetToMeters(newElevationData[newElevationData.length - 1].gain)
       const updatedElevation = this.props.rideElevations.set('elevationGain', newTotalGain)
-      this.props.dispatch(rideElevationsToSave(updatedElevation))
+      this.props.dispatch(rideElevationsLoaded(updatedElevation))
 
       const updatedRide = this.props.ride.set(
         'mapURL', staticMap(this.props.ride, updatedCoords.get('rideCoordinates'))
