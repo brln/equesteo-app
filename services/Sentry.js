@@ -49,6 +49,6 @@ export function captureBreadcrumb (message, category, data) {
     if (data) {
       bcData[data] = data
     }
-    Sentry.captureBreadcrumb(data)
+    Sentry.captureBreadcrumb(bcData)
   }
 }
