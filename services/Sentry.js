@@ -36,9 +36,8 @@ export function captureException (e) {
 
 export function configure () {
   if (ENV !== 'local') {
-    Sentry.config(SENTRY_DSN, {
-      release: RELEASE.split('-')[1],
-    }).install()
+    Sentry.config(SENTRY_DSN).install()
+    Sentry.setRelease(RELEASE)
     Sentry.setDist(DISTRIBUTION)
   }
 }
