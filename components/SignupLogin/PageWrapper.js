@@ -1,19 +1,37 @@
 import React, { PureComponent } from 'react'
 import {
   Dimensions,
+  Linking,
+  Platform,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View
 } from 'react-native';
 
-import { RELEASE } from '../../dotEnv'
 import BuildImage from '../../components/Images/BuildImage'
 
 const { width, height } = Dimensions.get('window')
 
 export default class PageWrapper extends PureComponent {
+  openEmail () {
+    const subject = 'Help me Equesteo!'
+    const email = 'info@equesteo.com'
+    const url = (Platform.OS === 'android')
+      ? `mailto:${email}?cc=?subject=${subject}`
+      : `mailto:${email}?cc=&subject=${subject}`
+    Linking.canOpenURL(url).then((supported) => {
+      if (!supported) {
+        console.log("Can't handle url: " + url);
+      } else {
+        return Linking.openURL(url);
+      }
+    })
+    .catch((err) => console.error('An error occurred', err));
+  }
+
   render() {
     const error = this.props.error ? <Text style={styles.errorBox}>{this.props.error}</Text> : null
     return (
@@ -30,8 +48,11 @@ export default class PageWrapper extends PureComponent {
               { error }
             </View>
           </ScrollView>
-          <View style={{position: 'absolute', bottom: 5, left: 5, width}}>
-            <Text style={{color: '#b8b8b8', fontSize: 8}}>Version { RELEASE.split('-')[1] }</Text>
+
+          <View style={{position: 'absolute', bottom: 5, left: 0, width}}>
+            <TouchableOpacity onPress={this.openEmail}>
+              <Text style={{color: '#FFFFFF', fontSize: 14, textAlign: "center"}}>Email info@equesteo.com for help!</Text>
+            </TouchableOpacity>
           </View>
       </View>
     )

@@ -132,7 +132,7 @@ class SignupContainer extends PureComponent {
 
   submitSignup () {
     if (!this.state.password1) {
-      this.props.errorOccurred('Yeah, gonna need a password.')
+      this.errorOccurred('Yeah, gonna need a password.')
     } else if (this.state.password1 === this.state.password2) {
       this.setState({
         reqSubmitted: true,

@@ -182,23 +182,20 @@ export default class RideRecorder extends PureComponent {
           onPress={this.showCamera}
         />
       )
-      if (this.props.user.get('experimentalHoofTracks')) {
-        let pulse = null
-        if (this.props.hoofTracksRunning) {
-          pulse = <Pulse color='orange' numPulses={3} diameter={80} speed={50} duration={25000} />
-        }
-        hoofTracksButton = (
-          <View>
-            { pulse }
-            <MapButton
-              color={green}
-              icon={require('../../img/radio.png')}
-              onPress={this.props.startHoofTracks}
-            />
-          </View>
-        )
+      let pulse = null
+      if (this.props.hoofTracksRunning) {
+        pulse = <Pulse color='orange' numPulses={3} diameter={80} speed={50} duration={25000} />
       }
-
+      hoofTracksButton = (
+        <View>
+          { pulse }
+          <MapButton
+            color={green}
+            icon={require('../../img/radio.png')}
+            onPress={this.props.startHoofTracks}
+          />
+        </View>
+      )
     }
     if (this.props.currentRide && !this.props.currentRide.get('lastPauseStart')) {
       pauseButton = (

@@ -162,7 +162,7 @@ class FirstStartContainer extends PureComponent {
         this.state.horsePhoto,
         this.props.horseUser.get('rideDefault')
       ))
-    } else if (this.props.horse) {
+    } else if (this.props.horse && complete) {
       this.props.dispatch(deleteUnpersistedHorse(this.props.horse.get('_id'), this.props.horseUser.get('_id')))
     }
     EqNavigation.pop(this.props.componentId).catch(() => {})

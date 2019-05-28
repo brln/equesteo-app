@@ -327,9 +327,11 @@ class FeedContainer extends BackgroundComponent {
         } else {
           return a.get('timestamp') - b.get('timestamp')
         }
-      }).map(rh => {
-        return horses.get(rh.get('horseID'))
-      })
+      }).reduce((a, rh) => {
+        const h = horses.get(rh.get('horseID'))
+        h ?  a = a.push(h) : null
+        return a
+      }, List())
       yourRideHorses = yourRideHorses.set(rideID, rideHorseSet)
     }
     return yourRideHorses
@@ -358,9 +360,11 @@ class FeedContainer extends BackgroundComponent {
         } else {
           return a.get('timestamp') - b.get('timestamp')
         }
-      }).map(rh => {
-        return horses.get(rh.get('horseID'))
-      })
+      }).reduce((a, rh) => {
+        const h = horses.get(rh.get('horseID'))
+        h ?  a = a.push(h) : null
+        return a
+      }, List())
       followingRideHorses = followingRideHorses.set(rideID, rideHorseSet)
     }
     return followingRideHorses

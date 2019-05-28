@@ -7,7 +7,7 @@ import {
 } from 'react-native'
 
 import Thumbnail from '../../components/Images/Thumbnail'
-import { orange, darkGrey } from '../../colors'
+import { darkGrey } from '../../colors'
 
 const { width } = Dimensions.get('window')
 
@@ -18,7 +18,7 @@ export default class HorseThumbnails extends PureComponent {
 
   horseProfileURL (horse, horsePhotos) {
     const profilePhotoID = horse.get('profilePhotoID')
-    if (horse && profilePhotoID && horsePhotos.get(profilePhotoID)) {
+    if (profilePhotoID && horsePhotos.get(profilePhotoID)) {
       return horsePhotos.getIn([profilePhotoID, 'uri'])
     }
   }

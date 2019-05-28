@@ -64,7 +64,6 @@ class SettingsContainer extends BackgroundComponent {
     this.changeAlertDistance = this.changeAlertDistance.bind(this)
     this.changeEnableGPSAlerts = this.changeEnableGPSAlerts.bind(this)
     this.changeEnableDistanceAlerts = this.changeEnableDistanceAlerts.bind(this)
-    this.changeExperimentalHoofTracks = this.changeExperimentalHoofTracks.bind(this)
     this.changeLeaderboardOptOut = this.changeLeaderboardOptOut.bind(this)
     this.changeDefaultPublic = this.changeDefaultPublic.bind(this)
     this.distancePicker = this.distancePicker.bind(this)
@@ -108,14 +107,6 @@ class SettingsContainer extends BackgroundComponent {
       Amplitude.logEvent(OPT_OUT_OF_LEADERBOARDS)
     }
     this.changeAccountDetails(this.props.user.set('leaderboardOptOut', newVal))
-  }
-
-  changeExperimentalHoofTracks () {
-    const newVal = !this.props.user.get('experimentalHoofTracks')
-    if (newVal) {
-      Amplitude.logEvent(ENABLE_HOOF_TRACKS)
-    }
-    this.changeAccountDetails(this.props.user.set('experimentalHoofTracks', newVal))
   }
 
   changeDefaultPublic () {
@@ -256,25 +247,6 @@ class SettingsContainer extends BackgroundComponent {
                 </View>
                 <View style={{flex: 6, justifyContent: 'center'}}>
                   <Text>Disable gps alerts.</Text>
-                </View>
-              </View>
-            </CardItem>
-          </Card>
-
-          <Card>
-            <CardItem header>
-              <Text style={{color: darkBrand }}>Equesteo Labs:</Text>
-            </CardItem>
-            <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
-              <View style={{flex: 1, flexDirection: 'row'}}>
-                <View style={styles.switch}>
-                  <Switch
-                    value={this.props.user.get('experimentalHoofTracks')}
-                    onValueChange={this.changeExperimentalHoofTracks}
-                  />
-                </View>
-                <View style={{flex: 6, justifyContent: 'center'}}>
-                  <Text>Enable experimental HoofTracks.</Text>
                 </View>
               </View>
             </CardItem>

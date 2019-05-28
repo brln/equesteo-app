@@ -108,7 +108,6 @@ export const DB_SYNCED = 'DB_SYNCED'
 
 Tts.setDucking(true)
 
-
 function cb(action) {
   logInfo('functionalAction: ' + action)
   captureBreadcrumb(action, 'functionalAction')

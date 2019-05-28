@@ -28,7 +28,7 @@ for line in fileinput.input('./.env.production', inplace=True):
     if line.strip().startswith('distribution'):
         sys.stdout.write('distribution={}\n'.format(newCode))
     elif line.strip().startswith('release'):
-        sys.stdout.write('release="com.equesteo-{}"\n'.format(newName))
+        sys.stdout.write('release="{}"\n'.format(newName))
     else:
         sys.stdout.write(line)
 
@@ -36,7 +36,7 @@ for line in fileinput.input('./.env', inplace=True):
     if line.strip().startswith('distribution'):
         sys.stdout.write('distribution={}\n'.format(newCode))
     elif line.strip().startswith('release'):
-        sys.stdout.write('release="com.equesteo-{}"\n'.format(newName))
+        sys.stdout.write('release="{}"\n'.format(newName))
     else:
         sys.stdout.write(line)
 
