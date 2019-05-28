@@ -54,7 +54,7 @@ PODS:
     - React
   - react-native-mapbox-gl (6.1.3):
     - React
-  - react-native-webview (4.1.0):
+  - react-native-webview (4.2.0):
     - React
   - React/ART (0.55.4):
     - React/Core
