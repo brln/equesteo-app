@@ -147,7 +147,8 @@ class RideToolsContainer extends Component {
         this.props.ride,
         this.props.rideElevations,
         this.props.rideCoordinates,
-        this.props.ride.get('_id')
+        this.props.ride.get('_id'),
+        true
       ))
       return this.props.dispatch(persistRide(rideID, true, [], [], false, []))
     }

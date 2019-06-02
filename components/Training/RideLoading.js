@@ -20,7 +20,6 @@ export default class RideLoading extends PureComponent {
         style={styles.modal}
         position={"top"}
         isOpen={this.props.modalOpen}
-        startOpen={true}
         animationDuration={0}
       >
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 56}}>

@@ -73,7 +73,7 @@ class TrainingContainer extends PureComponent {
 
   showRide (ride) {
     if (this.props.rides.get(ride.get('rideID'))) {
-      EqNavigation.push(this.props.componentId, {
+      return EqNavigation.push(this.props.componentId, {
         component: {
           name: RIDE,
           passProps: {rideID: ride.get('rideID')}
@@ -81,7 +81,7 @@ class TrainingContainer extends PureComponent {
       }).catch(() => {})
     } else if (this.props.goodConnection) {
       this.setState({ loadingRide: true })
-      this.props.dispatch(loadSingleRide(ride.get('rideID'))).then(() => {
+      return this.props.dispatch(loadSingleRide(ride.get('rideID'))).then(() => {
         this.setState({ loadingRide: false })
         return EqNavigation.push(this.props.componentId, {
           component: {
@@ -98,19 +98,26 @@ class TrainingContainer extends PureComponent {
 
         })
       }).catch(() => {
-        this.setState({ loadingRide: false })
+        setTimeout(() => {
+          this.setState({ loadingRide: false })
+          setTimeout(() => {
+            Alert.alert(
+              'Not Available',
+              'We can\'t load this ride for some reason. \n\n Please contact us if you keep seeing this. info@equesteo.com',
+              [{ text: 'OK' }],
+              {cancelable: true}
+            )
+          }, 500)
+        }, 500)
       })
     } else {
       Alert.alert(
         'Not Available',
         'This ride data is not available offline. \n\n Please try again when you have service.',
-        [
-          {
-            text: 'OK',
-          },
-        ],
+        [{ text: 'OK' }],
         {cancelable: true}
       )
+      return Promise.reject()
     }
   }
 

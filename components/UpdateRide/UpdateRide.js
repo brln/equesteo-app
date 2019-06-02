@@ -185,6 +185,38 @@ export default class UpdateRide extends PureComponent {
               </Card>
 
               <Card>
+                <CardItem header>
+                  <Text style={{color: darkBrand }}>Accessibility:</Text>
+                </CardItem>
+                <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
+                  <View style={{flex: 1, flexDirection: 'row'}}>
+                    <View style={styles.switch}>
+                      <Switch
+                        value={this.props.ride.get('publiclyAccessible')}
+                        onValueChange={this.props.changePubliclyAccessible}
+                      />
+                    </View>
+                    <View style={{flex: 6, justifyContent: 'center'}}>
+                      <Text>This whole ride is publicly accessible.</Text>
+                    </View>
+                  </View>
+                </CardItem>
+                <CardItem cardBody style={{marginLeft: 20, marginRight: 20, marginBottom: 20}}>
+                  <View style={{flex: 1, flexDirection: 'row'}}>
+                    <View style={styles.switch}>
+                      <Switch
+                        value={this.props.ride.get('containsPrivateProperty')}
+                        onValueChange={this.props.changePrivateProperty}
+                      />
+                    </View>
+                    <View style={{flex: 6, justifyContent: 'center'}}>
+                      <Text>This ride goes through private property and you need landowner permission.</Text>
+                    </View>
+                  </View>
+                </CardItem>
+              </Card>
+
+              <Card>
                 <CardItem header style={{padding: 5}}>
                   <View style={{paddingLeft: 5}}>
                     <Text style={{color: darkBrand}}>Ride Photos</Text>
@@ -332,5 +364,9 @@ const styles = StyleSheet.create({
   },
   buttonPad: {
     margin: 20
+  },
+  switch: {
+    flex: 1,
+    paddingRight: 20,
   },
 });

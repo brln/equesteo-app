@@ -14,14 +14,14 @@ class NotificationButton extends PureComponent {
     this.memoAllNotifications = memoizeOne(this.allNotifications.bind(this))
   }
 
-  allNotifications (notifications, rides) {
+  allNotifications (notifications) {
     return notifications.valueSeq().filter(n => {
-      return n.get('seen') !== true && rides.get(n.get('rideID'))
+      return n.get('seen') !== true
     })
   }
 
   render() {
-    if (this.memoAllNotifications(this.props.notifications, this.props.rides).count()) {
+    if (this.memoAllNotifications(this.props.notifications).count()) {
       return Platform.select({
         ios: (
           <TouchableOpacity onPress={this.props.onPress}>
@@ -51,7 +51,6 @@ function mapStateToProps (state, passedProps) {
   const pouchState = state.get('pouchRecords')
   return {
     notifications: pouchState.get('notifications'),
-    rides: pouchState.get('rides'),
     onPress: passedProps.onPress
   }
 }

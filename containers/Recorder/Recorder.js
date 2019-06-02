@@ -251,7 +251,8 @@ class RecorderContainer extends PureComponent {
       this.props.currentRide,
       this.props.currentRideElevations,
       this.props.currentRideCoordinates,
-      null
+      null,
+      this.props.user.get('ridesDefaultPublic')
     ))
     EqNavigation.push(this.props.componentId, {
       component: {

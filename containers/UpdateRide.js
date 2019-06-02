@@ -86,7 +86,9 @@ class UpdateRideContainer extends BackgroundComponent {
     this.allPhotos = this.allPhotos.bind(this)
     this.changeCoverPhoto = this.changeCoverPhoto.bind(this)
     this.changeHorseID = this.changeHorseID.bind(this)
+    this.changePrivateProperty = this.changePrivateProperty.bind(this)
     this.changePublic = this.changePublic.bind(this)
+    this.changePubliclyAccessible = this.changePubliclyAccessible.bind(this)
     this.changeRideName = this.changeRideName.bind(this)
     this.changeRideNotes = this.changeRideNotes.bind(this)
     this.clearMenus = this.clearMenus.bind(this)
@@ -411,6 +413,24 @@ class UpdateRideContainer extends BackgroundComponent {
     ))
   }
 
+  changePubliclyAccessible () {
+    const newVal = !this.props.ride.get('publiclyAccessible')
+    let newRide = this.props.ride.set('publiclyAccessible', newVal)
+    if (newVal === true) {
+      newRide = newRide.set('containsPrivateProperty', false)
+    }
+    this.props.dispatch(rideUpdated(newRide))
+  }
+
+  changePrivateProperty () {
+    const newVal = !this.props.ride.get('containsPrivateProperty')
+    let newRide = this.props.ride.set('containsPrivateProperty', newVal)
+    if (newVal === true) {
+      newRide = newRide.set('publiclyAccessible', false)
+    }
+    this.props.dispatch(rideUpdated(newRide))
+  }
+
   changeHorseID (horseID) {
     this.props.dispatch(rideUpdated(
       this.props.ride.set('horseID', horseID)
@@ -558,6 +578,8 @@ class UpdateRideContainer extends BackgroundComponent {
           changeRideNotes={this.changeRideNotes}
           changeHorseID={this.changeHorseID}
           changePublic={this.changePublic}
+          changePrivateProperty={this.changePrivateProperty}
+          changePubliclyAccessible={this.changePubliclyAccessible}
           clearMenus={this.clearMenus}
           createPhoto={this.createPhoto}
           discardRide={this.discardRide}

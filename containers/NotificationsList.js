@@ -1,13 +1,13 @@
 import memoizeOne from 'memoize-one'
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
-import { View, Text } from 'react-native'
+import { Alert, Text, View } from 'react-native'
 import PushNotification from 'react-native-push-notification'
 import firebase from 'react-native-firebase'
 import { Navigation } from 'react-native-navigation'
 
 import { brand } from '../colors'
-import { markNotificationsSeen } from "../actions/functional"
+import { loadSingleRide, markNotificationsSeen } from "../actions/functional"
 import { logRender } from '../helpers'
 import NotificationList from '../components/NotificationsList/NotificationsList'
 import { RIDE } from '../screens/main'
@@ -17,6 +17,7 @@ import Amplitude, {
   CLEAR_ONE_NOTIFICATION,
   VIEW_NOTIFICATION_RIDE,
 } from "../services/Amplitude"
+import RideLoading from '../components/Training/RideLoading'
 
 class NotificationsListContainer extends PureComponent {
   static options() {
@@ -50,7 +51,8 @@ class NotificationsListContainer extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      deleted: []
+      deleted: [],
+      loadingRide: false,
     }
 
     this.memoAllNotifications = memoizeOne(this.allNotifications.bind(this))
@@ -72,7 +74,7 @@ class NotificationsListContainer extends PureComponent {
   navigationButtonPressed ({ buttonId }) {
     if (buttonId === 'clearAll') {
       Amplitude.logEvent(CLEAR_ALL_NOTIFICATIONS)
-      const notifications = this.memoAllNotifications(this.props.notifications, this.props.rides, this.state.deleted)
+      const notifications = this.memoAllNotifications(this.props.notifications, this.state.deleted)
       for (let notification of notifications) {
         this.justClear(notification.get('_id'), true)
       }
@@ -85,16 +87,62 @@ class NotificationsListContainer extends PureComponent {
   }
 
 
-  showRide (rideID, skipToComments) {
-    EqNavigation.push(this.props.componentId, {
-      component: {
-        name: RIDE,
-        passProps: {
-          rideID,
-          skipToComments,
+  showRide (rideID, skipToComments, notificationID) {
+    if (this.props.rides.get(rideID)) {
+      return EqNavigation.push(this.props.componentId, {
+        component: {
+          name: RIDE,
+          passProps: {rideID: rideID}
         }
-      }
-    }).catch(() => {})
+      }).catch(() => {})
+    } else if (this.props.goodConnection) {
+      this.setState({ loadingRide: true })
+      return this.props.dispatch(loadSingleRide(rideID)).then(() => {
+        this.setState({ loadingRide: false })
+        this.markNotificationSeen(notificationID)
+        return EqNavigation.push(this.props.componentId, {
+          component: {
+            name: RIDE,
+            passProps: {
+              rideID,
+              skipToComments,
+            },
+            options: {
+              animations: {
+                push: {
+                  enabled: false
+                }
+              }
+            }
+          },
+
+        })
+      }).catch(() => {
+        setTimeout(() => {
+          this.setState({ loadingRide: false })
+          setTimeout(() => {
+            Alert.alert(
+              'Not Available',
+              'We can\'t load this ride for some reason. \n\n Please contact us if you keep seeing this. info@equesteo.com',
+              [{ text: 'OK' }],
+              {cancelable: true}
+            )
+          }, 500)
+        }, 500)
+      })
+    } else {
+      Alert.alert(
+        'Not Available',
+        'This ride data is not available offline. \n\n Please try again when you have service.',
+        [
+          {
+            text: 'OK',
+          },
+        ],
+        {cancelable: true}
+      )
+      return Promise.reject()
+    }
   }
 
   markNotificationSeen (id) {
@@ -108,8 +156,7 @@ class NotificationsListContainer extends PureComponent {
   showAndClear (notificationID, rideID, skipToComments) {
     return () => {
       Amplitude.logEvent(VIEW_NOTIFICATION_RIDE)
-      this.markNotificationSeen(notificationID)
-      this.showRide(rideID, skipToComments)
+      this.showRide(rideID, skipToComments, notificationID)
     }
   }
 
@@ -120,35 +167,46 @@ class NotificationsListContainer extends PureComponent {
     this.markNotificationSeen(notificationID)
   }
 
-  allNotifications (notifications, rides, deleted) {
+  allNotifications (notifications, deleted) {
     return notifications.valueSeq().filter(n => {
-      return n.get('seen') !== true && rides.get(n.get('rideID')) && deleted.indexOf(n.get('_id')) < 0
+      return n.get('seen') !== true && n.get('rideID') && deleted.indexOf(n.get('_id')) < 0
     })
   }
 
   render() {
     logRender('NotificationsListContainer')
-    if (this.memoAllNotifications(this.props.notifications, this.props.rides, this.state.deleted).count()) {
-      return (
+    let main
+    if (this.memoAllNotifications(this.props.notifications, this.state.deleted).count()) {
+      main = (
         <NotificationList
           justClear={this.justClear}
-          notifications={this.memoAllNotifications(this.props.notifications, this.props.rides, this.state.deleted)}
+          notifications={this.memoAllNotifications(this.props.notifications, this.state.deleted)}
           showAndClear={this.showAndClear}
         />
       )
     } else {
-      return (
+      main = (
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
           <Text>All caught up!</Text>
         </View>
       )
     }
+    return (
+      <View style={{flex: 1}}>
+        <RideLoading
+          modalOpen={this.state.loadingRide}
+        />
+        { main }
+      </View>
+    )
   }
 }
 
 function mapStateToProps (state, passedProps) {
   const pouchState = state.get('pouchRecords')
+  const localState = state.get('localState')
   return {
+    goodConnection: localState.get('goodConnection'),
     notifications: pouchState.get('notifications'),
     rides: pouchState.get('rides'),
   }

@@ -31,6 +31,7 @@ import {
   TRAINING,
 } from '../../screens/main'
 import { EqNavigation } from '../../services'
+import { captureMessage } from '../../services/Sentry'
 
 export const END_OF_FEED = unixTimeNow() - (1000 * 60 * 60 * 24 * 30)
 
@@ -394,10 +395,14 @@ class FeedContainer extends BackgroundComponent {
     })
   }
 
-  filteredHorseUsers (follows, userID, horseUsers) {
+  filteredHorseUsers (follows, userID, horseUsers, horses) {
     const followIDs = this.memoizeFollowIDs(follows, userID)
     return horseUsers.filter(h => {
-      return h.get('deleted') !== true && (h.get('userID') === userID || followIDs.get(h.get('userID')))
+      if (horses.get(h.get('horseID'))) {
+        return h.get('deleted') !== true && (h.get('userID') === userID || followIDs.get(h.get('userID')))
+      } else {
+        captureMessage('HorseUser missing horse: ' + h.get('_id'))
+      }
     })
   }
 
@@ -428,7 +433,7 @@ class FeedContainer extends BackgroundComponent {
         horses={horses}
         horsePhotos={this.props.horsePhotos}
         horseOwnerIDs={this.memoizeHorseOwnerIDs(this.props.horseUsers)}
-        horseUsers={this.memoizeFilteredHorseUsers(this.props.follows, this.props.userID, this.props.horseUsers)}
+        horseUsers={this.memoizeFilteredHorseUsers(this.props.follows, this.props.userID, this.props.horseUsers, this.props.horses)}
         openLeaderboards={this.openLeaderboards}
         openMore={this.openMore}
         openNotifications={this.openNotifications}

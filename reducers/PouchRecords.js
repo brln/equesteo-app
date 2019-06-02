@@ -28,8 +28,6 @@ import {
   RIDE_PHOTO_UPDATED,
   RIDE_UPDATED,
   RIDE_ELEVATIONS_LOADED,
-  UPDATE_NEW_RIDE_COORDS,
-  UPDATE_NEW_RIDE_ELEVATIONS,
   USER_PHOTO_UPDATED,
   USER_UPDATED,
 } from '../constants'
@@ -128,7 +126,7 @@ const createRide = (action, state) => {
   let newState = state
   const startTime = action.currentRide.get('startTime')
 
-  let finishTime = new Date()
+  let finishTime = action.currentRideCoordinates.get('rideCoordinates').map(rc => rc.get(2)).max()
   let pausedTime = action.currentRide.get('pausedTime')
   let lastPausedTime = action.currentRide.get('lastPauseStart')
   if (action.duplicateFrom) {
@@ -145,7 +143,7 @@ const createRide = (action, state) => {
     lastPausedTime
   )
 
-  const name = newRideName(action.currentRide)
+  const name = action.name ? action.name : newRideName(action.currentRide)
 
   let defaultID = null
   if (!action.duplicateFrom) {
@@ -170,9 +168,9 @@ const createRide = (action, state) => {
     newState = newState.setIn(['rideHorses', recordID], newRideHorse)
   }
 
-  const TEN_FEET_AS_DEG_LATITUDE = 0.0000274
+  const FIVE_FEET_AS_DEG_LATITUDE = 0.0000137
   const simplifiedCoords = simplifyLine(
-    TEN_FEET_AS_DEG_LATITUDE,
+    FIVE_FEET_AS_DEG_LATITUDE,
     action.currentRideCoordinates.get('rideCoordinates')
   )
 
@@ -182,7 +180,7 @@ const createRide = (action, state) => {
     distance: action.currentRide.get('distance') ,
     elapsedTimeSecs: elapsed,
     horseID: defaultID,
-    isPublic: state.getIn(['users', action.userID, 'ridesDefaultPublic']),
+    isPublic: action.isPublic,
     name,
     notes: null,
     photosByID: Map({}),

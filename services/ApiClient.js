@@ -77,8 +77,8 @@ export default class ApiClient {
 
   static checkConnection() {
     return Promise.race([
-      new Promise((res, rej) => {
-        return ApiClient.request(GET, '/checkConnection').then(resp => {
+      new Promise((res) => {
+        return ApiClient.simpleGet('/checkConnection2').then(resp => {
           if (resp) {
             res(resp)
           } else {
@@ -96,7 +96,20 @@ export default class ApiClient {
     ])
   }
 
-  static request (method, endpoint, body, isJSON=true) {
+  static simpleGet (endpoint) {
+    let resp
+    return fetch(API_URL + endpoint, { method: 'GET' }).then(_resp => {
+      resp = _resp
+      return resp.json()
+    }).then(json => {
+      if (resp.status !== 200) {
+        throw Error(JSON.stringify(json))
+      }
+      return json
+    })
+  }
+
+  static request (method, endpoint, body, isJSON=true, doAuth=true) {
     if (isJSON) {
       body = body ? JSON.stringify(body) : undefined
     }
@@ -123,7 +136,9 @@ export default class ApiClient {
             token = null
             throw new UnauthorizedError(json.error)
         }
-        this.setToken(resp.headers.map['x-auth-token'][0], endpoint)
+        if (doAuth) {
+          this.setToken(resp.headers.map['x-auth-token'][0], endpoint)
+        }
         return json
       })
     }).catch(e => {
@@ -131,7 +146,7 @@ export default class ApiClient {
         throw new BadResponseError('Can\'t parse response.')
       } else if (e instanceof TypeError) {
         if (e.toString() === 'TypeError: Network request failed') {
-          throw new NotConnectedError('Can\'t find the internet.')
+          throw new NotConnectedError('Can\'t find the server.')
         } else {
           throw e
         }

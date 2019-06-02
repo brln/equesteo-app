@@ -37,10 +37,13 @@ export function loginAndSync(loginFunc, loginArgs, dispatch, getState) {
     setUserContext(userID)
     Amplitude.setUserID(userID)
     dispatch(startListeningFCMTokenRefresh())
-    dispatch(setDistributionOnServer())
     dispatch(setDoingInitialLoad(true))
     return dispatch(doSync({userID, followingIDs, followerIDs})).catch(catchAsyncError(dispatch))
   }).then(() => {
+    // setDistribution needs to be far apart from FCMToken or they
+    // end up in a race condition on the server. really, need to
+    // consolidate the two calls.
+    dispatch(setDistributionOnServer())
     const syncFail = getState().getIn(['localState', 'fullSyncFail'])
     if (!syncFail) {
       setTimeout(() => {

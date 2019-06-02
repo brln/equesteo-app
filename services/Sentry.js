@@ -14,6 +14,8 @@ export function setUserContext(userID) {
 export function captureMessage (m) {
   if (ENV !== 'local') {
     Sentry.captureMessage(m)
+  } else {
+    logDebug(m, 'Sentry message captured')
   }
 }
 

@@ -1,5 +1,9 @@
 export function makeMessage (notification) {
   switch (notification.notificationType) {
+    case 'importedRide':
+      const rn = notification.name
+      const d = parseFloat(notification.distance)
+      return `You imported a ${d.toFixed(1)} mile ride: ${rn}`
     case 'newRide':
       const userName = notification.userName
       const rideName = notification.name

@@ -237,6 +237,7 @@ export function createRide (
   currentRideElevations,
   currentRideCoordinates,
   duplicateFrom,
+  isPublic,
 ) {
   return {
     type: CREATE_RIDE,
@@ -246,6 +247,7 @@ export function createRide (
     duplicateFrom,
     rideID,
     userID,
+    isPublic,
   }
 }
 

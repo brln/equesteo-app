@@ -31,6 +31,10 @@ export default class NotificationsList extends PureComponent {
         icon = require('../../img/notifications/route.png')
         onPress = this.props.showAndClear(item._id, item.rideID, false)
         break
+      case 'importedRide':
+        icon = require('../../img/notifications/route.png')
+        onPress = this.props.showAndClear(item._id, item.rideID, false)
+        break
       case 'newComment':
         icon = require('../../img/notifications/comment.png')
         onPress = this.props.showAndClear(item._id, item.rideID, true)

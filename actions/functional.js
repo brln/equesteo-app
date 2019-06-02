@@ -222,11 +222,14 @@ export function appInitialized () {
           }
           return dispatch(startNetworkTracking())
         }).then(() => {
-          return dispatch(setDistributionOnServer())
-        }).then(() => {
           return dispatch(doSync({}, true, false)).then(postSync)
         }).then(() => {
           dispatch(startBackgroundFetch())
+        }).then(() => {
+          // setDistribution needs to be far apart from FCMToken or they
+          // end up in a race condition on the server. really, need to
+          // consolidate the two calls.
+          return dispatch(setDistributionOnServer())
         })
       } else {
         if (getState().getIn(['localState', 'everLoggedIn'])) {
@@ -447,7 +450,7 @@ export function loadRideCoordinates (rideID) {
   const source = 'loadRideCoordinates'
   cb(source)
   return (dispatch) => {
-    PouchCouch.loadRideCoordinates(rideID).then((coords) => {
+    return PouchCouch.loadRideCoordinates(rideID).then((coords) => {
       dispatch(rideCoordinatesLoaded(coords))
     }).catch(catchAsyncError(dispatch, source))
   }
@@ -457,7 +460,7 @@ export function loadRideElevations (rideID) {
   const source = 'loadRideElevations'
   cb(source)
   return (dispatch) => {
-    PouchCouch.loadRideElevations(rideID).then((elevations) => {
+    return PouchCouch.loadRideElevations(rideID).then((elevations) => {
       dispatch(rideElevationsLoaded(elevations))
     }).catch(e => {
       if (e.status === 404) {
@@ -477,8 +480,19 @@ export function loadSingleRide (rideID) {
       return PouchCouch.localLoad()
     }).then(localData => {
       dispatch(localDataLoaded(localData))
-      loadRideCoordinates(rideID)
-      loadRideElevations(rideID)
+      return loadRideCoordinates(rideID)
+    }).then(() => {
+      return loadRideElevations(rideID)
+    }).catch(e => {
+      // Everywhere else, we ignore the NotConnectedError, but here we
+      // need to know so the Training page and NotificationList can react
+      // to the fact that we can't load a ride.
+      if (e instanceof NotConnectedError) {
+        throw e
+      } else {
+        catchAsyncError(dispatch, 'loadSingleRide')
+      }
+
     })
   }
 }
@@ -1069,7 +1083,6 @@ export function startLocationTracking () {
               accuracy: location.accuracy,
               latitude: location.latitude,
               longitude: location.longitude,
-              provider: location.provider,
               timestamp: location.time,
               speed: location.speed,
             })
@@ -1256,6 +1269,10 @@ export function startListeningFCM () {
       firebase.notifications().onNotificationOpened(() => {
         dispatch(doSync())
       })
+    }).catch(e => {
+      if (e.code !== 'messaging/permission_error') {
+        throw e
+      }
     }).catch(catchAsyncError(dispatch, source))
   }
 }
@@ -1416,9 +1433,6 @@ export function doSync (syncData={}, showProgress=true, doUpload=true) {
 
 
     if (getState().getIn(['localState', 'goodConnection'])) {
-      dispatch(clearDocsNumbers())
-      dispatch(runPhotoQueue())
-
       const remotePersistStatus = getState().getIn(['localState', 'needsRemotePersist'])
       if (remotePersistStatus === DB_SYNCING) {
         // If a sync has already started, wait 10 seconds then run another one.
@@ -1433,6 +1447,9 @@ export function doSync (syncData={}, showProgress=true, doUpload=true) {
       } else {
         dispatch(setRemotePersist(DB_SYNCING))
       }
+
+      dispatch(clearDocsNumbers())
+      dispatch(runPhotoQueue())
 
       dispatch(setFullSyncFail(true))
       let upload = Promise.resolve()
@@ -1483,7 +1500,7 @@ export function doSync (syncData={}, showProgress=true, doUpload=true) {
       })
     } else {
       dispatch(setFullSyncFail(true))
-      feedMessage('No Internet Connection', warning, 10000)
+      feedMessage('Can\'t find the server.', warning, 10000)
       dispatch(checkNetworkConnection())
       return Promise.resolve()
     }
