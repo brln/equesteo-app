@@ -29,6 +29,7 @@ import Amplitude, {
   ADD_HORSE_PHOTO_TO_OTHERS_HORSE,
   ADD_HORSE_PHOTO_TO_OWN_HORSE,
 } from '../../services/Amplitude'
+import EqText from '../Shared/EqText'
 
 const { height } = Dimensions.get('window')
 
@@ -190,9 +191,7 @@ export default class HorseProfile extends PureComponent {
           </View>
         </CardItem>
         <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20}}>
-          <Text>
-            { userName(this.props.horseOwner) }
-            </Text>
+          <EqText>{ userName(this.props.horseOwner) }</EqText>
         </CardItem>
         </View>
       )
@@ -224,7 +223,7 @@ export default class HorseProfile extends PureComponent {
               </View>
             </CardItem>
             <CardItem cardBody style={{marginLeft: 20, marginBottom: 30, marginRight: 20}}>
-              <Text>{this.props.horse.get('description') || 'nothing'}</Text>
+              <EqText>{this.props.horse.get('description') || 'nothing'}</EqText>
             </CardItem>
           </Card>
 

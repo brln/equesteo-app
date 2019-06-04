@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux';
-import { StyleSheet, Switch, Text, View } from 'react-native'
+import { Platform, StyleSheet, Switch, Text, View } from 'react-native'
 import {
   Card,
   CardItem,
@@ -260,7 +260,7 @@ class SettingsContainer extends BackgroundComponent {
 const styles = StyleSheet.create({
   switch: {
     flex: 1,
-    paddingRight: 20,
+    marginRight: Platform.select({ios: 20, android: 0}),
   },
 });
 

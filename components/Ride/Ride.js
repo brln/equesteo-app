@@ -20,7 +20,7 @@ import {
 import BuildImage from '../Images/BuildImage'
 import Button from '../Button'
 import CarrotCard from './CarrotCard'
-import { brand, darkBrand, darkGrey } from '../../colors'
+import { brand, darkBrand, danger, darkGrey } from '../../colors'
 import HorseCard from './HorseCard'
 import {
   DEFAULT_HORSE_SPEEDS,
@@ -305,6 +305,7 @@ export default class Ride extends PureComponent {
     let maxSpeed = this.memoizedMaxSpeed(this.props.rideCoordinates.get('rideCoordinates'))
     let elevationGain = this.props.rideElevations ? this.props.rideElevations.get('elevationGain') : 0
     const height = (width * 9 / 16) + 54
+
     return (
       <KeyboardAwareScrollView
         keyboardShouldPersistTaps={'always'}
@@ -338,16 +339,21 @@ export default class Ride extends PureComponent {
 
         <View style={{flex: 1}}>
           <View style={{height}}>
-            <ViewingMap
-              rideCoordinates={this.props.rideCoordinates.get('rideCoordinates')}
-              ridePhotos={this.props.ridePhotos}
-              showPhotoLightbox={this.props.showPhotoLightbox}
-            />
-            <View style={[{position: 'absolute', right: 10}, Platform.select({android: {bottom: 10}, ios: {top: 10}})]}>
-              <TouchableOpacity onPress={this.fullscreenMap}>
-                <BuildImage source={require('../../img/fullscreen.png')} style={{width: 35, height: 35}} />
-              </TouchableOpacity>
+            <View style={{flex: 1}}>
+              <ViewingMap
+                rideCoordinates={this.props.rideCoordinates.get('rideCoordinates')}
+                ridePhotos={this.props.ridePhotos}
+                showPhotoLightbox={this.props.showPhotoLightbox}
+              />
+              <View style={[{position: 'absolute', right: 10}, Platform.select({android: {bottom: 10}, ios: {top: 10}})]}>
+                <TouchableOpacity onPress={this.fullscreenMap}>
+                  <BuildImage source={require('../../img/fullscreen.png')} style={{width: 35, height: 35}} />
+                </TouchableOpacity>
+              </View>
             </View>
+            { this.props.ride.get('containsPrivateProperty') ? (<View style={{backgroundColor: danger, marginBottom: 5, paddingTop: 3, paddingBottom: 3}}>
+              <Text style={{textAlign: 'center'}}>This ride contains private land and should not be ridden without landowner permission.</Text>
+            </View>) : null }
           </View>
 
           <PhotoFilmstrip

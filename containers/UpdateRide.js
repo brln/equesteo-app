@@ -47,6 +47,8 @@ import { PHOTO_LIGHTBOX, RIDE } from '../screens/main'
 import { EqNavigation } from '../services'
 import Amplitude, {
   DISCARD_NEW_RIDE,
+  MARK_RIDE_PRIVATE_LAND,
+  MARK_RIDE_PUBLIC_LAND,
   SAVE_RIDE,
   SAVE_NEW_RIDE,
   SET_SINGLE_RIDE_TO_PRIVATE
@@ -417,6 +419,7 @@ class UpdateRideContainer extends BackgroundComponent {
     const newVal = !this.props.ride.get('publiclyAccessible')
     let newRide = this.props.ride.set('publiclyAccessible', newVal)
     if (newVal === true) {
+      Amplitude.logEvent(MARK_RIDE_PUBLIC_LAND)
       newRide = newRide.set('containsPrivateProperty', false)
     }
     this.props.dispatch(rideUpdated(newRide))
@@ -426,6 +429,7 @@ class UpdateRideContainer extends BackgroundComponent {
     const newVal = !this.props.ride.get('containsPrivateProperty')
     let newRide = this.props.ride.set('containsPrivateProperty', newVal)
     if (newVal === true) {
+      Amplitude.logEvent(MARK_RIDE_PRIVATE_LAND)
       newRide = newRide.set('publiclyAccessible', false)
     }
     this.props.dispatch(rideUpdated(newRide))
