@@ -984,17 +984,28 @@ export function showLocalNotifications () {
   }
 }
 
+export function clearLocationRetry () {
+  const source = 'clearLocationRetry'
+  cb(source)
+  return () => {
+    if (locationTrackingRetry) {
+      clearTimeout(locationTrackingRetry)
+    }
+  }
+}
+
+let locationTrackingRetry = null
 export function retryLocationTracking () {
   const source = 'retryLocationTracking'
   cb(source)
   return (dispatch, getState) => {
-    setTimeout(() => {
+    locationTrackingRetry = setTimeout(() => {
       const currentRide = getState().getIn(['currentRide', 'currentRide'])
       const lastLocation = getState().getIn(['currentRide', 'lastLocation'])
       if (currentRide && !lastLocation) {
-        dispatch(stopLocationTracking(false))
-        dispatch(startLocationTracking())
-        dispatch(retryLocationTracking())
+        dispatch(stopLocationTracking(false)).then(() => {
+          dispatch(startLocationTracking())
+        })
       }
     }, 30000)
   }
@@ -1043,6 +1054,25 @@ export function stopGPSWatcher () {
   }
 }
 
+export function locationPermissionsError () {
+  const source = 'locationPermissionsError'
+  cb(source)
+  return (_, getState) => {
+    const recorderComponent = getState().getIn(['localState', 'activeComponent'])
+    Alert.alert(
+      'Uh Oh',
+      'Looks like you denied location permission. \n\n This app is kind of useless without it. \n\n Allow this permission in your system settings and try again',
+      [
+        {
+          text: 'OK',
+          onPress: () => { EqNavigation.popToRoot(recorderComponent)},
+        },
+      ],
+      {cancelable: false},
+    )
+  }
+}
+
 
 export function startLocationTracking () {
   const source = 'startLocationTracking'
@@ -1056,7 +1086,12 @@ export function startLocationTracking () {
         const KALMAN_FILTER_Q = 6
         BackgroundGeolocation.on('error', (error) => {
           logError(error, 'BackgroundGeolocation.error')
-          captureException(error)
+          dispatch(stopLocationTracking())
+          if (error.code === 1000) {
+            dispatch(locationPermissionsError())
+          } else {
+            captureException(error)
+          }
         })
 
 
@@ -1308,26 +1343,31 @@ function startActiveComponentListener () {
 export function shutdownBackgroundGeolocation () {
   const source = 'shutdownBackgroundGeolocation'
   cb(source)
-  return () => {
+  return (dispatch) => {
     let numTries = 0
     function ensureStop () {
-      numTries = numTries + 1
-      if (numTries > 5) {
-        throw new Error ('Too many tries shutting down BackgroundGeolocation')
-      }
-      setTimeout(() => {
-        BackgroundGeolocation.checkStatus((status) => {
-          console.log(status)
-          if (status.isRunning) {
-            BackgroundGeolocation.stop()
+      return new Promise(res => {
+        numTries = numTries + 1
+        if (numTries > 5) {
+          throw new Error ('Too many tries shutting down BackgroundGeolocation')
+        }
+        setTimeout(() => {
+          BackgroundGeolocation.checkStatus((status) => {
+            BackgroundGeolocation.removeAllListeners()
+            if (status.isRunning) {
+              BackgroundGeolocation.stop()
+              ensureStop()
+            } else {
+              dispatch(setBackgroundGeolocationRunning(false))
+              res()
+            }
+          }, () => {
             ensureStop()
-          }
-        }, () => {
-          ensureStop()
-        })
-      }, 2000)
+          })
+        }, 2000)
+      })
     }
-    ensureStop()
+    return ensureStop()
   }
 }
 
@@ -1335,13 +1375,11 @@ export function stopLocationTracking (clearLast=true) {
   const source = 'stopLocationTracking'
   cb(source)
   return (dispatch) => {
-    dispatch(setBackgroundGeolocationRunning(false))
     dispatch(stopGPSWatcher())
-    dispatch(shutdownBackgroundGeolocation())
-    BackgroundGeolocation.removeAllListeners('location')
     if (clearLast) {
       dispatch(clearLastLocation())
     }
+    return dispatch(shutdownBackgroundGeolocation())
   }
 }
 

@@ -3,7 +3,7 @@ import { Navigation } from 'react-native-navigation'
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import LocationServicesDialogBox from "react-native-android-location-services-dialog-box";
-import { Alert, BackHandler } from 'react-native'
+import { Alert, BackHandler, PermissionsAndroid } from 'react-native'
 
 import {
   createRide,
@@ -17,6 +17,8 @@ import {
   unpauseLocationTracking,
 } from '../../actions/standard'
 import {
+  clearLocationRetry,
+  locationPermissionsError,
   startLocationTracking,
   stopHoofTracksDispatcher,
   stopLocationTracking,
@@ -72,6 +74,7 @@ class RecorderContainer extends PureComponent {
     this.handleBackPress = this.handleBackPress.bind(this)
     this.finishRide = this.finishRide.bind(this)
     this.pauseLocationTracking = this.pauseLocationTracking.bind(this)
+    this.requestLocationPermission = this.requestLocationPermission.bind(this)
     this.showAtlas = this.showAtlas.bind(this)
     this.showCamera = this.showCamera.bind(this)
     this.showUpdateRide = this.showUpdateRide.bind(this)
@@ -106,6 +109,7 @@ class RecorderContainer extends PureComponent {
   }
 
   componentWillUnmount () {
+    this.props.dispatch(clearLocationRetry())
     BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
     clearTimeout(this.gpsTimeout)
   }
@@ -122,6 +126,21 @@ class RecorderContainer extends PureComponent {
     if (!this.props.currentRide) {
       this.startRide()
     }
+  }
+
+  requestLocationPermission() {
+    return new Promise((res, rej) => {
+      PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      ).then(granted => {
+        if (granted) {
+          res()
+        } else {
+          this.props.dispatch(locationPermissionsError())
+          rej()
+        }
+      })
+    })
   }
 
   componentDidMount () {
@@ -149,6 +168,8 @@ class RecorderContainer extends PureComponent {
         providerListener: false,
       }).then(() => {
         return this.props.dispatch(startLocationTracking())
+      }).then(() => {
+        return this.requestLocationPermission()
       }).catch(e => {
         captureException(e)
       })
