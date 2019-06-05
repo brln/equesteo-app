@@ -172,6 +172,8 @@ class UpdateRideContainer extends BackgroundComponent {
         this.props.dispatch(persistRide(
           this.props.ride.get('_id'),
           true,
+          this.props.rideCoordinates,
+          this.props.rideElevations,
           this.props.stashedRidePhotos,
           this.state.deletedPhotoIDs,
           this.state.trimValues,
@@ -224,6 +226,8 @@ class UpdateRideContainer extends BackgroundComponent {
         this.props.dispatch(persistRide(
           this.props.ride.get('_id'),
           false,
+          this.props.rideCoordinates,
+          this.props.rideElevations,
           this.props.stashedRidePhotos,
           this.state.deletedPhotoIDs,
           this.state.trimValues,

@@ -203,7 +203,6 @@ export default class PouchCouch {
 
   static localReplicateRide (rideID) {
     const allDocIDs = {}
-    logDebug('localReplicateRide')
     return PouchCouch.preReplicate().then(options => {
       return new Promise((resolve, reject) => {
         const remoteRidesDB = new PouchDB(`${API_URL}/couchproxy/${ridesDBName}`, options)

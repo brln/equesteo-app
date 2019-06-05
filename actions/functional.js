@@ -116,7 +116,7 @@ function cb(action) {
 export function catchAsyncError (dispatch, source) {
   return (e) => {
     if (!(e instanceof NotConnectedError)) {
-      if (e.status === 401) {
+      if (e && e.status === 401) {
         dispatch(signOut())
       }
       captureBreadcrumb(source)
@@ -222,7 +222,9 @@ export function appInitialized () {
           }
           return dispatch(startNetworkTracking())
         }).then(() => {
-          return dispatch(doSync({}, true, false)).then(postSync)
+          return dispatch(doSync({}, true, false)).then(postSync).catch(e => {
+            logError(e)
+          })
         }).then(() => {
           dispatch(startBackgroundFetch())
         }).then(() => {
@@ -331,6 +333,8 @@ export function createCareEvent () {
       nextSave.then(() => {
         dispatch(clearCurrentCareEvent())
         dispatch(doSync())
+      }).catch(e => {
+        logError(e)
       })
     })
   }
@@ -395,8 +399,8 @@ export function deleteCareEvent (careEvent) {
     PouchCouch.saveHorse(deleted.toJS()).then(doc => {
       const afterSave = getState().getIn(['pouchRecords', 'careEvents', careEvent.get('_id')])
       dispatch(careEventUpdated(afterSave.set('_rev', doc.rev)))
-      dispatch(doSync())
-    })
+      return dispatch(doSync())
+    }).catch(catchAsyncError(dispatch, source))
   }
 }
 
@@ -559,12 +563,12 @@ export function persistFollow (followID, creating) {
   }
 }
 
-export function persistRide (rideID, newRide, stashedPhotos, deletedPhotoIDs, trimValues, rideHorses) {
+export function persistRide (rideID, newRide, rideCoordinates, rideElevations, stashedPhotos, deletedPhotoIDs, trimValues, rideHorses) {
   const source = 'persistRide'
   cb(source)
   return (dispatch, getState) => {
     const ridePersister = new RidePersister(dispatch, getState, rideID)
-    return ridePersister.persistRide(newRide, stashedPhotos, deletedPhotoIDs, trimValues, rideHorses)
+    return ridePersister.persistRide(newRide, rideCoordinates, rideElevations, stashedPhotos, deletedPhotoIDs, trimValues, rideHorses)
   }
 }
 
@@ -1205,7 +1209,6 @@ export function doHoofTracksUpload () {
     if (running) {
       const lastUpload = getState().getIn(['currentRide', 'lastHoofTracksUpload'])
       const timeDiff = unixTimeNow() - lastUpload
-      logDebug(timeDiff)
       if ((!lastUpload || ((timeDiff) > 30000))) {
         const startTime = getState().getIn(['currentRide', 'currentRide', 'startTime'])
         const hoofTracksID = getState().getIn(['localState', 'hoofTracksID'])
@@ -1298,11 +1301,11 @@ export function startListeningFCM () {
         if (isAndroid() || inForeground) {
           dispatch(doSync({}, false)).then(() => {
             dispatch(showLocalNotifications())
-          })
+          }).catch(catchAsyncError(dispatch, source))
         }
       })
       firebase.notifications().onNotificationOpened(() => {
-        dispatch(doSync())
+        dispatch(doSync()).catch(catchAsyncError, source)
       })
     }).catch(e => {
       if (e.code !== 'messaging/permission_error') {
@@ -1321,6 +1324,8 @@ export function startListeningFCMTokenRefresh () {
       if (newToken) {
         dispatch(setFCMTokenOnServer(newToken))
       }
+    }).catch(e => {
+      logError(e)
     })
     FCMTokenRefreshListenerRemover = firebase.messaging().onTokenRefresh((newToken) => {
       dispatch(setFCMTokenOnServer(newToken))
@@ -1402,7 +1407,6 @@ function startBackgroundFetch () {
       stopOnTerminate: false,   // <-- Android-only,
       startOnBoot: true         // <-- Android-only
     }, () => {
-      logDebug('start background fetch')
       const remotePersistStatus = getState().getIn(['localState', 'needsRemotePersist'])
       let before = Promise.resolve()
       let result = BackgroundFetch.FETCH_RESULT_NO_DATA
@@ -1413,6 +1417,7 @@ function startBackgroundFetch () {
       before.then(() => {
         BackgroundFetch.finish(result)
       })
+      before.catch(catchAsyncError(dispatch, source))
     }, (error) => {
       logError("RNBackgroundFetch failed to start", error)
     });
@@ -1469,79 +1474,80 @@ export function doSync (syncData={}, showProgress=true, doUpload=true) {
       }
     }
 
-
-    if (getState().getIn(['localState', 'goodConnection'])) {
-      const remotePersistStatus = getState().getIn(['localState', 'needsRemotePersist'])
-      if (remotePersistStatus === DB_SYNCING) {
-        // If a sync has already started, wait 10 seconds then run another one.
-        // This gives time for everything (photo uploads, mostly) to settle,
-        // then they can all go with one sync.
-        clearTimeout(enqueuedSync)
-        enqueuedSync = setTimeout(() => {
-          dispatch(doSync(syncData, showProgress)).catch(catchAsyncError(dispatch, source))
-          enqueuedSync = null
-        }, 10000)
-        return Promise.resolve()
-      } else {
-        dispatch(setRemotePersist(DB_SYNCING))
-      }
-
-      dispatch(clearDocsNumbers())
-      dispatch(runPhotoQueue())
-
-      dispatch(setFullSyncFail(true))
-      let upload = Promise.resolve()
-      if (remotePersistStatus === DB_NEEDS_SYNC || doUpload) {
-        feedMessage('Uploading...', warning, null)
-        upload = PouchCouch.remoteReplicateDBs()
-      }
-      return upload.then(() => {
-        let userID = syncData.userID
-        let followingIDs = syncData.followingIDs
-        let followerIDs = syncData.followerIDs
-        if (!Object.keys(syncData).length) {
-          userID = getState().getIn(['localState', 'userID'])
-          const follows = getState().getIn(['pouchRecords', 'follows'])
-          followingIDs = follows.valueSeq().filter(
-            f => !f.get('deleted') && f.get('followerID') === userID
-          ).map(
-            f => f.get('followingID')
-          ).toJS()
-
-          followerIDs = follows.valueSeq().filter(
-            f => !f.get('deleted') && f.get('followingID') === userID
-          ).map(
-            f => f.get('followerID')
-          ).toJS()
+    return new Promise((res, rej) => {
+      if (getState().getIn(['localState', 'goodConnection'])) {
+        const remotePersistStatus = getState().getIn(['localState', 'needsRemotePersist'])
+        if (remotePersistStatus === DB_SYNCING) {
+          // If a sync has already started, wait 10 seconds then run another one.
+          // This gives time for everything (photo uploads, mostly) to settle,
+          // then they can all go with one sync.
+          clearTimeout(enqueuedSync)
+          enqueuedSync = setTimeout(() => {
+            dispatch(doSync(syncData, showProgress)).catch(catchAsyncError(dispatch, source))
+            enqueuedSync = null
+          }, 10000)
+          return Promise.resolve()
+        } else {
+          dispatch(setRemotePersist(DB_SYNCING))
         }
-        feedMessage('Downloading...', warning, null)
-        const lastSync = getState().getIn(['localState', 'lastFullSync'])
-        return PouchCouch.localReplicateDBs(userID, followingIDs, followerIDs, progress, lastSync)
-      }).then(() => {
-        feedMessage('Calculating...', warning, null)
-        return PouchCouch.localLoad()
-      }).then(localData => {
-        dispatch(localDataLoaded(localData))
-        dispatch(setRemotePersist(DB_SYNCED))
-        dispatch(syncComplete())
-        dispatch(setFullSyncFail(false))
-        dispatch(setFollowingSyncRunning(false))
-        feedMessage('Sync Complete', green, 3000)
-      }).catch((e) => {
+
+        dispatch(clearDocsNumbers())
+        dispatch(runPhotoQueue())
+
         dispatch(setFullSyncFail(true))
-        dispatch(setRemotePersist(DB_NEEDS_SYNC))
-        feedMessage('Error Syncing Data', danger, 5000)
-        logError(e, 'doSync.remoteReplicateDBs')
-        if (!(e instanceof NotConnectedError)) {
-          throw e
+        let upload = Promise.resolve()
+        if (remotePersistStatus === DB_NEEDS_SYNC || doUpload) {
+          feedMessage('Uploading...', warning, null)
+          upload = PouchCouch.remoteReplicateDBs()
         }
-      })
-    } else {
-      dispatch(setFullSyncFail(true))
-      feedMessage('Can\'t find the server.', warning, 10000)
-      dispatch(checkNetworkConnection())
-      return Promise.resolve()
-    }
+        upload.then(() => {
+          let userID = syncData.userID
+          let followingIDs = syncData.followingIDs
+          let followerIDs = syncData.followerIDs
+          if (!Object.keys(syncData).length) {
+            userID = getState().getIn(['localState', 'userID'])
+            const follows = getState().getIn(['pouchRecords', 'follows'])
+            followingIDs = follows.valueSeq().filter(
+              f => !f.get('deleted') && f.get('followerID') === userID
+            ).map(
+              f => f.get('followingID')
+            ).toJS()
+
+            followerIDs = follows.valueSeq().filter(
+              f => !f.get('deleted') && f.get('followingID') === userID
+            ).map(
+              f => f.get('followerID')
+            ).toJS()
+          }
+          feedMessage('Downloading...', warning, null)
+          const lastSync = getState().getIn(['localState', 'lastFullSync'])
+          return PouchCouch.localReplicateDBs(userID, followingIDs, followerIDs, progress, lastSync)
+        }).then(() => {
+          feedMessage('Calculating...', warning, null)
+          return PouchCouch.localLoad()
+        }).then(localData => {
+          dispatch(localDataLoaded(localData))
+          dispatch(setRemotePersist(DB_SYNCED))
+          dispatch(syncComplete())
+          dispatch(setFullSyncFail(false))
+          dispatch(setFollowingSyncRunning(false))
+          feedMessage('Sync Complete', green, 3000)
+          res()
+        }).catch((e) => {
+          dispatch(setFullSyncFail(true))
+          dispatch(setRemotePersist(DB_NEEDS_SYNC))
+          feedMessage('Error Syncing Data', danger, 5000)
+          logError(e, 'doSync.remoteReplicateDBs')
+          rej()
+        })
+      } else {
+        dispatch(setFullSyncFail(true))
+        feedMessage('Can\'t find the server.', warning, 10000)
+        dispatch(checkNetworkConnection())
+        rej()
+      }
+    })
+
   }
 }
 

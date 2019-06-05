@@ -9,7 +9,6 @@ import {
   rideUpdated
 } from '../actions/standard'
 import {
-  doSync,
   photoNeedsUpload,
 } from "../actions/functional"
 import { coordSplice } from '../helpers'
@@ -21,14 +20,6 @@ export default class RidePersister {
     this.dispatch = dispatch
     this.getState = getState
     this.rideID = rideID
-  }
-
-  getCoordinates () {
-    return this.getState().getIn(['pouchRecords', 'selectedRideCoordinates'])
-  }
-
-  getElevations () {
-    return this.getState().getIn(['pouchRecords', 'selectedRideElevations'])
   }
 
   getRide () {
@@ -55,31 +46,31 @@ export default class RidePersister {
     })
   }
 
-  saveElevations () {
-    let theElevations = this.getElevations().toJS()
+  saveElevations (rideElevations) {
+    let theElevations = rideElevations.toJS()
     return PouchCouch.saveRide(theElevations).then(({ rev }) => {
       theElevations._rev = rev
       this.dispatch(rideElevationsLoaded(theElevations))
     })
   }
 
-  saveCoordinates () {
-    let theCoordinates = this.getCoordinates().toJS()
+  saveCoordinates (rideCoordinates) {
+    let theCoordinates = rideCoordinates.toJS()
     return PouchCouch.saveRide(theCoordinates).then(({ rev }) => {
       theCoordinates._rev = rev
       this.dispatch(rideCoordinatesLoaded(theCoordinates))
     })
   }
 
-  persistRide (newRide, stashedPhotos, deletedPhotoIDs, trimValues, rideHorses) {
+  persistRide (newRide, rideCoordinates, rideElevations, stashedPhotos, deletedPhotoIDs, trimValues, rideHorses) {
     // Ride elevations needs to be saved before the ride so that the elevations
     // are available in the changes iterator on the server when it processes
     // the new ride for trainings.
 
     let docSaves = Promise.resolve()
     if (newRide) {
-      docSaves = this.saveElevations().then(() => {
-        return this.saveCoordinates()
+      docSaves = this.saveElevations(rideElevations).then(() => {
+        return this.saveCoordinates(rideCoordinates)
       })
     } else if (trimValues) {
       let immutableCoordinates
@@ -127,6 +118,6 @@ export default class RidePersister {
       })
     }
 
-    return docSaves.catch(catchAsyncError(this.dispatch))
+    return docSaves.catch(catchAsyncError(this.dispatch, 'RidePersister.persistRide'))
   }
 }

@@ -3,7 +3,9 @@ import moment from 'moment'
 import mbxStatic from '@mapbox/mapbox-sdk/services/static'
 import { Platform } from 'react-native'
 
+
 import { MAPBOX_TOKEN } from './dotEnv'
+import { captureException } from './services/Sentry'
 
 export const DEFAULT_HORSE_SPEEDS = Map({
   walk: List([0, 6]),
@@ -45,10 +47,6 @@ export const heading = (lat1,lng1,lat2,lng2) => {
 
 export const unixTimeNow = () => {
   return Math.floor(new Date().getTime())
-}
-
-export const toUnixTime = (date) => {
-  return Math.floor(date.getTime())
 }
 
 export const profilePhotoURL = (id) => {
@@ -183,6 +181,7 @@ export function logError (error, id) {
   console.log(`******** logError ${id} ****************`)
   console.log(error)
   console.log('*****************************************')
+  captureException(error)
 }
 
 export function logInfo (info) {

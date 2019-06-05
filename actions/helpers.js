@@ -58,6 +58,7 @@ export function loginAndSync(loginFunc, loginArgs, dispatch, getState) {
   }).catch(e => {
     logError(e, 'loginAndSync')
     dispatch(errorOccurred(e.message))
+    catchAsyncError(dispatch, 'loginAndSync')(e)
   })
 }
 

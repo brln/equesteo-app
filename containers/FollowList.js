@@ -75,7 +75,7 @@ class FollowListContainer extends PureComponent {
   }
 
   users (allUsers, userIDs) {
-    return List(userIDs.map(userID => allUsers.get(userID))).sort((a, b) => {
+    return List(userIDs.map(userID => allUsers.get(userID)).filter(u => u)).sort((a, b) => {
       const aName = userName(a).toLowerCase()
       const bName = userName(b).toLowerCase()
       if (aName < bName) { return -1 }

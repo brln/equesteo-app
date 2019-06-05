@@ -98,7 +98,16 @@ class RideToolsContainer extends Component {
   deleteRide () {
     Amplitude.logEvent(DELETE_RIDE)
     this.props.dispatch(rideUpdated(this.props.ride.set('deleted', true)))
-    this.props.dispatch(persistRide(this.props.ride.get('_id'), false, [], [], null, List())).then(() => {
+    this.props.dispatch(persistRide(
+      this.props.ride.get('_id'),
+      false,
+      this.props.rideCoordinates,
+      this.props.rideElevations,
+      [],
+      [],
+      null,
+      List()
+    )).then(() => {
       return EqNavigation.popToRoot(this.props.componentId).catch(() => {})
     }).then(() => {
       this.props.dispatch(doSync())
@@ -150,7 +159,16 @@ class RideToolsContainer extends Component {
         this.props.ride.get('_id'),
         true
       ))
-      return this.props.dispatch(persistRide(rideID, true, [], [], false, []))
+      return this.props.dispatch(persistRide(
+        rideID,
+        true,
+        this.props.rideCoordinates,
+        this.props.rideElevations,
+        [],
+        [],
+        false,
+        []
+      ))
     }
 
 

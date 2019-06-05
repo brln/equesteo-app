@@ -1,7 +1,7 @@
 import { Sentry } from 'react-native-sentry'
 import { DISTRIBUTION, ENV, RELEASE, SENTRY_DSN } from '../dotEnv'
 
-import { logError } from '../helpers'
+import { logError, logInfo } from '../helpers'
 
 export function setUserContext(userID) {
   if (ENV !== 'local') {
@@ -15,7 +15,8 @@ export function captureMessage (m) {
   if (ENV !== 'local') {
     Sentry.captureMessage(m)
   } else {
-    logDebug(m, 'Sentry message captured')
+    alert('see logs, sentry message captured')
+    logInfo(m, 'Sentry message captured')
   }
 }
 
@@ -31,7 +32,8 @@ export function captureException (e) {
       }
     } catch (e) {
       logError(e, 'Sentry.captureException')
-      Sentry.captureException('Cannot capture exception')
+      Sentry.captureBreadcrumb('Cannot capture exception')
+      Sentry.captureException(e)
     }
   }
 }

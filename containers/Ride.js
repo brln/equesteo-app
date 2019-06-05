@@ -301,7 +301,6 @@ class RideContainer extends PureComponent {
 }
 
 function mapStateToProps (state, passedProps) {
-  logDebug(passedProps)
   const pouchState = state.get('pouchRecords')
   const localState = state.get('localState')
   const ride = pouchState.getIn(['rides', passedProps.rideID])
