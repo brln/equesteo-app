@@ -98,7 +98,7 @@ import {
   updatePhotoStatus,
   userPhotoUpdated,
   userSearchReturned,
-  userUpdated, setBackgroundGeolocationRunning,
+  userUpdated, setBackgroundGeolocationRunning, setShutdownInProgress,
 } from './standard'
 import { NotConnectedError } from "../errors"
 
@@ -999,7 +999,7 @@ export function clearLocationRetry () {
 }
 
 let locationTrackingRetry = null
-export function retryLocationTracking () {
+export function retryLocationTracking (inMsec) {
   const source = 'retryLocationTracking'
   cb(source)
   return (dispatch, getState) => {
@@ -1011,7 +1011,7 @@ export function retryLocationTracking () {
           dispatch(startLocationTracking())
         })
       }
-    }, 30000)
+    }, inMsec)
   }
 }
 
@@ -1100,6 +1100,10 @@ export function startLocationTracking () {
 
 
         BackgroundGeolocation.on('location', (location) => {
+          if (Math.abs(location.time - unixTimeNow()) > 3000) {
+            // Sometimes IOS feeds us old locations for the first few
+            return
+          }
           if (getState().getIn(['localState', 'gpsSignalLost'])) {
             dispatch(gpsText('Found GPS'))
           }
@@ -1174,9 +1178,11 @@ export function startLocationTracking () {
         dispatch(gpsSignalLost(false))
         dispatch(startGPSWatcher())
         BackgroundGeolocation.start()
-        dispatch(retryLocationTracking())
+        dispatch(retryLocationTracking(30000))
         dispatch(doSpeech())
       }).catch(catchAsyncError(dispatch, source))
+    } else if (getState().getIn(['localState', 'shutdownInProgress'])) {
+      dispatch(retryLocationTracking(5000))
     }
   }
 }
@@ -1350,28 +1356,50 @@ export function shutdownBackgroundGeolocation () {
   cb(source)
   return (dispatch) => {
     let numTries = 0
-    function ensureStop () {
+    function doStop () {
+      logDebug('doStop')
       return new Promise(res => {
-        numTries = numTries + 1
-        if (numTries > 5) {
-          throw new Error ('Too many tries shutting down BackgroundGeolocation')
-        }
-        setTimeout(() => {
-          BackgroundGeolocation.checkStatus((status) => {
-            BackgroundGeolocation.removeAllListeners()
-            if (status.isRunning) {
-              BackgroundGeolocation.stop()
-              ensureStop()
-            } else {
-              dispatch(setBackgroundGeolocationRunning(false))
+        BackgroundGeolocation.checkStatus((status) => {
+          BackgroundGeolocation.removeAllListeners()
+          BackgroundGeolocation.deleteAllLocations()
+          if (status.isRunning) {
+            BackgroundGeolocation.stop()
+            ensureStop().then(() => {
               res()
-            }
-          }, () => {
-            ensureStop()
+            })
+          } else {
+            logDebug('stopped')
+            dispatch(setBackgroundGeolocationRunning(false))
+            res()
+          }
+        }, () => {
+          ensureStop().then(() => {
+            res()
           })
-        }, 2000)
+        })
       })
     }
+
+    function ensureStop () {
+      logDebug('ensureStop')
+      numTries = numTries + 1
+      if (numTries > 5) {
+        throw new Error ('Too many tries shutting down BackgroundGeolocation')
+      }
+      if (numTries === 1) {
+        return doStop()
+      } else {
+        return new Promise(res => {
+          setTimeout(() => {
+            doStop().then(() => {
+              res()
+            })
+          }, 2000)
+        })
+      }
+    }
+
+    logDebug('shutdownBGLocation start')
     return ensureStop()
   }
 }
@@ -1381,10 +1409,13 @@ export function stopLocationTracking (clearLast=true) {
   cb(source)
   return (dispatch) => {
     dispatch(stopGPSWatcher())
-    if (clearLast) {
-      dispatch(clearLastLocation())
-    }
-    return dispatch(shutdownBackgroundGeolocation())
+    dispatch(setShutdownInProgress(true))
+    return dispatch(shutdownBackgroundGeolocation()).then(() => {
+      dispatch(setShutdownInProgress(false))
+      if (clearLast) {
+        dispatch(clearLastLocation())
+      }
+    })
   }
 }
 

@@ -48,20 +48,15 @@ exports[`renders 1`] = `
       >
         Distance
       </Text>
-      <Text
-        accessible={true}
-        allowFontScaling={true}
-        ellipsizeMode="tail"
+      <View
         style={
           Object {
-            "color": "black",
-            "fontSize": 35,
-            "textAlign": "center",
+            "alignItems": "center",
+            "flex": 1,
+            "justifyContent": "center",
           }
         }
       >
-        32.00
-         
         <Text
           accessible={true}
           allowFontScaling={true}
@@ -69,13 +64,28 @@ exports[`renders 1`] = `
           style={
             Object {
               "color": "black",
-              "fontSize": 25,
+              "fontSize": 35,
+              "textAlign": "center",
             }
           }
         >
-          mi
+          32.00
+           
+          <Text
+            accessible={true}
+            allowFontScaling={true}
+            ellipsizeMode="tail"
+            style={
+              Object {
+                "color": "black",
+                "fontSize": 25,
+              }
+            }
+          >
+            mi
+          </Text>
         </Text>
-      </Text>
+      </View>
     </View>
     <View
       style={
@@ -107,20 +117,15 @@ exports[`renders 1`] = `
       >
         Current Speed
       </Text>
-      <Text
-        accessible={true}
-        allowFontScaling={true}
-        ellipsizeMode="tail"
+      <View
         style={
           Object {
-            "color": "black",
-            "fontSize": 35,
-            "textAlign": "center",
+            "alignItems": "center",
+            "flex": 1,
+            "justifyContent": "center",
           }
         }
       >
-        0.0
-         
         <Text
           accessible={true}
           allowFontScaling={true}
@@ -128,13 +133,28 @@ exports[`renders 1`] = `
           style={
             Object {
               "color": "black",
-              "fontSize": 25,
+              "fontSize": 35,
+              "textAlign": "center",
             }
           }
         >
-          mi/h
+          0.0
+           
+          <Text
+            accessible={true}
+            allowFontScaling={true}
+            ellipsizeMode="tail"
+            style={
+              Object {
+                "color": "black",
+                "fontSize": 25,
+              }
+            }
+          >
+            mi/h
+          </Text>
         </Text>
-      </Text>
+      </View>
     </View>
     <View
       style={
@@ -166,20 +186,15 @@ exports[`renders 1`] = `
       >
         Altitude
       </Text>
-      <Text
-        accessible={true}
-        allowFontScaling={true}
-        ellipsizeMode="tail"
+      <View
         style={
           Object {
-            "color": "black",
-            "fontSize": 35,
-            "textAlign": "center",
+            "alignItems": "center",
+            "flex": 1,
+            "justifyContent": "center",
           }
         }
       >
-        0
-         
         <Text
           accessible={true}
           allowFontScaling={true}
@@ -187,13 +202,28 @@ exports[`renders 1`] = `
           style={
             Object {
               "color": "black",
-              "fontSize": 25,
+              "fontSize": 35,
+              "textAlign": "center",
             }
           }
         >
-          ft
+          0
+           
+          <Text
+            accessible={true}
+            allowFontScaling={true}
+            ellipsizeMode="tail"
+            style={
+              Object {
+                "color": "black",
+                "fontSize": 25,
+              }
+            }
+          >
+            ft
+          </Text>
         </Text>
-      </Text>
+      </View>
     </View>
   </View>
   <View
@@ -233,18 +263,28 @@ exports[`renders 1`] = `
       >
         Total Time
       </Text>
-      <Text
-        accessible={true}
-        allowFontScaling={true}
-        ellipsizeMode="tail"
+      <View
         style={
           Object {
-            "color": "black",
-            "fontSize": 35,
-            "textAlign": "center",
+            "alignItems": "center",
+            "flex": 1,
+            "justifyContent": "center",
           }
         }
-      />
+      >
+        <Text
+          accessible={true}
+          allowFontScaling={true}
+          ellipsizeMode="tail"
+          style={
+            Object {
+              "color": "black",
+              "fontSize": 35,
+              "textAlign": "center",
+            }
+          }
+        />
+      </View>
     </View>
     <View
       style={
@@ -276,20 +316,15 @@ exports[`renders 1`] = `
       >
         Avg. Speed
       </Text>
-      <Text
-        accessible={true}
-        allowFontScaling={true}
-        ellipsizeMode="tail"
+      <View
         style={
           Object {
-            "color": "black",
-            "fontSize": 35,
-            "textAlign": "center",
+            "alignItems": "center",
+            "flex": 1,
+            "justifyContent": "center",
           }
         }
       >
-        0.0
-         
         <Text
           accessible={true}
           allowFontScaling={true}
@@ -297,13 +332,28 @@ exports[`renders 1`] = `
           style={
             Object {
               "color": "black",
-              "fontSize": 25,
+              "fontSize": 35,
+              "textAlign": "center",
             }
           }
         >
-          mi/h
+          0.0
+           
+          <Text
+            accessible={true}
+            allowFontScaling={true}
+            ellipsizeMode="tail"
+            style={
+              Object {
+                "color": "black",
+                "fontSize": 25,
+              }
+            }
+          >
+            mi/h
+          </Text>
         </Text>
-      </Text>
+      </View>
     </View>
     <View
       style={
@@ -335,20 +385,15 @@ exports[`renders 1`] = `
       >
         Elevation Gain
       </Text>
-      <Text
-        accessible={true}
-        allowFontScaling={true}
-        ellipsizeMode="tail"
+      <View
         style={
           Object {
-            "color": "black",
-            "fontSize": 35,
-            "textAlign": "center",
+            "alignItems": "center",
+            "flex": 1,
+            "justifyContent": "center",
           }
         }
       >
-        66
-         
         <Text
           accessible={true}
           allowFontScaling={true}
@@ -356,13 +401,28 @@ exports[`renders 1`] = `
           style={
             Object {
               "color": "black",
-              "fontSize": 25,
+              "fontSize": 35,
+              "textAlign": "center",
             }
           }
         >
-          ft
+          66
+           
+          <Text
+            accessible={true}
+            allowFontScaling={true}
+            ellipsizeMode="tail"
+            style={
+              Object {
+                "color": "black",
+                "fontSize": 25,
+              }
+            }
+          >
+            ft
+          </Text>
         </Text>
-      </Text>
+      </View>
     </View>
   </View>
 </View>

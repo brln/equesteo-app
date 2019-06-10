@@ -6,6 +6,7 @@ import { DB_NEEDS_SYNC, DB_SYNCING, DB_SYNCED } from "../actions/functional"
 
 import {
   ADD_DOCS_TO_DOWNLOAD,
+  ADD_DOCS_DOWNLOADED,
   ADD_NEW_CARE_HORSE_ID,
   CARROT_MUTEX,
   CHANGE_CARE_CALENDAR_TAB,
@@ -47,10 +48,11 @@ import {
   SET_HOOF_TRACKS_RUNNING,
   SET_SIGNING_OUT,
   SET_SHOWING_RIDE,
+  SET_SHUTDOWN_IN_PROGRESS,
   STASH_RIDE_PHOTO,
   SYNC_COMPLETE,
   UPDATE_PHOTO_STATUS,
-  USER_SEARCH_RETURNED, ADD_DOCS_DOWNLOADED,
+  USER_SEARCH_RETURNED,
 } from '../constants'
 
 const initialDocsDownloaded = Map({
@@ -75,6 +77,7 @@ export const initialState = Map({
   error: null,
   everLoggedIn: false,
   feedMessage: null,
+  followingSyncRunning: false,
   forgotEmail: null,
   firstStartHorseID: null,
   fullSyncFail: false,
@@ -91,8 +94,8 @@ export const initialState = Map({
   photoQueue: Map(),
   ridePhotoStash: Map(),
   root: SIGNUP,
-  followingSyncRunning: false,
   showingRide: null,
+  shutdownInProgress: false,
   signingOut: false,
   userID: null,
   userSearchResults: List(),
@@ -209,6 +212,8 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.set('newCareEvent', withSecondaryType)
     case SET_SHOWING_RIDE:
       return state.set('showingRide', action.rideID)
+    case SET_SHUTDOWN_IN_PROGRESS:
+      return state.set('shutdownInProgress', action.value)
     case SET_SIGNING_OUT:
       return state.set('signingOut', action.value)
     case SYNC_COMPLETE:

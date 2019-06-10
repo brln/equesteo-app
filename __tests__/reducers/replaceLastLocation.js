@@ -232,13 +232,13 @@ describe('REPLACE_LAST_LOCATION', () => {
     })
     let newState = CurrentRideReducer(initialState, newLocation(location, elevation))
 
-    latitude = 5.242249617518764
-    longitude = 156.67569432673565
+    let latitude2 = 5.242249617518764
+    let longitude2 = 156.67569432673565
     elevationPoint = 105
     location = Map({
       accuracy: 5,
-      latitude: latitude,
-      longitude: longitude,
+      latitude: latitude2,
+      longitude: longitude2,
       provider: 'gps',
       timestamp: 1,
       speed: 1,
@@ -250,20 +250,20 @@ describe('REPLACE_LAST_LOCATION', () => {
     })
     newState = CurrentRideReducer(newState, newLocation(location, elevation))
 
-    latitude = 45.111111999
-    longitude = 27.28923333
+    let latitude3 = 45.111111999
+    let longitude3 = 27.28923333
     elevationPoint = 110
     location = Map({
       accuracy: 5,
-      latitude: latitude,
-      longitude: longitude,
+      latitude: latitude3,
+      longitude: longitude3,
       provider: 'gps',
       timestamp: 1,
       speed: 1,
     })
     elevation = Map({
-      latitude: latitude,
-      longitude: longitude,
+      latitude: latitude3,
+      longitude: longitude3,
       elevation: elevationPoint,
     })
     newState = CurrentRideReducer(newState, replaceLastLocation(location, elevation))
@@ -277,20 +277,23 @@ describe('REPLACE_LAST_LOCATION', () => {
          elevations: { '57.2805': {'134.8588': 100}, '5.2423': {'156.6757': 105}, '45.1111': {'27.2892': 110} } },
       currentRideCoordinates: { rideCoordinates: [ [57.280466, 134.858762, 1, 5], [45.111112, 27.289233, 1, 5] ] },
       lastElevation: { latitude: 45.111111999, longitude: 27.28923333, elevation: 110 },
-      lastLocation:
-       { accuracy: 5,
-         latitude: 45.111111999,
-         longitude: 27.28923333,
-         provider: 'gps',
-         timestamp: 1,
-         speed: 1 },
-      refiningLocation:
-       { accuracy: 5,
-         latitude: 5.242249617518764,
-         longitude: 156.67569432673565,
-         provider: 'gps',
-         timestamp: 1,
-         speed: 1 }
+      lastLocation: { accuracy: 5,
+        latitude: 45.111111999,
+        longitude: 27.28923333,
+        provider: 'gps',
+        timestamp: 1,
+        speed: 1
+      },
+      refiningLocation: { accuracy: 5,
+        latitude: 5.242249617518764,
+        longitude: 156.67569432673565,
+        provider: 'gps',
+        timestamp: 1,
+        speed: 1
+      },
+      nullMapLocation: [
+        longitude2, latitude2
+      ]
     })
 
     expect(newState).toEqual(expectedState)

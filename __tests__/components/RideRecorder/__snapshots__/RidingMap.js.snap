@@ -21,7 +21,7 @@ exports[`renders 1`] = `
         "left": 10,
         "position": "absolute",
         "top": 10,
-        "width": 40,
+        "width": 46,
       }
     }
   >
@@ -53,17 +53,25 @@ exports[`renders 1`] = `
           }
         }
       >
-        <Image
-          onError={[Function]}
-          source={1}
+        <View
           style={
             Object {
-              "height": 40,
-              "marginRight": 5,
-              "width": 40,
+              "padding": 3,
             }
           }
-        />
+        >
+          <Image
+            onError={[Function]}
+            source={1}
+            style={
+              Object {
+                "height": 40,
+                "marginRight": 5,
+                "width": 40,
+              }
+            }
+          />
+        </View>
       </View>
     </View>
   </View>

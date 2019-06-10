@@ -21,7 +21,8 @@ describe('NEW_LOCATION', () => {
       currentRide: null,
       lastLocation: location,
       refiningLocation: location,
-      lastElevation: elevation
+      lastElevation: elevation,
+      nullMapLocation: List([1, 1])
     })
 
     const action = newLocation(location, elevation)
@@ -78,6 +79,9 @@ describe('NEW_LOCATION', () => {
       lastLocation: location,
       refiningLocation: location,
       lastElevation: elevation,
+      nullMapLocation: List([
+        longitude, latitude
+      ])
     })
     expectedNewState = expectedNewState.setIn(
       ['currentRideElevations', 'elevations', latitude.toFixed(4), longitude.toFixed(4)],
@@ -154,6 +158,7 @@ describe('NEW_LOCATION', () => {
       lastLocation: location,
       refiningLocation: location,
       lastElevation: elevation,
+      nullMapLocation: List([longitude, latitude])
     })
 
     const action = newLocation(location, elevation)
@@ -222,7 +227,10 @@ describe('NEW_LOCATION', () => {
       lastElevation: elevation,
       stashedCoordinates: List([List([
         45.213230, 27.289230, 1, 5
-      ])])
+      ])]),
+      nullMapLocation: List([
+        longitude, latitude
+      ])
     })
     expectedNewState = expectedNewState.setIn(
       ['currentRideElevations', 'elevations', latitude.toFixed(4), longitude.toFixed(4)],

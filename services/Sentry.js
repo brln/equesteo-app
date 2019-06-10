@@ -23,12 +23,14 @@ export function captureMessage (m) {
 export function captureException (e) {
   if (ENV !== 'local') {
     try {
-      if (e.stacktrace) {
-        Sentry.captureException(e)
-      } else if (typeof e === 'object') {
-        Sentry.captureException(new Error(JSON.stringify(e)))
-      } else {
-        Sentry.captureException(new Error(e.toString()))
+      if (e) {
+        if (e.stacktrace) {
+          Sentry.captureException(e)
+        } else if (typeof e === 'object') {
+          Sentry.captureException(new Error(JSON.stringify(e)))
+        } else {
+          Sentry.captureException(new Error(e.toString()))
+        }
       }
     } catch (e) {
       logError(e, 'Sentry.captureException')
