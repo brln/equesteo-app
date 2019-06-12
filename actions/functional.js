@@ -1090,8 +1090,8 @@ export function startLocationTracking () {
         const KALMAN_FILTER_Q = 6
         BackgroundGeolocation.on('error', (error) => {
           logError(error, 'BackgroundGeolocation.error')
-          dispatch(stopLocationTracking())
           if (error.code === 1000) {
+            dispatch(stopLocationTracking())
             dispatch(locationPermissionsError())
           } else {
             captureException(error)
