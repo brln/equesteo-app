@@ -195,7 +195,7 @@ class UpdateRideContainer extends BackgroundComponent {
             }
           })
         }).then(() => {
-          this.props.dispatch(doSync())
+          return this.props.dispatch(doSync())
         }).catch(catchAsyncError(this.props.dispatch, 'UpdateRide.navigationButtonPressed'))
       } else if (buttonId === 'discard') {
         Amplitude.logEvent(DISCARD_NEW_RIDE)

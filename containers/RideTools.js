@@ -110,7 +110,7 @@ class RideToolsContainer extends Component {
     )).then(() => {
       return EqNavigation.popToRoot(this.props.componentId).catch(() => {})
     }).then(() => {
-      this.props.dispatch(doSync())
+      return this.props.dispatch(doSync())
     }).catch(catchAsyncError(this.props.dispatch, 'RideTools.deleteRide'))
   }
 

@@ -332,7 +332,7 @@ export function createCareEvent () {
       }
       nextSave.then(() => {
         dispatch(clearCurrentCareEvent())
-        dispatch(doSync())
+        return dispatch(doSync())
       }).catch(e => {
         logError(e)
       })
@@ -361,7 +361,7 @@ export function createRideAtlasEntry(name, userID, ride, rideCoordinates, rideEl
     return PouchCouch.saveRide(newAtlasEntry.toJS()).then(doc => {
       const afterSave = getState().getIn(['pouchRecords', 'rideAtlasEntries', entryID])
       dispatch(rideAtlasEntryUpdated(afterSave.set('_rev', doc.rev)))
-      dispatch(doSync())
+      dispatch(doSync()).catch(catchAsyncError(dispatch, source))
     }).catch(catchAsyncError(dispatch, source))
   }
 }
