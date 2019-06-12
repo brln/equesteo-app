@@ -68,6 +68,13 @@ export default class RidePersister {
     // the new ride for trainings.
 
     let docSaves = Promise.resolve()
+
+    rideHorses.forEach((rideHorse) => {
+      docSaves = docSaves.then(() => {
+        return this.saveRideHorse(rideHorse)
+      })
+    })
+
     if (newRide) {
       docSaves = this.saveElevations(rideElevations).then(() => {
         return this.saveCoordinates(rideCoordinates)
@@ -85,12 +92,6 @@ export default class RidePersister {
     }
     docSaves = docSaves.then(() => {
       return this.saveRide()
-    })
-
-    rideHorses.forEach((rideHorse) => {
-      docSaves = docSaves.then(() => {
-        return this.saveRideHorse(rideHorse)
-      })
     })
 
     stashedPhotos.forEach((stashedPhoto, photoID) => {

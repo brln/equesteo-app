@@ -1569,13 +1569,13 @@ export function doSync (syncData={}, showProgress=true, doUpload=true) {
           dispatch(setRemotePersist(DB_NEEDS_SYNC))
           feedMessage('Error Syncing Data', danger, 5000)
           logError(e, 'doSync.remoteReplicateDBs')
-          rej()
+          rej(e)
         })
       } else {
         dispatch(setFullSyncFail(true))
         feedMessage('Can\'t find the server.', warning, 10000)
         dispatch(checkNetworkConnection())
-        rej()
+        rej('sync with bad connection')
       }
     })
 
