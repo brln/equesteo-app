@@ -61,6 +61,7 @@
     "babel-preset-env": "^1.7.0",
     "babel-preset-react-native": "^4.0.0",
     "jest": "^23.6.0",
+    "jetifier": "^1.6.1",
     "react-native-dotenv": "^0.1.1",
     "react-test-renderer": "16.3.2",
     "regenerator-runtime": "^0.12.1"

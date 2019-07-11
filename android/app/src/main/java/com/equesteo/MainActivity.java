@@ -4,7 +4,7 @@ import com.reactnativenavigation.NavigationActivity;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.graphics.drawable.Drawable;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.widget.LinearLayout;
 
 public class MainActivity extends NavigationActivity {
