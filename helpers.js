@@ -5,7 +5,7 @@ import { Platform } from 'react-native'
 
 
 import { MAPBOX_TOKEN } from './dotEnv'
-import { captureException } from './services/Sentry'
+import { captureBreadcrumb, captureException } from './services/Sentry'
 
 export const DEFAULT_HORSE_SPEEDS = Map({
   walk: List([0, 6]),
@@ -181,6 +181,7 @@ export function logError (error, id) {
   console.log(`******** logError ${id} ****************`)
   console.log(error)
   console.log('*****************************************')
+  captureBreadcrumb(id)
   captureException(error)
 }
 

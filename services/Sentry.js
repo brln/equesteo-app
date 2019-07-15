@@ -37,6 +37,9 @@ export function captureException (e) {
       Sentry.captureBreadcrumb('Cannot capture exception')
       Sentry.captureException(e)
     }
+  } else {
+    alert('see logs, sentry exception captured')
+    logInfo(e, 'Sentry exception captured')
   }
 }
 

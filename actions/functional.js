@@ -222,9 +222,7 @@ export function appInitialized () {
           }
           return dispatch(startNetworkTracking())
         }).then(() => {
-          return dispatch(doSync({}, true, false)).then(postSync).catch(e => {
-            logError(e)
-          })
+          return dispatch(doSync({}, true, false)).then(postSync).catch(catchAsyncError(dispatch, source))
         }).then(() => {
           dispatch(startBackgroundFetch())
         }).then(() => {
@@ -333,9 +331,7 @@ export function createCareEvent () {
       nextSave.then(() => {
         dispatch(clearCurrentCareEvent())
         return dispatch(doSync())
-      }).catch(e => {
-        logError(e)
-      })
+      }).catch(catchAsyncError(dispatch, source))
     })
   }
 }
@@ -846,10 +842,9 @@ export function uploadPhoto (type, photoLocation, photoID) {
       }).then(() => {
         dispatch(dequeuePhoto(photoID))
         ImagePicker.cleanSingle(photoLocation).catch(e => {
-          logError(e, 'ImagePicker.cleanSingle')
+          logInfo('ImagePicker.cleanSingle error')
         })
       }).catch(e => {
-        logError(e, 'uploadPhoto')
         dispatch(updatePhotoStatus(photoID, 'failed'))
         catchAsyncError(dispatch)(e)
       })
@@ -923,9 +918,7 @@ export function signOut () {
       dispatch(setSigningOut(true))
       dispatch(stopLocationTracking())
       FCMTokenRefreshListenerRemover ? FCMTokenRefreshListenerRemover() : null
-      firebase.iid().deleteToken('373350399276', 'GCM').catch(e => {
-        logError(e, 'signOut.stopListeningFCM')
-      }).then(() => {
+      firebase.iid().deleteToken('373350399276', 'GCM').catch(catchAsyncError).then(() => {
         return Promise.all([
           PouchCouch.deleteLocalDBs(),
           LocalStorage.deleteLocalState(),
@@ -1253,9 +1246,7 @@ export function stopHoofTracksDispatcher () {
    if (hoofTracksID) {
      dispatch(setHoofTracksLastUpload(null))
      dispatch(setHoofTracksID(null))
-     UserAPI.clearHoofTrackCoords(hoofTracksID).catch(e => {
-       logError(e)
-     })
+     UserAPI.clearHoofTrackCoords(hoofTracksID).catch(catchAsyncError(dispatch, source))
    }
  }
 }
@@ -1330,9 +1321,7 @@ export function startListeningFCMTokenRefresh () {
       if (newToken) {
         dispatch(setFCMTokenOnServer(newToken))
       }
-    }).catch(e => {
-      logError(e)
-    })
+    }).catch(catchAsyncError(dispatch, source))
     FCMTokenRefreshListenerRemover = firebase.messaging().onTokenRefresh((newToken) => {
       dispatch(setFCMTokenOnServer(newToken))
     })
@@ -1450,7 +1439,7 @@ function startBackgroundFetch () {
       })
       before.catch(catchAsyncError(dispatch, source))
     }, (error) => {
-      logError("RNBackgroundFetch failed to start", error)
+      logError(error, "RNBackgroundFetch failed to start")
     });
   }
 }
@@ -1568,14 +1557,14 @@ export function doSync (syncData={}, showProgress=true, doUpload=true) {
           dispatch(setFullSyncFail(true))
           dispatch(setRemotePersist(DB_NEEDS_SYNC))
           feedMessage('Error Syncing Data', danger, 5000)
-          logError(e, 'doSync.remoteReplicateDBs')
+          catchAsyncError(dispatch, source)(e)
           rej(e)
         })
       } else {
         dispatch(setFullSyncFail(true))
         feedMessage('Can\'t find the server.', warning, 10000)
         dispatch(checkNetworkConnection())
-        rej('sync with bad connection')
+        rej(new NotConnectedError('sync with bad connection'))
       }
     })
 
