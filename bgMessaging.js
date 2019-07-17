@@ -9,7 +9,7 @@ export default (store) => {
     }).then(() => {
       return store.dispatch(showLocalNotifications())
     }).catch(e => {
-      logError(e)
+      logError(e, 'bgMessageing.mainFunc')
     })
   }
 }

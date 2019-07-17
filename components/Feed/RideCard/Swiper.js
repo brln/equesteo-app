@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native'
 
-import { logError } from '../../../helpers'
+import { logInfo } from '../../../helpers'
 import RideMapImage from '../RideMapImage'
 import MedImage from '../../Images/MedImage'
 
@@ -37,7 +37,7 @@ export default class Swiper extends PureComponent {
             style={{height: swiperHeight, width: width - 5}}
             key={photo.get('uri')}
             source={{uri: photo.get('uri')}}
-            onError={(e) => { logError('there was an error loading RideCard image') }}
+            onError={() => { logInfo('there was an error loading RideCard image') }}
             showSource={true}
             onPress={this.props.showRide(false)}
           />

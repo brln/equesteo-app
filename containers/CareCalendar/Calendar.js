@@ -231,4 +231,4 @@ function mapStateToProps (state, passedProps) {
   }
 }
 
-export default  connect(mapStateToProps)(Calendar)
+export default connect(mapStateToProps)(Calendar)

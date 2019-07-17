@@ -56,7 +56,6 @@ export function loginAndSync(loginFunc, loginArgs, dispatch, getState) {
     }
     dispatch(removeForgotPWLinkListener())
   }).catch(e => {
-    logError(e, 'loginAndSync')
     dispatch(errorOccurred(e.message))
     catchAsyncError(dispatch, 'loginAndSync')(e)
   })
@@ -79,9 +78,7 @@ export function tryToLoadStateFromDisk (dispatch) {
     } else {
       logInfo('no cached current ride state found')
     }
-  }).catch(e => {
-    logError(e)
-  })
+  }).catch(catchAsyncError(dispatch, 'tryToLoadStateFromDisk'))
 }
 
 export function configureBackgroundGeolocation () {

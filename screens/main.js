@@ -8,7 +8,6 @@ import FeedContainer from '../containers/Feed/Feed'
 import RideButton from '../containers/Feed/RideButton'
 import FeedbackContainer from '../containers/Feedback'
 import FindPeopleContainer from '../containers/FindPeople'
-import FirstStartContainer from '../containers/FirstStart'
 import FollowListContainer from '../containers/FollowList'
 import ForgotContainer from '../containers/SignupLogin/Forgot'
 import HorseProfileContainer from '../containers/HorseProfile'
@@ -44,7 +43,6 @@ export const CAMERA = 'equesteo.Camera'
 export const DRAWER = 'equesteo.Drawer'
 export const FEED = 'equesteo.Feed'
 export const FEEDBACK = 'equesteo.Feedback'
-export const FIRST_START = 'equesteo.FirstStart'
 export const FOLLOW_LIST = 'equesteo.FollowList'
 export const FORGOT = 'equesteo.Forgot'
 export const HORSE_PROFILE = 'equesteo.HorseProfile'
@@ -86,7 +84,6 @@ export function registerScreens(store, Provider) {
   Navigation.registerComponentWithRedux(FEED, () => FeedContainer, Provider, store)
   Navigation.registerComponentWithRedux(FEEDBACK, () => FeedbackContainer, Provider, store)
   Navigation.registerComponentWithRedux(FIND_PEOPLE, () => FindPeopleContainer, Provider, store)
-  Navigation.registerComponentWithRedux(FIRST_START, () => FirstStartContainer, Provider, store)
   Navigation.registerComponentWithRedux(FOLLOW_LIST, () => FollowListContainer, Provider, store)
   Navigation.registerComponentWithRedux(FORGOT, () => ForgotContainer, Provider, store)
   Navigation.registerComponentWithRedux(HORSE_PROFILE, () => HorseProfileContainer, Provider, store)

@@ -84,7 +84,7 @@ class SettingsContainer extends BackgroundComponent {
   navigationButtonPressed ({ buttonId }) {
     if (buttonId === 'save') {
       EqNavigation.pop(this.props.componentId).catch(() => {})
-      this.props.dispatch(persistUserUpdate(this.props.user.get('_id'), []))
+      this.props.dispatch(persistUserUpdate(this.props.user.get('_id'), [], true))
       this.setState({
         doRevert: false,
       })

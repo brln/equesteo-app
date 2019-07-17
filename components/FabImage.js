@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { logError } from '../helpers'
+import { logInfo } from '../helpers'
 import BuildImage from './Images/BuildImage'
 
 export default function FabImage (props) {
@@ -8,7 +8,7 @@ export default function FabImage (props) {
     <BuildImage
       source={props.source}
       style={{resizeMode: 'contain', width: props.width, height: props.height}}
-      onError={() => logError("Can't load FabImage")}
+      onError={() => logInfo("Can't load FabImage")}
     />
   )
 }

@@ -75,7 +75,7 @@ class ShareRideContainer extends PureComponent {
         shareLink: resp.shareLink,
       })
     }).catch(e => {
-      logError(e)
+      logError(e, 'Containers.ShareRide.componentDidMount')
       this.setState({
         loading: false
       })
@@ -83,7 +83,7 @@ class ShareRideContainer extends PureComponent {
   }
 
   imageError (e) {
-    logError(e)
+    logError(e, 'Containers.ShareRide.imageError')
   }
 
   imageLoaded () {
@@ -172,7 +172,7 @@ class ShareRideContainer extends PureComponent {
         Linking.openURL(newURI)
       }).catch(e => {
         this.setState({ loading: false })
-        logError(e)
+        logError(e, 'Containers.ShareRide.downloadMap')
       })
     } else {
       CameraRoll.saveToCameraRoll(this.state.mapURL).then(url => {

@@ -195,7 +195,7 @@ class ProfileContainer extends BackgroundComponent {
       }
     ))
     this.props.dispatch(userUpdated(this.props.profileUser.set('profilePhotoID', photoID)))
-    this.props.dispatch(persistUserWithPhoto(userID, photoID))
+    this.props.dispatch(persistUserWithPhoto(userID, photoID, true))
   }
 
   showProfile (profileUser) {

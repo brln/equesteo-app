@@ -90,7 +90,7 @@ export default class UpdateRide extends PureComponent {
       if (e.code && e.code === 'E_PERMISSION_MISSING') {
         Alert.alert('Denied', 'You denied permission to access photos. Please enable via iOS settings for Equesteo.')
       } else {
-        logError(e)
+        logError(e, 'UpdateRide.UpdateRide.createPhoto')
       }
     })
   }

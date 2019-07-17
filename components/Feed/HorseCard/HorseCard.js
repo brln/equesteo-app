@@ -16,7 +16,7 @@ import moment from 'moment'
 import Headline from './Headline'
 import Thumbnail from '../../Images/Thumbnail'
 import { darkGrey } from '../../../colors'
-import { logError } from '../../../helpers'
+import { logInfo } from '../../../helpers'
 import { userName } from '../../../modelHelpers/user'
 import MedImage from '../../Images/MedImage'
 
@@ -97,7 +97,7 @@ export default class HorseCard extends PureComponent {
             style={{height: swiperHeight, width: width - 5}}
             key={photo.get('uri')}
             source={{uri: photo.get('uri')}}
-            onError={e => logError("Can't load HorseCard image")}
+            onError={() => logInfo("Can't load HorseCard image")}
             onPress={this.showHorseProfile}
           />
         )

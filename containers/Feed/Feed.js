@@ -18,7 +18,6 @@ import { brand } from '../../colors'
 import Feed from '../../components/Feed/Feed'
 import { logError, logRender, unixTimeNow } from '../../helpers'
 import {
-  FIRST_START,
   HORSE_PROFILE,
   LEADERBOARDS,
   MORE,
@@ -30,6 +29,9 @@ import {
   RIDE_BUTTON,
   TRAINING,
 } from '../../screens/main'
+import {
+  INTRO_PAGE
+} from '../../screens/firstStart'
 import { EqNavigation } from '../../services'
 import { captureMessage } from '../../services/Sentry'
 
@@ -147,7 +149,7 @@ class FeedContainer extends BackgroundComponent {
     openPromise.then(() => {
       return this.makeSureDrawerClosed()
     }).catch(e => {
-      logError(e)
+      logError(e, 'Feed.Feed.openScreen')
     })
   }
 
@@ -218,7 +220,7 @@ class FeedContainer extends BackgroundComponent {
   showFirstStart () {
      this.openScreen(EqNavigation.push(this.props.componentId, {
        component: {
-         name: FIRST_START,
+         name: INTRO_PAGE,
        }
      }))
   }

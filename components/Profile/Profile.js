@@ -57,7 +57,7 @@ export default class Profile extends PureComponent {
       if (e.code && e.code === 'E_PERMISSION_MISSING') {
         Alert.alert('Denied', 'You denied permission to access photos. Please enable via permissions settings for Equesteo.')
       } else {
-        logError(e)
+        logError(e, 'Profile.Profile.uploadProfile')
       }
     })
   }
@@ -141,7 +141,7 @@ export default class Profile extends PureComponent {
           key={"profile"}
           style={{width: '100%', height: '100%'}}
           source={{uri: this.props.profilePhotoURL}}
-          onError={e => logError("Can't load Profile image")}
+          onError={() => logInfo("Can't load Profile image")}
         />
       )
     } else {
@@ -154,7 +154,7 @@ export default class Profile extends PureComponent {
             key={"profile"}
             style={{width: '100%', height: '100%'}}
             source={profileSource}
-            onError={e => logError("Can't load Profile image")}
+            onError={() => logInfo("Can't load Profile image")}
             showSource={true}
           />
         )
@@ -164,7 +164,7 @@ export default class Profile extends PureComponent {
             <BuildImage
               style={{width: '100%', height: '100%'}}
               source={require('../../img/emptyProfile.png')}
-              onError={e => logError("Can't load empty profile image")}
+              onError={() => logInfo("Can't load empty profile image")}
             />
           </View>
         )

@@ -84,7 +84,7 @@ class UpdateProfileContainer extends PureComponent {
         doRevert: false
       })
       EqNavigation.pop(this.props.componentId).catch(() => {})
-      this.props.dispatch(persistUserUpdate(this.props.user.get('_id'), this.state.deletedPhotoIDs))
+      this.props.dispatch(persistUserUpdate(this.props.user.get('_id'), this.state.deletedPhotoIDs, true))
     }
   }
 

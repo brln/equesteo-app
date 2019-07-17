@@ -9,7 +9,7 @@ import {
 
 import BuildImage from '../Images/BuildImage'
 import { lightGrey } from '../../colors'
-import { logError } from '../../helpers'
+import { logInfo } from '../../helpers'
 import CommentList from './CommentList'
 
 const { width } = Dimensions.get('window')
@@ -51,7 +51,7 @@ export default class RideComments extends PureComponent {
                 <BuildImage
                   style={{height: 50, width: 50}}
                   source={require('../../img/caretRight.png')}
-                  onError={(e) => { logError('there was an error loading RideComments image') }}
+                  onError={() => { logInfo('there was an error loading RideComments image') }}
                 />
               </TouchableOpacity>
             </View>

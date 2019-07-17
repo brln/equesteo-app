@@ -9,14 +9,14 @@ export default storeLocalState = store => dispatch => action => {
   const localState = store.getState().get('localState')
   let newHash = localState.hashCode()
   if (newHash !== lastLocalStateHash) {
-    LocalStorage.saveLocalState(localState.toJS()).catch(e => {logError(e)})
+    LocalStorage.saveLocalState(localState.toJS()).catch(e => {logError(e, 'LocalStorage.saveLocalState1')})
     lastLocalStateHash = newHash
   }
 
   const currentRideState = store.getState().get('currentRide')
   let newCRHash = currentRideState.hashCode()
   if (newCRHash !== lastCurrentRideHash) {
-    LocalStorage.saveCurrentRideState(currentRideState.toJS()).catch(e => {logError(e)})
+    LocalStorage.saveCurrentRideState(currentRideState.toJS()).catch(e => {logError(e, 'LocalStorage.saveLocalState2')})
     lastCurrentRideHash = newCRHash
   }
 }

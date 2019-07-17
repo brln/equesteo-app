@@ -568,7 +568,7 @@ export function persistRide (rideID, newRide, rideCoordinates, rideElevations, s
   }
 }
 
-export function persistUserWithPhoto (userID, userPhotoID) {
+export function persistUserWithPhoto (userID, userPhotoID, doSyncNow) {
   const source = 'persistUserWithPhoto'
   cb(source)
   return (dispatch, getState) => {
@@ -590,12 +590,14 @@ export function persistUserWithPhoto (userID, userPhotoID) {
       const theUserAfterSave = getState().getIn(['pouchRecords', 'users', userID])
       dispatch(userUpdated(theUserAfterSave.set('_rev', rev)))
     }).then(() => {
-      return dispatch(doSync())
+      if (doSyncNow) {
+        return dispatch(doSync())
+      }
     }).catch(catchAsyncError(dispatch, source))
   }
 }
 
-export function persistHorseWithPhoto (horseID, horsePhotoID) {
+export function persistHorseWithPhoto (horseID, horsePhotoID, doSyncNow) {
   const source = 'persistHorseWithPhoto'
   cb(source)
   return (dispatch, getState) => {
@@ -615,12 +617,14 @@ export function persistHorseWithPhoto (horseID, horsePhotoID) {
     }).then((doc) => {
       const theHorseAfterSave = getState().getIn(['pouchRecords', 'horses', horseID])
       dispatch(horseUpdated(theHorseAfterSave.set('_rev', doc.rev)))
-      return dispatch(doSync())
+      if (doSyncNow) {
+        return dispatch(doSync())
+      }
     }).catch(catchAsyncError(dispatch, source))
   }
 }
 
-export function persistHorseUpdate (horseID, horseUserID, deletedPhotoIDs, newPhotoIDs, previousDefaultValue) {
+export function persistHorseUpdate (horseID, horseUserID, deletedPhotoIDs, newPhotoIDs, previousDefaultValue, doSyncNow) {
   const source = 'persistHorseUpdate'
   cb(source)
   return (dispatch, getState) => {
@@ -692,7 +696,9 @@ export function persistHorseUpdate (horseID, horseUserID, deletedPhotoIDs, newPh
     }
 
     horseSaves.then(() => {
-      return dispatch(doSync())
+      if (doSyncNow) {
+        return dispatch(doSync())
+      }
     }).catch(catchAsyncError(dispatch, source))
   }
 }
@@ -715,7 +721,7 @@ export function persistHorseUser (horseUserID, runSyncNow=true) {
   }
 }
 
-export function persistUserUpdate (userID, deletedPhotoIDs) {
+export function persistUserUpdate (userID, deletedPhotoIDs, doSyncNow) {
   const source = 'persistUserUpdate'
   cb(source)
   return (dispatch, getState) => {
@@ -746,7 +752,9 @@ export function persistUserUpdate (userID, deletedPhotoIDs) {
     }
 
     userSave.then(() => {
-      return dispatch(doSync())
+      if (doSyncNow) {
+        return dispatch(doSync())
+      }
     }).catch(catchAsyncError(dispatch, source))
   }
 }
@@ -1082,7 +1090,6 @@ export function startLocationTracking () {
       return configureBackgroundGeolocation().then(() => {
         const KALMAN_FILTER_Q = 6
         BackgroundGeolocation.on('error', (error) => {
-          logError(error, 'BackgroundGeolocation.error')
           if (error.code === 1000) {
             dispatch(stopLocationTracking())
             dispatch(locationPermissionsError())

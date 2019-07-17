@@ -188,7 +188,8 @@ class UpdateHorseContainer extends PureComponent {
           this.props.horseUser.get('_id'),
           this.state.deletedPhotoIDs,
           this.state.newPhotoIDs,
-          this.state.cachedHorseUser.get('rideDefault')
+          this.state.cachedHorseUser.get('rideDefault'),
+          true
         ))
       }).catch(() => {})
     }

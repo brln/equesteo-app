@@ -14,7 +14,7 @@ export default class EqNavigation {
       })
     }) .catch(e => {
       EqNavigation.debounce = false
-      logError(e)
+      logError(e, 'EqNavigation.wrap')
     })
   }
 
