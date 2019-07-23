@@ -73,6 +73,14 @@ android {
         incremental true
         javaMaxHeapSize "4g"
     }
+    signingConfigs {
+        release {
+            storeFile file(MY_AWESOME_PROJECT_RELEASE_STORE_FILE)
+            storePassword MY_AWESOME_PROJECT_RELEASE_STORE_PASSWORD
+            keyAlias MY_AWESOME_PROJECT_RELEASE_KEY_ALIAS
+            keyPassword MY_AWESOME_PROJECT_RELEASE_KEY_PASSWORD
+        }
+    }
     splits {
         abi {
             reset()
