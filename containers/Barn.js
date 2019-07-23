@@ -6,7 +6,7 @@ import Barn from '../components/Barn/Barn'
 import BackgroundComponent from '../components/BackgroundComponent'
 import { brand } from '../colors'
 import { logRender } from '../helpers'
-import { HORSE_PROFILE, UPDATE_HORSE } from '../screens/main'
+import { HORSE_PROFILE, UPDATE_HORSE } from '../screens/consts/main'
 import { EqNavigation } from '../services'
 import Amplitude, { ADD_HORSE } from '../services/Amplitude'
 

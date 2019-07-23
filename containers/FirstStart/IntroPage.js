@@ -21,7 +21,7 @@ import {
   persistUserUpdate,
 } from '../../actions/functional'
 import { EqNavigation } from '../../services'
-import { NAME_PAGE } from '../../screens/firstStart'
+import { NAME_PAGE } from '../../screens/consts/firstStart'
 
 class IntroPage extends PureComponent {
   static options() {

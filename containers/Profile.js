@@ -30,7 +30,7 @@ import {
   PHOTO_LIGHTBOX,
   PROFILE,
   UPDATE_PROFILE
-} from '../screens/main'
+} from '../screens/consts/main'
 import { generateUUID, logRender, unixTimeNow } from '../helpers'
 import { EqNavigation } from '../services'
 import Amplitude, {
@@ -109,7 +109,7 @@ class ProfileContainer extends BackgroundComponent {
     }
   }
 
-  componentWillMount () {
+  componentDidMount () {
     if (this.props.userID !== this.props.profileUser.get('_id')) {
       Amplitude.logEvent(VIEW_USER_PROFILE)
     }

@@ -13,7 +13,7 @@ import { darkBrand } from '../../colors'
 import EmailInfoModal from '../../components/SignupLogin/EmailInfoModal'
 import UnsubmittedForm from '../../components/SignupLogin/UnsubmittedForm'
 import PageWrapper from '../../components/SignupLogin/PageWrapper'
-import { SIGNUP, LOGIN, RESET_CODE } from '../../screens/main'
+import { SIGNUP, LOGIN, RESET_CODE } from '../../screens/consts/main'
 import {
   dismissError,
   errorOccurred,

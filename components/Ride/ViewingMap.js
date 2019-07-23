@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import MapboxGL from '@mapbox/react-native-mapbox-gl';
+import MapboxGL from '@react-native-mapbox-gl/maps';
 import memoizeOne from 'memoize-one';
 
 import {
@@ -142,9 +142,9 @@ export default class ViewingMap extends PureComponent {
   }
 }
 
-const layerStyles = MapboxGL.StyleSheet.create({
+const layerStyles = {
   routeLine: {
-    lineColor: MapboxGL.StyleSheet.identity('stroke'),
+    lineColor: ['get', 'stroke'],
     lineWidth: 3,
     lineCap: 'round',
   },
@@ -153,14 +153,14 @@ const layerStyles = MapboxGL.StyleSheet.create({
     iconIgnorePlacement: true,
     iconSize: 2
   }
-});
+}
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     flex: 1,
   },
   map: {
     ...StyleSheet.absoluteFillObject,
   },
-});
+}
 

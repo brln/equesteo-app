@@ -13,7 +13,7 @@ import { connect } from 'react-redux'
 import { brand, darkGrey, lightGrey } from '../../colors'
 import {setCareEventSpecificData, setSecondaryCareEventType} from '../../actions/standard'
 import Thumbnail from '../../components/Images/Thumbnail'
-import { FARRIER, GROUNDWORK, VETERINARY } from "../../screens/care"
+import { FARRIER, GROUNDWORK, VETERINARY } from "../../screens/consts/care"
 import { EqNavigation } from '../../services'
 
 const { width } = Dimensions.get('window')

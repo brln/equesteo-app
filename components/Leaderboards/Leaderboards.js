@@ -10,13 +10,14 @@ import { brand, darkBrand } from '../../colors'
 import Button from '../Button'
 import LeaderList from './LeaderList'
 
-export const TIME_WEEK = 'week'
-export const TIME_MONTH = 'month'
-export const TIME_YEAR = 'year'
-
-export const STAT_DISTANCE = 'distance'
-export const STAT_TIME = 'elapsedTimeSecs'
-export const STAT_ASCENT = 'elevationGain'
+import {
+  TIME_WEEK,
+  TIME_MONTH,
+  TIME_YEAR,
+  STAT_DISTANCE,
+  STAT_TIME,
+  STAT_ASCENT,
+} from './consts'
 
 export default class Leaderboards extends PureComponent {
   constructor (props) {

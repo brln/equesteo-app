@@ -23,7 +23,7 @@ import {
   persistUserWithPhoto,
 } from '../../actions/functional'
 import EqNavigation from "../../services/EqNavigation"
-import { FIRST_HORSE_PAGE } from "../../screens/firstStart"
+import { FIRST_HORSE_PAGE } from "../../screens/consts/firstStart"
 import Wrapper from '../../components/FirstStart/Wrapper'
 
 const { width } = Dimensions.get('window')

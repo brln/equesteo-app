@@ -11,7 +11,11 @@ import {
 
 import { darkGrey }  from '../../colors'
 import { metersToFeet } from '../../helpers'
-import { STAT_DISTANCE, STAT_TIME, STAT_ASCENT } from "./Leaderboards"
+import {
+  STAT_DISTANCE,
+  STAT_TIME,
+  STAT_ASCENT,
+} from './consts'
 import { userName } from '../../modelHelpers/user'
 import Thumbnail from '../Images/Thumbnail'
 

@@ -137,7 +137,8 @@ export default class ApiClient {
             throw new UnauthorizedError(json.error)
         }
         if (doAuth) {
-          this.setToken(resp.headers.map['x-auth-token'][0], endpoint)
+          logDebug(resp.headers.map)
+          this.setToken(resp.headers.map['x-auth-token'], endpoint)
         }
         return json
       })

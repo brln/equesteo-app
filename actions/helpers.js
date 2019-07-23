@@ -20,7 +20,7 @@ import {
   switchRoot,
 } from './functional'
 import { logError, logInfo } from '../helpers'
-import { FEED, NEEDS_SYNC } from '../screens/main'
+import { FEED, NEEDS_SYNC } from '../screens/consts/main'
 import { Amplitude, LocalStorage } from '../services'
 
 import { setUserContext } from "../services/Sentry"

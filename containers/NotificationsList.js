@@ -10,7 +10,7 @@ import { brand } from '../colors'
 import { loadSingleRide, markNotificationsSeen } from "../actions/functional"
 import { logRender } from '../helpers'
 import NotificationList from '../components/NotificationsList/NotificationsList'
-import { RIDE } from '../screens/main'
+import { RIDE } from '../screens/consts/main'
 import { EqNavigation } from '../services'
 import Amplitude, {
   CLEAR_ALL_NOTIFICATIONS,

@@ -13,7 +13,7 @@ import { brand, darkGrey, lightGrey } from '../../colors'
 import { feed, groundwork, veterinary, ferrier} from '../../colors'
 import { setMainCareEventType } from '../../actions/standard'
 import Thumbnail from '../../components/Images/Thumbnail'
-import { FEED_PAGE, NEW_SECONDARY_EVENT_MENU } from "../../screens/care"
+import { FEED_PAGE, NEW_SECONDARY_EVENT_MENU } from "../../screens/consts/care"
 import { EqNavigation } from '../../services'
 
 const { width } = Dimensions.get('window')

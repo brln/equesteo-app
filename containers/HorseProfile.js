@@ -18,7 +18,7 @@ import {
 import BackgroundComponent from '../components/BackgroundComponent'
 import { brand } from '../colors'
 import { generateUUID, logRender, unixTimeNow } from '../helpers'
-import { HORSE_TOOLS, PHOTO_LIGHTBOX, PROFILE } from '../screens/main'
+import { HORSE_TOOLS, PHOTO_LIGHTBOX, PROFILE } from '../screens/consts/main'
 import HorseProfile from '../components/HorseProfile/HorseProfile'
 import { EqNavigation } from '../services'
 import Amplitude, {
@@ -79,7 +79,7 @@ class HorseProfileContainer extends BackgroundComponent {
     }
   }
 
-  componentWillMount () {
+  componentDidMount () {
     Amplitude.logEvent(VIEW_HORSE_PROFILE)
   }
 

@@ -1,10 +1,11 @@
 import BackgroundTimer from 'react-native-background-timer'
 import ImagePicker from 'react-native-image-crop-picker'
 import { fromJS, Map  } from 'immutable'
-import { Alert, AppState, Linking, NetInfo, Platform } from 'react-native'
+import { Alert, AppState, Linking, Platform } from 'react-native'
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation'
 import firebase from 'react-native-firebase'
 import { Navigation } from 'react-native-navigation'
+import NetInfo from "@react-native-community/netinfo";
 import PushNotification from 'react-native-push-notification'
 import BackgroundFetch from "react-native-background-fetch"
 import Tts from 'react-native-tts'
@@ -42,7 +43,7 @@ import {
   RIDE,
   RIDE_BUTTON,
   SIGNUP,
-} from '../screens/main'
+} from '../screens/consts/main'
 import {
   EqNavigation,
   LocalStorage,
@@ -1279,9 +1280,9 @@ let networkListenerRemover = null
 export function startNetworkTracking () {
   const source = 'startNetworkTracking'
   cb(source)
-  return (dispatch, getState) => {
+  return (dispatch) => {
     if (networkListenerRemover) {
-      networkListenerRemover.remove()
+      networkListenerRemover()
     }
 
     const listener = () => {
@@ -1290,7 +1291,7 @@ export function startNetworkTracking () {
       }, 2000)
     }
 
-    networkListenerRemover = NetInfo.addEventListener('connectionChange', listener)
+    networkListenerRemover = NetInfo.addEventListener(listener)
     listener()
   }
 }
@@ -1353,7 +1354,6 @@ export function shutdownBackgroundGeolocation () {
   return (dispatch) => {
     let numTries = 0
     function doStop () {
-      logDebug('doStop')
       return new Promise(res => {
         BackgroundGeolocation.checkStatus((status) => {
           BackgroundGeolocation.removeAllListeners()
@@ -1364,7 +1364,6 @@ export function shutdownBackgroundGeolocation () {
               res()
             })
           } else {
-            logDebug('stopped')
             dispatch(setBackgroundGeolocationRunning(false))
             res()
           }
@@ -1377,7 +1376,6 @@ export function shutdownBackgroundGeolocation () {
     }
 
     function ensureStop () {
-      logDebug('ensureStop')
       numTries = numTries + 1
       if (numTries > 5) {
         throw new Error ('Too many tries shutting down BackgroundGeolocation')
@@ -1395,7 +1393,6 @@ export function shutdownBackgroundGeolocation () {
       }
     }
 
-    logDebug('shutdownBGLocation start')
     return ensureStop()
   }
 }

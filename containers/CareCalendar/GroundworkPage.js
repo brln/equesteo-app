@@ -16,7 +16,7 @@ import EqPicker from '../../components/EqPicker'
 import { brand, green, danger, darkBrand, darkGrey, lightGrey } from '../../colors'
 import { elapsedTime, timeToString, unixTimeNow } from '../../helpers'
 import EqNavigation from '../../services/EqNavigation'
-import { HORSE_PICKER } from '../../screens/care'
+import { HORSE_PICKER } from '../../screens/consts/care'
 import Button from "../../components/Button"
 import {setCareEventSpecificData} from "../../actions/standard"
 

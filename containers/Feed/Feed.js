@@ -28,10 +28,10 @@ import {
   RIDE,
   RIDE_BUTTON,
   TRAINING,
-} from '../../screens/main'
+} from '../../screens/consts/main'
 import {
   INTRO_PAGE
-} from '../../screens/firstStart'
+} from '../../screens/consts/firstStart'
 import { EqNavigation } from '../../services'
 import { captureMessage } from '../../services/Sentry'
 

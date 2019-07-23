@@ -23,7 +23,7 @@ import Amplitude, {
   SIGN_IN,
 } from "../../services/Amplitude"
 import EqNavigation from '../../services/EqNavigation'
-import { SIGNUP, FORGOT } from '../../screens/main'
+import { SIGNUP, FORGOT } from '../../screens/consts/main'
 
 
 const { height } = Dimensions.get('window')

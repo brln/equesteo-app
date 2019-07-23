@@ -9,7 +9,7 @@ import { brand } from '../colors'
 import Training from '../components/Training/Training'
 import { loadSingleRide } from '../actions/functional'
 import { logRender } from '../helpers'
-import { RIDE } from '../screens/main'
+import { RIDE } from '../screens/consts/main'
 import { EqNavigation, PouchCouch } from '../services'
 
 class TrainingContainer extends PureComponent {

@@ -59,7 +59,9 @@ export default class URIImage extends PureComponent {
         }
       }
       return typeImage
-    } catch (e) {}
+    } catch (e) {
+      return null
+    }
   }
 
   mainImage () {

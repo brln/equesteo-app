@@ -24,7 +24,7 @@ import { submitSignup, switchRoot } from '../../actions/functional'
 import Amplitude, {
   SIGN_UP,
 } from "../../services/Amplitude"
-import { LOGIN } from '../../screens/main'
+import { LOGIN } from '../../screens/consts/main'
 import EqNavigation from '../../services/EqNavigation'
 import { logError } from '../../helpers'
 

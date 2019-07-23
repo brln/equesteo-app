@@ -7,12 +7,14 @@ import IntroPage from '../containers/FirstStart/IntroPage'
 import NamePage from '../containers/FirstStart/NamePage'
 import ProfilePhotoPage from '../containers/FirstStart/ProfilePhotoPage'
 
-export const FINAL_PAGE = 'equesteo.FinalPage'
-export const FIRST_HORSE_PAGE = 'equesteo.FirstHorsePage'
-export const FIRST_HORSE_PHOTO = 'equesteo.FirstHorsePhoto'
-export const INTRO_PAGE = 'equesteo.IntroPage'
-export const NAME_PAGE = 'equesteo.NamePage'
-export const PROFILE_PHOTO_PAGE = 'equesteo.ProfilePhotoPage'
+import {
+  FINAL_PAGE,
+  FIRST_HORSE_PAGE,
+  FIRST_HORSE_PHOTO,
+  INTRO_PAGE,
+  NAME_PAGE,
+  PROFILE_PHOTO_PAGE,
+} from './consts/firstStart'
 
 
 export function firstStartRegisterScreens(store, Provider) {

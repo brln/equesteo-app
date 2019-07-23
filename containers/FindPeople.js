@@ -7,7 +7,7 @@ import { searchForFriends } from "../actions/functional"
 import { clearSearch } from "../actions/standard"
 import { brand } from '../colors'
 import { logError, logRender } from '../helpers'
-import { PROFILE } from '../screens/main'
+import { PROFILE } from '../screens/consts/main'
 import FindPeople from '../components/FindPeople'
 import { EqNavigation } from '../services'
 

@@ -14,19 +14,21 @@ import NewSecondaryEventMenu from '../containers/CareCalendar/NewSecondaryEventM
 import TimePicker from '../containers/CareCalendar/TimePicker'
 import Veterinary from '../containers/CareCalendar/Veterinary'
 
-export const CARE_CALENDAR = 'equesteo.CareCalendar'
-export const CARE_EVENT = 'equesteo.CareEvent'
-export const DAY = 'equesteo.Day'
-export const EVENT_LIST = 'equesteo.EventList'
-export const EVENT_TOOLS = 'equesteo.EventTools'
-export const FARRIER = 'equesteo.Farrier'
-export const GROUNDWORK = 'equesteo.Groundwork'
-export const HORSE_PICKER = 'equesteo.HorsePicker'
-export const FEED_PAGE = 'equesteo.FeedPage'
-export const NEW_MAIN_EVENT_MENU = 'equesteo.NewMainEventMenu'
-export const NEW_SECONDARY_EVENT_MENU = 'equesteo.NewSecondaryEventMenu'
-export const TIME_PICKER = 'equesteo.TimePicker'
-export const VETERINARY = 'equesteo.Veterinary'
+import {
+  CARE_CALENDAR,
+  CARE_EVENT,
+  DAY,
+  EVENT_LIST,
+  EVENT_TOOLS,
+  FARRIER,
+  GROUNDWORK,
+  HORSE_PICKER,
+  FEED_PAGE,
+  NEW_MAIN_EVENT_MENU,
+  NEW_SECONDARY_EVENT_MENU,
+  TIME_PICKER,
+  VETERINARY,
+} from './consts/care'
 
 export function registerCareScreens(store, Provider) {
   Navigation.registerComponentWithRedux(CARE_CALENDAR, () => Calendar, Provider, store)
@@ -42,5 +44,4 @@ export function registerCareScreens(store, Provider) {
   Navigation.registerComponentWithRedux(NEW_SECONDARY_EVENT_MENU, () => NewSecondaryEventMenu, Provider, store)
   Navigation.registerComponentWithRedux(TIME_PICKER, () => TimePicker, Provider, store)
   Navigation.registerComponentWithRedux(VETERINARY, () => Veterinary, Provider, store)
-
 }

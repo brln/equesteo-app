@@ -12,7 +12,7 @@ import {
 
 import BuildImage from '../../components/Images/BuildImage'
 import { brand, darkGrey } from '../../colors'
-import {CARE_EVENT, NEW_MAIN_EVENT_MENU} from '../../screens/care'
+import {CARE_EVENT, NEW_MAIN_EVENT_MENU} from '../../screens/consts/care'
 import EqNavigation from '../../services/EqNavigation'
 import EventList from '../../components/CareCalendar/EventList'
 

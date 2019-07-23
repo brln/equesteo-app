@@ -13,7 +13,7 @@ import {
 import { brand, darkGrey, lightGrey } from '../colors'
 import { logRender } from '../helpers'
 import Thumbnail from '../components/Images/Thumbnail'
-import { FOLLOW_LIST, UPDATE_HORSE } from '../screens/main'
+import { FOLLOW_LIST, UPDATE_HORSE } from '../screens/consts/main'
 import { EqNavigation } from '../services'
 import {
   changeHorseOwner,

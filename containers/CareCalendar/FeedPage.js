@@ -15,7 +15,7 @@ import Button from '../../components/Button'
 import { brand, darkBrand, darkGrey, lightGrey } from '../../colors'
 import { setCareEventSpecificData } from "../../actions/standard"
 import EqNavigation from '../../services/EqNavigation'
-import { HORSE_PICKER } from '../../screens/care'
+import { HORSE_PICKER } from '../../screens/consts/care'
 
 class FeedEvent extends Component {
   static options() {

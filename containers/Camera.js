@@ -8,7 +8,7 @@ import { stashRidePhoto } from '../actions/standard'
 import Camera from '../components/Camera'
 import { brand } from '../colors'
 import { generateUUID, unixTimeNow } from '../helpers'
-import { PHOTO_LIGHTBOX } from '../screens/main'
+import { PHOTO_LIGHTBOX } from '../screens/consts/main'
 import { EqNavigation } from '../services'
 
 

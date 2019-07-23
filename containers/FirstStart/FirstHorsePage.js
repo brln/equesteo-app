@@ -20,7 +20,7 @@ import {
   persistHorseUpdate,
 } from '../../actions/functional'
 import { EqNavigation } from '../../services'
-import { FINAL_PAGE, FIRST_HORSE_PHOTO } from "../../screens/firstStart"
+import { FINAL_PAGE, FIRST_HORSE_PHOTO } from "../../screens/consts/firstStart"
 import { Navigation } from 'react-native-navigation'
 import Wrapper from '../../components/FirstStart/Wrapper'
 

@@ -43,7 +43,7 @@ import {
   unixTimeNow
 } from '../helpers'
 import UpdateRide from '../components/UpdateRide/UpdateRide'
-import { PHOTO_LIGHTBOX, RIDE } from '../screens/main'
+import { PHOTO_LIGHTBOX, RIDE } from '../screens/consts/main'
 import { EqNavigation } from '../services'
 import Amplitude, {
   DISCARD_NEW_RIDE,

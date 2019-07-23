@@ -136,9 +136,11 @@ export default class RideRecorder extends PureComponent {
   }
 
   setMapRef (ref) {
-    this.setState({
-      mapRef: ref
-    })
+    if (!this.state.mapRef) {
+      this.setState({
+        mapRef: ref
+      })
+    }
   }
 
   showAtlas () {

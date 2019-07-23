@@ -57,7 +57,11 @@ buck-out/
 .swo
 .swp
 
-ios/Pods
 coverage/
 package-lock.json
 
+# Bundle artifact
+*.jsbundle
+
+# CocoaPods
+/ios/Pods/

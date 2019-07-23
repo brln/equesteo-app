@@ -18,7 +18,7 @@ import {
   FOLLOW_LIST,
   SHARE_RIDE,
   UPDATE_RIDE
-} from '../screens/main'
+} from '../screens/consts/main'
 import Thumbnail from '../components/Images/Thumbnail'
 import {
   createRide,

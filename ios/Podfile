@@ -66,6 +66,8 @@ target 'equesteo' do
 
   pod 'react-native-background-timer', :path => '../node_modules/react-native-background-timer'
 
+  pod 'react-native-netinfo', :path => '../node_modules/@react-native-community/netinfo'
+
 end
 
 # also from https://github.com/ivpusic/react-native-image-crop-picker

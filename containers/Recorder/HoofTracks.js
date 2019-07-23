@@ -126,7 +126,7 @@ class HoofTracksContainer extends PureComponent {
     }
   }
 
-  componentWillMount () {
+  componentDidMount () {
     return UserAPI.getHoofTracksID().then((resp) => {
       this.props.dispatch(setHoofTracksID(resp.htID))
     }).catch(e => {

@@ -20,10 +20,10 @@ import {
   MORE,
   PROFILE,
   TRAINING,
-} from '../screens/main'
+} from '../screens/consts/main'
 import {
   EVENT_LIST
-} from '../screens/care'
+} from '../screens/consts/care'
 import BuildImage from '../components/Images/BuildImage'
 import { brand, lightGrey } from '../colors'
 import { logRender } from '../helpers'

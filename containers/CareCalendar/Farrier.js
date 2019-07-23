@@ -12,7 +12,7 @@ import { Navigation } from 'react-native-navigation'
 import { brand, darkBrand, darkGrey, lightGrey } from '../../colors'
 import { setCareEventSpecificData } from "../../actions/standard"
 import EqNavigation from '../../services/EqNavigation'
-import { HORSE_PICKER } from '../../screens/care'
+import { HORSE_PICKER } from '../../screens/consts/care'
 
 class FarrierEvent extends Component {
   static options() {

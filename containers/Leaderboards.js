@@ -7,7 +7,7 @@ import BackgroundComponent from '../components/BackgroundComponent'
 import { brand } from '../colors'
 import { logRender } from '../helpers'
 import Leaderboards from '../components/Leaderboards/Leaderboards'
-import { HORSE_PROFILE, PROFILE } from '../screens/main'
+import { HORSE_PROFILE, PROFILE } from '../screens/consts/main'
 import { EqNavigation } from '../services'
 
 class LeaderboardsContainer extends BackgroundComponent {

@@ -5,7 +5,7 @@ import thunkMiddleware from 'redux-thunk'
 import { Navigation } from 'react-native-navigation'
 import { configure } from './services/Sentry'
 import { combineReducers } from 'redux-immutable';
-import Mapbox from '@mapbox/react-native-mapbox-gl';
+import Mapbox from '@react-native-mapbox-gl/maps';
 
 import { MAPBOX_TOKEN } from './dotEnv'
 import { appInitialized } from "./actions/functional"
@@ -22,13 +22,10 @@ import PouchRecordsReducer from './reducers/PouchRecords'
 
 import { NativeModules, NativeEventEmitter, YellowBox } from 'react-native'
 
-// Remove when on > 0.56
-// https://github.com/facebook/react-native/issues/17504
-// https://github.com/facebook/react-native/issues/14806
 YellowBox.ignoreWarnings([
-  'Class RCTCxxModule',
   'Warning: isMounted(...) is deprecated',
-  'Module RCTImageLoader requires',
+  'Warning: componentWillReceiveProps is deprecated',
+  'Warning: componentWillMount is deprecated',
   'Task orphaned for request'
 ])
 

@@ -19,7 +19,7 @@ import MedImage from '../../components/Images/MedImage'
 import { createHorsePhoto, horseUpdated } from '../../actions/standard'
 import { persistHorseWithPhoto } from '../../actions/functional'
 import EqNavigation from '../../services/EqNavigation'
-import { FINAL_PAGE } from '../../screens/firstStart'
+import { FINAL_PAGE } from '../../screens/consts/firstStart'
 import Wrapper from '../../components/FirstStart/Wrapper'
 
 const { width } = Dimensions.get('window')

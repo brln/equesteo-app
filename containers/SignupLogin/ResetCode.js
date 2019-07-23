@@ -15,7 +15,7 @@ import {
   errorOccurred,
 } from '../../actions/standard'
 import { exchangePWCode, switchRoot } from '../../actions/functional'
-import {NEW_PASSWORD} from "../../screens/main"
+import {NEW_PASSWORD} from "../../screens/consts/main"
 import EqNavigation from '../../services/EqNavigation'
 
 const { height, width } = Dimensions.get('window');

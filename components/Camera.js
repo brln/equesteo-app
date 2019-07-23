@@ -74,9 +74,10 @@ export default class Camera extends Component {
             style = {styles.preview}
             type={this.state.backCamera ? RNCamera.Constants.Type.back : RNCamera.Constants.Type.front}
             flashMode={RNCamera.Constants.FlashMode.off}
+            captureAudio={false}
           /> : null}
         </View>
-        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+        <View style={{borderColor: 'red', borderWidth: 1, flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
           <View style={{flex: 1, aspectRatio: 1}}>
             <TouchableOpacity onPress={this.props.showRecentPhoto}>
               { lastPhoto }
@@ -113,5 +114,6 @@ const styles = StyleSheet.create({
   preview: {
     flex: 1,
     alignItems: 'center',
+    height: width,
   },
 })

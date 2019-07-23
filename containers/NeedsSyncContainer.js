@@ -14,7 +14,7 @@ import { logInfo } from '../helpers'
 import BuildImage from '../components/Images/BuildImage'
 import Loader from '../components/SignupLogin/Loader'
 import { doSync, startListeningFCM, switchRoot } from '../actions/functional'
-import { FEED } from '../screens/main'
+import { FEED } from '../screens/consts/main'
 
 
 class NeedsSyncContainer extends PureComponent {

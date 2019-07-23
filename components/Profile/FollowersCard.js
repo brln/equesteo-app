@@ -41,7 +41,8 @@ export default class FollowersCard extends PureComponent {
           </CardItem>
         </Card>
       )
-    } else {}
+    } else {
       return null
     }
+  }
 }

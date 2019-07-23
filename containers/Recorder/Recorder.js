@@ -39,8 +39,8 @@ import {
   RIDE_ATLAS,
   START_HOOF_TRACKS,
   UPDATE_RIDE,
-  UPDATE_NEW_RIDE_ID
-} from "../../screens/main"
+  UPDATE_NEW_RIDE_ID,
+} from "../../screens/consts/main"
 import { EqNavigation } from '../../services'
 
 class RecorderContainer extends PureComponent {
@@ -122,11 +122,6 @@ class RecorderContainer extends PureComponent {
     }
   }
 
-  componentWillMount() {
-    if (!this.props.currentRide) {
-      this.startRide()
-    }
-  }
 
   requestLocationPermission() {
     return new Promise((res, rej) => {
@@ -144,6 +139,9 @@ class RecorderContainer extends PureComponent {
   }
 
   componentDidMount () {
+    if (!this.props.currentRide) {
+      this.startRide()
+    }
     if (!this.gpsTimeout) {
       this.gpsTimeout = setInterval(() => {
         if (this.props.lastLocation) {

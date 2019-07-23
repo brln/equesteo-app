@@ -88,7 +88,6 @@ export default class RideStats extends PureComponent {
   }
 
   componentWillUnmount() {
-    this.setState({ ...initialState })
     clearInterval(this.renderTimer)
   }
 

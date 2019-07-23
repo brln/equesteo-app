@@ -1,6 +1,6 @@
 import { List, Map } from 'immutable'
 
-import { FEED, SIGNUP } from '../screens/main'
+import { FEED, SIGNUP } from '../screens/consts/main'
 import { appStates, logInfo, unixTimeNow } from '../helpers'
 import { DB_NEEDS_SYNC, DB_SYNCING, DB_SYNCED } from "../actions/functional"
 

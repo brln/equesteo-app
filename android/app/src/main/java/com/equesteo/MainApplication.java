@@ -2,9 +2,8 @@ package com.equesteo;
 
 import android.app.Application;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
-import com.facebook.react.bridge.ReadableNativeArray;
-import com.facebook.react.bridge.ReadableNativeMap;
 import com.facebook.react.ReactApplication;
+import com.reactnativecommunity.netinfo.NetInfoPackage;
 import com.ocetnik.timer.BackgroundTimerPackage;
 import net.no_mad.tts.TextToSpeechPackage;
 import com.transistorsoft.rnbackgroundfetch.RNBackgroundFetchPackage;
@@ -55,8 +54,8 @@ public class MainApplication extends NavigationApplication {
         // https://github.com/facebook/react-native/issues/18292
         super.onCreate();
         SoLoader.init(this, /* native exopackage */ false);
-        ReadableNativeArray.setUseNativeAccessor(true);
-        ReadableNativeMap.setUseNativeAccessor(true);
+        // ReadableNativeArray.setUseNativeAccessor(true);
+        // ReadableNativeMap.setUseNativeAccessor(true);
 
 
         // https://codedaily.io/tutorials/4/Increase-Android-AsyncStorage-Size-in-React-Native
@@ -91,7 +90,8 @@ public class MainApplication extends NavigationApplication {
             new RNFetchBlobPackage(),
             new RNBackgroundFetchPackage(),
             new TextToSpeechPackage(),
-            new BackgroundTimerPackage()
+            new BackgroundTimerPackage(),
+            new NetInfoPackage()
         );
     }
 

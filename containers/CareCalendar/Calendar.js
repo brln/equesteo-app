@@ -8,7 +8,7 @@ import { View } from 'react-native'
 import { brand, routeLine } from '../../colors'
 import { feed, groundwork, veterinary, ferrier} from '../../colors'
 import { setCareEventDate } from '../../actions/standard'
-import { CARE_EVENT, DAY, NEW_MAIN_EVENT_MENU } from '../../screens/care'
+import { CARE_EVENT, DAY, NEW_MAIN_EVENT_MENU } from '../../screens/consts/care'
 import EqNavigation from '../../services/EqNavigation'
 import DateTimePicker from "react-native-modal-datetime-picker"
 

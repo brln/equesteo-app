@@ -26,7 +26,7 @@ import {
   PROFILE,
   RIDE_CHARTS,
   RIDE_TOOLS,
-} from '../screens/main'
+} from '../screens/consts/main'
 import { EqNavigation } from '../services'
 import Amplitude, {
   ADD_COMMENT,

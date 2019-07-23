@@ -22,8 +22,8 @@ import { brand, darkBrand, darkGrey, lightGrey } from '../../colors'
 
 import BuildImage from '../../components/Images/BuildImage'
 import EqNavigation from '../../services/EqNavigation'
-import { EVENT_TOOLS } from '../../screens/care'
-import { HORSE_PROFILE } from '../../screens/main'
+import { EVENT_TOOLS } from '../../screens/consts/care'
+import { HORSE_PROFILE } from '../../screens/consts/main'
 import Thumbnail from '../../components/Images/Thumbnail'
 import { eventDetails } from "../../modelHelpers/careEvent"
 import { userName } from '../../modelHelpers/user'

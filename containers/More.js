@@ -11,8 +11,8 @@ import {
 } from 'react-native'
 import { brand, darkGrey, lightGrey } from '../colors'
 import { logRender } from '../helpers'
-import { BARN, FEEDBACK, FIND_PEOPLE, PROFILE, SETTINGS } from '../screens/main'
-import { EVENT_LIST } from '../screens/care'
+import { BARN, FEEDBACK, FIND_PEOPLE, PROFILE, SETTINGS } from '../screens/consts/main'
+import { EVENT_LIST } from '../screens/consts/care'
 import Thumbnail from '../components/Images/Thumbnail'
 import { EqNavigation } from '../services'
 import Amplitude, {
