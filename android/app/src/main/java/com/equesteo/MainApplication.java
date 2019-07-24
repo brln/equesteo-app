@@ -90,7 +90,7 @@ public class MainApplication extends NavigationApplication {
             new RNBackgroundFetchPackage(),
             new TextToSpeechPackage(),
             new BackgroundTimerPackage(),
-            new NetInfoPackage(),
+            new NetInfoPackage()
         );
     }
 
