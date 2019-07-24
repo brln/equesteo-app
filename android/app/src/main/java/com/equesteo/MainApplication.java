@@ -1,14 +1,13 @@
 package com.equesteo;
 
 import android.app.Application;
-import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.facebook.react.ReactApplication;
+import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.reactnativecommunity.netinfo.NetInfoPackage;
 import com.ocetnik.timer.BackgroundTimerPackage;
 import net.no_mad.tts.TextToSpeechPackage;
 import com.transistorsoft.rnbackgroundfetch.RNBackgroundFetchPackage;
 import com.transistorsoft.rnbackgroundfetch.RNBackgroundFetchPackage;
-import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import org.reactnative.camera.RNCameraPackage;
@@ -91,7 +90,7 @@ public class MainApplication extends NavigationApplication {
             new RNBackgroundFetchPackage(),
             new TextToSpeechPackage(),
             new BackgroundTimerPackage(),
-            new NetInfoPackage()
+            new NetInfoPackage(),
         );
     }
 

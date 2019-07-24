@@ -1,3 +1,4 @@
+import { Alert } from 'react-native'
 import { Sentry } from 'react-native-sentry'
 import { DISTRIBUTION, ENV, RELEASE, SENTRY_DSN } from '../dotEnv'
 
@@ -15,8 +16,8 @@ export function captureMessage (m) {
   if (ENV !== 'local') {
     Sentry.captureMessage(m)
   } else {
-    alert('see logs, sentry message captured')
-    logInfo(m, 'Sentry message captured')
+    logInfo(JSON.stringify(m), 'Sentry message captured')
+    Alert.alert('see logs, sentry message captured')
   }
 }
 
@@ -38,8 +39,8 @@ export function captureException (e) {
       Sentry.captureException(e)
     }
   } else {
-    alert('see logs, sentry exception captured')
-    logInfo(e, 'Sentry exception captured')
+    logInfo(JSON.stringify(e), 'Sentry exception captured')
+    Alert.alert('see logs, sentry exception captured')
   }
 }
 

@@ -269,18 +269,19 @@ export default class RidingMap extends PureComponent {
       <View style ={styles.container}>
         <View style={{flex: 1}}>
           <MapboxGL.MapView
-            animated={true}
-            centerCoordinate={this.props.centerCoordinate}
             compassEnabled={true}
-            onRegionDidChange={this.props.mapRegionChanged}
-            pitch={45}
-            heading={this.props.heading}
-            ref={ref => (this.props.setMapRef(ref))}
+            onRegionWillChange={this.props.mapRegionChanged}
             styleURL={mapStyleURL}
             style={styles.map}
-            zoomLevel={this.props.zoomLevel}
             rotateEnabled={true}
           >
+            <MapboxGL.Camera
+              centerCoordinate={this.props.centerCoordinate}
+              heading={this.props.heading}
+              pitch={45}
+              zoomLevel={this.props.zoomLevel}
+              isUserInteraction={false}
+            />
             {this.activeAtlasEntry()}
             <MapboxGL.ShapeSource id="routeSource" shape={mapCoords}>
               <MapboxGL.LineLayer id="route" sourceID={"routeSource"} style={layerStyles.routeLine}/>

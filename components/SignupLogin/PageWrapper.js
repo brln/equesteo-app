@@ -39,7 +39,7 @@ export default class PageWrapper extends PureComponent {
           <ScrollView
             keyboardShouldPersistTaps={'always'}
           >
-            <View style={{height: height - StatusBar.currentHeight}}>
+            <View style={{height: height - StatusBar.currentHeight || 0}}>
               <BuildImage
                 source={require('../../img/loginbg4.jpg')}
                 style={{ width, height, resizeMode: 'cover' }}

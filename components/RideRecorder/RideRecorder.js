@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import {
+  Alert,
   PermissionsAndroid,
   StyleSheet,
   View
@@ -23,7 +24,6 @@ export default class RideRecorder extends PureComponent {
       fabActive: false,
       userControlledMap: false,
       heading: 0,
-      mapRef: null,
       nullMapLocation: props.nullMapLocation ? props.nullMapLocation.toJS() : null,
       zoomLevel: 14,
     }
@@ -32,7 +32,6 @@ export default class RideRecorder extends PureComponent {
     this.mapRegionChanged = this.mapRegionChanged.bind(this)
     this.recenter = this.recenter.bind(this)
     this.showAtlas = this.showAtlas.bind(this)
-    this.setMapRef = this.setMapRef.bind(this)
     this.showCamera = this.showCamera.bind(this)
     this.toggleFab = this.toggleFab.bind(this)
   }
@@ -95,11 +94,6 @@ export default class RideRecorder extends PureComponent {
         centerCoordinate: e.geometry.coordinates,
         zoomLevel: e.properties.zoomLevel
       })
-    } else if (this.state.mapRef) {
-      this.state.mapRef.setCamera({
-        heading: this.state.heading,
-        duration: 50
-      })
     }
   }
 
@@ -127,19 +121,11 @@ export default class RideRecorder extends PureComponent {
         if (show) {
           this.props.showCamera()
         } else {
-          alert("Sorry, without those permissions you can't take pictures.")
+          Alert.alert("Sorry, without those permissions you can't take pictures.")
         }
       })
     } else {
       this.props.showCamera()
-    }
-  }
-
-  setMapRef (ref) {
-    if (!this.state.mapRef) {
-      this.setState({
-        mapRef: ref
-      })
     }
   }
 
@@ -227,7 +213,6 @@ export default class RideRecorder extends PureComponent {
               mapRegionChanged={this.mapRegionChanged}
               recenter={this.recenter}
               refiningLocation={this.props.refiningLocation}
-              setMapRef={this.setMapRef}
               userControlledMap={this.state.userControlledMap}
               zoomLevel={this.state.zoomLevel}
             />

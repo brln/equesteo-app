@@ -185,8 +185,12 @@ export function logError (error, id) {
   captureException(error)
 }
 
-export function logInfo (info) {
-  console.log(info)
+export function logInfo (info, info2) {
+  if (info2) {
+    console.log(info, info2)
+  } else {
+    console.log(info)
+  }
 }
 
 export function logDebug (info, title) {
