@@ -123,7 +123,7 @@ export function catchAsyncError (dispatch, source) {
       captureBreadcrumb(source)
       captureException(e)
       if (ENV === 'local') {
-        alert('Async error, check logs')
+        Alert.alert('Async error, check logs')
         logError(e, 'catchAsyncError')
       }
     }
@@ -1408,7 +1408,7 @@ export function stopLocationTracking (clearLast=true) {
       if (clearLast) {
         dispatch(clearLastLocation())
       }
-    })
+    }).catch(catchAsyncError(dispatch, source))
   }
 }
 

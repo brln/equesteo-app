@@ -8,19 +8,13 @@
  */
 
 #import "AppDelegate.h"
-#import <React/RCTBundleURLProvider.h>
+#import <RCTBundleURLProvider.h>
 #import <Firebase.h>
 #import "RNFirebaseNotifications.h"
 #import <ReactNativeNavigation/ReactNativeNavigation.h>
+#import <RNSentry.h>
 #import <React/RCTPushNotificationManager.h>
-#import <React/RCTRootView.h>
-#if __has_include(<React/RNSentry.h>)
-#import <React/RNSentry.h> // This is used for versions of react >= 0.40
-#else
-#import "RNSentry.h" // This is used for versions of react < 0.40
-#endif
-#import <React/RCTPushNotificationManager.h>
-#import <React/RCTLinkingManager.h>
+#import <RCTLinkingManager.h>
 
 @implementation AppDelegate
 

@@ -304,13 +304,11 @@ class RecorderContainer extends PureComponent {
         activeAtlasEntry={this.props.activeAtlasEntry}
         appState={this.props.appState}
         clearActiveAtlasEntry={this.clearActiveAtlasEntry}
-        closeHoofTracksModal={this.closeHoofTracksModal}
         currentRide={this.props.currentRide}
         currentRideCoordinates={this.props.currentRideCoordinates}
         currentRideElevations={this.props.currentRideElevations}
         discardRide={this.discardRide}
         discardModalOpen={this.state.discardModalOpen}
-        fetchHTID={this.fetchHTID}
         gpsSignalLost={this.props.gpsSignalLost}
         hoofTracksID={this.props.hoofTracksID}
         hoofTracksRunning={this.props.hoofTracksRunning}
@@ -324,7 +322,6 @@ class RecorderContainer extends PureComponent {
         showGPSBar={this.state.showGPSBar}
         showUpdateRide={this.showUpdateRide}
         startHoofTracks={this.startHoofTracks}
-        stopHoofTracks={this.stopHoofTracks}
         unpauseLocationTracking={this.unpauseLocationTracking}
         user={this.props.user}
       />

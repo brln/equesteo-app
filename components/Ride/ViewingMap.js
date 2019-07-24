@@ -113,14 +113,14 @@ export default class ViewingMap extends PureComponent {
     return (
       <View style={styles.container}>
         <MapboxGL.MapView
-          ref={ref => (this.map = ref)}
           styleURL={"mapbox://styles/equesteo/cjopu37k3fm442smn4ncz3x9m"}
           onDidFinishLoadingMap={this.fitToElements}
           style={styles.map}
           onPress={this.photoPress}
-          minZoomLevel={4}
-          maxZoomLevel={15}
         >
+          <MapboxGL.Camera
+            ref={ref => (this.map = ref)}
+          />
           <MapboxGL.ShapeSource id="routeSource" shape={mapCoords}>
             <MapboxGL.LineLayer id="route" sourceID={"routeSource"} style={layerStyles.routeLine}/>
           </MapboxGL.ShapeSource>

@@ -4,6 +4,7 @@ import memoizeOne from 'memoize-one'
 import moment from 'moment'
 import {
   ActivityIndicator,
+  Alert,
   Clipboard,
   Dimensions,
   Platform,
@@ -242,7 +243,7 @@ export default class Ride extends PureComponent {
       titleTouchCount: this.state.titleTouchCount + 1
     })
     if (this.state.titleTouchCount === 5) {
-      alert(this.props.ride.get('_id'))
+      Alert.alert(this.props.ride.get('_id'))
       Clipboard.setString(this.props.ride.get('_id'))
       logInfo(this.props.ride.get('_id'))
       this.setState({
