@@ -42,6 +42,7 @@ import {
   UPDATE_NEW_RIDE_ID,
 } from "../../screens/consts/main"
 import { EqNavigation } from '../../services'
+import TimeoutManager from '../../services/TimeoutManager'
 
 class RecorderContainer extends PureComponent {
   static options() {
@@ -111,7 +112,7 @@ class RecorderContainer extends PureComponent {
   componentWillUnmount () {
     this.props.dispatch(clearLocationRetry())
     BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
-    clearTimeout(this.gpsTimeout)
+    TimeoutManager.deleteTimeout(this.gpsTimeout)
   }
 
   navigationButtonPressed ({ buttonId }) {
@@ -146,7 +147,7 @@ class RecorderContainer extends PureComponent {
       this.gpsTimeout = setInterval(() => {
         if (this.props.lastLocation) {
            clearInterval(this.gpsTimeout)
-           this.gpsTimeout = setTimeout(() => {
+           this.gpsTimeout = TimeoutManager.newTimeout(() => {
               this.setState({showGPSBar: false})
            })
         }

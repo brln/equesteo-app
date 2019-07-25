@@ -14,6 +14,7 @@ import {
 
 import { brand, darkBrand, lightGrey } from '../../colors'
 import { shade } from '../../helpers'
+import TimeoutManager from '../../services/TimeoutManager'
 
 const { width } = Dimensions.get('window')
 const SQUARE_FRACTION = 30
@@ -69,10 +70,16 @@ export default class SquaresCard extends PureComponent {
     super(props)
     this.generateSquares = this.generateSquares.bind(this)
     this.squaresContainer = null
+
+    this.scrollTimeout = null
+  }
+
+  componentWillUnmount () {
+    TimeoutManager.deleteTimeout(this.scrollTimeout)
   }
 
   componentDidMount () {
-    setTimeout(() => {
+    TimeoutManager.newTimeout(() => {
       if (this.squaresContainer) {
         this.squaresContainer.scrollToEnd()
       }

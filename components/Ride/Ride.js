@@ -38,6 +38,7 @@ import PhotoFilmstrip from './PhotoFilmstrip'
 import RideComments from '../RideComments/RideComments'
 import Stats from './Stats'
 import Thumbnail from '../Images/Thumbnail'
+import TimeoutManager from '../../services/TimeoutManager'
 import ViewingMap from './ViewingMap'
 
 const { width } = Dimensions.get('window')
@@ -66,15 +67,17 @@ export default class Ride extends PureComponent {
 
     this.memoizedMaxSpeed = memoizeOne(this.maxSpeed)
     this.memoizedParsePaceData = memoizeOne(this.parsePaceData)
+
+    this.scrollTimeout = null
   }
 
   componentWillUnmount () {
-    clearTimeout(this.scrollTimeout)
+    TimeoutManager.deleteTimeout(this.scrollTimeout)
   }
 
   componentDidUpdate (nextProps) {
     if (nextProps.skipToComments && !this.state.scrolled) {
-      setTimeout(() => {
+      TimeoutManager.newTimeout(() => {
         if (this.scrollable) {
           this.scrollable.scrollToEnd({animated: true})
           this.setState({

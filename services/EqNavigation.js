@@ -1,5 +1,6 @@
 import { Navigation } from 'react-native-navigation'
 import { logError } from '../helpers'
+import TimeoutManager from './TimeoutManager'
 
 export default class EqNavigation {
   static debounce = false
@@ -7,7 +8,7 @@ export default class EqNavigation {
   static wrap (navCommand) {
     return navCommand.then(() => {
       return new Promise(res => {
-        setTimeout(() => {
+        TimeoutManager.newTimeout(() => {
           EqNavigation.debounce = false
           res()
         }, 50)

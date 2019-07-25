@@ -3,13 +3,14 @@
 import React, {
   Component
 } from 'react';
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 import {
   View,
-  Text,
   Image,
   StyleSheet,
-} from 'react-native';
+} from 'react-native'
+
+import TimeoutManager from '../../services/TimeoutManager'
 
 const styles = StyleSheet.create({
     container: {
@@ -81,7 +82,7 @@ export default class Pulse extends Component {
 
         let a = 0;
         while(a < numPulses){
-            this.createPulseTimer = setTimeout(()=>{
+            this.createPulseTimer = TimeoutManager.newTimeout(()=>{
                 this.createPulse(a);
             }, a * duration);
 
@@ -95,7 +96,7 @@ export default class Pulse extends Component {
 
     componentWillUnmount(){
         this.mounted = false;
-        clearTimeout(this.createPulseTimer);
+        TimeoutManager.deleteTimeout(this.createPulseTimer);
         clearInterval(this.timer);
     }
 

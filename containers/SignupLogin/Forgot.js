@@ -21,22 +21,11 @@ import {
 } from '../../actions/standard'
 import { getPWCode, switchRoot } from '../../actions/functional'
 import EqNavigation from '../../services/EqNavigation'
+import SignupContainerParent  from './SignupContainerParent'
 
 const { height, width } = Dimensions.get('window');
 
-class ForgotContainer extends PureComponent {
-  static options() {
-    return {
-      layout: {
-        orientation: ['portrait']
-      },
-      topBar: {
-        visible: false,
-        drawBehind: true,
-      }
-    }
-  }
-
+class ForgotContainer extends SignupContainerParent  {
   constructor (props) {
     super(props)
     this.state = {
@@ -51,14 +40,6 @@ class ForgotContainer extends PureComponent {
     this._renderLoading = this._renderLoading.bind(this)
     this.showLogin = this.showLogin.bind(this)
     this.showSignup = this.showSignup.bind(this)
-  }
-
-  componentDidUpdate (nextProps) {
-    if (this.props.error) {
-      setTimeout(() => {
-        this.props.dispatch(dismissError())
-      }, 3000)
-    }
   }
 
   changeEmail (text) {

@@ -18,6 +18,7 @@ import Amplitude, {
   VIEW_NOTIFICATION_RIDE,
 } from "../services/Amplitude"
 import RideLoading from '../components/Training/RideLoading'
+import TimeoutManager from '../services/TimeoutManager'
 
 class NotificationsListContainer extends PureComponent {
   static options() {
@@ -63,12 +64,16 @@ class NotificationsListContainer extends PureComponent {
     this.showAndClear = this.showAndClear.bind(this)
 
     Navigation.events().bindComponent(this);
+    this.loadingRideFailedTimeout = null
+    this.loadingRideAlertTimeout = null
   }
 
   componentWillUnmount () {
     if (this.state.deleted.length > 0) {
       this.props.dispatch(markNotificationsSeen(this.state.deleted))
     }
+    TimeoutManager.deleteTimeout(this.loadingRideAlertTimeout)
+    TimeoutManager.deleteTimeout(this.loadingRideAlertTimeout)
   }
 
   navigationButtonPressed ({ buttonId }) {
@@ -118,9 +123,9 @@ class NotificationsListContainer extends PureComponent {
 
         })
       }).catch(() => {
-        setTimeout(() => {
+        this.loadingRideFailedTimeout = TimeoutManager.newTimeout(() => {
           this.setState({ loadingRide: false })
-          setTimeout(() => {
+          this.loadingRideAlertTimeout = TimeoutManager.newTimeout(() => {
             Alert.alert(
               'Not Available',
               'We can\'t load this ride for some reason. \n\n Please contact us if you keep seeing this. info@equesteo.com',

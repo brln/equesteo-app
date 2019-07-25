@@ -12,6 +12,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import Button from '../components/Button'
 import { brand, darkBrand } from '../colors'
 import UserAPI from '../services/UserApi'
+import TimeoutManager from '../services/TimeoutManager'
 
 const { width, height } = Dimensions.get('window')
 
@@ -46,6 +47,12 @@ class FeedbackContainer extends PureComponent {
     }
     this.changeFeedback = this.changeFeedback.bind(this)
     this.submit = this.submit.bind(this)
+
+    this.clearErrorTimeout = null
+  }
+
+  componentWillUnmount () {
+    TimeoutManager.deleteTimeout(this.clearErrorTimeout)
   }
 
   changeFeedback (e) {
@@ -68,7 +75,7 @@ class FeedbackContainer extends PureComponent {
         error: "Couldn't send. Maybe you don't have service?",
         disableSubmit: false
       })
-      setTimeout(() => {
+      this.clearErrorTimeout = TimeoutManager.newTimeout(() => {
         this.setState({
           error: null
         })

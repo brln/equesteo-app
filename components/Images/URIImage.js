@@ -5,6 +5,7 @@ import {
   View
 } from 'react-native'
 import BuildImage from './BuildImage'
+import TimeoutManager from '../../services/TimeoutManager'
 
 export default class URIImage extends PureComponent {
   constructor () {
@@ -16,10 +17,12 @@ export default class URIImage extends PureComponent {
     this.mainImage = this.mainImage.bind(this)
     this.typeImage = this.typeImage.bind(this)
     this.onError = this.onError.bind(this)
+
+    this.retryTimeout = null
   }
 
   componentWillUnmount () {
-    clearTimeout(this.retryTimeout)
+    TimeoutManager.deleteTimeout(this.retryTimeout)
   }
 
   onError () {
@@ -28,7 +31,7 @@ export default class URIImage extends PureComponent {
       error: true,
     })
     if (this.state.nextRetry <= 32000) {
-      this.retryTimeout = setTimeout(() => {
+      this.retryTimeout = TimeoutManager.newTimeout(() => {
         this.setState({
           error: false,
           nextRetry: this.state.nextRetry * 2

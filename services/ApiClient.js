@@ -1,15 +1,17 @@
 import RNFetchBlob from 'rn-fetch-blob'
 
 import { API_URL } from '../dotEnv'
-import { logError, logInfo } from '../helpers'
+import { logError } from '../helpers'
 import {
   BadRequestError,
   BadResponseError,
   NotConnectedError,
-  UnauthorizedError
+  UnauthorizedError,
+  UserAlreadyExistsError
 } from '../errors'
 import LocalStorage from './LocalStorage'
-import { captureException, captureMessage } from './Sentry'
+import { captureException } from './Sentry'
+import TimeoutManager from './TimeoutManager'
 
 let token = null
 
@@ -89,7 +91,7 @@ export default class ApiClient {
         })
       }),
       new Promise((res) => {
-        setTimeout(() => {
+        TimeoutManager.newTimeout(() => {
           res({connected: false})
         }, 3000)
       })
@@ -135,6 +137,9 @@ export default class ApiClient {
           case 401:
             token = null
             throw new UnauthorizedError(json.error)
+          case 409:
+            throw new UserAlreadyExistsError(json.error)
+
         }
         if (doAuth) {
           this.setToken(resp.headers.map['x-auth-token'], endpoint)

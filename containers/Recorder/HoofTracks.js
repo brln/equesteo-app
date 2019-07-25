@@ -82,7 +82,6 @@ class HoofTracksContainer extends PureComponent {
 
   componentWillUnmount () {
     BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
-    clearTimeout(this.gpsTimeout)
   }
 
   startHoofTracks () {

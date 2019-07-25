@@ -12,22 +12,11 @@ import PageWrapper from '../../components/SignupLogin/PageWrapper'
 import { dismissError, errorOccurred } from '../../actions/standard'
 import { newPassword } from '../../actions/functional'
 import Loader from '../../components/SignupLogin/Loader'
+import SignupContainerParent  from './SignupContainerParent'
 
 const { height, width } = Dimensions.get('window');
 
-class NewPasswordContainer extends PureComponent {
-  static options() {
-    return {
-      layout: {
-        orientation: ['portrait']
-      },
-      topBar: {
-        visible: false,
-        drawBehind: true,
-      }
-    }
-  }
-
+class NewPasswordContainer extends SignupContainerParent  {
   constructor (props) {
     super(props)
     this.state = {
@@ -40,14 +29,6 @@ class NewPasswordContainer extends PureComponent {
     this.changePassword2 = this.changePassword2.bind(this)
     this.moveToPassword2 = this.moveToPassword2.bind(this)
     this.submitNewPassword = this.submitNewPassword.bind(this)
-  }
-
-  componentDidUpdate (nextProps) {
-    if (this.props.error) {
-      setTimeout(() => {
-        this.props.dispatch(dismissError())
-      }, 3000)
-    }
   }
 
   changePassword1 (text) {

@@ -36,6 +36,7 @@ import Amplitude, {
   OPEN_FEEDBACK,
   OPEN_TRAINING_PAGE
 } from "../services/Amplitude"
+import TimeoutManager from '../services/TimeoutManager'
 
 
 const { height, width } = Dimensions.get('window')
@@ -50,6 +51,12 @@ class DrawerContainer extends Component {
     this.openLeaderboards = this.openLeaderboards.bind(this)
     this.openMore = this.openMore.bind(this)
     this.openTraining = this.openTraining.bind(this)
+
+    this.drawerToggleTimeout = null
+  }
+
+  componentWillUnmount () {
+    TimeoutManager.deleteTimeout(this.drawerToggleTimeout)
   }
 
   shouldComponentUpdate () {
@@ -195,7 +202,7 @@ class DrawerContainer extends Component {
   }
 
   toggleDrawer() {
-    setTimeout(() => {
+    this.drawerToggleTimeout = TimeoutManager.newTimeout(() => {
       return Navigation.mergeOptions(FEED, {
         sideMenu: {
           left: {

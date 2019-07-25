@@ -19,11 +19,13 @@ import {
   setDistributionOnServer,
   switchRoot,
 } from './functional'
-import { logError, logInfo } from '../helpers'
+import { logInfo } from '../helpers'
 import { FEED, NEEDS_SYNC } from '../screens/consts/main'
 import { Amplitude, LocalStorage } from '../services'
 
 import { setUserContext } from "../services/Sentry"
+import TimeoutManager from '../services/TimeoutManager'
+import { UnauthorizedError, UserAlreadyExistsError } from "../errors"
 
 export function loginAndSync(loginFunc, loginArgs, dispatch, getState) {
   return loginFunc(...loginArgs).then(resp => {
@@ -46,7 +48,7 @@ export function loginAndSync(loginFunc, loginArgs, dispatch, getState) {
     dispatch(setDistributionOnServer())
     const syncFail = getState().getIn(['localState', 'fullSyncFail'])
     if (!syncFail) {
-      setTimeout(() => {
+      TimeoutManager.newTimeout(() => {
         dispatch(switchRoot(FEED))
         dispatch(startListeningFCM())
       }, 100)
@@ -57,7 +59,9 @@ export function loginAndSync(loginFunc, loginArgs, dispatch, getState) {
     dispatch(removeForgotPWLinkListener())
   }).catch(e => {
     dispatch(errorOccurred(e.message))
-    catchAsyncError(dispatch, 'loginAndSync')(e)
+    if (!(e instanceof UnauthorizedError) && !(e instanceof UserAlreadyExistsError)) {
+      catchAsyncError(dispatch, 'loginAndSync')(e)
+    }
   })
 }
 

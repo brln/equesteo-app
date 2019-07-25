@@ -24,23 +24,11 @@ import Amplitude, {
 } from "../../services/Amplitude"
 import EqNavigation from '../../services/EqNavigation'
 import { SIGNUP, FORGOT } from '../../screens/consts/main'
-
+import SignupContainerParent  from './SignupContainerParent'
 
 const { height } = Dimensions.get('window')
 
-class LoginContainer extends PureComponent {
-  static options() {
-    return {
-      layout: {
-        orientation: ['portrait']
-      },
-      topBar: {
-        visible: false,
-        drawBehind: true,
-      }
-    }
-  }
-
+class LoginContainer extends SignupContainerParent  {
   constructor (props) {
     super(props)
     this.state = {
@@ -59,14 +47,6 @@ class LoginContainer extends PureComponent {
     this.showSignup = this.showSignup.bind(this)
     this.submitLogin = this.submitLogin.bind(this)
     this.togglePasswordVisible = this.togglePasswordVisible.bind(this)
-  }
-
-  componentDidUpdate (nextProps) {
-    if (this.props.error) {
-      setTimeout(() => {
-        this.props.dispatch(dismissError())
-      }, 3000)
-    }
   }
 
   togglePasswordVisible () {

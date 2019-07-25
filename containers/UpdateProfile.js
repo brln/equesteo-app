@@ -9,7 +9,6 @@ import {
 } from "../actions/standard"
 import {
   persistUserUpdate,
-  startNetworkTracking,
 } from "../actions/functional"
 import { brand } from '../colors'
 import { logRender } from '../helpers'
@@ -72,7 +71,6 @@ class UpdateProfileContainer extends PureComponent {
     this.markPhotoDeleted = this.markPhotoDeleted.bind(this)
     this.memoThisUsersPhotos = memoizeOne(this.thisUsersPhotos)
     this.openPhotoMenu = this.openPhotoMenu.bind(this)
-    this.restartNetworkListener = this.restartNetworkListener.bind(this)
 
     Navigation.events().bindComponent(this);
   }
@@ -141,10 +139,6 @@ class UpdateProfileContainer extends PureComponent {
     this.props.dispatch(userUpdated(user))
   }
 
-  restartNetworkListener() {
-    this.props.dispatch(startNetworkTracking())
-  }
-
   markPhotoDeleted (photoID) {
     if (photoID === this.props.user.get('profilePhotoID')) {
       let swapped = false
@@ -181,7 +175,6 @@ class UpdateProfileContainer extends PureComponent {
         clearPhotoMenu={this.clearPhotoMenu}
         markPhotoDeleted={this.markPhotoDeleted}
         openPhotoMenu={this.openPhotoMenu}
-        restartNetworkListener={this.restartNetworkListener}
         user={this.props.user}
         userPhotos={this.memoThisUsersPhotos(this.props.userPhotos, this.state.deletedPhotoIDs)}
         showPhotoMenu={this.state.showPhotoMenu}

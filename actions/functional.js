@@ -1,3 +1,4 @@
+import BackgroundFetch from "react-native-background-fetch"
 import BackgroundTimer from 'react-native-background-timer'
 import ImagePicker from 'react-native-image-crop-picker'
 import { fromJS, Map  } from 'immutable'
@@ -7,7 +8,6 @@ import firebase from 'react-native-firebase'
 import { Navigation } from 'react-native-navigation'
 import NetInfo from "@react-native-community/netinfo";
 import PushNotification from 'react-native-push-notification'
-import BackgroundFetch from "react-native-background-fetch"
 import Tts from 'react-native-tts'
 import URI from 'urijs'
 
@@ -15,6 +15,7 @@ import ApiClient from '../services/ApiClient'
 import { DISTRIBUTION, ENV } from '../dotEnv'
 import kalmanFilter from '../services/Kalman'
 import Amplitude, { APP_INITIALIZED, GIVE_CARROT } from "../services/Amplitude"
+import TimeoutManager from '../services/TimeoutManager'
 import { captureBreadcrumb, captureException, setUserContext } from "../services/Sentry"
 import {
   goodConnection,
@@ -114,6 +115,14 @@ function cb(action) {
   captureBreadcrumb(action, 'functionalAction')
 }
 
+const functionalState = {
+  enqueuedSync: null,
+  FCMTokenRefreshListenerRemover: null,
+  locationTrackingRetry: null,
+  networkListenerRemover: null,
+  pwlinkListener: null,
+}
+
 export function catchAsyncError (dispatch, source) {
   return (e) => {
     if (!(e instanceof NotConnectedError)) {
@@ -154,10 +163,9 @@ export function addHorseUser (horse, user) {
   }
 }
 
-let listener
 export function startForgotPWLinkListener () {
   return (dispatch, getState) => {
-    listener = ({ url }) => {
+    functionalState.pwLinkListener = ({ url }) => {
       const parsedURL = URI(url)
       const token = parsedURL.search(true).t
       const email = atob(parsedURL.search(true).e)
@@ -175,14 +183,14 @@ export function startForgotPWLinkListener () {
         })
       }
     }
-    Linking.addEventListener('url', listener)
+    Linking.addEventListener('url', functionalState.pwLinkListener)
   }
 }
 
 export function removeForgotPWLinkListener () {
   return () => {
-    if (listener) {
-      Linking.removeEventListener('url', listener)
+    if (functionalState.pwLinkListener) {
+      Linking.removeEventListener('url', functionalState.pwLinkListener)
     }
   }
 }
@@ -926,7 +934,7 @@ export function signOut () {
     if (!getState().getIn(['localState', 'signingOut'])) {
       dispatch(setSigningOut(true))
       dispatch(stopLocationTracking())
-      FCMTokenRefreshListenerRemover ? FCMTokenRefreshListenerRemover() : null
+      functionalState.FCMTokenRefreshListenerRemover ? functionalState.FCMTokenRefreshListenerRemover() : null
       firebase.iid().deleteToken('373350399276', 'GCM').catch(catchAsyncError).then(() => {
         return Promise.all([
           PouchCouch.deleteLocalDBs(),
@@ -994,18 +1002,17 @@ export function clearLocationRetry () {
   const source = 'clearLocationRetry'
   cb(source)
   return () => {
-    if (locationTrackingRetry) {
-      clearTimeout(locationTrackingRetry)
+    if (functionalState.locationTrackingRetry) {
+      TimeoutManager.deleteTimeout(functionalState.locationTrackingRetry)
     }
   }
 }
 
-let locationTrackingRetry = null
 export function retryLocationTracking (inMsec) {
   const source = 'retryLocationTracking'
   cb(source)
   return (dispatch, getState) => {
-    locationTrackingRetry = setTimeout(() => {
+    functionalState.locationTrackingRetry = TimeoutManager.newTimeout(() => {
       const currentRide = getState().getIn(['currentRide', 'currentRide'])
       const lastLocation = getState().getIn(['currentRide', 'lastLocation'])
       if (currentRide && !lastLocation) {
@@ -1276,22 +1283,21 @@ export function checkNetworkConnection () {
   }
 }
 
-let networkListenerRemover = null
 export function startNetworkTracking () {
   const source = 'startNetworkTracking'
   cb(source)
   return (dispatch) => {
-    if (networkListenerRemover) {
-      networkListenerRemover()
+    if (functionalState.networkListenerRemover) {
+      functionalState.networkListenerRemover()
     }
 
     const listener = () => {
-      setTimeout (() => {
+      TimeoutManager.newTimeout(() => {
         dispatch(checkNetworkConnection())
       }, 2000)
     }
 
-    networkListenerRemover = NetInfo.addEventListener(listener)
+    functionalState.networkListenerRemover = NetInfo.addEventListener(listener)
     listener()
   }
 }
@@ -1320,7 +1326,6 @@ export function startListeningFCM () {
   }
 }
 
-let FCMTokenRefreshListenerRemover = null
 export function startListeningFCMTokenRefresh () {
   const source = 'startListeningFCMTokenRefresh'
   cb(source)
@@ -1330,7 +1335,7 @@ export function startListeningFCMTokenRefresh () {
         dispatch(setFCMTokenOnServer(newToken))
       }
     }).catch(catchAsyncError(dispatch, source))
-    FCMTokenRefreshListenerRemover = firebase.messaging().onTokenRefresh((newToken) => {
+    functionalState.FCMTokenRefreshListenerRemover = firebase.messaging().onTokenRefresh((newToken) => {
       dispatch(setFCMTokenOnServer(newToken))
     })
   }
@@ -1384,7 +1389,7 @@ export function shutdownBackgroundGeolocation () {
         return doStop()
       } else {
         return new Promise(res => {
-          setTimeout(() => {
+          TimeoutManager.newTimeout(() => {
             doStop().then(() => {
               res()
             })
@@ -1470,7 +1475,6 @@ export function pulldownSync () {
   }
 }
 
-let enqueuedSync = null
 export function doSync (syncData={}, showProgress=true, doUpload=true) {
   const source = 'doSync'
   cb(source)
@@ -1482,7 +1486,7 @@ export function doSync (syncData={}, showProgress=true, doUpload=true) {
           color,
         })))
         if (timeout) {
-          setTimeout(() => {
+          TimeoutManager.newTimeout(() => {
             dispatch(clearFeedMessage())
           }, timeout)
         }
@@ -1505,10 +1509,10 @@ export function doSync (syncData={}, showProgress=true, doUpload=true) {
           // If a sync has already started, wait 10 seconds then run another one.
           // This gives time for everything (photo uploads, mostly) to settle,
           // then they can all go with one sync.
-          clearTimeout(enqueuedSync)
-          enqueuedSync = setTimeout(() => {
+          TimeoutManager.deleteTimeout(functionalState.enqueuedSync)
+          functionalState.enqueuedSync = TimeoutManager.newTimeout(() => {
             dispatch(doSync(syncData, showProgress)).catch(catchAsyncError(dispatch, source))
-            enqueuedSync = null
+            functionalState.enqueuedSync = null
           }, 10000)
           return Promise.resolve()
         } else {
@@ -1571,10 +1575,8 @@ export function doSync (syncData={}, showProgress=true, doUpload=true) {
         rej(new NotConnectedError('sync with bad connection'))
       }
     })
-
   }
 }
-
 
 export function switchRoot (newRoot) {
   const source = 'switchRoot'

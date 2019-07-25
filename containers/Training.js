@@ -1,5 +1,5 @@
 import { Alert } from 'react-native'
-import { List, Map } from 'immutable'
+import { Map } from 'immutable'
 import memoizeOne from 'memoize-one'
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
@@ -10,7 +10,8 @@ import Training from '../components/Training/Training'
 import { loadSingleRide } from '../actions/functional'
 import { logRender } from '../helpers'
 import { RIDE } from '../screens/consts/main'
-import { EqNavigation, PouchCouch } from '../services'
+import { EqNavigation } from '../services'
+import TimeoutManager from '../services/TimeoutManager'
 
 class TrainingContainer extends PureComponent {
   static options() {
@@ -56,6 +57,14 @@ class TrainingContainer extends PureComponent {
 
     Navigation.events().bindComponent(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
+
+    this.errorLoadingRideTimeout = null
+    this.loadingRideAlertTimeout = null
+  }
+
+  componentWillUnmount () {
+    TimeoutManager.deleteTimeout(this.errorLoadingRideTimeout)
+    TimeoutManager.deleteTimeout(this.loadingRideAlertTimeout)
   }
 
   navigationButtonPressed({ buttonId }) {
@@ -98,9 +107,9 @@ class TrainingContainer extends PureComponent {
 
         })
       }).catch(() => {
-        setTimeout(() => {
+        this.errorLoadingRideTimeout = TimeoutManager.newTimeout(() => {
           this.setState({ loadingRide: false })
-          setTimeout(() => {
+          this.loadingRideAlertTimeout = TimeoutManager.newTimeout(() => {
             Alert.alert(
               'Not Available',
               'We can\'t load this ride for some reason. \n\n Please contact us if you keep seeing this. info@equesteo.com',

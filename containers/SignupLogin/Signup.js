@@ -20,33 +20,17 @@ import {
   dismissError,
   errorOccurred,
 } from '../../actions/standard'
-import { submitSignup, switchRoot } from '../../actions/functional'
+import { submitSignup } from '../../actions/functional'
 import Amplitude, {
   SIGN_UP,
 } from "../../services/Amplitude"
 import { LOGIN } from '../../screens/consts/main'
 import EqNavigation from '../../services/EqNavigation'
-import { logError } from '../../helpers'
+import SignupContainerParent from './SignupContainerParent'
 
 const { height, width } = Dimensions.get('window')
 
-class SignupContainer extends PureComponent {
-  static options() {
-    return {
-      layout: {
-        orientation: ['portrait']
-      },
-      topBar: {
-        visible: false,
-        drawBehind: true,
-      }
-    }
-  }
-
-  static navigatorStyle = {
-    navBarHidden: true
-  }
-
+class SignupContainer extends SignupContainerParent  {
   constructor (props) {
     super(props)
     this.state = {
@@ -69,14 +53,6 @@ class SignupContainer extends PureComponent {
     this.submitSignup = this.submitSignup.bind(this)
     this.toggleTOS = this.toggleTOS.bind(this)
     this.inputs = {}
-  }
-
-  componentDidUpdate (nextProps) {
-    if (this.props.error) {
-      setTimeout(() => {
-        this.props.dispatch(dismissError())
-      }, 3000)
-    }
   }
 
   errorOccurred (errorText) {

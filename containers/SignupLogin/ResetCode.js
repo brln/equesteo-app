@@ -17,22 +17,11 @@ import {
 import { exchangePWCode, switchRoot } from '../../actions/functional'
 import {NEW_PASSWORD} from "../../screens/consts/main"
 import EqNavigation from '../../services/EqNavigation'
+import SignupContainerParent  from './SignupContainerParent'
 
 const { height, width } = Dimensions.get('window');
 
-class ResetCodeContainer extends PureComponent {
-  static options() {
-    return {
-      layout: {
-        orientation: ['portrait']
-      },
-      topBar: {
-        visible: false,
-        drawBehind: true,
-      }
-    }
-  }
-
+class ResetCodeContainer extends SignupContainerParent  {
   constructor (props) {
     super(props)
     this.state = {
@@ -42,14 +31,6 @@ class ResetCodeContainer extends PureComponent {
     this.changeResetCode = this.changeResetCode.bind(this)
     this.setEmailInfoModalOpen = this.setEmailInfoModalOpen.bind(this)
     this.submitResetCode = this.submitResetCode.bind(this)
-  }
-
-  componentDidUpdate (nextProps) {
-    if (this.props.error) {
-      setTimeout(() => {
-        this.props.dispatch(dismissError())
-      }, 3000)
-    }
   }
 
   setEmailInfoModalOpen (value) {
