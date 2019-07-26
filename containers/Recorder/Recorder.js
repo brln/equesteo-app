@@ -191,7 +191,6 @@ class RecorderContainer extends PureComponent {
   }
 
   startRide () {
-    logDebug(this.props.lastLocation ? this.props.lastLocation.toJSON(): null, 'LAST LOCATION')
     Navigation.mergeOptions(this.props.componentId, {
       topBar: {
         rightButtons: [

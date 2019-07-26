@@ -24,13 +24,13 @@ export default class PaceChart extends PureComponent {
       // and scrolling gets fucked.
       <View pointerEvents='none' style={styles.container}>
         <VictoryChart
-          padding={{bottom: 50, left: 30, right: 10 }}
-          height={150}
+          height={200}
           width={width}
+          padding={{ bottom: 50, left: 20, right: 60 }}
         >
           <VictoryBar
             barRatio={1}
-            domain={{x: [0, maxY]}}
+            range={{x: [0.5, 4.5], y: [0, maxY]}}
             data={this.props.speedData}
             horizontal={true}
             labels={d => d.label}
@@ -42,12 +42,11 @@ export default class PaceChart extends PureComponent {
           />
           <VictoryAxis
             label={'mi'}
+            dependentAxis
           />
           <VictoryAxis
-            domain={{y: [0.5, 4.5]}}
-            dependentAxis
-            offsetY={-1}
-            tickFormat={_ => ''}
+            domain={[0, this.props.speedData.length + 0.5]}
+            tickFormat={(_) => null}
           />
         </VictoryChart>
       </View>

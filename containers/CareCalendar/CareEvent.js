@@ -27,6 +27,7 @@ import { HORSE_PROFILE } from '../../screens/consts/main'
 import Thumbnail from '../../components/Images/Thumbnail'
 import { eventDetails } from "../../modelHelpers/careEvent"
 import { userName } from '../../modelHelpers/user'
+import { viewHorseOwnerIDs } from '../../dataViews/dataViews'
 
 const { width, height } = Dimensions.get('window')
 
@@ -64,7 +65,6 @@ class CareEvent extends Component {
     this.eventTime = this.eventTime.bind(this)
 
     this.memoHorses = memoizeOne(this.horses)
-    this.memoHorseOwnerIDs = memoizeOne(this.horseOwnerIDs)
     this.renderHorse = this.renderHorse.bind(this)
     Navigation.events().bindComponent(this);
   }
@@ -85,7 +85,7 @@ class CareEvent extends Component {
   }
 
   showHorseProfile (horse) {
-    const ownerID = this.memoHorseOwnerIDs(this.props.horseUsers).get(horse.get('_id'))
+    const ownerID = viewHorseOwnerIDs(this.props.horseUsers).get(horse.get('_id'))
     return () => {
       EqNavigation.push(this.props.componentId, {
         component: {
@@ -113,14 +113,6 @@ class CareEvent extends Component {
       return horses.get(hce.get('horseID'))
     })
     return h
-  }
-
-  horseOwnerIDs (horseUsers) {
-    return horseUsers.filter(hu => {
-      return hu.get('owner') === true
-    }).mapEntries(([horseUserID, horseUser]) => {
-      return [horseUser.get('horseID'), horseUser.get('userID')]
-    })
   }
 
   renderHorse ({item}) {

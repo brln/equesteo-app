@@ -193,6 +193,7 @@ export default class Week extends Component {
   }
 
   timeString (seconds, style, showSpace=true) {
+    logDebug(seconds)
     const space = showSpace ? ' ' : ''
     const hours = seconds / 3600
     const justHours = Math.floor(hours)

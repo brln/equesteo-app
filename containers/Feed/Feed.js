@@ -34,6 +34,7 @@ import {
 } from '../../screens/consts/firstStart'
 import { EqNavigation } from '../../services'
 import { captureMessage } from '../../services/Sentry'
+import { viewHorseOwnerIDs } from "../../dataViews/dataViews"
 
 export const END_OF_FEED = unixTimeNow() - (1000 * 60 * 60 * 24 * 30)
 
@@ -81,7 +82,6 @@ class FeedContainer extends BackgroundComponent {
 
     this.followIDs = this.followIDs.bind(this)
     this.followingRides = this.followingRides.bind(this)
-    this.horseOwnerIDs = this.horseOwnerIDs.bind(this)
     this.filteredHorses = this.filteredHorses.bind(this)
     this.filteredHorseUsers = this.filteredHorseUsers.bind(this)
     this.makeSureDrawerClosed = this.makeSureDrawerClosed.bind(this)
@@ -100,7 +100,6 @@ class FeedContainer extends BackgroundComponent {
     this.memoizeFollowingRideHorses = memoizeOne(this.followingRideHorses)
     this.memoizeFollowIDs = memoizeOne(this.followIDs)
     this.memoizeFollowingRides = memoizeOne(this.followingRides)
-    this.memoizeHorseOwnerIDs = memoizeOne(this.horseOwnerIDs)
     this.memoizeFilteredHorses = memoizeOne(this.filteredHorses)
     this.memoizeFilteredHorseUsers = memoizeOne(this.filteredHorseUsers)
     this.memoizeYourRides = memoizeOne(this.yourRides)
@@ -407,15 +406,6 @@ class FeedContainer extends BackgroundComponent {
     })
   }
 
-
-  horseOwnerIDs (horseUsers) {
-    return horseUsers.filter(hu => {
-      return hu.get('owner') === true
-    }).mapEntries(([horseUserID, horseUser]) => {
-      return [horseUser.get('horseID'), horseUser.get('userID')]
-    })
-  }
-
   render() {
     logRender('feedContainer')
     const yourRides = this.memoizeYourRides(this.props.rides, this.props.userID)
@@ -433,7 +423,7 @@ class FeedContainer extends BackgroundComponent {
         followingRideHorses={followingRideHorses}
         horses={horses}
         horsePhotos={this.props.horsePhotos}
-        horseOwnerIDs={this.memoizeHorseOwnerIDs(this.props.horseUsers)}
+        horseOwnerIDs={viewHorseOwnerIDs(this.props.horseUsers)}
         horseUsers={this.memoizeFilteredHorseUsers(this.props.follows, this.props.userID, this.props.horseUsers, this.props.horses)}
         openLeaderboards={this.openLeaderboards}
         openMore={this.openMore}

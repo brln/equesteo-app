@@ -39,6 +39,7 @@ import Amplitude, {
   START_FOLLOWING_SOMEONE,
   VIEW_USER_PROFILE,
 } from "../services/Amplitude"
+import { viewHorseOwnerIDs } from '../dataViews/dataViews'
 
 class ProfileContainer extends BackgroundComponent {
   static options() {
@@ -76,7 +77,6 @@ class ProfileContainer extends BackgroundComponent {
     this.showUserList = this.showUserList.bind(this)
     this.uploadPhoto = this.uploadPhoto.bind(this)
 
-    this.memoHorseOwnerIDs = memoizeOne(this.horseOwnerIDs.bind(this))
     this.memoFollowers = memoizeOne(this.followers.bind(this))
     this.memoFollowings = memoizeOne(this.followings.bind(this))
     this.memoOneDegreeUser = memoizeOne(this.oneDegreeUser.bind(this))
@@ -281,14 +281,6 @@ class ProfileContainer extends BackgroundComponent {
     return oneDegree
   }
 
-  horseOwnerIDs (horseUsers) {
-    return horseUsers.filter(hu => {
-      return hu.get('owner') === true
-    }).mapEntries(([horseUserID, horseUser]) => {
-      return [horseUser.get('horseID'), horseUser.get('userID')]
-    })
-  }
-
   thisUsersPhotos (userPhotos, profileUser) {
     return userPhotos.filter((photo) => {
       return photo.get('deleted') !== true && photo.get('userID') === profileUser.get('_id')
@@ -320,7 +312,7 @@ class ProfileContainer extends BackgroundComponent {
           followingSyncRunning={this.props.followingSyncRunning}
           followers={this.memoFollowers(this.props.follows, this.props.profileUser)}
           horses={this.memoProfileUserHorses(this.props.horseUsers, this.props.profileUser, this.props.horses)}
-          horseOwnerIDs={this.memoHorseOwnerIDs(this.props.horseUsers)}
+          horseOwnerIDs={viewHorseOwnerIDs(this.props.horseUsers)}
           horsePhotos={this.props.horsePhotos}
           leaderboardProfile={this.props.leaderboardProfile}
           oneDegreeUser={this.memoOneDegreeUser(this.props.profileUser, this.props.userID, this.props.follows)}

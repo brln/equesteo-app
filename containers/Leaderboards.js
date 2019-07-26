@@ -1,7 +1,6 @@
 import memoize from 'memoize-one'
 import React from 'react'
 import { connect } from 'react-redux';
-import { Navigation } from 'react-native-navigation'
 
 import BackgroundComponent from '../components/BackgroundComponent'
 import { brand } from '../colors'
@@ -9,6 +8,7 @@ import { logRender } from '../helpers'
 import Leaderboards from '../components/Leaderboards/Leaderboards'
 import { HORSE_PROFILE, PROFILE } from '../screens/consts/main'
 import { EqNavigation } from '../services'
+import { viewHorseOwnerIDs } from "../dataViews/dataViews"
 
 class LeaderboardsContainer extends BackgroundComponent {
   static options() {
@@ -38,7 +38,6 @@ class LeaderboardsContainer extends BackgroundComponent {
     this.state = {
       loading: true
     }
-    this.memoHorseOwnerIDs = memoize(this.horseOwnerIDs.bind(this))
     this.showProfile = this.showProfile.bind(this)
     this.showHorseProfile = this.showHorseProfile.bind(this)
   }
@@ -68,20 +67,12 @@ class LeaderboardsContainer extends BackgroundComponent {
     }).catch(() => {})
   }
 
-  horseOwnerIDs (horseUsers) {
-    return horseUsers.filter(hu => {
-      return hu.get('owner') === true
-    }).mapEntries(([horseUserID, horseUser]) => {
-      return [horseUser.get('horseID'), horseUser.get('userID')]
-    })
-  }
-
   render() {
     logRender('Leaderboards Container')
     return (
       <Leaderboards
         horses={this.props.horses}
-        horseOwnerIDs={this.memoHorseOwnerIDs(this.props.horseUsers)}
+        horseOwnerIDs={viewHorseOwnerIDs(this.props.horseUsers)}
         horsePhotos={this.props.horsePhotos}
         leaderboards={this.props.leaderboards.get('values')}
         showHorseProfile={this.showHorseProfile}

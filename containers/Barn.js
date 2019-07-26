@@ -9,6 +9,7 @@ import { logRender } from '../helpers'
 import { HORSE_PROFILE, UPDATE_HORSE } from '../screens/consts/main'
 import { EqNavigation } from '../services'
 import Amplitude, { ADD_HORSE } from '../services/Amplitude'
+import { viewHorsesByUserID, viewHorseOwnerIDs } from "../dataViews/dataViews"
 
 class BarnContainer extends BackgroundComponent {
   static options() {
@@ -37,7 +38,6 @@ class BarnContainer extends BackgroundComponent {
     super(props)
     this.horseProfile = this.horseProfile.bind(this)
     this.newHorse = this.newHorse.bind(this)
-    this.yourHorses = this.yourHorses.bind(this)
   }
 
   horseProfile (horse, ownerID) {
@@ -72,30 +72,15 @@ class BarnContainer extends BackgroundComponent {
     }).catch(() => {})
   }
 
-  yourHorses () {
-    return this.props.horseUsers.valueSeq().filter((hu) => {
-      return hu.get('userID') === this.props.userID && hu.get('deleted') !== true
-    }).map((hu) => {
-      return this.props.horses.get(hu.get('horseID'))
-    })
-  }
-
-  horseOwnerIDs () {
-    return this.props.horseUsers.filter(hu => {
-      return hu.get('owner') === true
-    }).mapEntries(([horseUserID, horseUser]) => {
-      return [horseUser.get('horseID'), horseUser.get('userID')]
-    })
-  }
-
   render() {
     logRender('BarnContainer')
+    const horsesToShow = viewHorsesByUserID(this.props.horseUsers, this.props.horses).get(this.props.userID)
     return (
       <Barn
-        horses={this.yourHorses()}
+        horses={horsesToShow}
         horsePhotos={this.props.horsePhotos}
         horseProfile={this.horseProfile}
-        horseOwnerIDs={this.horseOwnerIDs()}
+        horseOwnerIDs={viewHorseOwnerIDs(this.props.horseUsers)}
         newHorse={this.newHorse}
       />
     )

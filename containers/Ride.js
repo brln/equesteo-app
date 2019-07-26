@@ -1,4 +1,3 @@
-import { fromJS, List } from 'immutable'
 import memoizeOne from 'memoize-one';
 import { Navigation } from 'react-native-navigation'
 import React, { PureComponent } from 'react'
@@ -32,6 +31,7 @@ import Amplitude, {
   ADD_COMMENT,
   VIEW_RIDE_CHARTS,
 } from "../services/Amplitude"
+import { viewHorseOwnerIDs } from '../dataViews/dataViews'
 
 class RideContainer extends PureComponent {
   static options() {
@@ -101,7 +101,6 @@ class RideContainer extends PureComponent {
     this.memoRideComments = memoizeOne(this.rideComments.bind(this))
     this.memoRideHorses = memoizeOne(this.rideHorses.bind(this))
     this.memoThisRidesPhotos = memoizeOne(this.thisRidesPhotos.bind(this))
-    this.memoHorseOwnerIDs = memoizeOne(this.horseOwnerIDs.bind(this))
   }
 
   componentDidAppear () {
@@ -237,14 +236,6 @@ class RideContainer extends PureComponent {
     })
   }
 
-  horseOwnerIDs (horseUsers) {
-    return horseUsers.filter(hu => {
-      return hu.get('owner') === true
-    }).mapEntries(([horseUserID, horseUser]) => {
-      return [horseUser.get('horseID'), horseUser.get('userID')]
-    })
-  }
-
   paceHorse (horses, allRideHorses) {
     const rideHorses = this.memoRideHorses(allRideHorses).valueSeq()
     if (rideHorses.count()) {
@@ -271,7 +262,7 @@ class RideContainer extends PureComponent {
       <Ride
         horses={this.props.horses}
         horsePhotos={this.props.horsePhotos}
-        horseOwnerIDs={this.memoHorseOwnerIDs(this.props.horseUsers)}
+        horseOwnerIDs={viewHorseOwnerIDs(this.props.horseUsers)}
         modalOpen={this.state.modalOpen}
         newComment={this.state.newComment}
         paceHorse={this.memoPaceHorse(this.props.horses, this.props.rideHorses)}

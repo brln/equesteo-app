@@ -35,9 +35,6 @@ exports[`renders 1`] = `
       }
     >
       <Text
-        accessible={true}
-        allowFontScaling={true}
-        ellipsizeMode="tail"
         style={
           Object {
             "color": "#9b9d9b",
@@ -58,9 +55,6 @@ exports[`renders 1`] = `
         }
       >
         <Text
-          accessible={true}
-          allowFontScaling={true}
-          ellipsizeMode="tail"
           style={
             Object {
               "color": "black",
@@ -72,9 +66,6 @@ exports[`renders 1`] = `
           32.00
            
           <Text
-            accessible={true}
-            allowFontScaling={true}
-            ellipsizeMode="tail"
             style={
               Object {
                 "color": "black",
@@ -104,9 +95,6 @@ exports[`renders 1`] = `
       }
     >
       <Text
-        accessible={true}
-        allowFontScaling={true}
-        ellipsizeMode="tail"
         style={
           Object {
             "color": "#9b9d9b",
@@ -127,9 +115,6 @@ exports[`renders 1`] = `
         }
       >
         <Text
-          accessible={true}
-          allowFontScaling={true}
-          ellipsizeMode="tail"
           style={
             Object {
               "color": "black",
@@ -141,9 +126,6 @@ exports[`renders 1`] = `
           0.0
            
           <Text
-            accessible={true}
-            allowFontScaling={true}
-            ellipsizeMode="tail"
             style={
               Object {
                 "color": "black",
@@ -173,9 +155,6 @@ exports[`renders 1`] = `
       }
     >
       <Text
-        accessible={true}
-        allowFontScaling={true}
-        ellipsizeMode="tail"
         style={
           Object {
             "color": "#9b9d9b",
@@ -196,9 +175,6 @@ exports[`renders 1`] = `
         }
       >
         <Text
-          accessible={true}
-          allowFontScaling={true}
-          ellipsizeMode="tail"
           style={
             Object {
               "color": "black",
@@ -210,9 +186,6 @@ exports[`renders 1`] = `
           0
            
           <Text
-            accessible={true}
-            allowFontScaling={true}
-            ellipsizeMode="tail"
             style={
               Object {
                 "color": "black",
@@ -250,9 +223,6 @@ exports[`renders 1`] = `
       }
     >
       <Text
-        accessible={true}
-        allowFontScaling={true}
-        ellipsizeMode="tail"
         style={
           Object {
             "color": "#9b9d9b",
@@ -273,9 +243,6 @@ exports[`renders 1`] = `
         }
       >
         <Text
-          accessible={true}
-          allowFontScaling={true}
-          ellipsizeMode="tail"
           style={
             Object {
               "color": "black",
@@ -303,9 +270,6 @@ exports[`renders 1`] = `
       }
     >
       <Text
-        accessible={true}
-        allowFontScaling={true}
-        ellipsizeMode="tail"
         style={
           Object {
             "color": "#9b9d9b",
@@ -326,9 +290,6 @@ exports[`renders 1`] = `
         }
       >
         <Text
-          accessible={true}
-          allowFontScaling={true}
-          ellipsizeMode="tail"
           style={
             Object {
               "color": "black",
@@ -340,9 +301,6 @@ exports[`renders 1`] = `
           0.0
            
           <Text
-            accessible={true}
-            allowFontScaling={true}
-            ellipsizeMode="tail"
             style={
               Object {
                 "color": "black",
@@ -372,9 +330,6 @@ exports[`renders 1`] = `
       }
     >
       <Text
-        accessible={true}
-        allowFontScaling={true}
-        ellipsizeMode="tail"
         style={
           Object {
             "color": "#9b9d9b",
@@ -395,9 +350,6 @@ exports[`renders 1`] = `
         }
       >
         <Text
-          accessible={true}
-          allowFontScaling={true}
-          ellipsizeMode="tail"
           style={
             Object {
               "color": "black",
@@ -409,9 +361,6 @@ exports[`renders 1`] = `
           66
            
           <Text
-            accessible={true}
-            allowFontScaling={true}
-            ellipsizeMode="tail"
             style={
               Object {
                 "color": "black",

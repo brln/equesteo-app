@@ -182,6 +182,18 @@ export default class Ride extends PureComponent {
       }
       lastPoint = parsedCoord
     }
+    const removes = []
+    for (let i = 0; i < paceBuckets.length; i++) {
+      const bucket = paceBuckets[i]
+      if (bucket.distance === 0) {
+        removes.push(i)
+      }
+    }
+    for (let i = removes.length -1; i >= 0; i--) {
+      paceBuckets.splice(removes[i], 1);
+    }
+
+
     return paceBuckets
   }
 
@@ -270,8 +282,7 @@ export default class Ride extends PureComponent {
             </View>
             <Text style={{fontSize: 20}}>Pace</Text>
           </CardItem>
-          <CardItem cardBody style={{marginLeft: 20, marginRight: 20}}>
-
+          <CardItem cardBody>
             { child }
           </CardItem>
         </Card>

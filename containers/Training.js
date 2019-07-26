@@ -8,10 +8,11 @@ import { Navigation } from 'react-native-navigation'
 import { brand } from '../colors'
 import Training from '../components/Training/Training'
 import { loadSingleRide } from '../actions/functional'
-import { logRender } from '../helpers'
+import { logError, logRender } from '../helpers'
 import { RIDE } from '../screens/consts/main'
 import { EqNavigation } from '../services'
 import TimeoutManager from '../services/TimeoutManager'
+import { filterUsersHorses } from '../dataViews/dataViews'
 
 class TrainingContainer extends PureComponent {
   static options() {
@@ -130,9 +131,9 @@ class TrainingContainer extends PureComponent {
     }
   }
 
-  allRidersButYou (trainings, users, userID) {
+  allRidersButYou (trainings, users, userID, rides, horseUsers, horses) {
     let peopleWhoRideYourHorses = Map()
-    this.trainings(trainings, userID).forEach(ride => {
+    this.memoTrainings(trainings, userID, rides, horseUsers, horses).forEach(ride => {
       if (ride.get('userID') !== userID) {
         peopleWhoRideYourHorses = peopleWhoRideYourHorses.set(
           ride.get('userID'),
@@ -149,25 +150,51 @@ class TrainingContainer extends PureComponent {
     })
   }
 
-  trainings (trainings, userID) {
-    return trainings.getIn([`${userID}_training`, 'rides']).filter(t => {
-      return t.get('deleted') !== true
+  trainings (trainings, userID, rides, horseUsers, horses) {
+    let byID = Map()
+    for (let training of trainings.getIn([`${userID}_training`, 'rides'])) {
+      if (training.get('deleted') !== true) {
+        byID = byID.set(training.get('rideID'), training)
+      }
+    }
+
+    const usersHorseIDs = filterUsersHorses(horseUsers, userID, horses).map(horse => {
+      horse.get('_id')
     })
+
+    rides.forEach((ride, rideID) => {
+      if (!byID.get(rideID)) {
+        byID = byID.set(rideID, Map({
+          rideID: rideID,
+          elapsedTimeSecs: ride.get('elapsedTimeSecs'),
+          startTime: ride.get('startTime'),
+          distance: ride.get('distance'),
+          userID: ride.get('userID'),
+          isPublic: ride.get('isPublic'),
+          horseIDs: [],
+          riderHorseID: null,
+          elevationGain: 0
+        }))
+      }
+    })
+
+    return byID.valueSeq().toList()
   }
 
   render() {
     logRender('TrainingContainer')
+    logDebug(this.props.rides.toJSON())
     return (
       <Training
         horses={this.props.horses}
         horseUsers={this.props.horseUsers}
         loadingRide={this.state.loadingRide}
         rideHorses={this.memoRideHorses(this.props.rideHorses)}
-        riders={this.memoAllRidersButYou(this.props.trainings, this.props.users, this.props.userID)}
+        riders={this.memoAllRidersButYou(this.props.trainings, this.props.users, this.props.userID, this.props.rides, this.props.horseUsers, this.props.horses)}
         settingsModalOpen={this.state.settingsModalOpen}
         settingsModalToggle={this.settingsModalToggle}
         showRide={this.showRide}
-        trainings={this.memoTrainings(this.props.trainings, this.props.userID)}
+        trainings={this.memoTrainings(this.props.trainings, this.props.userID, this.props.rides, this.props.horseUsers, this.props.horses)}
         user={this.props.user}
         userID={this.props.userID}
       />
