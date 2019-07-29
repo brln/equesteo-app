@@ -26,6 +26,7 @@ import Amplitude, {
   RIDE_ANOTHER_USERS_HORSE,
   VIEW_HORSE_PROFILE,
 } from '../services/Amplitude'
+import {viewTrainings} from "../dataViews/dataViews"
 
 
 class HorseProfileContainer extends BackgroundComponent {
@@ -171,18 +172,25 @@ class HorseProfileContainer extends BackgroundComponent {
     })
   }
 
-  trainings (trainings, owner, horse) {
+  trainings (owner, horse) {
     const ownerID = owner && owner.get('_id')
     const horseID = horse && horse.get('_id')
     if (ownerID && horseID) {
       // If an owner that you're following transfers the horse to a user you aren't following,
       // you won't have the owner record or trainings locally, but the ride is still available to
       // look at on the feed.
-      return trainings.getIn([`${ownerID}_training`, 'rides']).filter(t => {
-        return t.get('deleted') !== true && (t.get('horseIDs').indexOf(horseID) >= 0)
-      }).reduce((accum, t) => {
-        const day = moment(t.get('startTime')).hour(0).minute(0).second(0).millisecond(0).toISOString()
-        accum.get(day) ? accum = accum.set(day, accum.get(day).push(t)) : accum = accum.set(day, List([t]))
+      return viewTrainings(
+        this.props.trainings,
+        this.props.users,
+        this.props.rides,
+        this.props.rideHorses,
+        this.props.horses,
+        this.props.horseUsers,
+      ).get(ownerID).reduce((accum, t) => {
+        if (t.get('horseIDs').includes(horseID)) {
+          const day = moment(t.get('startTime')).hour(0).minute(0).second(0).millisecond(0).toISOString()
+          accum.get(day) ? accum = accum.set(day, accum.get(day).push(t)) : accum = accum.set(day, List([t]))
+        }
         return accum
       }, Map())
     }
@@ -202,7 +210,7 @@ class HorseProfileContainer extends BackgroundComponent {
         riders={this.memoThisHorsesRiders(this.props.horseUsers, this.props.horse, this.props.users)}
         showRiderProfile={this.showRiderProfile}
         showPhotoLightbox={this.showPhotoLightbox}
-        trainings={this.trainings(this.props.trainings, this.props.owner, this.props.horse)}
+        trainings={this.trainings(this.props.owner, this.props.horse)}
         uploadPhoto={this.uploadPhoto}
         user={this.props.user}
         userPhotos={this.props.userPhotos}
@@ -223,6 +231,7 @@ function mapStateToProps (state, passedProps) {
     horse: pouchState.getIn(['horses', passedProps.horse.get('_id')]),
     owner: pouchState.getIn(['users', passedProps.ownerID]),
     rides: pouchState.get('rides'),
+    rideHorses: pouchState.get('rideHorses'),
     trainings: pouchState.get('trainings'),
     user: pouchState.getIn(['users', localState.get('userID')]),
     userID: localState.get('userID'),

@@ -6,7 +6,6 @@ import { connect } from 'react-redux'
 import { Navigation } from 'react-native-navigation'
 import { Alert } from 'react-native'
 
-
 import BackgroundComponent from '../components/BackgroundComponent'
 import Profile from '../components/Profile/Profile'
 import {
@@ -39,7 +38,7 @@ import Amplitude, {
   START_FOLLOWING_SOMEONE,
   VIEW_USER_PROFILE,
 } from "../services/Amplitude"
-import { viewHorseOwnerIDs } from '../dataViews/dataViews'
+import {viewHorseOwnerIDs, viewTrainings} from '../dataViews/dataViews'
 
 class ProfileContainer extends BackgroundComponent {
   static options() {
@@ -80,7 +79,6 @@ class ProfileContainer extends BackgroundComponent {
     this.memoFollowers = memoizeOne(this.followers.bind(this))
     this.memoFollowings = memoizeOne(this.followings.bind(this))
     this.memoOneDegreeUser = memoizeOne(this.oneDegreeUser.bind(this))
-    this.memoTrainings = memoizeOne(this.trainings.bind(this))
     this.memoProfileUserHorses = memoizeOne(this.profileUserHorses.bind(this))
     this.memoThisUsersPhotos = memoizeOne(this.thisUsersPhotos.bind(this))
 
@@ -287,17 +285,19 @@ class ProfileContainer extends BackgroundComponent {
     })
   }
 
-  trainings (trainings, userID) {
-    const trainingDoc = trainings.get(`${userID}_training`)
-    if (trainingDoc) {
-      return trainingDoc.get('rides').filter(t => {
-        return t.get('deleted') !== true && t.get('riderHorseID') && t.get('userID') === this.props.profileUser.get('_id')
-      }).reduce((accum, t) => {
-        const day = moment(t.get('startTime')).hour(0).minute(0).second(0).millisecond(0).toISOString()
-        accum.get(day) ? accum = accum.set(day, accum.get(day).push(t)) : accum = accum.set(day, List([t]))
-        return accum
-      }, Map())
-    }
+  trainings () {
+    return viewTrainings(
+      this.props.trainings,
+      this.props.users,
+      this.props.rides,
+      this.props.rideHorses,
+      this.props.horses,
+      this.props.horseUsers,
+    ).get(this.props.profileUser.get('_id')).reduce((accum, t) => {
+      const day = moment(t.get('startTime')).hour(0).minute(0).second(0).millisecond(0).toISOString()
+      accum.get(day) ? accum = accum.set(day, accum.get(day).push(t)) : accum = accum.set(day, List([t]))
+      return accum
+    }, Map())
   }
 
   render() {
@@ -322,7 +322,7 @@ class ProfileContainer extends BackgroundComponent {
           showHorseProfile={this.showHorseProfile}
           showPhotoLightbox={this.showPhotoLightbox}
           showUserList={this.showUserList}
-          trainings={this.memoTrainings(this.props.trainings, this.props.profileUser.get('_id'))}
+          trainings={this.trainings()}
           uploadPhoto={this.uploadPhoto}
           userID={this.props.userID}
           users={this.props.users}
@@ -353,6 +353,8 @@ function mapStateToProps (state, passedProps) {
     photoQueue: localState.get('photoQueue'),
     profilePhotoURL: passedProps.profilePhotoURL,
     profileUser: pouchState.getIn(['users', profileUserID]) || passedProps.profileUser || new Map(),
+    rides: pouchState.get('rides'),
+    rideHorses: pouchState.get('rideHorses'),
     trainings: pouchState.get('trainings'),
     users: pouchState.get('users'),
     userID,
