@@ -307,6 +307,61 @@ describe('dataViews', () => {
       )
       expect(allTrainings.get(vars.userID1)).toEqual(expected)
     })
+
+    it ('doesn\'t care if the ride doesn\'t have horses', () => {
+      const userID1 = 'userID1'
+      const ride1 = fromJS({
+        userID: userID1,
+        elapsedTimeSecs: 4238.982,
+        startTime: 1555858691201,
+        rideID: 'fd66130136a86a59f98d403c706220d5_1555862930183',
+        isPublic: true,
+        distance: 6.387437999999997,
+        horseIDs: [],
+        elevationGain: 246.33092893912092,
+        riderHorseID: 'fd66130136a86a59f98d403c706220d5_1555849838985'
+      })
+      const trainings = fromJS({
+        userID1_training: {
+          rides: [
+            ride1,
+          ]
+        },
+      })
+
+      const rides = fromJS({
+        rideID2: {
+          _id: 'rideID2',
+          userID: userID1,
+          elapsedTimeSecs: 10,
+          startTime: 20,
+          distance: 30,
+          isPublic: true,
+        }
+      })
+
+      const morphedRide = fromJS({
+        rideID: 'rideID2',
+        userID: userID1,
+        elapsedTimeSecs: 10,
+        startTime: 20,
+        distance: 30,
+        isPublic: true,
+        horseIDs: [],
+        elevationGain: 0,
+        riderHorseID: null,
+      })
+      const expected = fromJS([ride1, morphedRide])
+      const allTrainings = viewTrainings(
+        trainings,
+        fromJS({userID1: {_id: userID1}}),
+        rides,
+        Map(),
+        Map(),
+        Map(),
+      )
+      expect(allTrainings.get(userID1)).toEqual(expected)
+    })
   })
 
   describe ('viewHorsesByRide', () => {

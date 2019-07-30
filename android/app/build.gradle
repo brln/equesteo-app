@@ -63,8 +63,8 @@ android {
         applicationId "com.equesteo"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 162
-        versionName "2.0.2"
+        versionCode 163
+        versionName "2.0.3"
         missingDimensionStrategy 'react-native-camera', 'general'
         missingDimensionStrategy "RNN.reactNativeVersion", "reactNative60"
         multiDexEnabled true

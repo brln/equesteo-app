@@ -92,6 +92,8 @@ PODS:
     - React-RCTText (= 0.60.4)
     - React-RCTVibration (= 0.60.4)
     - React-RCTWebSocket (= 0.60.4)
+  - React-ART (0.60.4):
+    - React-Core (= 0.60.4)
   - React-Core (0.60.4):
     - Folly (= 2018.10.22.00)
     - React-cxxreact (= 0.60.4)
@@ -207,6 +209,7 @@ DEPENDENCIES:
   - Folly (from `../node_modules/react-native/third-party-podspecs/Folly.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - React (from `../node_modules/react-native/`)
+  - React-ART (from `../node_modules/react-native/Libraries/ART`)
   - React-Core (from `../node_modules/react-native/React`)
   - React-cxxreact (from `../node_modules/react-native/ReactCommon/cxxreact`)
   - React-DevSupport (from `../node_modules/react-native/React`)
@@ -268,6 +271,8 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
   React:
     :path: "../node_modules/react-native/"
+  React-ART:
+    :path: "../node_modules/react-native/Libraries/ART"
   React-Core:
     :path: "../node_modules/react-native/React"
   React-cxxreact:
@@ -352,6 +357,7 @@ SPEC CHECKSUMS:
   Protobuf: 1097ca58584c8d9be81bfbf2c5ff5975648dd87a
   QBImagePickerController: d54cf93db6decf26baf6ed3472f336ef35cae022
   React: c438ccc7e14e86d4702bb92d7e262f549ffaa995
+  React-ART: 672146dfd612d95be4e51d2e26179245dc925bce
   React-Core: c76495f5c14e73c0f803b89c3fa83f804da61bd6
   React-cxxreact: f64bc64cf4682d6ea5a064f6017da72482858682
   React-DevSupport: 30336bca00f72681eac995d21a31b963e7d5cfec
@@ -387,6 +393,6 @@ SPEC CHECKSUMS:
   TextToSpeech: d68418db07e7d3ce39fd3360ccca8d8165cef859
   yoga: 88c514f310aff89b94a14c5fbf44b95735af0cb7
 
-PODFILE CHECKSUM: 782a34ca06e2f0f2d217ab98e8d1ae84dd180981
+PODFILE CHECKSUM: 1e91428fb7f5d45b581d1ee04c5655a6b0a296bb
 
 COCOAPODS: 1.5.3

@@ -1,4 +1,4 @@
-import {fromJS, Map, Set} from 'immutable'
+import {fromJS, List, Map, Set} from 'immutable'
 import memoizeOne from 'memoize-one'
 
 import { logError } from '../helpers'
@@ -93,11 +93,18 @@ function trainings (trainings, users, rides, rideHorses, horses, horseUsers) {
     rides.forEach((ride, rideID) => {
       if (!byRideID.get(rideID)) {
         const rideHorseData = viewHorsesByRide(rideHorses, horses).get(rideID)
-        const horseIDs = rideHorseData.get('horses').map(horse => {
-          return horse.get('_id')
-        })
+        let horseIDs = List()
+        let riderHorseID = null
+        if (rideHorseData) {
+          horseIDs = rideHorseData.get('horses').map(horse => {
+            return horse.get('_id')
+          })
+          riderHorseID = rideHorseData.getIn(['riderHorse', '_id'])
+        }
+
+
         const intersect = usersHorseIDs.intersect(horseIDs.toSet())
-        if (intersect.count() > 0) {
+        if (ride.get('userID') === user.get('_id') || intersect.count() > 0) {
           byRideID = byRideID.set(rideID, fromJS({
             rideID: rideID,
             elapsedTimeSecs: ride.get('elapsedTimeSecs'),
@@ -106,7 +113,7 @@ function trainings (trainings, users, rides, rideHorses, horses, horseUsers) {
             userID: ride.get('userID'),
             isPublic: ride.get('isPublic'),
             horseIDs,
-            riderHorseID: rideHorseData.getIn(['riderHorse', '_id']),
+            riderHorseID,
             elevationGain: 0
           }))
         }
