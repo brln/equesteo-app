@@ -9,11 +9,10 @@ import {
 
 import Button from '../components/Button'
 import { brand, lightGrey } from '../colors'
-import { DB_SYNCING } from '../actions/functional'
+import functional, { DB_SYNCING } from '../actions/functional'
 import { logInfo } from '../helpers'
 import BuildImage from '../components/Images/BuildImage'
 import Loader from '../components/SignupLogin/Loader'
-import { doSync, startListeningFCM, switchRoot } from '../actions/functional'
 import { FEED } from '../screens/consts/main'
 
 
@@ -43,10 +42,10 @@ class NeedsSyncContainer extends PureComponent {
   }
 
   doSync () {
-    this.props.dispatch(doSync()).then(() => {
+    this.props.dispatch(functional.doSync()).then(() => {
       if (!this.props.fullSyncFail) {
-        this.props.dispatch(switchRoot(FEED))
-        this.props.dispatch(startListeningFCM())
+        this.props.dispatch(functional.switchRoot(FEED))
+        this.props.dispatch(functional.startListeningFCM())
       }
     }).catch(e => {
       logInfo(e)

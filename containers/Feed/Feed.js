@@ -12,7 +12,7 @@ import Amplitude, {
   PULL_DOWN_FOR_SYNC,
   START_OR_CONTINUE_RIDE
 } from "../../services/Amplitude"
-import { pulldownSync, toggleRideCarrot} from "../../actions/functional"
+import functional from "../../actions/functional"
 import BackgroundComponent from '../../components/BackgroundComponent'
 import { brand } from '../../colors'
 import Feed from '../../components/Feed/Feed'
@@ -292,11 +292,11 @@ class FeedContainer extends BackgroundComponent {
     this.setState({
       refreshing: true
     })
-    this.props.dispatch(pulldownSync())
+    this.props.dispatch(functional.pulldownSync())
   }
 
   toggleCarrot (rideID) {
-    this.props.dispatch(toggleRideCarrot(rideID))
+    this.props.dispatch(functional.toggleRideCarrot(rideID))
   }
 
   yourRides (rides, userID) {

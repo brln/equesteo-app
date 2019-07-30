@@ -20,7 +20,7 @@ import {
   dismissError,
   errorOccurred,
 } from '../../actions/standard'
-import { submitSignup } from '../../actions/functional'
+import functional from '../../actions/functional'
 import Amplitude, {
   SIGN_UP,
 } from "../../services/Amplitude"
@@ -114,7 +114,7 @@ class SignupContainer extends SignupContainerParent  {
         reqSubmitted: true,
       }, () => {
         Amplitude.logEvent(SIGN_UP)
-        this.props.dispatch(submitSignup(this.state.email, this.state.password1)).then(() => {
+        this.props.dispatch(functional.submitSignup(this.state.email, this.state.password1)).then(() => {
           this.setState({
             reqSubmitted: false,
           })

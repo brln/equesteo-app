@@ -8,12 +8,9 @@ import {
   ridePhotoUpdated,
   rideUpdated
 } from '../actions/standard'
-import {
-  photoNeedsUpload,
-} from "../actions/functional"
+import functional, { catchAsyncError } from "../actions/functional"
 import { coordSplice } from '../helpers'
 import { PouchCouch } from '../services'
-import { catchAsyncError} from "../actions/functional"
 
 export default class RidePersister {
   constructor (dispatch, getState, rideID) {
@@ -102,7 +99,7 @@ export default class RidePersister {
       this.dispatch(ridePhotoUpdated(toSave))
       docSaves = docSaves.then(() => {
         return PouchCouch.saveRide(toSave.toJS()).then(rideDoc => {
-          this.dispatch(photoNeedsUpload('ride', stashedPhoto.get('uri'), photoID))
+          this.dispatch(functional.photoNeedsUpload('ride', stashedPhoto.get('uri'), photoID))
           this.dispatch(ridePhotoUpdated(this.getRidePhoto(photoID).set('_rev', rideDoc.rev)))
           this.dispatch(clearRidePhotoFromStash(this.rideID, photoID))
         })

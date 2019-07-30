@@ -1,8 +1,8 @@
 import PouchDB from 'pouchdb-react-native'
-import { API_URL, NICOLE_USER_ID } from '../dotEnv'
 
+import { API_URL, NICOLE_USER_ID } from '../dotEnv'
 import { NotConnectedError } from "../errors"
-import { logError, logInfo, unixTimeNow } from '../helpers'
+import { logInfo } from '../helpers'
 import ApiClient from './ApiClient'
 
 import { END_OF_FEED } from '../containers/Feed/Feed'

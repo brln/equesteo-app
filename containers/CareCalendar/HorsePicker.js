@@ -11,7 +11,7 @@ import { Navigation } from 'react-native-navigation'
 
 import Thumbnail from '../../components/Images/Thumbnail'
 import { brand, orange, darkGrey } from '../../colors'
-import { createCareEvent } from '../../actions/functional'
+import functional from '../../actions/functional'
 import {addNewCareHorseID, changeCareCalendarTab, removeNewCareHorseID} from "../../actions/standard"
 import EqNavigation from '../../services/EqNavigation'
 
@@ -58,7 +58,7 @@ class HorsePicker extends PureComponent {
 
   navigationButtonPressed ({ buttonId }) {
     if (buttonId === 'saveEvent') {
-      this.props.dispatch(createCareEvent())
+      this.props.dispatch(functional.createCareEvent())
       if (moment(this.props.newCareEvent.get('date')) < moment()) {
         this.props.dispatch(changeCareCalendarTab(1))
       } else {

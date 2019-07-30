@@ -1,12 +1,11 @@
 import { Alert } from 'react-native'
-import memoizeOne from 'memoize-one'
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux';
 import { Navigation } from 'react-native-navigation'
 
 import { brand } from '../colors'
 import Training from '../components/Training/Training'
-import { loadSingleRide } from '../actions/functional'
+import functional from '../actions/functional'
 import { logRender } from '../helpers'
 import { RIDE } from '../screens/consts/main'
 import { EqNavigation } from '../services'
@@ -76,7 +75,7 @@ class TrainingContainer extends PureComponent {
       }).catch(() => {})
     } else if (this.props.goodConnection) {
       this.setState({ loadingRide: true })
-      return this.props.dispatch(loadSingleRide(ride.get('rideID'))).then(() => {
+      return this.props.dispatch(functional.loadSingleRide(ride.get('rideID'))).then(() => {
         this.setState({ loadingRide: false })
         return EqNavigation.push(this.props.componentId, {
           component: {

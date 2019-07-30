@@ -8,7 +8,7 @@ import { combineReducers } from 'redux-immutable';
 import Mapbox from '@react-native-mapbox-gl/maps';
 
 import { MAPBOX_TOKEN } from './dotEnv'
-import { appInitialized } from "./actions/functional"
+import functional from "./actions/functional"
 import { logDebug } from './helpers'
 import logger from './middleware/logger'
 import storeLocalState from './middleware/localstate'
@@ -61,7 +61,7 @@ export default function start () {
   registerCareScreens(store, Provider)
   firstStartRegisterScreens(store, Provider)
   Navigation.events().registerAppLaunchedListener(() => {
-    store.dispatch(appInitialized())
+    store.dispatch(functional.appInitialized())
   })
   return store
 }

@@ -11,10 +11,7 @@ import {
 } from '../../actions/standard'
 import { brand } from '../../colors'
 import { EqNavigation, UserAPI } from '../../services'
-import {
-  doHoofTracksUpload,
-  stopHoofTracksDispatcher
-} from "../../actions/functional"
+import functional from "../../actions/functional"
 import HoofTracksLive from '../../components/HoofTracks/HoofTracksLive'
 import Amplitude, {
   ACTIVATE_HOOF_TRACKS,
@@ -98,7 +95,7 @@ class HoofTracksContainer extends PureComponent {
           onPress: () => {
             Amplitude.logEvent(ACTIVATE_HOOF_TRACKS)
             this.props.dispatch(setHoofTracksRunning(true))
-            this.props.dispatch(doHoofTracksUpload())
+            this.props.dispatch(functional.doHoofTracksUpload())
             Navigation.mergeOptions(this.props.componentId, {
               topBar: {
                 rightButtons: [
@@ -120,7 +117,7 @@ class HoofTracksContainer extends PureComponent {
   navigationButtonPressed ({ buttonId }) {
     if (buttonId === 'stopTracks') {
       Amplitude.logEvent(DEACTIVATE_HOOF_TRACKS)
-      this.props.dispatch(stopHoofTracksDispatcher())
+      this.props.dispatch(functional.stopHoofTracksDispatcher())
       EqNavigation.pop(this.props.componentId)
     }
   }

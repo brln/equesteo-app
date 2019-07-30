@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { brand } from '../colors'
 import { logRender } from '../helpers'
 import RideAtlas from '../components/RideAtlas/RideAtlas'
-import { deleteRideAtlasEntry } from "../actions/functional"
+import functional from "../actions/functional"
 import {setActiveAtlasEntry} from "../actions/standard"
 import { EqNavigation } from '../services'
 import Amplitude, { CHOOSE_RIDE_ATLAS_RIDE } from "../services/Amplitude"
@@ -50,7 +50,7 @@ class RideAtlasContainer extends PureComponent {
 
   deleteRideAtlasEntry (id) {
     return () => {
-      this.props.dispatch(deleteRideAtlasEntry(id))
+      this.props.dispatch(functional.deleteRideAtlasEntry(id))
     }
   }
 

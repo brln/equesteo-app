@@ -16,9 +16,7 @@ import {
   horseUpdated,
   setFirstStartHorseID,
 } from '../../actions/standard'
-import {
-  persistHorseUpdate,
-} from '../../actions/functional'
+import functional from '../../actions/functional'
 import { EqNavigation } from '../../services'
 import { FINAL_PAGE, FIRST_HORSE_PHOTO } from "../../screens/consts/firstStart"
 import { Navigation } from 'react-native-navigation'
@@ -88,7 +86,7 @@ class FirstHorsePage extends PureComponent {
 
   next () {
     if (this.state.horseUpdated) {
-      this.props.dispatch(persistHorseUpdate(
+      this.props.dispatch(functional.persistHorseUpdate(
         this.props.horse.get('_id'),
         this.props.horseUser.get('_id'),
         [],

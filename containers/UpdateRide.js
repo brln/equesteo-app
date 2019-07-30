@@ -20,14 +20,7 @@ import {
   stopStashNewLocations,
   stashRidePhoto,
 } from '../actions/standard'
-import {
-  catchAsyncError,
-  doSync,
-  loadRideCoordinates,
-  persistRide,
-  stopHoofTracksDispatcher,
-  stopLocationTracking,
-} from '../actions/functional'
+import functional from '../actions/functional'
 import BackgroundComponent from '../components/BackgroundComponent'
 import { brand } from '../colors'
 import {
@@ -168,8 +161,8 @@ class UpdateRideContainer extends BackgroundComponent {
         })
         Navigation.mergeOptions(this.props.componentId, {topBar: {rightButtons: []}})
         this.updateLocalRideCoords()
-        this.props.dispatch(stopHoofTracksDispatcher())
-        this.props.dispatch(persistRide(
+        this.props.dispatch(functional.stopHoofTracksDispatcher())
+        this.props.dispatch(functional.persistRide(
           this.props.ride.get('_id'),
           true,
           this.props.rideCoordinates,
@@ -182,7 +175,7 @@ class UpdateRideContainer extends BackgroundComponent {
           return EqNavigation.popToRoot(this.props.componentId)
         }).then(() => {
           this.props.dispatch(clearPausedLocations())
-          this.props.dispatch(stopLocationTracking())
+          this.props.dispatch(functional.stopLocationTracking())
           this.props.dispatch(discardCurrentRide())
           this.props.dispatch(setActiveAtlasEntry(null))
           return EqNavigation.push(this.props.activeComponent, {
@@ -195,7 +188,7 @@ class UpdateRideContainer extends BackgroundComponent {
             }
           })
         }).then(() => {
-          return this.props.dispatch(doSync())
+          return this.props.dispatch(functional.doSync())
         }).catch(catchAsyncError(this.props.dispatch, 'UpdateRide.navigationButtonPressed'))
       } else if (buttonId === 'discard') {
         Amplitude.logEvent(DISCARD_NEW_RIDE)
@@ -223,7 +216,7 @@ class UpdateRideContainer extends BackgroundComponent {
         this.setState({
           doRevert: false
         })
-        this.props.dispatch(persistRide(
+        this.props.dispatch(functional.persistRide(
           this.props.ride.get('_id'),
           false,
           this.props.rideCoordinates,
@@ -257,14 +250,14 @@ class UpdateRideContainer extends BackgroundComponent {
   }
 
   discardRide () {
-    this.props.dispatch(stopHoofTracksDispatcher())
+    this.props.dispatch(functional.stopHoofTracksDispatcher())
     this.setState({
       doRevert: false
     })
     EqNavigation.popToRoot(this.props.componentId).then(() => {
       this.props.dispatch(clearPausedLocations())
       this.props.dispatch(clearRidePhotoStash(this.stashedRidePhotoKey()))
-      this.props.dispatch(stopLocationTracking())
+      this.props.dispatch(functional.stopLocationTracking())
       this.props.dispatch(discardCurrentRide())
       this.props.dispatch(deleteUnpersistedRide(this.props.ride.get('_id')))
     }).catch(() => {})
@@ -330,7 +323,7 @@ class UpdateRideContainer extends BackgroundComponent {
 
   componentDidMount () {
     if(!this.props.rideCoordinates || this.props.rideCoordinates.get('rideID') !== this.props.ride.get('_id')) {
-      this.props.dispatch(loadRideCoordinates(this.props.ride.get('_id')))
+      this.props.dispatch(functional.loadRideCoordinates(this.props.ride.get('_id')))
     }
   }
 

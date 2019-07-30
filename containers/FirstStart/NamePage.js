@@ -13,9 +13,7 @@ import NameForm from '../../components/FirstStart/NameForm'
 import {
   userUpdated,
 } from '../../actions/standard'
-import {
-  persistUserUpdate
-} from "../../actions/functional"
+import functional from "../../actions/functional"
 import EqNavigation from "../../services/EqNavigation"
 import { PROFILE_PHOTO_PAGE } from "../../screens/consts/firstStart"
 import Wrapper from '../../components/FirstStart/Wrapper'
@@ -59,7 +57,7 @@ class NamePage extends PureComponent {
   }
 
   nextPage () {
-    this.props.dispatch(persistUserUpdate(this.props.user.get('_id'), [], false))
+    this.props.dispatch(functional.persistUserUpdate(this.props.user.get('_id'), [], false))
     EqNavigation.push(this.props.componentId, {
       component: {
         name: PROFILE_PHOTO_PAGE,

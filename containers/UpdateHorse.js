@@ -13,7 +13,7 @@ import {
   horseUpdated,
   horseUserUpdated,
 } from '../actions/standard'
-import { persistHorseUpdate } from '../actions/functional'
+import functional from '../actions/functional'
 import { brand } from '../colors'
 import { generateUUID, logRender, unixTimeNow } from '../helpers'
 import { EqNavigation } from '../services'
@@ -183,7 +183,7 @@ class UpdateHorseContainer extends PureComponent {
         doRevert: false,
       })
       EqNavigation.pop(this.props.componentId).then(() => {
-        this.props.dispatch(persistHorseUpdate(
+        this.props.dispatch(functional.persistHorseUpdate(
           this.props.horse.get('_id'),
           this.props.horseUser.get('_id'),
           this.state.deletedPhotoIDs,

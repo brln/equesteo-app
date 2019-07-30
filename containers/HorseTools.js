@@ -15,11 +15,7 @@ import { logRender } from '../helpers'
 import Thumbnail from '../components/Images/Thumbnail'
 import { FOLLOW_LIST, UPDATE_HORSE } from '../screens/consts/main'
 import { EqNavigation } from '../services'
-import {
-  changeHorseOwner,
-  deleteHorseUser,
-  persistHorseUser,
-} from '../actions/functional'
+import functional from '../actions/functional'
 import Amplitude, { TRANSFER_HORSE_TO_NEW_USER } from "../services/Amplitude"
 
 const { width } = Dimensions.get('window')
@@ -58,8 +54,8 @@ class HorseToolsContainer extends Component {
 
   deleteHorse () {
     const horseUser = this.props.horseUser
-    this.props.dispatch(deleteHorseUser(horseUser.get('_id')))
-    this.props.dispatch(persistHorseUser(horseUser.get('_id')))
+    this.props.dispatch(functional.deleteHorseUser(horseUser.get('_id')))
+    this.props.dispatch(functional.persistHorseUser(horseUser.get('_id')))
     EqNavigation.popTo(this.props.popBackTo).catch(() => {})
   }
 
@@ -113,7 +109,7 @@ class HorseToolsContainer extends Component {
   transferHorse () {
     const doTransfer  = (userID) => {
       Amplitude.logEvent(TRANSFER_HORSE_TO_NEW_USER)
-      this.props.dispatch(changeHorseOwner(this.props.horse, userID))
+      this.props.dispatch(functional.changeHorseOwner(this.props.horse, userID))
     }
 
     EqNavigation.push(this.props.componentId, {

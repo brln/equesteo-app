@@ -9,12 +9,7 @@ import {
   createHorsePhoto,
   horseUpdated,
 } from '../actions/standard'
-import {
-  addHorseUser,
-  deleteHorseUser,
-  persistHorseWithPhoto,
-  persistHorseUser,
-} from '../actions/functional'
+import functional from '../actions/functional'
 import BackgroundComponent from '../components/BackgroundComponent'
 import { brand } from '../colors'
 import { generateUUID, logRender, unixTimeNow } from '../helpers'
@@ -97,7 +92,7 @@ class HorseProfileContainer extends BackgroundComponent {
 
   addRider () {
     Amplitude.logEvent(RIDE_ANOTHER_USERS_HORSE)
-    this.props.dispatch(addHorseUser(this.props.horse, this.props.user))
+    this.props.dispatch(functional.addHorseUser(this.props.horse, this.props.user))
   }
 
   navigationButtonPressed ({ buttonId }) {
@@ -135,8 +130,8 @@ class HorseProfileContainer extends BackgroundComponent {
   deleteHorse () {
     Amplitude.logEvent(ARCHIVE_HORSE)
     const horseUser = this.horseUser()
-    this.props.dispatch(deleteHorseUser(horseUser.get('_id')))
-    this.props.dispatch(persistHorseUser(horseUser.get('_id')))
+    this.props.dispatch(functional.deleteHorseUser(horseUser.get('_id')))
+    this.props.dispatch(functional.persistHorseUser(horseUser.get('_id')))
     EqNavigation.pop(this.props.componentId).catch(() => {})
   }
 
@@ -155,7 +150,7 @@ class HorseProfileContainer extends BackgroundComponent {
       updateHorse = updateHorse.set('profilePhotoID', photoID)
     }
     this.props.dispatch(horseUpdated(updateHorse))
-    this.props.dispatch(persistHorseWithPhoto(this.props.horse.get('_id'), photoID))
+    this.props.dispatch(functional.persistHorseWithPhoto(this.props.horse.get('_id'), photoID))
   }
 
   thisHorsesPhotos (horsePhotos, horse) {

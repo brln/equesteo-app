@@ -17,7 +17,7 @@ import { logInfo, generateUUID, unixTimeNow, logRender, logError } from '../../h
 import Button from '../../components/Button'
 import MedImage from '../../components/Images/MedImage'
 import { createHorsePhoto, horseUpdated } from '../../actions/standard'
-import { persistHorseWithPhoto } from '../../actions/functional'
+import functional from '../../actions/functional'
 import EqNavigation from '../../services/EqNavigation'
 import { FINAL_PAGE } from '../../screens/consts/firstStart'
 import Wrapper from '../../components/FirstStart/Wrapper'
@@ -81,7 +81,7 @@ class FirstHorsePhoto extends PureComponent {
   }
 
   nextWithPhoto () {
-    this.props.dispatch(persistHorseWithPhoto(
+    this.props.dispatch(functional.persistHorseWithPhoto(
       this.props.horse.get('_id'),
       this.props.horse.get('profilePhotoID')
     ))

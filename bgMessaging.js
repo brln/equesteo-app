@@ -1,13 +1,13 @@
 import { tryToLoadStateFromDisk } from "./actions/helpers"
 import { logError } from './helpers'
-import { doSync, showLocalNotifications } from './actions/functional'
+import functional from './actions/functional'
 
 export default (store) => {
   return () => {
     return tryToLoadStateFromDisk(store.dispatch).then(() => {
-      return store.dispatch(doSync())
+      return store.dispatch(functional.doSync())
     }).then(() => {
-      return store.dispatch(showLocalNotifications())
+      return store.dispatch(functional.showLocalNotifications())
     }).catch(e => {
       logError(e, 'bgMessageing.mainFunc')
     })

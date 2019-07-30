@@ -286,16 +286,20 @@ export default class RidingMap extends PureComponent {
             <MapboxGL.ShapeSource id="routeSource" shape={mapCoords}>
               <MapboxGL.LineLayer id="route" sourceID={"routeSource"} style={layerStyles.routeLine}/>
             </MapboxGL.ShapeSource>
-            <MapboxGL.ShapeSource
-              id="currentLocationSource"
-              shape={this.currentLocation(this.props.lastLocation)}
-            >
-              <MapboxGL.SymbolLayer
-                id="currentLocation"
-                sourceID={"currentLocationSource"}
-                style={layerStyles.icon}
-              />
-            </MapboxGL.ShapeSource>
+            {
+              this.props.lastLocation
+                ? <MapboxGL.ShapeSource
+                  id="currentLocationSource"
+                  shape={this.currentLocation(this.props.lastLocation)}
+                >
+                  <MapboxGL.SymbolLayer
+                    id="currentLocation"
+                    sourceID={"currentLocationSource"}
+                    style={layerStyles.icon}
+                  />
+                </MapboxGL.ShapeSource>
+              : null
+            }
           </MapboxGL.MapView>
         </View>
         { this.gpsIndicator() }

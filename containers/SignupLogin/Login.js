@@ -18,7 +18,7 @@ import {
   dismissError,
   setForgotEmail,
 } from '../../actions/standard'
-import { submitLogin } from '../../actions/functional'
+import functional from '../../actions/functional'
 import Amplitude, {
   SIGN_IN,
 } from "../../services/Amplitude"
@@ -80,7 +80,7 @@ class LoginContainer extends SignupContainerParent  {
         reqSubmitted: true,
       }, () => {
         Amplitude.logEvent(SIGN_IN)
-        this.props.dispatch(submitLogin(this.state.email, this.state.password)).then(() => {
+        this.props.dispatch(functional.submitLogin(this.state.email, this.state.password)).then(() => {
           this.setState({
             reqSubmitted: false,
           })

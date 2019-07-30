@@ -16,16 +16,10 @@ import {
   stopStashNewLocations,
   unpauseLocationTracking,
 } from '../../actions/standard'
-import {
-  clearLocationRetry,
-  locationPermissionsError,
-  startLocationTracking,
-  stopHoofTracksDispatcher,
-  stopLocationTracking,
-} from '../../actions/functional'
+import functional from '../../actions/functional'
 import { brand } from '../../colors'
 import RideRecorder from '../../components/RideRecorder/RideRecorder'
-import { isAndroid, logError, logRender, unixTimeNow } from '../../helpers'
+import { isAndroid, logRender, rideIDGenerator, unixTimeNow } from '../../helpers'
 import { captureException } from '../../services/Sentry'
 import Amplitude, {
   DISCARD_EMPTY_RIDE,
@@ -110,7 +104,7 @@ class RecorderContainer extends PureComponent {
   }
 
   componentWillUnmount () {
-    this.props.dispatch(clearLocationRetry())
+    this.props.dispatch(functional.clearLocationRetry())
     BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
     TimeoutManager.deleteTimeout(this.gpsTimeout)
   }
@@ -132,7 +126,7 @@ class RecorderContainer extends PureComponent {
         if (granted) {
           res()
         } else {
-          this.props.dispatch(locationPermissionsError())
+          this.props.dispatch(functional.locationPermissionsError())
           rej()
         }
       })
@@ -166,14 +160,14 @@ class RecorderContainer extends PureComponent {
         preventBackClick: true,
         providerListener: false,
       }).then(() => {
-        return this.props.dispatch(startLocationTracking())
+        return this.props.dispatch(functional.startLocationTracking())
       }).then(() => {
         return this.requestLocationPermission()
       }).catch(e => {
         captureException(e)
       })
     } else {
-      this.props.dispatch(startLocationTracking())
+      this.props.dispatch(functional.startLocationTracking())
     }
 
     if (this.props.hoofTracksRunning) {
@@ -258,13 +252,13 @@ class RecorderContainer extends PureComponent {
     Amplitude.logEvent(DISCARD_EMPTY_RIDE)
     EqNavigation.popToRoot(this.props.componentId).then(() => {
       this.props.dispatch(discardCurrentRide())
-      this.props.dispatch(stopLocationTracking())
-      this.props.dispatch(stopHoofTracksDispatcher())
+      this.props.dispatch(functional.stopLocationTracking())
+      this.props.dispatch(functional.stopHoofTracksDispatcher())
     }).catch(() => {})
   }
 
   showUpdateRide () {
-    const rideID = `${this.props.userID.toString()}_${(new Date).getTime().toString()}`
+    const rideID =  rideIDGenerator(this.props.userID)
     this.props.dispatch(createRide(
       rideID,
       this.props.userID,

@@ -14,7 +14,7 @@ import {
   dismissError,
   errorOccurred,
 } from '../../actions/standard'
-import { exchangePWCode, switchRoot } from '../../actions/functional'
+import functional from '../../actions/functional'
 import {NEW_PASSWORD} from "../../screens/consts/main"
 import EqNavigation from '../../services/EqNavigation'
 import SignupContainerParent  from './SignupContainerParent'
@@ -47,7 +47,7 @@ class ResetCodeContainer extends SignupContainerParent  {
 
   submitResetCode () {
     this.props.dispatch(dismissError())
-    this.props.dispatch(exchangePWCode(this.props.forgotEmail, this.state.resetCode)).then(() => {
+    this.props.dispatch(functional.exchangePWCode(this.props.forgotEmail, this.state.resetCode)).then(() => {
       EqNavigation.push(this.props.componentId, {
         component: {
           name: NEW_PASSWORD

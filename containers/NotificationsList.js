@@ -7,7 +7,7 @@ import firebase from 'react-native-firebase'
 import { Navigation } from 'react-native-navigation'
 
 import { brand } from '../colors'
-import { loadSingleRide, markNotificationsSeen } from "../actions/functional"
+import functional from "../actions/functional"
 import { logRender } from '../helpers'
 import NotificationList from '../components/NotificationsList/NotificationsList'
 import { RIDE } from '../screens/consts/main'
@@ -70,7 +70,7 @@ class NotificationsListContainer extends PureComponent {
 
   componentWillUnmount () {
     if (this.state.deleted.length > 0) {
-      this.props.dispatch(markNotificationsSeen(this.state.deleted))
+      this.props.dispatch(functional.markNotificationsSeen(this.state.deleted))
     }
     TimeoutManager.deleteTimeout(this.loadingRideAlertTimeout)
     TimeoutManager.deleteTimeout(this.loadingRideAlertTimeout)
@@ -102,7 +102,7 @@ class NotificationsListContainer extends PureComponent {
       }).catch(() => {})
     } else if (this.props.goodConnection) {
       this.setState({ loadingRide: true })
-      return this.props.dispatch(loadSingleRide(rideID)).then(() => {
+      return this.props.dispatch(functional.loadSingleRide(rideID)).then(() => {
         this.setState({ loadingRide: false })
         this.markNotificationSeen(notificationID)
         return EqNavigation.push(this.props.componentId, {

@@ -19,7 +19,7 @@ import {
   errorOccurred,
   setForgotEmail,
 } from '../../actions/standard'
-import { getPWCode, switchRoot } from '../../actions/functional'
+import functional from '../../actions/functional'
 import EqNavigation from '../../services/EqNavigation'
 import SignupContainerParent  from './SignupContainerParent'
 
@@ -47,8 +47,8 @@ class ForgotContainer extends SignupContainerParent  {
   }
 
   getPWCode () {
-    this.props.dispatch(getPWCode(this.props.forgotEmail)).then(() => {
-      this.props.dispatch(switchRoot(RESET_CODE))
+    this.props.dispatch(functional.getPWCode(this.props.forgotEmail)).then(() => {
+      this.props.dispatch(functional.switchRoot(RESET_CODE))
     }).catch(e => {
       this.props.dispatch(errorOccurred(e.message))
     })
@@ -82,7 +82,7 @@ class ForgotContainer extends SignupContainerParent  {
   }
 
   enterCode () {
-    this.props.dispatch(switchRoot(RESET_CODE))
+    this.props.dispatch(functional.switchRoot(RESET_CODE))
   }
 
   render() {

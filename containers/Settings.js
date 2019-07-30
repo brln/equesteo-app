@@ -11,13 +11,12 @@ import { Navigation } from 'react-native-navigation'
 import BackgroundComponent from '../components/BackgroundComponent'
 import { darkBrand } from '../colors'
 import { brand } from '../colors'
-import { persistUserUpdate } from '../actions/functional'
+import functional from '../actions/functional'
 import { userUpdated } from '../actions/standard'
 import { EqNavigation } from '../services'
 import EqPicker from '../components/EqPicker'
 import Amplitude, {
   DISABLE_GPS_SOUND_ALERTS,
-  ENABLE_HOOF_TRACKS,
   MAKE_RIDES_DEFAULT_PRIVATE,
   OPT_OUT_OF_LEADERBOARDS,
   TURN_ON_DISTANCE_ALERTS,
@@ -84,7 +83,7 @@ class SettingsContainer extends BackgroundComponent {
   navigationButtonPressed ({ buttonId }) {
     if (buttonId === 'save') {
       EqNavigation.pop(this.props.componentId).catch(() => {})
-      this.props.dispatch(persistUserUpdate(this.props.user.get('_id'), [], true))
+      this.props.dispatch(functional.persistUserUpdate(this.props.user.get('_id'), [], true))
       this.setState({
         doRevert: false,
       })

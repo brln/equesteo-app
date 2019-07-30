@@ -464,3 +464,7 @@ export function dateArray (startDate, stopDate) {
   }
   return dateArray;
 }
+
+export function rideIDGenerator (userID) {
+  return `${userID.toString()}_${(new Date).getTime().toString()}`
+}

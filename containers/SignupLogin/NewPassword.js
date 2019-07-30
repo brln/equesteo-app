@@ -10,7 +10,7 @@ import { connect } from 'react-redux'
 import NewPasswordForm from '../../components/SignupLogin/NewPasswordForm'
 import PageWrapper from '../../components/SignupLogin/PageWrapper'
 import { dismissError, errorOccurred } from '../../actions/standard'
-import { newPassword } from '../../actions/functional'
+import functional from '../../actions/functional'
 import Loader from '../../components/SignupLogin/Loader'
 import SignupContainerParent  from './SignupContainerParent'
 
@@ -47,7 +47,7 @@ class NewPasswordContainer extends SignupContainerParent  {
     if (this.state.pw1 !== this.state.pw2) {
       this.props.dispatch(errorOccurred('Passwords do not match.'))
     } else {
-      this.props.dispatch(newPassword(this.state.pw1)).catch(e => {
+      this.props.dispatch(functional.newPassword(this.state.pw1)).catch(e => {
         this.props.dispatch(errorOccurred(e))
       })
     }

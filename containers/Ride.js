@@ -9,13 +9,7 @@ import {
   clearSelectedRideCoordinates,
   setShowingRide,
 } from '../actions/standard'
-import {
-  clearRideNotifications,
-  createRideComment,
-  loadRideCoordinates,
-  loadRideElevations,
-  toggleRideCarrot,
-} from '../actions/functional'
+import functional from '../actions/functional'
 import { brand } from '../colors'
 import { logRender, unixTimeNow } from '../helpers'
 import {
@@ -138,7 +132,7 @@ class RideContainer extends PureComponent {
   submitComment () {
     if (!!this.state.newComment === true) {
       Amplitude.logEvent(ADD_COMMENT)
-      this.props.dispatch(createRideComment({
+      this.props.dispatch(functional.createRideComment({
         comment: this.state.newComment,
         rideID: this.props.ride.get('_id'),
         timestamp: unixTimeNow()
@@ -166,11 +160,11 @@ class RideContainer extends PureComponent {
 
   componentDidMount () {
     if(!this.props.rideCoordinates || this.props.rideCoordinates.get('rideID') !== this.props.ride.get('_id')) {
-      this.props.dispatch(loadRideCoordinates(this.props.ride.get('_id')))
-      this.props.dispatch(loadRideElevations(this.props.ride.get('_id')))
+      this.props.dispatch(functional.loadRideCoordinates(this.props.ride.get('_id')))
+      this.props.dispatch(functional.loadRideElevations(this.props.ride.get('_id')))
     }
     if (this.memoAnyNotifications(this.props.notifications, this.props.ride)) {
-      this.props.dispatch(clearRideNotifications(this.props.ride.get('_id')))
+      this.props.dispatch(functional.clearRideNotifications(this.props.ride.get('_id')))
     }
 
   }
@@ -253,7 +247,7 @@ class RideContainer extends PureComponent {
   }
 
   toggleCarrot () {
-    this.props.dispatch(toggleRideCarrot(this.props.ride.get('_id')))
+    this.props.dispatch(functional.toggleRideCarrot(this.props.ride.get('_id')))
   }
 
   render() {

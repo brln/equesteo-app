@@ -15,12 +15,7 @@ import {
   deleteFollow,
   userUpdated,
 } from "../actions/standard"
-import {
-  DB_SYNCED,
-  persistFollow,
-  persistUserWithPhoto,
-  signOut,
-} from "../actions/functional"
+import functional, { DB_SYNCED } from "../actions/functional"
 import { brand } from '../colors'
 import {
   ABOUT_PAGE,
@@ -164,21 +159,21 @@ class ProfileContainer extends BackgroundComponent {
 
   doLogout () {
     Amplitude.logEvent(DO_USER_LOGOUT)
-    this.props.dispatch(signOut())
+    this.props.dispatch(functional.signOut())
   }
 
   createFollow (followingID) {
     Amplitude.logEvent(START_FOLLOWING_SOMEONE)
     const followID = `${this.props.userID}_${followingID}`
     this.props.dispatch(createFollow(followID, followingID, this.props.userID))
-    this.props.dispatch(persistFollow(followID, true))
+    this.props.dispatch(functional.persistFollow(followID, true))
     this.props.dispatch(clearSearch())
   }
 
   deleteFollow (followingID) {
     const followID = `${this.props.userID}_${followingID}`
     this.props.dispatch(deleteFollow(followID))
-    this.props.dispatch(persistFollow(followID, false))
+    this.props.dispatch(functional.persistFollow(followID, false))
   }
 
   uploadPhoto (location) {
@@ -193,7 +188,7 @@ class ProfileContainer extends BackgroundComponent {
       }
     ))
     this.props.dispatch(userUpdated(this.props.profileUser.set('profilePhotoID', photoID)))
-    this.props.dispatch(persistUserWithPhoto(userID, photoID, true))
+    this.props.dispatch(functional.persistUserWithPhoto(userID, photoID, true))
   }
 
   showProfile (profileUser) {

@@ -9,15 +9,12 @@ import {
 import { brand } from '../../colors'
 import { logRender } from '../../helpers'
 import Button from '../../components/Button'
-import { doSync } from '../../actions/functional'
 import EqNavigation from '../../services/EqNavigation'
 import {
   deleteUnpersistedHorse,
   userUpdated,
 } from '../../actions/standard'
-import {
-  persistUserUpdate,
-} from '../../actions/functional'
+import functional from '../../actions/functional'
 import Wrapper from '../../components/FirstStart/Wrapper'
 
 
@@ -46,13 +43,13 @@ class FinalPage extends PureComponent {
 
   done () {
     this.props.dispatch(userUpdated(this.props.user.set('finishedFirstStart', true)))
-    this.props.dispatch(persistUserUpdate(this.props.user.get('_id'), [], false))
+    this.props.dispatch(functional.persistUserUpdate(this.props.user.get('_id'), [], false))
 
     EqNavigation.popToRoot(this.props.componentId).then(() => {
       if (this.props.skippedHorse) {
         this.props.dispatch(deleteUnpersistedHorse(this.props.horseID, this.props.horseUserID))
       }
-      this.props.dispatch(doSync())
+      this.props.dispatch(functional.doSync())
     }).catch(() => {})
   }
 

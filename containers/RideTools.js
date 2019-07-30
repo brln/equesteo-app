@@ -21,18 +21,11 @@ import {
 } from '../screens/consts/main'
 import Thumbnail from '../components/Images/Thumbnail'
 import {
-  createRide,
   rideUpdated,
 } from '../actions/standard'
-import {
-  catchAsyncError,
-  createRideAtlasEntry,
-  doSync,
-  persistRide,
-} from '../actions/functional'
+import functional from '../actions/functional'
 import { EqNavigation } from '../services'
 import Amplitude, {
-  DUPLICATE_RIDE_TO_ANOTHER_USER,
   DELETE_RIDE,
   EDIT_RIDE,
   SAVE_RIDE_TO_ATLAS,
@@ -75,7 +68,7 @@ class RideToolsContainer extends Component {
     this.confirmDelete = this.confirmDelete.bind(this)
     this.createRideAtlasEntry = this.createRideAtlasEntry.bind(this)
     this.deleteRide = this.deleteRide.bind(this)
-    this.duplicateRide = this.duplicateRide.bind(this)
+    this.startDuplicate = this.startDuplicate.bind(this)
     this.memoFollowings = memoizeOne(this.followings.bind(this))
     this.menuItems = this.menuItems.bind(this)
     this.shareRide = this.shareRide.bind(this)
@@ -86,7 +79,7 @@ class RideToolsContainer extends Component {
 
   createRideAtlasEntry () {
     Amplitude.logEvent(SAVE_RIDE_TO_ATLAS)
-    return this.props.dispatch(createRideAtlasEntry(
+    return this.props.dispatch(functional.createRideAtlasEntry(
       this.state.atlasEntryName,
       this.props.userID,
       this.props.ride,
@@ -98,7 +91,7 @@ class RideToolsContainer extends Component {
   deleteRide () {
     Amplitude.logEvent(DELETE_RIDE)
     this.props.dispatch(rideUpdated(this.props.ride.set('deleted', true)))
-    this.props.dispatch(persistRide(
+    this.props.dispatch(functional.persistRide(
       this.props.ride.get('_id'),
       false,
       this.props.rideCoordinates,
@@ -110,7 +103,7 @@ class RideToolsContainer extends Component {
     )).then(() => {
       return EqNavigation.popToRoot(this.props.componentId).catch(() => {})
     }).then(() => {
-      return this.props.dispatch(doSync())
+      return this.props.dispatch(functional.doSync())
     }).catch(catchAsyncError(this.props.dispatch, 'RideTools.deleteRide'))
   }
 
@@ -146,31 +139,15 @@ class RideToolsContainer extends Component {
     }).catch(() => {})
   }
 
-  duplicateRide () {
-    const doDupe  = (userID) => {
-      Amplitude.logEvent(DUPLICATE_RIDE_TO_ANOTHER_USER)
-      const rideID = `${userID.toString()}_${(new Date).getTime().toString()}`
-      this.props.dispatch(createRide(
-        rideID,
+  startDuplicate () {
+    const doDupe = (userID) => {
+      return this.props.dispatch(functional.duplicateRide(
         userID,
         this.props.ride,
         this.props.rideElevations,
         this.props.rideCoordinates,
-        this.props.ride.get('_id'),
-        true
-      ))
-      return this.props.dispatch(persistRide(
-        rideID,
-        true,
-        this.props.rideCoordinates,
-        this.props.rideElevations,
-        [],
-        [],
-        false,
-        []
       ))
     }
-
 
     EqNavigation.push(this.props.componentId, {
       component: {
@@ -260,7 +237,7 @@ class RideToolsContainer extends Component {
         {
           name: 'Duplicate to Another User',
           icon: require('../img/rideTools/duplicate.png'),
-          onPress: this.duplicateRide
+          onPress: this.startDuplicate
         },
         {
           name: 'Share',

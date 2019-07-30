@@ -3,7 +3,7 @@ import React, { PureComponent } from 'react'
 import { Keyboard } from 'react-native'
 import { connect } from 'react-redux';
 
-import { searchForFriends } from "../actions/functional"
+import functional from "../actions/functional"
 import { clearSearch } from "../actions/standard"
 import { brand } from '../colors'
 import { logError, logRender } from '../helpers'
@@ -63,7 +63,7 @@ class FindPeopleContainer extends PureComponent {
   }
 
   search (phrase) {
-    this.props.dispatch(searchForFriends(phrase))
+    this.props.dispatch(functional.searchForFriends(phrase))
   }
 
   render() {

@@ -10,15 +10,7 @@ import {
   setDoingInitialLoad,
 } from './standard'
 
-import {
-  catchAsyncError,
-  doSync,
-  removeForgotPWLinkListener,
-  startListeningFCMTokenRefresh,
-  startListeningFCM,
-  setDistributionOnServer,
-  switchRoot,
-} from './functional'
+import functional, { catchAsyncError } from './functional'
 import { logInfo } from '../helpers'
 import { FEED, NEEDS_SYNC } from '../screens/consts/main'
 import { Amplitude, LocalStorage } from '../services'
@@ -38,25 +30,25 @@ export function loginAndSync(loginFunc, loginArgs, dispatch, getState) {
     dispatch(saveUserID(userID))
     setUserContext(userID)
     Amplitude.setUserID(userID)
-    dispatch(startListeningFCMTokenRefresh())
+    dispatch(functional.startListeningFCMTokenRefresh())
     dispatch(setDoingInitialLoad(true))
-    return dispatch(doSync({userID, followingIDs, followerIDs})).catch(catchAsyncError(dispatch))
+    return dispatch(functional.doSync({userID, followingIDs, followerIDs})).catch(catchAsyncError(dispatch))
   }).then(() => {
     // setDistribution needs to be far apart from FCMToken or they
     // end up in a race condition on the server. really, need to
     // consolidate the two calls.
-    dispatch(setDistributionOnServer())
+    dispatch(functional.setDistributionOnServer())
     const syncFail = getState().getIn(['localState', 'fullSyncFail'])
     if (!syncFail) {
       TimeoutManager.newTimeout(() => {
-        dispatch(switchRoot(FEED))
-        dispatch(startListeningFCM())
+        dispatch(functional.switchRoot(FEED))
+        dispatch(functional.startListeningFCM())
       }, 100)
 
     } else {
-      dispatch(switchRoot(NEEDS_SYNC))
+      dispatch(functional.switchRoot(NEEDS_SYNC))
     }
-    dispatch(removeForgotPWLinkListener())
+    dispatch(functional.removeForgotPWLinkListener())
   }).catch(e => {
     dispatch(errorOccurred(e.message))
     if (!(e instanceof UnauthorizedError) && !(e instanceof UserAlreadyExistsError)) {

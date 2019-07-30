@@ -17,9 +17,7 @@ import {
   deleteUnpersistedHorse,
   userUpdated,
 } from '../../actions/standard'
-import {
-  persistUserUpdate,
-} from '../../actions/functional'
+import functional from '../../actions/functional'
 import { EqNavigation } from '../../services'
 import { NAME_PAGE } from '../../screens/consts/firstStart'
 
@@ -50,7 +48,7 @@ class IntroPage extends PureComponent {
   skipForever () {
     Amplitude.logEvent(SKIP_FIRST_START_FOREVER)
     this.props.dispatch(userUpdated(this.props.user.set('finishedFirstStart', true)))
-    this.props.dispatch(persistUserUpdate(this.props.user.get('_id'), [], true))
+    this.props.dispatch(functional.persistUserUpdate(this.props.user.get('_id'), [], true))
     if (this.props.horseID) {
       this.props.dispatch(deleteUnpersistedHorse(this.props.horseID, this.props.horseUserID))
     }

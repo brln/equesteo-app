@@ -7,9 +7,7 @@ import { BackHandler, Keyboard } from 'react-native'
 import {
   userUpdated,
 } from "../actions/standard"
-import {
-  persistUserUpdate,
-} from "../actions/functional"
+import functional from "../actions/functional"
 import { brand } from '../colors'
 import { logRender } from '../helpers'
 import { EqNavigation } from '../services'
@@ -82,7 +80,7 @@ class UpdateProfileContainer extends PureComponent {
         doRevert: false
       })
       EqNavigation.pop(this.props.componentId).catch(() => {})
-      this.props.dispatch(persistUserUpdate(this.props.user.get('_id'), this.state.deletedPhotoIDs, true))
+      this.props.dispatch(functional.persistUserUpdate(this.props.user.get('_id'), this.state.deletedPhotoIDs, true))
     }
   }
 
