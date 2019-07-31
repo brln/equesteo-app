@@ -137,6 +137,8 @@ PODS:
     - React
   - react-native-camera/RN (2.11.1):
     - React
+  - react-native-cameraroll (1.1.1):
+    - React
   - react-native-mapbox-gl (7.0.0-rc3):
     - React
   - react-native-netinfo (4.1.3):
@@ -182,6 +184,8 @@ PODS:
     - Fabric
     - Firebase/Core
     - React
+  - RNFS (2.14.1):
+    - React
   - RNImageCropPicker (0.25.0):
     - QBImagePickerController
     - React-Core
@@ -219,6 +223,7 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - react-native-background-timer (from `../node_modules/react-native-background-timer`)
   - react-native-camera (from `../node_modules/react-native-camera`)
+  - "react-native-cameraroll (from `../node_modules/@react-native-community/cameraroll`)"
   - "react-native-mapbox-gl (from `../node_modules/@react-native-mapbox-gl/maps`)"
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-webview (from `../node_modules/react-native-webview`)
@@ -236,6 +241,7 @@ DEPENDENCIES:
   - rn-fetch-blob (from `../node_modules/rn-fetch-blob`)
   - RNBackgroundFetch (from `../node_modules/react-native-background-fetch`)
   - RNFirebase (from `../node_modules/react-native-firebase/ios`)
+  - RNFS (from `../node_modules/react-native-fs`)
   - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
@@ -291,6 +297,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-background-timer"
   react-native-camera:
     :path: "../node_modules/react-native-camera"
+  react-native-cameraroll:
+    :path: "../node_modules/@react-native-community/cameraroll"
   react-native-mapbox-gl:
     :path: "../node_modules/@react-native-mapbox-gl/maps"
   react-native-netinfo:
@@ -325,6 +333,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-background-fetch"
   RNFirebase:
     :path: "../node_modules/react-native-firebase/ios"
+  RNFS:
+    :path: "../node_modules/react-native-fs"
   RNImageCropPicker:
     :path: "../node_modules/react-native-image-crop-picker"
   RNSVG:
@@ -367,6 +377,7 @@ SPEC CHECKSUMS:
   React-jsinspector: 044105eea064aec81adc5e4d777a8f6589e7d094
   react-native-background-timer: bb7a98c8e97fc7c290de2d423dd09ddb73dcbcbb
   react-native-camera: 9c50d7def800895e7991ccda6203929553ceec9c
+  react-native-cameraroll: a0817e9d2e054f166500e3ca1c70f2e7c615c66a
   react-native-mapbox-gl: 099d223de88d75815e3a5a0a04b64c970b929105
   react-native-netinfo: d16e16984e3ff0f164d3747508151a461ced301e
   react-native-webview: ad9581723f4d401c22cb3a371811d4dc9310df56
@@ -384,6 +395,7 @@ SPEC CHECKSUMS:
   rn-fetch-blob: 6aa7c5b59f442fbfcdcc847edbc062119f6af66c
   RNBackgroundFetch: 8c4f77f83c398c659bce82af2f0a885079417b9e
   RNFirebase: ca408d6bee0ca9383bd0cfe84f40b01370b8ad4d
+  RNFS: 6a2bfb5d0b14cf0ad72667f76202358abba4aacf
   RNImageCropPicker: c406db73f02f11bf3a887f856ff04ee50af173f4
   RNSVG: 4834be1d644eb77f0e3f6de851881b83758a3124
   RNVectorIcons: 66af4d5c8ff4f584c7b7cd9c4b0780920f27fce2
@@ -393,6 +405,6 @@ SPEC CHECKSUMS:
   TextToSpeech: d68418db07e7d3ce39fd3360ccca8d8165cef859
   yoga: 88c514f310aff89b94a14c5fbf44b95735af0cb7
 
-PODFILE CHECKSUM: 1e91428fb7f5d45b581d1ee04c5655a6b0a296bb
+PODFILE CHECKSUM: 92c3cc55e3c4327fe0689014508dc24694ca9929
 
 COCOAPODS: 1.5.3

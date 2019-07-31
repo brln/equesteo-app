@@ -264,7 +264,7 @@ export default class RidingMap extends PureComponent {
   render() {
     logRender('RideRecorder.RidingMap')
     const mapCoords = RidingMap.mapCoordinates(this.props.currentRideCoordinates)
-    const mapStyleURL = this.state.mapType === 'map' ? "mapbox://styles/equesteo/cjopu37k3fm442smn4ncz3x9m" : "mapbox://styles/equesteo/cjoug4j877tc82ro2l2p3n1q2"
+    const mapStyleURL = this.state.mapType === 'map' ? "mapbox://styles/equesteo/cjxwcq2oa03z91ck8uv8d6xcr" : "mapbox://styles/equesteo/cjoug4j877tc82ro2l2p3n1q2"
     return (
       <View style ={styles.container}>
         <View style={{flex: 1}}>

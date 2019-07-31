@@ -20,7 +20,7 @@ import {
   stopStashNewLocations,
   stashRidePhoto,
 } from '../actions/standard'
-import functional from '../actions/functional'
+import functional, { catchAsyncError } from '../actions/functional'
 import BackgroundComponent from '../components/BackgroundComponent'
 import { brand } from '../colors'
 import {

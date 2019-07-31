@@ -17,6 +17,9 @@ export default class ViewingMap extends PureComponent {
 
     this.memoMapCoordinates = memoizeOne(this.mapCoordinates)
     this.memoBoundingBox = memoizeOne(boundingBox)
+
+    this.camera = null
+    this.map = null
   }
 
   mapCoordinates (rideCoordinates) {
@@ -85,7 +88,7 @@ export default class ViewingMap extends PureComponent {
 
   fitToElements () {
     const bounds = this.memoBoundingBox(this.props.rideCoordinates)
-    this.map.fitBounds(bounds[0], bounds[1], 20, 200)
+    this.camera.fitBounds(bounds[0], bounds[1], 20, 200)
   }
 
   photoPress (e) {
@@ -113,13 +116,14 @@ export default class ViewingMap extends PureComponent {
     return (
       <View style={styles.container}>
         <MapboxGL.MapView
-          styleURL={"mapbox://styles/equesteo/cjopu37k3fm442smn4ncz3x9m"}
+          styleURL={"mapbox://styles/equesteo/cjxwcq2oa03z91ck8uv8d6xcr"}
           onDidFinishLoadingMap={this.fitToElements}
           style={styles.map}
           onPress={this.photoPress}
+          ref={ref => (this.map = ref)}
         >
           <MapboxGL.Camera
-            ref={ref => (this.map = ref)}
+            ref={ref => (this.camera = ref)}
           />
           <MapboxGL.ShapeSource id="routeSource" shape={mapCoords}>
             <MapboxGL.LineLayer id="route" sourceID={"routeSource"} style={layerStyles.routeLine}/>

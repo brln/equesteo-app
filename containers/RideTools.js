@@ -23,7 +23,7 @@ import Thumbnail from '../components/Images/Thumbnail'
 import {
   rideUpdated,
 } from '../actions/standard'
-import functional from '../actions/functional'
+import functional, { catchAsyncError } from '../actions/functional'
 import { EqNavigation } from '../services'
 import Amplitude, {
   DELETE_RIDE,

@@ -64,6 +64,7 @@ import {
   SET_FOLLOWING_SYNC_RUNNING,
   SET_FORGOT_EMAIL,
   SET_FULL_SYNC_FAIL,
+  SET_GPS_COORDINATES_RECEIVED,
   SET_HOOF_TRACKS_ID,
   SET_HOOF_TRACKS_LAST_UPLOAD,
   SET_REMOTE_PERSIST,
@@ -592,6 +593,13 @@ export function setFullSyncFail (status) {
     type: SET_FULL_SYNC_FAIL,
     status,
     logData: ['status'],
+  }
+}
+
+export function setGPSCoordinatesReceived (value) {
+  return {
+    type: SET_GPS_COORDINATES_RECEIVED,
+    value,
   }
 }
 

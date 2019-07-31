@@ -2,6 +2,8 @@ package com.equesteo;
 
 import android.app.Application;
 import com.facebook.react.ReactApplication;
+import com.rnfs.RNFSPackage;
+import com.reactnativecommunity.cameraroll.CameraRollPackage;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.reactnativecommunity.netinfo.NetInfoPackage;
 import com.ocetnik.timer.BackgroundTimerPackage;
@@ -90,7 +92,9 @@ public class MainApplication extends NavigationApplication {
             new RNBackgroundFetchPackage(),
             new TextToSpeechPackage(),
             new BackgroundTimerPackage(),
-            new NetInfoPackage()
+            new NetInfoPackage(),
+            new CameraRollPackage(),
+            new RNFSPackage()
         );
     }
 

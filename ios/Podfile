@@ -70,6 +70,10 @@ target 'equesteo' do
 
   pod 'ReactNativeNavigation', :path => '../node_modules/react-native-navigation'
 
+  pod 'react-native-cameraroll', :path => '../node_modules/@react-native-community/cameraroll'
+
+  pod 'RNFS', :path => '../node_modules/react-native-fs'
+
 end
 
 # also from https://github.com/ivpusic/react-native-image-crop-picker

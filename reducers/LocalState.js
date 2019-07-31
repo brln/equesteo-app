@@ -22,6 +22,7 @@ import {
   DISMISS_ERROR,
   ENQUEUE_PHOTO,
   ERROR_OCCURRED,
+  GPS_COORDINATES_RECEIVED,
   GPS_SIGNAL_LOST,
   LOAD_LOCAL_STATE,
   NEW_APP_STATE,
@@ -52,7 +53,7 @@ import {
   STASH_RIDE_PHOTO,
   SYNC_COMPLETE,
   UPDATE_PHOTO_STATUS,
-  USER_SEARCH_RETURNED,
+  USER_SEARCH_RETURNED, SET_GPS_COORDINATES_RECEIVED,
 } from '../constants'
 
 const initialDocsDownloaded = Map({
@@ -82,6 +83,7 @@ export const initialState = Map({
   firstStartHorseID: null,
   fullSyncFail: false,
   goodConnection: true,
+  gpsCoordinatesReceived: 0,
   gpsSignalLost: false,
   hoofTracksID: null,
   hoofTracksRunning: false,
@@ -236,6 +238,8 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.set('doingInitialLoad', action.newVal)
     case SET_FOLLOWING_SYNC_RUNNING:
       return state.set('followingSyncRunning', action.value)
+    case SET_GPS_COORDINATES_RECEIVED:
+      return state.set('gpsCoordinatesReceived', action.value)
     case STASH_RIDE_PHOTO:
       let newState = state
       if (!state.getIn(['ridePhotoStash', action.stashKey])) {

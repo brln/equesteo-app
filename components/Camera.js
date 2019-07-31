@@ -1,14 +1,13 @@
-import React, { Component } from 'react';
-import ImagePicker from 'react-native-image-crop-picker'
+import React, { Component } from 'react'
 import {
-  CameraRoll,
   Dimensions,
-  ImageEditor,
   StyleSheet,
   TouchableOpacity,
   View
-} from 'react-native';
-import { RNCamera } from 'react-native-camera';
+} from 'react-native'
+import { RNCamera } from 'react-native-camera'
+import CameraRoll from "@react-native-community/cameraroll"
+import * as RNFS from 'react-native-fs'
 
 import BuildImage from './Images/BuildImage'
 import URIImage from './Images/URIImage'
@@ -48,7 +47,7 @@ export default class Camera extends Component {
       }).then((permURI) => {
         this.props.stashNewRidePhoto(permURI)
         this.camera.resumePreview()
-        ImagePicker.cleanSingle(tempURI).catch(e => logError(e, 'Camera.ImagePicker.cleanSingle'))
+        return RNFS.unlink(tempURI)
       }).catch((e) => { logError(e, 'Camera.takePicture.takePictureAsync') })
     }
   }
@@ -68,7 +67,7 @@ export default class Camera extends Component {
     }
     return (
       <View style={styles.container}>
-        <View style={{width, height: width}}>
+        <View style={{width, height: width, overflow: 'hidden'}}>
           { this.props.showCam ? <RNCamera
             ref={ref => { this.camera = ref }}
             style = {styles.preview}
@@ -77,7 +76,7 @@ export default class Camera extends Component {
             captureAudio={false}
           /> : null}
         </View>
-        <View style={{borderColor: 'red', borderWidth: 1, flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+        <View style={{zIndex: 10, flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
           <View style={{flex: 1, aspectRatio: 1}}>
             <TouchableOpacity onPress={this.props.showRecentPhoto}>
               { lastPhoto }

@@ -8,7 +8,6 @@ export default function kalmanFilter (point, lastPoint, Q) { //lat_measurement, 
   }
   const K = variance / (variance + point.get('accuracy') * point.get('accuracy'));
   return Map({
-    provider: point.get('provider'),
     timestamp: point.get('timestamp'),
     speed: point.get('speed'),
     latitude: lastPoint.get('latitude') + K * (point.get('latitude') - lastPoint.get('latitude')),

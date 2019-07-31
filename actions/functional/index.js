@@ -13,7 +13,7 @@ import URI from 'urijs'
 
 import ApiClient from '../../services/ApiClient'
 import { DISTRIBUTION, ENV } from '../../dotEnv'
-import kalmanFilter from '../../services/Kalman'
+
 import Amplitude, {
   APP_INITIALIZED,
   DUPLICATE_RIDE_TO_ANOTHER_USER,
@@ -23,7 +23,6 @@ import TimeoutManager from '../../services/TimeoutManager'
 import { captureBreadcrumb, captureException, setUserContext } from "../../services/Sentry"
 import {
   goodConnection,
-  haversine,
   horsePhotoURL,
   isAndroid,
   logError,
@@ -31,14 +30,9 @@ import {
   rideIDGenerator,
   ridePhotoURL,
   unixTimeNow,
-  profilePhotoURL
+  profilePhotoURL, haversine
 } from "../../helpers"
 import { danger, green, warning } from '../../colors'
-import {
-  configureBackgroundGeolocation,
-  loginAndSync,
-  tryToLoadStateFromDisk
-} from './../helpers'
 import {
   DRAWER,
   FEED,
@@ -82,10 +76,8 @@ import {
   horseUserUpdated,
   localDataLoaded,
   newAppState,
-  newLocation,
   newNetworkState,
   notificationUpdated,
-  replaceLastLocation,
   rideAtlasEntryUpdated,
   setBackgroundGeolocationRunning,
   setShutdownInProgress,
@@ -109,8 +101,15 @@ import {
   userPhotoUpdated,
   userSearchReturned,
   userUpdated,
+  replaceLastLocation,
+  newLocation,
+  setGPSCoordinatesReceived,
+  setAwaitingPasswordChange,
+  saveUserID,
+  setDoingInitialLoad, loadLocalState, loadCurrentRideState,
 } from './../standard'
-import { NotConnectedError } from "../../errors"
+import {NotConnectedError, UnauthorizedError, UserAlreadyExistsError} from "../../errors"
+import kalmanFilter from "../../services/Kalman"
 
 export const DB_NEEDS_SYNC = 'DB_NEEDS_SYNC'
 export const DB_SYNCING = 'DB_SYNCING'
@@ -208,7 +207,7 @@ function appInitialized () {
   cb(source)
   return (dispatch, getState) => {
     let postSync = () => {}
-    tryToLoadStateFromDisk(dispatch).then(() => {
+    dispatch(functional.tryToLoadStateFromDisk()).then(() => {
       dispatch(functional.startActiveComponentListener())
       dispatch(dismissError())
       dispatch(functional.startAppStateTracking())
@@ -584,8 +583,8 @@ function markNotificationPopped (notification) {
 function newPassword (password) {
   const source = 'newPassword'
   cb(source)
-  return (dispatch, getState) => {
-    return loginAndSync(UserAPI.changePassword, [password], dispatch, getState)
+  return (dispatch) => {
+    return dispatch(functional.loginAndSync(UserAPI.changePassword, [password]))
   }
 }
 
@@ -1135,92 +1134,14 @@ function startLocationTracking () {
     const isRunning = getState().getIn(['localState', 'backgroundGeolocationRunning'])
     if (!isRunning) {
       dispatch(setBackgroundGeolocationRunning(true))
-      return configureBackgroundGeolocation().then(() => {
-        const KALMAN_FILTER_Q = 6
-        BackgroundGeolocation.on('error', (error) => {
-          if (error.code === 1000) {
-            dispatch(functional.stopLocationTracking())
-            dispatch(functional.locationPermissionsError())
-          } else {
-            captureException(error)
-          }
+      return dispatch(functional.configureBackgroundGeolocation()).then(() => {
+        BackgroundGeolocation.on('error', error => {
+          dispatch(functional.gpsLocationError(error))
         })
 
 
-        BackgroundGeolocation.on('location', (location) => {
-          if (Math.abs(location.time - unixTimeNow()) > 15000) {
-            // Sometimes IOS feeds us old locations for the first few
-            return
-          }
-          if (getState().getIn(['localState', 'gpsSignalLost'])) {
-            dispatch(functional.gpsText('Found GPS'))
-          }
-          dispatch(gpsSignalLost(false))
-          if (location.accuracy > 25) {
-            return
-          }
-
-          const lastLocation = getState().getIn(['currentRide', 'lastLocation'])
-          let timeDiff = 0
-          if (lastLocation) {
-            timeDiff = (location.time / 1000) - (lastLocation.get('timestamp') / 1000)
-          }
-
-          if (!lastLocation || timeDiff > 5) {
-            const oldDistance = getState().getIn(['currentRide', 'currentRide', 'distance'])
-            const refiningLocation = getState().getIn(['currentRide', 'refiningLocation'])
-
-            let parsedLocation = Map({
-              accuracy: location.accuracy,
-              latitude: location.latitude,
-              longitude: location.longitude,
-              timestamp: location.time,
-              speed: location.speed,
-            })
-
-            let parsedElevation = Map({
-              latitude: location.latitude,
-              longitude: location.longitude,
-              elevation: location.altitude,
-            })
-
-            let replaced = false
-            if (refiningLocation && lastLocation) {
-              // If you have at least one point already recorded, run the Kalman filter
-              // on the new location coming in using the one you already have
-              parsedLocation = kalmanFilter(
-                parsedLocation,
-                lastLocation,
-                KALMAN_FILTER_Q
-              )
-              parsedElevation = parsedElevation.set(
-                'latitude', parsedLocation.get('latitude')
-              ).set(
-                'longitude', parsedLocation.get('longitude')
-              ).set(
-                'accuracy', parsedLocation.get('accuracy')
-              )
-
-              let distance = haversine(
-                refiningLocation.get('latitude'),
-                refiningLocation.get('longitude'),
-                parsedLocation.get('latitude'),
-                parsedLocation.get('longitude')
-              )
-              if (distance < (30 / 5280)) {
-                // If you're within a 30' radius of the last place you were, don't
-                // just add the point on, replace the old one.
-                dispatch(replaceLastLocation(parsedLocation, parsedElevation))
-                replaced = true
-              }
-            }
-            if (!replaced) {
-              dispatch(newLocation(parsedLocation, parsedElevation))
-              const newDistance = getState().getIn(['currentRide', 'currentRide', 'distance'])
-              dispatch(functional.doSpeech(oldDistance, newDistance))
-            }
-            dispatch(functional.doHoofTracksUpload())
-          }
+        BackgroundGeolocation.on('location', location => {
+          dispatch(functional.onGPSLocation(location))
         })
 
         dispatch(gpsSignalLost(false))
@@ -1235,32 +1156,214 @@ function startLocationTracking () {
   }
 }
 
-function doSpeech (oldDistance, newDistance) {
-  const source = 'doSpeech'
+export function gpsLocationError (error) {
+  const source = 'gpsLocationError'
   cb(source)
-  return (_, getState) => {
-    const newMiles = Math.floor(newDistance)
-    const oldMiles = Math.floor(oldDistance)
-    if (newMiles > oldMiles) {
-      const currentUserID = getState().getIn(['localState', 'userID'])
-      const currentUser = getState().getIn(['pouchRecords', 'users', currentUserID])
-      const settingEnabled = currentUser.get('enableDistanceAlerts')
-      const alertDistance = currentUser.get('alertDistance')
-      if (settingEnabled && newMiles % alertDistance === 0) {
-        Tts.getInitStatus().then(() => {
-          Tts.speak(`You have gone ${newMiles} miles`);
-        })
-      }
+  return (dispatch) => {
+    if (error.code === 1000) {
+      dispatch(functional.stopLocationTracking())
+      dispatch(functional.locationPermissionsError())
+    } else {
+      captureException(error)
     }
   }
 }
 
+function onGPSLocation (location) {
+  const KALMAN_FILTER_Q = 6
+  const THROWAWAY_FIRST_N_COORDS = 3
+  const MINIMUM_ACCURACY_IN_M = 25
+
+  return (dispatch, getState) => {
+    const alreadyReceived = getState().getIn(['localState', 'gpsCoordinatesReceived'])
+    const nowReceived = alreadyReceived + 1
+    dispatch(setGPSCoordinatesReceived(nowReceived))
+    if (nowReceived <= THROWAWAY_FIRST_N_COORDS || location.accuracy > MINIMUM_ACCURACY_IN_M) {
+      return
+    }
+
+    if (getState().getIn(['localState', 'gpsSignalLost'])) {
+      dispatch(functional.gpsText('Found GPS'))
+    }
+    dispatch(gpsSignalLost(false))
+
+    const lastLocation = getState().getIn(['currentRide', 'lastLocation'])
+    let timeDiff = 0
+    if (lastLocation) {
+      timeDiff = (location.time / 1000) - (lastLocation.get('timestamp') / 1000)
+    }
+
+    if (!lastLocation || timeDiff > 5) {
+      const oldDistance = getState().getIn(['currentRide', 'currentRide', 'distance'])
+      const refiningLocation = getState().getIn(['currentRide', 'refiningLocation'])
+
+      let parsedLocation = Map({
+        accuracy: location.accuracy,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        timestamp: location.time,
+        speed: location.speed,
+      })
+
+      let parsedElevation = Map({
+        latitude: location.latitude,
+        longitude: location.longitude,
+        elevation: location.altitude,
+      })
+
+      let replaced = false
+      if (refiningLocation && lastLocation) {
+        // If you have at least one point already recorded, run the Kalman filter
+        // on the new location coming in using the one you already have
+        parsedLocation = kalmanFilter(
+          parsedLocation,
+          lastLocation,
+          KALMAN_FILTER_Q
+        )
+        parsedElevation = parsedElevation.set(
+          'latitude', parsedLocation.get('latitude')
+        ).set(
+          'longitude', parsedLocation.get('longitude')
+        ).set(
+          'accuracy', parsedLocation.get('accuracy')
+        )
+
+        let distance = haversine(
+          refiningLocation.get('latitude'),
+          refiningLocation.get('longitude'),
+          parsedLocation.get('latitude'),
+          parsedLocation.get('longitude')
+        )
+        if (distance < (30 / 5280)) {
+          // If you're within a 30' radius of the last place you were, don't
+          // just add the point on, replace the old one.
+          dispatch(replaceLastLocation(parsedLocation, parsedElevation))
+          replaced = true
+        }
+      }
+      if (!replaced) {
+        dispatch(newLocation(parsedLocation, parsedElevation))
+        const newDistance = getState().getIn(['currentRide', 'currentRide', 'distance'])
+        dispatch(functional.doSpeech(oldDistance, newDistance))
+      }
+      dispatch(functional.doHoofTracksUpload())
+    }
+  }
+}
+
+export function tryToLoadStateFromDisk () {
+  return (dispatch) => {
+    return Promise.all([
+      LocalStorage.loadLocalState(),
+      LocalStorage.loadCurrentRideState()
+    ]).then(([localState, currentRideState]) => {
+      if (localState) {
+        dispatch(loadLocalState(localState))
+      } else {
+        logInfo('no cached local state found')
+      }
+
+      if (currentRideState) {
+        logInfo('current ride state loaded')
+        dispatch(loadCurrentRideState(currentRideState))
+      } else {
+        logInfo('no cached current ride state found')
+      }
+    }).catch(catchAsyncError(dispatch, 'tryToLoadStateFromDisk'))
+  }
+}
+
+function loginAndSync(loginFunc, loginArgs) {
+  return (dispatch, getState) => {
+    return loginFunc(...loginArgs).then(resp => {
+      const userID = resp.id
+      const followingIDs = resp.following
+      const followerIDs = resp.followers
+
+      dispatch(dismissError())
+      dispatch(setAwaitingPasswordChange(true))
+      dispatch(saveUserID(userID))
+      setUserContext(userID)
+      Amplitude.setUserID(userID)
+      dispatch(functional.startListeningFCMTokenRefresh())
+      dispatch(setDoingInitialLoad(true))
+      return dispatch(functional.doSync({userID, followingIDs, followerIDs})).catch(catchAsyncError(dispatch))
+    }).then(() => {
+      // setDistribution needs to be far apart from FCMToken or they
+      // end up in a race condition on the server. really, need to
+      // consolidate the two calls.
+      dispatch(functional.setDistributionOnServer())
+      const syncFail = getState().getIn(['localState', 'fullSyncFail'])
+      if (!syncFail) {
+        TimeoutManager.newTimeout(() => {
+          dispatch(functional.switchRoot(FEED))
+          dispatch(functional.startListeningFCM())
+        }, 100)
+
+      } else {
+        dispatch(functional.switchRoot(NEEDS_SYNC))
+      }
+      dispatch(functional.removeForgotPWLinkListener())
+    }).catch(e => {
+      dispatch(errorOccurred(e.message))
+      if (!(e instanceof UnauthorizedError) && !(e instanceof UserAlreadyExistsError)) {
+        catchAsyncError(dispatch, 'loginAndSync')(e)
+      }
+    })
+  }
+}
+
+function configureBackgroundGeolocation () {
+  return () => {
+    return new Promise((res, rej) => {
+      BackgroundGeolocation.configure(
+        {
+          desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
+          locationProvider: BackgroundGeolocation.RAW_PROVIDER,
+          distanceFilter: 0,
+          maxLocations: 10,
+          interval: 0,
+          notificationTitle: 'You\'re out on a ride.',
+          notificationText: 'Tap here to see your progress.',
+        },
+        () => {
+          logInfo('Background geolocation configured')
+          res()
+        },
+        (e) => {
+          rej(e)
+        },
+      )
+    })
+  }
+}
+
+function doSpeech (oldDistance, newDistance) {
+const source = 'doSpeech'
+return (_, getState) => {
+  const newMiles = Math.floor(newDistance)
+  const oldMiles = Math.floor(oldDistance)
+  if (newMiles > oldMiles) {
+    const currentUserID = getState().getIn(['localState', 'userID'])
+    const currentUser = getState().getIn(['pouchRecords', 'users', currentUserID])
+    const settingEnabled = currentUser.get('enableDistanceAlerts')
+    const alertDistance = currentUser.get('alertDistance')
+    if (settingEnabled && newMiles % alertDistance === 0) {
+      cb(source)
+      Tts.getInitStatus().then(() => {
+        Tts.speak(`You have gone ${newMiles} miles`);
+      })
+    }
+  }
+}
+}
+
 function doHoofTracksUpload () {
   const source = 'doHoofTracksUpload'
-  cb(source)
   return (dispatch, getState) => {
     const running = getState().getIn(['localState', 'hoofTracksRunning'])
     if (running) {
+      cb(source)
       const lastUpload = getState().getIn(['currentRide', 'lastHoofTracksUpload'])
       const timeDiff = unixTimeNow() - lastUpload
       if ((!lastUpload || ((timeDiff) > 30000))) {
@@ -1293,42 +1396,42 @@ function doHoofTracksUpload () {
 }
 
 function stopHoofTracksDispatcher () {
- const source = 'stopHoofTracksDispatcher'
-  cb(source)
- return (dispatch, getState) => {
-   const hoofTracksID = getState().getIn(['localState', 'hoofTracksID'])
-   dispatch(setHoofTracksRunning(false))
-   if (hoofTracksID) {
-     dispatch(setHoofTracksLastUpload(null))
-     dispatch(setHoofTracksID(null))
-     UserAPI.clearHoofTrackCoords(hoofTracksID).catch(catchAsyncError(dispatch, source))
-   }
+const source = 'stopHoofTracksDispatcher'
+cb(source)
+return (dispatch, getState) => {
+ const hoofTracksID = getState().getIn(['localState', 'hoofTracksID'])
+ dispatch(setHoofTracksRunning(false))
+ if (hoofTracksID) {
+   dispatch(setHoofTracksLastUpload(null))
+   dispatch(setHoofTracksID(null))
+   UserAPI.clearHoofTrackCoords(hoofTracksID).catch(catchAsyncError(dispatch, source))
  }
+}
 }
 
 function checkNetworkConnection () {
-  const source = 'checkNetworkConnection'
-  cb(source)
-  return (dispatch, getState) => {
-    ApiClient.checkConnection().then(resp => {
-      dispatch(newNetworkState(resp.connected))
-      if (resp.connected) {
-        dispatch(functional.runPhotoQueue())
-        const needsPersist = getState().getIn(['localState', 'needsRemotePersist']) === DB_NEEDS_SYNC
-        if (needsPersist) {
-          dispatch(functional.doSync()).catch(catchAsyncError(dispatch, source))
-        }
+const source = 'checkNetworkConnection'
+cb(source)
+return (dispatch, getState) => {
+  ApiClient.checkConnection().then(resp => {
+    dispatch(newNetworkState(resp.connected))
+    if (resp.connected) {
+      dispatch(functional.runPhotoQueue())
+      const needsPersist = getState().getIn(['localState', 'needsRemotePersist']) === DB_NEEDS_SYNC
+      if (needsPersist) {
+        dispatch(functional.doSync()).catch(catchAsyncError(dispatch, source))
       }
-    })
-  }
+    }
+  })
+}
 }
 
 function startNetworkTracking () {
-  const source = 'startNetworkTracking'
-  cb(source)
-  return (dispatch) => {
-    if (functionalState.networkListenerRemover) {
-      functionalState.networkListenerRemover()
+const source = 'startNetworkTracking'
+cb(source)
+return (dispatch) => {
+  if (functionalState.networkListenerRemover) {
+    functionalState.networkListenerRemover()
     }
 
     const listener = () => {
@@ -1449,6 +1552,7 @@ function stopLocationTracking (clearLast=true) {
     dispatch(functional.stopGPSWatcher())
     dispatch(setShutdownInProgress(true))
     return dispatch(functional.shutdownBackgroundGeolocation()).then(() => {
+      dispatch(setGPSCoordinatesReceived(0))
       dispatch(setShutdownInProgress(false))
       if (clearLast) {
         dispatch(clearLastLocation())
@@ -1496,16 +1600,16 @@ function startBackgroundFetch () {
 function submitLogin (email, password) {
   const source = 'submitLogin'
   cb(source)
-  return (dispatch, getState) => {
-    return loginAndSync(UserAPI.login, [email, password], dispatch, getState)
+  return (dispatch) => {
+    return dispatch(functional.loginAndSync(UserAPI.login, [email, password]))
   }
 }
 
 function submitSignup (email, password) {
   const source = 'submitSignup'
   cb(source)
-  return (dispatch, getState) => {
-    return loginAndSync(UserAPI.signup, [email, password], dispatch, getState)
+  return (dispatch) => {
+    return dispatch(functional.loginAndSync(UserAPI.signup, [email, password]))
   }
 }
 
@@ -1739,14 +1843,16 @@ function toggleRideCarrot (rideID) {
   }
 }
 
+// This method of exporting allows us to mock individual functional actions
+// while testing some other functional action from this same module.
 const functional = {
   addHorseUser,
   appInitialized,
-  cb,
   changeHorseOwner,
   checkNetworkConnection,
   clearLocationRetry,
   clearRideNotifications,
+  configureBackgroundGeolocation,
   createCareEvent,
   createRideAtlasEntry,
   createRideComment,
@@ -1759,14 +1865,17 @@ const functional = {
   duplicateRide,
   exchangePWCode,
   getPWCode,
+  gpsLocationError,
   gpsText,
   loadRideCoordinates,
   loadRideElevations,
   loadSingleRide,
   locationPermissionsError,
+  loginAndSync,
   markNotificationPopped,
   markNotificationsSeen,
   newPassword,
+  onGPSLocation,
   persistFollow,
   persistHorseUpdate,
   persistHorseUser,
@@ -1800,6 +1909,7 @@ const functional = {
   submitLogin,
   submitSignup,
   switchRoot,
+  tryToLoadStateFromDisk,
   toggleRideCarrot,
   uploadPhoto,
 }
