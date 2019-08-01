@@ -7,6 +7,7 @@ import {
   viewTrainings,
 } from "../../dataViews/dataViews"
 import * as helpers from '../../helpers'
+import { trainingData } from '../__testData__/trainingData'
 
 function trainingSetup () {
   const userID1 = 'userID1'

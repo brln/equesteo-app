@@ -4,11 +4,17 @@ import { fromJS, Map } from 'immutable'
 
 import {
   CREATE_RIDE,
+  DISMISS_ERROR,
   GPS_SIGNAL_LOST,
   NEW_LOCATION,
   RIDE_ELEVATIONS_LOADED,
   RIDE_COORDINATES_LOADED,
-  RIDE_UPDATED, SET_GPS_COORDINATES_RECEIVED, REPLACE_LAST_LOCATION,
+  RIDE_UPDATED,
+  SET_GPS_COORDINATES_RECEIVED,
+  REPLACE_LAST_LOCATION,
+  SET_AWAITING_PW_CHANGE,
+  SAVE_USER_ID,
+  SET_DOING_INITIAL_LOAD,
 } from "../../constants"
 import * as helpers from '../../helpers'
 import functional from '../../actions/functional'
@@ -280,5 +286,32 @@ describe('onGPSLocation', () => {
     expect(actions[0].value).toBe(4)
     expect(actions[1].value).toBe(false)
     expect(actions[2]).toEqual(expectedLocation)
+  })
+})
+
+describe('loginAndSync', () => {
+  it ('logs in and syncs', () => {
+    const store = mockStore(fromJS({}))
+    const loginFunc = () => {
+      return Promise.resolve({
+        id: 'someID',
+        following: [],
+        followers: [],
+      })
+    }
+
+    functional.startListeningFCMTokenRefresh = jest.fn(() => { return () => {}  })
+    functional.setDistributionOnServer = jest.fn(() => { return () => {}  })
+    functional.doSync = jest.fn(() => { return () => Promise.resolve()  })
+
+    return store.dispatch(functional.loginAndSync(loginFunc, [])).then(() => {
+      const actions = store.getActions()
+      expect(actions.map(a => a.type)).toEqual([
+        DISMISS_ERROR,
+        SET_AWAITING_PW_CHANGE,
+        SAVE_USER_ID,
+        SET_DOING_INITIAL_LOAD,
+      ])
+    })
   })
 })

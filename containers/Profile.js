@@ -280,17 +280,19 @@ class ProfileContainer extends BackgroundComponent {
     })
   }
 
-  trainings () {
+  static trainings (trainings, users, rides, rideHorses, horses, horseUsers, profileUser) {
     return viewTrainings(
-      this.props.trainings,
-      this.props.users,
-      this.props.rides,
-      this.props.rideHorses,
-      this.props.horses,
-      this.props.horseUsers,
-    ).get(this.props.profileUser.get('_id')).reduce((accum, t) => {
-      const day = moment(t.get('startTime')).hour(0).minute(0).second(0).millisecond(0).toISOString()
-      accum.get(day) ? accum = accum.set(day, accum.get(day).push(t)) : accum = accum.set(day, List([t]))
+      trainings,
+      users,
+      rides,
+      rideHorses,
+      horses,
+      horseUsers,
+    ).get(profileUser.get('_id')).reduce((accum, t) => {
+      if (t.get('rideID')) {
+        const day = moment(t.get('startTime')).hour(0).minute(0).second(0).millisecond(0).toISOString()
+        accum.get(day) ? accum = accum.set(day, accum.get(day).push(t)) : accum = accum.set(day, List([t]))
+      }
       return accum
     }, Map())
   }
@@ -298,6 +300,15 @@ class ProfileContainer extends BackgroundComponent {
   render() {
     logRender('ProfileContainer')
     if (this.props.profileUser.get('_id')) {
+      const trainings = ProfileContainer.trainings(
+        this.props.trainings,
+        this.props.users,
+        this.props.rides,
+        this.props.rideHorses,
+        this.props.horses,
+        this.props.horseUsers,
+        this.props.profileUser
+      )
       return (
         <Profile
           createFollow={this.createFollow}
@@ -317,7 +328,7 @@ class ProfileContainer extends BackgroundComponent {
           showHorseProfile={this.showHorseProfile}
           showPhotoLightbox={this.showPhotoLightbox}
           showUserList={this.showUserList}
-          trainings={this.trainings()}
+          trainings={trainings}
           uploadPhoto={this.uploadPhoto}
           userID={this.props.userID}
           users={this.props.users}
