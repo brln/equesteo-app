@@ -16,7 +16,7 @@ class MockPouch {
 }
 
 describe("RidePersister service", () => {
-  it('persists a ride', () => {
+  it('persists a new ride', () => {
     const rideID = '3522a01c3bf3032ef03838d658b9400f_1564701204237'
     const ride = fromJS({
       notes: null,
@@ -76,14 +76,14 @@ describe("RidePersister service", () => {
     const mockPouch = new MockPouch()
 
     const ridePersister = new RidePersister(dispatch, getState, rideID, mockPouch)
-    return ridePersister.persistRide(true, rideCoordinates, rideElevations, Map(), Map(), Map(), Map()).then(() => {
+    return ridePersister.persistRide(true, rideCoordinates, rideElevations).then(() => {
       expect(mockPouch.saves[0].type).toBe('rideElevations')
       expect(mockPouch.saves[1].type).toBe('rideCoordinates')
       expect(mockPouch.saves[2].type).toBe('ride')
     })
   })
 
-  it('trims rides ride', () => {
+  it('persists an existing ride', () => {
     const rideID = '3522a01c3bf3032ef03838d658b9400f_1564701204237'
     const ride = fromJS({
       notes: null,
@@ -117,22 +117,16 @@ describe("RidePersister service", () => {
       userID: '3522a01c3bf3032ef03838d658b9400f'
     })
 
-    const coord1 = [ 37.324607, -122.024893, 1564701180963.9158, 5 ]
-    const coord2 = [ 37.324664, -122.025035, 1564701185964.258, 4.72 ]
-    const coord3 = [ 37.324836, -122.025072, 1564701191960.047, 4.76 ]
-    const coord4 = [ 37.325156, -122.025069, 1564701201974.845, 4.72 ]
-
     const rideCoordinates = fromJS({
       _id: '3522a01c3bf3032ef03838d658b9400f_1564701204237_coordinates',
       rideID: '3522a01c3bf3032ef03838d658b9400f_1564701204237',
       userID: '3522a01c3bf3032ef03838d658b9400f',
       type: 'rideCoordinates',
       rideCoordinates:
-        [ coord1,
-          coord2,
-          coord3,
-          coord4,
-        ]
+        [ [ 37.324607, -122.024893, 1564701180963.9158, 5 ],
+          [ 37.324664, -122.025035, 1564701185964.258, 4.72 ],
+          [ 37.324836, -122.025072, 1564701191960.047, 4.76 ],
+          [ 37.325156, -122.025069, 1564701201974.845, 4.72 ] ]
     })
 
     const getState = function () {
@@ -149,38 +143,10 @@ describe("RidePersister service", () => {
     const mockPouch = new MockPouch()
 
     const ridePersister = new RidePersister(dispatch, getState, rideID, mockPouch)
-    return ridePersister.persistRide(true, rideCoordinates, rideElevations, Map(), Map(), [1, 3], Map()).then(() => {
-      expect(mockPouch.saves[0].type).toBe('rideElevations')
-      expect(mockPouch.saves[1].type).toBe('rideCoordinates')
-      expect(mockPouch.saves[2].type).toBe('ride')
-
-      expect(mockPouch.saves[1].rideCoordinates).toEqual([
-        coord2,
-        coord3,
-        coord4
-      ])
-    }).then(() => {
-      ridePersister.persistRide(true, rideCoordinates, rideElevations, Map(), Map(), [1, 2], Map()).then(() => {
-        expect(mockPouch.saves[0].type).toBe('rideElevations')
-        expect(mockPouch.saves[1].type).toBe('rideCoordinates')
-        expect(mockPouch.saves[2].type).toBe('ride')
-
-        expect(mockPouch.saves[1].rideCoordinates).toEqual([
-          coord2,
-          coord3,
-        ])
-      })
-    }).then(() => {
-      ridePersister.persistRide(false, rideCoordinates, rideElevations, Map(), Map(), [1, 2], Map()).then(() => {
-        expect(mockPouch.saves[0].type).toBe('rideElevations')
-        expect(mockPouch.saves[1].type).toBe('rideCoordinates')
-        expect(mockPouch.saves[2].type).toBe('ride')
-
-        expect(mockPouch.saves[1].rideCoordinates).toEqual([
-          coord2,
-          coord3,
-        ])
-      })
+    return ridePersister.persistRide(false, rideCoordinates, rideElevations).then(() => {
+      expect(mockPouch.saves[0].type).toBe('rideCoordinates')
+      expect(mockPouch.saves[1].type).toBe('ride')
     })
   })
 })
+

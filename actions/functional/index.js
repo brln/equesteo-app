@@ -438,10 +438,6 @@ function duplicateRide (userID, ride, rideElevations, rideCoordinates) {
       true,
       newCoordinates,
       newElevations,
-      [],
-      [],
-      false,
-      []
     )).then(() => {
       return dispatch(functional.doSync())
     })
@@ -607,12 +603,12 @@ function persistFollow (followID, creating) {
   }
 }
 
-function persistRide (rideID, newRide, rideCoordinates, rideElevations, stashedPhotos, deletedPhotoIDs, trimValues, rideHorses) {
+function persistRide (rideID, newRide, rideCoordinates, rideElevations, stashedPhotos=Map(), deletedPhotoIDs=Map(), rideHorses=Map()) {
   const source = 'persistRide'
   cb(source)
   return (dispatch, getState) => {
     const ridePersister = new RidePersister(dispatch, getState, rideID, PouchCouch)
-    return ridePersister.persistRide(newRide, rideCoordinates, rideElevations, stashedPhotos, deletedPhotoIDs, trimValues, rideHorses)
+    return ridePersister.persistRide(newRide, rideCoordinates, rideElevations, stashedPhotos, deletedPhotoIDs, rideHorses)
   }
 }
 

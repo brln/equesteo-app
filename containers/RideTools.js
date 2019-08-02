@@ -96,10 +96,6 @@ class RideToolsContainer extends Component {
       false,
       this.props.rideCoordinates,
       this.props.rideElevations,
-      [],
-      [],
-      null,
-      List()
     )).then(() => {
       return EqNavigation.popToRoot(this.props.componentId).catch(() => {})
     }).then(() => {

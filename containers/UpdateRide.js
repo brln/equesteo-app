@@ -89,6 +89,7 @@ class UpdateRideContainer extends BackgroundComponent {
     this.clearMenus = this.clearMenus.bind(this)
     this.createPhoto = this.createPhoto.bind(this)
     this.discardRide = this.discardRide.bind(this)
+    this.doPersist = this.doPersist.bind(this)
     this.horses = this.horses.bind(this)
     this.markPhotoDeleted = this.markPhotoDeleted.bind(this)
     this.openPhotoMenu = this.openPhotoMenu.bind(this)
@@ -99,7 +100,7 @@ class UpdateRideContainer extends BackgroundComponent {
     this.stashedRidePhotoKey = this.stashedRidePhotoKey.bind(this)
     this.trimRide = this.trimRide.bind(this)
     this.unselectHorse = this.unselectHorse.bind(this)
-    this.updateLocalRideCoords = this.updateLocalRideCoords.bind(this)
+    this.maybeDoTrim = this.maybeDoTrim.bind(this)
 
     this.memoizedHorses = memoizeOne(this.horses)
     this.memoizedRideHorses = memoizeOne(this.rideHorses)
@@ -152,6 +153,18 @@ class UpdateRideContainer extends BackgroundComponent {
     return state
   }
 
+  doPersist() {
+    return this.props.dispatch(functional.persistRide(
+      this.props.ride.get('_id'),
+      true,
+      this.props.rideCoordinates,
+      this.props.rideElevations,
+      this.props.stashedRidePhotos,
+      this.state.deletedPhotoIDs,
+      this.memoizedRideHorses(this.props.rideHorses, this.props.rideID),
+    ))
+  }
+
   navigationButtonPressed({ buttonId }) {
     if (this.props.newRide) {
       if (buttonId === 'save') {
@@ -160,18 +173,9 @@ class UpdateRideContainer extends BackgroundComponent {
           doRevert: false
         })
         Navigation.mergeOptions(this.props.componentId, {topBar: {rightButtons: []}})
-        this.updateLocalRideCoords()
+        this.maybeDoTrim()
         this.props.dispatch(functional.stopHoofTracksDispatcher())
-        this.props.dispatch(functional.persistRide(
-          this.props.ride.get('_id'),
-          true,
-          this.props.rideCoordinates,
-          this.props.rideElevations,
-          this.props.stashedRidePhotos,
-          this.state.deletedPhotoIDs,
-          this.state.trimValues,
-          this.memoizedRideHorses(this.props.rideHorses, this.props.rideID),
-        )).then(() => {
+        this.doPersist().then(() => {
           return EqNavigation.popToRoot(this.props.componentId)
         }).then(() => {
           this.props.dispatch(clearPausedLocations())
@@ -216,19 +220,9 @@ class UpdateRideContainer extends BackgroundComponent {
         this.setState({
           doRevert: false
         })
-        this.props.dispatch(functional.persistRide(
-          this.props.ride.get('_id'),
-          false,
-          this.props.rideCoordinates,
-          this.props.rideElevations,
-          this.props.stashedRidePhotos,
-          this.state.deletedPhotoIDs,
-          this.state.trimValues,
-          this.memoizedRideHorses(this.props.rideHorses, this.props.rideID),
-        )).then(() => {
-          Navigation.popTo(this.props.popBackTo).then(() => {
-            this.updateLocalRideCoords()
-          })
+        this.maybeDoTrim()
+        this.doPersist().then(() => {
+          return Navigation.popTo(this.props.popBackTo)
         })
       } else if (buttonId === 'discard') {
         EqNavigation.pop(this.props.componentId).catch(() => {})
@@ -263,7 +257,7 @@ class UpdateRideContainer extends BackgroundComponent {
     }).catch(() => {})
   }
 
-  updateLocalRideCoords () {
+  maybeDoTrim () {
     if (this.state.trimValues) {
       const rideCoords = this.props.rideCoordinates.get('rideCoordinates').toJS()
       const spliced = coordSplice(rideCoords, this.state.trimValues)
@@ -315,8 +309,6 @@ class UpdateRideContainer extends BackgroundComponent {
       ).set(
         'startTime', firstCoord.get('timestamp')
       )
-
-
       this.props.dispatch(rideUpdated(updatedRide))
     }
   }

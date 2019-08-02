@@ -60,7 +60,7 @@ export default class RidePersister {
     })
   }
 
-  persistRide (newRide, rideCoordinates, rideElevations, stashedPhotos, deletedPhotoIDs, trimValues, rideHorses) {
+  persistRide (newRide, rideCoordinates, rideElevations, stashedPhotos=Map(), deletedPhotoIDs=Map(), rideHorses=Map()) {
     // Ride elevations needs to be saved before the ride so that the elevations
     // are available in the changes iterator on the server when it processes
     // the new ride for trainings.
@@ -74,22 +74,15 @@ export default class RidePersister {
     })
 
     if (newRide) {
-      docSaves = this.saveElevations(rideElevations)
-    }
-
-    if (trimValues) {
-      const newCoords = coordSplice(rideCoordinates.get('rideCoordinates').toJS(), trimValues)
-      rideCoordinates = rideCoordinates.set('rideCoordinates', List(newCoords))
-    }
-
-    if (newRide || trimValues) {
       docSaves = docSaves.then(() => {
-        return this.saveCoordinates(rideCoordinates)
+        this.saveElevations(rideElevations)
       })
     }
 
     docSaves = docSaves.then(() => {
-      return this.saveRide()
+      return this.saveCoordinates(rideCoordinates).then(() => {
+        return this.saveRide()
+      })
     })
 
     stashedPhotos.forEach((stashedPhoto, photoID) => {
