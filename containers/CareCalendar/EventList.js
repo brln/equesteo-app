@@ -226,12 +226,14 @@ class EventListContainer extends Component {
 
 
   render() {
+    // This used to move the tab to the relevant one when you were done
+    // inputing an event, but native-base broke the switching and made it
+    // create an infinite loop. Try again someday and hope they've fixed it.
     return (
       <View style={{flex: 1}}>
         <Tabs
           locked={true}
           onChangeTab={this.onChangeTab}
-          page={this.props.careCalendarTab}
           tabBarUnderlineStyle={{backgroundColor: 'white'}}
           style={{flex: 10}}
         >

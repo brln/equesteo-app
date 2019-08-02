@@ -17,7 +17,7 @@
     "immutable": "^3.8.2",
     "memoize-one": "^5.0.5",
     "moment": "^2.24.0",
-    "native-base": "^2.13.3",
+    "native-base": "git://github.com/equesteo/NativeBase.git",
     "pouchdb-react-native": "^6.4.1",
     "react": "16.8.6",
     "react-native": "^0.60.4",
