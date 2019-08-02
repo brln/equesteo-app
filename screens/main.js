@@ -3,6 +3,7 @@ import { Navigation } from 'react-native-navigation';
 import About from '../components/About'
 import BarnContainer from '../containers/Barn'
 import Camera from '../containers/Camera'
+import ColorPickerContainer from '../containers/UpdateHorse/ColorPicker'
 import DrawerContainer from '../containers/Drawer'
 import FeedContainer from '../containers/Feed/Feed'
 import RideButton from '../containers/Feed/RideButton'
@@ -33,7 +34,7 @@ import ShareRideContainer from '../containers/ShareRide'
 import SignupContainer from '../containers/SignupLogin/Signup'
 import HoofTracksContainer from '../containers/Recorder/HoofTracks'
 import TrainingContainer from '../containers/Training'
-import UpdateHorseContainer from '../containers/UpdateHorse'
+import UpdateHorseContainer from '../containers/UpdateHorse/UpdateHorse'
 import UpdateRideContainer from '../containers/UpdateRide'
 import UpdateProfileContainer from '../containers/UpdateProfile'
 
@@ -41,6 +42,7 @@ import {
   ABOUT_PAGE,
   BARN,
   CAMERA,
+  COLOR_PICKER,
   DRAWER,
   FEED,
   FEEDBACK,
@@ -74,7 +76,6 @@ import {
   UPDATE_HORSE,
   UPDATE_PROFILE,
   UPDATE_RIDE,
-  UPDATE_NEW_RIDE_ID,
 } from './consts/main'
 
 
@@ -82,6 +83,7 @@ import {
 export function registerScreens(store, Provider) {
   Navigation.registerComponent(ABOUT_PAGE, () => About)
   Navigation.registerComponentWithRedux(CAMERA, () => Camera, Provider, store)
+  Navigation.registerComponentWithRedux(COLOR_PICKER, () => ColorPickerContainer, Provider, store)
   Navigation.registerComponentWithRedux(BARN, () => BarnContainer, Provider, store)
   Navigation.registerComponentWithRedux(DRAWER, () => DrawerContainer, Provider, store)
   Navigation.registerComponentWithRedux(FEED, () => FeedContainer, Provider, store)

@@ -6,22 +6,23 @@ import { fromHsv } from 'react-native-color-picker'
 import { Navigation } from 'react-native-navigation'
 
 
-import UpdateHorse from '../components/UpdateHorse/UpdateHorse'
+import UpdateHorse from '../../components/UpdateHorse/UpdateHorse'
 import {
   createHorsePhoto,
   deleteUnpersistedHorse,
   horseUpdated,
   horseUserUpdated,
-} from '../actions/standard'
-import functional from '../actions/functional'
-import { brand } from '../colors'
-import { generateUUID, logRender, unixTimeNow } from '../helpers'
-import { EqNavigation } from '../services'
+} from '../../actions/standard'
+import functional from '../../actions/functional'
+import { brand } from '../../colors'
+import { generateUUID, logRender, unixTimeNow } from '../../helpers'
+import { EqNavigation } from '../../services'
 import Amplitude, {
   CHOOSE_HORSE_TACK_COLOR,
   UPDATE_DEFAULT_HORSE,
   UPDATE_GAIT_SPEEDS
-} from "../services/Amplitude"
+} from "../../services/Amplitude"
+import { COLOR_PICKER } from "../../screens/consts/main"
 
 class UpdateHorseContainer extends PureComponent {
   static options() {
@@ -58,7 +59,6 @@ class UpdateHorseContainer extends PureComponent {
     this.state = {
       backDebounce: false,
       colorModalOpen: false,
-      chosenColor: null,
       cachedHorse: null,
       cachedHorseUser: null,
       deletedPhotoIDs: [],
@@ -69,15 +69,13 @@ class UpdateHorseContainer extends PureComponent {
       showPhotoMenu: false,
     }
 
-    this.changeColor = this.changeColor.bind(this)
     this.clearPhotoMenu = this.clearPhotoMenu.bind(this)
     this.goBack = this.goBack.bind(this)
     this.horseUpdated = this.horseUpdated.bind(this)
     this.markGaitSpeedsUpdated = this.markGaitSpeedsUpdated.bind(this)
     this.markPhotoDeleted = this.markPhotoDeleted.bind(this)
     this.navigationButtonPressed = this.navigationButtonPressed.bind(this)
-    this.onColorModalClosed = this.onColorModalClosed.bind(this)
-    this.openColorModal = this.openColorModal.bind(this)
+    this.openColorPicker = this.openColorPicker.bind(this)
     this.openPhotoMenu = this.openPhotoMenu.bind(this)
     this.setDefaultHorse = this.setDefaultHorse.bind(this)
     this.stashPhoto = this.stashPhoto.bind(this)
@@ -105,25 +103,15 @@ class UpdateHorseContainer extends PureComponent {
     return nextState
   }
 
-  openColorModal (colorModalOpen) {
-    return () => {
-      this.removeMenuItems()
-      this.setState({ colorModalOpen })
-    }
-  }
-
-  onColorModalClosed () {
-    this.replaceMenuItems()
-    this.setState({ colorModalOpen: false})
-    if (this.state.chosenColor) {
-      this.horseUpdated(this.props.horse.merge({
-        color: fromHsv(this.state.chosenColor)
-      }))
-    }
-  }
-
-  changeColor (chosenColor) {
-    this.setState({ chosenColor })
+  openColorPicker () {
+    EqNavigation.push(this.props.componentId, {
+      component: {
+        name: COLOR_PICKER,
+        passProps: {
+          horseID: this.props.horseID
+        }
+      }
+    }).catch(() => {})
   }
 
   openPhotoMenu (profilePhotoID) {
@@ -283,7 +271,6 @@ class UpdateHorseContainer extends PureComponent {
     logRender('UpdateHorseContainer')
     return (
       this.props.horse ? <UpdateHorse
-        changeColor={this.changeColor}
         clearPhotoMenu={this.clearPhotoMenu}
         colorModalOpen={this.state.colorModalOpen}
         horse={this.props.horse}
@@ -293,8 +280,7 @@ class UpdateHorseContainer extends PureComponent {
         markGaitSpeedsUpdated={this.markGaitSpeedsUpdated}
         markPhotoDeleted={this.markPhotoDeleted}
         newHorse={this.props.newHorse}
-        onColorModalClosed={this.onColorModalClosed}
-        openColorModal={this.openColorModal}
+        openColorPicker={this.openColorPicker}
         openPhotoMenu={this.openPhotoMenu}
         setDefaultHorse={this.setDefaultHorse}
         showPhotoMenu={this.state.showPhotoMenu}

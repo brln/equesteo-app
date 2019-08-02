@@ -1,4 +1,4 @@
-import { fromJS, Map } from 'immutable'
+import { fromJS, Map, List } from 'immutable'
 
 import {
   clearRidePhotoFromStash,
@@ -10,13 +10,13 @@ import {
 } from '../actions/standard'
 import functional, { catchAsyncError } from "../actions/functional"
 import { coordSplice } from '../helpers'
-import { PouchCouch } from '../services'
 
 export default class RidePersister {
-  constructor (dispatch, getState, rideID) {
+  constructor (dispatch, getState, rideID, pouchService) {
     this.dispatch = dispatch
     this.getState = getState
     this.rideID = rideID
+    this.pouchService = pouchService
   }
 
   getRide () {
@@ -32,20 +32,21 @@ export default class RidePersister {
   }
 
   saveRide () {
-    return PouchCouch.saveRide(this.getRide().toJS()).then(({ rev }) => {
+    const ride = this.getRide().toJS()
+    return this.pouchService.saveRide(ride).then(({ rev }) => {
       this.dispatch(rideUpdated(this.getRide().set('_rev', rev)))
     })
   }
 
   saveRideHorse (rideHorse) {
-    return PouchCouch.saveRide(rideHorse.toJS()).then(({ rev }) => {
+    return this.pouchService.saveRide(rideHorse.toJS()).then(({ rev }) => {
       this.dispatch(rideHorseUpdated(this.getRideHorse(rideHorse.get('_id')).set('_rev', rev)))
     })
   }
 
   saveElevations (rideElevations) {
     let theElevations = rideElevations.toJS()
-    return PouchCouch.saveRide(theElevations).then(({ rev }) => {
+    return this.pouchService.saveRide(theElevations).then(({ rev }) => {
       theElevations._rev = rev
       this.dispatch(rideElevationsLoaded(theElevations))
     })
@@ -53,7 +54,7 @@ export default class RidePersister {
 
   saveCoordinates (rideCoordinates) {
     let theCoordinates = rideCoordinates.toJS()
-    return PouchCouch.saveRide(theCoordinates).then(({ rev }) => {
+    return this.pouchService.saveRide(theCoordinates).then(({ rev }) => {
       theCoordinates._rev = rev
       this.dispatch(rideCoordinatesLoaded(theCoordinates))
     })
@@ -73,20 +74,20 @@ export default class RidePersister {
     })
 
     if (newRide) {
-      docSaves = this.saveElevations(rideElevations).then(() => {
+      docSaves = this.saveElevations(rideElevations)
+    }
+
+    if (trimValues) {
+      const newCoords = coordSplice(rideCoordinates.get('rideCoordinates').toJS(), trimValues)
+      rideCoordinates = rideCoordinates.set('rideCoordinates', List(newCoords))
+    }
+
+    if (newRide || trimValues) {
+      docSaves = docSaves.then(() => {
         return this.saveCoordinates(rideCoordinates)
       })
-    } else if (trimValues) {
-      let immutableCoordinates
-      docSaves = PouchCouch.loadRideCoordinates(this.rideID).then((theCoordinates) => {
-        theCoordinates.rideCoordinates = coordSplice(theCoordinates.rideCoordinates, trimValues)
-        immutableCoordinates = fromJS(theCoordinates)
-        return PouchCouch.saveRide(theCoordinates)
-      }).then(rideCoordinateDoc => {
-        this.dispatch(rideCoordinatesLoaded(immutableCoordinates.set('_rev', rideCoordinateDoc.rev)))
-        return this.saveRide()
-      })
     }
+
     docSaves = docSaves.then(() => {
       return this.saveRide()
     })
@@ -98,7 +99,7 @@ export default class RidePersister {
       }))
       this.dispatch(ridePhotoUpdated(toSave))
       docSaves = docSaves.then(() => {
-        return PouchCouch.saveRide(toSave.toJS()).then(rideDoc => {
+        return this.pouchService.saveRide(toSave.toJS()).then(rideDoc => {
           this.dispatch(functional.photoNeedsUpload('ride', stashedPhoto.get('uri'), photoID))
           this.dispatch(ridePhotoUpdated(this.getRidePhoto(photoID).set('_rev', rideDoc.rev)))
           this.dispatch(clearRidePhotoFromStash(this.rideID, photoID))
@@ -110,7 +111,7 @@ export default class RidePersister {
       const deleted = this.getRidePhoto(deletedPhotoID).set('deleted', true)
       this.dispatch(ridePhotoUpdated(deleted))
       docSaves = docSaves.then(() => {
-        return PouchCouch.saveRide(deleted.toJS()).then(rideDoc => {
+        return this.pouchService.saveRide(deleted.toJS()).then(rideDoc => {
           this.dispatch(ridePhotoUpdated(this.getRidePhoto(deletedPhotoID).set('_rev', rideDoc.rev)))
         })
       })

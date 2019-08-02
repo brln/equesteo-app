@@ -15,7 +15,6 @@ import {
   CardItem,
 } from 'native-base';
 
-import ColorModal from './ColorModal'
 import EqPicker from '../EqPicker'
 import { brand, darkBrand } from '../../colors'
 import PhotoFab from './PhotoFab'
@@ -255,12 +254,6 @@ export default class UpdateHorse extends PureComponent {
   render() {
     return (
       <View>
-        <ColorModal
-          initialColor={this.props.horse.get('color') || brand}
-          changeColor={this.props.changeColor}
-          modalOpen={this.props.colorModalOpen}
-          onClosed={this.props.onColorModalClosed}
-        />
         <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'}>
           <View style={styles.container}>
             <View style={{flex: 1, padding: 5}}>
@@ -324,7 +317,7 @@ export default class UpdateHorse extends PureComponent {
                 <CardItem cardBody style={{marginLeft: 20, marginRight: 20}}>
                   <TouchableOpacity
                     style={{height: 40, width: '100%', backgroundColor: this.props.horse.get('color') || brand, borderRadius: 4}}
-                    onPress={this.props.openColorModal(true)}
+                    onPress={this.props.openColorPicker}
                   />
                 </CardItem>
 

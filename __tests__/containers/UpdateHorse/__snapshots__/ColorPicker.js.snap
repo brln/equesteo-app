@@ -1,0 +1,71 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders 1`] = `
+<View
+  style={
+    Object {
+      "flex": 1,
+      "height": "100%",
+      "padding": 20,
+      "width": "100%",
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "flex": 1,
+      }
+    }
+  >
+    <View
+      onLayout={[Function]}
+      style={
+        Object {
+          "alignItems": "center",
+          "flex": 1,
+          "justifyContent": "center",
+        }
+      }
+    />
+    <View>
+      <RCTSlider
+        disabled={false}
+        enabled={true}
+        maximumValue={1}
+        minimumValue={0}
+        onChange={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onSlidingComplete={null}
+        onStartShouldSetResponder={[Function]}
+        onValueChange={[Function]}
+        step={0}
+        style={
+          Object {
+            "height": 40,
+          }
+        }
+        value={0.6127659574468085}
+      />
+      <RCTSlider
+        disabled={false}
+        enabled={true}
+        maximumValue={1}
+        minimumValue={0}
+        onChange={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onSlidingComplete={null}
+        onStartShouldSetResponder={[Function]}
+        onValueChange={[Function]}
+        step={0}
+        style={
+          Object {
+            "height": 40,
+          }
+        }
+        value={0.9215686274509803}
+      />
+    </View>
+  </View>
+</View>
+`;

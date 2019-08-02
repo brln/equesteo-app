@@ -8,7 +8,7 @@ import { trainingDataByDay } from '../../__testData__/trainingData'
 describe('TrainingCard', () => {
   it("parses the training data", () => {
     const data = fromJS(trainingDataByDay)
-    const result = TrainingCard.calcs(data)
+    const result = TrainingCard.calcs(data, (new Date('2019-07-29T07:00:00.000Z')))
     const expected = {
       "rides": {
         "thisWeek": 0,

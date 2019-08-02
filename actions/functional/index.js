@@ -611,7 +611,7 @@ function persistRide (rideID, newRide, rideCoordinates, rideElevations, stashedP
   const source = 'persistRide'
   cb(source)
   return (dispatch, getState) => {
-    const ridePersister = new RidePersister(dispatch, getState, rideID)
+    const ridePersister = new RidePersister(dispatch, getState, rideID, PouchCouch)
     return ridePersister.persistRide(newRide, rideCoordinates, rideElevations, stashedPhotos, deletedPhotoIDs, trimValues, rideHorses)
   }
 }

@@ -1,6 +1,7 @@
 export const ABOUT_PAGE = 'equesteo.About'
 export const BARN = 'equesteo.Barn'
 export const CAMERA = 'equesteo.Camera'
+export const COLOR_PICKER = 'equesteo.ColorPicker'
 export const DRAWER = 'equesteo.Drawer'
 export const FEED = 'equesteo.Feed'
 export const FEEDBACK = 'equesteo.Feedback'

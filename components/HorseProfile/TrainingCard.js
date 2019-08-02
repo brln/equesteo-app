@@ -17,11 +17,10 @@ const { width } = Dimensions.get('window')
 const columnWidth = (width / 4) - 20
 
 export default class TrainingCard extends PureComponent {
-  static calcs (trainings) {
-    const today = new Date()
-    const thisMonday = getMonday(today)
-    const firstOfMonth = getFirstOfMonth(today)
-    const firstOfYear = getFirstOfYear(today)
+  static calcs (trainings, forDate) {
+    const thisMonday = getMonday(forDate)
+    const firstOfMonth = getFirstOfMonth(forDate)
+    const firstOfYear = getFirstOfYear(forDate)
     const data = {
       rides: {
         thisWeek: 0,
@@ -77,7 +76,7 @@ export default class TrainingCard extends PureComponent {
       return null
     }
     console.log(this.props.trainings.toJSON())
-    const calcs = TrainingCard.calcs(this.props.trainings)
+    const calcs = TrainingCard.calcs(this.props.trainings, (new Date()))
     console.log(calcs)
     return (
       <Card style={{flex: 1}}>
