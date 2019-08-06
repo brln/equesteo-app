@@ -22,7 +22,9 @@ export default class URIImage extends PureComponent {
   }
 
   componentWillUnmount () {
-    TimeoutManager.deleteTimeout(this.retryTimeout)
+    if (this.retryTimeout) {
+      TimeoutManager.deleteTimeout(this.retryTimeout)
+    }
   }
 
   onError () {

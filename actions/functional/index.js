@@ -128,6 +128,7 @@ const functionalState = {
   locationTrackingRetry: null,
   networkListenerRemover: null,
   pwlinkListener: null,
+  feedMessageTimeout: null,
 }
 
 export function catchAsyncError (dispatch, source) {
@@ -1626,7 +1627,10 @@ function doSync (syncData={}, showProgress=true, doUpload=true) {
           color,
         })))
         if (timeout) {
-          TimeoutManager.newTimeout(() => {
+          if (functionalState.feedMessageTimeout) {
+            TimeoutManager.deleteTimeout(functionalState.feedMessageTimeout)
+          }
+          functionalState.feedMessageTimeout = TimeoutManager.newTimeout(() => {
             dispatch(clearFeedMessage())
           }, timeout)
         }
@@ -1646,14 +1650,6 @@ function doSync (syncData={}, showProgress=true, doUpload=true) {
       if (getState().getIn(['localState', 'goodConnection'])) {
         const remotePersistStatus = getState().getIn(['localState', 'needsRemotePersist'])
         if (remotePersistStatus === DB_SYNCING) {
-          // If a sync has already started, wait 10 seconds then run another one.
-          // This gives time for everything (photo uploads, mostly) to settle,
-          // then they can all go with one sync.
-          TimeoutManager.deleteTimeout(functionalState.enqueuedSync)
-          functionalState.enqueuedSync = TimeoutManager.newTimeout(() => {
-            dispatch(functional.doSync(syncData, showProgress)).catch(catchAsyncError(dispatch, source))
-            functionalState.enqueuedSync = null
-          }, 10000)
           return Promise.resolve()
         } else {
           dispatch(setRemotePersist(DB_SYNCING))

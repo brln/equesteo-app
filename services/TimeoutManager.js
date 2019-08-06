@@ -16,7 +16,7 @@ export default class TimeoutManager {
       })
     }, time)
     timeoutID += 1
-    if (Object.keys(allTimeouts).length > 10) {
+    if (Object.keys(allTimeouts).length > 100) {
       captureMessage('Too many timeout Events!')
     }
     return timeoutID
@@ -27,4 +27,5 @@ export default class TimeoutManager {
       clearTimeout(allTimeouts[id])
       delete allTimeouts[id]
     }
-  }}
+  }
+}
