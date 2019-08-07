@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { Map } from 'immutable'
 
 import { createHorse } from '../actions/standard'
 import Barn from '../components/Barn/Barn'
@@ -74,7 +75,7 @@ class BarnContainer extends BackgroundComponent {
 
   render() {
     logRender('BarnContainer')
-    const horsesToShow = viewHorsesByUserID(this.props.horseUsers, this.props.horses).get(this.props.userID)
+    const horsesToShow = viewHorsesByUserID(this.props.horseUsers, this.props.horses).get(this.props.userID) || Map()
     return (
       <Barn
         horses={horsesToShow}

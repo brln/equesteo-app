@@ -15,7 +15,7 @@ export default class Barn extends PureComponent {
         <ScrollView>
           <View style={styles.main}>
             {
-              this.props.horses.map((horse) => {
+              this.props.horses.count() ? this.props.horses.map((horse) => {
                 return <HorseBarnCard
                   key={horse.get('_id')}
                   horse={horse}
@@ -23,7 +23,7 @@ export default class Barn extends PureComponent {
                   horseProfile={this.props.horseProfile}
                   ownerID={this.props.horseOwnerIDs.get(horse.get('_id'))}
                 />
-              }).toJS()
+              }).toJS() : null
             }
             {
               <NewHorseButton
