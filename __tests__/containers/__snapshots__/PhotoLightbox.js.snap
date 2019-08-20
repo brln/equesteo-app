@@ -1,0 +1,107 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`render 1`] = `
+<View
+  onLayout={[Function]}
+  style={
+    Object {
+      "flex": 1,
+      "overflow": "hidden",
+    }
+  }
+>
+  <View>
+    <View
+      style={
+        Object {
+          "zIndex": 9,
+        }
+      }
+    >
+      <View
+        style={
+          Object {
+            "backgroundColor": "transparent",
+            "opacity": 0,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "bottom": 0,
+              "justifyContent": "center",
+              "left": 0,
+              "position": "absolute",
+              "top": 0,
+              "zIndex": 13,
+            }
+          }
+        >
+          <View
+            accessible={true}
+            clickable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          />
+        </View>
+        <View
+          style={
+            Object {
+              "bottom": 0,
+              "justifyContent": "center",
+              "position": "absolute",
+              "right": 0,
+              "top": 0,
+              "zIndex": 13,
+            }
+          }
+        >
+          <View
+            accessible={true}
+            clickable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+          />
+        </View>
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flexDirection": "row",
+              "transform": Array [
+                Object {
+                  "translateX": 0,
+                },
+              ],
+              "width": 0,
+            }
+          }
+        />
+        <View
+          style={
+            Array [
+              Object {
+                "bottom": 0,
+                "position": "absolute",
+                "zIndex": 9,
+              },
+              Object {},
+            ]
+          }
+        />
+      </View>
+    </View>
+  </View>
+</View>
+`;

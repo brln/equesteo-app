@@ -33,7 +33,7 @@ import {
   INTRO_PAGE
 } from '../../screens/consts/firstStart'
 import { EqNavigation } from '../../services'
-import { captureMessage } from '../../services/Sentry'
+import { captureBreadcrumb } from '../../services/Sentry'
 import { viewHorseOwnerIDs } from "../../dataViews/dataViews"
 
 export const END_OF_FEED = unixTimeNow() - (1000 * 60 * 60 * 24 * 30)
@@ -401,7 +401,7 @@ class FeedContainer extends BackgroundComponent {
       if (horses.get(h.get('horseID'))) {
         return h.get('deleted') !== true && (h.get('userID') === userID || followIDs.get(h.get('userID')))
       } else {
-        captureMessage('HorseUser missing horse: ' + h.get('_id'))
+        captureBreadcrumb('HorseUser missing horse: ' + h.get('_id'))
       }
     })
   }

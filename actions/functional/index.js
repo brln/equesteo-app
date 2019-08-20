@@ -971,6 +971,7 @@ function signOut () {
       dispatch(setSigningOut(true))
       dispatch(functional.stopLocationTracking())
       functionalState.FCMTokenRefreshListenerRemover ? functionalState.FCMTokenRefreshListenerRemover() : null
+      dispatch(functional.stopBackgroundFetch())
       firebase.iid().deleteToken('373350399276', 'GCM').catch(catchAsyncError).then(() => {
         return Promise.all([
           PouchCouch.deleteLocalDBs(),
@@ -1575,7 +1576,7 @@ function startBackgroundFetch () {
     BackgroundFetch.configure({
       minimumFetchInterval: 15, // <-- minutes (15 is minimum allowed)
       stopOnTerminate: false,   // <-- Android-only,
-      startOnBoot: true         // <-- Android-only
+      startOnBoot: false         // <-- Android-only
     }, () => {
       const remotePersistStatus = getState().getIn(['localState', 'needsRemotePersist'])
       let before = Promise.resolve()
@@ -1591,6 +1592,14 @@ function startBackgroundFetch () {
     }, (error) => {
       logError(error, "RNBackgroundFetch failed to start")
     });
+  }
+}
+
+function stopBackgroundFetch () {
+  const source = 'stopBackgroundFetch'
+  cb(source)
+  return () => {
+    BackgroundFetch.stop()
   }
 }
 
@@ -1895,6 +1904,7 @@ const functional = {
   startListeningFCMTokenRefresh,
   startLocationTracking,
   startNetworkTracking,
+  stopBackgroundFetch,
   stopGPSWatcher,
   stopHoofTracksDispatcher,
   stopLocationTracking,

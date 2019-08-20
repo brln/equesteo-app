@@ -1,0 +1,599 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`render 1`] = `
+<View>
+  <View
+    style={
+      Object {
+        "backgroundColor": "#e8eae8",
+        "height": 30,
+      }
+    }
+  />
+  <View />
+  <RCTScrollView
+    containerStyle={
+      Object {
+        "marginTop": 0,
+      }
+    }
+    data={
+      Array [
+        Object {
+          "icon": 1,
+          "name": "Save to My Ride Atlas",
+          "onPress": [Function],
+        },
+        Object {
+          "icon": 1,
+          "name": "Duplicate to Another User",
+          "onPress": [Function],
+        },
+        Object {
+          "icon": 1,
+          "name": "Share",
+          "onPress": [Function],
+        },
+        Object {
+          "icon": 1,
+          "name": "Edit",
+          "onPress": [Function],
+        },
+        Object {
+          "icon": 1,
+          "name": "Delete",
+          "onPress": [Function],
+        },
+      ]
+    }
+    disableVirtualization={false}
+    getItem={[Function]}
+    getItemCount={[Function]}
+    horizontal={false}
+    initialNumToRender={10}
+    keyExtractor={[Function]}
+    maxToRenderPerBatch={10}
+    numColumns={1}
+    onContentSizeChange={[Function]}
+    onEndReachedThreshold={2}
+    onLayout={[Function]}
+    onMomentumScrollEnd={[Function]}
+    onScroll={[Function]}
+    onScrollBeginDrag={[Function]}
+    onScrollEndDrag={[Function]}
+    removeClippedSubviews={false}
+    renderItem={[Function]}
+    scrollEventThrottle={50}
+    stickyHeaderIndices={Array []}
+    style={
+      Object {
+        "backgroundColor": "#e8eae8",
+        "borderTopColor": "#9b9d9b",
+        "borderTopWidth": 1,
+        "height": "100%",
+      }
+    }
+    updateCellsBatchingPeriod={50}
+    viewabilityConfigCallbackPairs={Array []}
+    windowSize={21}
+  >
+    <View>
+      <View
+        onLayout={[Function]}
+        style={null}
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+            }
+          }
+        >
+          <View
+            accessible={true}
+            clickable={true}
+            isTVSelectable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "backgroundColor": "#5bc0eb",
+                "height": 80,
+                "opacity": 1,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "borderBottomColor": "#9b9d9b",
+                  "borderBottomWidth": 1,
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "padding": 20,
+                }
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "flex": 1,
+                    "justifyContent": "center",
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "padding": undefined,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      Object {
+                        "borderColor": "transparent",
+                        "borderRadius": 0,
+                        "borderWidth": 2,
+                        "height": 107.14285714285714,
+                        "width": 107.14285714285714,
+                      }
+                    }
+                  >
+                    <Image
+                      source={1}
+                      style={
+                        Object {
+                          "borderRadius": 0,
+                          "height": "100%",
+                          "width": "100%",
+                        }
+                      }
+                    />
+                  </View>
+                </View>
+              </View>
+              <View
+                style={
+                  Object {
+                    "flex": 3,
+                    "justifyContent": "center",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "white",
+                      "fontSize": 20,
+                    }
+                  }
+                >
+                  Save to My Ride Atlas
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        onLayout={[Function]}
+        style={null}
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+            }
+          }
+        >
+          <View
+            accessible={true}
+            clickable={true}
+            isTVSelectable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "backgroundColor": "#5bc0eb",
+                "height": 80,
+                "opacity": 1,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "borderBottomColor": "#9b9d9b",
+                  "borderBottomWidth": 1,
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "padding": 20,
+                }
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "flex": 1,
+                    "justifyContent": "center",
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "padding": undefined,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      Object {
+                        "borderColor": "transparent",
+                        "borderRadius": 0,
+                        "borderWidth": 2,
+                        "height": 107.14285714285714,
+                        "width": 107.14285714285714,
+                      }
+                    }
+                  >
+                    <Image
+                      source={1}
+                      style={
+                        Object {
+                          "borderRadius": 0,
+                          "height": "100%",
+                          "width": "100%",
+                        }
+                      }
+                    />
+                  </View>
+                </View>
+              </View>
+              <View
+                style={
+                  Object {
+                    "flex": 3,
+                    "justifyContent": "center",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "white",
+                      "fontSize": 20,
+                    }
+                  }
+                >
+                  Duplicate to Another User
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        onLayout={[Function]}
+        style={null}
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+            }
+          }
+        >
+          <View
+            accessible={true}
+            clickable={true}
+            isTVSelectable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "backgroundColor": "#5bc0eb",
+                "height": 80,
+                "opacity": 1,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "borderBottomColor": "#9b9d9b",
+                  "borderBottomWidth": 1,
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "padding": 20,
+                }
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "flex": 1,
+                    "justifyContent": "center",
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "padding": undefined,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      Object {
+                        "borderColor": "transparent",
+                        "borderRadius": 0,
+                        "borderWidth": 2,
+                        "height": 107.14285714285714,
+                        "width": 107.14285714285714,
+                      }
+                    }
+                  >
+                    <Image
+                      source={1}
+                      style={
+                        Object {
+                          "borderRadius": 0,
+                          "height": "100%",
+                          "width": "100%",
+                        }
+                      }
+                    />
+                  </View>
+                </View>
+              </View>
+              <View
+                style={
+                  Object {
+                    "flex": 3,
+                    "justifyContent": "center",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "white",
+                      "fontSize": 20,
+                    }
+                  }
+                >
+                  Share
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        onLayout={[Function]}
+        style={null}
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+            }
+          }
+        >
+          <View
+            accessible={true}
+            clickable={true}
+            isTVSelectable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "backgroundColor": "#5bc0eb",
+                "height": 80,
+                "opacity": 1,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "borderBottomColor": "#9b9d9b",
+                  "borderBottomWidth": 1,
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "padding": 20,
+                }
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "flex": 1,
+                    "justifyContent": "center",
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "padding": undefined,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      Object {
+                        "borderColor": "transparent",
+                        "borderRadius": 0,
+                        "borderWidth": 2,
+                        "height": 107.14285714285714,
+                        "width": 107.14285714285714,
+                      }
+                    }
+                  >
+                    <Image
+                      source={1}
+                      style={
+                        Object {
+                          "borderRadius": 0,
+                          "height": "100%",
+                          "width": "100%",
+                        }
+                      }
+                    />
+                  </View>
+                </View>
+              </View>
+              <View
+                style={
+                  Object {
+                    "flex": 3,
+                    "justifyContent": "center",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "white",
+                      "fontSize": 20,
+                    }
+                  }
+                >
+                  Edit
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        onLayout={[Function]}
+        style={null}
+      >
+        <View
+          style={
+            Object {
+              "flex": 1,
+            }
+          }
+        >
+          <View
+            accessible={true}
+            clickable={true}
+            isTVSelectable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "backgroundColor": "#5bc0eb",
+                "height": 80,
+                "opacity": 1,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "borderBottomColor": "#9b9d9b",
+                  "borderBottomWidth": 1,
+                  "flex": 1,
+                  "flexDirection": "row",
+                  "padding": 20,
+                }
+              }
+            >
+              <View
+                style={
+                  Object {
+                    "flex": 1,
+                    "justifyContent": "center",
+                  }
+                }
+              >
+                <View
+                  style={
+                    Object {
+                      "padding": undefined,
+                    }
+                  }
+                >
+                  <View
+                    style={
+                      Object {
+                        "borderColor": "transparent",
+                        "borderRadius": 0,
+                        "borderWidth": 2,
+                        "height": 107.14285714285714,
+                        "width": 107.14285714285714,
+                      }
+                    }
+                  >
+                    <Image
+                      source={1}
+                      style={
+                        Object {
+                          "borderRadius": 0,
+                          "height": "100%",
+                          "width": "100%",
+                        }
+                      }
+                    />
+                  </View>
+                </View>
+              </View>
+              <View
+                style={
+                  Object {
+                    "flex": 3,
+                    "justifyContent": "center",
+                  }
+                }
+              >
+                <Text
+                  style={
+                    Object {
+                      "color": "white",
+                      "fontSize": 20,
+                    }
+                  }
+                >
+                  Delete
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+  </RCTScrollView>
+</View>
+`;

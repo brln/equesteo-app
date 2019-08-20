@@ -1,6 +1,7 @@
+import { Map } from 'immutable'
 import { Alert } from 'react-native'
 import React, { PureComponent } from 'react'
-import { connect } from 'react-redux';
+import { connect } from 'react-redux'
 import { Navigation } from 'react-native-navigation'
 
 import { brand } from '../colors'
@@ -124,7 +125,7 @@ class TrainingContainer extends PureComponent {
       this.props.rideHorses,
       this.props.horses,
       this.props.horseUsers,
-    ).get(this.props.userID)
+    ).get(this.props.userID) || Map()
     const riders = viewAllRidersButUser(
       this.props.trainings,
       this.props.users,
@@ -132,7 +133,7 @@ class TrainingContainer extends PureComponent {
       this.props.rideHorses,
       this.props.horses,
       this.props.horseUsers,
-    ).get(this.props.userID)
+    ).get(this.props.userID) || Map()
     return (
       <Training
         horses={this.props.horses}

@@ -1,0 +1,264 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`render 1`] = `
+<View>
+  <View
+    style={
+      Object {
+        "height": 1278,
+        "position": "absolute",
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "backgroundColor": "white",
+          "flex": 3,
+          "justifyContent": "flex-end",
+        }
+      }
+    >
+      <Image
+        source={
+          Object {
+            "testUri": "../../../img/firstStart.jpg",
+          }
+        }
+        style={
+          Object {
+            "height": 750,
+            "resizeMode": "cover",
+            "width": 750,
+          }
+        }
+      />
+    </View>
+  </View>
+  <RCTScrollView
+    automaticallyAdjustContentInsets={false}
+    contentInset={
+      Object {
+        "bottom": 0,
+      }
+    }
+    enableAutomaticScroll={true}
+    enableOnAndroid={false}
+    enableResetScrollToCoords={true}
+    extraHeight={75}
+    extraScrollHeight={0}
+    getScrollResponder={[Function]}
+    handleOnScroll={[Function]}
+    keyboardDismissMode="interactive"
+    keyboardOpeningTime={250}
+    keyboardSpace={0}
+    onScroll={[Function]}
+    resetKeyboardSpace={[Function]}
+    scrollEventThrottle={1}
+    scrollForExtraHeightOnAndroid={[Function]}
+    scrollIntoView={[Function]}
+    scrollToEnd={[Function]}
+    scrollToFocusedInput={[Function]}
+    scrollToPosition={[Function]}
+    showsVerticalScrollIndicator={true}
+    style={
+      Object {
+        "backgroundColor": "transparent",
+      }
+    }
+    update={[Function]}
+    viewIsInsideTabBar={false}
+  >
+    <View>
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "backgroundColor": "white",
+            "flexDirection": "column",
+            "paddingTop": 20,
+          }
+        }
+      >
+        <Image
+          source={1}
+          style={
+            Object {
+              "alignItems": "center",
+              "height": 60,
+              "width": 60,
+            }
+          }
+        />
+      </View>
+      <View
+        style={
+          Object {
+            "flex": 1,
+          }
+        }
+      >
+        <View
+          style={
+            Object {
+              "paddingLeft": 20,
+              "paddingRight": 20,
+            }
+          }
+        >
+          <Text
+            style={
+              Object {
+                "color": "black",
+                "fontFamily": "Montserrat-Regular",
+                "fontSize": 30,
+                "textAlign": "center",
+              }
+            }
+          >
+            Upload a profile photo?
+          </Text>
+        </View>
+        <View
+          style={
+            Object {
+              "alignItems": "center",
+              "flex": 1,
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "height": 375,
+                "paddingLeft": 10,
+                "paddingRight": 10,
+                "paddingTop": 30,
+                "width": 375,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "backgroundColor": "white",
+                  "borderColor": "#5bc0eb",
+                  "borderWidth": 5,
+                }
+              }
+            >
+              <View
+                accessible={true}
+                clickable={true}
+                isTVSelectable={true}
+                onClick={[Function]}
+                onResponderGrant={[Function]}
+                onResponderMove={[Function]}
+                onResponderRelease={[Function]}
+                onResponderTerminate={[Function]}
+                onResponderTerminationRequest={[Function]}
+                onStartShouldSetResponder={[Function]}
+                style={
+                  Object {
+                    "opacity": 1,
+                  }
+                }
+              >
+                <Image
+                  source={1}
+                  style={
+                    Object {
+                      "height": "100%",
+                      "width": "100%",
+                    }
+                  }
+                />
+              </View>
+            </View>
+          </View>
+          <View
+            style={
+              Object {
+                "paddingTop": 20,
+              }
+            }
+          >
+            <View
+              accessible={true}
+              clickable={true}
+              isTVSelectable={true}
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                Object {
+                  "alignSelf": "center",
+                  "backgroundColor": "#5bc0eb",
+                  "borderColor": undefined,
+                  "borderRadius": 10,
+                  "borderWidth": null,
+                  "marginTop": 10,
+                  "opacity": 1,
+                  "paddingBottom": 10,
+                  "paddingTop": 10,
+                  "width": undefined,
+                }
+              }
+            >
+              <Text
+                style={
+                  Array [
+                    Object {
+                      "color": "#fff",
+                      "paddingLeft": 20,
+                      "paddingRight": 20,
+                      "textAlign": "center",
+                    },
+                    undefined,
+                  ]
+                }
+              >
+                Yes!
+              </Text>
+            </View>
+            <View
+              accessible={true}
+              clickable={true}
+              isTVSelectable={true}
+              onClick={[Function]}
+              onResponderGrant={[Function]}
+              onResponderMove={[Function]}
+              onResponderRelease={[Function]}
+              onResponderTerminate={[Function]}
+              onResponderTerminationRequest={[Function]}
+              onStartShouldSetResponder={[Function]}
+              style={
+                Object {
+                  "opacity": 1,
+                  "paddingTop": 10,
+                }
+              }
+            >
+              <Text
+                style={
+                  Object {
+                    "fontSize": 10,
+                    "textAlign": "center",
+                    "textDecorationLine": "underline",
+                  }
+                }
+              >
+                No, thanks.
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
+  </RCTScrollView>
+</View>
+`;

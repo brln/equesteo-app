@@ -1,0 +1,123 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`render 1`] = `
+<RCTScrollView
+  automaticallyAdjustContentInsets={false}
+  contentInset={
+    Object {
+      "bottom": 0,
+    }
+  }
+  enableAutomaticScroll={false}
+  enableOnAndroid={false}
+  enableResetScrollToCoords={true}
+  extraHeight={75}
+  extraScrollHeight={0}
+  getScrollResponder={[Function]}
+  handleOnScroll={[Function]}
+  keyboardDismissMode="interactive"
+  keyboardOpeningTime={250}
+  keyboardSpace={0}
+  onScroll={[Function]}
+  resetKeyboardSpace={[Function]}
+  scrollEventThrottle={1}
+  scrollForExtraHeightOnAndroid={[Function]}
+  scrollIntoView={[Function]}
+  scrollToEnd={[Function]}
+  scrollToFocusedInput={[Function]}
+  scrollToPosition={[Function]}
+  showsVerticalScrollIndicator={true}
+  style={
+    Object {
+      "height": 1334,
+    }
+  }
+  update={[Function]}
+  viewIsInsideTabBar={false}
+>
+  <View>
+    <View
+      style={
+        Object {
+          "alignItems": "center",
+          "flex": 1,
+          "height": 1394,
+          "marginTop": 20,
+        }
+      }
+    >
+      <View>
+        <TextInput
+          allowFontScaling={true}
+          maxLength={5000}
+          multiline={true}
+          onChangeText={[Function]}
+          placeholder="Let us know what you think. Likes, dislikes, problems, feature requests, musings, anecdotes, stories, we'd love to hear it.
+
+It sends a message straight to our phones.
+
+We'll email you back at the address you signed up with, let us know if there's a better way to reach you.
+
+Or come to Ben Lomond and ride with us!"
+          rejectResponderTermination={true}
+          style={
+            Object {
+              "borderColor": "#4b9ec1",
+              "borderWidth": 1,
+              "height": 800.4,
+              "padding": 10,
+              "textAlignVertical": "top",
+              "width": 600,
+            }
+          }
+          underlineColorAndroid="transparent"
+          value={null}
+        />
+        <View
+          style={
+            Object {
+              "paddingBottom": 10,
+            }
+          }
+        >
+          <View
+            style={
+              Array [
+                Object {
+                  "backgroundColor": "#e8eae8",
+                  "width": undefined,
+                },
+                Object {
+                  "alignSelf": "center",
+                  "borderRadius": 10,
+                  "marginTop": 10,
+                  "paddingBottom": 10,
+                  "paddingTop": 10,
+                },
+              ]
+            }
+          >
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#fff",
+                    "paddingLeft": 20,
+                    "paddingRight": 20,
+                    "textAlign": "center",
+                  },
+                  Object {
+                    "color": "#9b9d9b",
+                  },
+                ]
+              }
+            >
+              Submit
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>
+</RCTScrollView>
+`;

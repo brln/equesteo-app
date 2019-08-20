@@ -1,0 +1,384 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`render 1`] = `
+<RCTScrollView
+  style={
+    Object {
+      "flex": 1,
+      "height": 1334,
+      "width": 562.5,
+    }
+  }
+>
+  <View>
+    <View
+      style={
+        Object {
+          "height": 1292,
+        }
+      }
+    >
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "backgroundColor": "#e8eae8",
+            "flex": 1,
+            "flexDirection": "column",
+            "justifyContent": "center",
+          }
+        }
+      >
+        <Image
+          source={1}
+          style={
+            Object {
+              "alignItems": "center",
+              "height": 110,
+              "width": 110,
+            }
+          }
+        />
+        <Text
+          style={
+            Object {
+              "color": "black",
+              "fontFamily": "Panama-Light",
+              "fontSize": 30,
+            }
+          }
+        >
+          Equesteo
+        </Text>
+      </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "#5bc0eb",
+            "flex": 2,
+            "justifyContent": "flex-start",
+            "paddingLeft": 20,
+            "paddingTop": 10,
+          }
+        }
+      >
+        <View
+          style={Object {}}
+        >
+          <View
+            accessible={true}
+            clickable={true}
+            isTVSelectable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "opacity": 1,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "marginBottom": 25,
+                }
+              }
+            >
+              <Image
+                source={1}
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "height": 75,
+                    "width": 75,
+                  }
+                }
+              />
+              <Text
+                onTouch={true}
+                style={
+                  Object {
+                    "color": "white",
+                    "flex": 1,
+                    "fontSize": 21,
+                    "fontWeight": "bold",
+                    "paddingLeft": 15,
+                  }
+                }
+              >
+                Training
+              </Text>
+            </View>
+          </View>
+          <View
+            accessible={true}
+            clickable={true}
+            isTVSelectable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "opacity": 1,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "marginBottom": 25,
+                }
+              }
+            >
+              <Image
+                source={1}
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "height": 75,
+                    "width": 75,
+                  }
+                }
+              />
+              <Text
+                onTouch={true}
+                style={
+                  Object {
+                    "color": "white",
+                    "flex": 1,
+                    "fontSize": 21,
+                    "fontWeight": "bold",
+                    "paddingLeft": 15,
+                  }
+                }
+              >
+                Leaderboards
+              </Text>
+            </View>
+          </View>
+          <View
+            accessible={true}
+            clickable={true}
+            isTVSelectable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "opacity": 1,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "marginBottom": 25,
+                }
+              }
+            >
+              <Image
+                source={1}
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "height": 75,
+                    "width": 75,
+                  }
+                }
+              />
+              <Text
+                style={
+                  Object {
+                    "color": "white",
+                    "flex": 1,
+                    "fontSize": 21,
+                    "fontWeight": "bold",
+                    "paddingLeft": 15,
+                  }
+                }
+              >
+                My Barn
+              </Text>
+            </View>
+          </View>
+          <View
+            accessible={true}
+            clickable={true}
+            isTVSelectable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "opacity": 1,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "marginBottom": 25,
+                }
+              }
+            >
+              <Image
+                source={1}
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "height": 75,
+                    "width": 75,
+                  }
+                }
+              />
+              <Text
+                onTouch={true}
+                style={
+                  Object {
+                    "color": "white",
+                    "flex": 1,
+                    "fontSize": 21,
+                    "fontWeight": "bold",
+                    "paddingLeft": 15,
+                  }
+                }
+              >
+                Care Calendar
+              </Text>
+            </View>
+          </View>
+          <View
+            accessible={true}
+            clickable={true}
+            isTVSelectable={true}
+            onClick={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onStartShouldSetResponder={[Function]}
+            style={
+              Object {
+                "opacity": 1,
+              }
+            }
+          >
+            <View
+              style={
+                Object {
+                  "alignItems": "center",
+                  "flexDirection": "row",
+                  "marginBottom": 25,
+                }
+              }
+            >
+              <Image
+                source={1}
+                style={
+                  Object {
+                    "alignItems": "center",
+                    "height": 75,
+                    "width": 75,
+                  }
+                }
+              />
+              <Text
+                style={
+                  Object {
+                    "color": "white",
+                    "flex": 1,
+                    "fontSize": 21,
+                    "fontWeight": "bold",
+                    "paddingLeft": 15,
+                  }
+                }
+              >
+                More
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "alignItems": "center",
+            "bottom": 10,
+            "flex": 1,
+            "justifyContent": "center",
+            "position": "absolute",
+            "width": "100%",
+          }
+        }
+      >
+        <View
+          accessible={true}
+          clickable={true}
+          isTVSelectable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "borderColor": "white",
+              "borderRadius": 4,
+              "borderWidth": 2,
+              "opacity": 1,
+            }
+          }
+        >
+          <View
+            style={
+              Object {
+                "padding": 6,
+              }
+            }
+          >
+            <Text
+              style={
+                Object {
+                  "color": "white",
+                  "fontSize": 15,
+                  "textAlign": "center",
+                }
+              }
+            >
+              Feedback
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>
+</RCTScrollView>
+`;

@@ -1,0 +1,158 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`render 1`] = `
+<View
+  style={
+    Object {
+      "height": "100%",
+    }
+  }
+>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "backgroundColor": "#e8eae8",
+        "flex": 1,
+        "flexDirection": "column",
+        "justifyContent": "center",
+      }
+    }
+  >
+    <Image
+      source={1}
+      style={
+        Object {
+          "alignItems": "center",
+          "height": 120,
+          "width": 120,
+        }
+      }
+    />
+    <Text
+      style={
+        Object {
+          "color": "black",
+          "fontFamily": "Panama-Light",
+          "fontSize": 30,
+        }
+      }
+    >
+      Equesteo
+    </Text>
+  </View>
+  <View
+    style={
+      Object {
+        "alignItems": "center",
+        "backgroundColor": "#e8eae8",
+        "flex": 1,
+        "justifyContent": "center",
+      }
+    }
+  >
+    <View
+      style={
+        Object {
+          "flex": 1,
+          "padding": 20,
+        }
+      }
+    >
+      <Text
+        style={
+          Object {
+            "fontSize": 25,
+            "textAlign": "center",
+          }
+        }
+      >
+        Oh No!
+      </Text>
+      <Text
+        style={
+          Object {
+            "fontSize": 14,
+            "paddingTop": 10,
+            "textAlign": "center",
+          }
+        }
+      >
+        When you sign up, the app has to download some data, and we're having problems finishing that. Please try again when you have better service (or WiFi works best!).
+      </Text>
+      <Text
+        style={
+          Object {
+            "fontSize": 14,
+            "paddingTop": 10,
+            "textAlign": "center",
+          }
+        }
+      >
+        If you continue to have problems, please get in touch!
+      </Text>
+      <Text
+        style={
+          Object {
+            "fontSize": 18,
+            "paddingTop": 15,
+            "textAlign": "center",
+          }
+        }
+      >
+        info@equesteo.com
+      </Text>
+      <View
+        style={
+          Object {
+            "padding": 20,
+          }
+        }
+      >
+        <View
+          accessible={true}
+          clickable={true}
+          isTVSelectable={true}
+          onClick={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onStartShouldSetResponder={[Function]}
+          style={
+            Object {
+              "alignSelf": "center",
+              "backgroundColor": "#5bc0eb",
+              "borderColor": undefined,
+              "borderRadius": 10,
+              "borderWidth": null,
+              "marginTop": 10,
+              "opacity": 1,
+              "paddingBottom": 10,
+              "paddingTop": 10,
+              "width": undefined,
+            }
+          }
+        >
+          <Text
+            style={
+              Array [
+                Object {
+                  "color": "#fff",
+                  "paddingLeft": 20,
+                  "paddingRight": 20,
+                  "textAlign": "center",
+                },
+                undefined,
+              ]
+            }
+          >
+            Try Again
+          </Text>
+        </View>
+      </View>
+    </View>
+  </View>
+</View>
+`;

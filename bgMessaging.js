@@ -1,5 +1,6 @@
 import { logError } from './helpers'
 import functional from './actions/functional'
+import {NotConnectedError} from "./errors"
 
 export default (store) => {
   return () => {
@@ -8,7 +9,9 @@ export default (store) => {
     }).then(() => {
       return store.dispatch(functional.showLocalNotifications())
     }).catch(e => {
-      logError(e, 'bgMessageing.mainFunc')
+      if (!(e instanceof NotConnectedError)) {
+        logError(e, 'bgMessageing.mainFunc')
+      }
     })
   }
 }

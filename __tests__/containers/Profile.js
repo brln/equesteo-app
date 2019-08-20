@@ -1,9 +1,16 @@
 import { Map, fromJS } from 'immutable'
 
 import React from 'react'
-import ProfileContainer from '../../containers/Profile'
 
 import { trainingData, trainingDataByDay } from '../__testData__/trainingData'
+import renderer from "react-test-renderer"
+import {Provider} from "react-redux"
+import ProfileContainer from '../../containers/Profile'
+import configureStore from "redux-mock-store"
+import thunk from "redux-thunk"
+
+
+const mockStore = configureStore([thunk])
 
 describe('profileContainer', () => {
   it("parses the training data", () => {
@@ -25,4 +32,18 @@ describe('profileContainer', () => {
     )
     expect(parsed).toEqual(fromJS(trainingDataByDay))
   })
+
+  it ('renders', () => {
+    const store = mockStore(fromJS({
+      pouchRecords: {},
+      localState: {},
+    }))
+
+    const tree = renderer.create(
+      <Provider store={store}>
+        <ProfileContainer />
+      </Provider>).toJSON()
+    expect(tree).toMatchSnapshot()
+  })
+
 })

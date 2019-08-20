@@ -3,5 +3,9 @@ export const Navigation = {
     return {
       bindComponent: () => {}
     }
+  },
+
+  mergeOptions: function () {
+
   }
 }

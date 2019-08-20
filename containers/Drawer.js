@@ -44,7 +44,6 @@ const { height, width } = Dimensions.get('window')
 class DrawerContainer extends Component {
   constructor (props) {
     super(props)
-    this.openAccount = this.openAccount.bind(this)
     this.openBarn = this.openBarn.bind(this)
     this.openCareCalendar = this.openCareCalendar.bind(this)
     this.openFeedback = this.openFeedback.bind(this)
@@ -81,29 +80,6 @@ class DrawerContainer extends Component {
       }).catch(() => {})
     }
   }
-
-  openAccount () {
-    this.toggleDrawer()
-    Amplitude.logEvent(OPEN_MY_ACCOUNT)
-    if (this.props.activeComponent === FEED) {
-      EqNavigation.push(this.props.activeComponent, {
-        component: {
-          name: PROFILE,
-          title: 'My Account',
-          passProps: {
-            profileUser: this.props.user,
-          },
-          options: {
-            sideMenu: {
-              left: {
-                visible: false
-              }
-            }
-          }
-        }
-      }).catch(() => {})
-    }
-	}
 
 	openCareCalendar () {
     this.toggleDrawer()
@@ -267,7 +243,7 @@ class DrawerContainer extends Component {
                 </View>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={this.openBarn}>
+              <TouchableOpacity testName='openBarnButton' onPress={this.openBarn}>
                 <View style={styles.drawerListItem}>
                   <BuildImage
                     source={require('../img/mainMenus/barn_wt.png')}
