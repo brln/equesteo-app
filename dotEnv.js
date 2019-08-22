@@ -13,13 +13,14 @@ import {
   sentry_dsn_ios,
 } from 'react-native-dotenv'
 
+export default {
+  API_URL: Platform.select({ios: api_url_ios, android: api_url_android}),
+  SENTRY_DSN: Platform.select({ios: sentry_dsn_ios, android: sentry_dsn_android}),
+  RELEASE: Platform.select({ios: `com.equesteo.equesteo-${release}`, android: `com.equesteo-${release}`}),
+  AMPLITUDE_TOKEN: amplitude_token,
+  ENV: env,
+  DISTRIBUTION: distribution,
+  MAPBOX_TOKEN: mapbox_token,
+  NICOLE_USER_ID: nicole_user_id,
+}
 
-export const API_URL = Platform.select({ios: api_url_ios, android: api_url_android})
-export const SENTRY_DSN = Platform.select({ios: sentry_dsn_ios, android: sentry_dsn_android})
-export const RELEASE = Platform.select({ios: `com.equesteo.equesteo-${release}`, android: `com.equesteo-${release}`})
-
-export const AMPLITUDE_TOKEN = amplitude_token
-export const ENV = env
-export const DISTRIBUTION = distribution
-export const MAPBOX_TOKEN = mapbox_token
-export const NICOLE_USER_ID = nicole_user_id

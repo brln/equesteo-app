@@ -1,6 +1,6 @@
 import amplitude from 'amplitude-js'
 
-import { AMPLITUDE_TOKEN, ENV } from "../dotEnv"
+import config from "../dotEnv"
 
 export const ACTIVATE_HOOF_TRACKS = 'ACTIVATE_HOOF_TRACKS'
 export const ADD_CARE_EVENT = 'ADD_CARE_EVENT'
@@ -72,20 +72,20 @@ export const VIEW_HORSE_PROFILE = 'VIEW_HORSE_PROFILE'
 export const VIEW_RIDE_CHARTS = 'VIEW_RIDE_CHARTS'
 export const VIEW_USER_PROFILE = 'VIEW_USER_PROFILE'
 
-amplitude.getInstance().init(AMPLITUDE_TOKEN, null, {
+amplitude.getInstance().init(config.AMPLITUDE_TOKEN, null, {
   useNativeDeviceInfo: true
 })
 
 export default class AmplitudeService {
   static setUserID (id) {
-    if (ENV !== 'local') {
+    if (config.ENV !== 'local') {
       amplitude.getInstance().setUserId(id)
     }
 
   }
 
   static logEvent (eventName, data) {
-    if (ENV !== 'local') {
+    if (config.ENV !== 'local') {
       amplitude.getInstance().logEvent(eventName, data)
     }
   }

@@ -7,7 +7,6 @@ import {
   viewTrainings,
 } from "../../dataViews/dataViews"
 import * as helpers from '../../helpers'
-import { trainingData } from '../__testData__/trainingData'
 
 function trainingSetup () {
   const userID1 = 'userID1'
@@ -267,6 +266,36 @@ describe('dataViews', () => {
         ]}
       })
       const expected = fromJS([ride1])
+      const calcedTrainings = viewTrainings(trainings, fromJS({userID1: {_id: userID1}}), Map(), Map(), Map(), Map())
+      expect(calcedTrainings.get(userID1)).toEqual(expected)
+    })
+
+    it('doesn\'t blow up when there isn\'t a training for a user', () => {
+      const userID1 = 'userID2'
+      const ride1 = fromJS({
+        userID: userID1,
+        elapsedTimeSecs: 4238.982,
+        startTime: 1555858691201,
+        rideID: 'fd66130136a86a59f98d403c706220d5_1555862930183',
+        isPublic: true,
+        distance: 6.387437999999997,
+        horseIDs:
+          [ 'fd66130136a86a59f98d403c706220d5_1555849838985',
+            'fd66130136a86a59f98d403c706220d5_1555849969030' ],
+        elevationGain: 246.33092893912092,
+        riderHorseID: 'fd66130136a86a59f98d403c706220d5_1555849838985'
+      })
+      const ride2 = fromJS({
+        userID: userID1,
+        deleted: true
+      })
+      const trainings = fromJS({
+        userID1_training: { rides: [
+            ride1,
+            ride2,
+          ]}
+      })
+      const expected = fromJS([])
       const calcedTrainings = viewTrainings(trainings, fromJS({userID1: {_id: userID1}}), Map(), Map(), Map(), Map())
       expect(calcedTrainings.get(userID1)).toEqual(expected)
     })

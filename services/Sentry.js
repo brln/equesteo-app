@@ -1,11 +1,11 @@
 import { Alert } from 'react-native'
 import { Sentry } from 'react-native-sentry'
-import { DISTRIBUTION, ENV, RELEASE, SENTRY_DSN } from '../dotEnv'
+import config from '../dotEnv'
 
 import { logError, logInfo } from '../helpers'
 
 export function setUserContext(userID) {
-  if (ENV !== 'local') {
+  if (config.ENV !== 'local') {
     Sentry.setUserContext({
       id: userID,
     });
@@ -13,7 +13,7 @@ export function setUserContext(userID) {
 }
 
 export function captureMessage (m) {
-  if (ENV !== 'local') {
+  if (config.ENV !== 'local') {
     Sentry.captureMessage(m)
   } else {
     logInfo(JSON.stringify(m), 'Sentry message captured')
@@ -22,7 +22,7 @@ export function captureMessage (m) {
 }
 
 export function captureException (e) {
-  if (ENV !== 'local') {
+  if (config.ENV !== 'local') {
     try {
       if (e) {
         if (e.stacktrace) {
@@ -45,15 +45,15 @@ export function captureException (e) {
 }
 
 export function configure () {
-  if (ENV !== 'local') {
-    Sentry.config(SENTRY_DSN).install()
-    Sentry.setRelease(RELEASE)
-    Sentry.setDist(DISTRIBUTION)
+  if (config.ENV !== 'local') {
+    Sentry.config(config.SENTRY_DSN).install()
+    Sentry.setRelease(config.RELEASE)
+    Sentry.setDist(config.DISTRIBUTION)
   }
 }
 
 export function captureBreadcrumb (message, category, data) {
-  if (ENV !== 'local') {
+  if (config.ENV !== 'local') {
     const bcData = { message, category }
     if (data) {
       bcData[data] = data

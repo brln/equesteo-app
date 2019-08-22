@@ -8,13 +8,13 @@ import {
   TouchableOpacity,
   View
 } from 'react-native'
-import { NICOLE_USER_ID } from '../../dotEnv'
+import config from '../../dotEnv'
 
 import { darkBrand } from '../../colors'
 
 export default class FollowersCard extends PureComponent {
   render() {
-    if (this.props.visible && (this.props.profileUser.get('_id') !== NICOLE_USER_ID || this.props.userID === NICOLE_USER_ID)) {
+    if (this.props.visible && (this.props.profileUser.get('_id') !== config.NICOLE_USER_ID || this.props.userID === config.NICOLE_USER_ID)) {
       return (
         <Card>
           <CardItem>

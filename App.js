@@ -7,7 +7,7 @@ import { configure } from './services/Sentry'
 import { combineReducers } from 'redux-immutable';
 import Mapbox from '@react-native-mapbox-gl/maps';
 
-import { MAPBOX_TOKEN } from './dotEnv'
+import config from './dotEnv'
 import functional from "./actions/functional"
 import { logDebug } from './helpers'
 import logger from './middleware/logger'
@@ -53,7 +53,7 @@ const store = createStore(
 global.logDebug = logDebug
 
 configure()
-Mapbox.setAccessToken(MAPBOX_TOKEN)
+Mapbox.setAccessToken(config.MAPBOX_TOKEN)
 
 
 export default function start () {

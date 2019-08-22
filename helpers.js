@@ -4,7 +4,7 @@ import mbxStatic from '@mapbox/mapbox-sdk/services/static'
 import { Platform } from 'react-native'
 
 
-import { MAPBOX_TOKEN } from './dotEnv'
+import config from './dotEnv'
 import { captureBreadcrumb, captureException } from './services/Sentry'
 
 export const DEFAULT_HORSE_SPEEDS = Map({
@@ -75,7 +75,7 @@ export function generateUUID () {
 }
 
 export function staticMap (ride, coordinateData) {
-  const staticService = mbxStatic({accessToken: MAPBOX_TOKEN})
+  const staticService = mbxStatic({accessToken: config.MAPBOX_TOKEN})
   const parsed = coordinateData.reduce((accum, coord) => {
     const decoded = parseRideCoordinate(coord)
     accum.push([decoded.get('longitude'), decoded.get('latitude')])

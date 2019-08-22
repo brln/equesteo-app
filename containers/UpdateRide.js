@@ -72,6 +72,7 @@ class UpdateRideContainer extends BackgroundComponent {
       deletedPhotoIDs: [],
       doRevert: true,
       discardModalOpen: false,
+      saving: false,
       showPhotoMenu: false,
       showSelectHorseMenu: false,
       selectedHorseID: null,
@@ -95,6 +96,7 @@ class UpdateRideContainer extends BackgroundComponent {
     this.openPhotoMenu = this.openPhotoMenu.bind(this)
     this.openSelectHorseMenu = this.openSelectHorseMenu.bind(this)
     this.rideHorses = this.rideHorses.bind(this)
+    this.saveSetup = this.saveSetup.bind(this)
     this.selectHorse = this.selectHorse.bind(this)
     this.showPhotoLightbox = this.showPhotoLightbox.bind(this)
     this.stashedRidePhotoKey = this.stashedRidePhotoKey.bind(this)
@@ -165,17 +167,23 @@ class UpdateRideContainer extends BackgroundComponent {
     ))
   }
 
+  saveSetup (eventName) {
+    Amplitude.logEvent(eventName)
+    Navigation.mergeOptions(this.props.componentId, {topBar: {rightButtons: []}})
+    this.setState({
+      doRevert: false,
+      saving: true
+    })
+    this.maybeDoTrim()
+  }
+
   navigationButtonPressed({ buttonId }) {
     if (this.props.newRide) {
-      if (buttonId === 'save') {
-        Amplitude.logEvent(SAVE_NEW_RIDE)
-        this.setState({
-          doRevert: false
-        })
-        Navigation.mergeOptions(this.props.componentId, {topBar: {rightButtons: []}})
-        this.maybeDoTrim()
+      if (buttonId === 'save' && !this.state.saving) {
+        this.saveSetup(SAVE_NEW_RIDE)
         this.props.dispatch(functional.stopHoofTracksDispatcher())
         this.doPersist().then(() => {
+          this.setState({ saving: false })
           return EqNavigation.popToRoot(this.props.componentId)
         }).then(() => {
           this.props.dispatch(clearPausedLocations())
@@ -215,14 +223,13 @@ class UpdateRideContainer extends BackgroundComponent {
         )
       }
     } else {
-      if (buttonId === 'save') {
-        Amplitude.logEvent(SAVE_RIDE)
-        this.setState({
-          doRevert: false
-        })
-        this.maybeDoTrim()
+      if (buttonId === 'save' && !this.state.saving) {
+        this.saveSetup(SAVE_RIDE)
         this.doPersist().then(() => {
+          this.setState({ saving: false })
           return Navigation.popTo(this.props.popBackTo)
+        }).then(() => {
+          this.props.dispatch(functional.doSync())
         })
       } else if (buttonId === 'discard') {
         EqNavigation.pop(this.props.componentId).catch(() => {})

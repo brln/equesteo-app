@@ -1,6 +1,6 @@
 import PouchDB from 'pouchdb-react-native'
 
-import { API_URL, NICOLE_USER_ID } from '../dotEnv'
+import config from '../dotEnv'
 import { NotConnectedError } from "../errors"
 import { logInfo } from '../helpers'
 import ApiClient from './ApiClient'
@@ -63,19 +63,19 @@ export default class PouchCouch {
     const dbs = [
       {
         local: localHorsesDB,
-        remote: `${API_URL}/couchproxy/${horsesDBName}`
+        remote: `${config.API_URL}/couchproxy/${horsesDBName}`
       },
       {
         local: localRidesDB,
-        remote: `${API_URL}/couchproxy/${ridesDBName}`
+        remote: `${config.API_URL}/couchproxy/${ridesDBName}`
       },
       {
         local: localUsersDB,
-        remote: `${API_URL}/couchproxy/${usersDBName}`
+        remote: `${config.API_URL}/couchproxy/${usersDBName}`
       },
       {
         local: localNotificationsDB,
-        remote: `${API_URL}/couchproxy/${notificationsDBName}`
+        remote: `${config.API_URL}/couchproxy/${notificationsDBName}`
       }
     ]
     return PouchCouch.preReplicate().then(options => {
@@ -136,7 +136,7 @@ export default class PouchCouch {
   }
 
   static getLeaderboardIDs (options) {
-    const remoteUsersDB = new PouchDB(`${API_URL}/couchproxy/${usersDBName}`, options)
+    const remoteUsersDB = new PouchDB(`${config.API_URL}/couchproxy/${usersDBName}`, options)
     return new Promise((resolve, reject) => {
       remoteUsersDB.query('users/leaderboardUsers').then((resp) => {
         const userIDs = resp.rows.map(r => r.key)
@@ -149,7 +149,7 @@ export default class PouchCouch {
     const rideIDs = {}
     const allDocIDs = {}
 
-    const remoteRidesDB = new PouchDB(`${API_URL}/couchproxy/${ridesDBName}`, options)
+    const remoteRidesDB = new PouchDB(`${config.API_URL}/couchproxy/${ridesDBName}`, options)
     return new Promise((resolve, reject) => {
       return remoteRidesDB.info().then(resp => {
         const docs = parseInt(resp.update_seq.split('-')[0])
@@ -205,7 +205,7 @@ export default class PouchCouch {
     const allDocIDs = {}
     return PouchCouch.preReplicate().then(options => {
       return new Promise((resolve, reject) => {
-        const remoteRidesDB = new PouchDB(`${API_URL}/couchproxy/${ridesDBName}`, options)
+        const remoteRidesDB = new PouchDB(`${config.API_URL}/couchproxy/${ridesDBName}`, options)
         remoteRidesDB.query('rides/rideJoins', {key: rideID}).then(resp => {
           resp.rows.map(row => {
             allDocIDs[row.id] = 0
@@ -230,7 +230,7 @@ export default class PouchCouch {
 
 
   static localReplicateNotifications (options, ownUserID, progress) {
-    const remoteNotificationsDB = new PouchDB(`${API_URL}/couchproxy/${notificationsDBName}`, options)
+    const remoteNotificationsDB = new PouchDB(`${config.API_URL}/couchproxy/${notificationsDBName}`, options)
     return new Promise((resolve, reject) => {
       return remoteNotificationsDB.info().then(resp => {
         const docs = parseInt(resp.update_seq.split('-')[0])
@@ -259,7 +259,7 @@ export default class PouchCouch {
   }
 
   static localReplicateUsers (options, ownUserID, leaderboardIDs, progress) {
-    const remoteUsersDB = new PouchDB(`${API_URL}/couchproxy/${usersDBName}`, options)
+    const remoteUsersDB = new PouchDB(`${config.API_URL}/couchproxy/${usersDBName}`, options)
     return new Promise((resolve, reject) => {
       remoteUsersDB.info().then(resp => {
         const docs = parseInt(resp.update_seq.split('-')[0])
@@ -269,9 +269,9 @@ export default class PouchCouch {
         return remoteUsersDB.query('users/relevantFollows', {key: ownUserID}).then((resp) => {
           // First degree follower/following
           resp.rows.reduce((accum, row) => {
-            if (row.value[0] !== NICOLE_USER_ID) {
+            if (row.value[0] !== config.NICOLE_USER_ID) {
               accum[row.value[0]] = 0
-            } else if (row.value[0] === NICOLE_USER_ID && ownUserID === NICOLE_USER_ID) {
+            } else if (row.value[0] === config.NICOLE_USER_ID && ownUserID === config.NICOLE_USER_ID) {
               accum[row.value[0]] = 0
             }
             return accum
@@ -286,7 +286,7 @@ export default class PouchCouch {
           for (let leaderboardID of leaderboardIDs) {
             fetchUserIDs[leaderboardID] = 0
           }
-          fetchUserIDs[NICOLE_USER_ID] = 0
+          fetchUserIDs[config.NICOLE_USER_ID] = 0
           return remoteUsersDB.query('users/userDocIDs', {keys: Object.keys(fetchUserIDs)})
         }).then(resp3 => {
           const allDocIDs = {}
@@ -317,7 +317,7 @@ export default class PouchCouch {
   }
 
   static localReplicateHorses (options, userIDs, progress) {
-    const remoteHorsesDB = new PouchDB(`${API_URL}/couchproxy/${horsesDBName}`, options)
+    const remoteHorsesDB = new PouchDB(`${config.API_URL}/couchproxy/${horsesDBName}`, options)
     return new Promise((resolve, reject) => {
       remoteHorsesDB.info().then(resp => {
         const docs = parseInt(resp.update_seq.split('-')[0])

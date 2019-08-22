@@ -16,7 +16,7 @@ import {
   stopStashNewLocations,
   unpauseLocationTracking,
 } from '../../actions/standard'
-import functional from '../../actions/functional'
+import functional, {gpsLocationError} from '../../actions/functional'
 import { brand } from '../../colors'
 import RideRecorder from '../../components/RideRecorder/RideRecorder'
 import { isAndroid, logRender, rideIDGenerator, unixTimeNow } from '../../helpers'
@@ -48,7 +48,14 @@ class RecorderContainer extends PureComponent {
         elevation: 0,
         backButton: {
           color: 'white',
-        }
+        },
+        rightButtons: [
+          {
+            id: 'finishRide',
+            text: 'Finish Ride',
+            color: 'white'
+          },
+        ]
       },
       layout: {
         orientation: ['portrait']
@@ -79,18 +86,8 @@ class RecorderContainer extends PureComponent {
 
     Navigation.events().bindComponent(this);
 
-    if (props.currentRide) {
-      Navigation.mergeOptions(this.props.componentId, {
-        topBar: {
-          rightButtons: [
-            {
-              id: 'finishRide',
-              text: 'Finish Ride',
-              color: 'white'
-            },
-          ]
-        }
-      })
+    if (!props.currentRide) {
+      this.startRide()
     }
   }
 
@@ -134,9 +131,6 @@ class RecorderContainer extends PureComponent {
   }
 
   componentDidMount () {
-    if (!this.props.currentRide) {
-      this.startRide()
-    }
     if (!this.gpsTimeout) {
       this.gpsTimeout = setInterval(() => {
         if (this.props.lastLocation) {
@@ -185,17 +179,6 @@ class RecorderContainer extends PureComponent {
   }
 
   startRide () {
-    Navigation.mergeOptions(this.props.componentId, {
-      topBar: {
-        rightButtons: [
-          {
-            id: 'finishRide',
-            text: 'Finish Ride',
-            color: 'white'
-          },
-        ]
-      }
-    })
     this.props.dispatch(stopStashNewLocations())
     this.props.dispatch(startRide(this.props.lastLocation, this.props.lastElevation, unixTimeNow()))
   }

@@ -90,7 +90,6 @@ class TrainingContainer extends PureComponent {
               }
             }
           },
-
         })
       }).catch(() => {
         setTimeout(() => {

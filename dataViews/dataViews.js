@@ -80,11 +80,15 @@ function trainings (trainings, users, rides, rideHorses, horses, horseUsers) {
   users.forEach((user) => {
     const userID = user.get('_id')
     let byRideID = Map()
-    trainings.getIn([`${userID}_training`, 'rides']).forEach(training => {
-      if (training.get('deleted') !== true) {
-        byRideID = byRideID.set(training.get('rideID'), training)
-      }
-    })
+    const usersTrainings = trainings.getIn([`${userID}_training`, 'rides'])
+    if (usersTrainings) {
+      usersTrainings.forEach(training => {
+        if (training.get('deleted') !== true) {
+          byRideID = byRideID.set(training.get('rideID'), training)
+        }
+      })
+    }
+
 
     const usersHorses = viewHorsesByUserID(horseUsers, horses).get(userID)
     const usersHorseIDs = usersHorses ? usersHorses.map(horse =>{

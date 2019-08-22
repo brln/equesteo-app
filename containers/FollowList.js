@@ -105,15 +105,13 @@ class FollowListContainer extends PureComponent {
     })
     this.props.duplicateRide(this.state.transferUserID).then(() => {
       EqNavigation.popToRoot(this.props.componentId).catch(() => {})
-    }).catch(() => {
-      EqNavigation.popToRoot(this.props.componentId).catch(() => {})
     })
 
   }
 
   doTransfer () {
     this.props.doTransfer(this.state.transferUserID)
-    EqNavigation.popToRoot(this.props.componentId)
+    EqNavigation.popToRoot(this.props.componentId).catch(() => {})
   }
 
   render() {

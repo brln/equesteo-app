@@ -18,6 +18,7 @@ import {
 } from "../../constants"
 import * as helpers from '../../helpers'
 import functional from '../../actions/functional'
+import * as EnvVars from '../../dotEnv'
 
 const mockStore = configureStore([thunk])
 
@@ -313,5 +314,36 @@ describe('loginAndSync', () => {
         SET_DOING_INITIAL_LOAD,
       ])
     })
+  })
+})
+
+describe('gpsLocationError', () => {
+  it ('logs but ignores 1003 errors', () => {
+    const store = mockStore(fromJS({}))
+    EnvVars.ENV = 'test'
+    const error = {"message":"The operation couldn’t be completed. (com.marianhello error 1003.)","code":1003}
+    return store.dispatch(functional.gpsLocationError(error))
+  })
+
+  it ('captures 1000 errors', () => {
+    const store = mockStore(fromJS({}))
+    EnvVars.ENV = 'test'
+    const error = {"message":"Yo you get permissions issues bro","code":1000}
+    return store.dispatch(functional.gpsLocationError(error))
+  })
+
+  it ('captures other kinds of errors', () => {
+    const store = mockStore(fromJS({}))
+    EnvVars.ENV = 'test'
+    const error = {"message":"I don't know what the text is for the other errors","code":1001}
+    return store.dispatch(functional.gpsLocationError(error))
+  })
+
+  it ('deals with some weird shit', () => {
+    const store = mockStore(fromJS({}))
+    EnvVars.ENV = 'test'
+    const error = {"message":"I don't know what the text is for the other errors","code":1001}
+    error.recurse = error
+    return store.dispatch(functional.gpsLocationError(error))
   })
 })

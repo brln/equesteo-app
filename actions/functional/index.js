@@ -12,7 +12,7 @@ import Tts from 'react-native-tts'
 import URI from 'urijs'
 
 import ApiClient from '../../services/ApiClient'
-import { DISTRIBUTION, ENV } from '../../dotEnv'
+import config from '../../dotEnv'
 
 import Amplitude, {
   APP_INITIALIZED,
@@ -139,7 +139,7 @@ export function catchAsyncError (dispatch, source) {
       }
       captureBreadcrumb(source)
       captureException(e)
-      if (ENV === 'local') {
+      if (config.ENV === 'local') {
         Alert.alert('Async error, check logs')
         logError(e, 'catchAsyncError')
       }
@@ -933,8 +933,8 @@ function setDistributionOnServer () {
   return (dispatch, getState) => {
     const currentUserID = getState().getIn(['localState', 'userID'])
     logInfo('setting distribution')
-    return UserAPI.setDistribution(currentUserID, DISTRIBUTION).then(resp => {
-      if (parseInt(resp.mostRecent) > parseInt(DISTRIBUTION)) {
+    return UserAPI.setDistribution(currentUserID, config.DISTRIBUTION).then(resp => {
+      if (parseInt(resp.mostRecent) > parseInt(config.DISTRIBUTION)) {
         const link = Platform.select({
           ios: 'https://itunes.apple.com/us/app/equesteo/id1455843114',
           android: 'market://details?id=com.equesteo',
@@ -1159,8 +1159,11 @@ export function gpsLocationError (error) {
   cb(source)
   return (dispatch) => {
     if (error.code === 1000) {
-      dispatch(functional.stopLocationTracking())
-      dispatch(functional.locationPermissionsError())
+      return dispatch(functional.stopLocationTracking()).then(() => {
+        dispatch(functional.locationPermissionsError())
+      })
+    } else if (error.code === 1003) {
+      logInfo(error, 'gpsLocationError1003')
     } else {
       captureException(error)
     }

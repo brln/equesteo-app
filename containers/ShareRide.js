@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react'
 import {
   ActivityIndicator,
-  CameraRoll,
   Dimensions,
   Image,
   Linking,
@@ -11,6 +10,7 @@ import {
   TextInput,
   View
 } from 'react-native'
+import CameraRoll from "@react-native-community/cameraroll"
 import { connect } from 'react-redux'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 

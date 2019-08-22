@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 
 import { brand, lightGrey } from '../colors'
-import { RELEASE } from '../dotEnv'
+import config from '../dotEnv'
 import BuildImage from './Images/BuildImage'
 
 
@@ -72,7 +72,7 @@ export default class About extends PureComponent {
             <Text> in Ben Lomond, CA</Text>
           </View>
           <View style={{flex: 3}}>
-            <Text>Version { RELEASE.split('-')[1] }</Text>
+            <Text>Version { config.RELEASE.split('-')[1] }</Text>
           </View>
         </View>
       </View>

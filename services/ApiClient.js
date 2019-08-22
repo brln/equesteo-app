@@ -1,6 +1,6 @@
 import RNFetchBlob from 'rn-fetch-blob'
 
-import { API_URL } from '../dotEnv'
+import config from '../dotEnv'
 import { logError } from '../helpers'
 import {
   BadRequestError,
@@ -100,7 +100,7 @@ export default class ApiClient {
 
   static simpleGet (endpoint) {
     let resp
-    return fetch(API_URL + endpoint, { method: 'GET' }).then(_resp => {
+    return fetch(config.API_URL + endpoint, { method: 'GET' }).then(_resp => {
       resp = _resp
       return resp.json()
     }).then(json => {
@@ -118,7 +118,7 @@ export default class ApiClient {
     let rawResp
     return this.headers(isJSON).then((headers) => {
       return fetch(
-        API_URL + endpoint,
+        config.API_URL + endpoint,
         {
           body,
           headers: headers,

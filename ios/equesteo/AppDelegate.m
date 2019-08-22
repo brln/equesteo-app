@@ -12,7 +12,7 @@
 #import <Firebase.h>
 #import "RNFirebaseNotifications.h"
 #import <ReactNativeNavigation/ReactNativeNavigation.h>
-#import <RNSentry.h>
+#import <React/RNSentry.h>
 #import <React/RCTPushNotificationManager.h>
 #import <RCTLinkingManager.h>
 
@@ -31,6 +31,7 @@
   #endif
 
   [ReactNativeNavigation bootstrap:jsCodeLocation launchOptions:launchOptions];
+  [RNSentry installWithRootView:rootView];
 
   return YES;
 }
