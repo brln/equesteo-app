@@ -229,8 +229,8 @@ class UpdateRideContainer extends BackgroundComponent {
           this.setState({ saving: false })
           return Navigation.popTo(this.props.popBackTo)
         }).then(() => {
-          this.props.dispatch(functional.doSync())
-        })
+          return this.props.dispatch(functional.doSync())
+        }).catch(catchAsyncError(this.props.dispatch, 'UpdateRide.navigationButtonPressedOldRide'))
       } else if (buttonId === 'discard') {
         EqNavigation.pop(this.props.componentId).catch(() => {})
       }

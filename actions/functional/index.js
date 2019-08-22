@@ -1139,12 +1139,15 @@ function startLocationTracking () {
 
 
         BackgroundGeolocation.on('location', location => {
-          dispatch(functional.onGPSLocation(location))
+          BackgroundGeolocation.startTask(taskKey => {
+            dispatch(functional.onGPSLocation(location))
+            BackgroundGeolocation.endTask(taskKey);
+          })
         })
 
         dispatch(gpsSignalLost(false))
         dispatch(startGPSWatcher())
-        BackgroundGeolocation.start()
+        BackgroundGeolocation.start ()
         dispatch(functional.retryLocationTracking(30000))
         dispatch(functional.doSpeech())
       }).catch(catchAsyncError(dispatch, source))
@@ -1352,7 +1355,11 @@ return (_, getState) => {
     if (settingEnabled && newMiles % alertDistance === 0) {
       cb(source)
       Tts.getInitStatus().then(() => {
-        Tts.speak(`You have gone ${newMiles} miles`);
+        let mileOrMiles = 'mile'
+        if (newMiles > 1) {
+          mileOrMiles = 'miles'
+        }
+        Tts.speak(`You have gone ${newMiles} ${mileOrMiles}`);
       })
     }
   }
@@ -1577,16 +1584,16 @@ function startBackgroundFetch () {
   cb(source)
   return (dispatch, getState) => {
     BackgroundFetch.configure({
-      minimumFetchInterval: 15, // <-- minutes (15 is minimum allowed)
-      stopOnTerminate: false,   // <-- Android-only,
-      startOnBoot: false         // <-- Android-only
+      minimumFetchInterval: 60,
+      stopOnTerminate: true,
+      startOnBoot: false
     }, () => {
       const remotePersistStatus = getState().getIn(['localState', 'needsRemotePersist'])
       let before = Promise.resolve()
       let result = BackgroundFetch.FETCH_RESULT_NO_DATA
       if (remotePersistStatus === DB_NEEDS_SYNC) {
         result = BackgroundFetch.FETCH_RESULT_NEW_DATA
-        before = dispatch(functional.doSync())
+        before = dispatch(functional.doSync()).catch(catchAsyncError(dispatch, source))
       }
       before.then(() => {
         BackgroundFetch.finish(result)
@@ -1595,6 +1602,7 @@ function startBackgroundFetch () {
     }, (error) => {
       logError(error, "RNBackgroundFetch failed to start")
     });
+    BackgroundFetch.start()
   }
 }
 
