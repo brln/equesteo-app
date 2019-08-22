@@ -13,7 +13,7 @@ import {
   sentry_dsn_ios,
 } from 'react-native-dotenv'
 
-export default {
+const config = {
   API_URL: Platform.select({ios: api_url_ios, android: api_url_android}),
   SENTRY_DSN: Platform.select({ios: sentry_dsn_ios, android: sentry_dsn_android}),
   RELEASE: Platform.select({ios: `com.equesteo.equesteo-${release}`, android: `com.equesteo-${release}`}),
@@ -23,4 +23,4 @@ export default {
   MAPBOX_TOKEN: mapbox_token,
   NICOLE_USER_ID: nicole_user_id,
 }
-
+export default config

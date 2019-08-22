@@ -1,6 +1,6 @@
 import { Alert } from 'react-native'
 import { Sentry } from 'react-native-sentry'
-import config from '../dotEnv'
+import  config from '../dotEnv'
 
 import { logError, logInfo } from '../helpers'
 
@@ -22,6 +22,7 @@ export function captureMessage (m) {
 }
 
 export function captureException (e) {
+  console.log(config.ENV)
   if (config.ENV !== 'local') {
     try {
       if (e) {

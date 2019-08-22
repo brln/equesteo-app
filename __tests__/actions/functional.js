@@ -18,7 +18,7 @@ import {
 } from "../../constants"
 import * as helpers from '../../helpers'
 import functional from '../../actions/functional'
-import * as EnvVars from '../../dotEnv'
+import EnvVars from '../../dotEnv'
 
 const mockStore = configureStore([thunk])
 
