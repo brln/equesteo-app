@@ -19,6 +19,7 @@ import {
 import * as helpers from '../../helpers'
 import functional from '../../actions/functional'
 import EnvVars from '../../dotEnv'
+import {unixTimeFromStamp} from "../../helpers"
 
 const mockStore = configureStore([thunk])
 
@@ -83,10 +84,11 @@ describe('onGPSLocation', () => {
     const longitude = 1.3798327932
     const altitude = 328.4
     const accuracy = 8.3
-    const time = 8932897237
+    const timestamp = 8932897237
     const speed = 5.4
     const location = {
-      latitude, longitude, altitude, accuracy, time, speed
+      coords: {latitude, longitude, altitude, accuracy, speed},
+      timestamp,
     }
 
     store.dispatch(functional.onGPSLocation(location))
@@ -101,20 +103,18 @@ describe('onGPSLocation', () => {
         accuracy,
         latitude,
         longitude,
-        timestamp: time,
+        timestamp,
         speed,
       }),
       type: NEW_LOCATION
     }
     const actions = store.getActions()
     expect(actions.map(a => a.type)).toEqual([
-      SET_GPS_COORDINATES_RECEIVED,
       GPS_SIGNAL_LOST,
       NEW_LOCATION
     ])
-    expect(actions[0].value).toBe(4)
-    expect(actions[1].value).toBe(false)
-    expect(actions[2]).toEqual(expectedLocation)
+    expect(actions[0].value).toBe(false)
+    expect(actions[1]).toEqual(expectedLocation)
   })
 
   it ('doesn\'t record locations that come in rapidly', () => {
@@ -143,20 +143,17 @@ describe('onGPSLocation', () => {
     const longitude = 1
     const altitude = 1
     const accuracy = 1
-    const time = lastSavedTime + 3000
+    const timestamp = lastSavedTime + 3000
     const speed = 5.4
     const location = {
-      latitude, longitude, altitude, accuracy, time, speed
+      coords: {latitude, longitude, altitude, accuracy, speed},
+      timestamp,
     }
 
     store.dispatch(functional.onGPSLocation(location))
 
     const actions = store.getActions()
-    expect(actions.map(a => a.type)).toEqual([
-      SET_GPS_COORDINATES_RECEIVED,
-      GPS_SIGNAL_LOST
-    ])
-    expect(actions[1].value).toBe(false)
+    expect(actions.map(a => a.type)).toEqual([])
   })
 
   it ('throws away locations with bad accuracy', () => {
@@ -179,10 +176,11 @@ describe('onGPSLocation', () => {
     const longitude = 1
     const altitude = 1
     const accuracy = 26
-    const time = lastSavedTime + 3000
+    const timestamp = lastSavedTime + 3000
     const speed = 5.4
     const location = {
-      latitude, longitude, altitude, accuracy, time, speed
+      coords: {latitude, longitude, altitude, accuracy, speed},
+      timestamp,
     }
 
     store.dispatch(functional.onGPSLocation(location))
@@ -213,10 +211,11 @@ describe('onGPSLocation', () => {
     const longitude = 1
     const altitude = 1
     const accuracy = 1
-    const time = lastSavedTime + 3000
+    const timestamp = lastSavedTime + 3000
     const speed = 5.4
     const location = {
-      latitude, longitude, altitude, accuracy, time, speed
+      coords: {latitude, longitude, altitude, accuracy, speed},
+      timestamp,
     }
 
     store.dispatch(functional.onGPSLocation(location))
@@ -254,10 +253,11 @@ describe('onGPSLocation', () => {
     const longitude = -122.02029078
     const altitude = 328.4
     const accuracy = 5
-    const time = 1564588145349.4282
+    const timestamp = new Date(1564588145349.4282).toISOString()
     const speed = 5.4
     const location = {
-      latitude, longitude, altitude, accuracy, time, speed
+      coords: {latitude, longitude, altitude, accuracy, speed},
+      timestamp,
     }
 
     store.dispatch(functional.onGPSLocation(location))
@@ -267,26 +267,24 @@ describe('onGPSLocation', () => {
         latitude,
         longitude,
         elevation: altitude,
-        accuracy: 4.7885763621517965,
+        accuracy: 4.788565330906798,
       }),
       newLocation: Map({
-        accuracy: 4.7885763621517965,
+        accuracy: 4.788565330906798,
         latitude,
         longitude,
-        timestamp: time,
+        timestamp: unixTimeFromStamp(timestamp),
         speed,
       }),
       type: REPLACE_LAST_LOCATION
     }
     const actions = store.getActions()
     expect(actions.map(a => a.type)).toEqual([
-      SET_GPS_COORDINATES_RECEIVED,
       GPS_SIGNAL_LOST,
       REPLACE_LAST_LOCATION,
     ])
-    expect(actions[0].value).toBe(4)
-    expect(actions[1].value).toBe(false)
-    expect(actions[2]).toEqual(expectedLocation)
+    expect(actions[0].value).toBe(false)
+    expect(actions[1]).toEqual(expectedLocation)
   })
 })
 

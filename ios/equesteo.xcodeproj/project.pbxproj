@@ -13,11 +13,10 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		89234E4322E8A331002B6FB7 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 89234E4222E8A331002B6FB7 /* JavaScriptCore.framework */; };
 		89234E5B22E8AFED002B6FB7 /* libRCTPushNotification.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A74F92222153E3D500AE0E34 /* libRCTPushNotification.a */; };
-		89234EC822E8C49F002B6FB7 /* libRCTBackgroundGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 899F355D225506B900BFAD02 /* libRCTBackgroundGeolocation.a */; };
 		89486A3F2296DC7C0093743A /* sentry.properties in Resources */ = {isa = PBXBuildFile; fileRef = 89486A3E2296DC7C0093743A /* sentry.properties */; };
 		89C3A144224BB954003C7F5E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 89C3A143224BB954003C7F5E /* GoogleService-Info.plist */; };
 		89D75AEC22149ADE003EF395 /* Montserrat-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 89D75AC022149ADE003EF395 /* Montserrat-Regular.otf */; };
-		8AD4AFF9D6CFB65DF7DD489A /* libPods-equesteo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F7C0F2CFC35E7908223258D /* libPods-equesteo.a */; };
+		8B63D5E7FA540F8C65CF6CAF /* libPods-equesteo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E11AA0A7FB31CBAE7CBD65F /* libPods-equesteo.a */; };
 		9E72F842913D4B8AA32F8B50 /* RNBackgroundFetch+AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 53EDBA175EE54A15A329E152 /* RNBackgroundFetch+AppDelegate.m */; };
 		A7307D192149BA2F00D9CDC4 /* Panama-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = A7307D182149BA2F00D9CDC4 /* Panama-Light.otf */; };
 		A7307D322149D61300D9CDC4 /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A7307D312149D61300D9CDC4 /* MaterialIcons.ttf */; };
@@ -96,13 +95,6 @@
 			proxyType = 2;
 			remoteGlobalIDString = 323A12871E5F266B004975B8;
 			remoteInfo = "ART-tvOS";
-		};
-		899F355C225506B900BFAD02 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 899F3557225506B900BFAD02 /* RCTBackgroundGeolocation.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 418F75461D02DC3D0045FEA0;
-			remoteInfo = RCTBackgroundGeolocation;
 		};
 		89B7E2972218652600B6FF2D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -370,22 +362,20 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = equesteo/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = equesteo/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = equesteo/main.m; sourceTree = "<group>"; };
-		1F7C0F2CFC35E7908223258D /* libPods-equesteo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-equesteo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2A98F3BBCFE94584A4B1FC95 /* Roboto.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Roboto.ttf; path = "../node_modules/native-base/Fonts/Roboto.ttf"; sourceTree = "<group>"; };
 		2D16E6891FA4F8E400B85C8A /* libReact.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReact.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		2E11AA0A7FB31CBAE7CBD65F /* libPods-equesteo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-equesteo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3219CD37E8C642AAA4D89228 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/native-base/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
-		3873EC3E513D2AA93F758A26 /* Pods-equesteo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-equesteo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-equesteo/Pods-equesteo.debug.xcconfig"; sourceTree = "<group>"; };
+		39584ECC01B7764B1B406734 /* Pods-equesteo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-equesteo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-equesteo/Pods-equesteo.debug.xcconfig"; sourceTree = "<group>"; };
 		3FE3815658B34F9895C0642F /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/native-base/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
 		53EDBA175EE54A15A329E152 /* RNBackgroundFetch+AppDelegate.m */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.objc; name = "RNBackgroundFetch+AppDelegate.m"; path = "../node_modules/react-native-background-fetch/ios/RNBackgroundFetch/RNBackgroundFetch+AppDelegate.m"; sourceTree = "<group>"; };
 		5964A287E13547F1AFD73A77 /* rubicon-icon-font.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "rubicon-icon-font.ttf"; path = "../node_modules/native-base/Fonts/rubicon-icon-font.ttf"; sourceTree = "<group>"; };
-		5E86F798AD7184A743FA95AC /* Pods-equesteo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-equesteo.release.xcconfig"; path = "Pods/Target Support Files/Pods-equesteo/Pods-equesteo.release.xcconfig"; sourceTree = "<group>"; };
 		5F0A9FF269C34402BDB93BAF /* libz.tbd */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		6AC11D8FB3DE446E8B5D6932 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/native-base/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		890CBC8C22186D5700843B7A /* RCTCameraRoll.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTCameraRoll.xcodeproj; path = "../node_modules/react-native/Libraries/CameraRoll/RCTCameraRoll.xcodeproj"; sourceTree = "<group>"; };
 		89234E4222E8A331002B6FB7 /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		89486A3E2296DC7C0093743A /* sentry.properties */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sentry.properties; sourceTree = "<group>"; };
 		899D40E5225258C30054499A /* ART.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ART.xcodeproj; path = "../node_modules/react-native/Libraries/ART/ART.xcodeproj"; sourceTree = "<group>"; };
-		899F3557225506B900BFAD02 /* RCTBackgroundGeolocation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTBackgroundGeolocation.xcodeproj; path = "../node_modules/@mauron85/react-native-background-geolocation/ios/RCTBackgroundGeolocation.xcodeproj"; sourceTree = "<group>"; };
 		89B7E2662218652500B6FF2D /* RNSentry.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNSentry.xcodeproj; path = "../node_modules/react-native-sentry/ios/RNSentry.xcodeproj"; sourceTree = "<group>"; };
 		89C3A136224AE25E003C7F5E /* equesteo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = equesteo.entitlements; path = equesteo/equesteo.entitlements; sourceTree = "<group>"; };
 		89C3A139224AE35D003C7F5E /* RCTPushNotification.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTPushNotification.xcodeproj; path = "../node_modules/react-native/Libraries/PushNotificationIOS/RCTPushNotification.xcodeproj"; sourceTree = "<group>"; };
@@ -428,6 +418,7 @@
 		B1E30145D6BD4F9886C48E70 /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/native-base/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
 		C7D9F08F18D54989B178F535 /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/native-base/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
 		CDA231D0BA58411EACD071CC /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/native-base/Fonts/Feather.ttf"; sourceTree = "<group>"; };
+		E561DB8D6389E83B5CD13109 /* Pods-equesteo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-equesteo.release.xcconfig"; path = "Pods/Target Support Files/Pods-equesteo/Pods-equesteo.release.xcconfig"; sourceTree = "<group>"; };
 		F83A8407371546DAAF85BAF3 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/native-base/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -436,10 +427,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				89234EC822E8C49F002B6FB7 /* libRCTBackgroundGeolocation.a in Frameworks */,
 				89234E5B22E8AFED002B6FB7 /* libRCTPushNotification.a in Frameworks */,
 				89234E4322E8A331002B6FB7 /* JavaScriptCore.framework in Frameworks */,
-				8AD4AFF9D6CFB65DF7DD489A /* libPods-equesteo.a in Frameworks */,
+				8B63D5E7FA540F8C65CF6CAF /* libPods-equesteo.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -511,16 +501,16 @@
 				2D16E6891FA4F8E400B85C8A /* libReact.a */,
 				8A1CEA24CABF4CA9BE893D38 /* TSBackgroundFetch.framework */,
 				5F0A9FF269C34402BDB93BAF /* libz.tbd */,
-				1F7C0F2CFC35E7908223258D /* libPods-equesteo.a */,
+				2E11AA0A7FB31CBAE7CBD65F /* libPods-equesteo.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		68F80307B310CC6E82747CFE /* Pods */ = {
+		6D646307111FF64683FF1E93 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				3873EC3E513D2AA93F758A26 /* Pods-equesteo.debug.xcconfig */,
-				5E86F798AD7184A743FA95AC /* Pods-equesteo.release.xcconfig */,
+				39584ECC01B7764B1B406734 /* Pods-equesteo.debug.xcconfig */,
+				E561DB8D6389E83B5CD13109 /* Pods-equesteo.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -528,7 +518,6 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				899F3557225506B900BFAD02 /* RCTBackgroundGeolocation.xcodeproj */,
 				899D40E5225258C30054499A /* ART.xcodeproj */,
 				89C3A139224AE35D003C7F5E /* RCTPushNotification.xcodeproj */,
 				89D782E92231AB1C009EE914 /* RNFetchBlob.xcodeproj */,
@@ -562,7 +551,7 @@
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				A721BE672146C9AA00AE909D /* Recovered References */,
 				09CD53CE1B954EE6A690041E /* Resources */,
-				68F80307B310CC6E82747CFE /* Pods */,
+				6D646307111FF64683FF1E93 /* Pods */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -590,14 +579,6 @@
 			children = (
 				899D40EB225258C30054499A /* libART.a */,
 				899D40ED225258C30054499A /* libART-tvOS.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		899F3558225506B900BFAD02 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				899F355D225506B900BFAD02 /* libRCTBackgroundGeolocation.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -784,14 +765,14 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "equesteo" */;
 			buildPhases = (
-				DDBEFA16EF6757B22E79BA70 /* [CP] Check Pods Manifest.lock */,
+				8A69E88ECD92E48060237EE3 /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				899F34342254F2FA00BFAD02 /* Bundle React Native code and images */,
 				89486A3C22960DB70093743A /* Upload Debug Symbols to Sentry */,
-				09FA1FF90752649A7BAC5FF1 /* [CP] Embed Pods Frameworks */,
-				A9947C0A1E6EA2C66BB3FDF6 /* [CP] Copy Pods Resources */,
+				053D7445B1186A169AC7EA80 /* [CP] Embed Pods Frameworks */,
+				F817479D8AB4C3E0E2E70776 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -848,10 +829,6 @@
 				{
 					ProductGroup = A74F92852153EA8000AE0E34 /* Products */;
 					ProjectRef = A74F92842153EA8000AE0E34 /* RCTAnimation.xcodeproj */;
-				},
-				{
-					ProductGroup = 899F3558225506B900BFAD02 /* Products */;
-					ProjectRef = 899F3557225506B900BFAD02 /* RCTBackgroundGeolocation.xcodeproj */;
 				},
 				{
 					ProductGroup = 890CBC8D22186D5700843B7A /* Products */;
@@ -979,13 +956,6 @@
 			fileType = archive.ar;
 			path = "libART-tvOS.a";
 			remoteRef = 899D40EC225258C30054499A /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		899F355D225506B900BFAD02 /* libRCTBackgroundGeolocation.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libRCTBackgroundGeolocation.a;
-			remoteRef = 899F355C225506B900BFAD02 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		89B7E2982218652600B6FF2D /* libRNSentry.a */ = {
@@ -1270,7 +1240,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		09FA1FF90752649A7BAC5FF1 /* [CP] Embed Pods Frameworks */ = {
+		053D7445B1186A169AC7EA80 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1328,7 +1298,29 @@
 			shellPath = /bin/sh;
 			shellScript = "export SENTRY_PROPERTIES=sentry.properties\n\n\n# Setup nvm and set node\n[ -z \"$NVM_DIR\" ] && export NVM_DIR=\"$HOME/.nvm\"\n\nif [[ -s \"$HOME/.nvm/nvm.sh\" ]]; then\n. \"$HOME/.nvm/nvm.sh\"\nelif [[ -x \"$(command -v brew)\" && -s \"$(brew --prefix nvm)/nvm.sh\" ]]; then\n. \"$(brew --prefix nvm)/nvm.sh\"\nfi\n\n# Set up the nodenv node version manager if present\nif [[ -x \"$HOME/.nodenv/bin/nodenv\" ]]; then\neval \"$(\"$HOME/.nodenv/bin/nodenv\" init -)\"\nfi\n\n# Trying notion\nif [ -z \"$NODE_BINARY\" ]; then\nif [[ -s \"$HOME/.notion/bin/node\" ]]; then\nexport NODE_BINARY=\"$HOME/.notion/bin/node\"\nfi\nfi\n\n[ -z \"$NODE_BINARY\" ] && export NODE_BINARY=\"node\"\n\n$NODE_BINARY ../node_modules/@sentry/cli/bin/sentry-cli react-native xcode \\\n../node_modules/react-native/scripts/react-native-xcode.sh\n\n";
 		};
-		A9947C0A1E6EA2C66BB3FDF6 /* [CP] Copy Pods Resources */ = {
+		8A69E88ECD92E48060237EE3 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-equesteo-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F817479D8AB4C3E0E2E70776 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1384,28 +1376,6 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-equesteo/Pods-equesteo-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		DDBEFA16EF6757B22E79BA70 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-equesteo-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -1436,7 +1406,7 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3873EC3E513D2AA93F758A26 /* Pods-equesteo.debug.xcconfig */;
+			baseConfigurationReference = 39584ECC01B7764B1B406734 /* Pods-equesteo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = equesteo/equesteo.entitlements;
@@ -1469,7 +1439,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5E86F798AD7184A743FA95AC /* Pods-equesteo.release.xcconfig */;
+			baseConfigurationReference = E561DB8D6389E83B5CD13109 /* Pods-equesteo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = equesteo/equesteo.entitlements;

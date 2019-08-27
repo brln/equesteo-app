@@ -88,7 +88,7 @@ import {
   SET_SECONDARY_CARE_EVENT_TYPE,
   SET_CARE_EVENT_SPECIFIC_DATA,
   CHANGE_CARE_CALENDAR_TAB,
-  SET_HOOF_TRACKS_RUNNING, SET_SHUTDOWN_IN_PROGRESS,
+  SET_HOOF_TRACKS_RUNNING,
 } from '../constants'
 
 export function addDocsDownloaded (num, db) {
@@ -111,13 +111,6 @@ export function setBackgroundGeolocationRunning (value) {
     type: SET_BACKGROUND_GEOLOCATION_RUNNING,
     value,
     logData: ['value'],
-  }
-}
-
-export function setShutdownInProgress (value) {
-  return {
-    type: SET_SHUTDOWN_IN_PROGRESS,
-    value
   }
 }
 

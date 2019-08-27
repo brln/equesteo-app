@@ -49,6 +49,10 @@ export const unixTimeNow = () => {
   return Math.floor(new Date().getTime())
 }
 
+export const unixTimeFromStamp = (stamp) => {
+  return Math.floor(new Date(stamp).getTime())
+}
+
 export const profilePhotoURL = (id) => {
   return `https://equesteo-profile-photos-2.s3.amazonaws.com/${id}.jpg`
 }

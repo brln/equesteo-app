@@ -49,7 +49,6 @@ import {
   SET_HOOF_TRACKS_RUNNING,
   SET_SIGNING_OUT,
   SET_SHOWING_RIDE,
-  SET_SHUTDOWN_IN_PROGRESS,
   STASH_RIDE_PHOTO,
   SYNC_COMPLETE,
   UPDATE_PHOTO_STATUS,
@@ -97,7 +96,6 @@ export const initialState = Map({
   ridePhotoStash: Map(),
   root: SIGNUP,
   showingRide: null,
-  shutdownInProgress: false,
   signingOut: false,
   userID: null,
   userSearchResults: List(),
@@ -214,8 +212,6 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.set('newCareEvent', withSecondaryType)
     case SET_SHOWING_RIDE:
       return state.set('showingRide', action.rideID)
-    case SET_SHUTDOWN_IN_PROGRESS:
-      return state.set('shutdownInProgress', action.value)
     case SET_SIGNING_OUT:
       return state.set('signingOut', action.value)
     case SYNC_COMPLETE:

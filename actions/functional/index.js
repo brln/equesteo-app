@@ -3,7 +3,7 @@ import BackgroundTimer from 'react-native-background-timer'
 import ImagePicker from 'react-native-image-crop-picker'
 import { fromJS, Map  } from 'immutable'
 import { Alert, AppState, Linking, Platform } from 'react-native'
-import BackgroundGeolocation from '@mauron85/react-native-background-geolocation'
+import BackgroundGeolocation from 'react-native-background-geolocation'
 import firebase from 'react-native-firebase'
 import { Navigation } from 'react-native-navigation'
 import NetInfo from "@react-native-community/netinfo";
@@ -30,7 +30,9 @@ import {
   rideIDGenerator,
   ridePhotoURL,
   unixTimeNow,
-  profilePhotoURL, haversine
+  profilePhotoURL,
+  haversine,
+  unixTimeFromStamp,
 } from "../../helpers"
 import { danger, green, warning } from '../../colors'
 import {
@@ -80,7 +82,6 @@ import {
   notificationUpdated,
   rideAtlasEntryUpdated,
   setBackgroundGeolocationRunning,
-  setShutdownInProgress,
   rideCoordinatesLoaded,
   rideCarrotCreated,
   rideCarrotSaved,
@@ -1045,22 +1046,6 @@ function clearLocationRetry () {
   }
 }
 
-function retryLocationTracking (inMsec) {
-  const source = 'retryLocationTracking'
-  cb(source)
-  return (dispatch, getState) => {
-    functionalState.locationTrackingRetry = TimeoutManager.newTimeout(() => {
-      const currentRide = getState().getIn(['currentRide', 'currentRide'])
-      const lastLocation = getState().getIn(['currentRide', 'lastLocation'])
-      if (currentRide && !lastLocation) {
-        dispatch(functional.stopLocationTracking(false)).then(() => {
-          dispatch(functional.startLocationTracking())
-        })
-      }
-    }, inMsec)
-  }
-}
-
 function gpsText(text) {
   const source = 'gpsText'
   cb(source)
@@ -1132,27 +1117,23 @@ function startLocationTracking () {
     const isRunning = getState().getIn(['localState', 'backgroundGeolocationRunning'])
     if (!isRunning) {
       dispatch(setBackgroundGeolocationRunning(true))
+      BackgroundGeolocation.onLocation(location => {
+        BackgroundGeolocation.startBackgroundTask(taskKey => {
+          dispatch(functional.onGPSLocation(location))
+          BackgroundGeolocation.stopBackgroundTask(taskKey);
+        })
+      }, (error) => {
+        dispatch(functional.gpsLocationError(error))
+      })
+
       return dispatch(functional.configureBackgroundGeolocation()).then(() => {
-        BackgroundGeolocation.on('error', error => {
-          dispatch(functional.gpsLocationError(error))
-        })
-
-
-        BackgroundGeolocation.on('location', location => {
-          BackgroundGeolocation.startTask(taskKey => {
-            dispatch(functional.onGPSLocation(location))
-            BackgroundGeolocation.endTask(taskKey);
-          })
-        })
-
         dispatch(gpsSignalLost(false))
         dispatch(startGPSWatcher())
-        BackgroundGeolocation.start ()
-        dispatch(functional.retryLocationTracking(30000))
         dispatch(functional.doSpeech())
+        return BackgroundGeolocation.start()
+      }).then(() => {
+        return BackgroundGeolocation.changePace(true)
       }).catch(catchAsyncError(dispatch, source))
-    } else if (getState().getIn(['localState', 'shutdownInProgress'])) {
-      dispatch(functional.retryLocationTracking(5000))
     }
   }
 }
@@ -1181,38 +1162,39 @@ function onGPSLocation (location) {
   return (dispatch, getState) => {
     const alreadyReceived = getState().getIn(['localState', 'gpsCoordinatesReceived'])
     const nowReceived = alreadyReceived + 1
-    dispatch(setGPSCoordinatesReceived(nowReceived))
-    if (nowReceived <= THROWAWAY_FIRST_N_COORDS || location.accuracy > MINIMUM_ACCURACY_IN_M) {
+    if (nowReceived <= THROWAWAY_FIRST_N_COORDS || location.coords.accuracy > MINIMUM_ACCURACY_IN_M) {
+      dispatch(setGPSCoordinatesReceived(nowReceived))
       return
     }
 
     if (getState().getIn(['localState', 'gpsSignalLost'])) {
       dispatch(functional.gpsText('Found GPS'))
     }
-    dispatch(gpsSignalLost(false))
 
     const lastLocation = getState().getIn(['currentRide', 'lastLocation'])
+    const newTimestamp = unixTimeFromStamp(location.timestamp)
     let timeDiff = 0
     if (lastLocation) {
-      timeDiff = (location.time / 1000) - (lastLocation.get('timestamp') / 1000)
+      timeDiff = (newTimestamp / 1000) - (lastLocation.get('timestamp') / 1000)
     }
 
     if (!lastLocation || timeDiff > 5) {
+      dispatch(gpsSignalLost(false))
       const oldDistance = getState().getIn(['currentRide', 'currentRide', 'distance'])
       const refiningLocation = getState().getIn(['currentRide', 'refiningLocation'])
 
       let parsedLocation = Map({
-        accuracy: location.accuracy,
-        latitude: location.latitude,
-        longitude: location.longitude,
-        timestamp: location.time,
-        speed: location.speed,
+        accuracy: location.coords.accuracy,
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        timestamp: newTimestamp,
+        speed: location.coords.speed,
       })
 
       let parsedElevation = Map({
-        latitude: location.latitude,
-        longitude: location.longitude,
-        elevation: location.altitude,
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        elevation: location.coords.altitude,
       })
 
       let replaced = false
@@ -1319,25 +1301,23 @@ function loginAndSync(loginFunc, loginArgs) {
 
 function configureBackgroundGeolocation () {
   return () => {
-    return new Promise((res, rej) => {
-      BackgroundGeolocation.configure(
+    return BackgroundGeolocation.ready(
         {
-          desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
-          locationProvider: BackgroundGeolocation.RAW_PROVIDER,
-          distanceFilter: 0,
+          debug: false,
+          reset: true,
+          disableElasticity: true,
+          distanceFilter: 2,
+          desiredAccuracy: BackgroundGeolocation.DESIRED_ACCURACY_HIGH,
           maxLocations: 10,
-          interval: 0,
-          notificationTitle: 'You\'re out on a ride.',
-          notificationText: 'Tap here to see your progress.',
+          notification: {
+            title: 'You\'re out on a ride.',
+            text: 'Tap here to see your progress.',
+          },
+          persistMode: BackgroundGeolocation.PERSIST_MODE_NONE,
+          logLevel: BackgroundGeolocation.LOG_LEVEL_WARNING
         },
-        () => {
-          logInfo('Background geolocation configured')
-          res()
-        },
-        (e) => {
-          rej(e)
-        },
-      )
+    ).then(() => {
+      logInfo('Background geolocation configured')
     })
   }
 }
@@ -1504,64 +1484,14 @@ function startActiveComponentListener () {
   }
 }
 
-function shutdownBackgroundGeolocation () {
-  const source = 'shutdownBackgroundGeolocation'
-  cb(source)
-  return (dispatch) => {
-    let numTries = 0
-    function doStop () {
-      return new Promise(res => {
-        BackgroundGeolocation.checkStatus((status) => {
-          BackgroundGeolocation.removeAllListeners()
-          BackgroundGeolocation.deleteAllLocations()
-          if (status.isRunning) {
-            BackgroundGeolocation.stop()
-            ensureStop().then(() => {
-              res()
-            })
-          } else {
-            dispatch(setBackgroundGeolocationRunning(false))
-            res()
-          }
-        }, () => {
-          ensureStop().then(() => {
-            res()
-          })
-        })
-      })
-    }
-
-    function ensureStop () {
-      numTries = numTries + 1
-      if (numTries > 5) {
-        throw new Error ('Too many tries shutting down BackgroundGeolocation')
-      }
-      if (numTries === 1) {
-        return doStop()
-      } else {
-        return new Promise(res => {
-          TimeoutManager.newTimeout(() => {
-            doStop().then(() => {
-              res()
-            })
-          }, 2000)
-        })
-      }
-    }
-
-    return ensureStop()
-  }
-}
-
 function stopLocationTracking (clearLast=true) {
   const source = 'stopLocationTracking'
   cb(source)
   return (dispatch) => {
     dispatch(functional.stopGPSWatcher())
-    dispatch(setShutdownInProgress(true))
-    return dispatch(functional.shutdownBackgroundGeolocation()).then(() => {
+    return BackgroundGeolocation.stop().then(() => {
+      dispatch(setBackgroundGeolocationRunning(false))
       dispatch(setGPSCoordinatesReceived(0))
-      dispatch(setShutdownInProgress(false))
       if (clearLast) {
         dispatch(clearLastLocation())
       }
@@ -1898,13 +1828,11 @@ const functional = {
   photoNeedsUpload,
   pulldownSync,
   removeForgotPWLinkListener,
-  retryLocationTracking,
   runPhotoQueue,
   searchForFriends,
   setDistributionOnServer,
   setFCMTokenOnServer,
   showLocalNotifications,
-  shutdownBackgroundGeolocation,
   signOut,
   startActiveComponentListener,
   startAppStateTracking,

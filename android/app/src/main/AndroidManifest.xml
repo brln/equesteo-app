@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.equesteo"
-    android:versionCode="174"
-    android:versionName="2.0.14">
+    android:versionCode="175"
+    android:versionName="2.0.15">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
