@@ -1118,15 +1118,12 @@ function startLocationTracking () {
     if (!isRunning) {
       dispatch(setBackgroundGeolocationRunning(true))
       BackgroundGeolocation.onLocation(location => {
-        BackgroundGeolocation.startBackgroundTask(taskKey => {
-          dispatch(functional.onGPSLocation(location))
-          BackgroundGeolocation.stopBackgroundTask(taskKey);
-        })
+        dispatch(functional.onGPSLocation(location))
       }, (error) => {
         dispatch(functional.gpsLocationError(error))
       })
 
-      return dispatch(functional.configureBackgroundGeolocation()).then(() => {
+      return dispatch(functional.configureBackgroundGeolocation(true)).then(() => {
         dispatch(gpsSignalLost(false))
         dispatch(startGPSWatcher())
         dispatch(functional.doSpeech())
@@ -1142,12 +1139,12 @@ export function gpsLocationError (error) {
   const source = 'gpsLocationError'
   cb(source)
   return (dispatch) => {
-    if (error.code === 1000) {
+    if (error === 1) {
       return dispatch(functional.stopLocationTracking()).then(() => {
         dispatch(functional.locationPermissionsError())
       })
-    } else if (error.code === 1003) {
-      logInfo(error, 'gpsLocationError1003')
+    } else if (error === 0 || error === 2 || error === 408) {
+      logInfo(error, 'gpsError')
     } else {
       captureException(error)
     }
@@ -1179,60 +1176,63 @@ function onGPSLocation (location) {
     }
 
     if (!lastLocation || timeDiff > 5) {
-      dispatch(gpsSignalLost(false))
-      const oldDistance = getState().getIn(['currentRide', 'currentRide', 'distance'])
-      const refiningLocation = getState().getIn(['currentRide', 'refiningLocation'])
+      BackgroundGeolocation.startBackgroundTask(taskKey => {
+        dispatch(gpsSignalLost(false))
+        const oldDistance = getState().getIn(['currentRide', 'currentRide', 'distance'])
+        const refiningLocation = getState().getIn(['currentRide', 'refiningLocation'])
 
-      let parsedLocation = Map({
-        accuracy: location.coords.accuracy,
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        timestamp: newTimestamp,
-        speed: location.coords.speed,
-      })
+        let parsedLocation = Map({
+          accuracy: location.coords.accuracy,
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          timestamp: newTimestamp,
+          speed: location.coords.speed,
+        })
 
-      let parsedElevation = Map({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        elevation: location.coords.altitude,
-      })
+        let parsedElevation = Map({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          elevation: location.coords.altitude,
+        })
 
-      let replaced = false
-      if (refiningLocation && lastLocation) {
-        // If you have at least one point already recorded, run the Kalman filter
-        // on the new location coming in using the one you already have
-        parsedLocation = kalmanFilter(
-          parsedLocation,
-          lastLocation,
-          KALMAN_FILTER_Q
-        )
-        parsedElevation = parsedElevation.set(
-          'latitude', parsedLocation.get('latitude')
-        ).set(
-          'longitude', parsedLocation.get('longitude')
-        ).set(
-          'accuracy', parsedLocation.get('accuracy')
-        )
+        let replaced = false
+        if (refiningLocation && lastLocation) {
+          // If you have at least one point already recorded, run the Kalman filter
+          // on the new location coming in using the one you already have
+          parsedLocation = kalmanFilter(
+            parsedLocation,
+            lastLocation,
+            KALMAN_FILTER_Q
+          )
+          parsedElevation = parsedElevation.set(
+            'latitude', parsedLocation.get('latitude')
+          ).set(
+            'longitude', parsedLocation.get('longitude')
+          ).set(
+            'accuracy', parsedLocation.get('accuracy')
+          )
 
-        let distance = haversine(
-          refiningLocation.get('latitude'),
-          refiningLocation.get('longitude'),
-          parsedLocation.get('latitude'),
-          parsedLocation.get('longitude')
-        )
-        if (distance < (30 / 5280)) {
-          // If you're within a 30' radius of the last place you were, don't
-          // just add the point on, replace the old one.
-          dispatch(replaceLastLocation(parsedLocation, parsedElevation))
-          replaced = true
+          let distance = haversine(
+            refiningLocation.get('latitude'),
+            refiningLocation.get('longitude'),
+            parsedLocation.get('latitude'),
+            parsedLocation.get('longitude')
+          )
+          if (distance < (30 / 5280)) {
+            // If you're within a 30' radius of the last place you were, don't
+            // just add the point on, replace the old one.
+            dispatch(replaceLastLocation(parsedLocation, parsedElevation))
+            replaced = true
+          }
         }
-      }
-      if (!replaced) {
-        dispatch(newLocation(parsedLocation, parsedElevation))
-        const newDistance = getState().getIn(['currentRide', 'currentRide', 'distance'])
-        dispatch(functional.doSpeech(oldDistance, newDistance))
-      }
-      dispatch(functional.doHoofTracksUpload())
+        if (!replaced) {
+          dispatch(newLocation(parsedLocation, parsedElevation))
+          const newDistance = getState().getIn(['currentRide', 'currentRide', 'distance'])
+          dispatch(functional.doSpeech(oldDistance, newDistance))
+        }
+        dispatch(functional.doHoofTracksUpload())
+        BackgroundGeolocation.stopBackgroundTask(taskKey)
+      })
     }
   }
 }
@@ -1299,10 +1299,11 @@ function loginAndSync(loginFunc, loginArgs) {
   }
 }
 
-function configureBackgroundGeolocation () {
+function configureBackgroundGeolocation (preventSuspend) {
   return () => {
     return BackgroundGeolocation.ready(
         {
+          preventSuspend,
           debug: false,
           reset: true,
           disableElasticity: true,
@@ -1490,6 +1491,8 @@ function stopLocationTracking (clearLast=true) {
   return (dispatch) => {
     dispatch(functional.stopGPSWatcher())
     return BackgroundGeolocation.stop().then(() => {
+      return dispatch(functional.configureBackgroundGeolocation(false))
+    }).then(() => {
       dispatch(setBackgroundGeolocationRunning(false))
       dispatch(setGPSCoordinatesReceived(0))
       if (clearLast) {

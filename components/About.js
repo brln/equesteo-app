@@ -6,9 +6,13 @@ import {
   View
 } from 'react-native';
 
+
 import { brand, lightGrey } from '../colors'
 import config from '../dotEnv'
 import BuildImage from './Images/BuildImage'
+import Button from './Button'
+import {EqNavigation} from "../services"
+import { LOCATION_LOG } from "../screens/consts/main"
 
 
 export default class About extends PureComponent {
@@ -33,10 +37,18 @@ export default class About extends PureComponent {
 
   constructor (props) {
     super(props)
+    this.showLocationLog = this.showLocationLog.bind(this)
+
   }
 
-  close () {
-    this.props.close()
+
+
+  showLocationLog () {
+    EqNavigation.push(this.props.componentId, {
+      component: {
+        name: LOCATION_LOG,
+      }
+    }).catch(() => {})
   }
 
   render() {
@@ -69,10 +81,18 @@ export default class About extends PureComponent {
           <View style={{flex: 1, flexDirection: 'row'}}>
             <Text>Made with </Text>
             <TouchableWithoutFeedback onPress={() => {throw new Error('error test')}}><View><Text>♡</Text></View></TouchableWithoutFeedback>
-            <Text> in Ben Lomond, CA</Text>
+            <Text> in Bend, OR</Text>
           </View>
           <View style={{flex: 3}}>
             <Text>Version { config.RELEASE.split('-')[1] }</Text>
+          </View>
+
+          <View style={{flex: 3}}>
+            <Button
+              text={"Location Log"}
+              color={brand}
+              onPress={this.showLocationLog}
+            />
           </View>
         </View>
       </View>

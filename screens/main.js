@@ -14,6 +14,7 @@ import ForgotContainer from '../containers/SignupLogin/Forgot'
 import HorseProfileContainer from '../containers/HorseProfile'
 import HorseToolsContainer from '../containers/HorseTools'
 import LeaderboardsContainer from '../containers/Leaderboards'
+import LocationLog from '../components/LocationLog'
 import LoginContainer from '../containers/SignupLogin/Login'
 import MapContainer from '../containers/Map'
 import MoreContainer from '../containers/More'
@@ -52,6 +53,7 @@ import {
   HORSE_TOOLS,
   FIND_PEOPLE,
   LEADERBOARDS,
+  LOCATION_LOG,
   LOGIN,
   MAP,
   NEEDS_SYNC,
@@ -82,6 +84,7 @@ import {
 
 export function registerScreens(store, Provider) {
   Navigation.registerComponent(ABOUT_PAGE, () => About)
+  Navigation.registerComponent(LOCATION_LOG, () => LocationLog)
   Navigation.registerComponentWithRedux(CAMERA, () => Camera, Provider, store)
   Navigation.registerComponentWithRedux(COLOR_PICKER, () => ColorPickerContainer, Provider, store)
   Navigation.registerComponentWithRedux(BARN, () => BarnContainer, Provider, store)

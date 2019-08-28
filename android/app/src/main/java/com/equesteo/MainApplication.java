@@ -9,7 +9,6 @@ import com.reactnativecommunity.netinfo.NetInfoPackage;
 import com.ocetnik.timer.BackgroundTimerPackage;
 import net.no_mad.tts.TextToSpeechPackage;
 import com.transistorsoft.rnbackgroundfetch.RNBackgroundFetchPackage;
-import com.transistorsoft.rnbackgroundfetch.RNBackgroundFetchPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import org.reactnative.camera.RNCameraPackage;
@@ -18,7 +17,6 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.horcrux.svg.SvgPackage;
-import com.marianhello.bgloc.react.BackgroundGeolocationPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.reactnativenavigation.NavigationApplication;
@@ -76,7 +74,6 @@ public class MainApplication extends NavigationApplication {
         // No need to add RnnPackage and MainReactPackage
         return Arrays.<ReactPackage>asList(
             new PickerPackage(),
-            new BackgroundGeolocationPackage(),
             new LocationServicesDialogBoxPackage(),
             new RNFirebasePackage(),
             new RNFirebaseMessagingPackage(),
