@@ -34,7 +34,6 @@ export default class LocationLog extends PureComponent {
   constructor (props) {
     super(props)
     this.clearLog = this.clearLog.bind(this)
-    this.emailLog = this.emailLog.bind(this)
     this.state = {
       logs: []
     }
@@ -49,10 +48,6 @@ export default class LocationLog extends PureComponent {
     })
   }
 
-  emailLog () {
-    BackgroundGeolocation.emailLog('matt@equesteo.com', () => {}, () => {})
-  }
-
   componentDidMount () {
     BackgroundGeolocation.getLog(logs => {
       this.setState({
@@ -65,7 +60,6 @@ export default class LocationLog extends PureComponent {
     return (
       <ScrollView>
         <Button text={"Clear Log"} color={brand} onPress={this.clearLog} />
-        <Button text={"Email Log"} color={brand} onPress={this.emailLog} />
         <View>
           { this.state.logs.map(l => {
             const each = l.split(' ')

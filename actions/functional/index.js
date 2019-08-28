@@ -1491,7 +1491,7 @@ function stopLocationTracking (clearLast=true) {
   return (dispatch) => {
     dispatch(functional.stopGPSWatcher())
     return BackgroundGeolocation.stop().then(() => {
-      return dispatch(functional.configureBackgroundGeolocation(false))
+      BackgroundGeolocation.reset()
     }).then(() => {
       dispatch(setBackgroundGeolocationRunning(false))
       dispatch(setGPSCoordinatesReceived(0))
