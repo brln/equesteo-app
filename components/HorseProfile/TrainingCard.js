@@ -75,9 +75,7 @@ export default class TrainingCard extends PureComponent {
     if (!this.props.trainings || !this.props.visible) {
       return null
     }
-    console.log(this.props.trainings.toJSON())
     const calcs = TrainingCard.calcs(this.props.trainings, (new Date()))
-    console.log(calcs)
     return (
       <Card style={{flex: 1}}>
         <CardItem header>

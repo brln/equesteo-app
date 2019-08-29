@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
@@ -30,6 +29,7 @@
 		A7307D522149D75E00D9CDC4 /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A7307D482149D75D00D9CDC4 /* EvilIcons.ttf */; };
 		A7307D532149D75E00D9CDC4 /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A7307D492149D75E00D9CDC4 /* Feather.ttf */; };
 		A7307D542149D75E00D9CDC4 /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A7307D4A2149D75E00D9CDC4 /* Zocial.ttf */; };
+		60B784FFF937446880E212C5 /* TSLocationManager.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 99EB302B62744429A4427303 /* TSLocationManager.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -420,6 +420,7 @@
 		CDA231D0BA58411EACD071CC /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/native-base/Fonts/Feather.ttf"; sourceTree = "<group>"; };
 		E561DB8D6389E83B5CD13109 /* Pods-equesteo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-equesteo.release.xcconfig"; path = "Pods/Target Support Files/Pods-equesteo/Pods-equesteo.release.xcconfig"; sourceTree = "<group>"; };
 		F83A8407371546DAAF85BAF3 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/native-base/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
+		99EB302B62744429A4427303 /* TSLocationManager.framework */ = {isa = PBXFileReference; name = "TSLocationManager.framework"; path = "../node_modules/react-native-background-geolocation/ios/RNBackgroundGeolocation/TSLocationManager.framework"; sourceTree = SDKROOT; fileEncoding = undefined; lastKnownFileType = wrapper.framework; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -430,6 +431,7 @@
 				89234E5B22E8AFED002B6FB7 /* libRCTPushNotification.a in Frameworks */,
 				89234E4322E8A331002B6FB7 /* JavaScriptCore.framework in Frameworks */,
 				8B63D5E7FA540F8C65CF6CAF /* libPods-equesteo.a in Frameworks */,
+				60B784FFF937446880E212C5 /* TSLocationManager.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -502,6 +504,7 @@
 				8A1CEA24CABF4CA9BE893D38 /* TSBackgroundFetch.framework */,
 				5F0A9FF269C34402BDB93BAF /* libz.tbd */,
 				2E11AA0A7FB31CBAE7CBD65F /* libPods-equesteo.a */,
+				99EB302B62744429A4427303 /* TSLocationManager.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1434,6 +1437,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.equesteo.equesteo;
 				PRODUCT_NAME = equesteo;
 				VERSIONING_SYSTEM = "apple-generic";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+				);
 			};
 			name = Debug;
 		};
@@ -1466,6 +1472,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.equesteo.equesteo;
 				PRODUCT_NAME = equesteo;
 				VERSIONING_SYSTEM = "apple-generic";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+				);
 			};
 			name = Release;
 		};

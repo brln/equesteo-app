@@ -22,7 +22,6 @@ class ColorPickerContainer extends PureComponent {
   componentWillUnmount () {
     if (this.state.chosenColor !== this.props.horse.get('color')) {
       const newColor = fromHsv(this.state.chosenColor)
-      logDebug(newColor, 'newColor')
       this.props.dispatch(horseUpdated(this.props.horse.set('color', newColor)))
     }
   }

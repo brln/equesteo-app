@@ -2,6 +2,7 @@ package com.equesteo;
 
 import android.app.Application;
 import com.facebook.react.ReactApplication;
+import com.transistorsoft.rnbackgroundgeolocation.RNBackgroundGeolocation;
 import com.rnfs.RNFSPackage;
 import com.reactnativecommunity.cameraroll.CameraRollPackage;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
@@ -91,7 +92,8 @@ public class MainApplication extends NavigationApplication {
             new BackgroundTimerPackage(),
             new NetInfoPackage(),
             new CameraRollPackage(),
-            new RNFSPackage()
+            new RNFSPackage(),
+            new RNBackgroundGeolocation()
         );
     }
 

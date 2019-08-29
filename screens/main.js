@@ -1,6 +1,7 @@
 import { Navigation } from 'react-native-navigation';
 
 import About from '../components/About'
+import ActionLog from '../containers/ActionLog'
 import BarnContainer from '../containers/Barn'
 import Camera from '../containers/Camera'
 import ColorPickerContainer from '../containers/UpdateHorse/ColorPicker'
@@ -41,6 +42,7 @@ import UpdateProfileContainer from '../containers/UpdateProfile'
 
 import {
   ABOUT_PAGE,
+  ACTION_LOG,
   BARN,
   CAMERA,
   COLOR_PICKER,
@@ -84,6 +86,7 @@ import {
 
 export function registerScreens(store, Provider) {
   Navigation.registerComponent(ABOUT_PAGE, () => About)
+  Navigation.registerComponentWithRedux(ACTION_LOG, () => ActionLog, Provider, store)
   Navigation.registerComponent(LOCATION_LOG, () => LocationLog)
   Navigation.registerComponentWithRedux(CAMERA, () => Camera, Provider, store)
   Navigation.registerComponentWithRedux(COLOR_PICKER, () => ColorPickerContainer, Provider, store)

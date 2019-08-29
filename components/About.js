@@ -12,7 +12,7 @@ import config from '../dotEnv'
 import BuildImage from './Images/BuildImage'
 import Button from './Button'
 import {EqNavigation} from "../services"
-import { LOCATION_LOG } from "../screens/consts/main"
+import { ACTION_LOG, LOCATION_LOG } from "../screens/consts/main"
 
 
 export default class About extends PureComponent {
@@ -37,11 +37,17 @@ export default class About extends PureComponent {
 
   constructor (props) {
     super(props)
+    this.showActionLog = this.showActionLog.bind(this)
     this.showLocationLog = this.showLocationLog.bind(this)
-
   }
 
-
+  showActionLog () {
+    EqNavigation.push(this.props.componentId, {
+      component: {
+        name: ACTION_LOG,
+      }
+    }).catch(() => {})
+  }
 
   showLocationLog () {
     EqNavigation.push(this.props.componentId, {
@@ -92,6 +98,11 @@ export default class About extends PureComponent {
               text={"Location Log"}
               color={brand}
               onPress={this.showLocationLog}
+            />
+            <Button
+              text={"Action Log"}
+              color={brand}
+              onPress={this.showActionLog}
             />
           </View>
         </View>

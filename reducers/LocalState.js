@@ -1,4 +1,4 @@
-import { List, Map } from 'immutable'
+import { fromJS, List, Map } from 'immutable'
 
 import { FEED, SIGNUP } from '../screens/consts/main'
 import { appStates, logInfo, unixTimeNow } from '../helpers'
@@ -10,6 +10,7 @@ import {
   ADD_NEW_CARE_HORSE_ID,
   CARROT_MUTEX,
   CHANGE_CARE_CALENDAR_TAB,
+  CLEAR_ACTION_LOG,
   CLEAR_CURRENT_CARE_EVENT,
   CLEAR_DOCS_NUMBERS,
   CLEAR_FEED_MESSAGE,
@@ -45,6 +46,7 @@ import {
   SET_ACTIVE_ATLAS_ENTRY,
   SET_AWAITING_PW_CHANGE,
   SET_DOING_INITIAL_LOAD,
+  SET_GPS_COORDINATES_RECEIVED,
   SET_HOOF_TRACKS_ID,
   SET_HOOF_TRACKS_RUNNING,
   SET_SIGNING_OUT,
@@ -52,7 +54,7 @@ import {
   STASH_RIDE_PHOTO,
   SYNC_COMPLETE,
   UPDATE_PHOTO_STATUS,
-  USER_SEARCH_RETURNED, SET_GPS_COORDINATES_RECEIVED,
+  USER_SEARCH_RETURNED, LOG_FUNCTIONAL_ACTION,
 } from '../constants'
 
 const initialDocsDownloaded = Map({
@@ -63,6 +65,7 @@ const initialDocsDownloaded = Map({
 })
 
 export const initialState = Map({
+  actionLog: List(),
   activeAtlasEntry: null,
   activeComponent: null,
   appState: appStates.active,
@@ -101,7 +104,26 @@ export const initialState = Map({
   userSearchResults: List(),
 })
 
+function appendLog (state, action) {
+  const log = state.get('actionLog') ? state.get('actionLog') : List()
+  const shortened = log.count() > 1000 ? log.shift() : log
+
+  const toLog = {
+    'action': (action.type === LOG_FUNCTIONAL_ACTION ? action.name : action.type),
+    actionType: action.actionType || 'standard',
+    timestamp: (new Date()).toISOString(),
+    logData: action.logData ? {} : null
+  }
+  if (action.logData) {
+    for (let logItem of action.logData) {
+      toLog.logData[logItem] = action[logItem]
+    }
+  }
+  return state.set('actionLog', shortened.push(fromJS(toLog)))
+}
+
 export default function LocalStateReducer(state=initialState, action) {
+  state = appendLog(state, action)
   switch (action.type) {
     case ADD_DOCS_DOWNLOADED:
       return state.setIn(['docsDownloaded', action.db], action.num)
@@ -112,6 +134,8 @@ export default function LocalStateReducer(state=initialState, action) {
       return state.set('newCareHorseIDs', newIDs)
     case CHANGE_CARE_CALENDAR_TAB:
       return state.set('careCalendarTab', action.tabVal)
+    case CLEAR_ACTION_LOG:
+      return state.set('actionLog', List())
     case CLEAR_CURRENT_CARE_EVENT:
       return state.set('newCareHorseIDs', List()).set('newCareEvent', Map())
     case CLEAR_DOCS_NUMBERS:

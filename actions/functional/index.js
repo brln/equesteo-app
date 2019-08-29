@@ -77,6 +77,7 @@ import {
   followUpdated,
   horseUserUpdated,
   localDataLoaded,
+  logFunctionalAction,
   newAppState,
   newNetworkState,
   notificationUpdated,
@@ -118,8 +119,9 @@ export const DB_SYNCED = 'DB_SYNCED'
 
 Tts.setDucking(true)
 
-function cb(action) {
+function cb(action, dispatch) {
   logInfo('functionalAction: ' + action)
+  dispatch(logFunctionalAction(action))
   captureBreadcrumb(action, 'functionalAction')
 }
 
@@ -149,9 +151,9 @@ export function catchAsyncError (dispatch, source) {
 }
 
 function addHorseUser (horse, user) {
-  const source = source
-  cb(source)
+  const source = 'addHorseUser'
   return (dispatch, getState) => {
+    cb(source, dispatch)
     const id = `${user.get('_id')}_${horse.get('_id')}`
     let newHorseUser = getState().getIn(['pouchRecords', 'horseUsers', id])
     if (newHorseUser) {
@@ -173,14 +175,14 @@ function addHorseUser (horse, user) {
 }
 
 function startForgotPWLinkListener () {
+  const source = 'startForgotPWLinkListener'
   return (dispatch, getState) => {
+    cb(source, dispatch)
     functionalState.pwLinkListener = ({ url }) => {
       const parsedURL = URI(url)
       const token = parsedURL.search(true).t
       const email = atob(parsedURL.search(true).e)
       if (email && token) {
-        console.log(email)
-        console.log(token)
         dispatch(functional.exchangePWCode(email, token)).then(() => {
           EqNavigation.push(getState().getIn(['localState', 'activeComponent']), {
             component: {
@@ -197,7 +199,9 @@ function startForgotPWLinkListener () {
 }
 
 function removeForgotPWLinkListener () {
-  return () => {
+  const source = 'removeForgotPWLinkListener'
+  return (dispatch) => {
+    cb(source, dispatch)
     if (functionalState.pwLinkListener) {
       Linking.removeEventListener('url', functionalState.pwLinkListener)
     }
@@ -206,7 +210,6 @@ function removeForgotPWLinkListener () {
 
 function appInitialized () {
   const source = 'appInitialized'
-  cb(source)
   return (dispatch, getState) => {
     let postSync = () => {}
     dispatch(functional.tryToLoadStateFromDisk()).then(() => {
@@ -250,6 +253,8 @@ function appInitialized () {
           return dispatch(functional.setDistributionOnServer())
         })
       } else {
+        logDebug(token, 'not found token')
+        logDebug(currentUserID, 'not found userID')
         if (getState().getIn(['localState', 'everLoggedIn'])) {
           dispatch(functional.switchRoot(LOGIN))
         } else {
@@ -258,13 +263,14 @@ function appInitialized () {
         dispatch(functional.startForgotPWLinkListener())
       }
     }).catch(catchAsyncError(dispatch, source))
+    cb(source, dispatch)
   }
 }
 
 function changeHorseOwner (horse, newOwnerID) {
   const source = 'addHorseUser'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     let oldOwnerHorseUser = getState().getIn(['pouchRecords', 'horseUsers']).filter(hu => {
       return hu.get('horseID') === horse.get('_id') && hu.get('owner') === true
     }).first()
@@ -294,8 +300,8 @@ function changeHorseOwner (horse, newOwnerID) {
 
 function clearRideNotifications (rideID) {
   const source = 'clearRideNotifications'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     const unseenNotifications = getState().getIn(['pouchRecords', 'notifications']).valueSeq().filter(n => {
       return n.get('seen') !== true && n.get('rideID') === rideID
     }).toList()
@@ -306,8 +312,8 @@ function clearRideNotifications (rideID) {
 
 function createCareEvent () {
   const source = 'createCareEvent'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     const currentUserID = getState().getIn(['localState', 'userID'])
     const careEventID = `${currentUserID}_${(new Date).getTime().toString()}`
     const newCareEvent = getState().getIn(['localState', 'newCareEvent'])
@@ -356,8 +362,8 @@ function createCareEvent () {
 
 function createRideAtlasEntry(name, userID, ride, rideCoordinates, rideElevations) {
   const source = 'createRideAtlasEntry'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     const entryID = `${userID}_${ride.get('_id')}_${unixTimeNow()}`
     const newAtlasEntry = fromJS({
       _id: entryID,
@@ -382,8 +388,8 @@ function createRideAtlasEntry(name, userID, ride, rideCoordinates, rideElevation
 
 function createRideComment(commentData) {
   const source = 'createRideComment'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     const currentUserID = getState().getIn(['localState', 'userID'])
     const commentID = `${currentUserID}_${(new Date).getTime().toString()}`
     const newComment = Map({
@@ -406,8 +412,8 @@ function createRideComment(commentData) {
 
 function deleteCareEvent (careEvent) {
   const source = 'deleteCareEvent'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     const deleted = careEvent.set('deleted', true)
     dispatch(careEventUpdated(deleted))
     PouchCouch.saveHorse(deleted.toJS()).then(doc => {
@@ -420,8 +426,8 @@ function deleteCareEvent (careEvent) {
 
 function duplicateRide (userID, ride, rideElevations, rideCoordinates) {
   const source = 'duplicateRide'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     Amplitude.logEvent(DUPLICATE_RIDE_TO_ANOTHER_USER)
     const rideID = rideIDGenerator(userID)
     dispatch(createRide(
@@ -448,8 +454,8 @@ function duplicateRide (userID, ride, rideElevations, rideCoordinates) {
 
 function deleteHorseUser (horseUserID) {
   const source = 'deleteHorseUser'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     let theHorseUser = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
     if (!theHorseUser) {
       throw Error('Could not find horseUser')
@@ -461,8 +467,8 @@ function deleteHorseUser (horseUserID) {
 
 function deleteRideAtlasEntry (entryID) {
   const source = 'deleteRideAtlasEntry'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     const theRideAtlasEntry = getState().getIn (['pouchRecords', 'rideAtlasEntries', entryID])
     const deleted = theRideAtlasEntry.set('deleted', true)
     dispatch(rideAtlasEntryUpdated(deleted))
@@ -476,16 +482,16 @@ function deleteRideAtlasEntry (entryID) {
 
 function exchangePWCode (email, code) {
   const source = 'exchangePWCode'
-  cb(source)
-  return () => {
+  return (dispatch) => {
+    cb(source, dispatch)
     return UserAPI.exchangePWCodeForToken(email, code)
   }
 }
 
 function getPWCode (email) {
   const source = 'getPWCode'
-  cb(source)
   return (dispatch) => {
+    cb(source, dispatch)
     return UserAPI.getPWCode(email).catch(e => {
       dispatch(errorOccurred(e.message))
     })
@@ -494,8 +500,8 @@ function getPWCode (email) {
 
 function loadRideCoordinates (rideID) {
   const source = 'loadRideCoordinates'
-  cb(source)
   return (dispatch) => {
+    cb(source, dispatch)
     return PouchCouch.loadRideCoordinates(rideID).then((coords) => {
       dispatch(rideCoordinatesLoaded(coords))
     }).catch(catchAsyncError(dispatch, source))
@@ -504,8 +510,8 @@ function loadRideCoordinates (rideID) {
 
 function loadRideElevations (rideID) {
   const source = 'loadRideElevations'
-  cb(source)
   return (dispatch) => {
+    cb(source, dispatch)
     return PouchCouch.loadRideElevations(rideID).then((elevations) => {
       dispatch(rideElevationsLoaded(elevations))
     }).catch(e => {
@@ -520,8 +526,8 @@ function loadRideElevations (rideID) {
 
 function loadSingleRide (rideID) {
   const source = 'loadSingleRide'
-  cb(source)
   return (dispatch) => {
+    cb(source, dispatch)
     return PouchCouch.localReplicateRide(rideID).then(() => {
       return PouchCouch.localLoad()
     }).then(localData => {
@@ -538,15 +544,14 @@ function loadSingleRide (rideID) {
       } else {
         catchAsyncError(dispatch, 'loadSingleRide')
       }
-
     })
   }
 }
 
 function markNotificationsSeen (notificationIDs) {
   const source = 'markNotificationsSeen'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     let nextUp = Promise.resolve()
     for (let notificationID of notificationIDs) {
       const notification = getState().getIn(['pouchRecords', 'notifications', notificationID])
@@ -567,8 +572,8 @@ function markNotificationsSeen (notificationIDs) {
 
 function markNotificationPopped (notification) {
   const source = 'markNotificationPopped'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     const markPopped = notification.set('popped', true)
     dispatch(notificationUpdated(markPopped))
     PouchCouch.saveNotification(markPopped.toJS()).then(({rev}) => {
@@ -580,16 +585,16 @@ function markNotificationPopped (notification) {
 
 function newPassword (password) {
   const source = 'newPassword'
-  cb(source)
   return (dispatch) => {
+    cb(source, dispatch)
     return dispatch(functional.loginAndSync(UserAPI.changePassword, [password]))
   }
 }
 
 function persistFollow (followID, creating) {
   const source = 'persistFollow'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     const theFollow = getState().getIn(['pouchRecords', 'follows', followID])
     if (!theFollow) {
       throw new Error('no follow with that ID')
@@ -607,8 +612,8 @@ function persistFollow (followID, creating) {
 
 function persistRide (rideID, newRide, rideCoordinates, rideElevations, stashedPhotos=Map(), deletedPhotoIDs=Map(), rideHorses=Map()) {
   const source = 'persistRide'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     const ridePersister = new RidePersister(dispatch, getState, rideID, PouchCouch)
     return ridePersister.persistRide(newRide, rideCoordinates, rideElevations, stashedPhotos, deletedPhotoIDs, rideHorses)
   }
@@ -616,8 +621,8 @@ function persistRide (rideID, newRide, rideCoordinates, rideElevations, stashedP
 
 function persistUserWithPhoto (userID, userPhotoID, doSyncNow) {
   const source = 'persistUserWithPhoto'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     const theUserPhoto = getState().getIn(['pouchRecords', 'userPhotos', userPhotoID])
     if (!theUserPhoto) {
       throw new Error('no user photo with that ID: ' + userPhotoID)
@@ -645,8 +650,8 @@ function persistUserWithPhoto (userID, userPhotoID, doSyncNow) {
 
 function persistHorseWithPhoto (horseID, horsePhotoID, doSyncNow) {
   const source = 'persistHorseWithPhoto'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     const theHorsePhoto = getState().getIn(['pouchRecords', 'horsePhotos', horsePhotoID])
     if (!theHorsePhoto) {
       throw new Error('no horse photo with that ID')
@@ -672,8 +677,8 @@ function persistHorseWithPhoto (horseID, horsePhotoID, doSyncNow) {
 
 function persistHorseUpdate (horseID, horseUserID, deletedPhotoIDs, newPhotoIDs, previousDefaultValue, doSyncNow) {
   const source = 'persistHorseUpdate'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     const theHorse = getState().getIn(['pouchRecords', 'horses', horseID])
     if (!theHorse) {
       throw new Error('no horse with that ID')
@@ -751,8 +756,8 @@ function persistHorseUpdate (horseID, horseUserID, deletedPhotoIDs, newPhotoIDs,
 
 function persistHorseUser (horseUserID, runSyncNow=true) {
   const source = 'persistHorseUser'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     const theHorseUser = getState().getIn(['pouchRecords', 'horseUsers', horseUserID])
     if (!theHorseUser) {
       throw new Error('no horse user with that ID')
@@ -769,8 +774,8 @@ function persistHorseUser (horseUserID, runSyncNow=true) {
 
 function persistUserUpdate (userID, deletedPhotoIDs, doSyncNow) {
   const source = 'persistUserUpdate'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     const theUser = getState().getIn(['pouchRecords', 'users', userID])
     if (!theUser) {
       throw new Error('no user with that ID')
@@ -807,8 +812,8 @@ function persistUserUpdate (userID, deletedPhotoIDs, doSyncNow) {
 
 function photoNeedsUpload (type, photoLocation, photoID) {
   const source = 'photoNeedsUpload'
-  cb(source)
   return (dispatch) => {
+    cb(source, dispatch)
     const item = Map({
       type,
       photoLocation,
@@ -823,8 +828,8 @@ function photoNeedsUpload (type, photoLocation, photoID) {
 
 function runPhotoQueue() {
   const source = 'runPhotoQueue'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     getState().getIn(['localState', 'photoQueue']).forEach((p) => {
       if (p.get('status') === 'enqueued'
         || p.get('status') === 'failed'
@@ -841,8 +846,8 @@ function runPhotoQueue() {
 
 function uploadPhoto (type, photoLocation, photoID) {
   const source = 'uploadPhoto'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     const goodConnection = getState().getIn(['localState', 'goodConnection'])
     if (goodConnection) {
       dispatch(updatePhotoStatus(photoID, 'uploading'))
@@ -908,8 +913,8 @@ function uploadPhoto (type, photoLocation, photoID) {
 
 function searchForFriends (phrase) {
   const source = 'searchForFriends'
-  cb(source)
   return (dispatch) => {
+    cb(source, dispatch)
     UserAPI.findUser(phrase).then(resp => {
       dispatch(userSearchReturned(fromJS(resp)))
     }).catch(catchAsyncError(dispatch, source))
@@ -918,8 +923,8 @@ function searchForFriends (phrase) {
 
 function setFCMTokenOnServer (token) {
   const source = 'setFCMTokenOnServer'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     const currentUserID = getState().getIn(['localState', 'userID'])
     logInfo('setting fcm token')
     UserAPI.setFCMToken(currentUserID, token, Platform.OS).then(() => {
@@ -930,8 +935,8 @@ function setFCMTokenOnServer (token) {
 
 function setDistributionOnServer () {
   const source = 'setDistributionOnServer'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     const currentUserID = getState().getIn(['localState', 'userID'])
     logInfo('setting distribution')
     return UserAPI.setDistribution(currentUserID, config.DISTRIBUTION).then(resp => {
@@ -966,8 +971,8 @@ function setDistributionOnServer () {
 
 function signOut () {
   const source = 'signOut'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     if (!getState().getIn(['localState', 'signingOut'])) {
       dispatch(setSigningOut(true))
       dispatch(functional.stopLocationTracking())
@@ -996,8 +1001,8 @@ function signOut () {
 
 function showLocalNotifications () {
   const source = 'showLocalNotification'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     PushNotification.configure({
       onNotification: (meta) => {
         if (meta.userInteraction) {
@@ -1038,8 +1043,8 @@ function showLocalNotifications () {
 
 function clearLocationRetry () {
   const source = 'clearLocationRetry'
-  cb(source)
-  return () => {
+  return (dispatch) => {
+    cb(source, dispatch)
     if (functionalState.locationTrackingRetry) {
       TimeoutManager.deleteTimeout(functionalState.locationTrackingRetry)
     }
@@ -1048,8 +1053,8 @@ function clearLocationRetry () {
 
 function gpsText(text) {
   const source = 'gpsText'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     const currentUserID = getState().getIn(['localState', 'userID'])
     const currentUser = getState().getIn(['pouchRecords', 'users', currentUserID])
     if (!currentUser.get('disableGPSAlerts')) {
@@ -1060,8 +1065,8 @@ function gpsText(text) {
 
 function startGPSWatcher () {
   const source = 'startGPSWatcher'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     BackgroundTimer.runBackgroundTimer(() => {
       const lastLocation = getState().getIn(['currentRide', 'lastLocation'])
       let timeDiff = 0
@@ -1083,16 +1088,16 @@ function startGPSWatcher () {
 
 function stopGPSWatcher () {
   const source = 'stopGPSWatcher'
-  cb(source)
-  return () => {
+  return (dispatch) => {
+    cb(source, dispatch)
     BackgroundTimer.stopBackgroundTimer();
   }
 }
 
 function locationPermissionsError () {
   const source = 'locationPermissionsError'
-  cb(source)
-  return (_, getState) => {
+  return (dispatch, getState) => {
+    cb(source, dispatch)
     const recorderComponent = getState().getIn(['localState', 'activeComponent'])
     Alert.alert(
       'Uh Oh',
@@ -1111,8 +1116,8 @@ function locationPermissionsError () {
 
 function startLocationTracking () {
   const source = 'startLocationTracking'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     logInfo('action: startLocationTracking')
     const isRunning = getState().getIn(['localState', 'backgroundGeolocationRunning'])
     if (!isRunning) {
@@ -1137,8 +1142,8 @@ function startLocationTracking () {
 
 export function gpsLocationError (error) {
   const source = 'gpsLocationError'
-  cb(source)
   return (dispatch) => {
+    cb(source, dispatch)
     if (error === 1) {
       return dispatch(functional.stopLocationTracking()).then(() => {
         dispatch(functional.locationPermissionsError())
@@ -1155,7 +1160,6 @@ function onGPSLocation (location) {
   const KALMAN_FILTER_Q = 6
   const THROWAWAY_FIRST_N_COORDS = 3
   const MINIMUM_ACCURACY_IN_M = 25
-
   return (dispatch, getState) => {
     const alreadyReceived = getState().getIn(['localState', 'gpsCoordinatesReceived'])
     const nowReceived = alreadyReceived + 1
@@ -1164,8 +1168,11 @@ function onGPSLocation (location) {
       return
     }
 
-    if (getState().getIn(['localState', 'gpsSignalLost'])) {
+    const currentlyLost = getState().getIn(['localState', 'gpsSignalLost'])
+    if (currentlyLost) {
+      dispatch(gpsSignalLost(false))
       dispatch(functional.gpsText('Found GPS'))
+
     }
 
     const lastLocation = getState().getIn(['currentRide', 'lastLocation'])
@@ -1177,7 +1184,6 @@ function onGPSLocation (location) {
 
     if (!lastLocation || timeDiff > 5) {
       BackgroundGeolocation.startBackgroundTask(taskKey => {
-        dispatch(gpsSignalLost(false))
         const oldDistance = getState().getIn(['currentRide', 'currentRide', 'distance'])
         const refiningLocation = getState().getIn(['currentRide', 'refiningLocation'])
 
@@ -1238,6 +1244,7 @@ function onGPSLocation (location) {
 }
 
 export function tryToLoadStateFromDisk () {
+  const source = 'tryToLoadStateFromDisk'
   return (dispatch) => {
     return Promise.all([
       LocalStorage.loadLocalState(),
@@ -1255,12 +1262,14 @@ export function tryToLoadStateFromDisk () {
       } else {
         logInfo('no cached current ride state found')
       }
-    }).catch(catchAsyncError(dispatch, 'tryToLoadStateFromDisk'))
+    }).catch(catchAsyncError(dispatch, source))
   }
 }
 
 function loginAndSync(loginFunc, loginArgs) {
+  const source = 'loginAndSync'
   return (dispatch, getState) => {
+    cb(source, dispatch)
     return loginFunc(...loginArgs).then(resp => {
       const userID = resp.id
       const followingIDs = resp.following
@@ -1300,7 +1309,9 @@ function loginAndSync(loginFunc, loginArgs) {
 }
 
 function configureBackgroundGeolocation (preventSuspend) {
-  return () => {
+  const source = 'configureBackgroundGeolocation'
+  return (dispatch) => {
+    cb(source, dispatch)
     return BackgroundGeolocation.ready(
         {
           preventSuspend,
@@ -1325,7 +1336,7 @@ function configureBackgroundGeolocation (preventSuspend) {
 
 function doSpeech (oldDistance, newDistance) {
 const source = 'doSpeech'
-return (_, getState) => {
+return (dispatch, getState) => {
   const newMiles = Math.floor(newDistance)
   const oldMiles = Math.floor(oldDistance)
   if (newMiles > oldMiles) {
@@ -1334,7 +1345,7 @@ return (_, getState) => {
     const settingEnabled = currentUser.get('enableDistanceAlerts')
     const alertDistance = currentUser.get('alertDistance')
     if (settingEnabled && newMiles % alertDistance === 0) {
-      cb(source)
+      cb(source, dispatch)
       Tts.getInitStatus().then(() => {
         let mileOrMiles = 'mile'
         if (newMiles > 1) {
@@ -1352,7 +1363,7 @@ function doHoofTracksUpload () {
   return (dispatch, getState) => {
     const running = getState().getIn(['localState', 'hoofTracksRunning'])
     if (running) {
-      cb(source)
+      cb(source, dispatch)
       const lastUpload = getState().getIn(['currentRide', 'lastHoofTracksUpload'])
       const timeDiff = unixTimeNow() - lastUpload
       if ((!lastUpload || ((timeDiff) > 30000))) {
@@ -1385,42 +1396,42 @@ function doHoofTracksUpload () {
 }
 
 function stopHoofTracksDispatcher () {
-const source = 'stopHoofTracksDispatcher'
-cb(source)
-return (dispatch, getState) => {
- const hoofTracksID = getState().getIn(['localState', 'hoofTracksID'])
- dispatch(setHoofTracksRunning(false))
- if (hoofTracksID) {
-   dispatch(setHoofTracksLastUpload(null))
-   dispatch(setHoofTracksID(null))
-   UserAPI.clearHoofTrackCoords(hoofTracksID).catch(catchAsyncError(dispatch, source))
- }
-}
+  const source = 'stopHoofTracksDispatcher'
+  return (dispatch, getState) => {
+    cb(source, dispatch)
+    const hoofTracksID = getState().getIn(['localState', 'hoofTracksID'])
+    dispatch(setHoofTracksRunning(false))
+    if (hoofTracksID) {
+      dispatch(setHoofTracksLastUpload(null))
+      dispatch(setHoofTracksID(null))
+      UserAPI.clearHoofTrackCoords(hoofTracksID).catch(catchAsyncError(dispatch, source))
+    }
+  }
 }
 
 function checkNetworkConnection () {
-const source = 'checkNetworkConnection'
-cb(source)
-return (dispatch, getState) => {
-  ApiClient.checkConnection().then(resp => {
-    dispatch(newNetworkState(resp.connected))
-    if (resp.connected) {
-      dispatch(functional.runPhotoQueue())
-      const needsPersist = getState().getIn(['localState', 'needsRemotePersist']) === DB_NEEDS_SYNC
-      if (needsPersist) {
-        dispatch(functional.doSync()).catch(catchAsyncError(dispatch, source))
+  const source = 'checkNetworkConnection'
+  return (dispatch, getState) => {
+    cb(source, dispatch)
+    ApiClient.checkConnection().then(resp => {
+      dispatch(newNetworkState(resp.connected))
+      if (resp.connected) {
+        dispatch(functional.runPhotoQueue())
+        const needsPersist = getState().getIn(['localState', 'needsRemotePersist']) === DB_NEEDS_SYNC
+        if (needsPersist) {
+          dispatch(functional.doSync()).catch(catchAsyncError(dispatch, source))
+        }
       }
-    }
-  })
-}
+    })
+  }
 }
 
 function startNetworkTracking () {
-const source = 'startNetworkTracking'
-cb(source)
-return (dispatch) => {
-  if (functionalState.networkListenerRemover) {
-    functionalState.networkListenerRemover()
+  const source = 'startNetworkTracking'
+  return (dispatch) => {
+    cb(source, dispatch)
+    if (functionalState.networkListenerRemover) {
+      functionalState.networkListenerRemover()
     }
 
     const listener = () => {
@@ -1436,8 +1447,8 @@ return (dispatch) => {
 
 function startListeningFCM () {
   const source = 'startListeningFCM'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     return firebase.messaging().requestPermission().then(() => {
       firebase.messaging().onMessage((m) => {
         const inForeground = getState().getIn(['localState', 'appState']) === 'active'
@@ -1460,8 +1471,8 @@ function startListeningFCM () {
 
 function startListeningFCMTokenRefresh () {
   const source = 'startListeningFCMTokenRefresh'
-  cb(source)
   return (dispatch) => {
+    cb(source, dispatch)
     firebase.messaging().getToken().then(newToken => {
       if (newToken) {
         dispatch(functional.setFCMTokenOnServer(newToken))
@@ -1475,8 +1486,8 @@ function startListeningFCMTokenRefresh () {
 
 function startActiveComponentListener () {
   const source = 'startActiveComponentListener'
-  cb(source)
-  return (dispatch, getState) => {
+  return (dispatch) => {
+    cb(source, dispatch)
     Navigation.events().registerComponentDidAppearListener( ( { componentId } ) => {
       if (componentId !== DRAWER && componentId !== RIDE_BUTTON && componentId !== NOTIFICATION_BUTTON) {
         dispatch(setActiveComponent(componentId))
@@ -1487,8 +1498,8 @@ function startActiveComponentListener () {
 
 function stopLocationTracking (clearLast=true) {
   const source = 'stopLocationTracking'
-  cb(source)
   return (dispatch) => {
+    cb(source, dispatch)
     dispatch(functional.stopGPSWatcher())
     return BackgroundGeolocation.stop().then(() => {
       BackgroundGeolocation.reset()
@@ -1504,8 +1515,8 @@ function stopLocationTracking (clearLast=true) {
 
 function startAppStateTracking () {
   const source = 'startAppStateTracking'
-  cb(source)
   return (dispatch) => {
+    cb(source, dispatch)
     AppState.addEventListener('change', (nextAppState) => {
       dispatch(newAppState(nextAppState))
     })
@@ -1514,8 +1525,8 @@ function startAppStateTracking () {
 
 function startBackgroundFetch () {
   const source = 'startBackgroundFetch'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     BackgroundFetch.configure({
       minimumFetchInterval: 60,
       stopOnTerminate: true,
@@ -1541,38 +1552,39 @@ function startBackgroundFetch () {
 
 function stopBackgroundFetch () {
   const source = 'stopBackgroundFetch'
-  cb(source)
-  return () => {
+  return (dispatch) => {
+    cb(source, dispatch)
     BackgroundFetch.stop()
   }
 }
 
 function submitLogin (email, password) {
   const source = 'submitLogin'
-  cb(source)
   return (dispatch) => {
+    cb(source, dispatch)
     return dispatch(functional.loginAndSync(UserAPI.login, [email, password]))
   }
 }
 
 function submitSignup (email, password) {
   const source = 'submitSignup'
-  cb(source)
   return (dispatch) => {
+    cb(source, dispatch)
     return dispatch(functional.loginAndSync(UserAPI.signup, [email, password]))
   }
 }
 
 function pulldownSync () {
   return (dispatch) => {
+    cb(source, dispatch)
     dispatch(functional.doSync({}, true, false)).catch(catchAsyncError(dispatch, 'pulldownSync'))
   }
 }
 
 function doSync (syncData={}, showProgress=true, doUpload=true) {
   const source = 'doSync'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     function feedMessage(message, color, timeout) {
       if (showProgress) {
         dispatch(setFeedMessage(Map({
@@ -1669,8 +1681,8 @@ function doSync (syncData={}, showProgress=true, doUpload=true) {
 
 function switchRoot (newRoot) {
   const source = 'switchRoot'
-  cb(source)
-  return () => {
+  return (dispatch) => {
+    cb(source, dispatch)
     if (newRoot === FEED) {
       Navigation.setRoot({
         root: Platform.select({
@@ -1744,8 +1756,8 @@ function switchRoot (newRoot) {
 
 function toggleRideCarrot (rideID) {
   const source = 'toggleRideCarrot'
-  cb(source)
   return (dispatch, getState) => {
+    cb(source, dispatch)
     const mutexSet = getState().getIn(['localState', 'carrotMutex'])
     if (!mutexSet) {
       dispatch(carrotMutex(true))

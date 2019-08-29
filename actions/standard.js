@@ -4,6 +4,7 @@ import {
   ADD_NEW_CARE_HORSE_ID,
   CARE_EVENT_UPDATED,
   CARROT_MUTEX,
+  CLEAR_ACTION_LOG,
   CLEAR_CURRENT_CARE_EVENT,
   CLEAR_DOCS_NUMBERS,
   CLEAR_FEED_MESSAGE,
@@ -37,6 +38,7 @@ import {
   LOAD_CURRENT_RIDE_STATE,
   LOAD_LOCAL_STATE,
   LOCAL_DATA_LOADED,
+  LOG_FUNCTIONAL_ACTION,
   MERGE_STASHED_LOCATIONS,
   NEW_LOCATION,
   NEW_APP_STATE,
@@ -138,6 +140,12 @@ export function carrotMutex (value) {
   return {
     type: CARROT_MUTEX,
     value,
+  }
+}
+
+export function clearActionLog () {
+  return {
+    type: CLEAR_ACTION_LOG,
   }
 }
 
@@ -397,6 +405,15 @@ export function localDataLoaded (localData) {
   }
 }
 
+export function logFunctionalAction (name) {
+  return {
+    type: LOG_FUNCTIONAL_ACTION,
+    name,
+    actionType: 'functional',
+    logData: ['name']
+  }
+}
+
 export function mergeStashedLocations () {
   return {
     type: MERGE_STASHED_LOCATIONS,
@@ -416,6 +433,7 @@ export function newLocation (location, elevation) {
     type: NEW_LOCATION,
     location,
     elevation,
+    logData: ['location']
   }
 }
 

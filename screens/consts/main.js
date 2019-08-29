@@ -1,4 +1,5 @@
 export const ABOUT_PAGE = 'equesteo.About'
+export const ACTION_LOG = 'equesteo.ActionLog'
 export const BARN = 'equesteo.Barn'
 export const CAMERA = 'equesteo.Camera'
 export const COLOR_PICKER = 'equesteo.ColorPicker'

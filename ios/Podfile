@@ -77,6 +77,8 @@ target 'equesteo' do
 
   use_native_modules!
 
+  pod 'RNBackgroundGeolocation', :path => '../node_modules/react-native-background-geolocation'
+
 end
 
 # also from https://github.com/ivpusic/react-native-image-crop-picker
