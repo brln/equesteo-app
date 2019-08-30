@@ -15,7 +15,7 @@ import {APP_INITIALIZED} from "../services/Amplitude"
 function StandardAction (props) {
   return (
     <View style={{padding: 5, backgroundColor: '#72eeff', borderBottomColor: "#000000", borderBottomWidth: 1}}>
-      <Text>{ moment(props.timestamp).format("dd D, hh:mm.SSS") } </Text>
+      <Text>{ moment(props.timestamp).format("dddd Do YYYY hh:mm:ss.SSS") } </Text>
       <Text>{ props.action }</Text>
       <Text>{ props.logData ? JSON.stringify(props.logData) : null}</Text>
     </View>

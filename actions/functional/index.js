@@ -119,16 +119,15 @@ export const DB_SYNCED = 'DB_SYNCED'
 
 Tts.setDucking(true)
 
-function cb(action, dispatch) {
+function cb(action, dispatch, otherData) {
   logInfo('functionalAction: ' + action)
-  dispatch(logFunctionalAction(action))
+  dispatch(logFunctionalAction(action, otherData))
   captureBreadcrumb(action, 'functionalAction')
 }
 
 const functionalState = {
   enqueuedSync: null,
   FCMTokenRefreshListenerRemover: null,
-  locationTrackingRetry: null,
   networkListenerRemover: null,
   pwlinkListener: null,
   feedMessageTimeout: null,
@@ -1041,16 +1040,6 @@ function showLocalNotifications () {
   }
 }
 
-function clearLocationRetry () {
-  const source = 'clearLocationRetry'
-  return (dispatch) => {
-    cb(source, dispatch)
-    if (functionalState.locationTrackingRetry) {
-      TimeoutManager.deleteTimeout(functionalState.locationTrackingRetry)
-    }
-  }
-}
-
 function gpsText(text) {
   const source = 'gpsText'
   return (dispatch, getState) => {
@@ -1143,7 +1132,7 @@ function startLocationTracking () {
 export function gpsLocationError (error) {
   const source = 'gpsLocationError'
   return (dispatch) => {
-    cb(source, dispatch)
+    cb(source, dispatch, { error })
     if (error === 1) {
       return dispatch(functional.stopLocationTracking()).then(() => {
         dispatch(functional.locationPermissionsError())
@@ -1807,7 +1796,6 @@ const functional = {
   appInitialized,
   changeHorseOwner,
   checkNetworkConnection,
-  clearLocationRetry,
   clearRideNotifications,
   configureBackgroundGeolocation,
   createCareEvent,

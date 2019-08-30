@@ -101,7 +101,6 @@ class RecorderContainer extends PureComponent {
   }
 
   componentWillUnmount () {
-    this.props.dispatch(functional.clearLocationRetry())
     BackHandler.removeEventListener('hardwareBackPress', this.handleBackPress);
     TimeoutManager.deleteTimeout(this.gpsTimeout)
   }

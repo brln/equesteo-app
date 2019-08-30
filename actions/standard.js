@@ -405,12 +405,13 @@ export function localDataLoaded (localData) {
   }
 }
 
-export function logFunctionalAction (name) {
+export function logFunctionalAction (name, otherData) {
   return {
     type: LOG_FUNCTIONAL_ACTION,
     name,
+    otherData,
     actionType: 'functional',
-    logData: ['name']
+    logData: ['name', 'otherData']
   }
 }
 
