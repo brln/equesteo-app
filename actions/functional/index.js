@@ -3,7 +3,7 @@ import BackgroundTimer from 'react-native-background-timer'
 import ImagePicker from 'react-native-image-crop-picker'
 import { fromJS, Map  } from 'immutable'
 import { Alert, AppState, Linking, Platform } from 'react-native'
-import BackgroundGeolocation from 'react-native-background-geolocation'
+import BackgroundGeolocation from 'react-native-background-geolocation-android'
 import firebase from 'react-native-firebase'
 import { Navigation } from 'react-native-navigation'
 import NetInfo from "@react-native-community/netinfo";
@@ -61,7 +61,6 @@ import {
   carrotMutex,
   clearCurrentCareEvent,
   clearDocsNumbers,
-  clearLastLocation,
   clearFeedMessage,
   clearState,
   createRide,
@@ -82,7 +81,6 @@ import {
   newNetworkState,
   notificationUpdated,
   rideAtlasEntryUpdated,
-  setBackgroundGeolocationRunning,
   rideCoordinatesLoaded,
   rideCarrotCreated,
   rideCarrotSaved,
@@ -212,15 +210,11 @@ function appInitialized () {
   return (dispatch, getState) => {
     let postSync = () => {}
     dispatch(functional.tryToLoadStateFromDisk()).then(() => {
+      return dispatch(configureBackgroundGeolocation())
+    }).then(() => {
       dispatch(functional.startActiveComponentListener())
       dispatch(dismissError())
       dispatch(functional.startAppStateTracking())
-
-      // Just in case app died, this will clear the notification
-      // just by opening app, so it's not stuck up there. Need to
-      // not clear last so if app died and the continue current ride,
-      // will keep working.
-      dispatch(functional.stopLocationTracking(false))
       return ApiClient.getToken()
     }).then((token) => {
       const currentUserID = getState().getIn(['localState', 'userID'])
@@ -250,6 +244,10 @@ function appInitialized () {
           // end up in a race condition on the server. really, need to
           // consolidate the two calls.
           return dispatch(functional.setDistributionOnServer())
+        }).then(() => {
+          if (getState().getIn(['currentRide', 'currentRide'])) {
+            return dispatch(functional.startLocationTracking())
+          }
         })
       } else {
         logDebug(token, 'not found token')
@@ -1083,49 +1081,25 @@ function stopGPSWatcher () {
   }
 }
 
-function locationPermissionsError () {
-  const source = 'locationPermissionsError'
-  return (dispatch, getState) => {
-    cb(source, dispatch)
-    const recorderComponent = getState().getIn(['localState', 'activeComponent'])
-    Alert.alert(
-      'Uh Oh',
-      'Looks like you denied location permission. \n\n This app is kind of useless without it. \n\n Allow this permission in your system settings and try again',
-      [
-        {
-          text: 'OK',
-          onPress: () => { EqNavigation.popToRoot(recorderComponent)},
-        },
-      ],
-      {cancelable: false},
-    )
-  }
-}
-
-
 function startLocationTracking () {
   const source = 'startLocationTracking'
-  return (dispatch, getState) => {
+  return (dispatch) => {
     cb(source, dispatch)
     logInfo('action: startLocationTracking')
-    const isRunning = getState().getIn(['localState', 'backgroundGeolocationRunning'])
-    if (!isRunning) {
-      dispatch(setBackgroundGeolocationRunning(true))
+    BackgroundGeolocation.stop().then(() => {
       BackgroundGeolocation.onLocation(location => {
         dispatch(functional.onGPSLocation(location))
       }, (error) => {
         dispatch(functional.gpsLocationError(error))
       })
 
-      return dispatch(functional.configureBackgroundGeolocation(true)).then(() => {
-        dispatch(gpsSignalLost(false))
-        dispatch(startGPSWatcher())
-        dispatch(functional.doSpeech())
-        return BackgroundGeolocation.start()
-      }).then(() => {
+      dispatch(gpsSignalLost(false))
+      dispatch(startGPSWatcher())
+      dispatch(functional.doSpeech())
+      BackgroundGeolocation.start().then(() => {
         return BackgroundGeolocation.changePace(true)
       }).catch(catchAsyncError(dispatch, source))
-    }
+    })
   }
 }
 
@@ -1133,15 +1107,7 @@ export function gpsLocationError (error) {
   const source = 'gpsLocationError'
   return (dispatch) => {
     cb(source, dispatch, { error })
-    if (error === 1) {
-      return dispatch(functional.stopLocationTracking()).then(() => {
-        dispatch(functional.locationPermissionsError())
-      })
-    } else if (error === 0 || error === 2 || error === 408) {
-      logInfo(error, 'gpsError')
-    } else {
-      captureException(error)
-    }
+    logInfo(error, 'gpsError')
   }
 }
 
@@ -1226,7 +1192,9 @@ function onGPSLocation (location) {
           dispatch(functional.doSpeech(oldDistance, newDistance))
         }
         dispatch(functional.doHoofTracksUpload())
-        BackgroundGeolocation.stopBackgroundTask(taskKey)
+        BackgroundGeolocation.stopBackgroundTask(taskKey, () => {}, e => {
+          logError(e)
+        })
       })
     }
   }
@@ -1297,28 +1265,39 @@ function loginAndSync(loginFunc, loginArgs) {
   }
 }
 
-function configureBackgroundGeolocation (preventSuspend) {
+function configureBackgroundGeolocation () {
   const source = 'configureBackgroundGeolocation'
   return (dispatch) => {
     cb(source, dispatch)
     return BackgroundGeolocation.ready(
-        {
-          preventSuspend,
-          debug: false,
-          reset: true,
-          disableElasticity: true,
-          distanceFilter: 2,
-          desiredAccuracy: BackgroundGeolocation.DESIRED_ACCURACY_HIGH,
-          maxLocations: 10,
-          notification: {
-            title: 'You\'re out on a ride.',
-            text: 'Tap here to see your progress.',
-          },
-          persistMode: BackgroundGeolocation.PERSIST_MODE_NONE,
-          logLevel: BackgroundGeolocation.LOG_LEVEL_INFO
+      {
+        autoSync: false,
+        preventSuspend: true,
+        heartbeatInterval: 60,
+        locationAuthorizationAlert: {
+          titleWhenNotEnabled: 'You\'ve disabled necessary location services.',
+          titleWhenOff: 'You\'ve turned location services off.',
+          instructions: 'You must enable "Always" in location-services.',
+          cancelButton: 'Cancel',
+          settingsButton: 'Settings'
         },
+        reset: true,
+        disableElasticity: true,
+        distanceFilter: 0,
+        locationUpdateInterval: 1000,
+        desiredAccuracy: BackgroundGeolocation.DESIRED_ACCURACY_HIGH,
+        maxRecordsToPersist: 1,
+        notification: {
+          title: 'You\'re out on a ride.',
+          text: 'Tap here to see your progress.',
+        },
+        persistMode: BackgroundGeolocation.PERSIST_MODE_NONE,
+        logLevel: BackgroundGeolocation.LOG_LEVEL_INFO,
+      },
     ).then(() => {
       logInfo('Background geolocation configured')
+    }).catch(e => {
+      console.log(e)
     })
   }
 }
@@ -1485,19 +1464,13 @@ function startActiveComponentListener () {
   }
 }
 
-function stopLocationTracking (clearLast=true) {
+function stopLocationTracking () {
   const source = 'stopLocationTracking'
   return (dispatch) => {
     cb(source, dispatch)
     dispatch(functional.stopGPSWatcher())
     return BackgroundGeolocation.stop().then(() => {
-      BackgroundGeolocation.reset()
-    }).then(() => {
-      dispatch(setBackgroundGeolocationRunning(false))
       dispatch(setGPSCoordinatesReceived(0))
-      if (clearLast) {
-        dispatch(clearLastLocation())
-      }
     }).catch(catchAsyncError(dispatch, source))
   }
 }
@@ -1518,7 +1491,7 @@ function startBackgroundFetch () {
     cb(source, dispatch)
     BackgroundFetch.configure({
       minimumFetchInterval: 60,
-      stopOnTerminate: true,
+      stopOnTerminate: false,
       startOnBoot: false
     }, () => {
       const remotePersistStatus = getState().getIn(['localState', 'needsRemotePersist'])
@@ -1535,7 +1508,14 @@ function startBackgroundFetch () {
     }, (error) => {
       logError(error, "RNBackgroundFetch failed to start")
     });
-    BackgroundFetch.start()
+    return new Promise((res, rej) => {
+      BackgroundFetch.start(() => {
+        res()
+      }, e => {
+        rej(e)
+      })
+    })
+
   }
 }
 
@@ -1815,7 +1795,6 @@ const functional = {
   loadRideCoordinates,
   loadRideElevations,
   loadSingleRide,
-  locationPermissionsError,
   loginAndSync,
   markNotificationPopped,
   markNotificationsSeen,

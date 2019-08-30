@@ -176,9 +176,9 @@ PODS:
     - React
   - rn-fetch-blob (0.10.16):
     - React-Core
-  - RNBackgroundFetch (2.6.1):
+  - RNBackgroundFetch (2.7.0):
     - React
-  - RNBackgroundGeolocation (3.2.0):
+  - RNBackgroundGeolocation (3.2.1):
     - CocoaLumberjack (~> 3.5.1)
     - React
   - RNFirebase (5.5.5):
@@ -246,7 +246,7 @@ DEPENDENCIES:
   - ReactNativeNavigation (from `../node_modules/react-native-navigation`)
   - rn-fetch-blob (from `../node_modules/rn-fetch-blob`)
   - RNBackgroundFetch (from `../node_modules/react-native-background-fetch`)
-  - RNBackgroundGeolocation (from `../node_modules/react-native-background-geolocation`)
+  - RNBackgroundGeolocation (from `../node_modules/react-native-background-geolocation-android`)
   - RNFirebase (from `../node_modules/react-native-firebase/ios`)
   - RNFS (from `../node_modules/react-native-fs`)
   - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
@@ -340,7 +340,7 @@ EXTERNAL SOURCES:
   RNBackgroundFetch:
     :path: "../node_modules/react-native-background-fetch"
   RNBackgroundGeolocation:
-    :path: "../node_modules/react-native-background-geolocation"
+    :path: "../node_modules/react-native-background-geolocation-android"
   RNFirebase:
     :path: "../node_modules/react-native-firebase/ios"
   RNFS:
@@ -404,8 +404,8 @@ SPEC CHECKSUMS:
   React-RCTWebSocket: f32b93e0953d7c07fd5dd45305406282cfdc95cf
   ReactNativeNavigation: 20522060de61b1c293ec50681a6aa11488596286
   rn-fetch-blob: 6aa7c5b59f442fbfcdcc847edbc062119f6af66c
-  RNBackgroundFetch: 8c4f77f83c398c659bce82af2f0a885079417b9e
-  RNBackgroundGeolocation: d005d595810fb52764da7ba646f1370daedbecff
+  RNBackgroundFetch: 7b9840f8aa759266899b3c33679ab037297d4798
+  RNBackgroundGeolocation: 40329c5d44e6d1c7977f106dbdf3577ddd880c4a
   RNFirebase: ca408d6bee0ca9383bd0cfe84f40b01370b8ad4d
   RNFS: 6a2bfb5d0b14cf0ad72667f76202358abba4aacf
   RNImageCropPicker: c406db73f02f11bf3a887f856ff04ee50af173f4
@@ -417,6 +417,6 @@ SPEC CHECKSUMS:
   TextToSpeech: d68418db07e7d3ce39fd3360ccca8d8165cef859
   yoga: 88c514f310aff89b94a14c5fbf44b95735af0cb7
 
-PODFILE CHECKSUM: 8aac85005567741528f0211eb6f94cb031aacd31
+PODFILE CHECKSUM: 385314bd9d6288ce112fc930172f417208045cf6
 
 COCOAPODS: 1.5.3

@@ -16,7 +16,7 @@ import {
   stopStashNewLocations,
   unpauseLocationTracking,
 } from '../../actions/standard'
-import functional, {gpsLocationError} from '../../actions/functional'
+import functional from '../../actions/functional'
 import { brand } from '../../colors'
 import RideRecorder from '../../components/RideRecorder/RideRecorder'
 import { isAndroid, logRender, rideIDGenerator, unixTimeNow } from '../../helpers'
@@ -76,7 +76,6 @@ class RecorderContainer extends PureComponent {
     this.handleBackPress = this.handleBackPress.bind(this)
     this.finishRide = this.finishRide.bind(this)
     this.pauseLocationTracking = this.pauseLocationTracking.bind(this)
-    this.requestLocationPermission = this.requestLocationPermission.bind(this)
     this.showAtlas = this.showAtlas.bind(this)
     this.showCamera = this.showCamera.bind(this)
     this.showUpdateRide = this.showUpdateRide.bind(this)
@@ -111,22 +110,6 @@ class RecorderContainer extends PureComponent {
     } else if (buttonId === 'back') {
       this.goBack()
     }
-  }
-
-
-  requestLocationPermission() {
-    return new Promise((res, rej) => {
-      PermissionsAndroid.check(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      ).then(granted => {
-        if (granted) {
-          res()
-        } else {
-          this.props.dispatch(functional.locationPermissionsError())
-          rej()
-        }
-      })
-    })
   }
 
   componentDidMount () {

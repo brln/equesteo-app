@@ -77,7 +77,7 @@ target 'equesteo' do
 
   use_native_modules!
 
-  pod 'RNBackgroundGeolocation', :path => '../node_modules/react-native-background-geolocation'
+  pod 'RNBackgroundGeolocation', :path => '../node_modules/react-native-background-geolocation-android'
 
 end
 

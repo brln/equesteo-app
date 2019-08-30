@@ -5,7 +5,7 @@ import {
   ScrollView,
   View,
 } from 'react-native'
-import BackgroundGeolocation from 'react-native-background-geolocation'
+import BackgroundGeolocation from 'react-native-background-geolocation-android'
 
 import Button from './Button'
 import { brand } from '../colors'

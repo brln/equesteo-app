@@ -144,6 +144,8 @@ class FeedContainer extends BackgroundComponent {
     )
   }
 
+
+
   openScreen (openPromise) {
     openPromise.then(() => {
       return this.makeSureDrawerClosed()

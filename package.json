@@ -22,7 +22,7 @@
     "react-native": "^0.60.4",
     "react-native-android-location-services-dialog-box": "^2.8.1",
     "react-native-background-fetch": "^2.7.0",
-    "react-native-background-geolocation": "^3.2.0",
+    "react-native-background-geolocation-android": "git+ssh://git@github.com/transistorsoft/react-native-background-geolocation-android.git",
     "react-native-background-timer": "^2.1.1",
     "react-native-calendars": "^1.200.0",
     "react-native-camera": "2.11.1",

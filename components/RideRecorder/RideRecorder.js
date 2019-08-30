@@ -14,7 +14,6 @@ import RidingMap from './RidingMap'
 import RideStats from './RideStats'
 import PlayButton from './PlayButton'
 import Pulse from '../Shared/Pulse'
-import {gpsLocationError} from "../../actions/functional"
 
 
 export default class RideRecorder extends PureComponent {

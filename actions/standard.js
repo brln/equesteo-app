@@ -108,14 +108,6 @@ export function addDocsToDownload (num) {
   }
 }
 
-export function setBackgroundGeolocationRunning (value) {
-  return {
-    type: SET_BACKGROUND_GEOLOCATION_RUNNING,
-    value,
-    logData: ['value'],
-  }
-}
-
 export function clearDocsNumbers () {
   return {
     type: CLEAR_DOCS_NUMBERS,
