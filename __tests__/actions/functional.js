@@ -14,7 +14,7 @@ import {
   REPLACE_LAST_LOCATION,
   SET_AWAITING_PW_CHANGE,
   SAVE_USER_ID,
-  SET_DOING_INITIAL_LOAD,
+  SET_DOING_INITIAL_LOAD, LOG_FUNCTIONAL_ACTION,
 } from "../../constants"
 import * as helpers from '../../helpers'
 import functional from '../../actions/functional'
@@ -54,12 +54,16 @@ describe('duplicateRide', () => {
     helpers.rideIDGenerator = jest.fn(() => rideID)
     return store.dispatch(functional.duplicateRide(userID, ride, rideElevations, rideCoordinates)).then(() => {
       const actions = store.getActions()
+      console.log(actions)
       expect(actions.map(a => a.type)).toEqual([
+        LOG_FUNCTIONAL_ACTION,
         CREATE_RIDE,
+        LOG_FUNCTIONAL_ACTION,
         RIDE_ELEVATIONS_LOADED,
         RIDE_COORDINATES_LOADED,
         RIDE_UPDATED,
       ])
+      expect(actions[0].name).toBe('duplicateRide')
     })
   })
 })
@@ -106,15 +110,15 @@ describe('onGPSLocation', () => {
         timestamp,
         speed,
       }),
-      type: NEW_LOCATION
+      type: NEW_LOCATION,
+      logData: ["location"]
+
     }
     const actions = store.getActions()
     expect(actions.map(a => a.type)).toEqual([
-      GPS_SIGNAL_LOST,
       NEW_LOCATION
     ])
-    expect(actions[0].value).toBe(false)
-    expect(actions[1]).toEqual(expectedLocation)
+    expect(actions[0]).toEqual(expectedLocation)
   })
 
   it ('doesn\'t record locations that come in rapidly', () => {
@@ -276,15 +280,14 @@ describe('onGPSLocation', () => {
         timestamp: unixTimeFromStamp(timestamp),
         speed,
       }),
-      type: REPLACE_LAST_LOCATION
+      type: REPLACE_LAST_LOCATION,
+      logData: ["newLocation"]
     }
     const actions = store.getActions()
     expect(actions.map(a => a.type)).toEqual([
-      GPS_SIGNAL_LOST,
       REPLACE_LAST_LOCATION,
     ])
-    expect(actions[0].value).toBe(false)
-    expect(actions[1]).toEqual(expectedLocation)
+    expect(actions[0]).toEqual(expectedLocation)
   })
 })
 
@@ -306,11 +309,15 @@ describe('loginAndSync', () => {
     return store.dispatch(functional.loginAndSync(loginFunc, [])).then(() => {
       const actions = store.getActions()
       expect(actions.map(a => a.type)).toEqual([
+        LOG_FUNCTIONAL_ACTION,
         DISMISS_ERROR,
         SET_AWAITING_PW_CHANGE,
         SAVE_USER_ID,
         SET_DOING_INITIAL_LOAD,
+        LOG_FUNCTIONAL_ACTION
       ])
+      expect(actions[0].name).toBe('loginAndSync')
+      expect(actions[5].name).toBe('removeForgotPWLinkListener')
     })
   })
 })

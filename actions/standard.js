@@ -478,6 +478,7 @@ export function replaceLastLocation (newLocation, newElevation) {
     type: REPLACE_LAST_LOCATION,
     newLocation,
     newElevation,
+    logData: ["newLocation"]
   }
 }
 

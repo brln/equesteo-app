@@ -1326,7 +1326,7 @@ function configureBackgroundGeolocation (preventSuspend) {
             text: 'Tap here to see your progress.',
           },
           persistMode: BackgroundGeolocation.PERSIST_MODE_NONE,
-          logLevel: BackgroundGeolocation.LOG_LEVEL_WARNING
+          logLevel: BackgroundGeolocation.LOG_LEVEL_INFO
         },
     ).then(() => {
       logInfo('Background geolocation configured')
