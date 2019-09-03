@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import {
   Alert,
+  FlatList,
   Text,
   ScrollView,
   View,
@@ -56,21 +57,27 @@ export default class LocationLog extends PureComponent {
     })
   }
 
+  static renderResult ({item}) {
+    const each = item.split(' ')
+    const datetime = `${each.shift()} ${each.shift()}`
+    return (
+      <View key={Math.random()} style={{paddingBottom: 5}}>
+        <Text>{ `${datetime}\n${each.join(' ')}` }</Text>
+      </View>
+    )
+  }
+
   render() {
     return (
       <ScrollView>
         <Button text={"Clear Log"} color={brand} onPress={this.clearLog} />
-        <View>
-          { this.state.logs.map(l => {
-            const each = l.split(' ')
-            const datetime = `${each.shift()} ${each.shift()}`
-            return (
-              <View key={Math.random()} style={{paddingBottom: 5}}>
-                <Text>{ `${datetime}\n${each.join(' ')}` }</Text>
-              </View>
-            )
-          }) }
-        </View>
+        <FlatList
+          initialNumToRender={50}
+          keyExtractor={() => Math.random().toString()}
+          containerStyle={{marginTop: 0}}
+          data={this.state.logs}
+          renderItem={LocationLog.renderResult}
+        />
       </ScrollView>
     )
   }

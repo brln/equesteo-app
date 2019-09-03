@@ -1077,7 +1077,7 @@ function stopGPSWatcher () {
   const source = 'stopGPSWatcher'
   return (dispatch) => {
     cb(source, dispatch)
-    BackgroundTimer.stopBackgroundTimer();
+    BackgroundTimer.stopBackgroundTimer()
   }
 }
 
@@ -1094,7 +1094,7 @@ function startLocationTracking () {
       })
 
       dispatch(gpsSignalLost(false))
-      dispatch(startGPSWatcher())
+      dispatch(functional.startGPSWatcher())
       dispatch(functional.doSpeech())
       BackgroundGeolocation.start().then(() => {
         return BackgroundGeolocation.changePace(true)

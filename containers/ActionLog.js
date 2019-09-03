@@ -4,7 +4,7 @@ import {connect} from "react-redux"
 import {
   Text,
   ScrollView,
-  View,
+  View, FlatList,
 } from 'react-native'
 
 import Button from '../components/Button'
@@ -66,32 +66,41 @@ class ActionLog extends PureComponent {
     this.props.dispatch(clearActionLog())
   }
 
+  static renderResult ({item}) {
+    if (item.actionType === 'standard') {
+      return (
+        <StandardAction
+          key={Math.random()}
+          timestamp={item.timestamp}
+          action={item.action}
+          logData={item.logData}
+        />
+      )
+    } else if (item.actionType === 'functional') {
+      return (
+        <FunctionalAction
+          key={Math.random()}
+          timestamp={item.timestamp}
+          action={item.action}
+          logData={item.logData}
+        />
+      )
+    }
+  }
+
   render() {
     return (
       <ScrollView>
+
         <Button text={"Clear Log"} color={brand} onPress={this.clearLog} />
         <View>
-          { this.props.actionLog.reverse().map(l => {
-            if (l.get('actionType') === 'standard') {
-              return (
-                <StandardAction
-                  key={Math.random()}
-                  timestamp={l.get('timestamp')}
-                  action={l.get('action')}
-                  logData={l.get('logData')}
-                />
-              )
-            } else if (l.get('actionType') === 'functional') {
-              return (
-                <FunctionalAction
-                  key={Math.random()}
-                  timestamp={l.get('timestamp')}
-                  action={l.get('action')}
-                  logData={l.get('logData')}
-                />
-              )
-            }
-          }) }
+          <FlatList
+            initialNumToRender={50}
+            keyExtractor={() => Math.random().toString()}
+            containerStyle={{marginTop: 0}}
+            data={this.props.actionLog.reverse().toJS()}
+            renderItem={ActionLog.renderResult}
+          />
         </View>
       </ScrollView>
     )
