@@ -75,7 +75,7 @@ export default class LocationLog extends PureComponent {
           initialNumToRender={50}
           keyExtractor={() => Math.random().toString()}
           containerStyle={{marginTop: 0}}
-          data={this.state.logs}
+          data={this.state.logs.reverse()}
           renderItem={LocationLog.renderResult}
         />
       </ScrollView>

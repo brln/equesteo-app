@@ -89,7 +89,6 @@ public class MainApplication extends NavigationApplication {
             new RNFetchBlobPackage(),
             new RNBackgroundFetchPackage(),
             new TextToSpeechPackage(),
-            new BackgroundTimerPackage(),
             new NetInfoPackage(),
             new CameraRollPackage(),
             new RNFSPackage(),

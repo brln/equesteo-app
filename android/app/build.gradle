@@ -64,8 +64,8 @@ android {
         applicationId "com.equesteo"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 182
-        versionName "2.0.22"
+        versionCode 183
+        versionName "2.0.23"
         missingDimensionStrategy 'react-native-camera', 'general'
         missingDimensionStrategy "RNN.reactNativeVersion", "reactNative60"
         multiDexEnabled true
@@ -132,7 +132,6 @@ dependencies {
     implementation project(':@react-native-community_cameraroll')
     implementation project(':react-native-push-notification')
     implementation project(':@react-native-community_netinfo')
-    compile project(':react-native-background-timer')
     compile project(':react-native-tts')
     compile project(':react-native-background-fetch')
     implementation project(':react-native-background-fetch')

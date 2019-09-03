@@ -65,8 +65,6 @@ target 'equesteo' do
 
   pod 'TextToSpeech', :path => '../node_modules/react-native-tts'
 
-  pod 'react-native-background-timer', :path => '../node_modules/react-native-background-timer'
-
   pod 'react-native-netinfo', :path => '../node_modules/@react-native-community/netinfo'
 
   pod 'ReactNativeNavigation', :path => '../node_modules/react-native-navigation'
