@@ -147,8 +147,6 @@ const STOPPED_CONFIG = {
   autoSync: false,
   preventSuspend: false,
   reset: true,
-  persistMode: BackgroundGeolocation.PERSIST_MODE_NONE,
-  logLevel: BackgroundGeolocation.LOG_LEVEL_INFO,
   disableStopDetection: false
 }
 
@@ -1466,6 +1464,8 @@ function stopLocationTracking () {
   return (dispatch) => {
     cb(source, dispatch)
     dispatch(reconfigureBackgroundGeolocation(STOPPED_CONFIG)).then(() => {
+      return BackgroundGeolocation.removeGeofences()
+    }).then(() => {
       return BackgroundGeolocation.stop()
     }).then(() => {
       dispatch(setGPSCoordinatesReceived(0))

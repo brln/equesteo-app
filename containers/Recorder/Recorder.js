@@ -4,6 +4,7 @@ import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import LocationServicesDialogBox from "react-native-android-location-services-dialog-box";
 import { Alert, BackHandler, PermissionsAndroid } from 'react-native'
+import Permissions from 'react-native-permissions'
 
 import {
   createRide,
@@ -33,7 +34,7 @@ import {
   RIDE_ATLAS,
   START_HOOF_TRACKS,
   UPDATE_RIDE,
-  UPDATE_NEW_RIDE_ID,
+  UPDATE_NEW_RIDE_ID, LOCATION_PERMISSIONS,
 } from "../../screens/consts/main"
 import { EqNavigation } from '../../services'
 import TimeoutManager from '../../services/TimeoutManager'

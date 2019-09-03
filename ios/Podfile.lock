@@ -130,8 +130,6 @@ PODS:
     - React-cxxreact (= 0.60.4)
     - React-jsi (= 0.60.4)
   - React-jsinspector (0.60.4)
-  - react-native-background-timer (2.1.1):
-    - React
   - react-native-camera (2.11.1):
     - React
     - react-native-camera/RCT (= 2.11.1)
@@ -174,12 +172,16 @@ PODS:
     - React-fishhook (= 0.60.4)
   - ReactNativeNavigation (3.0.0-alpha.2):
     - React
+  - ReactNativePermissions (1.2.0):
+    - React
   - rn-fetch-blob (0.10.16):
     - React-Core
   - RNBackgroundFetch (2.7.0):
     - React
   - RNBackgroundGeolocation (3.2.1):
     - CocoaLumberjack (~> 3.5.1)
+    - React
+  - RNCAsyncStorage (1.6.1):
     - React
   - RNFirebase (5.5.5):
     - Firebase/Core
@@ -227,7 +229,6 @@ DEPENDENCIES:
   - React-jsi (from `../node_modules/react-native/ReactCommon/jsi`)
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
-  - react-native-background-timer (from `../node_modules/react-native-background-timer`)
   - react-native-camera (from `../node_modules/react-native-camera`)
   - "react-native-cameraroll (from `../node_modules/@react-native-community/cameraroll`)"
   - "react-native-mapbox-gl (from `../node_modules/@react-native-mapbox-gl/maps`)"
@@ -244,9 +245,11 @@ DEPENDENCIES:
   - React-RCTVibration (from `../node_modules/react-native/Libraries/Vibration`)
   - React-RCTWebSocket (from `../node_modules/react-native/Libraries/WebSocket`)
   - ReactNativeNavigation (from `../node_modules/react-native-navigation`)
+  - ReactNativePermissions (from `../node_modules/react-native-permissions`)
   - rn-fetch-blob (from `../node_modules/rn-fetch-blob`)
   - RNBackgroundFetch (from `../node_modules/react-native-background-fetch`)
   - RNBackgroundGeolocation (from `../node_modules/react-native-background-geolocation-android`)
+  - "RNCAsyncStorage (from `../node_modules/@react-native-community/async-storage`)"
   - RNFirebase (from `../node_modules/react-native-firebase/ios`)
   - RNFS (from `../node_modules/react-native-fs`)
   - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
@@ -301,8 +304,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsiexecutor"
   React-jsinspector:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
-  react-native-background-timer:
-    :path: "../node_modules/react-native-background-timer"
   react-native-camera:
     :path: "../node_modules/react-native-camera"
   react-native-cameraroll:
@@ -335,12 +336,16 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/Libraries/WebSocket"
   ReactNativeNavigation:
     :path: "../node_modules/react-native-navigation"
+  ReactNativePermissions:
+    :path: "../node_modules/react-native-permissions"
   rn-fetch-blob:
     :path: "../node_modules/rn-fetch-blob"
   RNBackgroundFetch:
     :path: "../node_modules/react-native-background-fetch"
   RNBackgroundGeolocation:
     :path: "../node_modules/react-native-background-geolocation-android"
+  RNCAsyncStorage:
+    :path: "../node_modules/@react-native-community/async-storage"
   RNFirebase:
     :path: "../node_modules/react-native-firebase/ios"
   RNFS:
@@ -386,7 +391,6 @@ SPEC CHECKSUMS:
   React-jsi: 40f467ff088c811c6630acccb4aea57ea7ccb1b5
   React-jsiexecutor: e4b4717060a0cd8d0270323b5655a68c95432efd
   React-jsinspector: 044105eea064aec81adc5e4d777a8f6589e7d094
-  react-native-background-timer: bb7a98c8e97fc7c290de2d423dd09ddb73dcbcbb
   react-native-camera: 9c50d7def800895e7991ccda6203929553ceec9c
   react-native-cameraroll: a0817e9d2e054f166500e3ca1c70f2e7c615c66a
   react-native-mapbox-gl: 099d223de88d75815e3a5a0a04b64c970b929105
@@ -403,9 +407,11 @@ SPEC CHECKSUMS:
   React-RCTVibration: dabb8d59bb47e1d9124b3f77bfdc1b33d42b0a74
   React-RCTWebSocket: f32b93e0953d7c07fd5dd45305406282cfdc95cf
   ReactNativeNavigation: 20522060de61b1c293ec50681a6aa11488596286
+  ReactNativePermissions: a8da737c35e77bf4ea1d4102d881b406fb791125
   rn-fetch-blob: 6aa7c5b59f442fbfcdcc847edbc062119f6af66c
   RNBackgroundFetch: 7b9840f8aa759266899b3c33679ab037297d4798
   RNBackgroundGeolocation: 40329c5d44e6d1c7977f106dbdf3577ddd880c4a
+  RNCAsyncStorage: e99188b8a89ea0edddc82d8831cd5142f4550fdc
   RNFirebase: ca408d6bee0ca9383bd0cfe84f40b01370b8ad4d
   RNFS: 6a2bfb5d0b14cf0ad72667f76202358abba4aacf
   RNImageCropPicker: c406db73f02f11bf3a887f856ff04ee50af173f4
@@ -417,6 +423,6 @@ SPEC CHECKSUMS:
   TextToSpeech: d68418db07e7d3ce39fd3360ccca8d8165cef859
   yoga: 88c514f310aff89b94a14c5fbf44b95735af0cb7
 
-PODFILE CHECKSUM: 385314bd9d6288ce112fc930172f417208045cf6
+PODFILE CHECKSUM: 3c49fbcf43f126a88bcaf92f56b7eae8fca945e8
 
 COCOAPODS: 1.5.3

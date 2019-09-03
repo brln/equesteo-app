@@ -1,3 +1,4 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -17,7 +18,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-       <string>2.0.23</string>
+       <string>2.0.9</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -34,7 +35,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-       <string>183</string>
+       <string>169</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSApplicationCategoryType</key>
@@ -65,7 +66,9 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Allow Equesteo to use your camera to add pictures to your rides.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Please select &apos;Always&apos; to allow accurate tracking when your screen is off.</string>
+	<string>Allow Equesteo to access your location so you can track your rides.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Allow Equesteo to access your location so you can track your rides.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Allow Equesteo to access your location so you can track your rides.</string>
 	<key>NSMotionUsageDescription</key>
@@ -114,3 +117,4 @@
 	<false/>
 </dict>
 </plist>
+

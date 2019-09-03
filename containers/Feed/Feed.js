@@ -4,6 +4,8 @@ import React from 'react'
 import { Keyboard, Platform } from 'react-native'
 import { connect } from 'react-redux'
 import { Navigation } from 'react-native-navigation'
+import Permissions from 'react-native-permissions'
+
 
 import Amplitude, {
   OPEN_LEADERBOARDS,
@@ -19,7 +21,7 @@ import Feed from '../../components/Feed/Feed'
 import { logError, logRender, unixTimeNow } from '../../helpers'
 import {
   HORSE_PROFILE,
-  LEADERBOARDS,
+  LEADERBOARDS, LOCATION_PERMISSIONS,
   MORE,
   NOTIFICATION_BUTTON,
   NOTIFICATIONS_LIST,
@@ -155,13 +157,27 @@ class FeedContainer extends BackgroundComponent {
   }
 
   openRecorder () {
-    Amplitude.logEvent(START_OR_CONTINUE_RIDE)
-    this.openScreen(EqNavigation.push(this.props.activeComponent, {
-      component: {
-        name: RECORDER,
-        id: RECORDER
+    Permissions.check('location', 'always').then(response => {
+      if (response === 'authorized') {
+        Amplitude.logEvent(START_OR_CONTINUE_RIDE)
+        this.openScreen(EqNavigation.push(this.props.activeComponent, {
+          component: {
+            name: RECORDER,
+            id: RECORDER
+          }
+        }))
+      } else {
+        this.openScreen(EqNavigation.push(this.props.activeComponent, {
+          component: {
+            name: LOCATION_PERMISSIONS,
+            id: LOCATION_PERMISSIONS,
+            passProps: {
+              response
+            }
+          }
+        }))
       }
-    }))
+    })
   }
 
   openNotifications () {

@@ -16,6 +16,7 @@ import HorseProfileContainer from '../containers/HorseProfile'
 import HorseToolsContainer from '../containers/HorseTools'
 import LeaderboardsContainer from '../containers/Leaderboards'
 import LocationLog from '../components/LocationLog'
+import LocationPermissions from '../containers/LocationPermissions'
 import LoginContainer from '../containers/SignupLogin/Login'
 import MapContainer from '../containers/Map'
 import MoreContainer from '../containers/More'
@@ -56,6 +57,7 @@ import {
   FIND_PEOPLE,
   LEADERBOARDS,
   LOCATION_LOG,
+  LOCATION_PERMISSIONS,
   LOGIN,
   MAP,
   NEEDS_SYNC,
@@ -100,6 +102,7 @@ export function registerScreens(store, Provider) {
   Navigation.registerComponentWithRedux(HORSE_PROFILE, () => HorseProfileContainer, Provider, store)
   Navigation.registerComponentWithRedux(HORSE_TOOLS, () => HorseToolsContainer, Provider, store)
   Navigation.registerComponentWithRedux(LEADERBOARDS, () => LeaderboardsContainer, Provider, store)
+  Navigation.registerComponentWithRedux(LOCATION_PERMISSIONS, () => LocationPermissions, Provider, store)
   Navigation.registerComponentWithRedux(LOGIN, () => LoginContainer, Provider, store)
   Navigation.registerComponentWithRedux(MAP, () => MapContainer, Provider, store)
   Navigation.registerComponentWithRedux(NEEDS_SYNC, () => NeedsSyncContainer, Provider, store)
