@@ -18,7 +18,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-       <string>2.0.26</string>
+       <string>2.0.27</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -35,7 +35,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-       <string>186</string>
+       <string>187</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSApplicationCategoryType</key>
@@ -61,6 +61,14 @@
 			</dict>
 		</dict>
 	</dict>
+    <key>NSContactsUsageDescription</key>
+    <string>Our app does not request this permission or utilize this functionality but it is included in our info.plist since our app utilizes the react-native-permissions library, which references this permission in its code.</string>
+    <key>NSCalendarsUsageDescription</key>
+    <string>Our app does not request this permission or utilize this functionality but it is included in our info.plist since our app utilizes the react-native-permissions library, which references this permission in its code.</string>
+    <key>NSBluetoothPeripheralUsageDescription</key>
+    <string>Our app does not request this permission or utilize this functionality but it is included in our info.plist since our app utilizes the react-native-permissions library, which references this permission in its code.</string>
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>Our app does not request this permission or utilize this functionality but it is included in our info.plist since our app utilizes the react-native-permissions library, which references this permission in its code.</string>
 	<key>NSAppleMusicUsageDescription</key>
 	<string>Allow Equesteo Media Library access to save pictures to your camera roll.</string>
 	<key>NSCameraUsageDescription</key>
