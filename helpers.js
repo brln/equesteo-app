@@ -5,6 +5,7 @@ import { Platform } from 'react-native'
 
 
 import config from './dotEnv'
+import { logError } from './actions/standard'
 import { captureBreadcrumb, captureException } from './services/Sentry'
 
 export const DEFAULT_HORSE_SPEEDS = Map({
@@ -181,22 +182,6 @@ export function newRideName (currentRide) {
   return name
 }
 
-export function logError (error, id) {
-  console.log(`******** logError ${id} ****************`)
-  console.log(error)
-  console.log('*****************************************')
-  captureBreadcrumb(id)
-  captureException(error)
-}
-
-export function logInfo (info, info2) {
-  if (info2) {
-    console.log(info, info2)
-  } else {
-    console.log(info)
-  }
-}
-
 export function logDebug (info, title) {
   console.log(`======================= ${title} ===========================`)
   console.log(info)
@@ -204,7 +189,7 @@ export function logDebug (info, title) {
 }
 
 export function logRender (componentName) {
-  logInfo('rendering: ' + componentName)
+  console.log('rendering: ' + componentName)
 }
 
 export function isAndroid () {

@@ -24,8 +24,6 @@ import {
   goodConnection,
   horsePhotoURL,
   isAndroid,
-  logError,
-  logInfo,
   rideIDGenerator,
   ridePhotoURL,
   unixTimeNow,
@@ -60,6 +58,7 @@ import {
   carrotMutex,
   clearCurrentCareEvent,
   clearDocsNumbers,
+  clearLastLocation,
   clearFeedMessage,
   clearState,
   createRide,
@@ -74,6 +73,8 @@ import {
   horseUpdated,
   followUpdated,
   horseUserUpdated,
+  loadCurrentRideState,
+  loadLocalState,
   localDataLoaded,
   logFunctionalAction,
   newAppState,
@@ -105,7 +106,7 @@ import {
   setGPSCoordinatesReceived,
   setAwaitingPasswordChange,
   saveUserID,
-  setDoingInitialLoad, loadLocalState, loadCurrentRideState,
+  setDoingInitialLoad, logErrorToActivityLog, logInfoToActivityLog,
 } from './../standard'
 import {NotConnectedError, UnauthorizedError, UserAlreadyExistsError} from "../../errors"
 import kalmanFilter from "../../services/Kalman"
@@ -174,7 +175,7 @@ export function catchAsyncError (dispatch, source) {
       captureException(e)
       if (config.ENV === 'local') {
         Alert.alert('Async error, check logs')
-        logError(e, 'catchAsyncError')
+        functional.logError(e, 'catchAsyncError')
       }
     }
   }
@@ -283,8 +284,8 @@ function appInitialized () {
           }
         })
       } else {
-        logDebug(token, 'not found token')
-        logDebug(currentUserID, 'not found userID')
+        logInfo(token, 'not found token')
+        logInfo(currentUserID, 'not found userID')
         if (getState().getIn(['localState', 'everLoggedIn'])) {
           dispatch(functional.switchRoot(LOGIN))
         } else {
@@ -1123,13 +1124,35 @@ export function gpsLocationError (error) {
   }
 }
 
+export function logError (e, id) {
+  return (dispatch) => {
+    console.log(`******** logError ${id} ****************`)
+    console.log(error)
+    console.log('*****************************************')
+    dispatch(logErrorToActivityLog(e, id))
+    captureBreadcrumb(id)
+    captureException(error)
+  }
+}
+
+export function logInfo (info1, info2) {
+  return (dispatch) => {
+    if (info2) {
+      console.log(info, info2)
+    } else {
+      console.log(info)
+    }
+    dispatch(logInfoToActivityLog(info1, info2))
+    captureBreadcrumb(`${info1}: ${info2}`)
+  }
+}
+
 function onGPSLocation (location) {
   const KALMAN_FILTER_Q = 6
   const THROWAWAY_FIRST_N_COORDS = 5
   const MINIMUM_ACCURACY_IN_M = 25
   return (dispatch, getState) => {
     const alreadyReceived = getState().getIn(['localState', 'gpsCoordinatesReceived'])
-    logDebug(alreadyReceived, 'alreadyReceived')
     const nowReceived = alreadyReceived + 1
     if (nowReceived <= THROWAWAY_FIRST_N_COORDS || location.coords.accuracy > MINIMUM_ACCURACY_IN_M) {
       dispatch(setGPSCoordinatesReceived(nowReceived))
@@ -1468,6 +1491,7 @@ function stopLocationTracking () {
     }).then(() => {
       return BackgroundGeolocation.stop()
     }).then(() => {
+      dispatch(clearLastLocation())
       dispatch(setGPSCoordinatesReceived(0))
     }).catch(catchAsyncError(dispatch, source))
   }
@@ -1504,7 +1528,7 @@ function startBackgroundFetch () {
       })
       before.catch(catchAsyncError(dispatch, source))
     }, (error) => {
-      logError(error, "RNBackgroundFetch failed to start")
+      functional.logError(error, "RNBackgroundFetch failed to start")
     });
     return new Promise((res, rej) => {
       BackgroundFetch.start(() => {
@@ -1795,6 +1819,8 @@ const functional = {
   loadRideElevations,
   loadSingleRide,
   loginAndSync,
+  logInfo,
+  logError,
   markNotificationPopped,
   markNotificationsSeen,
   newPassword,

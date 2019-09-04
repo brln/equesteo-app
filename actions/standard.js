@@ -38,6 +38,8 @@ import {
   LOAD_CURRENT_RIDE_STATE,
   LOAD_LOCAL_STATE,
   LOCAL_DATA_LOADED,
+  LOG_ERROR_TO_ACTIVITY_LOG,
+  LOG_INFO_TO_ACTIVITY_LOG,
   LOG_FUNCTIONAL_ACTION,
   MERGE_STASHED_LOCATIONS,
   NEW_LOCATION,
@@ -60,7 +62,6 @@ import {
   SAVE_USER_ID,
   SET_ACTIVE_ATLAS_ENTRY,
   SET_ACTIVE_COMPONENT,
-  SET_BACKGROUND_GEOLOCATION_RUNNING,
   SET_FEED_MESSAGE,
   SET_FIRST_START_HORSE_ID,
   SET_FOLLOWING_SYNC_RUNNING,
@@ -394,6 +395,24 @@ export function localDataLoaded (localData) {
   return {
     type: LOCAL_DATA_LOADED,
     localData
+  }
+}
+
+export function logErrorToActivityLog (error, id) {
+  return {
+    type: LOG_ERROR_TO_ACTIVITY_LOG,
+    error,
+    id,
+    logData: ['id', 'error']
+  }
+}
+
+export function logInfoToActivityLog (info1, info2) {
+  return {
+    type: LOG_INFO_TO_ACTIVITY_LOG,
+    info1,
+    info2,
+    logData: ['info1', 'info2']
   }
 }
 
