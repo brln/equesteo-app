@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 
 import BuildImage from '../Images/BuildImage'
-import { haversine, logInfo, logRender, parseRideCoordinate } from '../../helpers'
+import { haversine, logRender, parseRideCoordinate } from '../../helpers'
 import { brand, darkGrey } from '../../colors'
 import { rainbow } from '../../services/Rainbow'
 import Amplitude, {
@@ -248,7 +248,6 @@ export default class RidingMap extends PureComponent {
                 <BuildImage
                   source={this.gpsStatusImage()}
                   style={{width: 40, height: 40, marginRight: 5}}
-                  onError={() => { logInfo('there was an error loading RidingMap image') }}
                 />
               </View>
             </TouchableOpacity>

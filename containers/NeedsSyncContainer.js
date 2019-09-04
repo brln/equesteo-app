@@ -10,10 +10,10 @@ import {
 import Button from '../components/Button'
 import { brand, lightGrey } from '../colors'
 import functional, { DB_SYNCING } from '../actions/functional'
-import { logInfo } from '../helpers'
 import BuildImage from '../components/Images/BuildImage'
 import Loader from '../components/SignupLogin/Loader'
 import { FEED } from '../screens/consts/main'
+import {Logger} from "../mixins/Logger"
 
 
 class NeedsSyncContainer extends PureComponent {
@@ -38,6 +38,10 @@ class NeedsSyncContainer extends PureComponent {
 
   constructor (props) {
     super(props)
+    Object.assign(this, Logger)
+    this.logError = this.logError.bind(this)
+    this.logInfo = this.logInfo.bind(this)
+
     this.doSync = this.doSync.bind(this)
   }
 
@@ -48,7 +52,7 @@ class NeedsSyncContainer extends PureComponent {
         this.props.dispatch(functional.startListeningFCM())
       }
     }).catch(e => {
-      logInfo(e)
+      this.logInfo(e)
     })
   }
 

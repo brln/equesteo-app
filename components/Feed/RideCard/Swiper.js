@@ -23,6 +23,7 @@ export default class Swiper extends PureComponent {
     const mapImage = (
       <TouchableOpacity onPress={this.props.showRide(false)} style={{flex: 1}} key="map">
         <RideMapImage
+          logInfo={this.props.logInfo}
           uri={this.props.ride.get('mapURL')}
           style={{height: swiperHeight, width: width, flex: 1}}
         />
@@ -37,7 +38,7 @@ export default class Swiper extends PureComponent {
             style={{height: swiperHeight, width: width - 5}}
             key={photo.get('uri')}
             source={{uri: photo.get('uri')}}
-            onError={() => { logInfo('there was an error loading RideCard image') }}
+            onError={() => { this.props.logInfo('there was an error loading RideCard image') }}
             showSource={true}
             onPress={this.props.showRide(false)}
           />

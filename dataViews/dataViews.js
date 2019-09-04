@@ -1,7 +1,6 @@
 import {fromJS, List, Map, Set} from 'immutable'
 import memoizeOne from 'memoize-one'
 
-import { logError } from '../helpers'
 import { captureBreadcrumb } from "../services/Sentry"
 
 function allRidersButUser (trainings, users, rides, rideHorses, horses, horseUsers) {
@@ -64,7 +63,7 @@ function horsesByRide (rideHorses, horses) {
       if (horse) {
         byRideID[rideHorse.get('rideID')].horses.push(horse)
       } else {
-        logError(`Should have horse in horsesByRide but don't: ${rideHorse.get('horseID')}`)
+        captureBreadcrumb(`Should have horse in horsesByRide but don't: ${rideHorse.get('horseID')}`)
       }
 
       if (rideHorse.get('rideHorseType') === 'rider') {

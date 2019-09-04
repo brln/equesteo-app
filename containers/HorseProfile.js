@@ -22,6 +22,7 @@ import Amplitude, {
   VIEW_HORSE_PROFILE,
 } from '../services/Amplitude'
 import {viewTrainings} from "../dataViews/dataViews"
+import {Logger} from "../mixins/Logger"
 
 
 class HorseProfileContainer extends BackgroundComponent {
@@ -47,6 +48,10 @@ class HorseProfileContainer extends BackgroundComponent {
 
   constructor (props) {
     super(props)
+    Object.assign(this, Logger)
+    this.logError = this.logError.bind(this)
+    this.logInfo = this.logInfo.bind(this)
+
     this.addRider = this.addRider.bind(this)
     this.deleteHorse = this.deleteHorse.bind(this)
     this.horseUser = this.horseUser.bind(this)
@@ -201,6 +206,8 @@ class HorseProfileContainer extends BackgroundComponent {
         horse={this.props.horse}
         horseOwner={this.props.owner}
         horsePhotos={this.memoThisHorsesPhotos(this.props.horsePhotos, this.props.horse)}
+        logError={this.logError}
+        logInfo={this.logInfo}
         owner={this.props.owner}
         riders={this.memoThisHorsesRiders(this.props.horseUsers, this.props.horse, this.props.users)}
         showRiderProfile={this.showRiderProfile}

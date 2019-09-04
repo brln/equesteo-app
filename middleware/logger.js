@@ -1,4 +1,3 @@
-import { logInfo } from '../helpers'
 import { captureBreadcrumb } from '../services/Sentry'
 
 export default logger = store => dispatch => action => {
@@ -11,7 +10,7 @@ export default logger = store => dispatch => action => {
 
 
   const asString = JSON.stringify(toLog)
-  logInfo(asString)
+  console.log(asString)
   captureBreadcrumb(asString, 'action', toLog)
   dispatch(action)
 }

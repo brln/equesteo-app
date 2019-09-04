@@ -1,5 +1,4 @@
 import { Navigation } from 'react-native-navigation'
-import { logError } from '../helpers'
 import TimeoutManager from './TimeoutManager'
 
 export default class EqNavigation {
@@ -15,7 +14,7 @@ export default class EqNavigation {
       })
     }) .catch(e => {
       EqNavigation.debounce = false
-      logError(e, 'EqNavigation.wrap')
+      console.log(e, 'EqNavigation.wrap')
     })
   }
 

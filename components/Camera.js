@@ -11,7 +11,6 @@ import * as RNFS from 'react-native-fs'
 
 import BuildImage from './Images/BuildImage'
 import URIImage from './Images/URIImage'
-import { logError } from '../helpers'
 import Amplitude, { TAKE_GEOTAGGED_PHOTO } from "../services/Amplitude"
 
 const { width } = Dimensions.get('window');
@@ -48,7 +47,7 @@ export default class Camera extends Component {
         this.props.stashNewRidePhoto(permURI)
         this.camera.resumePreview()
         return RNFS.unlink(tempURI)
-      }).catch((e) => { logError(e, 'Camera.takePicture.takePictureAsync') })
+      }).catch((e) => { this.props.logError(e, 'Camera.takePicture.takePictureAsync') })
     }
   }
 

@@ -126,6 +126,7 @@ export default class RideCard extends PureComponent {
         </CardItem>
         <CardItem cardBody>
           <Swiper
+            logInfo={this.props.logInfo}
             ride={this.props.ride}
             ridePhotos={this.props.ridePhotos}
             showRide={this.showRide}

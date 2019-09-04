@@ -17,10 +17,11 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import ApiClient from '../services/ApiClient'
 import Button from '../components/Button'
 import { brand, darkBrand, lightGrey } from '../colors'
-import { isAndroid, logError, logInfo } from '../helpers'
+import { isAndroid } from '../helpers'
 import UserAPI from '../services/UserApi'
 import URIImage from '../components/Images/URIImage'
 import Amplitude, { SEND_SHARE_RIDE } from "../services/Amplitude"
+import {Logger} from "../mixins/Logger"
 
 const { width } = Dimensions.get('window')
 
@@ -52,6 +53,10 @@ class ShareRideContainer extends PureComponent {
 
   constructor (props) {
     super(props)
+    Object.assign(this, Logger)
+    this.logError = this.logError.bind(this)
+    this.logInfo = this.logInfo.bind(this)
+
     this.state = {
       mapURL: null,
       shareLink: null,
@@ -75,7 +80,7 @@ class ShareRideContainer extends PureComponent {
         shareLink: resp.shareLink,
       })
     }).catch(e => {
-      logError(e, 'Containers.ShareRide.componentDidMount')
+      this.logError(e, 'Containers.ShareRide.componentDidMount')
       this.setState({
         loading: false
       })
@@ -83,7 +88,7 @@ class ShareRideContainer extends PureComponent {
   }
 
   imageError (e) {
-    logError(e, 'Containers.ShareRide.imageError')
+    this.logError(e, 'Containers.ShareRide.imageError')
   }
 
   imageLoaded () {
@@ -152,7 +157,7 @@ class ShareRideContainer extends PureComponent {
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
           this.downloadMap()
         } else {
-          logInfo('Camera permission denied');
+          this.logInfo('Camera permission denied');
         }
       }).catch((err) => {
         throw err
@@ -172,7 +177,7 @@ class ShareRideContainer extends PureComponent {
         Linking.openURL(newURI)
       }).catch(e => {
         this.setState({ loading: false })
-        logError(e, 'Containers.ShareRide.downloadMap')
+        this.logError(e, 'Containers.ShareRide.downloadMap')
       })
     } else {
       CameraRoll.saveToCameraRoll(this.state.mapURL).then(url => {

@@ -1,7 +1,6 @@
 import RNFetchBlob from 'rn-fetch-blob'
 
 import config from '../dotEnv'
-import { logError } from '../helpers'
 import {
   BadRequestError,
   BadResponseError,
@@ -40,7 +39,7 @@ export default class ApiClient {
         captureException(e)
       })
     } else if (!token) {
-      logError(`Trying to set null token from ${url}`)
+      console.log(`Trying to set null token from ${url}`)
     }
   }
 

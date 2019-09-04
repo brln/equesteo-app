@@ -26,6 +26,7 @@ import Amplitude, {
   VIEW_RIDE_CHARTS,
 } from "../services/Amplitude"
 import { viewHorseOwnerIDs } from '../dataViews/dataViews'
+import {Logger} from "../mixins/Logger"
 
 class RideContainer extends PureComponent {
   static options() {
@@ -71,6 +72,10 @@ class RideContainer extends PureComponent {
 
   constructor (props) {
     super(props)
+    Object.assign(this, Logger)
+    this.logError = this.logError.bind(this)
+    this.logInfo = this.logInfo.bind(this)
+
     this.state = {
       modalOpen: false,
       titleTouchCount: 0,
@@ -257,6 +262,8 @@ class RideContainer extends PureComponent {
         horses={this.props.horses}
         horsePhotos={this.props.horsePhotos}
         horseOwnerIDs={viewHorseOwnerIDs(this.props.horseUsers)}
+        logError={this.logError}
+        logInfo={this.logInfo}
         modalOpen={this.state.modalOpen}
         newComment={this.state.newComment}
         paceHorse={this.memoPaceHorse(this.props.horses, this.props.rideHorses)}

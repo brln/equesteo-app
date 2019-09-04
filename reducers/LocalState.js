@@ -1,7 +1,7 @@
 import { fromJS, List, Map } from 'immutable'
 
 import { FEED, SIGNUP } from '../screens/consts/main'
-import { appStates, logInfo, unixTimeNow } from '../helpers'
+import { appStates, unixTimeNow } from '../helpers'
 import { DB_NEEDS_SYNC, DB_SYNCING, DB_SYNCED } from "../actions/functional"
 
 import {
@@ -272,8 +272,6 @@ export default function LocalStateReducer(state=initialState, action) {
       if (queueItem) {
         const updated = queueItem.set('status', action.newStatus).set('timestamp', unixTimeNow())
         updatedState = state.setIn(['photoQueue', action.photoID], updated)
-      } else {
-        logInfo('Updating queue item that doesn\'t exist in queue anymore')
       }
       return updatedState
     case USER_SEARCH_RETURNED:

@@ -2,7 +2,6 @@ import memoizeOne from 'memoize-one';
 import React, { PureComponent } from 'react'
 import { BackHandler, Keyboard } from 'react-native'
 import { connect } from 'react-redux';
-import { fromHsv } from 'react-native-color-picker'
 import { Navigation } from 'react-native-navigation'
 
 
@@ -23,6 +22,7 @@ import Amplitude, {
   UPDATE_GAIT_SPEEDS
 } from "../../services/Amplitude"
 import { COLOR_PICKER } from "../../screens/consts/main"
+import {Logger} from "../../mixins/Logger"
 
 class UpdateHorseContainer extends PureComponent {
   static options() {
@@ -56,6 +56,9 @@ class UpdateHorseContainer extends PureComponent {
 
   constructor (props) {
     super(props)
+    Object.assign(this, Logger)
+    this.logError = this.logError.bind(this)
+
     this.state = {
       backDebounce: false,
       colorModalOpen: false,
@@ -277,6 +280,7 @@ class UpdateHorseContainer extends PureComponent {
         horsePhotos={this.memoThisHorsesPhotos(this.props.horsePhotos, this.state.deletedPhotoIDs)}
         horseUpdated={this.horseUpdated}
         horseUser={this.props.horseUser}
+        logError={this.logError}
         markGaitSpeedsUpdated={this.markGaitSpeedsUpdated}
         markPhotoDeleted={this.markPhotoDeleted}
         newHorse={this.props.newHorse}

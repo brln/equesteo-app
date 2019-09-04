@@ -27,7 +27,6 @@ import {
   DEFAULT_HORSE_SPEEDS,
   haversine,
   logRender,
-  logInfo,
   parseRideCoordinate,
   speedGradient,
 } from '../../helpers'
@@ -260,7 +259,7 @@ export default class Ride extends PureComponent {
     if (this.state.titleTouchCount === 5) {
       Alert.alert(this.props.ride.get('_id'))
       Clipboard.setString(this.props.ride.get('_id'))
-      logInfo(this.props.ride.get('_id'))
+      this.props.logInfo(this.props.ride.get('_id'))
       this.setState({
         titleTouchCount: 0
       })
@@ -356,6 +355,7 @@ export default class Ride extends PureComponent {
           <View style={{height}}>
             <View style={{flex: 1}}>
               <ViewingMap
+                logError={this.props.logError}
                 rideCoordinates={this.props.rideCoordinates.get('rideCoordinates')}
                 ridePhotos={this.props.ridePhotos}
                 showPhotoLightbox={this.props.showPhotoLightbox}

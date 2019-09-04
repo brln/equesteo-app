@@ -18,7 +18,7 @@ import functional from "../../actions/functional"
 import BackgroundComponent from '../../components/BackgroundComponent'
 import { brand } from '../../colors'
 import Feed from '../../components/Feed/Feed'
-import { logError, logRender, unixTimeNow } from '../../helpers'
+import { logRender, unixTimeNow } from '../../helpers'
 import {
   HORSE_PROFILE,
   LEADERBOARDS, LOCATION_PERMISSIONS,
@@ -37,6 +37,7 @@ import {
 import { EqNavigation } from '../../services'
 import { captureBreadcrumb } from '../../services/Sentry'
 import { viewHorseOwnerIDs } from "../../dataViews/dataViews"
+import {Logger} from "../../mixins/Logger"
 
 export const END_OF_FEED = unixTimeNow() - (1000 * 60 * 60 * 24 * 30)
 
@@ -74,6 +75,9 @@ class FeedContainer extends BackgroundComponent {
 
   constructor (props) {
     super(props)
+    Object.assign(this, Logger)
+    this.logError = this.logError.bind(this)
+    this.logInfo = this.logInfo.bind(this)
 
     this.state = {
       refreshing: false,
@@ -152,7 +156,7 @@ class FeedContainer extends BackgroundComponent {
     openPromise.then(() => {
       return this.makeSureDrawerClosed()
     }).catch(e => {
-      logError(e, 'Feed.Feed.openScreen')
+      this.logError(e, 'Feed.Feed.openScreen')
     })
   }
 
@@ -443,6 +447,8 @@ class FeedContainer extends BackgroundComponent {
         horsePhotos={this.props.horsePhotos}
         horseOwnerIDs={viewHorseOwnerIDs(this.props.horseUsers)}
         horseUsers={this.memoizeFilteredHorseUsers(this.props.follows, this.props.userID, this.props.horseUsers, this.props.horses)}
+        logInfo={this.logInfo}
+        logError={this.logError}
         openLeaderboards={this.openLeaderboards}
         openMore={this.openMore}
         openNotifications={this.openNotifications}

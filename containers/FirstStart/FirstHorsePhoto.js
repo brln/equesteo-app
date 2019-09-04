@@ -13,7 +13,7 @@ import { connect } from 'react-redux'
 
 import BuildImage from '../../components/Images/BuildImage'
 import { brand } from '../../colors'
-import { logInfo, generateUUID, unixTimeNow, logRender, logError } from '../../helpers'
+import { generateUUID, unixTimeNow, logRender } from '../../helpers'
 import Button from '../../components/Button'
 import MedImage from '../../components/Images/MedImage'
 import { createHorsePhoto, horseUpdated } from '../../actions/standard'
@@ -21,6 +21,7 @@ import functional from '../../actions/functional'
 import EqNavigation from '../../services/EqNavigation'
 import { FINAL_PAGE } from '../../screens/consts/firstStart'
 import Wrapper from '../../components/FirstStart/Wrapper'
+import {Logger} from "../../mixins/Logger"
 
 const { width } = Dimensions.get('window')
 
@@ -44,6 +45,10 @@ class FirstHorsePhoto extends PureComponent {
 
   constructor () {
     super()
+    Object.assign(this, Logger)
+    this.logError = this.logError.bind(this)
+    this.logInfo = this.logInfo.bind(this)
+
     this.addHorseProfilePhoto = this.addHorseProfilePhoto.bind(this)
     this.next = this.next.bind(this)
     this.nextWithPhoto = this.nextWithPhoto.bind(this)
@@ -61,7 +66,7 @@ class FirstHorsePhoto extends PureComponent {
       if (e.code && e.code === 'E_PERMISSION_MISSING') {
         Alert.alert('Denied', 'You denied permission to access photos. Please enable via permissions settings for Equesteo.')
       } else {
-        logError(e, 'FirstStart.FirstHorsePhoto.uploadHorsePhoto')
+        this.logError(e, 'FirstStart.FirstHorsePhoto.uploadHorsePhoto')
       }
     })
   }
@@ -132,7 +137,7 @@ class FirstHorsePhoto extends PureComponent {
         <MedImage
           style={{width: '100%', height: '100%'}}
           source={{uri: this.props.horsePhotos.getIn([this.props.horse.get('profilePhotoID'), 'uri'])}}
-          onError={() => logInfo("Can't load FirstHorsePhoto image")}
+          onError={() => this.logInfo("Can't load FirstHorsePhoto image")}
         />
       )
     }

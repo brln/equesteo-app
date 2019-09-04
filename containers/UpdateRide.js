@@ -46,6 +46,7 @@ import Amplitude, {
   SAVE_NEW_RIDE,
   SET_SINGLE_RIDE_TO_PRIVATE
 } from "../services/Amplitude"
+import {Logger} from "../mixins/Logger"
 
 class UpdateRideContainer extends BackgroundComponent {
   static options() {
@@ -67,6 +68,9 @@ class UpdateRideContainer extends BackgroundComponent {
 
   constructor (props) {
     super(props)
+    Object.assign(this, Logger)
+    this.logError = this.logError.bind(this)
+
     this.state = {
       cachedRide: null,
       deletedPhotoIDs: [],
@@ -586,6 +590,7 @@ class UpdateRideContainer extends BackgroundComponent {
           discardModalOpen={this.state.discardModalOpen}
           horses={this.memoizedHorses(this.props.horseUsers, this.props.horses, this.props.userID)}
           horsePhotos={this.props.horsePhotos}
+          logError={this.logError}
           markPhotoDeleted={this.markPhotoDeleted}
           rideCoordinates={this.props.rideCoordinates}
           openPhotoMenu={this.openPhotoMenu}

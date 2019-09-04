@@ -7,7 +7,7 @@ import {
   View
 } from 'react-native';
 
-import { boundingBox, haversine, logError, parseRideCoordinate, speedGradient } from '../../helpers'
+import { boundingBox, haversine, parseRideCoordinate, speedGradient } from '../../helpers'
 
 export default class ViewingMap extends PureComponent {
   constructor (props) {
@@ -105,7 +105,7 @@ export default class ViewingMap extends PureComponent {
         this.props.showPhotoLightbox(sources)
       }
     }).catch(e => {
-      logError(e, 'ViewingMap.photoPress')
+      this.props.logError(e, 'ViewingMap.photoPress')
     })
 
   }

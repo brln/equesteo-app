@@ -5,7 +5,6 @@ import {
 } from 'react-native';
 
 import BuildImage from './Images/BuildImage'
-import { logInfo } from '../helpers'
 
 export default function Stat (props) {
   return (
@@ -15,7 +14,6 @@ export default function Stat (props) {
           <BuildImage
             source={props.imgSrc}
             style={[{flex: 1, height: null, width: null, resizeMode: 'contain'}, props.imgStyle]}
-            onError={() => logInfo("Can't load Stat image")}
           />
         </View>
         <View style={{flex: 3}}>

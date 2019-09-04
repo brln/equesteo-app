@@ -8,7 +8,6 @@ export default function FabImage (props) {
     <BuildImage
       source={props.source}
       style={{resizeMode: 'contain', width: props.width, height: props.height}}
-      onError={() => logInfo("Can't load FabImage")}
     />
   )
 }

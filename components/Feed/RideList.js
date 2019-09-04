@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 
 
-import { getMonday, logInfo } from '../../helpers'
+import { getMonday } from '../../helpers'
 import HorseCard from './HorseCard/HorseCard'
 import RideCard from './RideCard/RideCard'
 import SectionHeader from './SectionHeader'
@@ -44,6 +44,7 @@ export default class RideList extends PureComponent {
           horses={this.props.rideHorses.get(item.childData.get('_id'))}
           horseOwnerIDs={this.props.horseOwnerIDs}
           horsePhotos={this.props.horsePhotos}
+          logInfo={this.props.logInfo}
           ownRideList={this.props.ownRideList}
           ride={item.childData}
           rideCarrots={this.props.rideCarrots.filter(childFilter(item.childData))}
@@ -70,6 +71,7 @@ export default class RideList extends PureComponent {
           createTime={item.sortTime}
           horse={item.childData}
           horsePhotos={horsePhotos}
+          logInfo={this.props.logInfo}
           ownerID={this.props.horseOwnerIDs.get(item.childData.get('_id'))}
           rider={item.itemUser}
           showHorseProfile={this.props.showHorseProfile}

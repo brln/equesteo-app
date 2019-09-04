@@ -6,7 +6,6 @@ import {
   View
 } from 'react-native';
 
-import { logError } from '../../helpers'
 import Thumbnail from '../Images/Thumbnail'
 
 const { width } = Dimensions.get('window')

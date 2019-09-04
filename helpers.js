@@ -5,8 +5,6 @@ import { Platform } from 'react-native'
 
 
 import config from './dotEnv'
-import { logError } from './actions/standard'
-import { captureBreadcrumb, captureException } from './services/Sentry'
 
 export const DEFAULT_HORSE_SPEEDS = Map({
   walk: List([0, 6]),

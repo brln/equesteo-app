@@ -32,6 +32,8 @@ export default class Feed extends PureComponent {
         horseOwnerIDs={this.props.horseOwnerIDs}
         openTraining={this.props.openTraining}
         ownRideList={ownRideList}
+        logInfo={this.props.logInfo}
+        logError={this.props.logError}
         refreshing={this.props.refreshing}
         rides={rides}
         rideCarrots={this.props.rideCarrots}

@@ -2,7 +2,6 @@ import { Alert } from 'react-native'
 import { Sentry } from 'react-native-sentry'
 import  config from '../dotEnv'
 
-import { logError, logInfo } from '../helpers'
 
 export function setUserContext(userID) {
   if (config.ENV !== 'local') {
@@ -16,7 +15,6 @@ export function captureMessage (m) {
   if (config.ENV !== 'local') {
     Sentry.captureMessage(m)
   } else {
-    logInfo(JSON.stringify(m), 'Sentry message captured')
     Alert.alert('see logs, sentry message captured')
   }
 }
@@ -35,12 +33,10 @@ export function captureException (e) {
         }
       }
     } catch (e) {
-      logError(e, 'Sentry.captureException')
       Sentry.captureBreadcrumb('Cannot capture exception')
       Sentry.captureException(e)
     }
   } else {
-    logInfo(JSON.stringify(e), 'Sentry exception captured')
     Alert.alert('see logs, sentry exception captured')
   }
 }

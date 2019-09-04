@@ -1,6 +1,5 @@
 import { fromJS } from 'immutable'
 import { AsyncStorage } from 'react-native'
-import { logError, logInfo } from '../helpers'
 
 export default class LocalStorage {
   static TOKEN_KEY = '@equesteo:jwtToken'
@@ -20,7 +19,6 @@ export default class LocalStorage {
   }
 
   static deleteToken () {
-    logInfo('deleting JWT')
     return AsyncStorage.removeItem(LocalStorage.TOKEN_KEY)
   }
 
@@ -63,7 +61,6 @@ export default class LocalStorage {
   }
 
   static deleteLocalState () {
-    logInfo('deleting async storage local state')
     return AsyncStorage.removeItem(LocalStorage.LOCAL_STATE_KEY)
   }
 }

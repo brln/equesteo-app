@@ -17,7 +17,7 @@ import {
 import BuildImage from '../Images/BuildImage'
 import { userName } from '../../modelHelpers/user'
 import { brand, darkBrand } from '../../colors'
-import { logError, logInfo, MONTHS } from '../../helpers'
+import { MONTHS } from '../../helpers'
 import RidersCard from './RidersCard'
 import FabImage from '../FabImage'
 import TrainingCard from './TrainingCard'
@@ -67,7 +67,7 @@ export default class HorseProfile extends PureComponent {
       if (e.code && e.code === 'E_PERMISSION_MISSING') {
         Alert.alert('Denied', 'You denied permission to access photos. Please enable via permissions settings for Equesteo.')
       } else {
-        logError(e, 'HorseProfile.uploadPhoto')
+        this.props.logError(e, 'HorseProfile.uploadPhoto')
       }
     })
   }
@@ -133,7 +133,7 @@ export default class HorseProfile extends PureComponent {
           onPress={() => this.props.showPhotoLightbox(swiperSources)}
           style={{width: '100%', height: '100%'}}
           source={profileSource}
-          onError={() => logInfo("Can't load HorseProfile image: " + profileSource.uri)}
+          onError={() => this.props.logInfo("Can't load HorseProfile image: " + profileSource.uri)}
           showSource={true}
         >
           { nameText }
@@ -145,7 +145,7 @@ export default class HorseProfile extends PureComponent {
           <BuildImage
             style={{width: '100%', height: '100%'}}
             source={require('../../img/emptyHorse.png')}
-            onError={() => logInfo("Can't load Empty Horse Profile image")}
+            onError={() => this.props.logInfo("Can't load Empty Horse Profile image")}
           />
           { nameText }
         </View>

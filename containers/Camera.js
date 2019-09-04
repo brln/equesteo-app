@@ -1,7 +1,6 @@
 import { Map } from 'immutable'
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
-import { Navigation } from 'react-native-navigation'
 
 
 import { stashRidePhoto } from '../actions/standard'
@@ -10,6 +9,7 @@ import { brand } from '../colors'
 import { generateUUID, unixTimeNow } from '../helpers'
 import { PHOTO_LIGHTBOX } from '../screens/consts/main'
 import { EqNavigation } from '../services'
+import { Logger } from '../mixins/Logger'
 
 
 class CameraContainer extends Component {
@@ -32,6 +32,9 @@ class CameraContainer extends Component {
 
   constructor (props) {
     super(props)
+    Object.assign(this, Logger)
+    this.logError = this.logError.bind(this)
+
     this.state = {
       showCam: true
     }
@@ -101,6 +104,7 @@ class CameraContainer extends Component {
   render() {
     return (
       <Camera
+        logError={this.logError}
         mostRecentPhoto={this.mostRecentPhoto()}
         showCam={this.state.showCam}
         showRecentPhoto={this.showRecentPhoto}

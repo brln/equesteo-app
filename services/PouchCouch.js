@@ -2,7 +2,6 @@ import PouchDB from 'pouchdb-react-native'
 
 import config from '../dotEnv'
 import { NotConnectedError } from "../errors"
-import { logInfo } from '../helpers'
 import ApiClient from './ApiClient'
 
 import { END_OF_FEED } from '../containers/Feed/Feed'
@@ -359,7 +358,6 @@ export default class PouchCouch {
   }
 
   static deleteLocalDBs () {
-    logInfo('deleting all local DBs')
     return Promise.all([
       localHorsesDB.destroy(),
       localNotificationsDB.destroy(),

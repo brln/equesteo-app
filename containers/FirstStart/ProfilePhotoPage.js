@@ -12,7 +12,7 @@ import { connect } from 'react-redux'
 
 import BuildImage from '../../components/Images/BuildImage'
 import { brand } from '../../colors'
-import { logInfo, logRender, logError, generateUUID, unixTimeNow } from '../../helpers'
+import { logRender, generateUUID, unixTimeNow } from '../../helpers'
 import Button from '../../components/Button'
 import MedImage from '../../components/Images/MedImage'
 import {
@@ -23,6 +23,7 @@ import functional from '../../actions/functional'
 import EqNavigation from "../../services/EqNavigation"
 import { FIRST_HORSE_PAGE } from "../../screens/consts/firstStart"
 import Wrapper from '../../components/FirstStart/Wrapper'
+import {Logger} from "../../mixins/Logger"
 
 const { width } = Dimensions.get('window')
 
@@ -44,8 +45,12 @@ class ProfilePhotoPage extends PureComponent {
     }
   }
 
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
+    Object.assign(this, Logger)
+    this.logError = this.logError.bind(this)
+    this.logInfo = this.logInfo.bind(this)
+
     this.nextPage = this.nextPage.bind(this)
     this.uploadProfile = this.uploadProfile.bind(this)
   }
@@ -61,7 +66,7 @@ class ProfilePhotoPage extends PureComponent {
       if (e.code && e.code === 'E_PERMISSION_MISSING') {
         Alert.alert('Denied', 'You denied permission to access photos. Please enable via permissions settings for Equesteo.')
       } else {
-        logError(e, 'Containers.FirstStart.uploadProfile')
+        this.logError(e, 'Containers.FirstStart.uploadProfile')
       }
     })
   }
@@ -126,7 +131,7 @@ class ProfilePhotoPage extends PureComponent {
         <MedImage
           source={{uri: this.props.userPhotos.getIn([this.props.user.get('profilePhotoID'), 'uri'])}}
           style={{width: '100%', height: '100%'}}
-          onError={e => logInfo("Can't load FirstProfilePhoto image")}
+          onError={e => this.logInfo("Can't load FirstProfilePhoto image")}
         />
       )
     }

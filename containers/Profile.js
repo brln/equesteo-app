@@ -34,6 +34,7 @@ import Amplitude, {
   VIEW_USER_PROFILE,
 } from "../services/Amplitude"
 import {viewHorseOwnerIDs, viewTrainings} from '../dataViews/dataViews'
+import {Logger} from "../mixins/Logger"
 
 class ProfileContainer extends BackgroundComponent {
   static options() {
@@ -59,6 +60,10 @@ class ProfileContainer extends BackgroundComponent {
 
   constructor (props) {
     super(props)
+    Object.assign(this, Logger)
+    this.logError = this.logError.bind(this)
+    this.logInfo = this.logInfo.bind(this)
+
     this.createFollow = this.createFollow.bind(this)
     this.deleteFollow = this.deleteFollow.bind(this)
     this.doLogout = this.doLogout.bind(this)
@@ -321,6 +326,8 @@ class ProfileContainer extends BackgroundComponent {
           horseOwnerIDs={viewHorseOwnerIDs(this.props.horseUsers)}
           horsePhotos={this.props.horsePhotos}
           leaderboardProfile={this.props.leaderboardProfile}
+          logError={this.logError}
+          logInfo={this.logInfo}
           oneDegreeUser={this.memoOneDegreeUser(this.props.profileUser, this.props.userID, this.props.follows)}
           profilePhotoURL={this.props.profilePhotoURL}
           profileUser={this.props.profileUser}

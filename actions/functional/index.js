@@ -152,7 +152,6 @@ const STOPPED_CONFIG = {
 }
 
 function cb(action, dispatch, otherData) {
-  logInfo('functionalAction: ' + action)
   dispatch(logFunctionalAction(action, otherData))
   captureBreadcrumb(action, 'functionalAction')
 }
@@ -284,8 +283,8 @@ function appInitialized () {
           }
         })
       } else {
-        logInfo(token, 'not found token')
-        logInfo(currentUserID, 'not found userID')
+        dispatch(functional.logInfo(token, 'not found token'))
+        dispatch(functional.logInfo(currentUserID, 'not found userID'))
         if (getState().getIn(['localState', 'everLoggedIn'])) {
           dispatch(functional.switchRoot(LOGIN))
         } else {
@@ -932,7 +931,7 @@ function uploadPhoto (type, photoLocation, photoID) {
       }).then(() => {
         dispatch(dequeuePhoto(photoID))
         ImagePicker.cleanSingle(photoLocation).catch(e => {
-          logInfo('ImagePicker.cleanSingle error')
+          dispatch(functional.logInfo('ImagePicker.cleanSingle error'))
         })
       }).catch(e => {
         dispatch(updatePhotoStatus(photoID, 'failed'))
@@ -957,9 +956,9 @@ function setFCMTokenOnServer (token) {
   return (dispatch, getState) => {
     cb(source, dispatch)
     const currentUserID = getState().getIn(['localState', 'userID'])
-    logInfo('setting fcm token')
+    dispatch(functional.logInfo('setting fcm token'))
     UserAPI.setFCMToken(currentUserID, token, Platform.OS).then(() => {
-      logInfo('FCM token set')
+      dispatch(functional.logInfo('FCM token set'))
     }).catch(catchAsyncError(dispatch, source))
   }
 }
@@ -969,7 +968,7 @@ function setDistributionOnServer () {
   return (dispatch, getState) => {
     cb(source, dispatch)
     const currentUserID = getState().getIn(['localState', 'userID'])
-    logInfo('setting distribution')
+    dispatch(functional.logInfo('setting distribution'))
     return UserAPI.setDistribution(currentUserID, config.DISTRIBUTION).then(resp => {
       if (parseInt(resp.mostRecent) > parseInt(config.DISTRIBUTION)) {
         const link = Platform.select({
@@ -1088,7 +1087,7 @@ function startLocationTracking () {
   const source = 'startLocationTracking'
   return (dispatch) => {
     cb(source, dispatch)
-    logInfo('action: startLocationTracking')
+    dispatch(functional.logInfo('action: startLocationTracking'))
     return BackgroundGeolocation.stop().then(() => {
       BackgroundGeolocation.onLocation(location => {
         dispatch(functional.onGPSLocation(location))
@@ -1120,16 +1119,16 @@ export function gpsLocationError (error) {
 
       dispatch(gpsSignalLost(true))
     }
-    logInfo(error, 'gpsError')
+    dispatch(functional.logInfo(error, 'gpsError'))
   }
 }
 
-export function logError (e, id) {
+export function logError (error, id) {
   return (dispatch) => {
     console.log(`******** logError ${id} ****************`)
     console.log(error)
     console.log('*****************************************')
-    dispatch(logErrorToActivityLog(e, id))
+    dispatch(logErrorToActivityLog(error, id))
     captureBreadcrumb(id)
     captureException(error)
   }
@@ -1138,9 +1137,9 @@ export function logError (e, id) {
 export function logInfo (info1, info2) {
   return (dispatch) => {
     if (info2) {
-      console.log(info, info2)
+      console.log(info1, info2)
     } else {
-      console.log(info)
+      console.log(info1)
     }
     dispatch(logInfoToActivityLog(info1, info2))
     captureBreadcrumb(`${info1}: ${info2}`)
@@ -1241,14 +1240,14 @@ export function tryToLoadStateFromDisk () {
       if (localState) {
         dispatch(loadLocalState(localState))
       } else {
-        logInfo('no cached local state found')
+        dispatch(functional.logInfo('no cached local state found'))
       }
 
       if (currentRideState) {
-        logInfo('current ride state loaded')
+        dispatch(functional.logInfo('current ride state loaded'))
         dispatch(loadCurrentRideState(currentRideState))
       } else {
-        logInfo('no cached current ride state found')
+        dispatch(functional.logInfo('no cached current ride state found'))
       }
     }).catch(catchAsyncError(dispatch, source))
   }
@@ -1301,7 +1300,7 @@ function configureBackgroundGeolocation () {
   return (dispatch) => {
     cb(source, dispatch)
     return BackgroundGeolocation.ready(RUNNING_CONFIG).then(() => {
-      logInfo('Background geolocation configured')
+      dispatch(functional.logInfo('Background geolocation configured'))
     }).catch(e => {
       console.log(e)
     })
@@ -1313,7 +1312,7 @@ function reconfigureBackgroundGeolocation (config) {
   return (dispatch) => {
     cb(source, dispatch)
     return BackgroundGeolocation.setConfig(config).then(() => {
-      logInfo('Background geolocation configured')
+      dispatch(functional.logInfo('Background geolocation configured'))
     }).catch(e => {
       console.log(e)
     })

@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
 
-import { logInfo } from '../../helpers'
 import config from '../../dotEnv'
 import URIImage from '../Images/URIImage'
 
@@ -13,8 +12,8 @@ export default class RideMapImage extends PureComponent {
         wrapFlex={1}
         source={{uri: uriWithKey}}
         style={this.props.style}
-        onError={() => {
-          logInfo('there was an error loading RideImage image')
+        onError={(e) => {
+          this.props.logInfo('there was an error loading RideImage image')
         }}
         showSource={true}
       />

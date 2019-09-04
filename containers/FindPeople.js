@@ -4,9 +4,8 @@ import { Keyboard } from 'react-native'
 import { connect } from 'react-redux';
 
 import functional from "../actions/functional"
-import { clearSearch } from "../actions/standard"
 import { brand } from '../colors'
-import { logError, logRender } from '../helpers'
+import { logRender } from '../helpers'
 import { PROFILE } from '../screens/consts/main'
 import FindPeople from '../components/FindPeople'
 import { EqNavigation } from '../services'

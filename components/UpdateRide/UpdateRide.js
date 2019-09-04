@@ -22,7 +22,6 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import MultiSlider from '@ptomasroos/react-native-multi-slider'
 
 import { brand, darkBrand, darkGrey } from '../../colors'
-import { logError } from '../../helpers'
 import FabImage from '../FabImage'
 import HorseSelector from './HorseSelector'
 import PhotosByTimestamp from '../PhotosByTimestamp'
@@ -90,7 +89,7 @@ export default class UpdateRide extends PureComponent {
       if (e.code && e.code === 'E_PERMISSION_MISSING') {
         Alert.alert('Denied', 'You denied permission to access photos. Please enable via iOS settings for Equesteo.')
       } else {
-        logError(e, 'UpdateRide.UpdateRide.createPhoto')
+        this.props.logError(e, 'UpdateRide.UpdateRide.createPhoto')
       }
     })
   }
