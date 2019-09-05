@@ -137,7 +137,7 @@ export default class Profile extends PureComponent {
       // got here from FindPeople
       images.push(
         <MedImage
-          onPress={() => {this.props.showPhotoLightbox([this.props.profilePhotoURL])}}
+          onPress={() => {this.props.showPhotoLightbox([{url: this.props.profilePhotoURL}])}}
           key={"profile"}
           style={{width: '100%', height: '100%'}}
           source={{uri: this.props.profilePhotoURL}}

@@ -4,8 +4,8 @@ import { createStore, applyMiddleware } from 'redux'
 import thunkMiddleware from 'redux-thunk'
 import { Navigation } from 'react-native-navigation'
 import { configure } from './services/Sentry'
-import { combineReducers } from 'redux-immutable';
-import Mapbox from '@react-native-mapbox-gl/maps';
+import { combineReducers } from 'redux-immutable'
+import Mapbox from '@react-native-mapbox-gl/maps'
 
 import config from './dotEnv'
 import functional from "./actions/functional"
@@ -54,6 +54,7 @@ global.logDebug = logDebug
 
 configure()
 Mapbox.setAccessToken(config.MAPBOX_TOKEN)
+Mapbox.setTelemetryEnabled(false)
 
 
 export default function start () {
