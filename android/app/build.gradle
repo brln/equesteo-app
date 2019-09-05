@@ -12,8 +12,10 @@ project.ext.react = [
 ]
 
 apply from: "../../node_modules/react-native/react.gradle"
-apply from: "../../node_modules/react-native-background-geolocation/android/app.gradle"
 apply from: "../../node_modules/react-native-sentry/sentry.gradle"
+
+Project background_geolocation = project(':react-native-background-geolocation-android')
+apply from: "${background_geolocation.projectDir}/app.gradle"
 
 /**
  * Set this to true to create two separate APKs instead of one:
@@ -64,8 +66,8 @@ android {
         applicationId "com.equesteo"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 188
-        versionName "2.0.28"
+        versionCode 189
+        versionName "2.0.29"
         missingDimensionStrategy 'react-native-camera', 'general'
         missingDimensionStrategy "RNN.reactNativeVersion", "reactNative60"
         multiDexEnabled true
@@ -99,6 +101,7 @@ android {
             // see https://facebook.github.io/react-native/docs/signed-apk-android.
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            proguardFiles "${background_geolocation.projectDir}/proguard-rules.pro"
             signingConfig signingConfigs.release
         }
     }
@@ -127,7 +130,8 @@ android {
 }
 
 dependencies {
-    implementation project(':react-native-background-geolocation')
+    implementation project(':@react-native-community_async-storage')
+    implementation project(':react-native-permissions')
     implementation project(':react-native-fs')
     implementation project(':@react-native-community_cameraroll')
     implementation project(':react-native-push-notification')
@@ -140,7 +144,6 @@ dependencies {
     implementation project(':react-native-camera')
     implementation project(':react-native-firebase')
     implementation "com.google.firebase:firebase-messaging:17.3.0"
-    implementation project(':react-native-android-location-services-dialog-box')
     implementation 'com.android.support:design:27.1.0'
     implementation project(':react-native-svg')
     implementation project(':react-native-sentry')
@@ -158,6 +161,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:16.0.1'
     implementation project(':@react-native-mapbox-gl_maps')
     implementation 'com.android.support:multidex:1.0.3'
+    implementation project(':react-native-background-geolocation-android')
 
     if (enableHermes) {
       def hermesPath = "../../node_modules/hermesvm/android/";

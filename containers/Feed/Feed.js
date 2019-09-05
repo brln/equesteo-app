@@ -4,7 +4,7 @@ import React from 'react'
 import { Keyboard, Platform } from 'react-native'
 import { connect } from 'react-redux'
 import { Navigation } from 'react-native-navigation'
-import Permissions from 'react-native-permissions'
+import Permissions, { PERMISSIONS } from 'react-native-permissions'
 
 
 import Amplitude, {
@@ -161,8 +161,8 @@ class FeedContainer extends BackgroundComponent {
   }
 
   openRecorder () {
-    Permissions.check('location', 'always').then(response => {
-      if (response === 'authorized') {
+    Permissions.check(Platform.select({android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION, ios: PERMISSIONS.IOS.LOCATION_ALWAYS})).then(response => {
+      if (response === 'granted') {
         Amplitude.logEvent(START_OR_CONTINUE_RIDE)
         this.openScreen(EqNavigation.push(this.props.activeComponent, {
           component: {
@@ -181,6 +181,8 @@ class FeedContainer extends BackgroundComponent {
           }
         }))
       }
+    }).catch(e => {
+      console.log(e)
     })
   }
 

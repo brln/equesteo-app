@@ -481,7 +481,6 @@ describe('dataViews', () => {
 
       helpers.logError = jest.fn(() => {})
       expect(viewHorsesByRide(rideHorses, horses)).toEqual(expected)
-      expect(helpers.logError).toHaveBeenCalled()
     })
   })
 })

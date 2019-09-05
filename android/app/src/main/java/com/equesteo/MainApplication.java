@@ -2,13 +2,13 @@ package com.equesteo;
 
 import android.app.Application;
 import com.facebook.react.ReactApplication;
-import com.transistorsoft.rnbackgroundgeolocation.RNBackgroundGeolocation;
+import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.rnfs.RNFSPackage;
 import com.reactnativecommunity.cameraroll.CameraRollPackage;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.reactnativecommunity.netinfo.NetInfoPackage;
-import com.ocetnik.timer.BackgroundTimerPackage;
 import net.no_mad.tts.TextToSpeechPackage;
+import com.transistorsoft.rnbackgroundgeolocation.*;
 import com.transistorsoft.rnbackgroundfetch.RNBackgroundFetchPackage;
 import com.RNFetchBlob.RNFetchBlobPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
@@ -23,7 +23,6 @@ import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.reactnativenavigation.NavigationApplication;
 import com.reactnativenavigation.react.NavigationReactNativeHost;
 import com.reactnativenavigation.react.ReactGateway;
-import com.showlocationservicesdialogbox.LocationServicesDialogBoxPackage;
 import io.invertase.firebase.RNFirebasePackage;
 import io.invertase.firebase.RNFirebasePackage;
 import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
@@ -31,6 +30,7 @@ import io.invertase.firebase.instanceid.RNFirebaseInstanceIdPackage;
 import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
 import io.sentry.RNSentryPackage;
 import com.mapbox.rctmgl.RCTMGLPackage;
+import com.reactnativecommunity.rnpermissions.RNPermissionsPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -75,7 +75,6 @@ public class MainApplication extends NavigationApplication {
         // No need to add RnnPackage and MainReactPackage
         return Arrays.<ReactPackage>asList(
             new PickerPackage(),
-            new LocationServicesDialogBoxPackage(),
             new RNFirebasePackage(),
             new RNFirebaseMessagingPackage(),
             new RNFirebaseNotificationsPackage(),
@@ -92,7 +91,9 @@ public class MainApplication extends NavigationApplication {
             new NetInfoPackage(),
             new CameraRollPackage(),
             new RNFSPackage(),
-            new RNBackgroundGeolocation()
+            new AsyncStoragePackage(),
+            new RNBackgroundGeolocation(),
+            new RNPermissionsPackage()
         );
     }
 

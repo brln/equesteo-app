@@ -63,7 +63,6 @@ exports[`renders 1`] = `
           }
         >
           <Image
-            onError={[Function]}
             source={1}
             style={
               Object {

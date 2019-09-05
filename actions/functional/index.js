@@ -115,7 +115,7 @@ export const DB_NEEDS_SYNC = 'DB_NEEDS_SYNC'
 export const DB_SYNCING = 'DB_SYNCING'
 export const DB_SYNCED = 'DB_SYNCED'
 
-Tts.setDucking(true)
+Tts.setDucking(true).catch(e => console.log(e))
 
 const RUNNING_CONFIG = {
   autoSync: false,
@@ -141,7 +141,8 @@ const RUNNING_CONFIG = {
   persistMode: BackgroundGeolocation.PERSIST_MODE_NONE,
   logLevel: BackgroundGeolocation.LOG_LEVEL_INFO,
   pausesLocationUpdatesAutomatically: false, // ios only
-  disableStopDetection: true // automatically disabled by pausesLocationUpdatesAutomatically
+  disableStopDetection: true, // automatically disabled by pausesLocationUpdatesAutomatically
+  speedJumpFilter: 999999999,
 }
 
 const STOPPED_CONFIG = {
@@ -1148,7 +1149,7 @@ export function logInfo (info1, info2) {
 
 function onGPSLocation (location) {
   const KALMAN_FILTER_Q = 6
-  const THROWAWAY_FIRST_N_COORDS = 5
+  const THROWAWAY_FIRST_N_COORDS = 3
   const MINIMUM_ACCURACY_IN_M = 25
   return (dispatch, getState) => {
     const alreadyReceived = getState().getIn(['localState', 'gpsCoordinatesReceived'])
@@ -1337,6 +1338,8 @@ return (dispatch, getState) => {
           mileOrMiles = 'miles'
         }
         Tts.speak(`You have gone ${newMiles} ${mileOrMiles}`);
+      }).catch(e => {
+        dispatch(functional.logError(e, source))
       })
     }
   }

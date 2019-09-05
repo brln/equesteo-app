@@ -287,7 +287,6 @@ exports[`render 1`] = `
                     }
                   >
                     <Image
-                      onError={[Function]}
                       source={1}
                       style={
                         Array [
@@ -358,7 +357,6 @@ exports[`render 1`] = `
                     }
                   >
                     <Image
-                      onError={[Function]}
                       source={1}
                       style={
                         Array [
@@ -438,7 +436,6 @@ exports[`render 1`] = `
                     }
                   >
                     <Image
-                      onError={[Function]}
                       source={1}
                       style={
                         Array [
@@ -509,7 +506,6 @@ exports[`render 1`] = `
                     }
                   >
                     <Image
-                      onError={[Function]}
                       source={1}
                       style={
                         Array [

@@ -77,6 +77,11 @@ target 'equesteo' do
 
   pod 'RNBackgroundGeolocation', :path => '../node_modules/react-native-background-geolocation-android'
 
+  pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-community/async-storage'
+
+  permissions_path = '../node_modules/react-native-permissions/ios'
+  pod 'Permission-LocationAlways', :path => "#{permissions_path}/LocationAlways.podspec"
+
 end
 
 # also from https://github.com/ivpusic/react-native-image-crop-picker

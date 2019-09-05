@@ -1,5 +1,5 @@
 export default {
   setDucking (val) {
-    return val
+    return Promise.resolve(val)
   }
 }

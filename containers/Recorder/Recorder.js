@@ -2,9 +2,7 @@ import { Map } from 'immutable'
 import { Navigation } from 'react-native-navigation'
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
-import LocationServicesDialogBox from "react-native-android-location-services-dialog-box";
-import { Alert, BackHandler, PermissionsAndroid } from 'react-native'
-import Permissions from 'react-native-permissions'
+import { Alert, BackHandler } from 'react-native'
 
 import {
   createRide,
@@ -20,8 +18,7 @@ import {
 import functional from '../../actions/functional'
 import { brand } from '../../colors'
 import RideRecorder from '../../components/RideRecorder/RideRecorder'
-import { isAndroid, logRender, rideIDGenerator, unixTimeNow } from '../../helpers'
-import { captureException } from '../../services/Sentry'
+import { logRender, rideIDGenerator, unixTimeNow } from '../../helpers'
 import Amplitude, {
   DISCARD_EMPTY_RIDE,
   FINISH_RIDE,
@@ -34,7 +31,7 @@ import {
   RIDE_ATLAS,
   START_HOOF_TRACKS,
   UPDATE_RIDE,
-  UPDATE_NEW_RIDE_ID, LOCATION_PERMISSIONS,
+  UPDATE_NEW_RIDE_ID
 } from "../../screens/consts/main"
 import { EqNavigation } from '../../services'
 import TimeoutManager from '../../services/TimeoutManager'
@@ -125,27 +122,7 @@ class RecorderContainer extends PureComponent {
       }, 2000)
     }
     BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
-    if (isAndroid()) {
-      LocationServicesDialogBox.checkLocationServicesIsEnabled({
-        message: "You need to turn on the GPS and enable 'High Accuracy' to record your ride. \nPlease do so and then come back.",
-        ok: "OK",
-        cancel: "Nope",
-        enableHighAccuracy: true,
-        showDialog: true,
-        openLocationServices: true,
-        preventOutSideTouch: false,
-        preventBackClick: true,
-        providerListener: false,
-      }).then(() => {
-        return this.props.dispatch(functional.startLocationTracking())
-      }).then(() => {
-        return this.requestLocationPermission()
-      }).catch(e => {
-        captureException(e)
-      })
-    } else {
-      this.props.dispatch(functional.startLocationTracking())
-    }
+    this.props.dispatch(functional.startLocationTracking())
 
     if (this.props.hoofTracksRunning) {
       this.props.dispatch(setHoofTracksRunning(true))

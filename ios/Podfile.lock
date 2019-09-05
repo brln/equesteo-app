@@ -80,6 +80,8 @@ PODS:
     - nanopb/encode (= 0.3.901)
   - nanopb/decode (0.3.901)
   - nanopb/encode (0.3.901)
+  - Permission-LocationAlways (2.0.0-rc.0):
+    - RNPermissions
   - Protobuf (3.9.0)
   - QBImagePickerController (3.4.0)
   - React (0.60.4):
@@ -172,8 +174,6 @@ PODS:
     - React-fishhook (= 0.60.4)
   - ReactNativeNavigation (3.0.0-alpha.2):
     - React
-  - ReactNativePermissions (1.2.0):
-    - React
   - rn-fetch-blob (0.10.16):
     - React-Core
   - RNBackgroundFetch (2.7.0):
@@ -199,6 +199,8 @@ PODS:
     - React-Core
     - React-RCTImage
     - RSKImageCropper
+  - RNPermissions (2.0.0-rc.0):
+    - React
   - RNSVG (9.5.3):
     - React
   - RNVectorIcons (6.6.0):
@@ -220,6 +222,7 @@ DEPENDENCIES:
   - Firebase/Messaging
   - Folly (from `../node_modules/react-native/third-party-podspecs/Folly.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
+  - Permission-LocationAlways (from `../node_modules/react-native-permissions/ios/LocationAlways.podspec`)
   - React (from `../node_modules/react-native/`)
   - React-ART (from `../node_modules/react-native/Libraries/ART`)
   - React-Core (from `../node_modules/react-native/React`)
@@ -245,7 +248,6 @@ DEPENDENCIES:
   - React-RCTVibration (from `../node_modules/react-native/Libraries/Vibration`)
   - React-RCTWebSocket (from `../node_modules/react-native/Libraries/WebSocket`)
   - ReactNativeNavigation (from `../node_modules/react-native-navigation`)
-  - ReactNativePermissions (from `../node_modules/react-native-permissions`)
   - rn-fetch-blob (from `../node_modules/rn-fetch-blob`)
   - RNBackgroundFetch (from `../node_modules/react-native-background-fetch`)
   - RNBackgroundGeolocation (from `../node_modules/react-native-background-geolocation-android`)
@@ -253,6 +255,7 @@ DEPENDENCIES:
   - RNFirebase (from `../node_modules/react-native-firebase/ios`)
   - RNFS (from `../node_modules/react-native-fs`)
   - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
+  - RNPermissions (from `../node_modules/react-native-permissions`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - SentryReactNative (from `../node_modules/react-native-sentry/SentryReactNative.podspec`)
@@ -286,6 +289,8 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/Folly.podspec"
   glog:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
+  Permission-LocationAlways:
+    :path: "../node_modules/react-native-permissions/ios/LocationAlways.podspec"
   React:
     :path: "../node_modules/react-native/"
   React-ART:
@@ -336,8 +341,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/Libraries/WebSocket"
   ReactNativeNavigation:
     :path: "../node_modules/react-native-navigation"
-  ReactNativePermissions:
-    :path: "../node_modules/react-native-permissions"
   rn-fetch-blob:
     :path: "../node_modules/rn-fetch-blob"
   RNBackgroundFetch:
@@ -352,6 +355,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-fs"
   RNImageCropPicker:
     :path: "../node_modules/react-native-image-crop-picker"
+  RNPermissions:
+    :path: "../node_modules/react-native-permissions"
   RNSVG:
     :path: "../node_modules/react-native-svg"
   RNVectorIcons:
@@ -380,6 +385,7 @@ SPEC CHECKSUMS:
   GoogleAppMeasurement: a35a645835bae31b6bdc0576396bc23908f12a22
   GoogleUtilities: e7dc37039b19df7fe543479d3e4a02ac8d11bb69
   nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
+  Permission-LocationAlways: fc6065443e2975b6852c8f034386e318247f24a8
   Protobuf: 1097ca58584c8d9be81bfbf2c5ff5975648dd87a
   QBImagePickerController: d54cf93db6decf26baf6ed3472f336ef35cae022
   React: c438ccc7e14e86d4702bb92d7e262f549ffaa995
@@ -407,7 +413,6 @@ SPEC CHECKSUMS:
   React-RCTVibration: dabb8d59bb47e1d9124b3f77bfdc1b33d42b0a74
   React-RCTWebSocket: f32b93e0953d7c07fd5dd45305406282cfdc95cf
   ReactNativeNavigation: 20522060de61b1c293ec50681a6aa11488596286
-  ReactNativePermissions: a8da737c35e77bf4ea1d4102d881b406fb791125
   rn-fetch-blob: 6aa7c5b59f442fbfcdcc847edbc062119f6af66c
   RNBackgroundFetch: 7b9840f8aa759266899b3c33679ab037297d4798
   RNBackgroundGeolocation: 40329c5d44e6d1c7977f106dbdf3577ddd880c4a
@@ -415,6 +420,7 @@ SPEC CHECKSUMS:
   RNFirebase: ca408d6bee0ca9383bd0cfe84f40b01370b8ad4d
   RNFS: 6a2bfb5d0b14cf0ad72667f76202358abba4aacf
   RNImageCropPicker: c406db73f02f11bf3a887f856ff04ee50af173f4
+  RNPermissions: 6752d4e57bf0894c914454172ce06f2a31e58ea6
   RNSVG: 4834be1d644eb77f0e3f6de851881b83758a3124
   RNVectorIcons: 66af4d5c8ff4f584c7b7cd9c4b0780920f27fce2
   RSKImageCropper: a446db0e8444a036b34f3c43db01b2373baa4b2a
@@ -423,6 +429,6 @@ SPEC CHECKSUMS:
   TextToSpeech: d68418db07e7d3ce39fd3360ccca8d8165cef859
   yoga: 88c514f310aff89b94a14c5fbf44b95735af0cb7
 
-PODFILE CHECKSUM: 3c49fbcf43f126a88bcaf92f56b7eae8fca945e8
+PODFILE CHECKSUM: 3e5b224afff41199c26876f760a0b44ab0775aaa
 
 COCOAPODS: 1.5.3

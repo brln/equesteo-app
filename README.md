@@ -31,3 +31,6 @@ cd node_modules/react-native/third-party/glog-0.3.4/ ; sh ../../scripts/ios-conf
 
 # follow couchdb on docker logs:
 docker logs --follow 8ab154e4f90a
+
+# start metro bundler with cleared cache
+npm start -- --reset-cache
