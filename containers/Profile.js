@@ -294,7 +294,7 @@ class ProfileContainer extends BackgroundComponent {
       horses,
       horseUsers,
     ).get(profileUser.get('_id')) || Map()
-    usersTrainings.reduce((accum, t) => {
+    return usersTrainings.reduce((accum, t) => {
       if (t.get('rideID')) {
         const day = moment(t.get('startTime')).hour(0).minute(0).second(0).millisecond(0).toISOString()
         accum.get(day) ? accum = accum.set(day, accum.get(day).push(t)) : accum = accum.set(day, List([t]))
