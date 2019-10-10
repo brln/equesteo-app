@@ -14,7 +14,7 @@
 #import <ReactNativeNavigation/ReactNativeNavigation.h>
 #import <React/RCTPushNotificationManager.h>
 #import <RCTLinkingManager.h>
-
+#import "RNSentry.h"
 
 @implementation AppDelegate
 
@@ -31,10 +31,10 @@
   #endif
 
   [ReactNativeNavigation bootstrap:jsCodeLocation launchOptions:launchOptions];
+  [RNSentry installWithBridge:[ReactNativeNavigation getBridge]];
 
   return YES;
 }
-
 // Required to register for notifications
 - (void)application:(UIApplication *)application didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSettings
 {
