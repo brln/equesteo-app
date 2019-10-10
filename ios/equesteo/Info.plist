@@ -34,7 +34,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Allow Equesteo to use your camera to add pictures to your rides.</string>
 	<key>CFBundleShortVersionString</key>
-       <string>2.0.29</string>
+       <string>2.1.1</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
@@ -65,7 +65,7 @@
 		<string>Montserrat-Regular.otf</string>
 	</array>
 	<key>CFBundleVersion</key>
-       <string>189</string>
+       <string>191</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Allow Equesteo to save photos from the in-app camera.</string>
 	<key>UILaunchStoryboardName</key>
